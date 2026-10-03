@@ -62,7 +62,7 @@ test('inner/outer corners and narrow corridor remain clear throughout a complete
 });
 test('actual voxel shaft descent and steep pitch preserve camera clearance',()=>{
  const p=new CharacterPhysics(),r=new ThirdPersonCamera();try{
-  for(const z of [-1,0]){const data=buildRegion('collision',[-1,-1,z],CHUNK,[]),m=data.mesh;p.world.createCollider(RAPIER.ColliderDesc.trimesh(m.positions,m.indices,RAPIER.TriMeshFlags.FIX_INTERNAL_EDGES).setTranslation(-CELL*CHUNK,-CELL*CHUNK,z*CELL*CHUNK));}
+  for(const z of [-1,0]){const data=buildRegion('collision',[-1,-1,z],CHUNK,[],{version:5,seed:0,samples:true}),m=data.mesh;p.world.createCollider(RAPIER.ColliderDesc.trimesh(m.positions,m.indices,RAPIER.TriMeshFlags.FIX_INTERNAL_EDGES).setTranslation(-CELL*CHUNK,-CELL*CHUNK,z*CELL*CHUNK));}
   p.teleport([-23,.05,0]);
   for(let i=0;i<100;i++){p.tick(0,0,0,false,true);r.update(p.world,p.collider,p.feet(),i*.08,i<60?1.4:-.4,1/60,844/390);check(r,p);}
   assert.ok(p.grounded&&p.feet()[1]<-7.9);

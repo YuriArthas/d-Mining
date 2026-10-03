@@ -6,14 +6,14 @@ import { SparseWorld, CELL, baseXYZ } from '../../src/game/terrain/SparseWorld.t
 import { GameSession } from '../../src/game/application/GameSession.ts';
 import { buildRegion } from '../../src/game/terrain/meshing.ts';
 
-test('rooms are local 20 by 20 by 10 cavities with solid perimeter, ceiling and mineable floor', () => {
+test('rooms are local 20 by 20 by 10 cavities with solid perimeter, ceiling and an aligned mineable entrance', () => {
  for (const r of ROOMS) {
   const x=r.x/CELL,z=r.z/CELL,y=-r.depth/CELL;
   for (let dx=-10;dx<10;dx++) for (let dz=-10;dz<10;dz++) for (let dy=0;dy<10;dy++) assert.equal(baseXYZ(x+dx,y+dy,z+dz),0);
   for (const c of [[x-11,y,z],[x+10,y,z],[x,y,z-11],[x,y,z+10],[x,y+10,z],[x+8,y-1,z+8]]) assert.ok(baseXYZ(...c),c.join(','));
   const world=new SparseWorld();assert.deepEqual(world.stats(),{editedRegions:0,editBytes:0,fullAirRegions:0});
-  assert.equal(world.remove([[x+8,y-1,z+8]]).length,1);assert.equal(world.cell([x+8,y-1,z+8]),0);
-  assert.equal(world.cell([x,y-1,z]),0); // permanent platform reservation
+  assert.equal(world.remove([[x+8,y-1,z+8]]).length,0);assert.equal(world.cell([x+8,y-1,z+8]),7);
+  assert.ok(world.canMine([x,y-1,z])); // aligned entrance remains mineral
  }
 });
 test('room boundary has separately merged render and collision surfaces', () => {

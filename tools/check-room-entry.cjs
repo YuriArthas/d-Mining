@@ -14,10 +14,10 @@ const {digCells}=require('./combat-browser.cjs');
   await digCells(page,[[-3,-190,-2]]);
   await page.waitForFunction(()=>{const s=window.__miningValidation.snapshot();return s.grounded&&s.position[1]<-399.9&&s.position[1]>-400.1});await ready();
   const after=await page.evaluate(()=>window.__miningValidation.snapshot());
-  assert.ok(after.economy.destinations[0].unlocked);assert.equal(after.economy.destinations[1].unlocked,false);assert.deepEqual(after.facilities.colliders,['rest-400']);
+  assert.ok(after.economy.destinations[0].unlocked);assert.equal(after.economy.destinations[1].unlocked,false);assert.deepEqual(after.facilities.visuals,['rest-400']);
   assert.ok(after.camera.position.every(Number.isFinite));assert.deepEqual(errors,[]);
   await page.screenshot({path:`artifacts/${label}.png`});
-  const report={checks:['mine through real room ceiling at 378m; fall into 10-cell-high cavity; stream in fixed platform before landing; land at 400m without falling through; unlock on arrival'],position:after.position,facilities:after.facilities,timings:after.timings,errors};
+  const report={checks:['mine through real room ceiling at 378m; fall into 10-cell-high cavity; stream in floor collision before landing; land at 400m without falling through; unlock on arrival'],position:after.position,facilities:after.facilities,timings:after.timings,errors};
   await fs.writeFile(`artifacts/${label}-report.json`,JSON.stringify(report,null,2));console.log(JSON.stringify(report));
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

@@ -11,7 +11,7 @@ import { MiningCombat } from './MiningCombat.ts';
 import { pickaxeOffer, upgradePickaxe } from './PickaxeUpgrade.ts';
 import { oreDrops, oreDefinition, itemVolume, itemPrice, SELL_ZONE } from './items.ts';
 import type { Coord } from '../terrain/SparseWorld.ts';
-export type WorldCommands = { cell(target: Coord): number | null; pending(target: Coord): boolean; mine(targets: readonly Coord[]): boolean; cancelMining(): void; returnToSurface(): void; travelTo?(feet: Coord): void };
+export type WorldCommands = { cell(target: Coord): number | null; canMine?(target: Coord): boolean; pending(target: Coord): boolean; mine(targets: readonly Coord[]): boolean; cancelMining(): void; returnToSurface(): void; travelTo?(feet: Coord): void };
 export class GameSession {
   private inventory: Inventory;
   private wallet = new Wallet();
@@ -40,7 +40,7 @@ export class GameSession {
     this.mining = new Mining(this.inventory, targets => this.world?.mine(targets) ?? false, oreDrops);
     this.combat = new MiningCombat({
       isFull: () => this.inventory.isFull(), stats: this.pickaxe.getSnapshot,
-      read: cell => { const kind = this.world?.cell(cell); return kind ? { key: cell.join(','), maximum: oreDefinition(kind).maxHp } : null; },
+      read: cell => { const kind = this.mineableKind(cell); return kind ? { key: cell.join(','), maximum: oreDefinition(kind).maxHp } : null; },
       pending: cell => this.world?.pending(cell) ?? false,
       destroy: cell => this.world?.mine([cell]) ?? false,
     });
@@ -51,8 +51,9 @@ export class GameSession {
   subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; };
   private publish() { this.snapshot = this.makeSnapshot(); for (const listener of this.listeners) listener(); }
   attach(world: WorldCommands) { this.world = world; return () => { if (this.world === world) this.world = null; }; }
+  private mineableKind(cell: Coord) { return this.world?.canMine?.(cell) === false ? null : this.world?.cell(cell); }
   private refreshTarget() {
-    const kind = this.targetCell && this.world?.cell(this.targetCell);
+    const kind = this.targetCell && this.mineableKind(this.targetCell);
     const item = kind ? oreDefinition(kind) : null;
     const key = this.targetCell?.join(',') ?? '';
     const hp = item ? this.combat.health.get(key, item.maxHp) : 0;
@@ -81,13 +82,13 @@ export class GameSession {
     return result.status === 'hit' || result.status === 'breaking';
   };
   blockHealth = (cell: Coord) => {
-    const kind = this.world?.cell(cell);
+    const kind = this.mineableKind(cell);
     return kind ? this.combat.health.get(cell.join(','), oreDefinition(kind).maxHp) : null;
   };
   observeBlockDamage = (listener: (damage: Readonly<{ cell: Coord; hp: number; maximum: number }>) => void) =>
     this.combat.health.observe((key, hp) => {
       const cell = key.split(',').map(Number) as unknown as Coord;
-      const kind = hp === null ? null : this.world?.cell(cell);
+      const kind = hp === null ? null : this.mineableKind(cell);
       listener({ cell, hp: hp ?? 0, maximum: kind ? oreDefinition(kind).maxHp : 0 });
     });
   combatDebug = () => ({ damagedCells: this.combat.health.size, nextAttackAt: this.combat.cooldown.nextAt, now: this.clock() });

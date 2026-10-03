@@ -7,18 +7,19 @@ let initialization: Promise<void> | undefined;
 export function initPhysics() { return initialization ??= RAPIER.init(); }
 export const STEP = MOVEMENT.step;
 export const PLAYER = { ...MOVEMENT, spawn: GAME_CONFIG.player.spawn };
-export const BOXES = [
-  ...COURSE_BOXES,
+export const SURFACE_BOXES = [
   { center: [0, 1, 16], half: [5, 1, 6], color: '#b3a38a' },
   { center: [5.5, 2.5, 17], half: [0.5, 2.5, 4], color: '#859ba1' },
   { center: [-7, 0.2, 12], half: [1.5, 0.2, 1], color: '#a3b0a2' },
   { center: [-7, 0.4, 14], half: [1.5, 0.4, 1], color: '#a3b0a2' },
   { center: [-7, 0.6, 16], half: [1.5, 0.6, 1], color: '#a3b0a2' },
 ];
+export const BOXES = [...COURSE_BOXES, ...SURFACE_BOXES];
 export const RAMP = {
   positions: new Float32Array([-3, 0, 4, 3, 0, 4, -3, 2, 10, 3, 2, 10, -3, 0, 10, 3, 0, 10]),
   indices: new Uint32Array([0, 2, 1, 1, 2, 3, 0, 4, 2, 1, 3, 5, 2, 4, 5, 2, 5, 3, 0, 1, 4, 1, 5, 4]),
 };
+export const ENTRY_RAMP = { ...RAMP, positions: new Float32Array(RAMP.positions.map((v, i) => i % 3 === 2 ? (v === 4 ? 8 : 12) : v)) };
 export class CharacterPhysics {
   readonly world = new RAPIER.World({ x: 0, y: -PLAYER.gravity, z: 0 });
   readonly body: RAPIER.RigidBody;
@@ -31,7 +32,9 @@ export class CharacterPhysics {
   private snapFrames = 0;
   private previousFeet: [number, number, number] = [...PLAYER.spawn];
   private surfaceColliders: RAPIER.Collider[] = [];
-  constructor() {
+  private readonly includeCourse: boolean;
+  constructor(includeCourse = true) {
+    this.includeCourse = includeCourse;
     this.world.timestep = STEP;
     const { radius, height } = GAME_CONFIG.player;
     this.body = this.world.createRigidBody(RAPIER.RigidBodyDesc.kinematicPositionBased());
@@ -56,8 +59,8 @@ export class CharacterPhysics {
       for (const collider of this.surfaceColliders) this.world.removeCollider(collider, false);
       this.surfaceColliders = []; return;
     }
-    for (const box of BOXES) this.surfaceColliders.push(this.world.createCollider(RAPIER.ColliderDesc.cuboid(box.half[0], box.half[1], box.half[2]).setTranslation(box.center[0], box.center[1], box.center[2])));
-    this.surfaceColliders.push(this.world.createCollider(RAPIER.ColliderDesc.trimesh(RAMP.positions, RAMP.indices, RAPIER.TriMeshFlags.FIX_INTERNAL_EDGES)));
+    for (const box of this.includeCourse ? BOXES : SURFACE_BOXES) this.surfaceColliders.push(this.world.createCollider(RAPIER.ColliderDesc.cuboid(box.half[0], box.half[1], box.half[2]).setTranslation(box.center[0], box.center[1], box.center[2])));
+    this.surfaceColliders.push(this.world.createCollider(RAPIER.ColliderDesc.trimesh((this.includeCourse ? RAMP : ENTRY_RAMP).positions, RAMP.indices, RAPIER.TriMeshFlags.FIX_INTERNAL_EDGES)));
   }
   feet(): [number, number, number] {
     const p = this.body.translation(); return [p.x, p.y - GAME_CONFIG.player.height / 2, p.z];

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { raycastCells } from '../../src/game/terrain/raycast.ts';
 import { selectCell, SELECTION } from '../../src/game/terrain/selection.ts';
-import { SparseWorld, CELL } from '../../src/game/terrain/SparseWorld.ts';
+import { SparseWorld, CELL, WORLD_GENERATION } from '../../src/game/terrain/SparseWorld.ts';
 import { pointerNdc } from '../../src/game/aim.ts';
 const source = (...cells) => c => cells.some(v => v.every((n, i) => n === c[i])) ? 1 : 0;
 
@@ -27,7 +27,7 @@ test('near either side of a grid edge selects the actual side without snapping',
   }
 });
 test('query follows sparse edits across both region grids and observes maximum range', () => {
-  const world = new SparseWorld(), sample = c => world.cell(c);
+  const world = new SparseWorld({...WORLD_GENERATION,samples:true}), sample = c => world.cell(c);
   for (const x of [7,8,15,16,-16]) {
     assert.deepEqual(raycastCells([2*x+1,3,-19], [0,-1,0], 8, sample).cell, [x,-1,-10]);
     world.remove([[x,-1,-10]]);

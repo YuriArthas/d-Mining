@@ -13,7 +13,7 @@ test('layer boundaries use metres and the top face of each block', () => {
 });
 test('production shallow terrain excludes advanced minerals even at old sample coordinates', () => {
  const game=new SparseWorld(),fixture=new SparseWorld({...WORLD_GENERATION,samples:true});
- for(let x=-16;x<32;x++)for(let y=-16;y<0;y++)for(let z=-32;z<-16;z++)assert.ok([1,3,4].includes(game.cell([x,y,z])));
+ for(let x=-16;x<32;x++)for(let y=-16;y<0;y++)for(let z=-32;z<-16;z++)assert.ok((y===-1?[7]:[1,3,4]).includes(game.cell([x,y,z])));
  assert.equal(fixture.cell([14,-1,-25]),6);assert.notEqual(game.cell([14,-1,-25]),6);
  assert.equal(game.generation.samples,false);assert.equal(game.stats().editBytes,0);
 });

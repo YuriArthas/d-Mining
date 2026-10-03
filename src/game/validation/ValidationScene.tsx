@@ -3,7 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { BoxGeometry, EdgesGeometry, Group, LineBasicMaterial, LineSegments, Raycaster, Vector2, Mesh, Material, PerspectiveCamera } from 'three';
 import { GAME_CONFIG } from '../config.ts';
 import type { GameInput } from '../GameInput.ts';
-import { CharacterPhysics, initPhysics, BOXES, RAMP, PLAYER } from './physics.ts';
+import { CharacterPhysics, initPhysics, BOXES, SURFACE_BOXES, RAMP, ENTRY_RAMP, PLAYER } from './physics.ts';
 import { FixedStepClock, RenderSchedule, MOVEMENT } from '../movement.ts';
 import { ThirdPersonCamera } from '../ThirdPersonCamera.ts';
 import { COURSE_SPAWN } from './course.ts';
@@ -15,10 +15,12 @@ import { CELL, WORLD_GENERATION, type Coord } from '../terrain/SparseWorld.ts';
 import type { GameSession } from '../application/GameSession.ts';
 import { RoomFacilities } from '../presentation/RoomFacilities.ts';
 import { BlockCracks } from '../presentation/BlockCracks.ts';
+import { ENTRANCE_EDGES } from '../world/entrance.ts';
 import { SELL_ZONE, SURFACE_RETURN } from '../application/items.ts';
 
 export type ValidationDebug = {
   snapshot: () => unknown;
+  canMine: (coord: Coord) => boolean;
   cell: (coord: Coord) => number | null;
   mine: (coord: Coord) => boolean;
   mineMany: (coords: readonly Coord[]) => boolean;
@@ -30,6 +32,8 @@ export type ValidationDebug = {
 declare global { interface Window { __miningValidation?: ValidationDebug } }
 
 export function ValidationScene({ input, onStatus, session }: { input: GameInput; onStatus: (text: string) => void; session: GameSession }) {
+  const params = new URLSearchParams(location.search), samples = params.get('debug') === '1' && params.get('samples') === '1';
+  const surfaceBoxes = samples ? BOXES : SURFACE_BOXES, ramp = samples ? RAMP : ENTRY_RAMP;
   const root = useRef<Group>(null), avatar = useRef<Group>(null), fixtures = useRef<Group>(null);
   const runtime = useRef<{ physics: CharacterPhysics; terrain: TerrainStream; cracks: BlockCracks; facilities: RoomFacilities } | null>(null);
   const view = useRef({ yaw: Number(GAME_CONFIG.camera.initialYaw), pitch: Number(GAME_CONFIG.camera.initialPitch) });
@@ -54,13 +58,13 @@ export function ValidationScene({ input, onStatus, session }: { input: GameInput
       if (cancelled) return;
       const params = new URLSearchParams(location.search);
       const generation = { ...WORLD_GENERATION, samples: params.get('debug') === '1' && params.get('samples') === '1' };
-      const physics = new CharacterPhysics(), terrain = new TerrainStream(physics, undefined, session.collected, generation);
+      const physics = new CharacterPhysics(generation.samples), terrain = new TerrainStream(physics, undefined, session.collected, generation);
       const teleport = (feet: readonly number[]) => {
         input.reset(); travelling.current = [...feet] as unknown as Coord; terrain.relocate(feet); fixed.current.reset(); session.resetPosition();
       };
-      detach = session.attach({ cell: cell => terrain.cell(cell), pending: cell => terrain.pending(cell), mine: targets => terrain.mineMany(targets), cancelMining: () => terrain.cancelPending(), travelTo: teleport, returnToSurface: () => teleport(SURFACE_RETURN) });
+      detach = session.attach({ cell: cell => terrain.cell(cell), canMine: cell => terrain.canMine(cell), pending: cell => terrain.pending(cell), mine: targets => terrain.mineMany(targets), cancelMining: () => terrain.cancelPending(), travelTo: teleport, returnToSurface: () => teleport(SURFACE_RETURN) });
       const cracks = new BlockCracks(); detachDamage = session.observeBlockDamage(cracks.setDamage); root.current!.add(cracks.group);
-      const facilities = new RoomFacilities(physics); root.current!.add(facilities.group);
+      const facilities = new RoomFacilities(); root.current!.add(facilities.group);
       runtime.current = { physics, terrain, cracks, facilities }; root.current!.add(terrain.group); terrain.recenter(physics.feet());
       const box = new BoxGeometry(CELL + 0.015, CELL + 0.015, CELL + 0.015);
       const outline = new LineSegments(new EdgesGeometry(box), new LineBasicMaterial({ color: '#fff0ae' })); box.dispose();
@@ -68,7 +72,7 @@ export function ValidationScene({ input, onStatus, session }: { input: GameInput
       if (new URLSearchParams(location.search).get('debug') === '1') {
         window.__miningValidation = {
           snapshot: () => ({ ...terrain.snapshot(), travelling: !!travelling.current, facilities: facilities.diagnostics(), cracks: cracks.diagnostics(), economy: session.getSnapshot(), combat: session.combatDebug(), sellZone: SELL_ZONE, samples: terrain.sampleStats(), terrainVisuals: terrain.render.diagnostics(), position: physics.feet(), grounded: physics.grounded, ready: !travelling.current && terrain.ready(physics.feet()), physicsSteps: physics.steps, jumps: physics.jumps, verticalSpeed: physics.verticalSpeed, droppedSeconds: fixed.current.droppedSeconds, renderedPosition: avatar.current?.position.toArray(), facing: avatar.current?.rotation.y, frames: timing.current.frames, renderer: { calls: gl.info.render.calls, triangles: gl.info.render.triangles, geometries: gl.info.memory.geometries, textures: gl.info.memory.textures }, view: { ...view.current }, camera: { ...followCamera.current.snapshot(), obstructed: followCamera.current.obstructed(physics.world, physics.collider) }, aim: { ...input.getAim() }, mineral: selection.current ? mineralName(terrain.cell(selection.current) ?? 0) : null, target: selection.current }),
-          cell: coord => terrain.cell(coord),
+          cell: coord => terrain.cell(coord), canMine: coord => terrain.canMine(coord),
           hit: session.hit, health: session.blockHealth,
           mine: coord => session.requestMine([coord]),
           mineMany: coords => session.requestMine(coords),
@@ -156,6 +160,7 @@ export function ValidationScene({ input, onStatus, session }: { input: GameInput
         selected = selectCell(origin.toArray(), direction.toArray(), [feet[0], feet[1] + 1, feet[2]],
           cell => terrain.cell(cell));
       }
+      if (selected && !terrain.canMine(selected)) selected = null;
       terrain.measurements.add('selectionMs', performance.now() - selectionStart);
       selection.current = selected;
       session.selectTarget(selected);
@@ -187,8 +192,9 @@ export function ValidationScene({ input, onStatus, session }: { input: GameInput
       <mesh position={[SELL_ZONE.x, SELL_ZONE.y + 0.015, SELL_ZONE.z]} rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[SELL_ZONE.radius - 0.16, 48]} /><meshBasicMaterial color="#ffc24d" transparent opacity={0.2} depthWrite={false} />
       </mesh>
-      {BOXES.map((box, i) => <mesh key={i} position={box.center as [number, number, number]}><boxGeometry args={box.half.map(v => v * 2) as [number, number, number]} /><meshStandardMaterial color={box.color} roughness={1} /></mesh>)}
-      <mesh><bufferGeometry onUpdate={g => g.computeVertexNormals()}><bufferAttribute attach="attributes-position" args={[RAMP.positions, 3]} /><bufferAttribute attach="index" args={[RAMP.indices, 1]} /></bufferGeometry><meshStandardMaterial color="#c7b692" roughness={1} /></mesh>
+      {!samples && ENTRANCE_EDGES.map((edge, i) => <mesh key={`entry-${i}`} position={[...edge.center]}><boxGeometry args={[...edge.size]} /><meshBasicMaterial color="#f3d782" /></mesh>)}
+      {surfaceBoxes.map((box, i) => <mesh key={i} position={box.center as [number, number, number]}><boxGeometry args={box.half.map(v => v * 2) as [number, number, number]} /><meshStandardMaterial color={box.color} roughness={1} /></mesh>)}
+      <mesh><bufferGeometry onUpdate={g => g.computeVertexNormals()}><bufferAttribute attach="attributes-position" args={[ramp.positions, 3]} /><bufferAttribute attach="index" args={[ramp.indices, 1]} /></bufferGeometry><meshStandardMaterial color="#c7b692" roughness={1} /></mesh>
     </group>
     <group ref={avatar}>
       <mesh position={[0, GAME_CONFIG.player.height / 2, 0]}><cylinderGeometry args={[GAME_CONFIG.player.radius, GAME_CONFIG.player.radius, GAME_CONFIG.player.height, 20]} /><meshStandardMaterial color="#f0b45b" transparent /></mesh>

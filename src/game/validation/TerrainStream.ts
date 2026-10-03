@@ -67,6 +67,7 @@ export class TerrainStream {
     if (c[1] >= 0 && c[0] >= -48 && c[0] <= 51 && c[2] >= -48 && c[2] <= 51) return 0;
     return inBounds(c) ? this.world.cell(c) : null;
   }
+  canMine(c: Coord) { return c.every(Number.isInteger) && inBounds(c) && this.world.canMine(c); }
   ready(feet: readonly number[]) {
     // Covers the 7.5 m camera boom, capsule sweep and downward lookahead.
     const side = COLLISION_SIZE * CELL;
@@ -87,7 +88,7 @@ export class TerrainStream {
     for (const cell of targets) {
       if (cell.length !== 3 || !cell.every(Number.isInteger)) return false;
       const key = chunkKey(cell);
-      if (this.cell(cell) && !this.waiting.has(key) && !this.transaction?.cells.some(c => chunkKey(c) === key)) unique.set(key, [...cell]);
+      if (this.canMine(cell) && !this.waiting.has(key) && !this.transaction?.cells.some(c => chunkKey(c) === key)) unique.set(key, [...cell]);
     }
     if (!unique.size || this.waiting.size + unique.size > 32) return false;
     const now = performance.now(), cells = [...unique.values()];

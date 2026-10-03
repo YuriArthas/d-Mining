@@ -1,9 +1,9 @@
 import { DataTexture, MeshStandardMaterial, NearestFilter, RGBAFormat, ShaderChunk, SRGBColorSpace } from 'three';
-import { MINERALS, TILE_SIZE, mineralAtlas } from './minerals.ts';
+import { TERRAIN_MATERIALS, TILE_SIZE, mineralAtlas } from './minerals.ts';
 
 export function createMineralMaterial() {
   const pixels = mineralAtlas();
-  const atlas = new DataTexture(pixels, TILE_SIZE * MINERALS.length, TILE_SIZE, RGBAFormat);
+  const atlas = new DataTexture(pixels, TILE_SIZE * TERRAIN_MATERIALS.length, TILE_SIZE, RGBAFormat);
   atlas.colorSpace = SRGBColorSpace;
   atlas.magFilter = atlas.minFilter = NearestFilter;
   atlas.generateMipmaps = false; atlas.needsUpdate = true;
@@ -15,9 +15,9 @@ export function createMineralMaterial() {
     // UVs are in cell units. Repeat on every voxel face even if a quad spans an
     // entire region. Nearest sampling with no mipmaps cannot bleed atlas tiles.
     const map = ShaderChunk.map_fragment.replace('texture2D( map, vMapUv )',
-      `texture2D( map, vec2((vOreTile + fract(vMapUv.x)) / ${MINERALS.length.toFixed(1)}, fract(vMapUv.y)))`);
+      `texture2D( map, vec2((vOreTile + fract(vMapUv.x)) / ${TERRAIN_MATERIALS.length.toFixed(1)}, fract(vMapUv.y)))`);
     shader.fragmentShader = shader.fragmentShader.replace('#include <map_fragment>', map);
   };
-  material.customProgramCacheKey = () => 'mineral-atlas-v1';
+  material.customProgramCacheKey = () => 'mineral-atlas-v2';
   return { material, atlasBytes: pixels.byteLength, dispose: () => { material.dispose(); atlas.dispose(); } };
 }

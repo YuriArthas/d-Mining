@@ -31,18 +31,18 @@ const {digCells}=require('./combat-browser.cjs');
    assert.ok(s.economy.destinations[0].unlocked);assert.equal(s.economy.destinations[1].unlocked,false);assert.deepEqual(s.facilities.visuals,[]);
    assert.equal(s.editBytes>0,true);
    await press('返回地表');await ready();await travel(0);s=await snap();
-   assert.ok(Math.abs(s.position[1]+400)<.05);assert.deepEqual(s.facilities.colliders,['rest-400']);assert.equal(s.economy.shopId,null);
+   assert.ok(Math.abs(s.position[1]+400)<.05);assert.deepEqual(s.facilities.visuals,['rest-400']);assert.equal(s.economy.shopId,null);
    await page.screenshot({path:`artifacts/${label}-${layout}-room.png`});
    const before=s.economy.coins,quote=s.economy.sale.coins;
-   await teleport([-6.5,-399.9,0]);await move(1,()=>page.waitForFunction(()=>window.__miningValidation.snapshot().economy.inventory.used===0));
+   await teleport([-14.5,-399.9,12]);await move(1,()=>page.waitForFunction(()=>window.__miningValidation.snapshot().economy.inventory.used===0));
    assert.equal((await snap()).economy.coins,before+quote);
-   // Floor outside permanent platform remains mineable, and survives room unload/reload.
-   await teleport([0,-399.9,3]);await digCells(page,[[8,-201,8]]);await ready();
+   // The aligned entrance remains mineable, and edits survive room unload/reload.
+   await teleport([0,-399.9,3]);await digCells(page,[[3,-201,3]]);await ready();
    await teleport('deep');assert.equal((await snap()).economy.destinations.every(r=>r.unlocked),true);
-   assert.deepEqual((await snap()).facilities,{visuals:[],colliders:[]});
+   assert.deepEqual((await snap()).facilities,{visuals:[]});
    await press('返回地表');await ready();await travel(1);s=await snap();
-   assert.ok(Math.abs(s.position[1]+800)<.05);assert.deepEqual(s.facilities.colliders,['rest-800']);
-   await teleport([41.5,-799.9,-24]);await move(1,()=>page.waitForFunction(()=>window.__miningValidation.snapshot().economy.shopId==='rest-800'));
+   assert.ok(Math.abs(s.position[1]+800)<.05);assert.deepEqual(s.facilities.visuals,['rest-800']);
+   await teleport([9.5,-799.9,12]);await move(1,()=>page.waitForFunction(()=>window.__miningValidation.snapshot().economy.shopId==='rest-800'));
    await page.getByRole('heading',{name:'升级商店',exact:true}).waitFor();
    await press('花费 5 金币升级');assert.equal((await snap()).economy.pickaxe.level,2);
    await page.screenshot({path:`artifacts/${label}-${layout}-shop.png`});
@@ -50,11 +50,11 @@ const {digCells}=require('./combat-browser.cjs');
    assert.equal(await page.getByRole('heading',{name:'升级商店',exact:true}).count(),0);
    await move(1,()=>page.waitForFunction(()=>window.__miningValidation.snapshot().economy.shopId==='rest-800'));
    await page.getByRole('heading',{name:'升级商店',exact:true}).waitFor();await press('关闭升级界面');
-   await press('返回地表');await ready();assert.deepEqual((await snap()).facilities,{visuals:[],colliders:[]});
+   await press('返回地表');await ready();assert.deepEqual((await snap()).facilities,{visuals:[]});
    await press('传送');await page.screenshot({path:`artifacts/${label}-${layout}-travel.png`});
    const panel=await page.locator('.travel-panel').boundingBox();assert.ok(panel.x>=0&&panel.y>=0&&panel.x+panel.width<=viewport.width+1&&panel.y+panel.height<=viewport.height+1);
    const b=page.locator('.travel-list button').first();await(touch?b.tap():b.click());await ready();
-   assert.equal(await page.evaluate(()=>window.__miningValidation.cell([8,-201,8])),0);
+   assert.equal(await page.evaluate(()=>window.__miningValidation.cell([3,-201,3])),0);
    checks.push(`${layout}: locked travel; 400m reached outside room unlocks only first destination; home UI travel lands safely; physical entry sells once; floor excavation persists; depth jump unlocks second; shop entry/purchase/exit/reentry; fixtures unload; travel panel fits`);
   }catch(e){await page.screenshot({path:`artifacts/${label}-${layout}-failure.png`});console.error(JSON.stringify({layout,snapshot:await snap().catch(()=>null),errors}));throw e}finally{await page.close()}
  }

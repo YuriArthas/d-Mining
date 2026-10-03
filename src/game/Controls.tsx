@@ -52,7 +52,7 @@ export function ValidationPanel() {
   return <aside className="validation-panel">
     <output>{summary}</output>
     <div className="mineral-legend">{MINERALS.map(m => <span key={m.id}><i style={{ background: m.color }} />{m.name}</span>)}</div>
-    <div><button type="button" onClick={() => window.__miningValidation?.teleport('surface')}>定位地表</button><button type="button" onClick={() => window.__miningValidation?.teleport('course')}>碰撞场</button><button type="button" onClick={() => window.__miningValidation?.teleport('deep')}>定位 1000 层</button></div>
+    <div><button type="button" onClick={() => window.__miningValidation?.teleport('surface')}>定位地表</button>{new URLSearchParams(location.search).get('samples') === '1' && <button type="button" onClick={() => window.__miningValidation?.teleport('course')}>碰撞场</button>}<button type="button" onClick={() => window.__miningValidation?.teleport('deep')}>定位 1000 层</button></div>
     {new URLSearchParams(location.search).get('samples') === '1' && <details className="ore-samples"><summary>矿样与合并检查</summary>
       <div>同为 16×16 格表面；R 渲染三角 / C 碰撞三角</div>
       <div>{samples.map((s, i) => <button type="button" key={s.name} onClick={() => window.__miningValidation?.teleport((['uniform', 'bands', 'checker'] as const)[i])}>

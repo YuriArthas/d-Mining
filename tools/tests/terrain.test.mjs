@@ -58,7 +58,7 @@ test('sparse runs merge consecutive changes and full-air regions collapse to a m
  let runs=mergeRemoved(undefined,[7,3,5,4,7]);assert.deepEqual([...runs],[3,5,7,7]);
  runs=mergeRemoved(runs,[6]);assert.deepEqual([...runs],[3,7]);assert.ok(contains(runs,4));assert.equal(contains(runs,8),false);
  assert.equal(mergeRemoved(runs,Array.from({length:4096},(_,i)=>i)),null);
- const w=new SparseWorld(),cells=[];for(let z=0;z<16;z++)for(let y=-16;y<0;y++)for(let x=0;x<16;x++)cells.push([x,y,z]);w.remove(cells);
+ const w=new SparseWorld(samples),cells=[];for(let z=0;z<16;z++)for(let y=-16;y<0;y++)for(let x=0;x<16;x++)cells.push([x,y,z]);w.remove(cells);
  assert.equal(w.stats().fullAirRegions,1);assert.equal(w.stats().editBytes,0);assert.equal(w.cell([5,-8,5]),0);
 });
 test('independent region boundaries invalidate only face neighbors; staged edits never mutate source',()=>{
@@ -103,7 +103,7 @@ test('merged UVs retain cell scale and every quad has one material on both face 
  }
 });
 test('ore identity remains deterministic across lazy snapshots, sparse edits and independent seams',()=>{
- const w=new SparseWorld();const cells=[[7,-1,-25],[8,-1,-25],[15,-1,-25],[16,-1,-25],[0,-501,20]];
+ const w=new SparseWorld();const cells=[[7,-2,-25],[8,-2,-25],[15,-2,-25],[16,-2,-25],[0,-501,20]];
  for(const c of cells){
   const before=w.cell(c);assert.ok(before>=1&&before<=6);
   for(const size of [8,16])assert.equal(sampleXYZ(...c,new Map(w.snapshot(regionOf(c,size),size))),before);
@@ -123,14 +123,14 @@ test('digging each sample rebuilds exactly the exposed area and does not create 
   assert.equal(surfaceArea(render),surfaceArea(physical));
  }
 });
-test('six atlas tiles have distinct nonuniform appearances and a fixed small allocation',async()=>{
- const { mineralAtlas,MINERALS,TILE_SIZE }=await import('../../src/game/terrain/minerals.ts');
- const a=mineralAtlas();assert.equal(a.byteLength,6*32*32*4);assert.deepEqual(a,mineralAtlas());
+test('mineral tiles remain distinct within an atlas that includes the protected floor',async()=>{
+ const { mineralAtlas,MINERALS,TERRAIN_MATERIALS,TILE_SIZE }=await import('../../src/game/terrain/minerals.ts');
+ const a=mineralAtlas();assert.equal(a.byteLength,7*32*32*4);assert.deepEqual(a,mineralAtlas());
  const fingerprints=new Set();
  for(let tile=0;tile<MINERALS.length;tile++){
   const colors=new Set();let hash=0;
   for(let y=0;y<TILE_SIZE;y++)for(let x=0;x<TILE_SIZE;x++){
-   const p=(y*MINERALS.length*TILE_SIZE+tile*TILE_SIZE+x)*4;assert.equal(a[p+3],255);
+   const p=(y*TERRAIN_MATERIALS.length*TILE_SIZE+tile*TILE_SIZE+x)*4;assert.equal(a[p+3],255);
    colors.add(a.slice(p,p+3).join(','));hash=(Math.imul(hash,31)+a[p]*65536+a[p+1]*256+a[p+2])>>>0;
   }
   assert.ok(colors.size>8);fingerprints.add(hash);
