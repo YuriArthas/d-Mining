@@ -11,7 +11,7 @@ const {PerspectiveCamera,Vector3}=require('../node_modules/three');
  const snap=()=>page.evaluate(()=>window.__miningValidation.snapshot());
  const ready=()=>page.waitForFunction(()=>{const s=window.__miningValidation?.snapshot();return s?.ready&&!s.queue&&!s.inFlight&&!s.pendingEdit&&s.grounded},null,{timeout:30000});
  try{
-  await page.goto(origin+(hosted?'/games/mining/index.html':'/')+'?debug=1');await ready();
+  await page.goto(origin+(hosted?'/games/mining/index.html':'/')+'?debug=1&samples=1');await ready();
   assert.equal((await snap()).economy.inventory.used,0);await page.screenshot({path:`artifacts/${label}-surface.png`});
   await page.evaluate(()=>window.__miningValidation.teleport([41,.1,-19]));await ready();await page.waitForTimeout(350);
   const state=await snap(),camera=new PerspectiveCamera(55,1120/630,.08,1000);camera.position.fromArray(state.camera.position);camera.lookAt(camera.position.clone().sub(new Vector3(...state.camera.direction)));camera.updateMatrixWorld();

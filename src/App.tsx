@@ -3,12 +3,10 @@ import { flushSync } from 'react-dom';
 import { Canvas, unmountComponentAtNode, type RootState } from '@react-three/fiber';
 import { GAME_CONFIG } from './game/config.ts';
 import { GameInput, type InputSnapshot } from './game/GameInput.ts';
-import { Controls, InputMonitor, ValidationPanel } from './game/Controls.tsx';
+import { InputMonitor, ValidationPanel } from './game/Controls.tsx';
 import { ValidationScene } from './game/validation/ValidationScene.tsx';
 import { GameSession } from './game/application/GameSession.ts';
-import { InventoryHud } from './game/ui/InventoryHud.tsx';
-import { UpgradePanel } from './game/ui/UpgradePanel.tsx';
-import { TargetHealth } from './game/ui/TargetHealth.tsx';
+import { SessionUi } from './game/ui/SessionUi.tsx';
 
 declare global {
   interface Window {
@@ -26,7 +24,6 @@ export function App() {
   const scene = useRef<RootState | null>(null);
   const exiting = useRef(false);
   const [exited, setExited] = useState(false);
-  const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [status, setStatus] = useState('正在准备地形');
   const [input] = useState(() => new GameInput());
   const [session] = useState(() => new GameSession());
@@ -105,12 +102,7 @@ export function App() {
           退出游戏
         </button>
       </header>
-      {!upgradeOpen && <TargetHealth session={session} />}
-      <InventoryHud session={session} onOpenUpgrade={() => { input.reset(); setUpgradeOpen(true); }} />
-      {!upgradeOpen && <Controls input={input} surface={surface} />}
-      {upgradeOpen && <UpgradePanel session={session} onClose={() => {
-        input.reset(); setUpgradeOpen(false); surface.current?.focus();
-      }} />}
+      <SessionUi session={session} input={input} surface={surface} />
       {debug && <><InputMonitor input={input} /><ValidationPanel /></>}
     </main>
   );

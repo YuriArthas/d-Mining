@@ -181,3 +181,11 @@ button { font: inherit; touch-action: manipulation; }
   .inventory-items { column-gap: 6px; }
   .inventory-items span { gap: 3px; white-space: nowrap; }
 }
+
+.travel-list { display: grid; gap: 12px; }
+.travel-list > div { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px; border-radius: 10px; background: #0a2025; }
+.travel-list small { display: block; color: #adc7c1; margin-top: 5px; }
+.travel-list button { padding: 8px 18px; background: #eac475; color: #243c3d; }
+.travel-list button:disabled { background: #32474b; color: #adbdbc; }
+.shop-backdrop { pointer-events: none; background: transparent; }
+.shop-backdrop .upgrade-panel { pointer-events: auto; width: min(360px, 48%); }

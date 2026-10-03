@@ -16,7 +16,7 @@ const {digCells}=require('./combat-browser.cjs');
   const teleport=async target=>{await page.evaluate(t=>window.__miningValidation.teleport(t),target);await ready();await page.waitForTimeout(250)};
   const hp=c=>page.evaluate(c=>window.__miningValidation.health(c),c);
   try{
-   await page.goto(origin+(hosted?'/games/mining/index.html':'/')+'?debug=1');await ready();await page.addStyleTag({content:'.validation-panel,.input-monitor{display:none}'});
+   await page.goto(origin+(hosted?'/games/mining/index.html':'/')+'?debug=1&samples=1');await ready();await page.addStyleTag({content:'.validation-panel,.input-monitor{display:none}'});
    await press('升级');assert.ok(await page.getByRole('button',{name:'还差 5 金币',exact:true}).isDisabled());
    const rect=await page.getByRole('dialog').boundingBox();assert.ok(rect.x>=0&&rect.y>=0&&rect.x+rect.width<=viewport.width+1&&rect.y+rect.height<=viewport.height+1);
    assert.ok(await page.locator('.upgrade-panel').evaluate(el=>el.scrollHeight<=el.clientHeight+1),'all purchase controls fit without scrolling');

@@ -1,4 +1,4 @@
-import { CELL, sampleXYZ, type EditSnapshot, type Coord } from './SparseWorld.ts';
+import { CELL, sampleXYZ, WORLD_GENERATION, type WorldGeneration, type EditSnapshot, type Coord } from './SparseWorld.ts';
 export type MeshData = { positions: Float32Array; normals: Float32Array; uvs: Float32Array; tiles: Float32Array; indices: Uint32Array };
 
 
@@ -45,13 +45,13 @@ export function greedyMesh(get: (x: number, y: number, z: number) => number, siz
 
 export type LayerKind = 'render' | 'collision';
 export type RegionData = { coord: Coord; mesh: MeshData; buildMs: number };
-export function buildRegion(kind: LayerKind, coord: Coord, size: number, snapshot: EditSnapshot): RegionData {
+export function buildRegion(kind: LayerKind, coord: Coord, size: number, snapshot: EditSnapshot, generation: WorldGeneration = WORLD_GENERATION): RegionData {
   const start = performance.now(), edits = new Map(snapshot);
   const ox = coord[0] * size, oy = coord[1] * size, oz = coord[2] * size;
   // Sample the procedural/sparse source directly. Only the 2D face mask is dense.
-  const mesh = greedyMesh((x, y, z) => sampleXYZ(ox + x, oy + y, oz + z, edits), size, kind === 'collision');
+  const mesh = greedyMesh((x, y, z) => sampleXYZ(ox + x, oy + y, oz + z, edits, generation), size, kind === 'collision');
   return { coord, mesh, buildMs: performance.now() - start };
 }
 export type RegionJob = { coord: Coord; version: number; edits: EditSnapshot };
-export type BuildJob = { id: number; epoch: number; transaction: number; kind: LayerKind; size: number; regions: RegionJob[] };
+export type BuildJob = { generation: WorldGeneration; id: number; epoch: number; transaction: number; kind: LayerKind; size: number; regions: RegionJob[] };
 export type BuildReply = { id: number; epoch: number; transaction: number; results?: { version: number; data: RegionData }[]; error?: string };

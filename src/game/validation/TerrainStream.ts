@@ -1,11 +1,11 @@
 import { ORE_SAMPLES } from '../terrain/minerals.ts';
 import { type CharacterPhysics } from './physics.ts';
-import { SparseWorld, CELL, RENDER_SIZE, COLLISION_SIZE, regionOf, chunkKey, validRegion, inBounds, type Coord } from '../terrain/SparseWorld.ts';
+import { SparseWorld, WORLD_GENERATION, type WorldGeneration, CELL, RENDER_SIZE, COLLISION_SIZE, regionOf, chunkKey, validRegion, inBounds, type Coord } from '../terrain/SparseWorld.ts';
 import { RenderTerrain, CollisionTerrain } from '../terrain/TerrainLayers.ts';
 import { Measurements, type WorkerFactory } from '../terrain/RegionPipeline.ts';
 export type ExcavatedCell = Readonly<{ cell: Coord; kind: number }>;
 export class TerrainStream {
-  readonly world = new SparseWorld();
+  readonly world: SparseWorld;
   readonly measurements = new Measurements();
   readonly render: RenderTerrain;
   readonly collision: CollisionTerrain;
@@ -19,7 +19,8 @@ export class TerrainStream {
   error: string | null = null;
   private readonly physics: CharacterPhysics;
   private onExcavated: (resources: readonly ExcavatedCell[]) => void;
-  constructor(physics: CharacterPhysics, factory: WorkerFactory = () => new Worker(new URL('./terrain.worker.ts', import.meta.url), { type: 'module' }), onExcavated: (resources: readonly ExcavatedCell[]) => void = () => {}) {
+  constructor(physics: CharacterPhysics, factory: WorkerFactory = () => new Worker(new URL('./terrain.worker.ts', import.meta.url), { type: 'module' }), onExcavated: (resources: readonly ExcavatedCell[]) => void = () => {}, generation: WorldGeneration = WORLD_GENERATION) {
+    this.world = new SparseWorld(generation);
     this.onExcavated = onExcavated;
     this.physics = physics;
     this.render = new RenderTerrain(this.world, this.measurements, factory);
@@ -111,7 +112,7 @@ export class TerrainStream {
   }
   snapshot() {
     const r = this.render.pipeline, p = this.collision.pipeline, visuals = [...r.residents.values()].map(v => v.resource), physical = [...p.residents.values()].map(v => v.resource);
-    return { logicalCells: 20_000_000, cellBytes: 0, ...this.world.stats(), revision: this.world.revision, committedEdits: this.world.removed,
+    return { generation: this.world.generation, logicalCells: 20_000_000, cellBytes: 0, ...this.world.stats(), revision: this.world.revision, committedEdits: this.world.removed,
       chunks: r.residents.size, meshes: visuals.filter(v => v.mesh).length, physicsRegions: p.residents.size, terrainColliders: this.collision.handles.size,
       worldColliders: this.physics.world.colliders.len(), meshBytes: visuals.reduce((n, v) => n + v.bytes, 0), collisionGeometryBytes: physical.reduce((n, v) => n + v.bytes, 0),
       triangles: visuals.reduce((n, v) => n + v.triangles, 0), collisionTriangles: physical.reduce((n, v) => n + v.triangles, 0),

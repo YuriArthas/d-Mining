@@ -11,7 +11,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'../../d-Block-Blast/nod
   const snap=()=>page.evaluate(()=>window.__miningValidation.snapshot());
   const ready=()=>page.waitForFunction(()=>{const s=window.__miningValidation?.snapshot();return s?.ready&&!s.pendingEdit&&!s.inFlight&&!s.queue&&s.grounded},null,{timeout:30000});
   try{
-   await page.goto(origin+(hosted?'/games/mining/index.html':'/')+'?debug=1');await ready();
+   await page.goto(origin+(hosted?'/games/mining/index.html':'/')+'?debug=1&samples=1');await ready();
    await page.addStyleTag({content:'.validation-panel,.input-monitor{display:none}'});
    const hud=await page.locator('.inventory-hud').boundingBox(),jump=await page.locator('.jump-button').boundingBox();
    assert.ok(hud.x>=0&&hud.y>=0&&hud.x+hud.width<=viewport.width+1&&hud.y+hud.height<=viewport.height+1,`${layout}: HUD fits`);

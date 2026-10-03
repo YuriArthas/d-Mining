@@ -7,7 +7,7 @@ const {PerspectiveCamera,Vector3}=require('../node_modules/three');
  const page=await browser.newPage({viewport:{width:1120,height:630}});page.on('pageerror',e=>errors.push(e.message));
  const snap=()=>page.evaluate(()=>window.__miningValidation.snapshot());
  try{
-  await page.goto(origin+(hosted?'/games/mining/index.html':'/')+'?debug=1');
+  await page.goto(origin+(hosted?'/games/mining/index.html':'/')+'?debug=1&samples=1');
   await page.waitForFunction(()=>window.__miningValidation?.snapshot().ready);
   await page.addStyleTag({content:'.validation-panel,.input-monitor{display:none}'});
   await page.evaluate(()=>window.__miningValidation.teleport([22,.1,-47]));

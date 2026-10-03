@@ -10,8 +10,10 @@ import { COURSE_SPAWN } from './course.ts';
 import { TerrainStream } from './TerrainStream.ts';
 import { ORE_SAMPLES, mineralName } from '../terrain/minerals.ts';
 import { selectCell } from '../terrain/selection.ts';
-import { CELL, type Coord } from '../terrain/SparseWorld.ts';
+import { stratumAtDepth } from '../terrain/strata.ts';
+import { CELL, WORLD_GENERATION, type Coord } from '../terrain/SparseWorld.ts';
 import type { GameSession } from '../application/GameSession.ts';
+import { RoomFacilities } from '../presentation/RoomFacilities.ts';
 import { BlockCracks } from '../presentation/BlockCracks.ts';
 import { SELL_ZONE, SURFACE_RETURN } from '../application/items.ts';
 
@@ -29,7 +31,7 @@ declare global { interface Window { __miningValidation?: ValidationDebug } }
 
 export function ValidationScene({ input, onStatus, session }: { input: GameInput; onStatus: (text: string) => void; session: GameSession }) {
   const root = useRef<Group>(null), avatar = useRef<Group>(null), fixtures = useRef<Group>(null);
-  const runtime = useRef<{ physics: CharacterPhysics; terrain: TerrainStream; cracks: BlockCracks } | null>(null);
+  const runtime = useRef<{ physics: CharacterPhysics; terrain: TerrainStream; cracks: BlockCracks; facilities: RoomFacilities } | null>(null);
   const view = useRef({ yaw: Number(GAME_CONFIG.camera.initialYaw), pitch: Number(GAME_CONFIG.camera.initialPitch) });
   const followCamera = useRef(new ThirdPersonCamera());
   const fixed = useRef(new FixedStepClock());
@@ -39,6 +41,7 @@ export function ValidationScene({ input, onStatus, session }: { input: GameInput
   const error = useRef<string | null>(null);
   const pickPoint = useRef(new Vector2());
   const pickRay = useRef(new Raycaster());
+  const travelling = useRef<Coord | null>(null);
   const selection = useRef<Coord | null>(null);
   const { advance, gl } = useThree();
 
@@ -49,19 +52,22 @@ export function ValidationScene({ input, onStatus, session }: { input: GameInput
     onStatus('正在准备地形');
     initPhysics().then(() => {
       if (cancelled) return;
-      const physics = new CharacterPhysics(), terrain = new TerrainStream(physics, undefined, session.collected);
+      const params = new URLSearchParams(location.search);
+      const generation = { ...WORLD_GENERATION, samples: params.get('debug') === '1' && params.get('samples') === '1' };
+      const physics = new CharacterPhysics(), terrain = new TerrainStream(physics, undefined, session.collected, generation);
       const teleport = (feet: readonly number[]) => {
-        input.reset(); terrain.relocate(feet); physics.teleport(feet); fixed.current.reset(); followCamera.current.reset(); session.resetPosition();
+        input.reset(); travelling.current = [...feet] as unknown as Coord; terrain.relocate(feet); fixed.current.reset(); session.resetPosition();
       };
-      detach = session.attach({ cell: cell => terrain.cell(cell), pending: cell => terrain.pending(cell), mine: targets => terrain.mineMany(targets), cancelMining: () => terrain.cancelPending(), returnToSurface: () => teleport(SURFACE_RETURN) });
+      detach = session.attach({ cell: cell => terrain.cell(cell), pending: cell => terrain.pending(cell), mine: targets => terrain.mineMany(targets), cancelMining: () => terrain.cancelPending(), travelTo: teleport, returnToSurface: () => teleport(SURFACE_RETURN) });
       const cracks = new BlockCracks(); detachDamage = session.observeBlockDamage(cracks.setDamage); root.current!.add(cracks.group);
-      runtime.current = { physics, terrain, cracks }; root.current!.add(terrain.group); terrain.recenter(physics.feet());
+      const facilities = new RoomFacilities(physics); root.current!.add(facilities.group);
+      runtime.current = { physics, terrain, cracks, facilities }; root.current!.add(terrain.group); terrain.recenter(physics.feet());
       const box = new BoxGeometry(CELL + 0.015, CELL + 0.015, CELL + 0.015);
       const outline = new LineSegments(new EdgesGeometry(box), new LineBasicMaterial({ color: '#fff0ae' })); box.dispose();
       outline.visible = false; marker.current = outline; root.current!.add(outline);
       if (new URLSearchParams(location.search).get('debug') === '1') {
         window.__miningValidation = {
-          snapshot: () => ({ ...terrain.snapshot(), cracks: cracks.diagnostics(), economy: session.getSnapshot(), combat: session.combatDebug(), sellZone: SELL_ZONE, samples: terrain.sampleStats(), terrainVisuals: terrain.render.diagnostics(), position: physics.feet(), grounded: physics.grounded, ready: terrain.ready(physics.feet()), physicsSteps: physics.steps, jumps: physics.jumps, verticalSpeed: physics.verticalSpeed, droppedSeconds: fixed.current.droppedSeconds, renderedPosition: avatar.current?.position.toArray(), facing: avatar.current?.rotation.y, frames: timing.current.frames, renderer: { calls: gl.info.render.calls, triangles: gl.info.render.triangles, geometries: gl.info.memory.geometries, textures: gl.info.memory.textures }, view: { ...view.current }, camera: { ...followCamera.current.snapshot(), obstructed: followCamera.current.obstructed(physics.world, physics.collider) }, aim: { ...input.getAim() }, mineral: selection.current ? mineralName(terrain.cell(selection.current) ?? 0) : null, target: selection.current }),
+          snapshot: () => ({ ...terrain.snapshot(), travelling: !!travelling.current, facilities: facilities.diagnostics(), cracks: cracks.diagnostics(), economy: session.getSnapshot(), combat: session.combatDebug(), sellZone: SELL_ZONE, samples: terrain.sampleStats(), terrainVisuals: terrain.render.diagnostics(), position: physics.feet(), grounded: physics.grounded, ready: !travelling.current && terrain.ready(physics.feet()), physicsSteps: physics.steps, jumps: physics.jumps, verticalSpeed: physics.verticalSpeed, droppedSeconds: fixed.current.droppedSeconds, renderedPosition: avatar.current?.position.toArray(), facing: avatar.current?.rotation.y, frames: timing.current.frames, renderer: { calls: gl.info.render.calls, triangles: gl.info.render.triangles, geometries: gl.info.memory.geometries, textures: gl.info.memory.textures }, view: { ...view.current }, camera: { ...followCamera.current.snapshot(), obstructed: followCamera.current.obstructed(physics.world, physics.collider) }, aim: { ...input.getAim() }, mineral: selection.current ? mineralName(terrain.cell(selection.current) ?? 0) : null, target: selection.current }),
           cell: coord => terrain.cell(coord),
           hit: session.hit, health: session.blockHealth,
           mine: coord => session.requestMine([coord]),
@@ -78,7 +84,7 @@ export function ValidationScene({ input, onStatus, session }: { input: GameInput
     return () => {
       cancelled = true; detachDamage(); detach(); delete window.__miningValidation;
       const current = runtime.current; runtime.current = null;
-      if (current) { current.cracks.group.removeFromParent(); current.cracks.dispose(); current.terrain.group.removeFromParent(); current.terrain.dispose(); current.physics.dispose(); }
+      if (current) { current.facilities.group.removeFromParent(); current.facilities.dispose(); current.cracks.group.removeFromParent(); current.cracks.dispose(); current.terrain.group.removeFromParent(); current.terrain.dispose(); current.physics.dispose(); }
       if (marker.current) { marker.current.removeFromParent(); marker.current.geometry.dispose(); (marker.current.material as LineBasicMaterial).dispose(); marker.current = null; }
     };
   }, [input, gl, onStatus, session]);
@@ -107,13 +113,18 @@ export function ValidationScene({ input, onStatus, session }: { input: GameInput
     clock.frames++; clock.status -= delta;
     try {
       let processedTerrain = false;
-      const currentFeet = physics.feet();
+      const currentFeet = travelling.current ?? physics.feet();
+      current.facilities.sync(currentFeet);
       physics.setSurfaceActive(currentFeet[1] > -48 && Math.abs(currentFeet[0]) < 64 && Math.abs(currentFeet[2] - 16) < 64);
       fixed.current.advance(elapsed, () => {
-        const state = input.getSnapshot(); terrain.recenter(physics.feet());
+        const state = input.getSnapshot(); terrain.recenter(travelling.current ?? physics.feet());
         // Commit only immediately before a physics step: Rapier refreshes scene
         // queries in step(). Frames without a logic step defer resource installation.
         if (!processedTerrain) { terrain.process(); processedTerrain = true; }
+        if (travelling.current) {
+          if (!terrain.ready(travelling.current)) return;
+          physics.teleport(travelling.current); travelling.current = null; followCamera.current.reset();
+        }
         physics.tick(state.moveX, state.moveY, view.current.yaw, input.consumeJump(), terrain.ready(physics.feet()));
         session.updatePosition(physics.feet(), physics.grounded);
         if (state.moveX || state.moveY) facing.current = view.current.yaw + Math.atan2(-state.moveX, state.moveY);
@@ -137,7 +148,7 @@ export function ValidationScene({ input, onStatus, session }: { input: GameInput
       });
       const selectionStart = performance.now(), press = input.consumeMinePress(), aim = press ?? input.getAim();
       let selected: Coord | null = null;
-      if (aim.active && terrain.ready(feet)) {
+      if (aim.active && !travelling.current && terrain.ready(feet)) {
         // lookAt changes the local transform; picking must use this frame's camera.
         camera.updateMatrixWorld();
         pickRay.current.setFromCamera(pickPoint.current.set(aim.x, aim.y), lens);
@@ -154,7 +165,7 @@ export function ValidationScene({ input, onStatus, session }: { input: GameInput
       current.cracks.sync(terrain.render.pipeline.residents);
       if (clock.status <= 0) {
         const info = terrain.snapshot();
-        onStatus(terrain.error ?? (!terrain.ready(feet) ? '正在准备附近地形' : `深度 ${Math.max(0, Math.round(-feet[1] / CELL))} · 已挖 ${info.committedEdits}${selected ? ' · ' + mineralName(terrain.cell(selected) ?? 0) : ''}`));
+        onStatus(terrain.error ?? (travelling.current || !terrain.ready(feet) ? '正在准备附近地形' : `深度 ${Math.max(0, Math.round(-feet[1]))} 米 · ${stratumAtDepth(Math.max(0, Math.round(-feet[1]))).name} · 已挖 ${info.committedEdits}${selected ? ' · ' + mineralName(terrain.cell(selected) ?? 0) : ''}`));
         clock.status = 0.25;
       }
       terrain.measurements.add('frameCpuMs', performance.now() - start);

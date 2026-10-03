@@ -1,8 +1,11 @@
-import { generatedMineral } from './minerals.ts';
+import { generatedMineral } from './strata.ts';
+import { sampleMineral } from './minerals.ts';
+export { CELL } from './grid.ts';
+import { roomAir } from '../world/rooms.ts';
 import { SHAFT } from '../validation/course.ts';
 export type Coord = readonly [number, number, number];
-export const CELL = 2;
-export const WORLD_GENERATION = { version: 2, seed: 0 } as const;
+export type WorldGeneration = Readonly<{ version: number; seed: number; samples: boolean }>;
+export const WORLD_GENERATION: WorldGeneration = Object.freeze({ version: 4, seed: 0, samples: false });
 export const INDEX_SIZE = 16; // Sparse spatial index only; never a dense voxel allocation.
 export const RENDER_SIZE = 16;
 export const COLLISION_SIZE = 8;
@@ -45,14 +48,15 @@ function apply(edits: Edits, cells: readonly Coord[]) {
   }
   for (const [key, indices] of groups) edits.set(key, mergeRemoved(edits.get(key), indices));
 }
-export function baseXYZ(x: number, y: number, z: number): number {
+export function baseXYZ(x: number, y: number, z: number, generation: WorldGeneration = WORLD_GENERATION): number {
   if (x < -48 || x > 51 || y < -2000 || y > -1 || z < -48 || z > 51) return 0;
+  if (roomAir(x, y, z)) return 0;
   if (y >= -1000 && y <= -993 && x >= -8 && x < 8 && z >= -8 && z < 8) return 0;
   if (y >= SHAFT.minY && x >= SHAFT.minX && x <= SHAFT.maxX && z >= SHAFT.minZ && z <= SHAFT.maxZ) return 0;
-  return generatedMineral(x, y, z, WORLD_GENERATION.seed);
+  return (generation.samples ? sampleMineral(x, y, z) : null) ?? generatedMineral(x, y, z, generation.seed);
 }
-export function sampleXYZ(x: number, y: number, z: number, edits: Edits) {
-  const base = baseXYZ(x, y, z); // Check bounds before looking up the bounded numeric key.
+export function sampleXYZ(x: number, y: number, z: number, edits: Edits, generation: WorldGeneration = WORLD_GENERATION) {
+  const base = baseXYZ(x, y, z, generation); // Check bounds before looking up the bounded numeric key.
   return base && contains(edits.get(bucketKey(Math.floor(x / 16), Math.floor(y / 16), Math.floor(z / 16))), indexXYZ(x, y, z)) ? 0 : base;
 }
 export function affectedRegions(cell: Coord, size: number): Coord[] {
@@ -67,11 +71,12 @@ export function affectedRegions(cell: Coord, size: number): Coord[] {
   return result;
 }
 export class SparseWorld {
-  readonly generation = WORLD_GENERATION;
+  readonly generation: WorldGeneration;
+  constructor(generation: WorldGeneration = WORLD_GENERATION) { this.generation = Object.freeze({ ...generation }); }
   private readonly edits: Edits = new Map();
   revision = 0;
   removed = 0;
-  cell(c: Coord) { return sampleXYZ(...c, this.edits); }
+  cell(c: Coord) { return sampleXYZ(...c, this.edits, this.generation); }
   remove(cells: readonly Coord[]) {
     const accepted = [...new Map(cells.filter(c => inBounds(c) && c.every(Number.isInteger) && this.cell(c)).map(c => [chunkKey(c), c])).values()];
     if (accepted.length) { apply(this.edits, accepted); this.revision++; this.removed += accepted.length; }

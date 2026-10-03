@@ -53,13 +53,13 @@ export function ValidationPanel() {
     <output>{summary}</output>
     <div className="mineral-legend">{MINERALS.map(m => <span key={m.id}><i style={{ background: m.color }} />{m.name}</span>)}</div>
     <div><button type="button" onClick={() => window.__miningValidation?.teleport('surface')}>定位地表</button><button type="button" onClick={() => window.__miningValidation?.teleport('course')}>碰撞场</button><button type="button" onClick={() => window.__miningValidation?.teleport('deep')}>定位 1000 层</button></div>
-    <details className="ore-samples"><summary>矿样与合并检查</summary>
+    {new URLSearchParams(location.search).get('samples') === '1' && <details className="ore-samples"><summary>矿样与合并检查</summary>
       <div>同为 16×16 格表面；R 渲染三角 / C 碰撞三角</div>
       <div>{samples.map((s, i) => <button type="button" key={s.name} onClick={() => window.__miningValidation?.teleport((['uniform', 'bands', 'checker'] as const)[i])}>
         {s.name} R{s.renderTriangles ?? '—'} / C{s.collisionTriangles ?? '—'}
       </button>)}</div>
       <button type="button" aria-pressed={wireframe} onClick={() => { window.__miningValidation?.wireframe(!wireframe); setWireframe(!wireframe); }}>网格线{wireframe ? '开' : '关'}</button>
       <div>— 表示对应区域未完整加载；碰撞按 4 个 8 格区域合计。</div>
-    </details>
+    </details>}
   </aside>;
 }

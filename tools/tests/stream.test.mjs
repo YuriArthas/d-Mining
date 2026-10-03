@@ -6,15 +6,15 @@ import { buildRegion } from '../../src/game/terrain/meshing.ts';
 import { Inventory } from '../../src/game/logic/Inventory.ts';
 import { Mining } from '../../src/game/application/Mining.ts';
 import { oreDrops } from '../../src/game/application/items.ts';
-import { chunkKey, regionOf } from '../../src/game/terrain/SparseWorld.ts';
+import { chunkKey, regionOf, WORLD_GENERATION } from '../../src/game/terrain/SparseWorld.ts';
 await initPhysics();
 class WorkerProbe {
  requests=[];onmessage=null;onerror=null;onmessageerror=null;terminated=false;
  postMessage(job){this.requests.push(job);assert.ok(this.requests.length<=1,'unbounded worker queue');}
- flush(){const job=this.requests.shift();if(!job)return false;const results=job.regions.map(r=>({version:r.version,data:buildRegion(job.kind,r.coord,job.size,r.edits)}));this.onmessage?.({data:{id:job.id,epoch:job.epoch,transaction:job.transaction,results}});return true;}
+ flush(){const job=this.requests.shift();if(!job)return false;const results=job.regions.map(r=>({version:r.version,data:buildRegion(job.kind,r.coord,job.size,r.edits,job.generation)}));this.onmessage?.({data:{id:job.id,epoch:job.epoch,transaction:job.transaction,results}});return true;}
  terminate(){this.terminated=true;}
 }
-function setup(onExcavated){const p=new CharacterPhysics(),workers=[],stream=new TerrainStream(p,()=>{const w=new WorkerProbe();workers.push(w);return w;},onExcavated);stream.recenter(p.feet());return {p,stream,workers};}
+function setup(onExcavated){const p=new CharacterPhysics(),workers=[],stream=new TerrainStream(p,()=>{const w=new WorkerProbe();workers.push(w);return w;},onExcavated,{...WORLD_GENERATION,samples:true});stream.recenter(p.feet());return {p,stream,workers};}
 function drain(s,workers){for(let i=0;i<500;i++){s.process();for(const w of workers)w.flush();const v=s.snapshot();if(!v.pendingEdit&&!v.inFlight&&!v.queue)return;}throw new Error('stream did not drain');}
 function finish(f){f.stream.dispose();assert.ok(f.workers.every(w=>w.terminated));f.p.dispose();}
 test('render and physics have independent windows; logical data exists without either cache',()=>{

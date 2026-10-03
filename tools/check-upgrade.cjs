@@ -11,7 +11,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'../../d-Block-Blast/nod
   const ready=()=>page.waitForFunction(()=>{const s=window.__miningValidation?.snapshot();return s?.ready&&!s.queue&&!s.inFlight&&!s.pendingEdit&&s.grounded},null,{timeout:30000});
   const press=async(name)=>{const button=page.getByRole('button',{name,exact:true});if(touch)await button.tap();else await button.click();};
   try{
-   await page.goto(origin+(hosted?'/games/mining/index.html':'/')+'?debug=1');await ready();
+   await page.goto(origin+(hosted?'/games/mining/index.html':'/')+'?debug=1&samples=1');await ready();
    await page.addStyleTag({content:'.validation-panel,.input-monitor{display:none}'});
    await press('升级');await press('背包');await page.getByRole('dialog',{name:'升级'}).waitFor();
    assert.equal(await page.getByRole('button',{name:'还差 20 金币',exact:true}).isDisabled(),true);

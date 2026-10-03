@@ -9,7 +9,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'../../d-Block-Blast/nod
  const snap=()=>p.evaluate(()=>window.__miningValidation.snapshot());
  const ready=()=>p.waitForFunction(()=>{const s=window.__miningValidation?.snapshot();return s?.ready&&!s.queue&&!s.inFlight&&!s.pendingEdit&&s.grounded},null,{timeout:30000});
  try{
-  await p.goto(origin+(hosted?'/games/mining/index.html':'/')+'?debug=1');await ready();
+  await p.goto(origin+(hosted?'/games/mining/index.html':'/')+'?debug=1&samples=1');await ready();
   await p.locator('.ore-samples summary').click();
   const kinds=['uniform','bands','checker'],names=['整片','条带','交错'],expected=[2,12,512];
   for(let i=0;i<3;i++){

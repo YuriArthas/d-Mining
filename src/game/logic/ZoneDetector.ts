@@ -3,6 +3,7 @@ export class ZoneDetector {
   private inside = false;
   private config: ZoneConfig;
   constructor(config: ZoneConfig) { this.config = Object.freeze({ ...config }); }
+  get isInside() { return this.inside; }
   reset() { this.inside = false; }
   update(feet: readonly number[], grounded: boolean): 'enter' | 'exit' | null {
     const c = this.config, radius = c.radius + (this.inside ? c.hysteresis : 0);

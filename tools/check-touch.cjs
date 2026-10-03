@@ -28,7 +28,7 @@ const {PerspectiveCamera,Vector3}=require('../node_modules/three');
  try{
   for(const portrait of [false,true]){
    const layout=portrait?'portrait':'landscape';await p.setViewportSize(portrait?{width:390,height:844}:{width:844,height:390});
-   await p.goto(origin+(hosted?'/games/mining/index.html':'/')+'?debug=1');await ready();await p.addStyleTag({content:'.validation-panel,.input-monitor{display:none}'});await teleport(41);
+   await p.goto(origin+(hosted?'/games/mining/index.html':'/')+'?debug=1&samples=1');await ready();await p.addStyleTag({content:'.validation-panel,.input-monitor{display:none}'});await teleport(41);
    assert.equal(await p.locator('.mine-button,.crosshair').count(),0);assert.equal(await p.locator('.touch-target').isVisible(),false);
    assert.ok(await p.evaluate(()=>document.querySelector('canvas').width>document.querySelector('canvas').height));
    const old=(await snap()).committedEdits,tap=await project([43,0,-19]);

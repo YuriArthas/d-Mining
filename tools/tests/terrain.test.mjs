@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { WORLD_GENERATION } from '../../src/game/terrain/SparseWorld.ts';
+const samples = {...WORLD_GENERATION, samples:true};
 import { greedyMesh, buildRegion } from '../../src/game/terrain/meshing.ts';
 import { CELL, RENDER_SIZE as CHUNK, regionOf, SparseWorld, sampleXYZ, affectedRegions, LIMITS, mergeRemoved, contains } from '../../src/game/terrain/SparseWorld.ts';
 
@@ -75,13 +77,13 @@ test('six-mineral sample surfaces merge to 2/12/512 render triangles but identic
  const { ORE_SAMPLES } = await import('../../src/game/terrain/minerals.ts');
  const expected=[2,12,512];
  for(const [i,s] of ORE_SAMPLES.entries()){
-  const render=buildRegion('render',[s.x/16,-1,s.z/16],16,[]).mesh;
+  const render=buildRegion('render',[s.x/16,-1,s.z/16],16,[],samples).mesh;
   assert.equal(render.indices.length/3,expected[i]);assert.equal(surfaceArea(render),16*16*CELL**2);
   assert.equal(render.tiles.length,render.positions.length/3);assert.equal(render.uvs.length,render.tiles.length*2);
   const kinds=new Set(render.tiles);assert.equal(kinds.size,i===0?1:6);
   let triangles=0,area=0;
   for(let z=0;z<2;z++)for(let x=0;x<2;x++){
-   const mesh=buildRegion('collision',[s.x/8+x,-1,s.z/8+z],8,[]).mesh;
+   const mesh=buildRegion('collision',[s.x/8+x,-1,s.z/8+z],8,[],samples).mesh;
    triangles+=mesh.indices.length/3;area+=surfaceArea(mesh);
    assert.equal(mesh.uvs.length,0);assert.equal(mesh.tiles.length,0);assert.equal(mesh.normals.length,0);
   }
@@ -113,11 +115,11 @@ test('ore identity remains deterministic across lazy snapshots, sparse edits and
 test('digging each sample rebuilds exactly the exposed area and does not create internal ore faces',async()=>{
  const { ORE_SAMPLES }=await import('../../src/game/terrain/minerals.ts');
  for(const s of ORE_SAMPLES){
-  const w=new SparseWorld(),cell=[s.x+7,-1,s.z+7],region=[s.x/16,-1,s.z/16];w.remove([cell]);
-  const render=buildRegion('render',region,16,w.snapshot(region,16)).mesh;
+  const w=new SparseWorld(samples),cell=[s.x+7,-1,s.z+7],region=[s.x/16,-1,s.z/16];w.remove([cell]);
+  const render=buildRegion('render',region,16,w.snapshot(region,16),w.generation).mesh;
   // Removed top face becomes a bottom face plus four new walls.
   assert.equal(surfaceArea(render),(16*16+4)*CELL**2);
-  const physical=buildRegion('collision',region,16,w.snapshot(region,16)).mesh;
+  const physical=buildRegion('collision',region,16,w.snapshot(region,16),w.generation).mesh;
   assert.equal(surfaceArea(render),surfaceArea(physical));
  }
 });

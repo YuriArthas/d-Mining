@@ -12,7 +12,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'../../d-Block-Blast/nod
   const ready=()=>page.waitForFunction(()=>{const s=window.__miningValidation?.snapshot();return s?.ready&&!s.queue&&!s.inFlight&&!s.pendingEdit&&s.grounded});
   const hit=async cell=>{await page.waitForFunction(()=>{const t=window.__miningValidation.snapshot().combat;return t.now>=t.nextAttackAt});const r=await page.evaluate(c=>window.__miningValidation.hit(c),cell);assert.ok(['hit','breaking'].includes(r.status));await page.waitForTimeout(60);return r;};
   try{
-   await page.goto(origin+(hosted?'/games/mining/index.html':'/')+'?debug=1');await ready();await page.addStyleTag({content:'.validation-panel,.input-monitor{display:none}'});
+   await page.goto(origin+(hosted?'/games/mining/index.html':'/')+'?debug=1&samples=1');await ready();await page.addStyleTag({content:'.validation-panel,.input-monitor{display:none}'});
    await page.evaluate(()=>window.__miningValidation.teleport([27,.1,-47]));await ready();await page.waitForTimeout(200);
    const before=await snap(),cell=[14,-1,-25];
    const camera=new PerspectiveCamera(55,Math.max(viewport.width,viewport.height)/Math.min(viewport.width,viewport.height),.08,1000);

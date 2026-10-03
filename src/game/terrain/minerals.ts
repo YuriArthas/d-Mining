@@ -12,26 +12,13 @@ export const ORE_SAMPLES = [
   { name: '条带', x: 0, z: -32, spawn: [17, 0.1, -47] as const },
   { name: '交错', x: 16, z: -32, spawn: [49, 0.1, -47] as const },
 ] as const;
-// A fixed validation strip, generated on demand just like the rest of the mine.
+// An explicit validation-only strip; production generation never consults it.
 // All three patches have identical occupancy and span one 16-cell render region.
 export function sampleMineral(x: number, y: number, z: number): number | null {
   if (y < -16 || y >= 0 || z < -32 || z >= -16 || x < -16 || x >= 32) return null;
   if (x < 0) return 1;
   if (x < 16) return 1 + Math.floor(x * MINERALS.length / 16);
   return 1 + ((x - 16 + z + 32) % MINERALS.length);
-}
-export function generatedMineral(x: number, y: number, z: number, seed: number) {
-  const sample = sampleMineral(x, y, z);
-  if (sample !== null) return sample;
-  // Coherent small deposits instead of independent noise at every voxel. No
-  // cache or voxel arrays; world coordinates also keep veins continuous at seams.
-  const hash = (Math.imul(Math.floor(x / 3), 73856093) ^ Math.imul(Math.floor(y / 3), 19349663) ^ Math.imul(Math.floor(z / 3), 83492791) ^ seed) >>> 0;
-  const ore = hash % 100;
-  if (ore < 9) return 3;
-  if (ore < 18) return 4;
-  if (ore < (y < -250 ? 25 : 22)) return 5;
-  if (ore < (y < -500 ? 32 : 25)) return 6;
-  return y < -500 ? 2 : 1;
 }
 
 export const TILE_SIZE = 32;

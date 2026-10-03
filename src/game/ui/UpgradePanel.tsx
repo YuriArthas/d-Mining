@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import type { GameSession } from '../application/GameSession.ts';
 import { GameButton } from './GameButton.tsx';
-export function UpgradePanel({ session, onClose }: {
+export function UpgradePanel({ session, onClose, contextual = false }: {
   session: Pick<GameSession, 'subscribe' | 'getSnapshot' | 'upgradeBackpack' | 'upgradePickaxe'>;
   onClose: () => void;
+  contextual?: boolean;
 }) {
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot);
   const [tab, setTab] = useState<'pickaxe' | 'backpack'>('pickaxe');
@@ -13,9 +14,9 @@ export function UpgradePanel({ session, onClose }: {
   const next = tab === 'pickaxe' ? axe.next : bag.next;
   const price = tab === 'pickaxe' ? axe.price : bag.next?.price ?? 0;
   const canAfford = tab === 'pickaxe' ? axe.canAfford : bag.canAfford;
-  useEffect(() => { panel.current?.focus(); }, []);
-  return <div className="upgrade-backdrop">
-    <section ref={panel} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="upgrade-title" className="upgrade-panel"
+  useEffect(() => { if (!contextual) panel.current?.focus(); }, [contextual]);
+  return <div className={`upgrade-backdrop${contextual ? ' shop-backdrop' : ''}`}>
+    <section ref={panel} tabIndex={-1} role="dialog" aria-modal={!contextual} aria-labelledby="upgrade-title" className="upgrade-panel"
       onKeyDown={event => {
         if (event.key === 'Escape') { event.preventDefault(); onClose(); }
         if (event.key !== 'Tab') return;
@@ -24,7 +25,7 @@ export function UpgradePanel({ session, onClose }: {
         const nextIndex = event.shiftKey ? (index <= 0 ? buttons.length - 1 : index - 1) : (index + 1) % buttons.length;
         event.preventDefault(); buttons[nextIndex]?.focus();
       }}>
-      <header><h1 id="upgrade-title">升级</h1><GameButton blurAfterPress={false} aria-label="关闭升级界面" className="upgrade-close" onPress={onClose}>关闭</GameButton></header>
+      <header><h1 id="upgrade-title">{contextual ? '升级商店' : '升级'}</h1><GameButton blurAfterPress={false} aria-label="关闭升级界面" className="upgrade-close" onPress={onClose}>关闭</GameButton></header>
       <nav className="upgrade-tabs" aria-label="升级类别">
         {(['pickaxe', 'backpack'] as const).map(value => <GameButton key={value} blurAfterPress={false} aria-pressed={tab === value} onPress={() => { setTab(value); setMessage(''); }}>{value === 'pickaxe' ? '镐子' : '背包'}</GameButton>)}
       </nav>
@@ -51,7 +52,7 @@ export function UpgradePanel({ session, onClose }: {
         }
         panel.current?.focus();
       }}>{!next ? (tab === 'backpack' ? '已升至最高容量' : '已达数值范围上限') : canAfford ? `花费 ${price} 金币升级` : `还差 ${price - state.coins} 金币`}</GameButton>
-      <output role="status" className="upgrade-result">{message || '矿物可在地表金色圆圈出售'}</output>
+      <output role="status" className="upgrade-result">{message || '矿物可在金色圆圈出售'}</output>
     </section>
   </div>;
 }

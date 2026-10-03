@@ -140,7 +140,7 @@ export class RegionPipeline<T> {
     const targets = stage.length ? stage : ordinary.sort((a, b) => this.distance(a.coord) - this.distance(b.coord));
     if (!targets.length) return;
     const transaction = stage.length ? this.transaction : 0;
-    const job: BuildJob = { id: ++this.serial, epoch: this.epoch, transaction, kind: this.kind, size: this.size,
+    const job: BuildJob = { generation: this.world.generation, id: ++this.serial, epoch: this.epoch, transaction, kind: this.kind, size: this.size,
       regions: targets.slice(0, 8).map(({ coord }) => ({ coord, version: this.version(chunkKey(coord)), edits: this.world.snapshot(coord, this.size, transaction ? this.edits : []) })) };
     this.inFlight = job; this.worker.postMessage(job);
   }

@@ -22,7 +22,7 @@ const {digCells,totals}=require('./combat-browser.cjs');
   };
   const buy=async prices=>{await press('升级');for(const price of prices)await press(`花费 ${price} 金币升级`);await press('关闭升级界面')};
   try{
-   await page.goto(origin+(hosted?'/games/mining/index.html':'/')+'?debug=1');await ready();await page.addStyleTag({content:'.validation-panel,.input-monitor{display:none}'});await layoutCheck();
+   await page.goto(origin+(hosted?'/games/mining/index.html':'/')+'?debug=1&samples=1');await ready();await page.addStyleTag({content:'.validation-panel,.input-monitor{display:none}'});await layoutCheck();
    await teleport('bands');const point=await project([17,0,-49]);
    if(touch)await send('touchStart',[point]);else{await page.mouse.move(point.x,point.y);await page.mouse.down()}
    await page.waitForFunction(()=>window.__miningValidation.health([8,-1,-25])===80);
