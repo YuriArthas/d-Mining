@@ -1,10 +1,10 @@
 import { appearanceKey } from '../../src/game/terrain/minerals.ts';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { STRATA, stratumAtDepth, generatedMineral } from '../../src/game/terrain/strata.ts';
+import { STRATA, stratumAtDepth, generatedMineral, mineralRoll } from '../../src/game/terrain/strata.ts';
 import { SparseWorld, WORLD_GENERATION, regionOf, sampleXYZ } from '../../src/game/terrain/SparseWorld.ts';
 import { buildRegion, greedyMesh } from '../../src/game/terrain/meshing.ts';
-import { oreDefinition } from '../../src/game/application/items.ts';
+import {oreChanceAtDepth} from '../../src/game/content/oreDistribution.ts';
 
 test('layer boundaries use metres and the top face of each block', () => {
  assert.equal(stratumAtDepth(399.999).id,'surface');assert.equal(stratumAtDepth(400).id,'old_mine');
@@ -18,30 +18,33 @@ test('production shallow terrain excludes advanced minerals even at old sample c
  assert.equal(fixture.cell([14,-1,-25]),6);assert.notEqual(game.cell([14,-1,-25]),6);
  assert.equal(game.generation.samples,false);assert.equal(game.stats().editBytes,0);
 });
-test('large samples match configured frequencies and higher layers increase value per capacity', () => {
- let lastValue=0,lastHp=0;
+test('per-cell frequencies follow layer weights and ore chance rises continuously with depth', () => {
+ let previous=0;
  for(const [index,layer] of STRATA.entries()){
-  const counts=new Map();let total=0,coins=0,volume=0,hp=0;
-  for(let y=-40-index*200;y>-64-index*200;y--)for(let x=-48;x<=51;x++)for(let z=-48;z<=51;z++){
-   const id=generatedMineral(x,y,z,0),item=oreDefinition(id);counts.set(id,(counts.get(id)||0)+1);total++;coins+=item.price;volume+=item.volume;hp+=item.maxHp;
+  const counts=new Map();let total=0,chance=0;
+  for(let y=-40-index*200;y>-64-index*200;y--){
+   chance+=oreChanceAtDepth(-(y+1)*2)/24;
+   for(let x=-48;x<=51;x++)for(let z=-48;z<=51;z++){const kind=generatedMineral(x,y,z,0);counts.set(kind,(counts.get(kind)||0)+1);total++;}
   }
-  const weights=[...layer.ores,{kind:layer.base,weight:100-layer.ores.reduce((n,o)=>n+o.weight,0)}];
-  for(const {kind,weight} of weights)assert.ok(Math.abs((counts.get(kind)||0)/total-weight/100)<.015,`${layer.id} mineral ${kind}`);
-  assert.equal(counts.size,weights.length);assert.ok(coins/volume>lastValue);assert.ok(hp/total>lastHp);lastValue=coins/volume;lastHp=hp/total;
+  const sum=layer.ores.reduce((n,o)=>n+o.weight,0);
+  for(const o of layer.ores)assert.ok(Math.abs((counts.get(o.kind)||0)/total-chance*o.weight/sum)<.003,`${layer.id} mineral ${o.kind}`);
+  const density=1-counts.get(layer.base)/total;assert.ok(Math.abs(density-chance)<.003);assert.ok(density>previous);previous=density;
  }
+ assert.equal(oreChanceAtDepth(0),.025);assert.equal(oreChanceAtDepth(4000),.28);
+ for(let d=1;d<=4000;d++)assert.ok(oreChanceAtDepth(d)>=oreChanceAtDepth(d-1));
 });
-test('coherent deposits survive negative coordinates, seeds, and sparse region boundaries', () => {
+test('individual cell rolls are deterministic and neighboring ores are not quantized into 3-cube deposits', () => {
+ const rolls=new Set();for(let x=0;x<3;x++)for(let y=0;y<3;y++)for(let z=0;z<3;z++)rolls.add(mineralRoll(x-6,y-1401,z-9,73));
+ assert.equal(rolls.size,27);
+ const y=-1601,base=stratumAtDepth(-(y+1)*2).base,p=oreChanceAtDepth(-(y+1)*2);let adjacent=0;
+ for(let x=-15000;x<15000;x++)if(generatedMineral(x,y,5,73)!==base&&generatedMineral(x+1,y,5,73)!==base)adjacent++;
+ assert.ok(Math.abs(adjacent/30000-p*p)<.006,'neighbor probability should be independent');
  const g={...WORLD_GENERATION,seed:73},world=new SparseWorld(g);
- for(const y of [-40,-240,-440]){
-  // Each complete deposit has a single kind, including deposits at negative x/z.
-  const base=[-6,Math.floor(y/3)*3,-9],kind=generatedMineral(...base,g.seed);
-  for(let x=0;x<3;x++)for(let a=0;a<3;a++)for(let z=0;z<3;z++)assert.equal(generatedMineral(base[0]+x,base[1]+a,base[2]+z,g.seed),kind);
- }
  for(const c of [[7,-200,33],[8,-201,33],[15,-400,33],[16,-401,33]]){
   for(const size of [8,16])assert.equal(sampleXYZ(...c,new Map(world.snapshot(regionOf(c,size),size)),g),world.cell(c));
   world.remove([c]);for(const size of [8,16])assert.equal(sampleXYZ(...c,new Map(world.snapshot(regionOf(c,size),size)),g),0);
  }
- const different=Array.from({length:100},(_,x)=>generatedMineral(x,-80,4,0)!==generatedMineral(x,-80,4,73));assert.ok(different.some(Boolean));
+ assert.ok(Array.from({length:100},(_,x)=>generatedMineral(x,-80,4,0)!==generatedMineral(x,-80,4,73)).some(Boolean));
 });
 test('worker render and collision use the exact same generation source across layer seams', () => {
  for(const generation of [WORLD_GENERATION,{...WORLD_GENERATION,samples:true,seed:73}]){

@@ -22,7 +22,7 @@ export function validateLayers(layers: readonly Layer[]) {
     ids.add(l.id); themeById(l.theme); resourceByKind(l.base);
     const kinds=new Set([l.base]); let sum=0;
     for(const ore of l.ores) { resourceByKind(ore.kind); if(kinds.has(ore.kind)||!Number.isFinite(ore.weight)||ore.weight<=0)throw new Error(`无效矿物分布 ${l.id}`); kinds.add(ore.kind);sum+=ore.weight; }
-    if(sum>=100)throw new Error(`基础矿体比例为空 ${l.id}`);
+    if(!Number.isFinite(sum))throw new Error(`矿物权重总和无效 ${l.id}`);
   }
   if(!layers.length)throw new Error('楼层配置为空');
 }

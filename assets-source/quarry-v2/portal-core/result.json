@@ -1,0 +1,17 @@
+{
+  "taskId": "0c5281af-d58e-4d00-a575-b578584f7036",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "text_to_model",
+  "faceLimit": 1200,
+  "prompt": "An isolated modern ROBLOX Mining Simulator game prop. Extremely simple chunky voxel-like large shapes, clean saturated flat painted colors, matte nonmetal materials, no realistic grain, no tiny detail, no text, no logos, no characters, no ground landscape. Complete object, centered. Miniature earth core landmark: one massive gold diamond crystal between two broad dark purple blocky pillars, on a small flat purple stone base. Broad glossy-looking painted gold faces, no tiny crystals or effects.",
+  "bytes": 2029244,
+  "triangles": 1037,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "generated_image",
+    "rendered_image"
+  ]
+}

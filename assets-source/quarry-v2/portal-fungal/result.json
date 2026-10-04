@@ -1,0 +1,17 @@
+{
+  "taskId": "021a12ec-1f0f-48c8-a97e-f9e576dcaf90",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "text_to_model",
+  "faceLimit": 1200,
+  "prompt": "An isolated modern ROBLOX Mining Simulator game prop. Extremely simple chunky voxel-like large shapes, clean saturated flat painted colors, matte nonmetal materials, no realistic grain, no tiny detail, no text, no logos, no characters, no ground landscape. Complete object, centered. Miniature mushroom cave landmark: exactly three large chunky glowing-looking turquoise and violet mushrooms on a small flat dark stone foot. Big smooth caps, short thick stems, no small mushrooms or grass. Simple iconic silhouette.",
+  "bytes": 1773128,
+  "triangles": 1116,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "generated_image",
+    "rendered_image"
+  ]
+}

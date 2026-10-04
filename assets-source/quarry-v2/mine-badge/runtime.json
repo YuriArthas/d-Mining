@@ -1,0 +1,17 @@
+{
+  "materialProfile": "generated-textures",
+  "solidColor": null,
+  "parts": [
+    "mine-badge.000.part"
+  ],
+  "bytes": 350281,
+  "sha256": "eff2e15758bc7a666453ea752c34234c175ac4a4685abe555c6a633083d1539a",
+  "taskId": "3e63c078-3bb7-43fe-b703-faafa3403c64",
+  "sourceSha256": "30aa6b53a8141ec2bd9f0c71f52b545181f50e7ac6fb0a41a3ea89bf0c2706ae",
+  "triangles": 1886,
+  "faceLimit": 2000,
+  "source": "new Tripo image_to_model",
+  "reference": "output/imagegen/mine-material-light/mine-badge.png",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

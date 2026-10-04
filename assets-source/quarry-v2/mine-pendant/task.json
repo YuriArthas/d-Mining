@@ -1,0 +1,8 @@
+{
+  "task_id": "51eee6cc-af2f-457d-8724-0913a669a61b",
+  "type": "image_to_model",
+  "reference": "output/imagegen/mine-material-light/mine-pendant.png",
+  "model_version": "v3.1-20260211",
+  "face_limit": 1800,
+  "prompt": "Modern Roblox orange construction floodlight hanging from a straight rod; broad warm lens faces vertically down."
+}

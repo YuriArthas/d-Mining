@@ -1,0 +1,8 @@
+{
+  "task_id": "3e63c078-3bb7-43fe-b703-faafa3403c64",
+  "type": "image_to_model",
+  "reference": "output/imagegen/mine-material-light/mine-badge.png",
+  "model_version": "v3.1-20260211",
+  "face_limit": 2000,
+  "prompt": "Symmetrical modern Roblox mining badge: cyan gem and crossed pickaxes on a blue medallion, ivory rim."
+}

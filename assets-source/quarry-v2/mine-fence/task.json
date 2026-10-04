@@ -1,0 +1,8 @@
+{
+  "task_id": "b84a3c88-d25b-4296-b136-5604bc9c5561",
+  "type": "image_to_model",
+  "reference": "output/imagegen/mine-material-light/mine-fence.png",
+  "model_version": "v3.1-20260211",
+  "face_limit": 500,
+  "prompt": "Simple low Roblox fence panel: two thin posts and two straight rails, no grain or ornament."
+}

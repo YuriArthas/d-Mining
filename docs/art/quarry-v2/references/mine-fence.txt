@@ -1,0 +1,6 @@
+Use case: stylized-concept
+Asset type: single modular fence segment for Roblox Mining Simulator, reference for image-to-3D.
+Subject: exactly TWO straight thin square wooden end posts joined by exactly TWO straight horizontal rectangular wooden rails. The posts are dark brown and rails medium honey brown. Width is FOUR TIMES the height. Thin cross-sections, low waist-height safety fence around a mine pit. Flat straight square-cut timber, simple Roblox Studio block construction, precise symmetric geometry.
+Composition: full fence segment centered in a nearly front orthographic view, a tiny amount of side depth visible. White background, no ground plane. All parts visible, rails fully horizontal, posts completely vertical.
+Materials: plain uniform matte brown painted wood, no wood grain, no baked stains, no weathering, no metal, no bolts, no fancy carving.
+Constraints: no diagonal braces, no extra posts, no rocks, no plants, no lanterns, no ornaments, no text, no characters. Not a wall or a gate. Keep the broad open gap between the rails.

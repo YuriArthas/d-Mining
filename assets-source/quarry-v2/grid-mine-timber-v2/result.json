@@ -1,0 +1,17 @@
+{
+  "taskId": "1848dc16-8005-4b9b-9683-cf43b4c28d9a",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "image_to_model",
+  "reference": "output/imagegen/grid-mine/grid-mine-timber-v2.png",
+  "faceLimit": 200,
+  "prompt": "Image-guided regular Roblox/Minecraft timber cube, unchanged planar geometry.",
+  "bytes": 2104608,
+  "triangles": 82,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "rendered_image"
+  ]
+}

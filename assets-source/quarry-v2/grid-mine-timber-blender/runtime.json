@@ -1,0 +1,18 @@
+{
+  "materialProfile": "authored-color",
+  "solidColor": null,
+  "parts": [
+    "grid-mine-timber-blender.000.part"
+  ],
+  "bytes": 5109,
+  "sha256": "d6fd60b5e9d15b5287c8782f7f5b17ff0a2d8916a1e4e799557f9bbe1f2a788f",
+  "generationId": "grid-mine-timber-blender-v1",
+  "textureSize": 128,
+  "sourceSha256": "42ccd4657548147639283c580916e474e66d6c5671600c38b57da908b8edd76e",
+  "triangles": 44,
+  "faceLimit": 128,
+  "source": "Blender authored mesh and texture",
+  "reference": "tools/blender/build-mine-blocks.py",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

@@ -1,5 +1,6 @@
 const assert=require('node:assert/strict'),fs=require('node:fs/promises');
 const {chromium}=require('../../d-Block-Blast/node_modules/playwright');
+const assetPlan=require('../docs/art/quarry-v2/assets.json');
 const {digCells}=require('./combat-browser.cjs');
 (async()=>{
  const base='https://w-sunjun-public.dev.clock-p.com/',report={mode:process.env.SMOKE?'final-art-smoke':'full',errors:[],checks:[],samples:[],resources:[]};
@@ -20,13 +21,13 @@ const {digCells}=require('./combat-browser.cjs');
   page.on('response',r=>{if(r.status()>=400)report.errors.push(`${r.status()} ${r.url()}`)});
   const snap=()=>page.evaluate(()=>window.__miningValidation.snapshot());
   const ready=async()=>{try{return await page.waitForFunction(()=>{const s=window.__miningValidation?.snapshot();return s?.ready&&s.grounded&&!s.queue&&!s.inFlight&&!s.pendingEdit},null,{polling:500});}catch(error){report.lastState=await page.evaluate(()=>window.__miningValidation?.snapshot());await save();throw error;}};
-  const shot=async name=>{const frame=(await snap()).renderer.submission.submitted;await page.waitForFunction(n=>window.__miningValidation.snapshot().renderer.submission.submitted>=n+2,frame,{polling:200});if(!process.env.DATA_ONLY){console.log('capturing',name);await page.screenshot({path:`artifacts/quarry-${layout}-${name}.png`,timeout:180000});}report.samples.push({layout,name,capture:process.env.DATA_ONLY?'runtime-state-only':'screenshot',snapshot:await snap()});await save();console.log(layout,name)};
+  const shot=async name=>{const capture=!process.env.DATA_ONLY&&(!process.env.SHOT_NAMES||process.env.SHOT_NAMES.split(',').includes(name));const frame=(await snap()).renderer.submission.submitted;await page.waitForFunction(n=>window.__miningValidation.snapshot().renderer.submission.submitted>=n+2,frame,{polling:200});if(capture){console.log('capturing',name);await page.screenshot({path:`artifacts/quarry-${layout}-${name}.png`,timeout:180000});}report.samples.push({layout,name,capture:capture?'screenshot':'runtime-state-only',snapshot:await snap()});await save();console.log(layout,name)};
   await page.goto(base);console.log('public list loaded');const preview=page.locator('a[href$="games/mining-test/index.html"]');assert.equal(await preview.count(),1);assert.equal(await page.locator('a[href$="games/mining/index.html"]').count(),1);assert.equal(await preview.evaluate(el=>el.previousElementSibling.querySelector('strong').textContent),'Mining');
   await page.goto(base+'games/mining-test/index.html?debug=1');console.log('public game document loaded');await ready();console.log('runtime ready');await page.addStyleTag({content:'.validation-panel,.input-monitor{display:none}'});
-  const s=await snap();report.initial=s;await save();assert.equal(s.facilities.surfaceShading.version,'camp-tripo-v2');assert.equal(s.facilities.surfaceShading.runtimeOcclusionProbes,0);assert.equal(s.facilities.visuals.length,10);assert.equal(s.lighting.surfaceFog,false);assert.equal(s.startup.sky.sharedSkyLighting,true);
+  const s=await snap();report.initial=s;await save();assert.equal(s.facilities.surfaceShading.version,'camp-tripo-v2');assert.equal(s.facilities.surfaceShading.runtimeOcclusionProbes,0);assert.equal(s.facilities.visuals.length,10);assert.equal(s.lighting.surfaceFog,false);assert.equal(s.startup.sky.sharedSkyLighting,true);assert.equal(s.startup.sky.version,'camp-moonlit-v2');assert.equal(s.lighting.surfaceArea.fillLights,8);
   const probes=await page.evaluate(()=>{const api=window.__miningValidation;let count=0;for(let x=-10;x<10;x++)for(let z=-10;z<10;z++)if(api.canMine([x,-1,z]))count++;return {count,shaft:[[-7.99,-7.99],[0,0],[7.99,7.99],[-7.99,7.99],[7.99,-7.99]].map(([x,z])=>api.surfaceHeight(x,z)),outside:api.surfaceHeight(8.01,0)}});
   assert.equal(probes.count,64);assert.ok(probes.shaft.every(h=>h===null));assert.ok(probes.outside!==null&&Math.abs(probes.outside)<.03);report.checks.push(layout+': open 64-cell shaft, flat spawn, sky IBL, ten scenery sites, no runtime AO');
-  assert.equal(s.facilities.surfaceShading.assets.length,61);assert.equal(s.facilities.surfaceShading.instances,808);await shot('arrival');
+  assert.equal(s.facilities.surfaceShading.assets.length,assetPlan.uniqueModels);assert.equal(s.facilities.surfaceShading.instances,assetPlan.instances);await shot('arrival');
   report.resources.push({layout,entries:await page.evaluate(()=>performance.getEntriesByType('resource').filter(r=>/glb|webp|wasm|index-/.test(r.name)).map(r=>({name:r.name,duration:r.duration,bytes:r.encodedBodySize,transfer:r.transferSize})))});await save();
   if(!touch&&!process.env.ARRIVAL_ONLY){
    if(!process.env.SMOKE){await page.evaluate(()=>window.__miningValidation.teleport([0,.1,9.5]));await ready();await digCells(page,[[-1,-1,3],[0,-1,3]]);await ready();assert.ok((await snap()).economy.inventory.used>0);
@@ -35,6 +36,15 @@ const {digCells}=require('./combat-browser.cjs');
    if(process.env.REVERSE){await page.evaluate(()=>{window.__miningValidation.teleport([-3,.1,16]);window.__miningValidation.look(2.6,.12)});await ready();await shot('reverse');}
    if(process.env.FACILITIES){await page.evaluate(()=>{window.__miningValidation.teleport([-18,.1,15]);window.__miningValidation.look(.3,.08)});await ready();assert.equal((await snap()).economy.shopId,'surface-upgrade');await page.getByRole('heading',{name:'升级商店',exact:true}).waitFor();await shot('upgrade-shop');await page.evaluate(()=>window.__miningValidation.teleport([-13,.1,20]));await ready();assert.equal((await snap()).economy.shopId,null);assert.equal(await page.getByRole('heading',{name:'升级商店',exact:true}).count(),0);report.checks.push('surface upgrade shop opens on entry and closes on exit');}
    if(process.env.ENCLOSURE){await page.evaluate(()=>{window.__miningValidation.teleport([0,.1,17]);window.__miningValidation.look(0,.25)});await ready();await shot('shaft-frame');}
+   if(process.env.MINE_LIGHT){
+    const detail=(await snap()).facilities.surfaceShading;
+    assert.equal(detail.mineMaterials,'blender-authored-128px');const area=(await snap()).lighting.surfaceArea;assert.equal(area.independentOfDecorations,true);assert.equal(area.castsShadow,true);assert.ok(area.position[1]>8);assert.ok(area.intensity>0);assert.equal(detail.decorativeLights.emitLight,false);
+    assert.ok(detail.assets.some(a=>a.name==='mine-badge'));assert.ok(detail.assets.some(a=>a.name==='mine-pendant'));
+    await page.evaluate(()=>{window.__miningValidation.teleport([0,.1,36]);window.__miningValidation.look(0,.05)});await ready();await shot('mine-facade');
+    await page.evaluate(()=>{window.__miningValidation.teleport([0,.1,8]);window.__miningValidation.look(0,-.14)});await ready();await shot('mine-lamp');
+    report.checks.push('painted block materials, mining badge and downward shadowed mine light');
+   }
+   if(process.env.NIGHT){await page.evaluate(()=>{window.__miningValidation.teleport([8,.1,32]);window.__miningValidation.look(.65,-.32)});await ready();await shot('night-sky');}
    if(process.env.ROOF){await page.evaluate(()=>{window.__miningValidation.teleport([0,.1,-3]);window.__miningValidation.look(0,.12)});await ready();await shot('mine-interior');await page.evaluate(()=>{window.__miningValidation.teleport([7,.1,0]);window.__miningValidation.look(Math.PI/2,1.3)});await ready();assert.equal((await snap()).camera.obstructed,false);report.checks.push('roof interior and steep camera clearance');}
    if(process.env.BOUNDARY){await page.evaluate(()=>{window.__miningValidation.teleport([-31,.1,0]);window.__miningValidation.look(Math.PI/2,.16)});await ready();await shot('timber-boundary');}
    await page.evaluate(()=>window.__miningValidation.teleport([0,.1,18]));await ready();assert.deepEqual((await snap()).facilities.visuals,s.facilities.visuals);report.checks.push('ordinary scenery stays resident');

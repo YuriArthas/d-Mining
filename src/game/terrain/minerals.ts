@@ -45,9 +45,9 @@ function buildMineralAtlas(response:boolean) {
   for(let y=0;y<TILE_SIZE;y++)for(let x=0;x<TILE_SIZE;x++){
    const px=Math.floor(x/2),py=Math.floor(y/2);
    const broad=grain(Math.floor(px/5),Math.floor(py/5),tile),medium=grain(Math.floor(px/2),Math.floor(py/2),tile+23),fine=grain(px,py,tile+43);
-   let shade=floor?0:(broad-.5)*24+(medium-.5)*17+(fine-.5)*14;
+   let shade=(floor||r?.base)?0:(broad-.5)*24+(medium-.5)*17+(fine-.5)*14;
    let mark=false,edge=false,facet=0,fracture=false;
-   if(!floor){
+   if(!floor&&!r!.base){
     // Short jagged fractures and layered grain remain distinct from damage cracks.
     const seam=Math.floor(9+py*.27)+Math.floor(py/6)%2;
     fracture=(px===seam&&py>6&&py<25)||(py===Math.floor(23-px*.18)&&px>17&&px<28);
@@ -80,7 +80,7 @@ function buildMineralAtlas(response:boolean) {
     const metal=r&&(r.pattern==='metal'||[4,5,16,17,27,28].includes(r.kind));
     const glass=r&&['ice','crystal','gem','star','amber'].includes(r.pattern);
     const inclusion=!!r&&(r.base||mark);
-    const h=floor?.5:mark?(edge?.43:.6+(medium-.5)*.045):.49+(broad-.5)*.065+(medium-.5)*.038-(fracture?.035:0);
+    const h=mark?1:0;
     pixels[i]=Math.round(h*255);
     pixels[i+1]=Math.round((inclusion&&metal?.38:inclusion&&glass?.32:.96)*255);
     pixels[i+2]=Math.round((inclusion&&metal?.65:0)*255);

@@ -1,4 +1,4 @@
-import { Mesh, type Object3D, type BufferGeometry } from 'three';
+import { InstancedMesh, Mesh, type Object3D, type BufferGeometry } from 'three';
 
 // CPU backing stores, counted once even for cloned meshes/interleaved attributes.
 // This does not estimate driver allocation or total browser memory.
@@ -8,7 +8,11 @@ export function sceneryGeometryMemory(root:Object3D){
   root.traverse(object=>{
     if(!(object instanceof Mesh))return;
     const geometry=object.geometry;
-    instanceTriangles+=(geometry.index?.count??geometry.attributes.position?.count??0)/3;
+    instanceTriangles+=(geometry.index?.count??geometry.attributes.position?.count??0)/3*(object instanceof InstancedMesh?object.count:1);
+    if(object instanceof InstancedMesh){
+      buffers.add(object.instanceMatrix.array.buffer);
+      if(object.instanceColor)buffers.add(object.instanceColor.array.buffer);
+    }
     if(geometries.has(geometry))return;
     geometries.add(geometry);
     for(const attribute of [...Object.values(geometry.attributes),geometry.index]){

@@ -1,3 +1,4 @@
+import {SURFACE_PORTALS} from '../world/SurfaceHub.ts';
 import { Exploration } from '../logic/Exploration.ts';
 import { SURFACE_SHOP } from '../world/surfaceLayout.ts';
 import { HOME_ZONE, ROOMS } from '../world/rooms.ts';
@@ -18,6 +19,7 @@ export class GameSession {
   private wallet = new Wallet();
   private world: WorldCommands | null = null;
   private zones = [SELL_ZONE, ...ROOMS.map(r => r.sell)].map(config => new ZoneDetector(config));
+  private portals = SURFACE_PORTALS.map(p=>({id:p.id,detector:new ZoneDetector(p.zone)}));
   private home = new ZoneDetector(HOME_ZONE);
   private shops = [{id:'surface-upgrade',detector:new ZoneDetector(SURFACE_SHOP)}, ...ROOMS.filter(r => r.shop).map(r => ({ id: r.id, detector: new ZoneDetector(r.shop!) }))];
   private exploration = new Exploration(ROOMS);
@@ -138,6 +140,13 @@ export class GameSession {
       const result = sellAll(this.inventory, this.wallet, itemPrice);
       this.notice = result.status === 'sold' ? `出售 ${result.count} 件，获得 ${result.coins} 金币` : result.status === 'empty' ? '没有可出售的矿物' : '金币数值超出范围';
     }
+    let stepped:string|null=null;
+    for(const portal of this.portals)if(portal.detector.update(feet,grounded)==='enter')stepped=portal.id;
+    if(stepped){
+      const room=ROOMS.find(r=>r.id===stepped)!;
+      if(this.exploration.has(stepped)&&this.world?.travelTo){this.beginTravel(room);return;}
+      this.notice=this.exploration.has(stepped)?'传送暂不可用':`到达 ${room.depth} 米后解锁 ${room.name}`;changed=true;
+    }
     if (changed) this.publish();
   }
   resetPosition() {
@@ -151,12 +160,16 @@ export class GameSession {
     if (!room || !this.exploration.has(id)) return 'locked' as const;
     if (!this.atHome) return 'away' as const;
     if (!this.world?.travelTo) return 'unavailable' as const;
-    this.world.cancelMining(); this.world.travelTo(room.spawn); this.resetPosition();
-    this.notice = `前往 ${room.name}`; this.publish(); return 'travelling' as const;
+    return this.beginTravel(room);
   };
+  private beginTravel(room:typeof ROOMS[number]){
+    this.world!.cancelMining();this.world!.travelTo!(room.spawn);this.resetPosition();
+    // Pad detectors keep their entry latch until feet actually leave the pad.
+    this.notice=`前往 ${room.name}`;this.publish();return 'travelling' as const;
+  }
   returnToSurface = () => {
     if (!this.world) return;
     this.world.cancelMining(); this.world.returnToSurface(); this.resetPosition();
-    this.notice = '走进金色圆圈出售，或在家选择营地传送'; this.publish();
+    this.notice = '走进金色圆圈出售，或踩右侧圆盘前往已解锁层'; this.publish();
   };
 }

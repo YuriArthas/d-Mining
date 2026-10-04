@@ -1,0 +1,16 @@
+{
+  "materialProfile": "generated-textures",
+  "solidColor": null,
+  "parts": [
+    "portal-fossil.000.part"
+  ],
+  "bytes": 101341,
+  "sha256": "13059f84f3399ec397b23cbd64addfa39fe8f2dbe35b9448f9991dd7d1419602",
+  "taskId": "52cc37df-9b76-4579-9082-a3347edc96e8",
+  "sourceSha256": "1362fead9bcfecee4c46bb757576dea8e7fc623e3a45750980b3f1f79f1e67b1",
+  "triangles": 1459,
+  "faceLimit": 1600,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

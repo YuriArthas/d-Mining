@@ -1,0 +1,11 @@
+{
+  "status": "success",
+  "generator": "Blender",
+  "generationId": "grid-mine-timber-blender-v1",
+  "type": "authored_mesh",
+  "faceLimit": 128,
+  "triangles": 44,
+  "textureSize": 128,
+  "reference": "tools/blender/build-mine-blocks.py",
+  "recipeSha256": "9fc494f3c4b4f66da7afad4ad041c32537cddd153f60fe28585938a4081e2229"
+}

@@ -1,0 +1,17 @@
+{
+  "materialProfile": "solid-color",
+  "solidColor": "#bf8546",
+  "parts": [
+    "grid-mine-timber-v2.000.part"
+  ],
+  "bytes": 2054,
+  "sha256": "72fe7d39f9b9ac7b94388a876f21c9d878c77b7401934cd1e8ccd2045c066971",
+  "taskId": "1848dc16-8005-4b9b-9683-cf43b4c28d9a",
+  "sourceSha256": "73de9260dfc895054141adef9660198cc6ab855686b33a51604117dd1c6d7c12",
+  "triangles": 82,
+  "faceLimit": 200,
+  "source": "new Tripo image_to_model",
+  "reference": "output/imagegen/grid-mine/grid-mine-timber-v2.png",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

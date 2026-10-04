@@ -1,0 +1,16 @@
+{
+  "materialProfile": "generated-textures",
+  "solidColor": null,
+  "parts": [
+    "portal-volcanic.000.part"
+  ],
+  "bytes": 99921,
+  "sha256": "413f8245ea0bc6f622408fcafe2630e6e2460fd9e74e1ff1c6d8895b2c370077",
+  "taskId": "004bdac5-5500-4fe8-a7c4-8a5a5d9212f0",
+  "sourceSha256": "b473688946608af094b73e94a023ab29a90ffb76fd48368b0c520756f6dbca12",
+  "triangles": 1356,
+  "faceLimit": 1400,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

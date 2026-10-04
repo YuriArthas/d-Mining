@@ -8,7 +8,7 @@ export type CollisionResource = { collider?: RAPIER.Collider; bytes: number; tri
 export class RenderTerrain {
   readonly group = new Group();
   readonly pipeline: RegionPipeline<RenderResource>;
-  private readonly surface = createMineralMaterial();
+  private readonly surface:ReturnType<typeof createMineralMaterial>;
   diagnostics() {
     const meshes = [...this.pipeline.residents.values()].flatMap(r => r.resource.mesh ? [r.resource.mesh] : []);
     return { materials: new Set(meshes.map(m => m.material)).size, atlases: new Set(meshes.map(m => (m.material as typeof this.surface.material).map)).size,
@@ -31,6 +31,7 @@ export class RenderTerrain {
     for (const resident of this.pipeline.residents.values()) this.showWire(resident.resource);
   }
   constructor(world: SparseWorld, metrics: Measurements, factory: WorkerFactory) {
+    this.surface=createMineralMaterial(world.generation.layers);
     this.pipeline = new RegionPipeline('render', RENDER_SIZE, 54, 78, 0, world, {
       prepare: ({ coord, mesh: m }) => {
         const resource: RenderResource = { bytes: m.positions.byteLength + m.normals.byteLength + m.uvs.byteLength + m.tiles.byteLength + m.indices.byteLength, triangles: m.indices.length / 3 };

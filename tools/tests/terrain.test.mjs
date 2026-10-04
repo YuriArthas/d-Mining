@@ -133,7 +133,8 @@ test('mineral tiles remain distinct within an atlas that includes the protected 
    const p=(y*ATLAS_TILES*TILE_SIZE+TERRAIN_MATERIALS.findIndex(r=>r.id===MINERALS[tile].id)*TILE_SIZE+x)*4;assert.equal(a[p+3],255);
    colors.add(a.slice(p,p+3).join(','));hash=(Math.imul(hash,31)+a[p]*65536+a[p+1]*256+a[p+2])>>>0;
   }
-  assert.ok(colors.size>=5);fingerprints.add(hash);
+  const {resourceByKind}=await import('../../src/game/content/resources.ts');
+  if(resourceByKind(MINERALS[tile].id).base)assert.equal(colors.size,1,'host rock has no repeated cell texture');else assert.ok(colors.size>=5);fingerprints.add(hash);
  }
  assert.equal(fingerprints.size,30);
 });

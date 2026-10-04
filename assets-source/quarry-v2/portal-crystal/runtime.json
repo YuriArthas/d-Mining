@@ -1,0 +1,16 @@
+{
+  "materialProfile": "generated-textures",
+  "solidColor": null,
+  "parts": [
+    "portal-crystal.000.part"
+  ],
+  "bytes": 102986,
+  "sha256": "29d8933375f97a57feba8bd1c4684e4ea5706dfdec569e94013935ee77b53b13",
+  "taskId": "ebce8d5d-0c67-43be-adb3-823f1476b1f8",
+  "sourceSha256": "01ae692281d5933dfbfacd64debaaff73924c59910291222e450c63c50e4e9da",
+  "triangles": 1110,
+  "faceLimit": 1200,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 import {mkdir,writeFile,readFile,readdir} from 'node:fs/promises';
 import path from 'node:path';
+import {surfaceHub} from './surface-hub.mjs';
 import {expansion} from './camp-expansion.mjs';
 import {worksite} from './mine-worksite.mjs';
 import {boundary} from './timber-boundary.mjs';
 import {shaftEnclosure} from './shaft-enclosure.mjs';
+import {mineDetails} from './mine-details.mjs';
+import {gridMine} from './grid-mine.mjs';
 import {simulatorFacilities} from './simulator-facilities.mjs';
 
 const root=path.resolve(import.meta.dirname,'../..');
@@ -17,11 +20,14 @@ const timeoutMs=Number(process.env.TRIPO_TASK_TIMEOUT_MS??25*60*1000);
 if(!apiKey)throw new Error('TRIPO_API_KEY is required');
 
 const components={
+ ...surfaceHub,
  ...expansion,
  ...worksite,
  ...boundary,
  ...shaftEnclosure,
  ...simulatorFacilities,
+ ...gridMine,
+ ...mineDetails,
  'soft-shrub':{faceLimit:1000,image:'output/imagegen/camp-v2/soft-shrub.png',prompt:'Image-guided three connected soft shrub lobes without individual leaf geometry.'},
  'crown-tree':{faceLimit:3000,image:'output/imagegen/camp-v2/crown-tree.png',prompt:'New image-guided solid three-lobe canopy tree; no leaf geometry.'},
  'rounded-ridge':{faceLimit:6000,image:'output/imagegen/camp-v2/rounded-ridge.png',prompt:'New image-guided broad smooth sandstone ridge with four large shoulders.'},

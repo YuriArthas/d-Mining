@@ -1,0 +1,7 @@
+{
+  "task_id": "ebce8d5d-0c67-43be-adb3-823f1476b1f8",
+  "type": "text_to_model",
+  "model_version": "v3.1-20260211",
+  "face_limit": 1200,
+  "prompt": "An isolated modern ROBLOX Mining Simulator game prop. Extremely simple chunky voxel-like large shapes, clean saturated flat painted colors, matte nonmetal materials, no realistic grain, no tiny detail, no text, no logos, no characters, no ground landscape. Complete object, centered. Miniature crystal cave landmark: three large faceted blue and lavender crystals rising from a small flat midnight-blue stone foot, broad simple polygon faces, cyan colored tips, no transparency, no tiny shards."
+}

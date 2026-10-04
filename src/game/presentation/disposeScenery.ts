@@ -1,8 +1,10 @@
-import { Mesh, Texture, type Group, type BufferGeometry, type Material } from 'three';
+import { SpotLight, InstancedMesh, Mesh, Texture, type Group, type BufferGeometry, type Material } from 'three';
 
 export function disposeScenery(group:Group) {
   const geometries=new Set<BufferGeometry>(),materials=new Set<Material>(),textures=new Set<Texture>(),images=new Set<{close:()=>void}>();
   group.traverse(object=>{
+    if(object instanceof InstancedMesh)object.dispose();
+    if(object instanceof SpotLight)object.dispose();
     if(object instanceof Mesh){
       geometries.add(object.geometry);
       for(const material of Array.isArray(object.material)?object.material:[object.material]){

@@ -1,7 +1,7 @@
 import { SURFACE_SPAWN } from './world/surfaceLayout.ts';
 // World distances are metres. Rendered geometry and cell queries share cellSize.
 export const GAME_CONFIG = {
-  background: '#c0dde0',
+  background: '#0b1233',
   pixelRatioMax: 1.5, // Device pixel ratio cap; positive, normally 1–2.
   player: { radius: 0.4, height: 1.65, spawn: SURFACE_SPAWN },
   camera: {

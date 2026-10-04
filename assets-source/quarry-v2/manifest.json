@@ -433,6 +433,24 @@
       ]
     },
     {
+      "name": "egg-meadow",
+      "taskId": "bc3ed03b-1527-4b9a-8a77-d1e3297648c8",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 900,
+      "prompt": "An isolated modern ROBLOX Mining Simulator game prop. Extremely simple chunky voxel-like large shapes, clean saturated flat painted colors, matte nonmetal materials, no realistic grain, no tiny detail, no text, no logos, no characters, no ground landscape. Complete object, centered. One large toy pet egg on a low blue square pedestal with cream beveled rim. A round white egg with exactly five large bright green spots, centred upright. Egg clearly dominates the compact base. Symmetric, solid smooth shapes, no faces, no animals.",
+      "bytes": 2033320,
+      "triangles": 778,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
       "name": "fence-corner",
       "taskId": "00bcba8c-05ad-4851-b55c-312dcc35e2cb",
       "status": "success",
@@ -499,6 +517,150 @@
       "outputFields": [
         "pbr_model",
         "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "grid-mine-roof",
+      "taskId": "92970859-98c5-4acf-8fbb-3cb9116fb0c0",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 200,
+      "prompt": "Exactly ONE solid cubic building block, equal width height depth, SIX FLAT SQUARE FACES, straight parallel edges, perfectly regular box silhouette. Minecraft building block meets modern Roblox Mining Simulator. Extremely tiny edge bevel only. No bulges, no taper, no warping, no protrusions, no pedestal, no other objects. Centered isolated complete cube. Details painted into the texture, NOT modeled. Simple clean saturated matte colors, no weathering, no realistic scratches. Rich saturated cobalt blue painted wooden cube. Nearly uniform blue faces with faint broad straight painted wood grain. No individual shingles, no metal, no studs, no raised details. A single modular blue roof voxel.",
+      "bytes": 4800560,
+      "triangles": 150,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "grid-mine-roof-blender",
+      "status": "success",
+      "generator": "Blender",
+      "generationId": "grid-mine-roof-blender-v1",
+      "type": "authored_mesh",
+      "faceLimit": 128,
+      "triangles": 44,
+      "textureSize": 128,
+      "reference": "tools/blender/build-mine-blocks.py",
+      "recipeSha256": "9fc494f3c4b4f66da7afad4ad041c32537cddd153f60fe28585938a4081e2229"
+    },
+    {
+      "name": "grid-mine-roof-v2",
+      "taskId": "d49ab52d-3513-4c35-8b39-d3697863517f",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/grid-mine/grid-mine-roof-v2.png",
+      "faceLimit": 200,
+      "prompt": "Image-guided regular Roblox/Minecraft roof cube, unchanged planar geometry.",
+      "bytes": 2616120,
+      "triangles": 192,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "grid-mine-timber",
+      "taskId": "50c28cb3-4879-4b6e-b452-8f6de2c40a10",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 200,
+      "prompt": "Exactly ONE solid cubic building block, equal width height depth, SIX FLAT SQUARE FACES, straight parallel edges, perfectly regular box silhouette. Minecraft building block meets modern Roblox Mining Simulator. Extremely tiny edge bevel only. No bulges, no taper, no warping, no protrusions, no pedestal, no other objects. Centered isolated complete cube. Details painted into the texture, NOT modeled. Simple clean saturated matte colors, no weathering, no realistic scratches. Warm honey brown timber log cube. Subtle broad straight vertical wood grain on the four side faces, simple square concentric end grain on top and bottom. No bands, no nails, no metal. A single modular timber voxel.",
+      "bytes": 3420840,
+      "triangles": 118,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "grid-mine-timber-blender",
+      "status": "success",
+      "generator": "Blender",
+      "generationId": "grid-mine-timber-blender-v1",
+      "type": "authored_mesh",
+      "faceLimit": 128,
+      "triangles": 44,
+      "textureSize": 128,
+      "reference": "tools/blender/build-mine-blocks.py",
+      "recipeSha256": "9fc494f3c4b4f66da7afad4ad041c32537cddd153f60fe28585938a4081e2229"
+    },
+    {
+      "name": "grid-mine-timber-v2",
+      "taskId": "1848dc16-8005-4b9b-9683-cf43b4c28d9a",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/grid-mine/grid-mine-timber-v2.png",
+      "faceLimit": 200,
+      "prompt": "Image-guided regular Roblox/Minecraft timber cube, unchanged planar geometry.",
+      "bytes": 2104608,
+      "triangles": 82,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "grid-mine-trim",
+      "taskId": "83e1c002-5d1c-485b-9a22-c9d6bf5afdf9",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 200,
+      "prompt": "Exactly ONE solid cubic building block, equal width height depth, SIX FLAT SQUARE FACES, straight parallel edges, perfectly regular box silhouette. Minecraft building block meets modern Roblox Mining Simulator. Extremely tiny edge bevel only. No bulges, no taper, no warping, no protrusions, no pedestal, no other objects. Centered isolated complete cube. Details painted into the texture, NOT modeled. Simple clean saturated matte colors, no weathering, no realistic scratches. Smooth warm ivory painted wooden cube, nearly uniform cream color, only very faint wide wood grain. No ornaments, no patterns, no dark outline. A single modular white trim voxel.",
+      "bytes": 2058780,
+      "triangles": 168,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "grid-mine-trim-blender",
+      "status": "success",
+      "generator": "Blender",
+      "generationId": "grid-mine-trim-blender-v1",
+      "type": "authored_mesh",
+      "faceLimit": 128,
+      "triangles": 44,
+      "textureSize": 128,
+      "reference": "tools/blender/build-mine-blocks.py",
+      "recipeSha256": "9fc494f3c4b4f66da7afad4ad041c32537cddd153f60fe28585938a4081e2229"
+    },
+    {
+      "name": "grid-mine-trim-v2",
+      "taskId": "0a185a21-324d-4704-a7df-7859c0794eb1",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/grid-mine/grid-mine-trim-v2.png",
+      "faceLimit": 200,
+      "prompt": "Image-guided regular Roblox/Minecraft trim cube, unchanged planar geometry.",
+      "bytes": 1704452,
+      "triangles": 172,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
         "rendered_image"
       ]
     },
@@ -571,6 +733,42 @@
       }
     },
     {
+      "name": "mine-badge",
+      "taskId": "3e63c078-3bb7-43fe-b703-faafa3403c64",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/mine-material-light/mine-badge.png",
+      "faceLimit": 2000,
+      "prompt": "Symmetrical modern Roblox mining badge: cyan gem and crossed pickaxes on a blue medallion, ivory rim.",
+      "bytes": 1983664,
+      "triangles": 1886,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "mine-fence",
+      "taskId": "b84a3c88-d25b-4296-b136-5604bc9c5561",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/mine-material-light/mine-fence.png",
+      "faceLimit": 500,
+      "prompt": "Simple low Roblox fence panel: two thin posts and two straight rails, no grain or ornament.",
+      "bytes": 1471700,
+      "triangles": 324,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
       "name": "mine-gate",
       "taskId": "8ac39c1e-8269-4586-b170-042b4b2de4e1",
       "status": "success",
@@ -585,6 +783,24 @@
         "generated_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/8ac39c1e-8269-4586-b170-042b4b2de4e1/text2image_8ac39c1e-8269-4586-b170-042b4b2de4e1.jpeg?auth_key=1791158400-ZB9GIqZi-0-2876765c904dc1b19783000f61407a0c",
         "rendered_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/8ac39c1e-8269-4586-b170-042b4b2de4e1/legacy_mesh.webp?auth_key=1791158400-ZB9GIqZi-0-b1bf5aa3eecff571c321911dcbf11071"
       }
+    },
+    {
+      "name": "mine-pendant",
+      "taskId": "51eee6cc-af2f-457d-8724-0913a669a61b",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/mine-material-light/mine-pendant.png",
+      "faceLimit": 1800,
+      "prompt": "Modern Roblox orange construction floodlight hanging from a straight rod; broad warm lens faces vertically down.",
+      "bytes": 1554952,
+      "triangles": 1699,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
     },
     {
       "name": "mushroom-cluster",
@@ -955,6 +1171,132 @@
       "materials": 1,
       "outputFields": [
         "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "portal-core",
+      "taskId": "0c5281af-d58e-4d00-a575-b578584f7036",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 1200,
+      "prompt": "An isolated modern ROBLOX Mining Simulator game prop. Extremely simple chunky voxel-like large shapes, clean saturated flat painted colors, matte nonmetal materials, no realistic grain, no tiny detail, no text, no logos, no characters, no ground landscape. Complete object, centered. Miniature earth core landmark: one massive gold diamond crystal between two broad dark purple blocky pillars, on a small flat purple stone base. Broad glossy-looking painted gold faces, no tiny crystals or effects.",
+      "bytes": 2029244,
+      "triangles": 1037,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "portal-crystal",
+      "taskId": "ebce8d5d-0c67-43be-adb3-823f1476b1f8",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 1200,
+      "prompt": "An isolated modern ROBLOX Mining Simulator game prop. Extremely simple chunky voxel-like large shapes, clean saturated flat painted colors, matte nonmetal materials, no realistic grain, no tiny detail, no text, no logos, no characters, no ground landscape. Complete object, centered. Miniature crystal cave landmark: three large faceted blue and lavender crystals rising from a small flat midnight-blue stone foot, broad simple polygon faces, cyan colored tips, no transparency, no tiny shards.",
+      "bytes": 1661880,
+      "triangles": 1110,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "portal-fossil",
+      "taskId": "52cc37df-9b76-4579-9082-a3347edc96e8",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 1600,
+      "prompt": "An isolated modern ROBLOX Mining Simulator game prop. Extremely simple chunky voxel-like large shapes, clean saturated flat painted colors, matte nonmetal materials, no realistic grain, no tiny detail, no text, no logos, no characters, no ground landscape. Complete object, centered. Miniature fossil cave landmark: an oversized ivory dinosaur skull and two broad curved ribs embedded into a chunky ochre stone pedestal. Friendly toy proportions, simplified large bones, broad silhouette, no teeth detail, no realism.",
+      "bytes": 1675232,
+      "triangles": 1459,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "portal-frozen",
+      "taskId": "72a444ef-8b45-4cf9-9d29-ed944669b7a9",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 1200,
+      "prompt": "An isolated modern ROBLOX Mining Simulator game prop. Extremely simple chunky voxel-like large shapes, clean saturated flat painted colors, matte nonmetal materials, no realistic grain, no tiny detail, no text, no logos, no characters, no ground landscape. Complete object, centered. Miniature frozen cave landmark: three broad ice-blue ice peaks with thick white snow caps on a small flat frosty blue base. Very chunky large angular shapes, no transparency, no icicles or tiny details.",
+      "bytes": 2234512,
+      "triangles": 1150,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "portal-fungal",
+      "taskId": "021a12ec-1f0f-48c8-a97e-f9e576dcaf90",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 1200,
+      "prompt": "An isolated modern ROBLOX Mining Simulator game prop. Extremely simple chunky voxel-like large shapes, clean saturated flat painted colors, matte nonmetal materials, no realistic grain, no tiny detail, no text, no logos, no characters, no ground landscape. Complete object, centered. Miniature mushroom cave landmark: exactly three large chunky glowing-looking turquoise and violet mushrooms on a small flat dark stone foot. Big smooth caps, short thick stems, no small mushrooms or grass. Simple iconic silhouette.",
+      "bytes": 1773128,
+      "triangles": 1116,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "portal-timber",
+      "taskId": "389594c5-ea96-4f0d-8f11-6834a2bdb9e8",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 1200,
+      "prompt": "An isolated modern ROBLOX Mining Simulator game prop. Extremely simple chunky voxel-like large shapes, clean saturated flat painted colors, matte nonmetal materials, no realistic grain, no tiny detail, no text, no logos, no characters, no ground landscape. Complete object, centered. Miniature old mine landmark: a squat square timber tunnel frame on a small flat stone foot, two fat straight oak pillars and a straight crossbeam, two large coal chunks beside it. Front faces open. Warm amber wood and dark slate. Width equals height.",
+      "bytes": 1862604,
+      "triangles": 1067,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "portal-volcanic",
+      "taskId": "004bdac5-5500-4fe8-a7c4-8a5a5d9212f0",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 1400,
+      "prompt": "An isolated modern ROBLOX Mining Simulator game prop. Extremely simple chunky voxel-like large shapes, clean saturated flat painted colors, matte nonmetal materials, no realistic grain, no tiny detail, no text, no logos, no characters, no ground landscape. Complete object, centered. Miniature lava cave landmark: three chunky dark charcoal basalt towers split by broad vivid orange painted lava stripes, on a small flat dark foot. A large orange crystal at the centre. No particles, no thin spikes.",
+      "bytes": 2384868,
+      "triangles": 1356,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
         "rendered_image"
       ]
     },

@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "grid-mine-timber.000.part"
+  ],
+  "bytes": 94851,
+  "sha256": "2679c3fb983489379e625ccaff01885b3aae13f5a2170af83e9d4426ee66b4c9",
+  "taskId": "50c28cb3-4879-4b6e-b452-8f6de2c40a10",
+  "sourceSha256": "663507da1df0a0723e6c2c76dbd9d36e3662d0c5b816026b13cd10feb489631a",
+  "triangles": 118,
+  "faceLimit": 200,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

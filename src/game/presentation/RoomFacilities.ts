@@ -52,6 +52,6 @@ export class RoomFacilities {
     surface.traverse(o=>{if(o instanceof Mesh&&o.userData.surfaceGround===true)ground.push(o);});
     return ray.intersectObjects(ground,false)[0]?.point.y??null;
   }
-  diagnostics(){return {visuals:[...this.visuals.keys()],geometryMemory:Object.fromEntries(this.geometryMemory),colliders:this.physical.size,surfaceShading:this.visuals.get('surface')?.userData.surfaceShading??null};}
+  diagnostics(){return {surfaceHub:this.visuals.get('surface')?.userData.hub??null,visuals:[...this.visuals.keys()],geometryMemory:Object.fromEntries(this.geometryMemory),colliders:this.physical.size,surfaceShading:this.visuals.get('surface')?.userData.surfaceShading??null};}
   dispose(){for(const g of this.visuals.values())disposeScenery(g);this.visuals.clear();for(const list of this.physical.values())for(const c of list)this.physics.world.removeCollider(c,false);this.physical.clear();this.plans.clear();this.geometryMemory.clear();}
 }

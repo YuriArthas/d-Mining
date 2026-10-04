@@ -1,3 +1,4 @@
+import {createWorldText} from './WorldText.ts';
 import { createMeadowGround } from './MeadowGround.ts';
 import { compactSceneryGeometry } from './compactSceneryGeometry.ts';
 import { stabilizeShadows } from './stableShadow.ts';
@@ -82,29 +83,7 @@ export function createScenery(plan:SceneryPlan):Group {
     mesh.castShadow=!glow&&!['water','trail','grass','ground'].includes(category);mesh.receiveShadow=!glow;group.add(mesh);
   }
   if(plan.meadow)group.add(createMeadowGround(noise!));
-  for(const sign of plan.signs){
-    const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=256;
-    const ctx=canvas.getContext('2d')!;
-    ctx.fillStyle=sign.background;ctx.fillRect(0,0,1024,256);
-    if(sign.style==='facility'){
-      const sheen=ctx.createLinearGradient(0,0,0,256);sheen.addColorStop(0,'#ffffff24');sheen.addColorStop(.5,'#ffffff00');sheen.addColorStop(1,'#071e3b20');ctx.fillStyle=sheen;ctx.fillRect(0,0,1024,256);
-      ctx.strokeStyle='#ffffff99';ctx.lineWidth=7;ctx.beginPath();ctx.roundRect(9,9,1006,238,27);ctx.stroke();
-      ctx.textAlign='center';ctx.lineJoin='round';ctx.font='900 112px sans-serif';
-      ctx.strokeStyle='#18354d';ctx.lineWidth=12;ctx.strokeText(sign.title,512,137);
-      ctx.fillStyle='#ffffff';ctx.fillText(sign.title,512,137);
-      ctx.font='bold 34px sans-serif';ctx.fillText(sign.subtitle,512,209);
-    }else{
-    ctx.fillStyle='#00000014';for(let i=0;i<8;i++){ctx.fillRect(0,30+i*29,1024,2);ctx.fillRect(80+i*119,18,2,219);}
-    ctx.strokeStyle='#00000044';ctx.lineWidth=10;ctx.strokeRect(5,5,1014,246);
-    ctx.strokeStyle=sign.color;ctx.lineWidth=4;ctx.strokeRect(13,13,998,230);
-    ctx.fillStyle='#fbefda';ctx.textAlign='center';ctx.font='bold 76px sans-serif';ctx.fillText(sign.title,512,121);
-    ctx.fillStyle=sign.color;ctx.font='28px sans-serif';ctx.fillText(sign.subtitle,512,195);
-    for(const x of [30,994])for(const y of [30,226]){ctx.fillStyle=sign.color;ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();}
-    }
-    const texture=new CanvasTexture(canvas);texture.colorSpace=SRGBColorSpace;
-    const mesh=new Mesh(new PlaneGeometry(sign.width,sign.width/4),new MeshBasicMaterial({map:texture}));
-    mesh.position.set(...sign.at);mesh.rotation.y=sign.yaw??0;group.add(mesh);
-  }
+  for(const sign of plan.signs)group.add(createWorldText(sign));
   return group;
 }
 export { disposeScenery } from './disposeScenery.ts';

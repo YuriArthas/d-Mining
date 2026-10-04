@@ -1,0 +1,17 @@
+{
+  "taskId": "0a185a21-324d-4704-a7df-7859c0794eb1",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "image_to_model",
+  "reference": "output/imagegen/grid-mine/grid-mine-trim-v2.png",
+  "faceLimit": 200,
+  "prompt": "Image-guided regular Roblox/Minecraft trim cube, unchanged planar geometry.",
+  "bytes": 1704452,
+  "triangles": 172,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "rendered_image"
+  ]
+}

@@ -1,8 +1,8 @@
 # 公开场景独立模型清单
 
-每行是独立 Tripo 生成任务；实例数为摆放次数，不计作新模型。
+环境组件记录独立 Tripo 任务；矿棚方块按用户授权由 Blender 建模，记录 generationId 与脚本来源。实例数为摆放次数，不计作新模型。
 
-|模型|Tripo 任务|三角面|实例|传输 KiB|
+|模型|任务 / Blender 生成标识|三角面|实例|传输 KiB|
 |---|---|---:|---:|---:|
 |oak-wide|7d1c2e59-3348-4749-876f-5b72e021a923|2663|1|360.5|
 |oak-tall|76d6a147-b27d-46d3-809e-a8ddc2b48e11|2708|1|281.2|
@@ -46,7 +46,7 @@
 |bank-turf|a68d7651-9af0-4a7c-adcb-c7246ab3786b|529|556|98.3|
 |bank-fence|d1cc28e7-f917-46e2-ae5c-6442d30c7ddf|325|45|101.7|
 |pit-plank-deck|031f3df9-8ede-4bee-b309-ba51c05955ec|1726|8|379.4|
-|pit-safety-rail|75c97185-8972-448b-a335-f8a13d6ccdb7|1344|8|390.8|
+|mine-fence|b84a3c88-d25b-4296-b136-5604bc9c5561|324|16|4.5|
 |pit-headframe|a92d4214-35c8-4954-9042-8b0369c8322c|3648|1|403.1|
 |pit-winch|3857c9e5-3ffd-4719-a9e8-da7c609cf353|2314|1|401.2|
 |pit-lumber-stack|bebef70a-030b-4590-aa97-76fb8fcd9b72|1320|2|384.6|
@@ -58,10 +58,21 @@
 |pit-supply-pallet|910e0a00-2696-4c94-bd5e-1dc3dd0d011d|1671|1|384.1|
 |pit-box-lantern|ed8007fc-24c0-4164-9585-a8a3a467730f|1441|3|394.9|
 |meadow-base|d87baa94-65cc-4da6-a2c8-cbcd5eff4c5f|3781|1|294.8|
-|terrain-slab|644925ed-966c-425f-bc52-40a44f1fa567|4696|2|432.8|
-|simulator-mine|80aeb00e-5dd1-42fd-913c-0ef3c3ee461d|8497|1|448.8|
+|grid-mine-trim-blender|grid-mine-trim-blender-v1|44|30|1.9|
+|grid-mine-timber-blender|grid-mine-timber-blender-v1|44|82|5.0|
+|grid-mine-roof-blender|grid-mine-roof-blender-v1|44|169|2.2|
+|mine-badge|3e63c078-3bb7-43fe-b703-faafa3403c64|1886|1|342.1|
+|mine-pendant|51eee6cc-af2f-457d-8724-0913a669a61b|1699|1|98.4|
 |simulator-exchange|6d3bf76e-2393-4ea3-bb6f-65b731fcf61a|4720|1|407.1|
 |simulator-upgrade|177a1b15-d6f6-4d03-a899-756e38994554|4764|1|416.4|
 |crown-tree|930768dc-dd1e-4f08-9bb4-f76229d1d859|2834|8|350.5|
 |soft-shrub|68f13b1a-e2b2-40ec-8e14-14427654ed96|968|8|316.7|
 |ore-cart|a5a30668-5fc3-48be-848c-ba8677a6905c|3330|2|399.1|
+|portal-timber|389594c5-ea96-4f0d-8f11-6834a2bdb9e8|1067|3|102.6|
+|portal-fungal|021a12ec-1f0f-48c8-a97e-f9e576dcaf90|1116|1|102.9|
+|portal-crystal|ebce8d5d-0c67-43be-adb3-823f1476b1f8|1110|1|100.6|
+|portal-frozen|72a444ef-8b45-4cf9-9d29-ed944669b7a9|1150|1|106.0|
+|portal-volcanic|004bdac5-5500-4fe8-a7c4-8a5a5d9212f0|1356|1|97.6|
+|portal-fossil|52cc37df-9b76-4579-9082-a3347edc96e8|1459|1|99.0|
+|portal-core|0c5281af-d58e-4d00-a575-b578584f7036|1037|1|98.1|
+|egg-meadow|bc3ed03b-1527-4b9a-8a77-d1e3297648c8|778|3|97.4|

@@ -1,0 +1,16 @@
+{
+  "materialProfile": "generated-textures",
+  "solidColor": null,
+  "parts": [
+    "portal-timber.000.part"
+  ],
+  "bytes": 105045,
+  "sha256": "dbfc3e4a591bc4fcffc28c88ab0e40ac6ec22e3da5345edc76f9c1710fbdb1c1",
+  "taskId": "389594c5-ea96-4f0d-8f11-6834a2bdb9e8",
+  "sourceSha256": "d302f14cd85b4a80854315981fda36ac1fa89e5c562e3df83569b1381640ee79",
+  "triangles": 1067,
+  "faceLimit": 1200,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

@@ -53,7 +53,7 @@ export class Planner {
     this.box([x,y+2.04,rear],[4.6,.16,1.8],CREAM);
     for(let i=0;i<7;i++)this.box([x-1.8+i*.6,y+4,rear],[.59,.15,2.8],i%2?CREAM:(shop?'#659e96':'#bf7955'),false,[.13,0,0]);
     this.box([x,y+3.82,rear+1.42],[4.2,.38,.12],shop?'#659e96':'#bf7955');
-    this.sign([x,y+3,rear+.85],3.6,shop?'装备工坊':'矿石收购',shop?'UPGRADES':'ORE EXCHANGE',t);
+    this.sign([x,y+3,rear+.85],3.6,shop?'SHOP':'SELL','',t);
     for(const dx of [-1.25,1.25])this.lantern(x+dx,y+3,rear+1,t);
     this.shape('ring',[x,y+.045,z],[1.7,.12,1.7],shop?'#95d9c6':'#f1ca76',[0,0,0],true);
     this.shape('ring',[x,y+.035,z],[1.95,.025,1.95],shop?'#95d9c6':'#f1ca76',[0,0,0],true);

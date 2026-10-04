@@ -1,20 +1,21 @@
-import {MINE_PAVILION_SOLIDS} from './MinePavilion.ts';
+import {HUB_ASSETS,HUB_PLACEMENTS,reserveHubSpace} from './SurfaceHub.ts';
+import {MINE_PAVILION_SOLIDS, MINE_PAVILION_PLACEMENTS, MINE_BLOCK_ASSETS} from './MinePavilion.ts';
 import {BOUNDARY_ASSETS, BOUNDARY_PLACEMENTS, BOUNDARY_SOLIDS} from './TimberBoundary.ts';
 import type { Solid } from './sceneryKit.ts';
 import {WORKSITE_ASSETS, WORKSITE_PLACEMENTS, WORKSITE_SOLIDS} from './MineWorksite.ts';
 import { CAMP_EXPANSION, EXPANSION_ASSETS } from './CampExpansion.ts';
-export type QuarryAsset=typeof BOUNDARY_ASSETS[number]|typeof WORKSITE_ASSETS[number]|typeof EXPANSION_ASSETS[number]|'meadow-base'|'simulator-mine'|'simulator-exchange'|'simulator-upgrade'|'terrain-slab'|'crown-tree'|'soft-shrub'|'ore-cart'|'lantern-post';
-export type QuarryPlacement={asset:QuarryAsset;x:number;z:number;width:number;yaw?:number;y?:number;height?:number;depth?:number};
-// Fresh Tripo-only assembly. Coordinates are authored independently of the old courtyard.
+export type QuarryAsset=typeof HUB_ASSETS[number]|typeof BOUNDARY_ASSETS[number]|typeof WORKSITE_ASSETS[number]|typeof EXPANSION_ASSETS[number]|'mine-badge'|'mine-pendant'|'meadow-base'|typeof MINE_BLOCK_ASSETS[number]|'simulator-exchange'|'simulator-upgrade'|'terrain-slab'|'crown-tree'|'soft-shrub'|'ore-cart'|'lantern-post';
+export type QuarryPlacement={asset:QuarryAsset;x:number;z:number;width:number;yaw?:number;y?:number;height?:number;depth?:number;portalId?:string;tint?:string;eggColor?:string};
+// Tripo environment assembly with authored Blender mine blocks.
 // The central 16m square is the gameplay shaft; surrounding ground is a generated mesh.
-export const QUARRY_PLACEMENTS:readonly QuarryPlacement[]=[
+const originalPlacements:readonly QuarryPlacement[]=[
  ...CAMP_EXPANSION,
  ...BOUNDARY_PLACEMENTS,
  ...WORKSITE_PLACEMENTS,
  {asset:'meadow-base',x:0,z:0,width:160,depth:160,height:.004,y:.018},
- {asset:'terrain-slab',x:0,z:19,width:5,depth:18,height:.004,y:.026,yaw:0},
- {asset:'terrain-slab',x:13,z:12,width:12,depth:5,height:.004,y:.026,yaw:.08},
- {asset:'simulator-mine',x:0,z:0,width:26,depth:26,height:14,y:0},
+ ...MINE_PAVILION_PLACEMENTS,
+ {asset:'mine-badge',x:0,z:11.55,width:3.8,depth:.7,height:3.8,y:9.45},
+ {asset:'mine-pendant',x:0,z:0,width:2.4,depth:2.4,height:3.6,y:11.34},
  {asset:'simulator-exchange',x:20,z:4,width:10,depth:8,height:9,yaw:-.55},
  {asset:'simulator-upgrade',x:-21,z:6,width:10,depth:8,height:9,yaw:.3},
  {asset:'crown-tree',x:-31,z:15,width:9,yaw:.4},
@@ -39,14 +40,18 @@ export const QUARRY_PLACEMENTS:readonly QuarryPlacement[]=[
  {asset:'lantern-post',x:24,z:22,width:1.1},
  {asset:'lantern-post',x:22,z:-20,width:1.1},
 ];
+export const QUARRY_PLACEMENTS:readonly QuarryPlacement[]=[...originalPlacements.map(reserveHubSpace),...HUB_PLACEMENTS];
 // Gameplay collision is deliberately independent from render topology.
 export const QUARRY_SOLIDS:Solid[]=[
+ ...HUB_PLACEMENTS.map(p=>({at:[p.x,p.height/2,p.z] as [number,number,number],half:[p.depth/2,p.height/2,p.width/2] as [number,number,number],yaw:0})),
  ...WORKSITE_SOLIDS,
  ...BOUNDARY_SOLIDS,
- {at:[-25,2.8,26],half:[1.65,.2,1.1],yaw:.3},
+ {at:[-25,2.8,38],half:[1.65,.2,1.1],yaw:.3},
  ...QUARRY_PLACEMENTS.filter(p=>['workshop-hut','warehouse-shed','assayer-stall','supply-awning'].includes(p.asset)).map(p=>({at:[p.x,(p.height??4)*.5,p.z] as [number,number,number],half:[p.width*.36,(p.height??4)*.5,p.width*.25] as [number,number,number],yaw:p.yaw??0})),
  ...QUARRY_PLACEMENTS.filter(p=>['well-stone','tool-rack','workbench','anvil-stump','crate-stack','barrel-pair','ore-bin-copper','ore-bin-jade','sack-stack','cart-empty','wheelbarrow','bench-timber','notice-board','waystone-crystal','boulder-moss','boulder-ore'].includes(p.asset)).map(p=>({at:[p.x,.5,p.z] as [number,number,number],half:[p.width*.3,.5,p.width*.22] as [number,number,number],yaw:p.yaw??0})),
  ...MINE_PAVILION_SOLIDS,
+ {at:[0,11.35,11.55],half:[1.9,1.9,.35],yaw:0},
+ {at:[0,13.14,0],half:[1.2,1.8,1.2],yaw:0},
  {at:[20,3,4],half:[4.3,3,3.4],yaw:-.55},
  {at:[-21,3,6],half:[4.3,3,3.4],yaw:.3},
  ...QUARRY_PLACEMENTS.filter(p=>['crown-tree','oak-wide','oak-tall','maple-gold','maple-coral','birch-round','cedar-pillow','willow-dome'].includes(p.asset)).map(p=>({at:[p.x,2,p.z] as [number,number,number],half:[.7,2,.7] as [number,number,number],yaw:0})),

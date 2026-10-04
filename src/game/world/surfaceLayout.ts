@@ -5,6 +5,12 @@ export const SURFACE_SHOP = {x:-18,y:0,z:15,radius:1.7,heightTolerance:.25,hyste
 export const SURFACE_SALE = {x:15,y:0,z:11,radius:1.7,heightTolerance:.25,hysteresis:.25} as const;
 export type Trail = { points:[number,number,number][]; width:number };
 export const SURFACE_TRAILS:Trail[]=[
+  {points:[[-30,0,30],[-20,0,30],[0,0,27],[25.7,0,27]],width:4.5},
+  {points:[[25.7,0,-23],[25.7,0,40]],width:4.2},
+  {points:[[0,0,37],[0,0,10]],width:5.2},
+  {points:[[-28,0,30],[-28,0,25]],width:3},
+  {points:[[-22,0,30],[-22,0,25]],width:3},
+  {points:[[-16,0,30],[-16,0,25]],width:3},
   {points:[[-14,0,19],[-18,0,15],[-19,0,12]],width:3.2},
   {points:[[0,0,29],[0,0,18],[0,0,10]],width:3.2},
   {points:[[-20,0,25],[-14,0,19],[0,0,15],[8,0,15],[15,0,11]],width:3.2},

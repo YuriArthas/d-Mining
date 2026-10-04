@@ -1,0 +1,7 @@
+{
+  "task_id": "004bdac5-5500-4fe8-a7c4-8a5a5d9212f0",
+  "type": "text_to_model",
+  "model_version": "v3.1-20260211",
+  "face_limit": 1400,
+  "prompt": "An isolated modern ROBLOX Mining Simulator game prop. Extremely simple chunky voxel-like large shapes, clean saturated flat painted colors, matte nonmetal materials, no realistic grain, no tiny detail, no text, no logos, no characters, no ground landscape. Complete object, centered. Miniature lava cave landmark: three chunky dark charcoal basalt towers split by broad vivid orange painted lava stripes, on a small flat dark foot. A large orange crystal at the centre. No particles, no thin spikes."
+}

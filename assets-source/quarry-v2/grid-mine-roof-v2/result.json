@@ -1,0 +1,17 @@
+{
+  "taskId": "d49ab52d-3513-4c35-8b39-d3697863517f",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "image_to_model",
+  "reference": "output/imagegen/grid-mine/grid-mine-roof-v2.png",
+  "faceLimit": 200,
+  "prompt": "Image-guided regular Roblox/Minecraft roof cube, unchanged planar geometry.",
+  "bytes": 2616120,
+  "triangles": 192,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "rendered_image"
+  ]
+}

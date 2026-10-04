@@ -1,5 +1,6 @@
 const {chromium}=require('../../d-Block-Blast/node_modules/playwright');
 const fs=require('node:fs'),assert=require('node:assert/strict');
+const assetPlan=require('../docs/art/quarry-v2/assets.json');
 const url='https://w-sunjun-public.dev.clock-p.com/games/mining-test/index.html?debug=1';
 (async()=>{
  const report={method:'Dedicated Chromium, SwiftShader, sum of process PSS sampled every 750ms; unmodified RAF',samples:[],events:[],runs:[]};
@@ -42,10 +43,13 @@ const url='https://w-sunjun-public.dev.clock-p.com/games/mining-test/index.html?
    },{},{timeout:240000});
    const before=await page.evaluate(()=>window.__miningValidation.snapshot());
    const shading=before.facilities.surfaceShading,memory=shading.textureMemory;
-   assert.equal(shading.instances,808);assert.equal(shading.assets.length,61);
-   assert.equal(memory.uniqueSources,183);assert.equal(memory.allCompressed,true);
+   assert.equal(shading.instances,assetPlan.instances);assert.equal(shading.assets.length,assetPlan.uniqueModels);
+   assert.equal(memory.uniqueSources,assetPlan.components.reduce((sum,c)=>sum+(c.materialProfile==='solid-color'?0:c.materialProfile==='authored-color'?1:3),0));assert.equal(memory.allCompressed,true);
    assert.ok(memory.encodedMipBytes<30*1024*1024);
-   for(const [size,count] of [[512,56],[256,61],[128,61],[64,5]])assert.equal(memory.maps.filter(m=>m.width===size&&m.height===size&&m.levels===Math.log2(size)+1).length,count);
+   const textured=assetPlan.components.filter(c=>!['solid-color','authored-color'].includes(c.materialProfile)),count=textured.length;
+   const authored=assetPlan.components.filter(c=>c.materialProfile==='authored-color').length;
+   const small=textured.filter(c=>/^(portal-|egg-|bank-|grid-mine-|mine-pendant)/.test(c.name)).length;
+   for(const [size,count] of [[512,count-small],[256,count],[128,count+authored],[64,small]])assert.equal(memory.maps.filter(m=>m.width===size&&m.height===size&&m.levels===Math.log2(size)+1).length,count);
    assert.equal(before.startup.terrainPendingAtAttach,0);
    await page.locator('.scene').focus();await page.keyboard.down('w');
    try{await page.waitForFunction(p=>{const s=window.__miningValidation.snapshot();return Math.hypot(s.position[0]-p[0],s.position[2]-p[2])>.2},before.position)}finally{await page.keyboard.up('w')}

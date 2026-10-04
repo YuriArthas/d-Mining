@@ -1,0 +1,17 @@
+{
+  "taskId": "50c28cb3-4879-4b6e-b452-8f6de2c40a10",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "text_to_model",
+  "faceLimit": 200,
+  "prompt": "Exactly ONE solid cubic building block, equal width height depth, SIX FLAT SQUARE FACES, straight parallel edges, perfectly regular box silhouette. Minecraft building block meets modern Roblox Mining Simulator. Extremely tiny edge bevel only. No bulges, no taper, no warping, no protrusions, no pedestal, no other objects. Centered isolated complete cube. Details painted into the texture, NOT modeled. Simple clean saturated matte colors, no weathering, no realistic scratches. Warm honey brown timber log cube. Subtle broad straight vertical wood grain on the four side faces, simple square concentric end grain on top and bottom. No bands, no nails, no metal. A single modular timber voxel.",
+  "bytes": 3420840,
+  "triangles": 118,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "generated_image",
+    "rendered_image"
+  ]
+}

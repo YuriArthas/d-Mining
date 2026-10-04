@@ -1,0 +1,7 @@
+{
+  "task_id": "72a444ef-8b45-4cf9-9d29-ed944669b7a9",
+  "type": "text_to_model",
+  "model_version": "v3.1-20260211",
+  "face_limit": 1200,
+  "prompt": "An isolated modern ROBLOX Mining Simulator game prop. Extremely simple chunky voxel-like large shapes, clean saturated flat painted colors, matte nonmetal materials, no realistic grain, no tiny detail, no text, no logos, no characters, no ground landscape. Complete object, centered. Miniature frozen cave landmark: three broad ice-blue ice peaks with thick white snow caps on a small flat frosty blue base. Very chunky large angular shapes, no transparency, no icicles or tiny details."
+}

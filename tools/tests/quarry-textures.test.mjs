@@ -8,7 +8,7 @@ import { QUARRY_PLACEMENTS } from '../../src/game/world/QuarryLayout.ts';
 test('shipped quarry models use role-sized GPU-compressed mip chains and exact transport parts',()=>{
  const directory=new URL('../../src/game/assets/camp/',import.meta.url);
  const files=readdirSync(directory).filter(name=>name.endsWith('.manifest.json'));
- assert.equal(files.length,61);let textures=0,triangles=0,downloadBytes=0;
+ assert.deepEqual(files.map(f=>f.replace('.manifest.json','')).sort(),[...new Set(QUARRY_PLACEMENTS.map(p=>p.asset))].sort());let textures=0,texturedModels=0,authoredModels=0,triangles=0,downloadBytes=0;
  for(const file of files){
   const manifest=JSON.parse(readFileSync(new URL(file,directory)));
   const packed=Buffer.concat(manifest.parts.map(name=>readFileSync(new URL(name,directory))));
@@ -20,12 +20,26 @@ test('shipped quarry models use role-sized GPU-compressed mip chains and exact t
   const buffer=gunzipSync(packed),jsonLength=buffer.readUInt32LE(12);
   const document=JSON.parse(buffer.subarray(20,20+jsonLength)),binaryStart=28+jsonLength;
   const count=document.meshes.reduce((n,m)=>n+m.primitives.reduce((n,p)=>n+document.accessors[p.indices??p.attributes.POSITION].count/3,0),0);
-  triangles+=count;assert.equal(count,manifest.triangles);assert.ok(count<=manifest.faceLimit);assert.equal(manifest.geometryEdits,false);assert.ok(manifest.taskId);
+  triangles+=count;assert.equal(count,manifest.triangles);assert.ok(count<=manifest.faceLimit);assert.equal(manifest.geometryEdits,false);assert.ok(manifest.taskId||manifest.generationId);
+  if(manifest.materialProfile==='solid-color'){
+   assert.ok(file.startsWith('grid-mine-')||file==='mine-fence.manifest.json');
+   assert.equal(document.images?.length??0,0);assert.equal(document.textures?.length??0,0);
+   for(const m of document.materials){assert.equal(m.pbrMetallicRoughness.metallicFactor,0);assert.equal(m.pbrMetallicRoughness.roughnessFactor,.82);assert.equal(m.normalTexture,undefined);assert.equal(m.pbrMetallicRoughness.baseColorTexture,undefined);}
+   continue;
+  }
+  if(manifest.materialProfile==='authored-color'){
+   authoredModels++;
+   assert.equal(manifest.source,'Blender authored mesh and texture');
+   assert.ok(manifest.generationId);assert.equal(manifest.taskId,undefined);
+   assert.ok(count<=128);assert.equal(document.images.length,1);
+   for(const material of document.materials){assert.equal(material.normalTexture,undefined);assert.equal(material.pbrMetallicRoughness.metallicRoughnessTexture,undefined);}
+  }else texturedModels++;
   assert.ok(document.extensionsRequired.includes('KHR_texture_basisu'));
-  const dimensions=new Map(),scale=file.startsWith('bank-')?.5:1;
+  const dimensions=new Map(),scale=(file.startsWith('portal-')||file.startsWith('egg-')||file.startsWith('bank-')||file.startsWith('grid-mine-')||file.startsWith('mine-pendant'))?.5:1;
   const source=index=>document.textures[index].extensions.KHR_texture_basisu.source;
   for(const material of document.materials){
-   dimensions.set(source(material.pbrMetallicRoughness.baseColorTexture.index),512*scale);
+   dimensions.set(source(material.pbrMetallicRoughness.baseColorTexture.index),manifest.materialProfile==='authored-color'?128:512*scale);
+   if(manifest.materialProfile==='authored-color')continue;
    dimensions.set(source(material.pbrMetallicRoughness.metallicRoughnessTexture.index),128*scale);
    dimensions.set(source(material.normalTexture.index),256*scale);
   }
@@ -38,9 +52,10 @@ test('shipped quarry models use role-sized GPU-compressed mip chains and exact t
    assert.equal(ktx.readUInt32LE(40),Math.log2(dimension)+1);textures++;
   }
  }
- assert.equal(textures,183);
+ assert.equal(textures,texturedModels*3+authoredModels);
  const manifests=new Map(files.map(file=>[file.replace('.manifest.json',''),JSON.parse(readFileSync(new URL(file,directory)))]));
- const placed=QUARRY_PLACEMENTS.reduce((sum,p)=>sum+manifests.get(p.asset).triangles,0);assert.ok(placed<650_000,`${placed} placed triangles`);
+ const placed=QUARRY_PLACEMENTS.reduce((sum,p)=>sum+manifests.get(p.asset).triangles,0);// Voxel-scale assembled mine adds 35,835 placed triangles; unique geometry shrinks.
+ assert.ok(placed<675_000,`${placed} placed triangles`);
  assert.ok(triangles<190_000,`Surface meshes contain ${triangles} unique triangles`);
  assert.ok(downloadBytes<26*1024*1024,`Surface download unexpectedly uses ${downloadBytes} bytes`);
 });

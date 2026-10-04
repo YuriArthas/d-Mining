@@ -1,0 +1,17 @@
+{
+  "materialProfile": "solid-color",
+  "solidColor": "#2389df",
+  "parts": [
+    "grid-mine-roof-v2.000.part"
+  ],
+  "bytes": 2592,
+  "sha256": "d497567a4acb376400b12f7a4f182c1f2bdf2b1fc3394101e993f4a57b37ef01",
+  "taskId": "d49ab52d-3513-4c35-8b39-d3697863517f",
+  "sourceSha256": "280475bf9f253c861fc59bb18b4c70c8ae5535b7cd06982696955643ec34f492",
+  "triangles": 192,
+  "faceLimit": 200,
+  "source": "new Tripo image_to_model",
+  "reference": "output/imagegen/grid-mine/grid-mine-roof-v2.png",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}
