@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "cliff-arch.000.part"
+  ],
+  "bytes": 374182,
+  "sha256": "ea077dffb7e4a2e631bd9210e143676e442da8d769694979794b2eb9791af147",
+  "taskId": "b9a6883b-d2d0-4be3-a85d-4011e85deb40",
+  "sourceSha256": "ef4fe7e2700654182dafee6a0d23c97b3510265cc7c9b1702ec39f2868f1f266",
+  "triangles": 5872,
+  "faceLimit": 6000,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

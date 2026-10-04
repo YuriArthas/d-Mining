@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "cart-empty.000.part"
+  ],
+  "bytes": 380185,
+  "sha256": "30952c7e36cb3661ec418e341aa2c18e202ee12920fc946c7c956531ff8085b1",
+  "taskId": "95ce4c13-1613-45c8-8ef5-01503ce0530b",
+  "sourceSha256": "d0cee7384d3728442dd60dbfcd4b41f05731fc413118863e3da349efd7ce2c2e",
+  "triangles": 2344,
+  "faceLimit": 2500,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

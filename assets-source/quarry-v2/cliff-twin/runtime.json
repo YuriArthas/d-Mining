@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "cliff-twin.000.part"
+  ],
+  "bytes": 369669,
+  "sha256": "a3c4693a9abdc507084c669c71a7f98447bfb2ceb2cdb180b9a6a64dc3db5afb",
+  "taskId": "ede0281d-aaf3-4e7a-942c-889cd29716e6",
+  "sourceSha256": "3c66f330a6eb8ece1224136e6b51f13071dc42b5f4b6d60d88b9384e4b0c80a5",
+  "triangles": 5362,
+  "faceLimit": 5500,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

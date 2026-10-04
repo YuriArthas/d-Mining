@@ -1,4 +1,5 @@
 import { Exploration } from '../logic/Exploration.ts';
+import { SURFACE_SHOP } from '../world/surfaceLayout.ts';
 import { HOME_ZONE, ROOMS } from '../world/rooms.ts';
 import { Inventory } from '../logic/Inventory.ts';
 import { Wallet } from '../logic/Wallet.ts';
@@ -18,7 +19,7 @@ export class GameSession {
   private world: WorldCommands | null = null;
   private zones = [SELL_ZONE, ...ROOMS.map(r => r.sell)].map(config => new ZoneDetector(config));
   private home = new ZoneDetector(HOME_ZONE);
-  private shops = ROOMS.filter(r => r.shop).map(r => ({ id: r.id, detector: new ZoneDetector(r.shop!) }));
+  private shops = [{id:'surface-upgrade',detector:new ZoneDetector(SURFACE_SHOP)}, ...ROOMS.filter(r => r.shop).map(r => ({ id: r.id, detector: new ZoneDetector(r.shop!) }))];
   private exploration = new Exploration(ROOMS);
   private atHome = false;
   private shopId: string | null = null;
@@ -123,10 +124,9 @@ export class GameSession {
     if (added.length) { this.notice = `已解锁 ${ROOMS.find(r => r.id === added.at(-1))!.name}，可回家传送`; changed = true; }
     const homeEvent = this.home.update(feet, grounded);
     if (homeEvent) { this.atHome = homeEvent === 'enter'; changed = true; }
-    for (const shop of this.shops) {
-      const event = shop.detector.update(feet, grounded);
-      if (event) { this.shopId = event === 'enter' ? shop.id : null; changed = true; }
-    }
+    for (const shop of this.shops) shop.detector.update(feet, grounded);
+    const activeShop = this.shops.find(shop => shop.detector.isInside)?.id ?? null;
+    if (activeShop !== this.shopId) { this.shopId = activeShop; changed = true; }
     let entered = false;
     for (const zone of this.zones) {
       const event = zone.update(feet, grounded);

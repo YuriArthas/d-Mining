@@ -12,7 +12,9 @@
     "build": "tsc --noEmit && vite build",
     "serve": "node server/serve.mjs",
     "preview": "vite preview",
-    "test": "node --test tools/tests/*.test.mjs"
+    "test": "node --test tools/tests/*.test.mjs",
+    "publish:preview": "npm run build && node tools/publish-preview.mjs",
+    "art:build": "node tools/build-camp.mjs"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "0.19.3",

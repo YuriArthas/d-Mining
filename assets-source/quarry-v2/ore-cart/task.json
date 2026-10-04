@@ -1,0 +1,7 @@
+{
+  "task_id": "a5a30668-5fc3-48be-848c-ba8677a6905c",
+  "type": "text_to_model",
+  "model_version": "v3.1-20260211",
+  "face_limit": 3500,
+  "prompt": "A single compact stylized mining handcart asset for a Roblox-inspired game. Chunky rounded wooden cart body, four simple dark iron wheels, thick axle, a few large blue and copper ore chunks, all resting on one flat ground datum. Readable silhouette, hand sculpted premium game prop, matte materials, no tracks, no character, no text, no logos, no giant base."
+}

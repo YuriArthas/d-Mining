@@ -1,0 +1,142 @@
+{
+  "concept": "output/imagegen/quarry-v1/concept.png",
+  "ground": "output/imagegen/quarry-v1/ground.png",
+  "assets": [
+    {
+      "name": "ore-cart",
+      "imageModel": "gpt-image-2.5-sunburst",
+      "reference": "output/imagegen/quarry-v1/ore-cart.png",
+      "rawTriangles": 1432066,
+      "finalTriangles": 225814,
+      "downloadBytes": 5952003,
+      "sha256": "5937a989ebfa690ddeb04a20d3f0050794818bc0ce34e376ac7a6b89dcfcec09",
+      "simplification": {
+        "targetRatio": 0.12,
+        "errorLimit": 0.0002,
+        "lockBorder": true
+      },
+      "tripoTaskId": "56280a26-f28f-458c-a8cc-c921b1cc0231",
+      "texturesUnchangedByCleanup": true
+    },
+    {
+      "name": "oak",
+      "imageModel": "gpt-image-2.5-sunburst",
+      "reference": "output/imagegen/quarry-v1/oak.png",
+      "rawTriangles": 1445228,
+      "finalTriangles": 793392,
+      "downloadBytes": 8157286,
+      "sha256": "904d4eb653b81d5022cc1043d9ad1e3b11f6bf6ff58046dc90b1bbfcac3c6132",
+      "simplification": {
+        "targetRatio": 0.12,
+        "errorLimit": 0.0002,
+        "lockBorder": true
+      },
+      "tripoTaskId": "fac9ded2-8e2d-4eca-b1c1-69c124a86f57",
+      "texturesUnchangedByCleanup": true,
+      "runtimeLods": [
+        {
+          "name": "oak-near",
+          "triangles": 9999,
+          "limit": 12000,
+          "downloadBytes": 567431,
+          "source": "assets-source/oak-budget-v1/oak-near.glb"
+        },
+        {
+          "name": "oak-mid",
+          "triangles": 3999,
+          "limit": 5000,
+          "downloadBytes": 481079,
+          "source": "assets-source/oak-budget-v1/oak-mid.glb"
+        },
+        {
+          "name": "oak-far",
+          "triangles": 999,
+          "limit": 1500,
+          "downloadBytes": 426828,
+          "source": "assets-source/oak-budget-v1/oak-far.glb"
+        }
+      ],
+      "runtimePolicy": "near at arrival edge, mid at back ledge, far on distant rim; ordinary scenery remains resident"
+    },
+    {
+      "name": "planted-bank",
+      "imageModel": "gpt-image-2.5-sunburst",
+      "reference": "output/imagegen/quarry-v1/planted-bank.png",
+      "rawTriangles": 1423814,
+      "finalTriangles": 450088,
+      "downloadBytes": 6830568,
+      "sha256": "896a3fe8f7b8935f92ac5f24d6cdf74115f737e3a5e5e6068c18462be1269422",
+      "simplification": {
+        "targetRatio": 0.12,
+        "errorLimit": 0.0002,
+        "lockBorder": true
+      },
+      "tripoTaskId": "7fbda3d8-ff66-4e31-8a2b-df87aee42db0",
+      "texturesUnchangedByCleanup": true
+    },
+    {
+      "name": "exchange",
+      "imageModel": "gpt-image-2.5-sunburst",
+      "reference": "output/imagegen/quarry-v1/exchange.png",
+      "rawTriangles": 1454216,
+      "finalTriangles": 322438,
+      "downloadBytes": 5926265,
+      "sha256": "3ae1a44f20fd010d1a324101b99896cf58d83e63b8a241babe75df3663ca68e1",
+      "simplification": {
+        "targetRatio": 0.12,
+        "errorLimit": 0.0002,
+        "lockBorder": true
+      },
+      "tripoTaskId": "cd59a16a-7750-419f-8035-72b79d420d62",
+      "texturesUnchangedByCleanup": true
+    },
+    {
+      "name": "cliff",
+      "imageModel": "gpt-image-2.5-sunburst",
+      "reference": "output/imagegen/quarry-v1/cliff.png",
+      "rawTriangles": 1489866,
+      "finalTriangles": 308294,
+      "downloadBytes": 7747290,
+      "sha256": "c750fdd5899b985a7ff47852aaa3dddc9cfaf43feaf52a9a6abe56ca4bdfb720",
+      "simplification": {
+        "targetRatio": 0.12,
+        "errorLimit": 0.0002,
+        "lockBorder": true
+      },
+      "tripoTaskId": "a88e895c-94ed-4017-a886-7bad005a6aee",
+      "texturesUnchangedByCleanup": true
+    },
+    {
+      "name": "waterfall",
+      "imageModel": "gpt-image-2.5-sunburst",
+      "reference": "output/imagegen/quarry-v1/waterfall.png",
+      "rawTriangles": 1415850,
+      "finalTriangles": 439266,
+      "downloadBytes": 8112591,
+      "sha256": "6aac8769904f2823569b9a7ce4940b11b4508ae8bbc067eafdd900428733be26",
+      "simplification": {
+        "targetRatio": 0.12,
+        "errorLimit": 0.0002,
+        "lockBorder": true
+      },
+      "tripoTaskId": "9f95ede1-f9b2-41c3-aa75-60b5e157d40e",
+      "texturesUnchangedByCleanup": true
+    },
+    {
+      "name": "workshop",
+      "imageModel": "gpt-image-2.5-sunburst",
+      "reference": "output/imagegen/quarry-v1/workshop.png",
+      "rawTriangles": 1392726,
+      "finalTriangles": 404568,
+      "downloadBytes": 6202509,
+      "sha256": "00c26da0ea6854320cfee4c500d05fd4f0b4e1725db6bc415dfd78f6a2134321",
+      "simplification": {
+        "targetRatio": 0.12,
+        "errorLimit": 0.0002,
+        "lockBorder": true
+      },
+      "tripoTaskId": "fb98565b-48ab-4d55-b786-9d6426b2e0ea",
+      "texturesUnchangedByCleanup": true
+    }
+  ]
+}

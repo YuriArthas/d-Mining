@@ -1,0 +1,13 @@
+{
+  "parts": [
+    "mine-gate.000.part"
+  ],
+  "bytes": 409585,
+  "sha256": "fe3190b0d96d8e169a7cb26f7e84f96786717d13c500bbddf3ebea22cc8b2132",
+  "taskId": "8ac39c1e-8269-4586-b170-042b4b2de4e1",
+  "sourceSha256": "cb4ff01e94bb51922276d7d834c0aca8d5eeacf7436051a64b3cb5c9d781a9d2",
+  "triangles": 5708,
+  "faceLimit": 7000,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false
+}

@@ -1,0 +1,8 @@
+{
+  "task_id": "83ea2186-5ac4-4820-8952-beb95efebff7",
+  "type": "image_to_model",
+  "reference": "output/imagegen/camp-v2/rounded-ridge.png",
+  "model_version": "v3.1-20260211",
+  "face_limit": 6000,
+  "prompt": "New image-guided broad smooth sandstone ridge with four large shoulders."
+}

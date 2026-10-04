@@ -1,0 +1,15 @@
+{
+  "parts": [
+    "pit-winch.000.part"
+  ],
+  "bytes": 410852,
+  "sha256": "308a7e8b6450658efd933e291785504c12b0487951d055b0e3e9d59fc4cf38d4",
+  "taskId": "3857c9e5-3ffd-4719-a9e8-da7c609cf353",
+  "sourceSha256": "478190462127a1233b725c9db5af0f4fbb4d346665db96cfa9c45929acc87cf0",
+  "triangles": 2314,
+  "faceLimit": 2500,
+  "source": "new Tripo image_to_model",
+  "reference": "output/imagegen/mine-worksite/pit-winch.png",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

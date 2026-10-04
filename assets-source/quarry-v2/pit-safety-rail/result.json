@@ -1,0 +1,17 @@
+{
+  "taskId": "75c97185-8972-448b-a335-f8a13d6ccdb7",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "image_to_model",
+  "reference": "output/imagegen/mine-worksite/pit-safety-rail.png",
+  "faceLimit": 1400,
+  "prompt": "One straight mining safety fence section: three thick square timber posts and two straight horizontal rectangular timber rails with one diagonal brace. Low broad rectangular silhouette, 4 times wider than tall. Dark iron square bolts. Rough sawn unpainted brown oak. No curved beams.",
+  "bytes": 3490008,
+  "triangles": 1344,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "rendered_image"
+  ]
+}

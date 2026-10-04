@@ -1,0 +1,8 @@
+{
+  "task_id": "56d4b5d5-d885-4d07-b580-9d1c8cd05b5d",
+  "type": "image_to_model",
+  "reference": "output/imagegen/camp-expansion/maple-gold.png",
+  "model_version": "v3.1-20260211",
+  "face_limit": 2800,
+  "prompt": "Autumn maple, three large rounded golden yellow crown masses, stout trunk. A sculpted toy-like tree: thick short trunk supporting TWO OR THREE HUGE SOLID SMOOTH CANOPY VOLUMES. Canopy surfaces continuous like inflated cushions, absolutely NO individual leaves, leaf cards, visible twigs, thin branches, spiky foliage or detailed leaf texture.  Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. "
+}

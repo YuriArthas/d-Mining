@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "cliff-saddle.000.part"
+  ],
+  "bytes": 389668,
+  "sha256": "88749710d1eac55fbdc5ad902d39a50fcfbdba6fe1f4fb25c5a235c39aa7c9e1",
+  "taskId": "8e35f5d6-0846-49ce-8a71-b0a4f7c4c730",
+  "sourceSha256": "3b5bac14d29499a5a0de3d3eb7921cce85aa9c185ae7143637fd8e763bb8aaab",
+  "triangles": 5380,
+  "faceLimit": 5500,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

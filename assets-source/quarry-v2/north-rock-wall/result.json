@@ -1,0 +1,15 @@
+{
+  "taskId": "47ca5822-3108-4bd0-9fea-29ffab00dc8e",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "faceLimit": 9000,
+  "prompt": "A single wide asymmetrical stylized limestone rock wall landmark for a Roblox-inspired mining valley. One connected low mountain wall, broad at the base and tapering into three large rounded terraces, layered warm gray stone, moss seams and a few broad fern masses. It must close a distant horizon from a playable courtyard, with varied organic silhouette and no straight circular ring. No waterfall, no buildings, no trees, no ground island, no visible tiled cubes, no text, no logos.",
+  "bytes": 12791784,
+  "triangles": 8577,
+  "meshes": 1,
+  "materials": 1,
+  "output": {
+    "generated_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/47ca5822-3108-4bd0-9fea-29ffab00dc8e/text2image_47ca5822-3108-4bd0-9fea-29ffab00dc8e.jpeg?auth_key=1791158400-ZB9GIqZi-0-ff42b48c46f7f246abd351ce915a2447",
+    "rendered_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/47ca5822-3108-4bd0-9fea-29ffab00dc8e/legacy_mesh.webp?auth_key=1791158400-ZB9GIqZi-0-f36e7cea3fe2e0a175138fb47c89e75e"
+  }
+}

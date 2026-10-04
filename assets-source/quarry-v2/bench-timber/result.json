@@ -1,0 +1,17 @@
+{
+  "taskId": "a9beb0d5-e2fd-4ea3-a15b-2255b6005d43",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "text_to_model",
+  "faceLimit": 1700,
+  "prompt": "Welcoming chunky timber park bench with broad curved backrest and two solid sandstone feet. Rounded honey wood, clean simple silhouette. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+  "bytes": 2104588,
+  "triangles": 1626,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "generated_image",
+    "rendered_image"
+  ]
+}

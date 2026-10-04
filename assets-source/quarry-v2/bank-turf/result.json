@@ -1,0 +1,17 @@
+{
+  "taskId": "a68d7651-9af0-4a7c-adcb-c7246ab3786b",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "image_to_model",
+  "reference": "output/imagegen/timber-boundary/bank-turf.png",
+  "faceLimit": 600,
+  "prompt": "One solid rectangular Minecraft-like grass dirt terrain block, width 4 metres, height 2 metres, depth 4 metres. Perfectly flat square green grass top and straight vertical dark brown earth sides, crisp 90 degree corners. Grass hangs in a short irregular pixelated band over the upper soil edges. Coarse low-resolution square mottling in the dirt, no stones sticking out. Solid cuboid, no rounded mound.",
+  "bytes": 2624952,
+  "triangles": 529,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "rendered_image"
+  ]
+}

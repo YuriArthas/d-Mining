@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "shrub-berry.000.part"
+  ],
+  "bytes": 340240,
+  "sha256": "6b9b8f0496fed02eb503d8f3285fb6707326f64426084de6afa1fe3d40c2e7f0",
+  "taskId": "c7d59009-d5c4-4464-935a-297c31cc1a89",
+  "sourceSha256": "c1e2d3390790bb17a6958efbb28c69d512836d20de954c7703a751cb5657038b",
+  "triangles": 1108,
+  "faceLimit": 1200,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

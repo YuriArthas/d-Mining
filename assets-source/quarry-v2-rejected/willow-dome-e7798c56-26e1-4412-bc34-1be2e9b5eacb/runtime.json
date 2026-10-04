@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "willow-dome.000.part"
+  ],
+  "bytes": 353163,
+  "sha256": "288285d65ce94b128de2fd267df242c74559cfb42f5693f1f02f62b59dbdbc19",
+  "taskId": "e7798c56-26e1-4412-bc34-1be2e9b5eacb",
+  "sourceSha256": "36e3a58a06cad30a7064234b71cc783ebfafdd71450baea36e30a533f7b4fe3f",
+  "triangles": 2646,
+  "faceLimit": 2800,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

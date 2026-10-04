@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "oak-tall.000.part"
+  ],
+  "bytes": 382306,
+  "sha256": "d9660526bc3b0b07cc67b7dea8154a138d393a82dd2f5e877e96a4c3132998d6",
+  "taskId": "995e7322-2ccf-4d51-ab30-aad30b79f1b5",
+  "sourceSha256": "3ad67357591c0f8694c4668521c522c7df20887c8be7afe5955ecf023053c1ee",
+  "triangles": 2672,
+  "faceLimit": 2800,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

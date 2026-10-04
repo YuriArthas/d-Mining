@@ -1,0 +1,15 @@
+{
+  "taskId": "0babd74f-32c4-4768-87ef-aa8cbd1af785",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "faceLimit": 6000,
+  "prompt": "A single complete stylized game tree with a very thick short sculpted trunk and only three to five large solid rounded canopy masses. Broad chunky silhouette, simple clustered foliage volumes like premium modern Roblox environment art, rich green material variation. Absolutely no thin branches, no twig network, no individual leaves, no leaf cards, no spiky crown, no broccoli balls, no ground island, no pot, no text, no logos. One flat ground datum.",
+  "bytes": 7164964,
+  "triangles": 5792,
+  "meshes": 1,
+  "materials": 1,
+  "output": {
+    "generated_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/0babd74f-32c4-4768-87ef-aa8cbd1af785/text2image_0babd74f-32c4-4768-87ef-aa8cbd1af785.jpeg?auth_key=1791158400-ZB9GIqZi-0-91135afddcd9e761d0ab26f39c2a42a0",
+    "rendered_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/0babd74f-32c4-4768-87ef-aa8cbd1af785/legacy_mesh.webp?auth_key=1791158400-ZB9GIqZi-0-f415069bb571c02669f4f73288a7c6ad"
+  }
+}

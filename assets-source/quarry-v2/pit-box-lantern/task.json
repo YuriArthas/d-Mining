@@ -1,0 +1,8 @@
+{
+  "task_id": "ed8007fc-24c0-4164-9585-a8a3a467730f",
+  "type": "image_to_model",
+  "reference": "output/imagegen/mine-worksite/pit-box-lantern.png",
+  "model_version": "v3.1-20260211",
+  "face_limit": 1600,
+  "prompt": "One simple mining construction work light: a thick square brown rough timber post on a squat square timber foot, supporting one box-shaped black iron lantern with warm cream glass panels. Straight angular frame, visible broad rough wood grain. No ornate details, no curved roof, no surrounding props."
+}

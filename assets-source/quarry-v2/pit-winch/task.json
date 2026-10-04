@@ -1,0 +1,8 @@
+{
+  "task_id": "3857c9e5-3ffd-4719-a9e8-da7c609cf353",
+  "type": "image_to_model",
+  "reference": "output/imagegen/mine-worksite/pit-winch.png",
+  "model_version": "v3.1-20260211",
+  "face_limit": 2500,
+  "prompt": "One squat hand operated mining winch: thick squared oak frame with a large horizontal wooden cable drum, short crank handle and two iron brackets. Rectilinear chunky frame, broad visible coarse wood grain and iron fasteners. No long cable extending away from object."
+}

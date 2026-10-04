@@ -1,0 +1,17 @@
+{
+  "taskId": "930768dc-dd1e-4f08-9bb4-f76229d1d859",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "image_to_model",
+  "reference": "output/imagegen/camp-v2/crown-tree.png",
+  "faceLimit": 3000,
+  "prompt": "New image-guided solid three-lobe canopy tree; no leaf geometry.",
+  "bytes": 1956384,
+  "triangles": 2834,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "rendered_image"
+  ]
+}

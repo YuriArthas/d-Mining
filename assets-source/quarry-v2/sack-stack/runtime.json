@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "sack-stack.000.part"
+  ],
+  "bytes": 327408,
+  "sha256": "07009bab5098b209ca18ffb4aa4c897232ee860b31a8c0ffb2a4e74acb9e4563",
+  "taskId": "455f1ca1-346a-4d7e-8dcc-4411a82a6a14",
+  "sourceSha256": "cba8652da2a895af9f0c425d22ad5e22c5f8a774bd214e40ed99fd93ac72e4bd",
+  "triangles": 1532,
+  "faceLimit": 1600,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

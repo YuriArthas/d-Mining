@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "waystone-crystal.000.part"
+  ],
+  "bytes": 287504,
+  "sha256": "b5337d3c180d004d5d04fb70a4d9a68986455dfefdce45cea962ca1a1e853b2f",
+  "taskId": "1d9ff20c-ed53-4699-94aa-fa7f5e54ca8b",
+  "sourceSha256": "c4e720444e02bc56c44d6cf112a73f865d4a63c322db90ac8ae3b4d68ac5020a",
+  "triangles": 2235,
+  "faceLimit": 2400,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

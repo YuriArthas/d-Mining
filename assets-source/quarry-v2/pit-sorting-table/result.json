@@ -1,0 +1,17 @@
+{
+  "taskId": "9d4e402f-2beb-43be-aab8-33b844c473a6",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "image_to_model",
+  "reference": "output/imagegen/mine-worksite/pit-sorting-table.png",
+  "faceLimit": 2400,
+  "prompt": "One low rectangular ore sorting table of worn thick rough brown oak planks with four square legs and stout cross braces. Four small irregular fractured gray and copper ore samples on the tabletop, shallow wooden sorting tray and a single heavy iron mallet. Rectangular workbench, no awning.",
+  "bytes": 3330548,
+  "triangles": 2114,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "rendered_image"
+  ]
+}

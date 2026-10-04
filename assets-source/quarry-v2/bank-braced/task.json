@@ -1,0 +1,8 @@
+{
+  "task_id": "ea100a0e-698e-470f-98d8-a22c532f365e",
+  "type": "image_to_model",
+  "reference": "output/imagegen/timber-boundary/bank-braced.png",
+  "model_version": "v3.1-20260211",
+  "face_limit": 1000,
+  "prompt": "One modular rectangular retaining wall block, 4 metres wide, 2 metres high, 2 metres deep. Four broad straight rough oak horizontal sleepers, square timber end posts, one stout diagonal timber brace against the FRONT. Solid brown earth back and sides, perfectly flat green grass top. Closed solid cuboid shape, square corners. No legs or holes."
+}

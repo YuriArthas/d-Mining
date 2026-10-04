@@ -4,6 +4,15 @@ import { initPhysics, CharacterPhysics, RAPIER } from '../../src/game/validation
 await initPhysics();
 function setup(){const p=new CharacterPhysics();const floor=p.world.createCollider(RAPIER.ColliderDesc.cuboid(40,0.5,40).setTranslation(0,-0.5,0));return {p,floor};}
 function tick(p,n,x=0,y=0,jump=false){for(let i=0;i<n;i++)p.tick(x,y,0,jump&&i===0,true);}
+test('production spawn and former deck footprint are flat without invisible ramp colliders',()=>{
+ const p=new CharacterPhysics(false);try{
+  p.world.createCollider(RAPIER.ColliderDesc.cuboid(40,.5,40).setTranslation(0,-.5,0));
+  tick(p,30);assert.ok(p.grounded);assert.ok(p.feet()[1]<.05);
+  p.teleport([0,.05,6.5]);tick(p,20);
+  for(let i=0;i<120;i++){tick(p,1,0,-1);assert.ok(p.grounded);assert.ok(p.feet()[1]>=0&&p.feet()[1]<.05);}
+  assert.ok(p.feet()[2]>18);
+ }finally{p.dispose();}
+});
 test('capsule lands, jumps once and returns to ground without penetration',()=>{
  const {p}=setup();try{
   p.teleport([12,12,0]);tick(p,180);assert.ok(p.grounded);assert.ok(p.feet()[1]>=0&&p.feet()[1]<0.1);
@@ -29,7 +38,7 @@ test('removing supporting terrain causes falling; unavailable collision region f
 
 test('idle capsule on ordinary platform remains stable without camera-height oscillation',()=>{
  const p=new CharacterPhysics();try{
-  tick(p,120);const heights=[];for(let i=0;i<300;i++){tick(p,1);heights.push(p.feet()[1]);}
+  p.teleport([0,2.05,16]);tick(p,120);const heights=[];for(let i=0;i<300;i++){tick(p,1);heights.push(p.feet()[1]);}
   assert.ok(Math.max(...heights)-Math.min(...heights)<0.001);
   assert.ok(heights.every(y=>y>=2&&y<2.1));
  }finally{p.dispose();}

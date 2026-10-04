@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "cedar-pillow.000.part"
+  ],
+  "bytes": 369920,
+  "sha256": "40c755b6ef1a6345cfbc4f36093b0e94b31865a27a9241cda838685b3b0503bb",
+  "taskId": "bb07b031-0add-4fed-a966-afb6e72b8466",
+  "sourceSha256": "6c11699e7b42304e26f1adf7202df7af400fc59ac2c722d63412338e181fa376",
+  "triangles": 2572,
+  "faceLimit": 2800,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

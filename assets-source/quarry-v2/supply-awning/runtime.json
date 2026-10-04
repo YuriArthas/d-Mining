@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "supply-awning.000.part"
+  ],
+  "bytes": 394759,
+  "sha256": "0f4a3f9c321647f7ed50ce2b670757a5d03239bb78efb97910dfb8aa76488967",
+  "taskId": "207e6c89-7611-4e7e-8eff-e25f738bef01",
+  "sourceSha256": "4e2264fc14833be62ec3345b473b42ada75bcadd4fc1a840877d8e6d04a7791b",
+  "triangles": 4040,
+  "faceLimit": 4200,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

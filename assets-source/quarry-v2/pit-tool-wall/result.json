@@ -1,0 +1,17 @@
+{
+  "taskId": "b871bac4-8e7a-4bd3-a10f-5f44b75386f1",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "image_to_model",
+  "reference": "output/imagegen/mine-worksite/pit-tool-wall.png",
+  "faceLimit": 2600,
+  "prompt": "One large rectangular freestanding mining tool rack made from vertical rough brown timber boards with two stout square feet. Three large tools hung clearly against the board: iron pickaxe, broad shovel, and sledgehammer. Two small iron hooks and a thick lower shelf. Squared construction, coarse wood grain, no roof, no curves, no painted trim.",
+  "bytes": 3603412,
+  "triangles": 2218,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "rendered_image"
+  ]
+}

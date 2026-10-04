@@ -1,0 +1,17 @@
+{
+  "taskId": "0c85ff6c-ad50-49ed-86bc-da0fcdbe8635",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "text_to_model",
+  "faceLimit": 900,
+  "prompt": "Small lush green grass clump formed from ONLY five broad thick smoothly curved rounded blades, solid toy-like shapes, no thin dense blades. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+  "bytes": 1967444,
+  "triangles": 860,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "generated_image",
+    "rendered_image"
+  ]
+}

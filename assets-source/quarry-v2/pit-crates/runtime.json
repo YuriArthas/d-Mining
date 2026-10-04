@@ -1,0 +1,15 @@
+{
+  "parts": [
+    "pit-crates.000.part"
+  ],
+  "bytes": 401699,
+  "sha256": "750d90c8deed0920003a769ba0b1e0cf2893545f58d15fe91772b4735442c0b8",
+  "taskId": "a1ed8067-279d-4df6-9563-50b43d16261e",
+  "sourceSha256": "d19b1ebf1d6030f729e9dd83b5118609fee5ac90497641bedf7d68d2a40a944f",
+  "triangles": 1508,
+  "faceLimit": 1800,
+  "source": "new Tripo image_to_model",
+  "reference": "output/imagegen/mine-worksite/pit-crates.png",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

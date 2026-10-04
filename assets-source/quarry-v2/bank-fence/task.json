@@ -1,0 +1,8 @@
+{
+  "task_id": "d1cc28e7-f917-46e2-ae5c-6442d30c7ddf",
+  "type": "image_to_model",
+  "reference": "output/imagegen/timber-boundary/bank-fence.png",
+  "model_version": "v3.1-20260211",
+  "face_limit": 500,
+  "prompt": "One short straight rustic wooden fence section, width 4 metres, height 1 metre, very shallow depth. Three square cut rough oak posts and two thick straight horizontal rectangular rails. Minecraft-like squared carpentry, broad wood grain, no round logs, no stone base, no foliage, no curved shapes."
+}

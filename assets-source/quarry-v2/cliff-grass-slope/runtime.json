@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "cliff-grass-slope.000.part"
+  ],
+  "bytes": 325730,
+  "sha256": "bc352f78400e81397367cef9976647340b0abcd84b3ece4ce23eebf9d4442bba",
+  "taskId": "9f1e6813-3c79-4c25-86ad-3b9a48f474ff",
+  "sourceSha256": "b3cb446ac2aebe962e843225744d7c72e8368bf6f53f892b5a5fc15796d5e861",
+  "triangles": 4866,
+  "faceLimit": 5000,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

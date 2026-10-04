@@ -1,0 +1,15 @@
+{
+  "parts": [
+    "shaft-kiln-frame.000.part"
+  ],
+  "bytes": 454090,
+  "sha256": "0074cb09975eb4937f9290bd8cd5a1612b91ae6aa083b89eb7e753bcf4ecf962",
+  "taskId": "2508c35d-a3c7-4a6a-9280-24621f200a97",
+  "sourceSha256": "5dd0559e882ef09ef30e4da03cc40fbfdab0e7b9f9a3e2f69f0320cfaa1ebb1b",
+  "triangles": 8935,
+  "faceLimit": 10000,
+  "source": "new Tripo image_to_model",
+  "reference": "output/imagegen/shaft-enclosure/shaft-kiln-frame.png",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

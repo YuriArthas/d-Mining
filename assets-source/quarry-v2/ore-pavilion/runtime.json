@@ -1,0 +1,13 @@
+{
+  "parts": [
+    "ore-pavilion.000.part"
+  ],
+  "bytes": 436966,
+  "sha256": "2c43c0cc7f0bfeb743dd79b199e53e3ca55bea52d766295dcc3aab2e2907320b",
+  "taskId": "536e8af6-97a0-4e2d-b076-3b3cb53d062a",
+  "sourceSha256": "fb5eed636f09d053033482fef0ff825a03035fbd3ea98a10bea75fc219afe1d1",
+  "triangles": 6410,
+  "faceLimit": 7000,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false
+}

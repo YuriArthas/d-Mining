@@ -1,0 +1,17 @@
+{
+  "taskId": "b4764231-d64e-4271-b1c4-76279d7939b9",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "image_to_model",
+  "reference": "output/imagegen/timber-boundary/bank-timber.png",
+  "faceLimit": 900,
+  "prompt": "One modular rectangular retaining wall block, 4 metres wide, 2 metres high, 2 metres deep. Front is four thick straight horizontal rough oak sleepers held by two square vertical posts and black square bolts. Solid brown earth back and sides, perfectly flat green grass top. Closed solid cuboid shape, square corners. No legs, no gaps through the wall.",
+  "bytes": 2433900,
+  "triangles": 673,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "rendered_image"
+  ]
+}

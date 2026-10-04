@@ -1,0 +1,15 @@
+{
+  "parts": [
+    "simulator-exchange.000.part"
+  ],
+  "bytes": 416858,
+  "sha256": "a28eb7214f453b15672fbc468904e6530f0ba9ebab5f7c6f56895f83f645985a",
+  "taskId": "6d3bf76e-2393-4ea3-bb6f-65b731fcf61a",
+  "sourceSha256": "8533df76be42cd0027aabff2b4156a9b8ffb6a8c62ae9f6077dbb65e10e9c0f2",
+  "triangles": 4720,
+  "faceLimit": 6000,
+  "source": "new Tripo image_to_model",
+  "reference": "output/imagegen/simulator-facilities/simulator-exchange.png",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

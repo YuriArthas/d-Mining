@@ -1,0 +1,15 @@
+{
+  "parts": [
+    "pit-headframe.000.part"
+  ],
+  "bytes": 412762,
+  "sha256": "36cf9b00348e7d5179f4c07b0734f1b5215f7df8fdd728ab1e566ac6eda1ca30",
+  "taskId": "a92d4214-35c8-4954-9042-8b0369c8322c",
+  "sourceSha256": "73ebfcb9e59bcf73fca66065f72c2c8854d75435cc62f3a531313959a9044855",
+  "triangles": 3648,
+  "faceLimit": 4000,
+  "source": "new Tripo image_to_model",
+  "reference": "output/imagegen/mine-worksite/pit-headframe.png",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

@@ -1,0 +1,7 @@
+{
+  "task_id": "c96c7072-6076-46e6-ba65-f5824728c30a",
+  "type": "text_to_model",
+  "model_version": "v3.1-20260211",
+  "face_limit": 1800,
+  "prompt": "Three chunky warm wooden shipping crates stacked asymmetrically, broad planks, rounded corners, simple blue corner straps, no labels. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. "
+}

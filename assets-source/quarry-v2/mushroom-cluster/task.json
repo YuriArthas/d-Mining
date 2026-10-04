@@ -1,0 +1,7 @@
+{
+  "task_id": "4ac7f0db-50b9-4d9b-b879-96bcd56fd5fe",
+  "type": "text_to_model",
+  "model_version": "v3.1-20260211",
+  "face_limit": 1300,
+  "prompt": "Three stout red and cream mushrooms with broad smooth domed caps, thick stems and a few large cream dots, grouped tightly. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. "
+}

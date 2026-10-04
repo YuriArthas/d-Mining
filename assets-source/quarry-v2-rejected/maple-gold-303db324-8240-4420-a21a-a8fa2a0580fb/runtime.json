@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "maple-gold.000.part"
+  ],
+  "bytes": 357435,
+  "sha256": "5a4cee375a138bdd8f97b8cd47f258dbd8e18f747dd6db000c5983f3dadcf68d",
+  "taskId": "303db324-8240-4420-a21a-a8fa2a0580fb",
+  "sourceSha256": "2eb4b61f8b8d0aea542dccd182b40f452af047d5727ffa8d07ab768bd59bcba6",
+  "triangles": 2554,
+  "faceLimit": 2800,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

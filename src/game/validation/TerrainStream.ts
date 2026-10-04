@@ -69,10 +69,10 @@ export class TerrainStream {
   }
   canMine(c: Coord) { return c.every(Number.isInteger) && inBounds(c) && this.world.canMine(c); }
   ready(feet: readonly number[]) {
-    // Covers the 7.5 m camera boom, capsule sweep and downward lookahead.
+    // Covers the 10.5 m camera boom, capsule sweep and downward lookahead.
     const side = COLLISION_SIZE * CELL;
-    const min = feet.map((v, i) => Math.floor((v - (i === 1 ? 12 : 9)) / side));
-    const max = feet.map(v => Math.floor((v + 9) / side));
+    const min = feet.map((v, i) => Math.floor((v - 12) / side));
+    const max = feet.map(v => Math.floor((v + 12) / side));
     for (let z = min[2]; z <= max[2]; z++) for (let y = min[1]; y <= max[1]; y++) for (let x = min[0]; x <= max[0]; x++) {
       const c: Coord = [x, y, z]; if (validRegion(c, COLLISION_SIZE) && !this.collision.pipeline.has(c)) return false;
     }

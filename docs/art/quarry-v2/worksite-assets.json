@@ -1,0 +1,200 @@
+{
+  "newTasks": 12,
+  "uniqueTriangles": 22491,
+  "downloadBytes": 4760588,
+  "referenceDirectory": "output/imagegen/mine-worksite",
+  "components": [
+    {
+      "name": "pit-plank-deck",
+      "parts": [
+        "pit-plank-deck.000.part"
+      ],
+      "bytes": 388474,
+      "sha256": "9524f323753c5792adb39e098428476ddeb50d1ad1c56a57583af95e38bcd5aa",
+      "taskId": "031f3df9-8ede-4bee-b309-ba51c05955ec",
+      "sourceSha256": "b1ec4cb6c25b96dcb7c32ee92e6bfe0e35762605143286a40cb58202589adedb",
+      "triangles": 1726,
+      "faceLimit": 2000,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-plank-deck.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16
+    },
+    {
+      "name": "pit-safety-rail",
+      "parts": [
+        "pit-safety-rail.000.part"
+      ],
+      "bytes": 400147,
+      "sha256": "496f5fc2ac842f30b8e77f4edec46c61baf93ac359ed1a14ec99523b3ae6bd91",
+      "taskId": "75c97185-8972-448b-a335-f8a13d6ccdb7",
+      "sourceSha256": "fe12c673cae590cd1950cfeb49932353cac512e8e2d54090487384787af623c6",
+      "triangles": 1344,
+      "faceLimit": 1400,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-safety-rail.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16
+    },
+    {
+      "name": "pit-headframe",
+      "parts": [
+        "pit-headframe.000.part"
+      ],
+      "bytes": 412762,
+      "sha256": "36cf9b00348e7d5179f4c07b0734f1b5215f7df8fdd728ab1e566ac6eda1ca30",
+      "taskId": "a92d4214-35c8-4954-9042-8b0369c8322c",
+      "sourceSha256": "73ebfcb9e59bcf73fca66065f72c2c8854d75435cc62f3a531313959a9044855",
+      "triangles": 3648,
+      "faceLimit": 4000,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-headframe.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16
+    },
+    {
+      "name": "pit-winch",
+      "parts": [
+        "pit-winch.000.part"
+      ],
+      "bytes": 410852,
+      "sha256": "308a7e8b6450658efd933e291785504c12b0487951d055b0e3e9d59fc4cf38d4",
+      "taskId": "3857c9e5-3ffd-4719-a9e8-da7c609cf353",
+      "sourceSha256": "478190462127a1233b725c9db5af0f4fbb4d346665db96cfa9c45929acc87cf0",
+      "triangles": 2314,
+      "faceLimit": 2500,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-winch.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16
+    },
+    {
+      "name": "pit-lumber-stack",
+      "parts": [
+        "pit-lumber-stack.000.part"
+      ],
+      "bytes": 393855,
+      "sha256": "b914add1e063e6fb3ce16b41d3d27470ccf6025acf2d2b9c461eb49bc863cd13",
+      "taskId": "bebef70a-030b-4590-aa97-76fb8fcd9b72",
+      "sourceSha256": "6af55fb837ccb19fbaabd45a8a6120630d07e6a654be00a85d3cf019d88a8871",
+      "triangles": 1320,
+      "faceLimit": 1500,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-lumber-stack.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16
+    },
+    {
+      "name": "pit-tool-wall",
+      "parts": [
+        "pit-tool-wall.000.part"
+      ],
+      "bytes": 399955,
+      "sha256": "2d60b9afc481bed248a24921d2d4ffbce1be2ca16cb4adb4e937812f13cdb251",
+      "taskId": "b871bac4-8e7a-4bd3-a10f-5f44b75386f1",
+      "sourceSha256": "87300d8bf74e185be5e03f74cddd28493d8a16f01ebcbcd3ef5aab30c3726436",
+      "triangles": 2218,
+      "faceLimit": 2600,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-tool-wall.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16
+    },
+    {
+      "name": "pit-sorting-table",
+      "parts": [
+        "pit-sorting-table.000.part"
+      ],
+      "bytes": 396622,
+      "sha256": "a9d0f3dfd19f89069b2dd4da4695607ca9bce0aeb40738b33bd12edb0a7ab626",
+      "taskId": "9d4e402f-2beb-43be-aab8-33b844c473a6",
+      "sourceSha256": "1bcee295e2f91ccb0e5278a310abe61e4ffb8369057192e85a231438749b5192",
+      "triangles": 2114,
+      "faceLimit": 2400,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-sorting-table.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16
+    },
+    {
+      "name": "pit-crates",
+      "parts": [
+        "pit-crates.000.part"
+      ],
+      "bytes": 401699,
+      "sha256": "750d90c8deed0920003a769ba0b1e0cf2893545f58d15fe91772b4735442c0b8",
+      "taskId": "a1ed8067-279d-4df6-9563-50b43d16261e",
+      "sourceSha256": "d19b1ebf1d6030f729e9dd83b5118609fee5ac90497641bedf7d68d2a40a944f",
+      "triangles": 1508,
+      "faceLimit": 1800,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-crates.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16
+    },
+    {
+      "name": "pit-track",
+      "parts": [
+        "pit-track.000.part"
+      ],
+      "bytes": 362386,
+      "sha256": "2c5b965e3f822afacc18997aec3cd200a3c877c4247d75d0f96c0e90038aae2c",
+      "taskId": "f523efd3-c6be-436d-88b9-5c190cdbb0a7",
+      "sourceSha256": "8624bb0580afcfcdcc89280ec206849ae122082e93c49b349bfe871e6698b166",
+      "triangles": 1278,
+      "faceLimit": 1400,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-track.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16
+    },
+    {
+      "name": "pit-spoil",
+      "parts": [
+        "pit-spoil.000.part"
+      ],
+      "bytes": 396204,
+      "sha256": "f0fe7e7e32b35c1a22719812d7acdada4fedc2c078dd1c4905435c28c99b4239",
+      "taskId": "f4dfc3b1-1095-485b-a6f0-fd9341f9d10d",
+      "sourceSha256": "27301549cc13879282ea7bb6eae5f551b14bbb81df145a9b40c44072124e54ad",
+      "triangles": 1909,
+      "faceLimit": 2000,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-spoil.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16
+    },
+    {
+      "name": "pit-supply-pallet",
+      "parts": [
+        "pit-supply-pallet.000.part"
+      ],
+      "bytes": 393283,
+      "sha256": "cff48c491394249feab18037cc4f92b29628113452949045b93e0ed4190c2422",
+      "taskId": "910e0a00-2696-4c94-bd5e-1dc3dd0d011d",
+      "sourceSha256": "b457d10d94e4194f0f3d7bb8d2c48aa8dd05b13e45d5165a237dd7e95f2b06a2",
+      "triangles": 1671,
+      "faceLimit": 1800,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-supply-pallet.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16
+    },
+    {
+      "name": "pit-box-lantern",
+      "parts": [
+        "pit-box-lantern.000.part"
+      ],
+      "bytes": 404349,
+      "sha256": "d5088a53329634f2edfa386da99a544cff98eb6512ef0c13cb02ddc407b1281c",
+      "taskId": "ed8007fc-24c0-4164-9585-a8a3a467730f",
+      "sourceSha256": "5b2af4c956723c602d795250af2a3429a27dee0d151f48146f98648cd4e5682c",
+      "triangles": 1441,
+      "faceLimit": 1600,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-box-lantern.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16
+    }
+  ]
+}

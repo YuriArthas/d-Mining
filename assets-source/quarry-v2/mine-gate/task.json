@@ -1,0 +1,7 @@
+{
+  "task_id": "8ac39c1e-8269-4586-b170-042b4b2de4e1",
+  "type": "text_to_model",
+  "model_version": "v3.1-20260211",
+  "face_limit": 7000,
+  "prompt": "A single complete stylized game asset: a compact underground mine entrance portal. Thick irregular warm gray stone arch with a heavy dark timber beam, two chunky timber braces, two small warm lantern housings and a readable dark tunnel opening. Premium modern Roblox adventure style, rounded hand sculpted forms, matte stone and wood, clear silhouette, all geometry connected to one flat ground datum. No characters, no text, no logos, no floating base, no thin repeated blocks."
+}

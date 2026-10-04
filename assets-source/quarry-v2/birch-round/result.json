@@ -1,0 +1,17 @@
+{
+  "taskId": "26832af1-87a1-4f1c-8776-6d557022df05",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "image_to_model",
+  "reference": "output/imagegen/camp-expansion/birch-round.png",
+  "faceLimit": 2400,
+  "prompt": "Cream bark birch with a single rounded lime green crown and a thick short trunk. A sculpted toy-like tree: thick short trunk supporting TWO OR THREE HUGE SOLID SMOOTH CANOPY VOLUMES. Canopy surfaces continuous like inflated cushions, absolutely NO individual leaves, leaf cards, visible twigs, thin branches, spiky foliage or detailed leaf texture.  Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+  "bytes": 2154508,
+  "triangles": 2348,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "rendered_image"
+  ]
+}

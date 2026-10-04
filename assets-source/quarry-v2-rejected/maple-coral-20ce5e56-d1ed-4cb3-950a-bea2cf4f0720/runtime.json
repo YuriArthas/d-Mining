@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "maple-coral.000.part"
+  ],
+  "bytes": 397010,
+  "sha256": "c790bde5bb8cc35603e61c47909eeae961e5a03b004af72c2f49d489b9347c01",
+  "taskId": "20ce5e56-d1ed-4cb3-950a-bea2cf4f0720",
+  "sourceSha256": "d3b070017992ee86d8bda29b42067c2345f47c5f5210a8f0564059e46cdf28d7",
+  "triangles": 2696,
+  "faceLimit": 2800,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

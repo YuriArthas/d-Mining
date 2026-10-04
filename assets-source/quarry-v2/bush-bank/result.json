@@ -1,0 +1,17 @@
+{
+  "taskId": "f93098fe-174f-466a-9b7a-97b39c003031",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "text_to_model",
+  "faceLimit": 1600,
+  "prompt": "A single low broad stylized shrub cluster for a colorful Roblox simulator game. Three overlapping solid lush green foliage volumes with six oversized soft rounded leaf lobes in total, a few small buttery yellow flowers as dots of color. Clean strong silhouette, simple painted color gradients, NO individual leaves, NO thin stems, NO twigs, NO transparent leaf cards. No container, no planter, no soil base, no text. Shape reads as one compact low hedge.",
+  "bytes": 6395296,
+  "triangles": 1560,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "generated_image",
+    "rendered_image"
+  ]
+}

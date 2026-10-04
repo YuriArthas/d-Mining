@@ -1,0 +1,15 @@
+{
+  "parts": [
+    "bank-timber.000.part"
+  ],
+  "bytes": 106010,
+  "sha256": "f8391560f0aeb4db6fc5d66c125d952bb5410903b98f873d9f146a0324f0e4b0",
+  "taskId": "b4764231-d64e-4271-b1c4-76279d7939b9",
+  "sourceSha256": "9fe5cdfda8e154f0279a74d6fda407d259e1c36505b163943a9c99b939886539",
+  "triangles": 673,
+  "faceLimit": 900,
+  "source": "new Tripo image_to_model",
+  "reference": "output/imagegen/timber-boundary/bank-timber.png",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

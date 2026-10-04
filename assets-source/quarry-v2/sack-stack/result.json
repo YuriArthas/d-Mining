@@ -1,0 +1,17 @@
+{
+  "taskId": "455f1ca1-346a-4d7e-8dcc-4411a82a6a14",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "text_to_model",
+  "faceLimit": 1600,
+  "prompt": "Three plump cream canvas ore sacks with simple folded mouths and one large turquoise mineral chunk alongside, rounded matte shapes. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+  "bytes": 2040040,
+  "triangles": 1532,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "generated_image",
+    "rendered_image"
+  ]
+}

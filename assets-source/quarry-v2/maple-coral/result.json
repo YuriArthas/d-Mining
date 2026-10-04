@@ -1,0 +1,17 @@
+{
+  "taskId": "afb147ad-fe8d-466a-8140-2ca77a8b88b9",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "image_to_model",
+  "reference": "output/imagegen/camp-expansion/maple-coral.png",
+  "faceLimit": 2800,
+  "prompt": "Coral orange maple, two broad pillowy crowns, stout curved trunk. A sculpted toy-like tree: thick short trunk supporting TWO OR THREE HUGE SOLID SMOOTH CANOPY VOLUMES. Canopy surfaces continuous like inflated cushions, absolutely NO individual leaves, leaf cards, visible twigs, thin branches, spiky foliage or detailed leaf texture.  Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+  "bytes": 2025140,
+  "triangles": 2657,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "rendered_image"
+  ]
+}

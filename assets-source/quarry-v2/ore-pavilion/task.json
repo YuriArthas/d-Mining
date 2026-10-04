@@ -1,0 +1,7 @@
+{
+  "task_id": "536e8af6-97a0-4e2d-b076-3b3cb53d062a",
+  "type": "text_to_model",
+  "model_version": "v3.1-20260211",
+  "face_limit": 7000,
+  "prompt": "A single complete stylized game asset: a small open-front ore exchange pavilion for a mining game. One solid timber frame with a broad moss-green curved roof, warm stone footings, a thick wooden counter, chunky crates and mineral baskets under the porch. Premium modern Roblox style with rounded crafted edges and readable large forms. Built on one flat ground datum, front open and walkable, no stairs, no text, no signage, no logos, no characters, no floating base."
+}

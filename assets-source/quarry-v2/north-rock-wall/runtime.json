@@ -1,0 +1,13 @@
+{
+  "parts": [
+    "north-rock-wall.000.part"
+  ],
+  "bytes": 477686,
+  "sha256": "4836508c7c73aa362ca100b4520dc56e5437c57bb364f964a0a52a9f27a5ee67",
+  "taskId": "47ca5822-3108-4bd0-9fea-29ffab00dc8e",
+  "sourceSha256": "b6d3ba7f8177237c991f489983113f17202e3359794da337eb04b44b440ebabc",
+  "triangles": 8577,
+  "faceLimit": 9000,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false
+}

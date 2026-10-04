@@ -1,0 +1,17 @@
+{
+  "taskId": "2508c35d-a3c7-4a6a-9280-24621f200a97",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "image_to_model",
+  "reference": "output/imagegen/shaft-enclosure/shaft-kiln-frame.png",
+  "faceLimit": 10000,
+  "prompt": "A large roofless square mine kiln enclosure, chunky squared stone masonry piers and rough oak braces surrounding an EMPTY square mining shaft. Four corner piers, tall rear stone arch, low side walls, wide open front entry. No floor, no roof over the center. Minecraft-inspired rough stone and timber.",
+  "bytes": 5591512,
+  "triangles": 8935,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "rendered_image"
+  ]
+}

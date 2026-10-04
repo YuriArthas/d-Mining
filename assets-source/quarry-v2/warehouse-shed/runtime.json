@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "warehouse-shed.000.part"
+  ],
+  "bytes": 405292,
+  "sha256": "b74b22d0183e66b2755544a652b3c637808e8455dfd674059e0d7cdf658dab6d",
+  "taskId": "5c16242a-a150-4cf3-a3be-1bb06c207869",
+  "sourceSha256": "dc9e1e56751f05df789eba49bfe6f0248f680ee7c84b487a4546bd6bd288e6bb",
+  "triangles": 5349,
+  "faceLimit": 6000,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

@@ -1,3 +1,4 @@
+import { ROOMS } from './world/rooms.ts';
 import { useEffect, useRef, useState, useSyncExternalStore, type RefObject } from 'react';
 import type { GameInput } from './GameInput.ts';
 import { MINERALS } from './terrain/minerals.ts';
@@ -51,8 +52,13 @@ export function ValidationPanel() {
   }, []);
   return <aside className="validation-panel">
     <output>{summary}</output>
-    <div className="mineral-legend">{MINERALS.map(m => <span key={m.id}><i style={{ background: m.color }} />{m.name}</span>)}</div>
-    <div><button type="button" onClick={() => window.__miningValidation?.teleport('surface')}>定位地表</button>{new URLSearchParams(location.search).get('samples') === '1' && <button type="button" onClick={() => window.__miningValidation?.teleport('course')}>碰撞场</button>}<button type="button" onClick={() => window.__miningValidation?.teleport('deep')}>定位 1000 层</button></div>
+    <details><summary>矿物图例 · 30 种</summary><div className="mineral-legend">{MINERALS.map(m => <span key={m.id}><i style={{ background: m.color }} />{m.name}</span>)}</div></details>
+    <div><button type="button" onClick={() => window.__miningValidation?.teleport('surface')}>定位地表</button>{new URLSearchParams(location.search).get('samples') === '1' && <button type="button" onClick={() => window.__miningValidation?.teleport('course')}>碰撞场</button>}<button type="button" onClick={() => window.__miningValidation?.teleport('deep')}>定位地心</button></div>
+    <select aria-label="预览场景" defaultValue="" onChange={event => {
+      const room=ROOMS.find(r=>r.id===event.target.value);
+      if(room)window.__miningValidation?.teleport(room.spawn);
+      else if(event.target.value==='surface')window.__miningValidation?.teleport('surface');
+    }}><option value="" disabled>选择主题场景</option><option value="surface">草地矿场 · 地表</option>{ROOMS.map(r=><option key={r.id} value={r.id}>{r.name} · {r.depth} 米</option>)}</select>
     {new URLSearchParams(location.search).get('samples') === '1' && <details className="ore-samples"><summary>矿样与合并检查</summary>
       <div>同为 16×16 格表面；R 渲染三角 / C 碰撞三角</div>
       <div>{samples.map((s, i) => <button type="button" key={s.name} onClick={() => window.__miningValidation?.teleport((['uniform', 'bands', 'checker'] as const)[i])}>

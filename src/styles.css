@@ -189,3 +189,17 @@ button { font: inherit; touch-action: manipulation; }
 .travel-list button:disabled { background: #32474b; color: #adbdbc; }
 .shop-backdrop { pointer-events: none; background: transparent; }
 .shop-backdrop .upgrade-panel { pointer-events: auto; width: min(360px, 48%); }
+
+/* Resource count is unbounded by the HUD: only owned items are shown, with a bounded list. */
+.inventory-items { max-height: 86px; overflow-y: auto; overscroll-behavior: contain; }
+.inventory-items:empty { margin: 8px 0; }
+@media (max-height: 420px) { .inventory-items { max-height: 42px; } }
+.game-header > div { padding: 7px 11px; border-radius: 9px; background: #f7f1dfdf; }
+.travel-panel { display: flex; flex-direction: column; overflow: hidden; }
+.travel-panel > header, .travel-panel > p { flex-shrink: 0; }
+.travel-list { min-height: 0; overflow: auto; overscroll-behavior: contain; }
+.validation-panel select { max-width: 100%; margin-top: 6px; padding: 5px; color: #f2dfab; background: #233d40; border: 1px solid #72887e; border-radius: 5px; }
+@media (max-height: 450px) and (orientation: landscape), (max-width: 450px) and (orientation: portrait) {
+  .inventory-hud { width: 210px; }
+  .inventory-items { grid-template-columns: repeat(2, minmax(0,1fr)); max-height: 42px; }
+}

@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "sapling-pair.000.part"
+  ],
+  "bytes": 362193,
+  "sha256": "abd3119209e9c910babc02da6ab52b4e1f5faa0a0235cd84b7cae950aa33c26c",
+  "taskId": "1128d2ff-a75a-4ed0-beb2-a3e1c0f23ddb",
+  "sourceSha256": "bb26ca9511e17d14de3c5fe4e5610ba24eefca3cf8e67dc8ce9a45a05531dddd",
+  "triangles": 2056,
+  "faceLimit": 2200,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

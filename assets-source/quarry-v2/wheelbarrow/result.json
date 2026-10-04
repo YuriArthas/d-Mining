@@ -1,0 +1,17 @@
+{
+  "taskId": "6fb72cab-015a-45d8-a3b9-bad664959b0b",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "text_to_model",
+  "faceLimit": 2300,
+  "prompt": "Chunky honey wood wheelbarrow with one thick teal front wheel and three pale stone chunks, short robust handles, no thin rods. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+  "bytes": 1941168,
+  "triangles": 2106,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "generated_image",
+    "rendered_image"
+  ]
+}

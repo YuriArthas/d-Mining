@@ -1,0 +1,13 @@
+{
+  "parts": [
+    "ore-cart.000.part"
+  ],
+  "bytes": 408636,
+  "sha256": "16f15d68d34f709442f04ef7407a16d623a6d9b24719a9262d11525f5322604a",
+  "taskId": "a5a30668-5fc3-48be-848c-ba8677a6905c",
+  "sourceSha256": "4dc2848f12cb06572b6c62643182b0062a8189bb072504c06262a63703b3cf99",
+  "triangles": 3330,
+  "faceLimit": 3500,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false
+}

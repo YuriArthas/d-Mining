@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "rounded-ridge.000.part"
+  ],
+  "bytes": 404881,
+  "sha256": "c41f806529b1c743fd28bb89c5333bd0773d65a85165094bf0616ced5b9c6f46",
+  "taskId": "83ea2186-5ac4-4820-8952-beb95efebff7",
+  "sourceSha256": "9a34dba797f55b41956385ac3fffe1b86f77bdaafb07d8e9e0162c6e1ada1981",
+  "triangles": 5958,
+  "faceLimit": 6000,
+  "source": "new Tripo image_to_model",
+  "reference": "output/imagegen/camp-v2/rounded-ridge.png",
+  "geometryEdits": false
+}

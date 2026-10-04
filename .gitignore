@@ -2,3 +2,15 @@ node_modules/
 dist/
 artifacts/
 .DS_Store
+.tools/
+
+# Local generation state and reproducible source intermediates
+.tripo/
+tmp/
+assets-source/**/*.glb
+assets-source/**/*.webp
+assets-source/**/*.jpeg
+assets-source/**/*.png
+assets-source/**/*.blend
+assets-source/**/*.bin
+__pycache__/

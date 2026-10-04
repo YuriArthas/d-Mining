@@ -1,3 +1,4 @@
+const {LAYERS}=require('../src/game/content/layers.ts');
 const assert=require('node:assert/strict'),fs=require('node:fs/promises');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'../../d-Block-Blast/node_modules/playwright');
 const {PerspectiveCamera,Vector3}=require('../node_modules/three');
@@ -20,11 +21,16 @@ const {digCells}=require('./combat-browser.cjs');
    await page.goto(origin+(hosted?'/games/mining/index.html':'/')+'?debug=1');await ready();await page.addStyleTag({content:'.validation-panel,.input-monitor{display:none}'});
    assert.equal((await snap()).generation.samples,false);assert.equal(await page.locator('.ore-samples').count(),0);
    const kinds=await page.evaluate(()=>[-50,-250,-450].map(y=>{const ids=new Set();for(let x=-48;x<=51;x++)for(let z=-48;z<=51;z++)ids.add(window.__miningValidation.cell([x,y,z]));return [...ids].sort()}));
-   assert.deepEqual(kinds,[[1,3,4],[2,3,4,5],[2,4,5,6]]);
+   assert.deepEqual(kinds,LAYERS.slice(0,3).map(l=>[l.base,...l.ores.map(o=>o.kind)].sort()));
    assert.notEqual(await page.evaluate(()=>window.__miningValidation.cell([14,-1,-25])),6);
-   const samples=[{name:'浅层矿区',feet:[5,.1,-1],point:[5,0,-3],cell:[2,-1,-2],kind:1},
-    {name:'金矿层',feet:[5,-399.9,7],point:[5,-400,5],cell:[2,-201,2],kind:2},
-    {name:'水晶矿层',feet:[3,-799.9,-5],point:[3,-800,-7],cell:[1,-401,-4],kind:5}];
+   const samples=[];
+   for(const layer of LAYERS.slice(0,3)){
+    const sample=await page.evaluate(({from,name,base})=>{
+     const y=-from/2-1;
+     for(let x=-3;x<=2;x++)for(let z=-3;z<=1;z++)if(window.__miningValidation.cell([x,y,z])===base)return {name,feet:[x*2+1,-from+.1,z*2+3],point:[x*2+1,-from,z*2+1],cell:[x,y,z],kind:base};
+     throw Error('No base mineral at entry');
+    },layer);samples.push(sample);
+   }
    for(const sample of samples){
     await teleport(sample.feet);await page.locator('.stage-label').filter({hasText:sample.name}).waitFor();
     assert.equal(await page.evaluate(c=>window.__miningValidation.cell(c),sample.cell),sample.kind);
@@ -37,14 +43,14 @@ const {digCells}=require('./combat-browser.cjs');
     await page.screenshot({path:`artifacts/${label}-${layout}-${sample.kind}.png`});
    }
    // Source, sparse HP and voxel edits survive crossing layers and loading again.
-   const damaged=await page.evaluate(()=>window.__miningValidation.health([1,-401,-4]));
+   const damaged=await page.evaluate(c=>window.__miningValidation.health(c),samples[2].cell);
    await teleport('surface');await teleport(samples[2].feet);
-   assert.equal(await page.evaluate(()=>window.__miningValidation.health([1,-401,-4])),damaged);
-   assert.equal(await page.evaluate(()=>window.__miningValidation.cell([2,-1,-2])),0);
+   assert.equal(await page.evaluate(c=>window.__miningValidation.health(c),samples[2].cell),damaged);
+   assert.equal(await page.evaluate(c=>window.__miningValidation.cell(c),samples[0].cell),0);
    if(layout==='desktop'){
-    await digCells(page,[[1,-401,-4]]);await ready();const state=(await snap()).economy;
-    assert.equal(state.inventory.items['ore.gold'],1);assert.equal(state.inventory.used,11);assert.equal(state.sale.coins,41);
-    await teleport([-12,-799.9,12]);assert.equal((await snap()).economy.coins,41);assert.equal((await snap()).economy.inventory.used,0);
+    await digCells(page,[samples[2].cell]);await ready();const state=(await snap()).economy;
+    assert.equal(state.inventory.items[oreDefinition(samples[2].kind).itemId],1);const quote=state.sale.coins;
+    await teleport([-12,-799.9,12]);assert.equal((await snap()).economy.coins,quote);assert.equal((await snap()).economy.inventory.used,0);
    }
    assert.equal((await snap()).cellBytes,0);
    checks.push(`${layout}: production world without ore sample overrides; shallow/middle/deep mineral sets; layer labels; actual ${touch?'touch':'mouse'} hit uses intrinsic HP, volume and price; cross-layer reload preserves damage and excavation`);

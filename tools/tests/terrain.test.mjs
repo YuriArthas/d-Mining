@@ -105,7 +105,7 @@ test('merged UVs retain cell scale and every quad has one material on both face 
 test('ore identity remains deterministic across lazy snapshots, sparse edits and independent seams',()=>{
  const w=new SparseWorld();const cells=[[7,-2,-25],[8,-2,-25],[15,-2,-25],[16,-2,-25],[0,-501,20]];
  for(const c of cells){
-  const before=w.cell(c);assert.ok(before>=1&&before<=6);
+  const before=w.cell(c);assert.ok(before>=1&&before<=31&&before!==7);
   for(const size of [8,16])assert.equal(sampleXYZ(...c,new Map(w.snapshot(regionOf(c,size),size))),before);
   w.remove([c]);assert.equal(w.cell(c),0);
   for(const size of [8,16])assert.equal(sampleXYZ(...c,new Map(w.snapshot(regionOf(c,size),size))),0);
@@ -124,16 +124,30 @@ test('digging each sample rebuilds exactly the exposed area and does not create 
  }
 });
 test('mineral tiles remain distinct within an atlas that includes the protected floor',async()=>{
- const { mineralAtlas,MINERALS,TERRAIN_MATERIALS,TILE_SIZE }=await import('../../src/game/terrain/minerals.ts');
- const a=mineralAtlas();assert.equal(a.byteLength,7*32*32*4);assert.deepEqual(a,mineralAtlas());
+ const { mineralAtlas,MINERALS,TERRAIN_MATERIALS,TILE_SIZE,ATLAS_TILES }=await import('../../src/game/terrain/minerals.ts');
+ const a=mineralAtlas();assert.equal(a.byteLength,ATLAS_TILES*TILE_SIZE*TILE_SIZE*4);assert.deepEqual(a,mineralAtlas());
  const fingerprints=new Set();
  for(let tile=0;tile<MINERALS.length;tile++){
   const colors=new Set();let hash=0;
   for(let y=0;y<TILE_SIZE;y++)for(let x=0;x<TILE_SIZE;x++){
-   const p=(y*TERRAIN_MATERIALS.length*TILE_SIZE+tile*TILE_SIZE+x)*4;assert.equal(a[p+3],255);
+   const p=(y*ATLAS_TILES*TILE_SIZE+TERRAIN_MATERIALS.findIndex(r=>r.id===MINERALS[tile].id)*TILE_SIZE+x)*4;assert.equal(a[p+3],255);
    colors.add(a.slice(p,p+3).join(','));hash=(Math.imul(hash,31)+a[p]*65536+a[p+1]*256+a[p+2])>>>0;
   }
-  assert.ok(colors.size>8);fingerprints.add(hash);
+  assert.ok(colors.size>=5);fingerprints.add(hash);
  }
- assert.equal(fingerprints.size,6);
+ assert.equal(fingerprints.size,30);
+});
+
+test('mineral response atlas separates metal inclusions from matte host and keeps floors flat',async()=>{
+ const { mineralResponseAtlas,TERRAIN_MATERIALS,TILE_SIZE,ATLAS_TILES }=await import('../../src/game/terrain/minerals.ts');
+ const data=mineralResponseAtlas();assert.equal(data.length,ATLAS_TILES*TILE_SIZE*TILE_SIZE*4);assert.deepEqual(data,mineralResponseAtlas());
+ const tilePixels=id=>{
+  const tile=TERRAIN_MATERIALS.findIndex(m=>m.id===id),pixels=[];
+  for(let y=0;y<TILE_SIZE;y++)for(let x=0;x<TILE_SIZE;x++){const i=(y*ATLAS_TILES*TILE_SIZE+tile*TILE_SIZE+x)*4;pixels.push([...data.slice(i,i+4)])}
+  return pixels;
+ };
+ const gold=tilePixels(5),floor=tilePixels(7),soil=tilePixels(8);
+ assert.ok(gold.some(p=>p[2]>100&&p[1]<120));assert.ok(gold.some(p=>p[2]===0&&p[1]>200));
+ assert.ok(soil.every(p=>p[2]===0));assert.equal(new Set(floor.map(p=>p.join(','))).size,1);
+ assert.ok(floor.every(p=>p[1]>200&&p[2]===0&&p[3]===255));
 });

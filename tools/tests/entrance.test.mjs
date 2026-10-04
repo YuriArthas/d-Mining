@@ -5,7 +5,7 @@ import { ROOMS } from '../../src/game/world/rooms.ts';
 import { inEntrance, PROTECTED_FLOOR } from '../../src/game/world/entrance.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
 import { TerrainStream } from '../../src/game/validation/TerrainStream.ts';
-import { CharacterPhysics, initPhysics } from '../../src/game/validation/physics.ts';
+import { CharacterPhysics, initPhysics, PLAYER, STEP } from '../../src/game/validation/physics.ts';
 import { buildRegion } from '../../src/game/terrain/meshing.ts';
 
 test('surface and every camp floor have exactly the same 64 mineable cells',()=>{
@@ -57,13 +57,14 @@ test('stream batch filters protected floors before either mesh staging or reward
  }finally{s.dispose();p.dispose()}
 });
 
-test('production home ramp reaches the rim without covering the 8 by 8 entrance',async()=>{
+test('production flat home route remains walkable without covering the 8 by 8 entrance',async()=>{
  await initPhysics();const p=new CharacterPhysics(false);
  const {RAPIER}=await import('../../src/game/validation/physics.ts');
  p.world.createCollider(RAPIER.ColliderDesc.cuboid(40,.5,40).setTranslation(0,-.5,0));
  try{
   for(let i=0;i<30;i++)p.tick(0,0,0,false,true);
-  for(let i=0;i<150&&p.feet()[2]>6.5;i++)p.tick(0,1,0,false,true);
+  const walkingSteps=Math.ceil((p.feet()[2]-6.5+1)/(PLAYER.speed*STEP))+30;
+  for(let i=0;i<walkingSteps&&p.feet()[2]>6.5;i++)p.tick(0,1,0,false,true);
   assert.ok(p.feet()[2]<7);assert.ok(p.feet()[1]<.1);assert.ok(p.grounded);
  }finally{p.dispose()}
 });

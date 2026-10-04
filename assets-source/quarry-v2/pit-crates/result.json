@@ -1,0 +1,17 @@
+{
+  "taskId": "a1ed8067-279d-4df6-9563-50b43d16261e",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "image_to_model",
+  "reference": "output/imagegen/mine-worksite/pit-crates.png",
+  "faceLimit": 1800,
+  "prompt": "Two angular square rough brown timber shipping crates stacked slightly offset, one open shallow crate beside them filled with dark gray coal rubble. Broad straight planks, dark narrow seams, square metal corner brackets and visible coarse wood grain. No rounded inflated shapes, no teal paint.",
+  "bytes": 3507456,
+  "triangles": 1508,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "rendered_image"
+  ]
+}

@@ -1,0 +1,1016 @@
+{
+  "version": "camp-tripo-v2-expanded",
+  "uniqueModels": 61,
+  "instances": 808,
+  "uniqueTriangles": 138655,
+  "placedTriangles": 622461,
+  "downloadBytes": 21232310,
+  "components": [
+    {
+      "name": "oak-wide",
+      "parts": [
+        "oak-wide.000.part"
+      ],
+      "bytes": 369191,
+      "sha256": "47ff93bd762b1eaabcd0ec51416f54bea7f533a01e0635d6d73c99c957c3df0f",
+      "taskId": "7d1c2e59-3348-4749-876f-5b72e021a923",
+      "sourceSha256": "9275a9da08f1ee594dd3140154f5fe3ad74d016c1ff66c978837a3c0228cae54",
+      "triangles": 2663,
+      "faceLimit": 2800,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/camp-expansion/oak-wide.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "oak-tall",
+      "parts": [
+        "oak-tall.000.part"
+      ],
+      "bytes": 287922,
+      "sha256": "76817f8827c041861b7c83fe58af51a6f0b48e7e57cfcf918dc817324d7e8da4",
+      "taskId": "76d6a147-b27d-46d3-809e-a8ddc2b48e11",
+      "sourceSha256": "9c46c3af923a1be98ad73190627b66f81367c922e1f1cfbdd056e67898b96a58",
+      "triangles": 2708,
+      "faceLimit": 2800,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/camp-expansion/oak-tall.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "maple-gold",
+      "parts": [
+        "maple-gold.000.part"
+      ],
+      "bytes": 332035,
+      "sha256": "b48339400c10a70828105026cbff0fbf57bcf859d304c36e621e214f7c564649",
+      "taskId": "56d4b5d5-d885-4d07-b580-9d1c8cd05b5d",
+      "sourceSha256": "c9b6e82ba0b27fd316a1ed8320a3f80fe9fc6e7db01b037de12e80efba9848d3",
+      "triangles": 2736,
+      "faceLimit": 2800,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/camp-expansion/maple-gold.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "maple-coral",
+      "parts": [
+        "maple-coral.000.part"
+      ],
+      "bytes": 336740,
+      "sha256": "293ba5f56fa0b10c220640a9d21d9474fb476c8e29e2d4988762c76d3edbb326",
+      "taskId": "afb147ad-fe8d-466a-8140-2ca77a8b88b9",
+      "sourceSha256": "3dff1a1d664040ed82340b50312b983efcb363b99a2df1520c60bf07cb8a08f6",
+      "triangles": 2657,
+      "faceLimit": 2800,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/camp-expansion/maple-coral.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "birch-round",
+      "parts": [
+        "birch-round.000.part"
+      ],
+      "bytes": 314445,
+      "sha256": "56332ccb1d693d2d300393be0ddf9556b91ac3e3c8270f85db54289c146d8eee",
+      "taskId": "26832af1-87a1-4f1c-8776-6d557022df05",
+      "sourceSha256": "5c80799415aaae20f19bcbf45121a8807d8c31dd66a2081959e629be0fbb094a",
+      "triangles": 2348,
+      "faceLimit": 2400,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/camp-expansion/birch-round.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "cedar-pillow",
+      "parts": [
+        "cedar-pillow.000.part"
+      ],
+      "bytes": 301129,
+      "sha256": "ec6235074496c425ce489c2c01c570d307e72624ed43514725651acaa04d98a0",
+      "taskId": "6b86dbd2-c9fc-48f7-ad6e-a66f659a5319",
+      "sourceSha256": "4cfd250742539a5b5a0544f7ad2da4e5867ba433d58839fff7101ccbd92a37bb",
+      "triangles": 2720,
+      "faceLimit": 2800,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/camp-expansion/cedar-pillow.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "willow-dome",
+      "parts": [
+        "willow-dome.000.part"
+      ],
+      "bytes": 326996,
+      "sha256": "6f2ad76a87f276389b603353e8e0349df9e2a49c458928aba01a7421114e0408",
+      "taskId": "d6c9af12-1d21-49a0-8422-5c031c41e4ee",
+      "sourceSha256": "3e03ceadea315f6f3072877bffc20fb9e444bd7d33d6548746c5bc89abc71458",
+      "triangles": 2732,
+      "faceLimit": 2800,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/camp-expansion/willow-dome.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "sapling-pair",
+      "parts": [
+        "sapling-pair.000.part"
+      ],
+      "bytes": 303112,
+      "sha256": "6140f72e246ddf63d05209faf557202af9bd999803ba7c818ae99d458be2ff1d",
+      "taskId": "4ac1db34-c2d3-4d9b-8f3c-ebb88b0b18c5",
+      "sourceSha256": "692d96d1a44e25de7bcd04f7c6a3f7c9bfc2a8389cf656ce5629df3df1743180",
+      "triangles": 2078,
+      "faceLimit": 2200,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/camp-expansion/sapling-pair.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "boulder-moss",
+      "parts": [
+        "boulder-moss.000.part"
+      ],
+      "bytes": 360148,
+      "sha256": "8c554022b478acf889cc5df30b8fe22973bf59075df8bfe30a20c06b6a375f35",
+      "taskId": "1d12c26f-8bc6-442b-88a5-b39dce830dba",
+      "sourceSha256": "a13bb284b01d0292491a765a4d46e5bfacb13c33ac4aea1b313e63f5865aa7ac",
+      "triangles": 1708,
+      "faceLimit": 1800,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 3
+    },
+    {
+      "name": "boulder-ore",
+      "parts": [
+        "boulder-ore.000.part"
+      ],
+      "bytes": 345710,
+      "sha256": "a04754a5ebc08a1124ef9a7f55325ce69c1f6c170ba3955e452c16072f81a59e",
+      "taskId": "d72f675b-604c-477d-b7cc-485510f2187a",
+      "sourceSha256": "d3ce633d02840080c979fcbe6c9bd4160ad3a30ce3c8b40e4edeab5d08abb89d",
+      "triangles": 2108,
+      "faceLimit": 2200,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "shrub-round",
+      "parts": [
+        "shrub-round.000.part"
+      ],
+      "bytes": 267880,
+      "sha256": "627c617570ee07358173c165476689151689bf195fd3d57bf0a9ee1d29616a26",
+      "taskId": "6b0c439d-59e8-4fed-a1e2-98fae87b4ae6",
+      "sourceSha256": "1c08b379d21bce8ca04636e54afa8c1f58363c111fd930149960defbcca7ab36",
+      "triangles": 1021,
+      "faceLimit": 1100,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 3
+    },
+    {
+      "name": "shrub-flower",
+      "parts": [
+        "shrub-flower.000.part"
+      ],
+      "bytes": 344224,
+      "sha256": "f1c00232e17a11eaadc9f7f8f355c633415222e55a8f83cc961dedb88115ac0f",
+      "taskId": "4516203e-7e83-40e0-a809-9cd5ebdaeebe",
+      "sourceSha256": "da2def36eb077153387eea43d1d2736deb58e7d39475b3c75f061cab0eace08a",
+      "triangles": 1298,
+      "faceLimit": 1400,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 2
+    },
+    {
+      "name": "shrub-berry",
+      "parts": [
+        "shrub-berry.000.part"
+      ],
+      "bytes": 340240,
+      "sha256": "6b9b8f0496fed02eb503d8f3285fb6707326f64426084de6afa1fe3d40c2e7f0",
+      "taskId": "c7d59009-d5c4-4464-935a-297c31cc1a89",
+      "sourceSha256": "c1e2d3390790bb17a6958efbb28c69d512836d20de954c7703a751cb5657038b",
+      "triangles": 1108,
+      "faceLimit": 1200,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 2
+    },
+    {
+      "name": "grass-tussock",
+      "parts": [
+        "grass-tussock.000.part"
+      ],
+      "bytes": 336226,
+      "sha256": "1ef8ce04c36cf8085373d5c9175b8f0ab47d45f63b3f0e47628b37e1561010e9",
+      "taskId": "0c85ff6c-ad50-49ed-86bc-da0fcdbe8635",
+      "sourceSha256": "0e6272caa54e455bb1c2c4d88e071f9a6029eb7da0fe148877972f57becae22e",
+      "triangles": 860,
+      "faceLimit": 900,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 37
+    },
+    {
+      "name": "flower-daisies",
+      "parts": [
+        "flower-daisies.000.part"
+      ],
+      "bytes": 370525,
+      "sha256": "93a494814fdbf89ccebc39b14f3ca445d908751b0540c8bdd833aac7aae56205",
+      "taskId": "3fbb52e6-22b2-4157-bfea-f4c3db148c37",
+      "sourceSha256": "a45a367e9bc6b87c2afc4140253a42b6a23bcbd62124abe34f26f67195c962a8",
+      "triangles": 1102,
+      "faceLimit": 1200,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 17
+    },
+    {
+      "name": "mushroom-cluster",
+      "parts": [
+        "mushroom-cluster.000.part"
+      ],
+      "bytes": 358541,
+      "sha256": "06c5617e1db767c5bcc8a4d3d62e8eecb95c91f3df18df780c637fcee136043a",
+      "taskId": "4ac7f0db-50b9-4d9b-b879-96bcd56fd5fe",
+      "sourceSha256": "c291261ff340fea074382898e12192558ca66a9cd3299d60a49d1ba5a64cb72f",
+      "triangles": 1184,
+      "faceLimit": 1300,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 3
+    },
+    {
+      "name": "workshop-hut",
+      "parts": [
+        "workshop-hut.000.part"
+      ],
+      "bytes": 431857,
+      "sha256": "c16863b564499beb8d80ff1ac6c37a37246da8d38cad6e69cda1a88e7e7b2d01",
+      "taskId": "931942d1-f4fd-467e-8309-22a5baf627c1",
+      "sourceSha256": "ab60073a8f89ed5aeeca8d41eed5dcb069990bc4ca4e3c683d0e94e12f7ae8a2",
+      "triangles": 5795,
+      "faceLimit": 6500,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "warehouse-shed",
+      "parts": [
+        "warehouse-shed.000.part"
+      ],
+      "bytes": 405292,
+      "sha256": "b74b22d0183e66b2755544a652b3c637808e8455dfd674059e0d7cdf658dab6d",
+      "taskId": "5c16242a-a150-4cf3-a3be-1bb06c207869",
+      "sourceSha256": "dc9e1e56751f05df789eba49bfe6f0248f680ee7c84b487a4546bd6bd288e6bb",
+      "triangles": 5349,
+      "faceLimit": 6000,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "assayer-stall",
+      "parts": [
+        "assayer-stall.000.part"
+      ],
+      "bytes": 393877,
+      "sha256": "61257b75c375102516a69d62aa8617d96f0f8dbbf82a21a14bc7f243cff187d0",
+      "taskId": "ad70d31f-7308-47f1-8093-b100840a4de3",
+      "sourceSha256": "6d848d70e0ce4f49e86ad27b4137ab57ea08d560beadd1921adb70d5d8e05cf0",
+      "triangles": 4120,
+      "faceLimit": 4500,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "well-stone",
+      "parts": [
+        "well-stone.000.part"
+      ],
+      "bytes": 392408,
+      "sha256": "6ec8af4a85396296c96d1b5197a816c5e95c5f7900856ac2f917b96d0d3e4ced",
+      "taskId": "43ed3e8d-b8fd-4145-b7c9-dc93cfe32811",
+      "sourceSha256": "37090690d279211f03231a017af650c6d238140b077e526b5c56c511b6cf4acd",
+      "triangles": 2684,
+      "faceLimit": 3000,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "tool-rack",
+      "parts": [
+        "tool-rack.000.part"
+      ],
+      "bytes": 385276,
+      "sha256": "1bea7e5834f4ec6634be6916110422457eb9a5176b92de3b28527d36ae039dc5",
+      "taskId": "ca5630b9-1a36-478c-a972-564f47dd29c7",
+      "sourceSha256": "bed61da78d50eb10d111b7f3569564048f166fc752db49e4def8d061b9c2db41",
+      "triangles": 2138,
+      "faceLimit": 2300,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "workbench",
+      "parts": [
+        "workbench.000.part"
+      ],
+      "bytes": 404300,
+      "sha256": "f84cdeb0227a0da2d1b837f1fc16e021177745c2c620a6dcecf938e33cae15dc",
+      "taskId": "f5615493-cea3-4af2-95ea-a19bb6e43ccb",
+      "sourceSha256": "8b8f6f741d52cd41cb13cdd1935f302fe53e6df44e41cedbd5f379f0d4976144",
+      "triangles": 2475,
+      "faceLimit": 2600,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "anvil-stump",
+      "parts": [
+        "anvil-stump.000.part"
+      ],
+      "bytes": 337722,
+      "sha256": "a2f3c812039cf2f8127e63125a1644330e98c2ef373e8b683ac479c97b8f8fbf",
+      "taskId": "ec510f45-97b3-48b8-ae80-a0967007e87c",
+      "sourceSha256": "d58e32e971e7a3da937a2a24094c1535b37fcdab7768b61609ee001aa25ce80a",
+      "triangles": 1772,
+      "faceLimit": 1900,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "crate-stack",
+      "parts": [
+        "crate-stack.000.part"
+      ],
+      "bytes": 379641,
+      "sha256": "a1aea61e5967d38a6ddaf38c386da1c83f49fa89c8dc039a02e6c445bb8b8192",
+      "taskId": "c96c7072-6076-46e6-ba65-f5824728c30a",
+      "sourceSha256": "6ef4bf0b6d95b562ab56eec3ddaca1c501824f9671252bf4f4be03f85ace1630",
+      "triangles": 1481,
+      "faceLimit": 1800,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 2
+    },
+    {
+      "name": "barrel-pair",
+      "parts": [
+        "barrel-pair.000.part"
+      ],
+      "bytes": 404907,
+      "sha256": "4b3bafa676d4631409c0cd242fc56b19a0b3664fa33cf163686849f6b008daf4",
+      "taskId": "38f92ce1-d10e-4b84-a988-cdf16f979f05",
+      "sourceSha256": "1ec5b1740a8671e146f0c44a457088a5930ae5d06c0afed9c83c72d169dc24ae",
+      "triangles": 1860,
+      "faceLimit": 2000,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 2
+    },
+    {
+      "name": "ore-bin-copper",
+      "parts": [
+        "ore-bin-copper.000.part"
+      ],
+      "bytes": 364165,
+      "sha256": "b30f363401fb8641fe6e606c91007d83aaeaf20d7ac81c08669cf97e281b596d",
+      "taskId": "40880d63-29df-4193-85b9-a6f03300064f",
+      "sourceSha256": "322475e5e74b1d710eabc42c0f54c51398b27ac0f11bd3eeeb9571380ec0a297",
+      "triangles": 1872,
+      "faceLimit": 2000,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 2
+    },
+    {
+      "name": "ore-bin-jade",
+      "parts": [
+        "ore-bin-jade.000.part"
+      ],
+      "bytes": 369974,
+      "sha256": "97b4d87f8154f09730fbb8234b5ef26dd9a48579107cc02e8673fc0bb0a8438b",
+      "taskId": "a7a2880b-2f97-42e2-8c2d-0aea2580b5df",
+      "sourceSha256": "aa34a67da7909da9e0d6e3d19e13c3bcc59863786a12f996d03855dfa2edd1d4",
+      "triangles": 1789,
+      "faceLimit": 2000,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "sack-stack",
+      "parts": [
+        "sack-stack.000.part"
+      ],
+      "bytes": 327408,
+      "sha256": "07009bab5098b209ca18ffb4aa4c897232ee860b31a8c0ffb2a4e74acb9e4563",
+      "taskId": "455f1ca1-346a-4d7e-8dcc-4411a82a6a14",
+      "sourceSha256": "cba8652da2a895af9f0c425d22ad5e22c5f8a774bd214e40ed99fd93ac72e4bd",
+      "triangles": 1532,
+      "faceLimit": 1600,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 2
+    },
+    {
+      "name": "cart-empty",
+      "parts": [
+        "cart-empty.000.part"
+      ],
+      "bytes": 380185,
+      "sha256": "30952c7e36cb3661ec418e341aa2c18e202ee12920fc946c7c956531ff8085b1",
+      "taskId": "95ce4c13-1613-45c8-8ef5-01503ce0530b",
+      "sourceSha256": "d0cee7384d3728442dd60dbfcd4b41f05731fc413118863e3da349efd7ce2c2e",
+      "triangles": 2344,
+      "faceLimit": 2500,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "wheelbarrow",
+      "parts": [
+        "wheelbarrow.000.part"
+      ],
+      "bytes": 356655,
+      "sha256": "90249a63221c063e1dd94e044826bb2427d905c9b235940b2810ff52498caf34",
+      "taskId": "6fb72cab-015a-45d8-a3b9-bad664959b0b",
+      "sourceSha256": "e18cda5bb913e3e472f410af162cfd13592244634ee2cc85c7220949cc1ddcc0",
+      "triangles": 2106,
+      "faceLimit": 2300,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "rail-buffer",
+      "parts": [
+        "rail-buffer.000.part"
+      ],
+      "bytes": 406099,
+      "sha256": "ff388f0b6c99feb5e1c96545464bb4894d56cc6838f9bf70c794f8fd4eb51bf3",
+      "taskId": "223619fb-6d41-4f24-bd5f-1d136fd08d07",
+      "sourceSha256": "259f8eb1d76b8d39c9a46bf109ecda293cd98964aee88fb58d8c46901fe1cee7",
+      "triangles": 1445,
+      "faceLimit": 1600,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "bench-timber",
+      "parts": [
+        "bench-timber.000.part"
+      ],
+      "bytes": 323355,
+      "sha256": "d2feb22a2e30ed15b65785b2e9aa259cbb5e4b2c05be5d67dda3dd8f952988fd",
+      "taskId": "a9beb0d5-e2fd-4ea3-a15b-2255b6005d43",
+      "sourceSha256": "39225fa2a5c23111e13da93cd28f05de712502a1928bb11d207699113f3045e9",
+      "triangles": 1626,
+      "faceLimit": 1700,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "notice-board",
+      "parts": [
+        "notice-board.000.part"
+      ],
+      "bytes": 387595,
+      "sha256": "82eb725a875a237aae4b44058071c71e06def96e3992fe27d11541bbfc51280f",
+      "taskId": "1ed98408-9ea5-4703-b4b9-bcaf3e242659",
+      "sourceSha256": "73e38b2730613082bff62291dca6a60feb7e2f3e27b282cd7ad544463456f57f",
+      "triangles": 1997,
+      "faceLimit": 2200,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "fence-corner",
+      "parts": [
+        "fence-corner.000.part"
+      ],
+      "bytes": 367278,
+      "sha256": "1e758189a3e3565882731f6ea125c659a2fa02feee870e4961fceb78e8202881",
+      "taskId": "00bcba8c-05ad-4851-b55c-312dcc35e2cb",
+      "sourceSha256": "6b9a5b9c024768041b6b584c33a43a40e17213f9b14f0504405c07967d958056",
+      "triangles": 1582,
+      "faceLimit": 1800,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "waystone-crystal",
+      "parts": [
+        "waystone-crystal.000.part"
+      ],
+      "bytes": 287504,
+      "sha256": "b5337d3c180d004d5d04fb70a4d9a68986455dfefdce45cea962ca1a1e853b2f",
+      "taskId": "1d9ff20c-ed53-4699-94aa-fa7f5e54ca8b",
+      "sourceSha256": "c4e720444e02bc56c44d6cf112a73f865d4a63c322db90ac8ae3b4d68ac5020a",
+      "triangles": 2235,
+      "faceLimit": 2400,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "lantern-post",
+      "parts": [
+        "lantern-post.000.part"
+      ],
+      "bytes": 405676,
+      "sha256": "f3cbf8634e3deb07d70c9bb044ddd1b3316fba7655bc0a8363926296ee93c8f0",
+      "taskId": "f23b7b64-c198-4c78-87fe-532fbdf7afb6",
+      "sourceSha256": "2c6fd820b79e2d5d7ed68830ad3e325f6fea00460f10483ef2c8399202c69e55",
+      "triangles": 1908,
+      "faceLimit": 2000,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 7
+    },
+    {
+      "name": "bank-braced",
+      "parts": [
+        "bank-braced.000.part"
+      ],
+      "bytes": 106921,
+      "sha256": "1a89caa8675b4130eb15f96825d591ebeb8f734cc14d26cf34d1a9536c89a22f",
+      "taskId": "ea100a0e-698e-470f-98d8-a22c532f365e",
+      "sourceSha256": "e54b9f5455a013a17e30e22974f0081234dafa35c5b276d411fa143d877dcf67",
+      "triangles": 802,
+      "faceLimit": 1000,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/timber-boundary/bank-braced.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 13
+    },
+    {
+      "name": "bank-steps",
+      "parts": [
+        "bank-steps.000.part"
+      ],
+      "bytes": 108072,
+      "sha256": "3d3fa0bd7bf1db4e8f2d6e74cf60c52f9b24898c23baaa8eb5ef11c6f3d706f9",
+      "taskId": "e6c1fb6a-4d12-4194-974b-40b765cb7526",
+      "sourceSha256": "d00709e322d457ac2cea2f361e16a696a60469b7ae3840353f8ac823baafff63",
+      "triangles": 1104,
+      "faceLimit": 1200,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/timber-boundary/bank-steps.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 9
+    },
+    {
+      "name": "bank-timber",
+      "parts": [
+        "bank-timber.000.part"
+      ],
+      "bytes": 106010,
+      "sha256": "f8391560f0aeb4db6fc5d66c125d952bb5410903b98f873d9f146a0324f0e4b0",
+      "taskId": "b4764231-d64e-4271-b1c4-76279d7939b9",
+      "sourceSha256": "9fe5cdfda8e154f0279a74d6fda407d259e1c36505b163943a9c99b939886539",
+      "triangles": 673,
+      "faceLimit": 900,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/timber-boundary/bank-timber.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 22
+    },
+    {
+      "name": "bank-turf",
+      "parts": [
+        "bank-turf.000.part"
+      ],
+      "bytes": 100704,
+      "sha256": "f0ce68f1d70d2a75d8f7a55edc9cbe7bc5fe6a6a532762c56bf07dc18ded5865",
+      "taskId": "a68d7651-9af0-4a7c-adcb-c7246ab3786b",
+      "sourceSha256": "e63143867a665eea468244c8ee2ae267f3b693b8f3d7490763cebf9c17cd7881",
+      "triangles": 529,
+      "faceLimit": 600,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/timber-boundary/bank-turf.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 556
+    },
+    {
+      "name": "bank-fence",
+      "parts": [
+        "bank-fence.000.part"
+      ],
+      "bytes": 104113,
+      "sha256": "55631ebda8d7cd25791ba6a3812d1f74cf27f21d1c300d6aa983cc698cb366e2",
+      "taskId": "d1cc28e7-f917-46e2-ae5c-6442d30c7ddf",
+      "sourceSha256": "f6b8af7903ad32105c5bcf219cda2e637234a4148aa6e8ffa74df562d7f9b187",
+      "triangles": 325,
+      "faceLimit": 500,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/timber-boundary/bank-fence.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 45
+    },
+    {
+      "name": "pit-plank-deck",
+      "parts": [
+        "pit-plank-deck.000.part"
+      ],
+      "bytes": 388474,
+      "sha256": "9524f323753c5792adb39e098428476ddeb50d1ad1c56a57583af95e38bcd5aa",
+      "taskId": "031f3df9-8ede-4bee-b309-ba51c05955ec",
+      "sourceSha256": "b1ec4cb6c25b96dcb7c32ee92e6bfe0e35762605143286a40cb58202589adedb",
+      "triangles": 1726,
+      "faceLimit": 2000,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-plank-deck.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 8
+    },
+    {
+      "name": "pit-safety-rail",
+      "parts": [
+        "pit-safety-rail.000.part"
+      ],
+      "bytes": 400147,
+      "sha256": "496f5fc2ac842f30b8e77f4edec46c61baf93ac359ed1a14ec99523b3ae6bd91",
+      "taskId": "75c97185-8972-448b-a335-f8a13d6ccdb7",
+      "sourceSha256": "fe12c673cae590cd1950cfeb49932353cac512e8e2d54090487384787af623c6",
+      "triangles": 1344,
+      "faceLimit": 1400,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-safety-rail.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 8
+    },
+    {
+      "name": "pit-headframe",
+      "parts": [
+        "pit-headframe.000.part"
+      ],
+      "bytes": 412762,
+      "sha256": "36cf9b00348e7d5179f4c07b0734f1b5215f7df8fdd728ab1e566ac6eda1ca30",
+      "taskId": "a92d4214-35c8-4954-9042-8b0369c8322c",
+      "sourceSha256": "73ebfcb9e59bcf73fca66065f72c2c8854d75435cc62f3a531313959a9044855",
+      "triangles": 3648,
+      "faceLimit": 4000,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-headframe.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "pit-winch",
+      "parts": [
+        "pit-winch.000.part"
+      ],
+      "bytes": 410852,
+      "sha256": "308a7e8b6450658efd933e291785504c12b0487951d055b0e3e9d59fc4cf38d4",
+      "taskId": "3857c9e5-3ffd-4719-a9e8-da7c609cf353",
+      "sourceSha256": "478190462127a1233b725c9db5af0f4fbb4d346665db96cfa9c45929acc87cf0",
+      "triangles": 2314,
+      "faceLimit": 2500,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-winch.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "pit-lumber-stack",
+      "parts": [
+        "pit-lumber-stack.000.part"
+      ],
+      "bytes": 393855,
+      "sha256": "b914add1e063e6fb3ce16b41d3d27470ccf6025acf2d2b9c461eb49bc863cd13",
+      "taskId": "bebef70a-030b-4590-aa97-76fb8fcd9b72",
+      "sourceSha256": "6af55fb837ccb19fbaabd45a8a6120630d07e6a654be00a85d3cf019d88a8871",
+      "triangles": 1320,
+      "faceLimit": 1500,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-lumber-stack.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 2
+    },
+    {
+      "name": "pit-tool-wall",
+      "parts": [
+        "pit-tool-wall.000.part"
+      ],
+      "bytes": 399955,
+      "sha256": "2d60b9afc481bed248a24921d2d4ffbce1be2ca16cb4adb4e937812f13cdb251",
+      "taskId": "b871bac4-8e7a-4bd3-a10f-5f44b75386f1",
+      "sourceSha256": "87300d8bf74e185be5e03f74cddd28493d8a16f01ebcbcd3ef5aab30c3726436",
+      "triangles": 2218,
+      "faceLimit": 2600,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-tool-wall.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "pit-sorting-table",
+      "parts": [
+        "pit-sorting-table.000.part"
+      ],
+      "bytes": 396622,
+      "sha256": "a9d0f3dfd19f89069b2dd4da4695607ca9bce0aeb40738b33bd12edb0a7ab626",
+      "taskId": "9d4e402f-2beb-43be-aab8-33b844c473a6",
+      "sourceSha256": "1bcee295e2f91ccb0e5278a310abe61e4ffb8369057192e85a231438749b5192",
+      "triangles": 2114,
+      "faceLimit": 2400,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-sorting-table.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "pit-crates",
+      "parts": [
+        "pit-crates.000.part"
+      ],
+      "bytes": 401699,
+      "sha256": "750d90c8deed0920003a769ba0b1e0cf2893545f58d15fe91772b4735442c0b8",
+      "taskId": "a1ed8067-279d-4df6-9563-50b43d16261e",
+      "sourceSha256": "d19b1ebf1d6030f729e9dd83b5118609fee5ac90497641bedf7d68d2a40a944f",
+      "triangles": 1508,
+      "faceLimit": 1800,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-crates.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 2
+    },
+    {
+      "name": "pit-track",
+      "parts": [
+        "pit-track.000.part"
+      ],
+      "bytes": 362386,
+      "sha256": "2c5b965e3f822afacc18997aec3cd200a3c877c4247d75d0f96c0e90038aae2c",
+      "taskId": "f523efd3-c6be-436d-88b9-5c190cdbb0a7",
+      "sourceSha256": "8624bb0580afcfcdcc89280ec206849ae122082e93c49b349bfe871e6698b166",
+      "triangles": 1278,
+      "faceLimit": 1400,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-track.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 3
+    },
+    {
+      "name": "pit-spoil",
+      "parts": [
+        "pit-spoil.000.part"
+      ],
+      "bytes": 396204,
+      "sha256": "f0fe7e7e32b35c1a22719812d7acdada4fedc2c078dd1c4905435c28c99b4239",
+      "taskId": "f4dfc3b1-1095-485b-a6f0-fd9341f9d10d",
+      "sourceSha256": "27301549cc13879282ea7bb6eae5f551b14bbb81df145a9b40c44072124e54ad",
+      "triangles": 1909,
+      "faceLimit": 2000,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-spoil.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 2
+    },
+    {
+      "name": "pit-supply-pallet",
+      "parts": [
+        "pit-supply-pallet.000.part"
+      ],
+      "bytes": 393283,
+      "sha256": "cff48c491394249feab18037cc4f92b29628113452949045b93e0ed4190c2422",
+      "taskId": "910e0a00-2696-4c94-bd5e-1dc3dd0d011d",
+      "sourceSha256": "b457d10d94e4194f0f3d7bb8d2c48aa8dd05b13e45d5165a237dd7e95f2b06a2",
+      "triangles": 1671,
+      "faceLimit": 1800,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-supply-pallet.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "pit-box-lantern",
+      "parts": [
+        "pit-box-lantern.000.part"
+      ],
+      "bytes": 404349,
+      "sha256": "d5088a53329634f2edfa386da99a544cff98eb6512ef0c13cb02ddc407b1281c",
+      "taskId": "ed8007fc-24c0-4164-9585-a8a3a467730f",
+      "sourceSha256": "5b2af4c956723c602d795250af2a3429a27dee0d151f48146f98648cd4e5682c",
+      "triangles": 1441,
+      "faceLimit": 1600,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-box-lantern.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 3
+    },
+    {
+      "name": "meadow-base",
+      "parts": [
+        "meadow-base.000.part"
+      ],
+      "bytes": 301907,
+      "sha256": "14244f774c1db07eff297132cd72016983f26e3fc209a12fe69664a312886177",
+      "taskId": "d87baa94-65cc-4da6-a2c8-cbcd5eff4c5f",
+      "sourceSha256": "3af544aed8c88b3ce0f7fe50eab11e211123880d72e3a5980aa82f96ea484b65",
+      "triangles": 3781,
+      "faceLimit": 4000,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "terrain-slab",
+      "parts": [
+        "terrain-slab.000.part"
+      ],
+      "bytes": 443144,
+      "sha256": "dc41a4d0f13fe84d2027dffa6db8f65d452a4e2b24d5feccd00ff43aef303f9c",
+      "taskId": "644925ed-966c-425f-bc52-40a44f1fa567",
+      "sourceSha256": "ae279e8a29913ff6443d6e203385b9e8f7aa937a9d298bc8751b914a2086d198",
+      "triangles": 4696,
+      "faceLimit": 5000,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 2
+    },
+    {
+      "name": "simulator-mine",
+      "parts": [
+        "simulator-mine.000.part"
+      ],
+      "bytes": 459530,
+      "sha256": "3a7309e0523e9d8b4c47e5f5d2da4565bfdd4c0ca22d2aa7a4d516b2c3841f5a",
+      "taskId": "80aeb00e-5dd1-42fd-913c-0ef3c3ee461d",
+      "sourceSha256": "7a5c605ff3d2e3a388afd4ace1b31f99c51c8b4c32d90eca3a67e2e2ff921e4f",
+      "triangles": 8497,
+      "faceLimit": 10000,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/simulator-facilities/simulator-mine.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "simulator-exchange",
+      "parts": [
+        "simulator-exchange.000.part"
+      ],
+      "bytes": 416858,
+      "sha256": "a28eb7214f453b15672fbc468904e6530f0ba9ebab5f7c6f56895f83f645985a",
+      "taskId": "6d3bf76e-2393-4ea3-bb6f-65b731fcf61a",
+      "sourceSha256": "8533df76be42cd0027aabff2b4156a9b8ffb6a8c62ae9f6077dbb65e10e9c0f2",
+      "triangles": 4720,
+      "faceLimit": 6000,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/simulator-facilities/simulator-exchange.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "simulator-upgrade",
+      "parts": [
+        "simulator-upgrade.000.part"
+      ],
+      "bytes": 426403,
+      "sha256": "1cc7d8643f4428427b3991bfb812d8c6bec945808ad10ddf054f4347ba2c6b8c",
+      "taskId": "177a1b15-d6f6-4d03-a899-756e38994554",
+      "sourceSha256": "8e8ec40dce7c0803bd1ef31ed3187137d977d19dfce9904eecbe6b0f281488b8",
+      "triangles": 4764,
+      "faceLimit": 6000,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/simulator-facilities/simulator-upgrade.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 1
+    },
+    {
+      "name": "crown-tree",
+      "parts": [
+        "crown-tree.000.part"
+      ],
+      "bytes": 358879,
+      "sha256": "26fa89cba12e882eb61a830f60ec33435733200367a99c6b19cc51ff9019034e",
+      "taskId": "930768dc-dd1e-4f08-9bb4-f76229d1d859",
+      "sourceSha256": "beb1dcaee0fde9b97ea2a39796eae51a6e388f2918fb54298c9151bfbffc5088",
+      "triangles": 2834,
+      "faceLimit": 3000,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/camp-v2/crown-tree.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 8
+    },
+    {
+      "name": "soft-shrub",
+      "parts": [
+        "soft-shrub.000.part"
+      ],
+      "bytes": 324307,
+      "sha256": "d8c302873ee20b98ee2e443ba2a4a5a465bab8a195559044e6d41a43f9dc609d",
+      "taskId": "68f13b1a-e2b2-40ec-8e14-14427654ed96",
+      "sourceSha256": "ddc1091fe00a412646d9281c72656a5a9fb8419a4879ee0b15e75dd392205dd6",
+      "triangles": 968,
+      "faceLimit": 1000,
+      "source": "new Tripo image_to_model",
+      "reference": "output/imagegen/camp-v2/soft-shrub.png",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 8
+    },
+    {
+      "name": "ore-cart",
+      "parts": [
+        "ore-cart.000.part"
+      ],
+      "bytes": 408636,
+      "sha256": "16f15d68d34f709442f04ef7407a16d623a6d9b24719a9262d11525f5322604a",
+      "taskId": "a5a30668-5fc3-48be-848c-ba8677a6905c",
+      "sourceSha256": "4dc2848f12cb06572b6c62643182b0062a8189bb072504c06262a63703b3cf99",
+      "triangles": 3330,
+      "faceLimit": 3500,
+      "source": "new Tripo text_to_model",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 2
+    }
+  ]
+}

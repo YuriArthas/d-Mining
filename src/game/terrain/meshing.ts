@@ -1,3 +1,4 @@
+import { appearanceKey } from './minerals.ts';
 import { CELL, sampleXYZ, WORLD_GENERATION, type WorldGeneration, type EditSnapshot, type Coord } from './SparseWorld.ts';
 export type MeshData = { positions: Float32Array; normals: Float32Array; uvs: Float32Array; tiles: Float32Array; indices: Uint32Array };
 
@@ -49,7 +50,7 @@ export function buildRegion(kind: LayerKind, coord: Coord, size: number, snapsho
   const start = performance.now(), edits = new Map(snapshot);
   const ox = coord[0] * size, oy = coord[1] * size, oz = coord[2] * size;
   // Sample the procedural/sparse source directly. Only the 2D face mask is dense.
-  const mesh = greedyMesh((x, y, z) => sampleXYZ(ox + x, oy + y, oz + z, edits, generation), size, kind === 'collision');
+  const mesh = greedyMesh((x, y, z) => { const id=sampleXYZ(ox+x,oy+y,oz+z,edits,generation); return kind==='collision' ? id : appearanceKey(id,oy+y,generation.layers); }, size, kind === 'collision');
   return { coord, mesh, buildMs: performance.now() - start };
 }
 export type RegionJob = { coord: Coord; version: number; edits: EditSnapshot };

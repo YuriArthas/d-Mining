@@ -1,0 +1,15 @@
+{
+  "parts": [
+    "willow-dome.000.part"
+  ],
+  "bytes": 326996,
+  "sha256": "6f2ad76a87f276389b603353e8e0349df9e2a49c458928aba01a7421114e0408",
+  "taskId": "d6c9af12-1d21-49a0-8422-5c031c41e4ee",
+  "sourceSha256": "3e03ceadea315f6f3072877bffc20fb9e444bd7d33d6548746c5bc89abc71458",
+  "triangles": 2732,
+  "faceLimit": 2800,
+  "source": "new Tripo image_to_model",
+  "reference": "output/imagegen/camp-expansion/willow-dome.png",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

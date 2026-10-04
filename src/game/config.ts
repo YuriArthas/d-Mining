@@ -1,13 +1,14 @@
+import { SURFACE_SPAWN } from './world/surfaceLayout.ts';
 // World distances are metres. Rendered geometry and cell queries share cellSize.
 export const GAME_CONFIG = {
-  background: '#adc5d0',
+  background: '#c0dde0',
   pixelRatioMax: 1.5, // Device pixel ratio cap; positive, normally 1–2.
-  player: { radius: 0.4, height: 1.65, spawn: [0, 2.1, 16] as const },
+  player: { radius: 0.4, height: 1.65, spawn: SURFACE_SPAWN },
   camera: {
-    distance: 7.5, // Metres from the player's observation target.
+    distance: 10.5, // Metres from the player's observation target.
     targetHeight: 1.9, // Keep the initial crosshair above the cylinder rather than on its back.
     initialYaw: 0,
-    initialPitch: 0.45,
+    initialPitch: 0.04,
     minPitch: -0.55, // Radians; look upward from a shaft without crossing the floor.
     maxPitch: 1.45, // Almost straight down, with a stable horizontal heading.
     near: 0.08, // Metres; reduced only for extreme landscape aspect ratios.

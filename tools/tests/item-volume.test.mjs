@@ -64,12 +64,13 @@ test('weighted capacity upgrades preserve pieces and occupied volume and reopen 
  const bag=new Inventory(50,volume),wallet=new Wallet(20);bag.add([...batch(47),...batch(1,'gold')]);
  assert.equal(upgradeBackpack('bag-100',bag,wallet).status,'upgraded');assert.equal(bag.getSnapshot().used,57);assert.equal(bag.getSnapshot().totalCount,48);assert.equal(bag.isFull(),false);assert.equal(wallet.getBalance(),0);
 });
-test('temporary mineral table has increasing price/HP/volume growth and immutable definitions',()=>{
- for(let i=1;i<ORE_ITEMS.length;i++){
+test('original mineral progression is retained and all resource definitions are immutable',()=>{
+ for(let i=1;i<6;i++){
   const a=ORE_ITEMS[i-1],b=ORE_ITEMS[i];assert.ok(b.volume>a.volume);
   assert.ok(b.maxHp/a.maxHp>b.volume/a.volume);assert.ok(b.price/a.price>b.maxHp/a.maxHp);
   assert.equal(itemVolume(b.itemId),b.volume);assert.equal(itemPrice(b.itemId),b.price);
  }
+ for(const r of ORE_ITEMS){assert.ok(r.volume>0&&r.maxHp>0&&r.price>0);assert.ok(Object.isFrozen(r));assert.equal(itemVolume(r.itemId),r.volume);assert.equal(itemPrice(r.itemId),r.price);}
  assert.throws(()=>{ORE_ITEMS[0].volume=99});assert.throws(()=>itemDefinition('unknown'));
 });
 test('session shows mixed-unit snapshots and sells completed overflow at independent prices once',()=>{

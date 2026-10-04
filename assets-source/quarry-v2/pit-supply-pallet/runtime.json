@@ -1,0 +1,15 @@
+{
+  "parts": [
+    "pit-supply-pallet.000.part"
+  ],
+  "bytes": 393283,
+  "sha256": "cff48c491394249feab18037cc4f92b29628113452949045b93e0ed4190c2422",
+  "taskId": "910e0a00-2696-4c94-bd5e-1dc3dd0d011d",
+  "sourceSha256": "b457d10d94e4194f0f3d7bb8d2c48aa8dd05b13e45d5165a237dd7e95f2b06a2",
+  "triangles": 1671,
+  "faceLimit": 1800,
+  "source": "new Tripo image_to_model",
+  "reference": "output/imagegen/mine-worksite/pit-supply-pallet.png",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

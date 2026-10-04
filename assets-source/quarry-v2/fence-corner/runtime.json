@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "fence-corner.000.part"
+  ],
+  "bytes": 367278,
+  "sha256": "1e758189a3e3565882731f6ea125c659a2fa02feee870e4961fceb78e8202881",
+  "taskId": "00bcba8c-05ad-4851-b55c-312dcc35e2cb",
+  "sourceSha256": "6b9a5b9c024768041b6b584c33a43a40e17213f9b14f0504405c07967d958056",
+  "triangles": 1582,
+  "faceLimit": 1800,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

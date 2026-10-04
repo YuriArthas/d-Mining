@@ -1,0 +1,13 @@
+{
+  "parts": [
+    "meadow-base.000.part"
+  ],
+  "bytes": 301907,
+  "sha256": "14244f774c1db07eff297132cd72016983f26e3fc209a12fe69664a312886177",
+  "taskId": "d87baa94-65cc-4da6-a2c8-cbcd5eff4c5f",
+  "sourceSha256": "3af544aed8c88b3ce0f7fe50eab11e211123880d72e3a5980aa82f96ea484b65",
+  "triangles": 3781,
+  "faceLimit": 4000,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false
+}

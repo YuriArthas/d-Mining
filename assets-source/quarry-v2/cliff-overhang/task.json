@@ -1,0 +1,7 @@
+{
+  "task_id": "083d5037-1ffb-4cb1-89da-d742013eff55",
+  "type": "text_to_model",
+  "model_version": "v3.1-20260211",
+  "face_limit": 5500,
+  "prompt": "Rounded pale sandstone bluff with one broad shallow sheltered overhang and soft green grass cap, clean warm rock walls. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. "
+}

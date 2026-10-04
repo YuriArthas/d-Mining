@@ -1,0 +1,13 @@
+{
+  "parts": [
+    "chunky-tree.000.part"
+  ],
+  "bytes": 451590,
+  "sha256": "35f6a9a4e7540bcaf3b0e8a84d3d410d87b3caa14c3aae80b686eb8dfc8d6dbd",
+  "taskId": "0babd74f-32c4-4768-87ef-aa8cbd1af785",
+  "sourceSha256": "843a2b4c661bdbd5c3fa700e64903b012b975c8bd5562b13bc0779739bbb9826",
+  "triangles": 5792,
+  "faceLimit": 6000,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false
+}

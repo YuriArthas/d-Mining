@@ -1,0 +1,11 @@
+Use case: stylized-concept
+Asset type: environment composition reference for a third-person mining game
+Primary request: Redesign the outside edge of a small Roblox-inspired mining valley. The camera is a comfortable third-person game camera inside a playable grassy quarry. The near foreground has a flat meadow, a readable mine entrance, warm wooden ore exchange building, a few rounded boulders, small trees and a path. The midground is a natural bowl made from several large sculpted valley landforms: two asymmetrical forested slopes, one distant waterfall and a wide notch between hills. The far background closes the horizon with soft layered blue-green mountains and atmospheric haze.
+Scene/backdrop: sunny stylized outdoor valley, no visible world edge
+Style/medium: premium modern Roblox environment, appealing rounded hand-sculpted forms, clean silhouettes, rich materials, tasteful asymmetry, polished game art
+Composition/framing: 16:9 wide establishing shot from player height, clear playable route through the center, foreground buildings remain the visual anchor, hills frame rather than surround the camera like a wall
+Lighting/mood: warm late-morning sun from upper left, blue sky fill, soft contact shadows, gentle aerial perspective, saturated grass and foliage, distinct warm wood and cool rock colors
+Color palette: fresh green grass, mossy olive, warm sandstone, muted teal-blue distant mountains, golden sunlight, clear blue sky
+Materials/textures: non-metallic matte grass and stone, layered soil and moss, clustered foliage, subtle roughness variation, no glossy plastic
+Constraints: horizon must feel naturally enclosed by a valley, use 5-8 unique large landforms with different heights and silhouettes; preserve visible sky above the ridge; keep the main route unobstructed
+Avoid: continuous circular wall, ring, perimeter fence, repeated identical rocks, radial symmetry, block piles, grey concrete, metallic ground, flat panorama, empty horizon, hard angular polygon seams, UI, text, logos, watermark, characters

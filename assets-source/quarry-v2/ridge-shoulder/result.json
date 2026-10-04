@@ -1,0 +1,15 @@
+{
+  "taskId": "b28bc3b9-b58d-43a4-a9c5-076b973c80c4",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "faceLimit": 4500,
+  "prompt": "One wide stylized grassy hill landscape component for a colorful Roblox mining game. A single flowing asymmetrical hill with a broad lush spring-green smooth grass cap over two broad rounded warm cream sandstone ledges. Low sweeping saddle silhouette, broad base, soft beautifully sculpted continuous contours. Big readable shapes, clean matte hand painted colors, no tiny rock fragments, no realistic texture noise, no trees, no individual grass blades, no architecture. Standalone full component.",
+  "bytes": 6678420,
+  "triangles": 4230,
+  "meshes": 1,
+  "materials": 1,
+  "output": {
+    "generated_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/b28bc3b9-b58d-43a4-a9c5-076b973c80c4/text2image_b28bc3b9-b58d-43a4-a9c5-076b973c80c4.jpeg?auth_key=1791158400-ZB9GIqZi-0-7c44b0d77a1216c1f5b03ec11b4df42a",
+    "rendered_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/b28bc3b9-b58d-43a4-a9c5-076b973c80c4/legacy_mesh.webp?auth_key=1791158400-ZB9GIqZi-0-5faa8da175b266f2312591fc328ddaa8"
+  }
+}

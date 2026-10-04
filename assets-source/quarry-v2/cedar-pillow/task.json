@@ -1,0 +1,8 @@
+{
+  "task_id": "6b86dbd2-c9fc-48f7-ad6e-a66f659a5319",
+  "type": "image_to_model",
+  "reference": "output/imagegen/camp-expansion/cedar-pillow.png",
+  "model_version": "v3.1-20260211",
+  "face_limit": 2800,
+  "prompt": "Evergreen cedar with three vertically stacked thick rounded bell-shaped solid green canopy tiers. No needles. A sculpted toy-like tree: thick short trunk supporting TWO OR THREE HUGE SOLID SMOOTH CANOPY VOLUMES. Canopy surfaces continuous like inflated cushions, absolutely NO individual leaves, leaf cards, visible twigs, thin branches, spiky foliage or detailed leaf texture.  Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. "
+}

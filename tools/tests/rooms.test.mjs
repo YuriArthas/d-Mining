@@ -1,3 +1,4 @@
+import { SURFACE_SHOP } from '../../src/game/world/surfaceLayout.ts';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { Exploration } from '../../src/game/logic/Exploration.ts';
@@ -25,11 +26,11 @@ test('room boundary has separately merged render and collision surfaces', () => 
 });
 test('depth milestones unlock independently of rooms and retain progress on ascent', () => {
  const p=new Exploration(ROOMS);
- assert.deepEqual(p.visit(399.999),[]);assert.deepEqual(p.visit(400),['rest-400']);
- assert.deepEqual(p.visit(0),[]);assert.equal(p.has('rest-400'),true);
- assert.deepEqual(p.visit(801),['rest-800']);assert.equal(p.maxDepth,801);
+ assert.deepEqual(p.visit(399.999),[]);assert.deepEqual(p.visit(400),['old_mine']);
+ assert.deepEqual(p.visit(0),[]);assert.equal(p.has('old_mine'),true);
+ assert.deepEqual(p.visit(801),['fungal']);assert.equal(p.maxDepth,801);
  for(const d of [NaN,Infinity,-3])assert.deepEqual(p.visit(d),[]);
- assert.equal(p.maxDepth,801);assert.equal(new Exploration(ROOMS).has('rest-400'),false);
+ assert.equal(p.maxDepth,801);assert.equal(new Exploration(ROOMS).has('old_mine'),false);
 });
 function setup() {
  const s=new GameSession(),calls=[];
@@ -39,10 +40,10 @@ function setup() {
 test('outside room at milestone depth unlocks travel; only home may initiate it', () => {
  const {s,calls}=setup();s.updatePosition([90,-400,90],false);
  assert.equal(s.getSnapshot().destinations[0].unlocked,true);assert.equal(s.getSnapshot().destinations[1].unlocked,false);
- assert.equal(s.travelTo('rest-400'),'away');s.updatePosition([HOME_ZONE.x,HOME_ZONE.y,HOME_ZONE.z],true);
- assert.equal(s.travelTo('rest-800'),'locked');assert.equal(s.travelTo('unknown'),'locked');
- assert.equal(s.travelTo('rest-400'),'travelling');assert.deepEqual(calls,[ROOMS[0].spawn]);
- assert.equal(s.travelTo('rest-400'),'away');s.resetPosition();assert.equal(s.getSnapshot().destinations[0].unlocked,true);
+ assert.equal(s.travelTo('old_mine'),'away');s.updatePosition([HOME_ZONE.x,HOME_ZONE.y,HOME_ZONE.z],true);
+ assert.equal(s.travelTo('fungal'),'locked');assert.equal(s.travelTo('unknown'),'locked');
+ assert.equal(s.travelTo('old_mine'),'travelling');assert.deepEqual(calls,[ROOMS[0].spawn]);
+ assert.equal(s.travelTo('old_mine'),'away');s.resetPosition();assert.equal(s.getSnapshot().destinations[0].unlocked,true);
 });
 test('standing at platform contact height reaches milestone without requiring room membership', () => {
  const {s}=setup();s.updatePosition([90,-399.973,90],false);assert.equal(s.getSnapshot().destinations[0].unlocked,false);
@@ -58,5 +59,13 @@ test('each underground sale zone sells once per entry; shops exit independently'
  }
  const r=ROOMS[1];s.updatePosition([r.shop.x,r.shop.y,r.shop.z],true);assert.equal(s.getSnapshot().shopId,r.id);
  assert.equal(s.getSnapshot().inSellZone,false);s.updatePosition([r.x,-r.depth,r.z],true);assert.equal(s.getSnapshot().shopId,null);
- assert.equal(s.getSnapshot().coins,80);
+ assert.equal(s.getSnapshot().coins,40*ROOMS.length);
+});
+
+test('surface upgrade kiosk reuses shop lifecycle and survives direct transfers between shops',()=>{
+ const s=new GameSession(),u=SURFACE_SHOP,r=ROOMS.find(r=>r.shop);
+ s.updatePosition([u.x,0,u.z],true);assert.equal(s.getSnapshot().shopId,'surface-upgrade');assert.equal(s.getSnapshot().inSellZone,false);
+ s.updatePosition([r.shop.x,r.shop.y,r.shop.z],true);assert.equal(s.getSnapshot().shopId,r.id);
+ s.updatePosition([u.x,0,u.z],true);assert.equal(s.getSnapshot().shopId,'surface-upgrade');
+ s.updatePosition([0,0,26],true);assert.equal(s.getSnapshot().shopId,null);
 });

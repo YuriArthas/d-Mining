@@ -1,0 +1,17 @@
+{
+  "taskId": "43ed3e8d-b8fd-4145-b7c9-dc93cfe32811",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "text_to_model",
+  "faceLimit": 3000,
+  "prompt": "Low round sandstone well with broad wooden roof on two thick posts, simple large wooden bucket, no thin ropes. Cozy stylized prop. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+  "bytes": 2555744,
+  "triangles": 2684,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "generated_image",
+    "rendered_image"
+  ]
+}

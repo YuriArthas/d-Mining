@@ -1,0 +1,8 @@
+{
+  "task_id": "930768dc-dd1e-4f08-9bb4-f76229d1d859",
+  "type": "image_to_model",
+  "reference": "output/imagegen/camp-v2/crown-tree.png",
+  "model_version": "v3.1-20260211",
+  "face_limit": 3000,
+  "prompt": "New image-guided solid three-lobe canopy tree; no leaf geometry."
+}

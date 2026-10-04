@@ -1,3 +1,4 @@
+import { appearanceKey } from '../../src/game/terrain/minerals.ts';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { STRATA, stratumAtDepth, generatedMineral } from '../../src/game/terrain/strata.ts';
@@ -6,14 +7,14 @@ import { buildRegion, greedyMesh } from '../../src/game/terrain/meshing.ts';
 import { oreDefinition } from '../../src/game/application/items.ts';
 
 test('layer boundaries use metres and the top face of each block', () => {
- assert.equal(stratumAtDepth(399.999).id,'surface');assert.equal(stratumAtDepth(400).id,'gold');
- assert.equal(stratumAtDepth(799.999).id,'gold');assert.equal(stratumAtDepth(800).id,'crystal');
- const allowed = [[-200,[1,3,4]],[-201,[2,3,4,5]],[-400,[2,3,4,5]],[-401,[2,4,5,6]]];
+ assert.equal(stratumAtDepth(399.999).id,'surface');assert.equal(stratumAtDepth(400).id,'old_mine');
+ assert.equal(stratumAtDepth(799.999).id,'old_mine');assert.equal(stratumAtDepth(800).id,'fungal');
+ const allowed = [[-200,[1,8,3,4,16]],[-201,[2,1,3,4,16,17,5]],[-400,[2,1,3,4,16,17,5]],[-401,[9,2,4,17,18,25]]];
  for(const [y,ids] of allowed) for(let x=-48;x<=51;x++)for(let z=-48;z<=51;z++)assert.ok(ids.includes(generatedMineral(x,y,z,0)));
 });
 test('production shallow terrain excludes advanced minerals even at old sample coordinates', () => {
  const game=new SparseWorld(),fixture=new SparseWorld({...WORLD_GENERATION,samples:true});
- for(let x=-16;x<32;x++)for(let y=-16;y<0;y++)for(let z=-32;z<-16;z++)assert.ok((y===-1?[7]:[1,3,4]).includes(game.cell([x,y,z])));
+ for(let x=-16;x<32;x++)for(let y=-16;y<0;y++)for(let z=-32;z<-16;z++)assert.ok((y===-1?[7]:[1,8,3,4,16]).includes(game.cell([x,y,z])));
  assert.equal(fixture.cell([14,-1,-25]),6);assert.notEqual(game.cell([14,-1,-25]),6);
  assert.equal(game.generation.samples,false);assert.equal(game.stats().editBytes,0);
 });
@@ -50,7 +51,7 @@ test('worker render and collision use the exact same generation source across la
    for(const [kind,size] of [['render',16],['collision',8]]){
     const coord=regionOf(cell,size),snapshot=world.snapshot(coord,size);
     const actual=buildRegion(kind,coord,size,snapshot,generation).mesh;
-    const expected=greedyMesh((x,y,z)=>world.cell([coord[0]*size+x,coord[1]*size+y,coord[2]*size+z]),size,kind==='collision');
+    const expected=greedyMesh((x,y,z)=>kind==='collision'?world.cell([coord[0]*size+x,coord[1]*size+y,coord[2]*size+z]):appearanceKey(world.cell([coord[0]*size+x,coord[1]*size+y,coord[2]*size+z]),coord[1]*size+y,generation.layers),size,kind==='collision');
     assert.deepEqual(actual,expected);
    }
   }

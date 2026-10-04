@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "cliff-overhang.000.part"
+  ],
+  "bytes": 285262,
+  "sha256": "451606cdfa8c59efcc55f007933967238d155074e4d9b67eff1513bb7c2afd22",
+  "taskId": "083d5037-1ffb-4cb1-89da-d742013eff55",
+  "sourceSha256": "b6f55731fbfa4d8e0eedac72e314aa81ebbab5644358df2cb3216920079984d9",
+  "triangles": 5306,
+  "faceLimit": 5500,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

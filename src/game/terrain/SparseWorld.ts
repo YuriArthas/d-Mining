@@ -1,3 +1,4 @@
+import { LAYERS, type Layer } from '../content/layers.ts';
 import { generatedMineral } from './strata.ts';
 import { sampleMineral } from './minerals.ts';
 export { CELL } from './grid.ts';
@@ -5,8 +6,8 @@ import { inEntrance, PROTECTED_FLOOR } from '../world/entrance.ts';
 import { roomAir, onRoomFloor } from '../world/rooms.ts';
 import { SHAFT } from '../validation/course.ts';
 export type Coord = readonly [number, number, number];
-export type WorldGeneration = Readonly<{ version: number; seed: number; samples: boolean }>;
-export const WORLD_GENERATION: WorldGeneration = Object.freeze({ version: 5, seed: 0, samples: false });
+export type WorldGeneration = Readonly<{ version: number; seed: number; samples: boolean; layers: readonly Layer[] }>;
+export const WORLD_GENERATION: WorldGeneration = Object.freeze({ version: 6, seed: 0, samples: false, layers: LAYERS });
 export const INDEX_SIZE = 16; // Sparse spatial index only; never a dense voxel allocation.
 export const RENDER_SIZE = 16;
 export const COLLISION_SIZE = 8;
@@ -51,11 +52,11 @@ function apply(edits: Edits, cells: readonly Coord[]) {
 }
 export function baseXYZ(x: number, y: number, z: number, generation: WorldGeneration = WORLD_GENERATION): number {
   if (x < -48 || x > 51 || y < -2000 || y > -1 || z < -48 || z > 51) return 0;
-  if (roomAir(x, y, z)) return 0;
-  if (y >= -1000 && y <= -993 && x >= -8 && x < 8 && z >= -8 && z < 8) return 0;
+  if (roomAir(x, y, z, generation.layers)) return 0;
+  if (generation.samples && y >= -1000 && y <= -993 && x >= -8 && x < 8 && z >= -8 && z < 8) return 0;
   if (generation.samples && y >= SHAFT.minY && x >= SHAFT.minX && x <= SHAFT.maxX && z >= SHAFT.minZ && z <= SHAFT.maxZ) return 0;
-  if (!generation.samples && !inEntrance(x, z) && (y === -1 || onRoomFloor(x, y, z))) return PROTECTED_FLOOR;
-  return (generation.samples ? sampleMineral(x, y, z) : null) ?? generatedMineral(x, y, z, generation.seed);
+  if (!generation.samples && !inEntrance(x, z) && (y === -1 || onRoomFloor(x, y, z, generation.layers))) return PROTECTED_FLOOR;
+  return (generation.samples ? sampleMineral(x, y, z) : null) ?? generatedMineral(x, y, z, generation.seed, generation.layers);
 }
 export function sampleXYZ(x: number, y: number, z: number, edits: Edits, generation: WorldGeneration = WORLD_GENERATION) {
   const base = baseXYZ(x, y, z, generation); // Check bounds before looking up the bounded numeric key.

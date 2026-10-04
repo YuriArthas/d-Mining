@@ -1,0 +1,17 @@
+{
+  "taskId": "910e0a00-2696-4c94-bd5e-1dc3dd0d011d",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "image_to_model",
+  "reference": "output/imagegen/mine-worksite/pit-supply-pallet.png",
+  "faceLimit": 1800,
+  "prompt": "One squat rectangular rough timber supply pallet holding a folded heavy tan canvas tarpaulin, a thick coil of brown rope and one square brown wooden toolbox with a dark iron handle. Rectilinear carpentry with broad coarse wood grain. No text, no painted color accents.",
+  "bytes": 3159008,
+  "triangles": 1671,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "rendered_image"
+  ]
+}

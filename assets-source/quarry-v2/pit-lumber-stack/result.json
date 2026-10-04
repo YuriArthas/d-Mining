@@ -1,0 +1,17 @@
+{
+  "taskId": "bebef70a-030b-4590-aa97-76fb8fcd9b72",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "image_to_model",
+  "reference": "output/imagegen/mine-worksite/pit-lumber-stack.png",
+  "faceLimit": 1500,
+  "prompt": "One neat stack of eight rough sawn rectangular brown timber beams with square end grain, differing lengths, stacked in three layers on two square spacers. Long low rectangular shape. Coarse longitudinal wood grain. No round logs, no extra props.",
+  "bytes": 3041296,
+  "triangles": 1320,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "rendered_image"
+  ]
+}

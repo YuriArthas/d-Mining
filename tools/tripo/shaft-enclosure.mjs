@@ -1,0 +1,4 @@
+export const shaftEnclosure={
+ 'shaft-roblox-mine':{faceLimit:10000,image:'output/imagegen/roblox-mine/shaft-roblox-mine.png',prompt:'Modern Roblox Mining Simulator 2 style open mining pavilion. Full green gabled roof covering the entire square footprint, tall honey oak square posts, chunky clean ivory stone footings. Bright clean stylized Roblox game architecture. Open front, empty center, no floor. No medieval ruins, no realistic weathered stone, no World of Warcraft style.'},
+ 'shaft-kiln-frame':{faceLimit:10000,image:'output/imagegen/shaft-enclosure/shaft-kiln-frame.png',prompt:'A large roofless square mine kiln enclosure, chunky squared stone masonry piers and rough oak braces surrounding an EMPTY square mining shaft. Four corner piers, tall rear stone arch, low side walls, wide open front entry. No floor, no roof over the center. Minecraft-inspired rough stone and timber.'}
+};

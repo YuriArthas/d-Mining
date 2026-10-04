@@ -1,0 +1,15 @@
+{
+  "taskId": "a82d29f6-6510-4f8f-acd1-7652d2de89ec",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "faceLimit": 5000,
+  "prompt": "One complete wide flat square meadow ground module for a colorful stylized mining game. A continuous smooth lush spring-green grassy surface occupying 90 percent of the area, with ONE broad warm ochre dirt path gently curving through the middle. Flat playable upper surface, very shallow thickness, no rocks or grass blades sticking up, no buildings, no trees, no objects. Big clean hand-painted green color shapes, modern Roblox simulator aesthetic, no realistic noisy textures, no tiles, no paving stones, no raised central platform, no labels.",
+  "bytes": 5808548,
+  "triangles": 4868,
+  "meshes": 1,
+  "materials": 1,
+  "output": {
+    "generated_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/a82d29f6-6510-4f8f-acd1-7652d2de89ec/text2image_a82d29f6-6510-4f8f-acd1-7652d2de89ec.jpeg?auth_key=1791158400-ZB9GIqZi-0-2fd5d2b41038de252b5bf85fe731a4fd",
+    "rendered_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/a82d29f6-6510-4f8f-acd1-7652d2de89ec/legacy_mesh.webp?auth_key=1791158400-ZB9GIqZi-0-7c146db167869210967dc794efa19e90"
+  }
+}

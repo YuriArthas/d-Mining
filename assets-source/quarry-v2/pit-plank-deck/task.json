@@ -1,0 +1,8 @@
+{
+  "task_id": "031f3df9-8ede-4bee-b309-ba51c05955ec",
+  "type": "image_to_model",
+  "reference": "output/imagegen/mine-worksite/pit-plank-deck.png",
+  "model_version": "v3.1-20260211",
+  "face_limit": 2000,
+  "prompt": "A thin flat rectangular walking deck made from six straight rough sawn oak planks fixed to two square cross battens underneath. Long horizontal rectangle, width four times depth, thickness tiny. Individual straight boards, dark narrow joints, saw marks, visible broad wood grain and square cut end grain. No railing, no legs."
+}

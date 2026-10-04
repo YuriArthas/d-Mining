@@ -1,0 +1,17 @@
+{
+  "taskId": "931942d1-f4fd-467e-8309-22a5baf627c1",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "text_to_model",
+  "faceLimit": 6500,
+  "prompt": "Small cozy mining equipment workshop, open broad timber front, teal curved gable roof, sandstone lower walls, chunky workbench visible in front. No tall chimney. One building, no surrounding scene. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+  "bytes": 2851588,
+  "triangles": 5795,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "generated_image",
+    "rendered_image"
+  ]
+}

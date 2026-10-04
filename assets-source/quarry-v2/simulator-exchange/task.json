@@ -1,0 +1,8 @@
+{
+  "task_id": "6d3bf76e-2393-4ea3-bb6f-65b731fcf61a",
+  "type": "image_to_model",
+  "reference": "output/imagegen/simulator-facilities/simulator-exchange.png",
+  "model_version": "v3.1-20260211",
+  "face_limit": 6000,
+  "prompt": "Modern Roblox Mining Simulator 2 orange roof sell kiosk with giant gold coin emblem, ivory trims and honey-yellow posts. Open service counter."
+}

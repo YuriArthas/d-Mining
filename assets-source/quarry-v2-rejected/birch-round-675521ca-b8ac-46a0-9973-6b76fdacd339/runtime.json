@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "birch-round.000.part"
+  ],
+  "bytes": 322821,
+  "sha256": "bca0b96d19ad88308b179a350a674da2a25b0a35765547355cb357404e641e88",
+  "taskId": "675521ca-b8ac-46a0-9973-6b76fdacd339",
+  "sourceSha256": "8dbdcde412c3be2bef56edb09583ba31554a1588b75721baba3ba02b6fe696b6",
+  "triangles": 2155,
+  "faceLimit": 2400,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

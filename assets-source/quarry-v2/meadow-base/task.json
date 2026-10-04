@@ -1,0 +1,7 @@
+{
+  "task_id": "d87baa94-65cc-4da6-a2c8-cbcd5eff4c5f",
+  "type": "text_to_model",
+  "model_version": "v3.1-20260211",
+  "face_limit": 4000,
+  "prompt": "An isolated THREE DIMENSIONAL thick square slab of green turf with rounded corners. One complete solid rectangular terrain block seen in three-quarter perspective against a plain white studio background, the WHOLE slab and ALL four outer edges fully visible inside the image. A very broad perfectly flat vivid green grass top with clean painted color gradients, shallow brown earth sides and flat bottom. Width ten times height. Smooth continuous green top, no path, no buildings, no props, no individual grass blades, no text. Colorful chunky Roblox game asset, not an illustration of a landscape, not a flat texture."
+}

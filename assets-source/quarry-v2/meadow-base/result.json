@@ -1,0 +1,15 @@
+{
+  "taskId": "d87baa94-65cc-4da6-a2c8-cbcd5eff4c5f",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "faceLimit": 4000,
+  "prompt": "An isolated THREE DIMENSIONAL thick square slab of green turf with rounded corners. One complete solid rectangular terrain block seen in three-quarter perspective against a plain white studio background, the WHOLE slab and ALL four outer edges fully visible inside the image. A very broad perfectly flat vivid green grass top with clean painted color gradients, shallow brown earth sides and flat bottom. Width ten times height. Smooth continuous green top, no path, no buildings, no props, no individual grass blades, no text. Colorful chunky Roblox game asset, not an illustration of a landscape, not a flat texture.",
+  "bytes": 2695960,
+  "triangles": 3781,
+  "meshes": 1,
+  "materials": 1,
+  "output": {
+    "generated_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/d87baa94-65cc-4da6-a2c8-cbcd5eff4c5f/text2image_d87baa94-65cc-4da6-a2c8-cbcd5eff4c5f.jpeg?auth_key=1791158400-ZB9GIqZi-0-c60553cbd8c47951367bff301c4beac6",
+    "rendered_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/d87baa94-65cc-4da6-a2c8-cbcd5eff4c5f/legacy_mesh.webp?auth_key=1791158400-ZB9GIqZi-0-6d337bda51fff430c2b98b1c07701d0a"
+  }
+}

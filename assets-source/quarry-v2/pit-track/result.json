@@ -1,0 +1,17 @@
+{
+  "taskId": "f523efd3-c6be-436d-88b9-5c190cdbb0a7",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "image_to_model",
+  "reference": "output/imagegen/mine-worksite/pit-track.png",
+  "faceLimit": 1400,
+  "prompt": "One straight short mining railway segment on FIVE thick square cut brown timber sleepers. Two continuous straight dark iron rails, rectangular low profile, elongated horizontal silhouette. Rails run from LEFT to RIGHT across the image, length four times width. No wagon, no ground base.",
+  "bytes": 2486900,
+  "triangles": 1278,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "rendered_image"
+  ]
+}

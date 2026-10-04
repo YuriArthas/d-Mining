@@ -1,0 +1,15 @@
+{
+  "parts": [
+    "pit-plank-deck.000.part"
+  ],
+  "bytes": 388474,
+  "sha256": "9524f323753c5792adb39e098428476ddeb50d1ad1c56a57583af95e38bcd5aa",
+  "taskId": "031f3df9-8ede-4bee-b309-ba51c05955ec",
+  "sourceSha256": "b1ec4cb6c25b96dcb7c32ee92e6bfe0e35762605143286a40cb58202589adedb",
+  "triangles": 1726,
+  "faceLimit": 2000,
+  "source": "new Tripo image_to_model",
+  "reference": "output/imagegen/mine-worksite/pit-plank-deck.png",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

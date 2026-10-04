@@ -1,0 +1,8 @@
+{
+  "task_id": "f4dfc3b1-1095-485b-a6f0-fd9341f9d10d",
+  "type": "image_to_model",
+  "reference": "output/imagegen/mine-worksite/pit-spoil.png",
+  "model_version": "v3.1-20260211",
+  "face_limit": 2000,
+  "prompt": "A low compact pile of angular broken gray shale and dusty dark brown gravel from a working mine. Twelve large irregular CHIPPED rock pieces with coarse granular fractured faces, surrounded by a small amount of coarse rubble. Matte stone, broad squareish chunks, no crystals, no vegetation, no pedestal."
+}

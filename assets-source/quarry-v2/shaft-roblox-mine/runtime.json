@@ -1,0 +1,15 @@
+{
+  "parts": [
+    "shaft-roblox-mine.000.part"
+  ],
+  "bytes": 461674,
+  "sha256": "aa48127c146d89dcde30c82e86251b47322db744a30f1829a9992860562a588e",
+  "taskId": "05e11380-312c-4cb9-b832-2d1d737cda8b",
+  "sourceSha256": "2ab69b558ba4333f2c71465e77521a0ac71695281ba6c456067c1254dfbd640b",
+  "triangles": 8128,
+  "faceLimit": 10000,
+  "source": "new Tripo image_to_model",
+  "reference": "output/imagegen/roblox-mine/shaft-roblox-mine.png",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

@@ -1,0 +1,13 @@
+{
+  "parts": [
+    "bush-bank.000.part"
+  ],
+  "bytes": 351156,
+  "sha256": "d771d04452edb6c050853a3dbd3002d21aa633287b7d0942969834e9b929f7d8",
+  "taskId": "f93098fe-174f-466a-9b7a-97b39c003031",
+  "sourceSha256": "d8057ebd1de3c2fce8e0f2fbced4e7cd989e0af1fa98bbdfe363c8c185d45732",
+  "triangles": 1560,
+  "faceLimit": 1600,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false
+}

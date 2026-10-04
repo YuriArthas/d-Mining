@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "flower-daisies.000.part"
+  ],
+  "bytes": 370525,
+  "sha256": "93a494814fdbf89ccebc39b14f3ca445d908751b0540c8bdd833aac7aae56205",
+  "taskId": "3fbb52e6-22b2-4157-bfea-f4c3db148c37",
+  "sourceSha256": "a45a367e9bc6b87c2afc4140253a42b6a23bcbd62124abe34f26f67195c962a8",
+  "triangles": 1102,
+  "faceLimit": 1200,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

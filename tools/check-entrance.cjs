@@ -41,10 +41,10 @@ const {digCells}=require('./combat-browser.cjs');
     await page.screenshot({path:`artifacts/${label}-${layout}-${depth}.png`});
    }
    await press('返回地表');await ready();await press('传送');const b=page.locator('.travel-list button').nth(1);await(touch?b.tap():b.click());await ready();
-   let s=await snap();assert.ok(Math.abs(s.position[0])<.01&&Math.abs(s.position[2]-14)<.01);assert.ok(Math.abs(s.position[1]+800)<.05);
+   let s=await snap();assert.ok(Math.abs(s.position[0])<.01&&Math.abs(s.position[2]-11)<.01);assert.ok(Math.abs(s.position[1]+800)<.05);
    assert.equal(await page.evaluate(()=>window.__miningValidation.cell([3,-401,-2])),0);assert.equal(await page.evaluate(()=>window.__miningValidation.cell([4,-401,-2])),7);
    const quote=s.economy.sale.coins;await teleport([-12,-799.9,12]);assert.equal((await snap()).economy.coins,quote);assert.equal((await snap()).economy.inventory.used,0);
-   await teleport([9.5,-799.9,12]);await moveRight(()=>page.waitForFunction(()=>window.__miningValidation.snapshot().economy.shopId==='rest-800'));
+   await teleport([9.5,-799.9,12]);await moveRight(()=>page.waitForFunction(()=>window.__miningValidation.snapshot().economy.shopId==='fungal'));
    await page.getByRole('heading',{name:'升级商店',exact:true}).waitFor();await press('花费 5 金币升级');assert.equal((await snap()).economy.pickaxe.level,2);
    checks.push(`${layout}: exactly 64 aligned entrance cells on all floors; real ${touch?'touch':'mouse'} cannot damage skin and digs entry; actual movement expands sideways below one-cell skin; safe return/room travel; edits persist; moved sale and shop work`);
   }catch(e){await page.screenshot({path:`artifacts/${label}-${layout}-failure.png`});console.error(JSON.stringify({layout,snapshot:await snap().catch(()=>null),errors}));throw e}finally{await page.close()}

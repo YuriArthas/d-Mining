@@ -1,0 +1,15 @@
+{
+  "parts": [
+    "maple-gold.000.part"
+  ],
+  "bytes": 332035,
+  "sha256": "b48339400c10a70828105026cbff0fbf57bcf859d304c36e621e214f7c564649",
+  "taskId": "56d4b5d5-d885-4d07-b580-9d1c8cd05b5d",
+  "sourceSha256": "c9b6e82ba0b27fd316a1ed8320a3f80fe9fc6e7db01b037de12e80efba9848d3",
+  "triangles": 2736,
+  "faceLimit": 2800,
+  "source": "new Tripo image_to_model",
+  "reference": "output/imagegen/camp-expansion/maple-gold.png",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

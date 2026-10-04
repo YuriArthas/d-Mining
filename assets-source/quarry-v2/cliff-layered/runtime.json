@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "cliff-layered.000.part"
+  ],
+  "bytes": 307202,
+  "sha256": "3dc15d9dd7c10c8de39a833304023ac887a81aea626e494b7df1094c264efd4f",
+  "taskId": "2cc8b914-770d-4018-b0e9-f91e1b8f8526",
+  "sourceSha256": "df06f47e6c3bd9b91d22ea6c6e851997999a93d9e304d53ff2fcc8d5ba608576",
+  "triangles": 5161,
+  "faceLimit": 5500,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

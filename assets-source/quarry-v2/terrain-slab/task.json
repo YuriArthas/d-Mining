@@ -1,0 +1,7 @@
+{
+  "task_id": "644925ed-966c-425f-bc52-40a44f1fa567",
+  "type": "text_to_model",
+  "model_version": "v3.1-20260211",
+  "face_limit": 5000,
+  "prompt": "A single large flat stylized Roblox-inspired game terrain slab for an outdoor mining yard. Broad low rounded meadow landform with packed warm soil, inset irregular pale stone pavers, a few broad grass clumps and low smooth stones. Completely flat and walkable through the centre, no raised island base, no buildings, no trees, no fences, no water, no text, no logos. The asset must have a clean flat underside and one consistent ground datum, with softly sculpted organic edges rather than square tiles or visible modular seams."
+}

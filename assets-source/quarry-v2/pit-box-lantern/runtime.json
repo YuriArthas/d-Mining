@@ -1,0 +1,15 @@
+{
+  "parts": [
+    "pit-box-lantern.000.part"
+  ],
+  "bytes": 404349,
+  "sha256": "d5088a53329634f2edfa386da99a544cff98eb6512ef0c13cb02ddc407b1281c",
+  "taskId": "ed8007fc-24c0-4164-9585-a8a3a467730f",
+  "sourceSha256": "5b2af4c956723c602d795250af2a3429a27dee0d151f48146f98648cd4e5682c",
+  "triangles": 1441,
+  "faceLimit": 1600,
+  "source": "new Tripo image_to_model",
+  "reference": "output/imagegen/mine-worksite/pit-box-lantern.png",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

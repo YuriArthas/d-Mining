@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { flushSync } from 'react-dom';
+import { NeutralToneMapping } from 'three';
 import { Canvas, unmountComponentAtNode, type RootState } from '@react-three/fiber';
 import { GAME_CONFIG } from './game/config.ts';
 import { GameInput, type InputSnapshot } from './game/GameInput.ts';
@@ -19,7 +20,7 @@ declare global {
 }
 
 export function App() {
-  const hosted = /\/games\/mining\/(?:index\.html)?$/.test(window.location.pathname);
+  const hosted = /\/games\/mining(?:-test)?\/(?:index\.html)?$/.test(window.location.pathname);
   const canvas = useRef<HTMLCanvasElement>(null);
   const scene = useRef<RootState | null>(null);
   const exiting = useRef(false);
@@ -80,12 +81,13 @@ export function App() {
       <div ref={surface} className="scene" tabIndex={0} aria-label="游戏视角，拖动观察，长按方块挖掘">
         <Canvas
           ref={canvas}
-          onCreated={state => { scene.current = state; }}
+          onCreated={state => { scene.current = state; state.gl.toneMapping=NeutralToneMapping; state.gl.toneMappingExposure=1.08; }}
           frameloop="never"
+          shadows
           resize={{ offsetSize: true }}
           dpr={[1, GAME_CONFIG.pixelRatioMax]}
-          camera={{ fov: GAME_CONFIG.camera.fov, near: GAME_CONFIG.camera.near, far: 80 }}
-          gl={{ antialias: false }}
+          camera={{ fov: GAME_CONFIG.camera.fov, near: GAME_CONFIG.camera.near, far: 10000 }}
+          gl={{ antialias: true }}
           fallback={<p className="graphics-error">当前浏览器无法启动 3D 画面，请使用支持 WebGL2 的浏览器。</p>}
         >
           <ValidationScene input={input} onStatus={setStatus} session={session} />

@@ -1,0 +1,13 @@
+{
+  "parts": [
+    "grass-floor.000.part"
+  ],
+  "bytes": 338903,
+  "sha256": "359dd11fdaf682891604a5ec6628c71481a9e066d98ad1004d9dc25044a700de",
+  "taskId": "a82d29f6-6510-4f8f-acd1-7652d2de89ec",
+  "sourceSha256": "5428d9511bed50ebd789a932db46ee0daae137506456dca9122bde7f7e79402d",
+  "triangles": 4868,
+  "faceLimit": 5000,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false
+}

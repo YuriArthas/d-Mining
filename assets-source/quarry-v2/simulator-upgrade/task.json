@@ -1,0 +1,8 @@
+{
+  "task_id": "177a1b15-d6f6-4d03-a899-756e38994554",
+  "type": "image_to_model",
+  "reference": "output/imagegen/simulator-facilities/simulator-upgrade.png",
+  "model_version": "v3.1-20260211",
+  "face_limit": 6000,
+  "prompt": "Modern Roblox Mining Simulator 2 blue roof upgrade kiosk with giant cyan pickaxe emblem, ivory trims and honey-yellow posts. Open service counter."
+}

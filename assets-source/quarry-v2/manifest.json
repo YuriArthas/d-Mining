@@ -1,0 +1,1390 @@
+{
+  "version": "quarry-v2-tripo-only",
+  "modelVersion": "v3.1-20260211",
+  "components": [
+    {
+      "name": "anvil-stump",
+      "taskId": "ec510f45-97b3-48b8-ae80-a0967007e87c",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 1900,
+      "prompt": "One chunky dark matte iron anvil on a thick round honey-colored tree stump, broad curved horn and simple clean shapes. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2102292,
+      "triangles": 1772,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "assayer-stall",
+      "taskId": "ad70d31f-7308-47f1-8093-b100840a4de3",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 4500,
+      "prompt": "Small open assay kiosk, broad cream canvas canopy with teal edge over thick timber frame, stone counter and large weighing bowl, open front. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2089664,
+      "triangles": 4120,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "bank-braced",
+      "taskId": "ea100a0e-698e-470f-98d8-a22c532f365e",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/timber-boundary/bank-braced.png",
+      "faceLimit": 1000,
+      "prompt": "One modular rectangular retaining wall block, 4 metres wide, 2 metres high, 2 metres deep. Four broad straight rough oak horizontal sleepers, square timber end posts, one stout diagonal timber brace against the FRONT. Solid brown earth back and sides, perfectly flat green grass top. Closed solid cuboid shape, square corners. No legs or holes.",
+      "bytes": 2533196,
+      "triangles": 802,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "bank-fence",
+      "taskId": "d1cc28e7-f917-46e2-ae5c-6442d30c7ddf",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/timber-boundary/bank-fence.png",
+      "faceLimit": 500,
+      "prompt": "One short straight rustic wooden fence section, width 4 metres, height 1 metre, very shallow depth. Three square cut rough oak posts and two thick straight horizontal rectangular rails. Minecraft-like squared carpentry, broad wood grain, no round logs, no stone base, no foliage, no curved shapes.",
+      "bytes": 2414204,
+      "triangles": 325,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "bank-steps",
+      "taskId": "e6c1fb6a-4d12-4194-974b-40b765cb7526",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/timber-boundary/bank-steps.png",
+      "faceLimit": 1200,
+      "prompt": "One modular small grassy earth terrace comprising two broad RECTANGULAR solid steps, overall width 4 metres, depth 4 metres, height 2 metres. Two perfectly flat green grass treads. Straight dark brown vertical soil risers, lower front riser reinforced with straight horizontal rough oak sleepers and short square posts. Minecraft-like square terracing, no rounded slopes, no boulders.",
+      "bytes": 2680532,
+      "triangles": 1104,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "bank-timber",
+      "taskId": "b4764231-d64e-4271-b1c4-76279d7939b9",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/timber-boundary/bank-timber.png",
+      "faceLimit": 900,
+      "prompt": "One modular rectangular retaining wall block, 4 metres wide, 2 metres high, 2 metres deep. Front is four thick straight horizontal rough oak sleepers held by two square vertical posts and black square bolts. Solid brown earth back and sides, perfectly flat green grass top. Closed solid cuboid shape, square corners. No legs, no gaps through the wall.",
+      "bytes": 2433900,
+      "triangles": 673,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "bank-turf",
+      "taskId": "a68d7651-9af0-4a7c-adcb-c7246ab3786b",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/timber-boundary/bank-turf.png",
+      "faceLimit": 600,
+      "prompt": "One solid rectangular Minecraft-like grass dirt terrain block, width 4 metres, height 2 metres, depth 4 metres. Perfectly flat square green grass top and straight vertical dark brown earth sides, crisp 90 degree corners. Grass hangs in a short irregular pixelated band over the upper soil edges. Coarse low-resolution square mottling in the dirt, no stones sticking out. Solid cuboid, no rounded mound.",
+      "bytes": 2624952,
+      "triangles": 529,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "barrel-pair",
+      "taskId": "38f92ce1-d10e-4b84-a988-cdf16f979f05",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 2000,
+      "prompt": "Two squat wooden barrels of different heights with broad teal metal hoops and rounded curved staves, side by side. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 3159568,
+      "triangles": 1860,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "bench-timber",
+      "taskId": "a9beb0d5-e2fd-4ea3-a15b-2255b6005d43",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 1700,
+      "prompt": "Welcoming chunky timber park bench with broad curved backrest and two solid sandstone feet. Rounded honey wood, clean simple silhouette. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2104588,
+      "triangles": 1626,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "birch-round",
+      "taskId": "26832af1-87a1-4f1c-8776-6d557022df05",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/camp-expansion/birch-round.png",
+      "faceLimit": 2400,
+      "prompt": "Cream bark birch with a single rounded lime green crown and a thick short trunk. A sculpted toy-like tree: thick short trunk supporting TWO OR THREE HUGE SOLID SMOOTH CANOPY VOLUMES. Canopy surfaces continuous like inflated cushions, absolutely NO individual leaves, leaf cards, visible twigs, thin branches, spiky foliage or detailed leaf texture.  Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2154508,
+      "triangles": 2348,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "boulder-moss",
+      "taskId": "1d12c26f-8bc6-442b-88a5-b39dce830dba",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 1800,
+      "prompt": "Three broad smooth cream sandstone boulders fused into one low cluster with a thick smooth moss patch, no small stones. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2098764,
+      "triangles": 1708,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "boulder-ore",
+      "taskId": "d72f675b-604c-477d-b7cc-485510f2187a",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 2200,
+      "prompt": "Single rounded sandstone boulder split to reveal three huge embedded turquoise mineral faces. Matte rock, clean mineral shapes. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2212360,
+      "triangles": 2108,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "bush-bank",
+      "taskId": "f93098fe-174f-466a-9b7a-97b39c003031",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 1600,
+      "prompt": "A single low broad stylized shrub cluster for a colorful Roblox simulator game. Three overlapping solid lush green foliage volumes with six oversized soft rounded leaf lobes in total, a few small buttery yellow flowers as dots of color. Clean strong silhouette, simple painted color gradients, NO individual leaves, NO thin stems, NO twigs, NO transparent leaf cards. No container, no planter, no soil base, no text. Shape reads as one compact low hedge.",
+      "bytes": 6395296,
+      "triangles": 1560,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "cart-empty",
+      "taskId": "95ce4c13-1613-45c8-8ef5-01503ce0530b",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 2500,
+      "prompt": "Short broad empty wooden mine trolley with thick rounded body and four large dark matte iron wheels. No tracks. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2410124,
+      "triangles": 2344,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "cedar-pillow",
+      "taskId": "6b86dbd2-c9fc-48f7-ad6e-a66f659a5319",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/camp-expansion/cedar-pillow.png",
+      "faceLimit": 2800,
+      "prompt": "Evergreen cedar with three vertically stacked thick rounded bell-shaped solid green canopy tiers. No needles. A sculpted toy-like tree: thick short trunk supporting TWO OR THREE HUGE SOLID SMOOTH CANOPY VOLUMES. Canopy surfaces continuous like inflated cushions, absolutely NO individual leaves, leaf cards, visible twigs, thin branches, spiky foliage or detailed leaf texture.  Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 1792896,
+      "triangles": 2720,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "chunky-tree",
+      "taskId": "0babd74f-32c4-4768-87ef-aa8cbd1af785",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "faceLimit": 6000,
+      "prompt": "A single complete stylized game tree with a very thick short sculpted trunk and only three to five large solid rounded canopy masses. Broad chunky silhouette, simple clustered foliage volumes like premium modern Roblox environment art, rich green material variation. Absolutely no thin branches, no twig network, no individual leaves, no leaf cards, no spiky crown, no broccoli balls, no ground island, no pot, no text, no logos. One flat ground datum.",
+      "bytes": 7164964,
+      "triangles": 5792,
+      "meshes": 1,
+      "materials": 1,
+      "output": {
+        "generated_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/0babd74f-32c4-4768-87ef-aa8cbd1af785/text2image_0babd74f-32c4-4768-87ef-aa8cbd1af785.jpeg?auth_key=1791158400-ZB9GIqZi-0-91135afddcd9e761d0ab26f39c2a42a0",
+        "rendered_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/0babd74f-32c4-4768-87ef-aa8cbd1af785/legacy_mesh.webp?auth_key=1791158400-ZB9GIqZi-0-f415069bb571c02669f4f73288a7c6ad"
+      }
+    },
+    {
+      "name": "cliff-arch",
+      "taskId": "b9a6883b-d2d0-4be3-a85d-4011e85deb40",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 6000,
+      "prompt": "Large natural sandstone arch joined to a rounded broad rocky shoulder, green grass cap, broad curved opening, simple massive organic shape. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2651160,
+      "triangles": 5872,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "cliff-grass-slope",
+      "taskId": "9f1e6813-3c79-4c25-86ad-3b9a48f474ff",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 5000,
+      "prompt": "Low sweeping grassy shoulder hill, smooth lime green top descending onto pale cream sandstone, one continuous organic landform. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2517332,
+      "triangles": 4866,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "cliff-layered",
+      "taskId": "2cc8b914-770d-4018-b0e9-f91e1b8f8526",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 5500,
+      "prompt": "Long horizontally layered sandstone bluff, three softly rounded strata, broad grassy upper shelf, continuous solid wall. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2235536,
+      "triangles": 5161,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "cliff-overhang",
+      "taskId": "083d5037-1ffb-4cb1-89da-d742013eff55",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 5500,
+      "prompt": "Rounded pale sandstone bluff with one broad shallow sheltered overhang and soft green grass cap, clean warm rock walls. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2189256,
+      "triangles": 5306,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "cliff-saddle",
+      "taskId": "8e35f5d6-0846-49ce-8a71-b0a4f7c4c730",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 5500,
+      "prompt": "Broad low cream sandstone ridge, one sweeping saddle contour, thick smooth grass cap, two broad rounded stone ledges. No detached boulders. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2613908,
+      "triangles": 5380,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "cliff-twin",
+      "taskId": "ede0281d-aaf3-4e7a-942c-889cd29716e6",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 5500,
+      "prompt": "Asymmetric twin sandstone hilltops connected by broad saddle, green soft grass cap, large continuous stone faces. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2332176,
+      "triangles": 5362,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "crate-stack",
+      "taskId": "c96c7072-6076-46e6-ba65-f5824728c30a",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 1800,
+      "prompt": "Three chunky warm wooden shipping crates stacked asymmetrically, broad planks, rounded corners, simple blue corner straps, no labels. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2789904,
+      "triangles": 1481,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "crown-tree",
+      "taskId": "930768dc-dd1e-4f08-9bb4-f76229d1d859",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/camp-v2/crown-tree.png",
+      "faceLimit": 3000,
+      "prompt": "New image-guided solid three-lobe canopy tree; no leaf geometry.",
+      "bytes": 1956384,
+      "triangles": 2834,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "fence-corner",
+      "taskId": "00bcba8c-05ad-4851-b55c-312dcc35e2cb",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 1800,
+      "prompt": "A low L-shaped rustic timber fence corner made of four thick rounded posts and two broad continuous curved rails per side. No thin pickets. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2683572,
+      "triangles": 1582,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "flower-daisies",
+      "taskId": "3fbb52e6-22b2-4157-bfea-f4c3db148c37",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 1200,
+      "prompt": "Compact clump of five oversized cream daisies with golden centers on short thick green stalks over one solid smooth moss mound. No leaf network. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2161184,
+      "triangles": 1102,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "grass-floor",
+      "taskId": "a82d29f6-6510-4f8f-acd1-7652d2de89ec",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "faceLimit": 5000,
+      "prompt": "One complete wide flat square meadow ground module for a colorful stylized mining game. A continuous smooth lush spring-green grassy surface occupying 90 percent of the area, with ONE broad warm ochre dirt path gently curving through the middle. Flat playable upper surface, very shallow thickness, no rocks or grass blades sticking up, no buildings, no trees, no objects. Big clean hand-painted green color shapes, modern Roblox simulator aesthetic, no realistic noisy textures, no tiles, no paving stones, no raised central platform, no labels.",
+      "bytes": 5808548,
+      "triangles": 4868,
+      "meshes": 1,
+      "materials": 1,
+      "output": {
+        "generated_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/a82d29f6-6510-4f8f-acd1-7652d2de89ec/text2image_a82d29f6-6510-4f8f-acd1-7652d2de89ec.jpeg?auth_key=1791158400-ZB9GIqZi-0-2fd5d2b41038de252b5bf85fe731a4fd",
+        "rendered_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/a82d29f6-6510-4f8f-acd1-7652d2de89ec/legacy_mesh.webp?auth_key=1791158400-ZB9GIqZi-0-7c146db167869210967dc794efa19e90"
+      }
+    },
+    {
+      "name": "grass-tussock",
+      "taskId": "0c85ff6c-ad50-49ed-86bc-da0fcdbe8635",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 900,
+      "prompt": "Small lush green grass clump formed from ONLY five broad thick smoothly curved rounded blades, solid toy-like shapes, no thin dense blades. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 1967444,
+      "triangles": 860,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "lantern-post",
+      "taskId": "f23b7b64-c198-4c78-87fe-532fbdf7afb6",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "faceLimit": 2000,
+      "prompt": "A single stylized mining yard lantern post prop. Short thick carved timber post, broad stone foot, one chunky warm metal lantern with simple glass, rounded premium Roblox game shape, matte wood and stone. No thin wires, no text, no logos, no ground island, no extra props.",
+      "bytes": 7080112,
+      "triangles": 1908,
+      "meshes": 1,
+      "materials": 1,
+      "output": {
+        "generated_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/f23b7b64-c198-4c78-87fe-532fbdf7afb6/text2image_f23b7b64-c198-4c78-87fe-532fbdf7afb6.jpeg?auth_key=1791158400-ZB9GIqZi-0-79af42acd641cc0739e53dd2d3efb006",
+        "rendered_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/f23b7b64-c198-4c78-87fe-532fbdf7afb6/legacy_mesh.webp?auth_key=1791158400-ZB9GIqZi-0-892ee3253d3b28fc0df66b1edbe1ad68"
+      }
+    },
+    {
+      "name": "maple-coral",
+      "taskId": "afb147ad-fe8d-466a-8140-2ca77a8b88b9",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/camp-expansion/maple-coral.png",
+      "faceLimit": 2800,
+      "prompt": "Coral orange maple, two broad pillowy crowns, stout curved trunk. A sculpted toy-like tree: thick short trunk supporting TWO OR THREE HUGE SOLID SMOOTH CANOPY VOLUMES. Canopy surfaces continuous like inflated cushions, absolutely NO individual leaves, leaf cards, visible twigs, thin branches, spiky foliage or detailed leaf texture.  Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2025140,
+      "triangles": 2657,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "maple-gold",
+      "taskId": "56d4b5d5-d885-4d07-b580-9d1c8cd05b5d",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/camp-expansion/maple-gold.png",
+      "faceLimit": 2800,
+      "prompt": "Autumn maple, three large rounded golden yellow crown masses, stout trunk. A sculpted toy-like tree: thick short trunk supporting TWO OR THREE HUGE SOLID SMOOTH CANOPY VOLUMES. Canopy surfaces continuous like inflated cushions, absolutely NO individual leaves, leaf cards, visible twigs, thin branches, spiky foliage or detailed leaf texture.  Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 1997360,
+      "triangles": 2736,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "meadow-base",
+      "taskId": "d87baa94-65cc-4da6-a2c8-cbcd5eff4c5f",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "faceLimit": 4000,
+      "prompt": "An isolated THREE DIMENSIONAL thick square slab of green turf with rounded corners. One complete solid rectangular terrain block seen in three-quarter perspective against a plain white studio background, the WHOLE slab and ALL four outer edges fully visible inside the image. A very broad perfectly flat vivid green grass top with clean painted color gradients, shallow brown earth sides and flat bottom. Width ten times height. Smooth continuous green top, no path, no buildings, no props, no individual grass blades, no text. Colorful chunky Roblox game asset, not an illustration of a landscape, not a flat texture.",
+      "bytes": 2695960,
+      "triangles": 3781,
+      "meshes": 1,
+      "materials": 1,
+      "output": {
+        "generated_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/d87baa94-65cc-4da6-a2c8-cbcd5eff4c5f/text2image_d87baa94-65cc-4da6-a2c8-cbcd5eff4c5f.jpeg?auth_key=1791158400-ZB9GIqZi-0-c60553cbd8c47951367bff301c4beac6",
+        "rendered_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/d87baa94-65cc-4da6-a2c8-cbcd5eff4c5f/legacy_mesh.webp?auth_key=1791158400-ZB9GIqZi-0-6d337bda51fff430c2b98b1c07701d0a"
+      }
+    },
+    {
+      "name": "mine-gate",
+      "taskId": "8ac39c1e-8269-4586-b170-042b4b2de4e1",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "faceLimit": 7000,
+      "prompt": "A single complete stylized game asset: a compact underground mine entrance portal. Thick irregular warm gray stone arch with a heavy dark timber beam, two chunky timber braces, two small warm lantern housings and a readable dark tunnel opening. Premium modern Roblox adventure style, rounded hand sculpted forms, matte stone and wood, clear silhouette, all geometry connected to one flat ground datum. No characters, no text, no logos, no floating base, no thin repeated blocks.",
+      "bytes": 7200984,
+      "triangles": 5708,
+      "meshes": 1,
+      "materials": 1,
+      "output": {
+        "generated_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/8ac39c1e-8269-4586-b170-042b4b2de4e1/text2image_8ac39c1e-8269-4586-b170-042b4b2de4e1.jpeg?auth_key=1791158400-ZB9GIqZi-0-2876765c904dc1b19783000f61407a0c",
+        "rendered_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/8ac39c1e-8269-4586-b170-042b4b2de4e1/legacy_mesh.webp?auth_key=1791158400-ZB9GIqZi-0-b1bf5aa3eecff571c321911dcbf11071"
+      }
+    },
+    {
+      "name": "mushroom-cluster",
+      "taskId": "4ac7f0db-50b9-4d9b-b879-96bcd56fd5fe",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 1300,
+      "prompt": "Three stout red and cream mushrooms with broad smooth domed caps, thick stems and a few large cream dots, grouped tightly. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2195156,
+      "triangles": 1184,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "north-rock-wall",
+      "taskId": "47ca5822-3108-4bd0-9fea-29ffab00dc8e",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "faceLimit": 9000,
+      "prompt": "A single wide asymmetrical stylized limestone rock wall landmark for a Roblox-inspired mining valley. One connected low mountain wall, broad at the base and tapering into three large rounded terraces, layered warm gray stone, moss seams and a few broad fern masses. It must close a distant horizon from a playable courtyard, with varied organic silhouette and no straight circular ring. No waterfall, no buildings, no trees, no ground island, no visible tiled cubes, no text, no logos.",
+      "bytes": 12791784,
+      "triangles": 8577,
+      "meshes": 1,
+      "materials": 1,
+      "output": {
+        "generated_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/47ca5822-3108-4bd0-9fea-29ffab00dc8e/text2image_47ca5822-3108-4bd0-9fea-29ffab00dc8e.jpeg?auth_key=1791158400-ZB9GIqZi-0-ff42b48c46f7f246abd351ce915a2447",
+        "rendered_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/47ca5822-3108-4bd0-9fea-29ffab00dc8e/legacy_mesh.webp?auth_key=1791158400-ZB9GIqZi-0-f36e7cea3fe2e0a175138fb47c89e75e"
+      }
+    },
+    {
+      "name": "notice-board",
+      "taskId": "1ed98408-9ea5-4703-b4b9-bcaf3e242659",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 2200,
+      "prompt": "Small freestanding mining camp notice board with curved teal roof and two thick timber legs, three blank cream papers, NO letters or symbols. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2345420,
+      "triangles": 1997,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "oak-tall",
+      "taskId": "76d6a147-b27d-46d3-809e-a8ddc2b48e11",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/camp-expansion/oak-tall.png",
+      "faceLimit": 2800,
+      "prompt": "Upright oak, tall pear-shaped deep green solid crown, stout ochre trunk. A sculpted toy-like tree: thick short trunk supporting TWO OR THREE HUGE SOLID SMOOTH CANOPY VOLUMES. Canopy surfaces continuous like inflated cushions, absolutely NO individual leaves, leaf cards, visible twigs, thin branches, spiky foliage or detailed leaf texture.  Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 1821928,
+      "triangles": 2708,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "oak-wide",
+      "taskId": "7d1c2e59-3348-4749-876f-5b72e021a923",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/camp-expansion/oak-wide.png",
+      "faceLimit": 2800,
+      "prompt": "Wide spreading oak with one broad emerald cushion canopy and two lower lobes. A sculpted toy-like tree: thick short trunk supporting TWO OR THREE HUGE SOLID SMOOTH CANOPY VOLUMES. Canopy surfaces continuous like inflated cushions, absolutely NO individual leaves, leaf cards, visible twigs, thin branches, spiky foliage or detailed leaf texture.  Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2276852,
+      "triangles": 2663,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "ore-bin-copper",
+      "taskId": "40880d63-29df-4193-85b9-a6f03300064f",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 2000,
+      "prompt": "Wide low wooden sorting bin filled with five oversized warm copper ore chunks. Thick rounded timber rim, clear readable shape. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2275508,
+      "triangles": 1872,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "ore-bin-jade",
+      "taskId": "a7a2880b-2f97-42e2-8c2d-0aea2580b5df",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 2000,
+      "prompt": "Wide low wooden sorting bin filled with four oversized jade green mineral chunks. Thick rounded honey wood rim. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2301268,
+      "triangles": 1789,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "ore-cart",
+      "taskId": "a5a30668-5fc3-48be-848c-ba8677a6905c",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "faceLimit": 3500,
+      "prompt": "A single compact stylized mining handcart asset for a Roblox-inspired game. Chunky rounded wooden cart body, four simple dark iron wheels, thick axle, a few large blue and copper ore chunks, all resting on one flat ground datum. Readable silhouette, hand sculpted premium game prop, matte materials, no tracks, no character, no text, no logos, no giant base.",
+      "bytes": 7419012,
+      "triangles": 3330,
+      "meshes": 1,
+      "materials": 1,
+      "output": {
+        "generated_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/a5a30668-5fc3-48be-848c-ba8677a6905c/text2image_a5a30668-5fc3-48be-848c-ba8677a6905c.jpeg?auth_key=1791158400-ZB9GIqZi-0-06d7bf5d76cc24915489dc55d497a11e",
+        "rendered_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/a5a30668-5fc3-48be-848c-ba8677a6905c/legacy_mesh.webp?auth_key=1791158400-ZB9GIqZi-0-657cfe9b57203fc9b309c5c8fb7929de"
+      }
+    },
+    {
+      "name": "ore-pavilion",
+      "taskId": "536e8af6-97a0-4e2d-b076-3b3cb53d062a",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "faceLimit": 7000,
+      "prompt": "A single complete stylized game asset: a small open-front ore exchange pavilion for a mining game. One solid timber frame with a broad moss-green curved roof, warm stone footings, a thick wooden counter, chunky crates and mineral baskets under the porch. Premium modern Roblox style with rounded crafted edges and readable large forms. Built on one flat ground datum, front open and walkable, no stairs, no text, no signage, no logos, no characters, no floating base.",
+      "bytes": 7648680,
+      "triangles": 6410,
+      "meshes": 1,
+      "materials": 1,
+      "output": {
+        "generated_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/536e8af6-97a0-4e2d-b076-3b3cb53d062a/text2image_536e8af6-97a0-4e2d-b076-3b3cb53d062a.jpeg?auth_key=1791158400-ZB9GIqZi-0-24f5619f3557692895ec56741f2eeddf",
+        "rendered_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/536e8af6-97a0-4e2d-b076-3b3cb53d062a/legacy_mesh.webp?auth_key=1791158400-ZB9GIqZi-0-8477fe3d47be4aba01fb59be77f43df6"
+      }
+    },
+    {
+      "name": "pit-box-lantern",
+      "taskId": "ed8007fc-24c0-4164-9585-a8a3a467730f",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-box-lantern.png",
+      "faceLimit": 1600,
+      "prompt": "One simple mining construction work light: a thick square brown rough timber post on a squat square timber foot, supporting one box-shaped black iron lantern with warm cream glass panels. Straight angular frame, visible broad rough wood grain. No ornate details, no curved roof, no surrounding props.",
+      "bytes": 3223940,
+      "triangles": 1441,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "pit-crates",
+      "taskId": "a1ed8067-279d-4df6-9563-50b43d16261e",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-crates.png",
+      "faceLimit": 1800,
+      "prompt": "Two angular square rough brown timber shipping crates stacked slightly offset, one open shallow crate beside them filled with dark gray coal rubble. Broad straight planks, dark narrow seams, square metal corner brackets and visible coarse wood grain. No rounded inflated shapes, no teal paint.",
+      "bytes": 3507456,
+      "triangles": 1508,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "pit-headframe",
+      "taskId": "a92d4214-35c8-4954-9042-8b0369c8322c",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-headframe.png",
+      "faceLimit": 4000,
+      "prompt": "One compact mine hoist tower: four stout SQUARE timber posts, rectangular top beam, diagonal wooden cross braces, one dark iron pulley wheel at the top, a small winding drum mounted between the two rear posts. The center is OPEN, no walls. Angular timber construction with visible mortise joints and square metal fasteners. Width slightly less than height. No ground platform, no long hanging ropes, no dangling bucket.",
+      "bytes": 3648616,
+      "triangles": 3648,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "pit-lumber-stack",
+      "taskId": "bebef70a-030b-4590-aa97-76fb8fcd9b72",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-lumber-stack.png",
+      "faceLimit": 1500,
+      "prompt": "One neat stack of eight rough sawn rectangular brown timber beams with square end grain, differing lengths, stacked in three layers on two square spacers. Long low rectangular shape. Coarse longitudinal wood grain. No round logs, no extra props.",
+      "bytes": 3041296,
+      "triangles": 1320,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "pit-plank-deck",
+      "taskId": "031f3df9-8ede-4bee-b309-ba51c05955ec",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-plank-deck.png",
+      "faceLimit": 2000,
+      "prompt": "A thin flat rectangular walking deck made from six straight rough sawn oak planks fixed to two square cross battens underneath. Long horizontal rectangle, width four times depth, thickness tiny. Individual straight boards, dark narrow joints, saw marks, visible broad wood grain and square cut end grain. No railing, no legs.",
+      "bytes": 2735236,
+      "triangles": 1726,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "pit-safety-rail",
+      "taskId": "75c97185-8972-448b-a335-f8a13d6ccdb7",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-safety-rail.png",
+      "faceLimit": 1400,
+      "prompt": "One straight mining safety fence section: three thick square timber posts and two straight horizontal rectangular timber rails with one diagonal brace. Low broad rectangular silhouette, 4 times wider than tall. Dark iron square bolts. Rough sawn unpainted brown oak. No curved beams.",
+      "bytes": 3490008,
+      "triangles": 1344,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "pit-sorting-table",
+      "taskId": "9d4e402f-2beb-43be-aab8-33b844c473a6",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-sorting-table.png",
+      "faceLimit": 2400,
+      "prompt": "One low rectangular ore sorting table of worn thick rough brown oak planks with four square legs and stout cross braces. Four small irregular fractured gray and copper ore samples on the tabletop, shallow wooden sorting tray and a single heavy iron mallet. Rectangular workbench, no awning.",
+      "bytes": 3330548,
+      "triangles": 2114,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "pit-spoil",
+      "taskId": "f4dfc3b1-1095-485b-a6f0-fd9341f9d10d",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-spoil.png",
+      "faceLimit": 2000,
+      "prompt": "A low compact pile of angular broken gray shale and dusty dark brown gravel from a working mine. Twelve large irregular CHIPPED rock pieces with coarse granular fractured faces, surrounded by a small amount of coarse rubble. Matte stone, broad squareish chunks, no crystals, no vegetation, no pedestal.",
+      "bytes": 4489792,
+      "triangles": 1909,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "pit-supply-pallet",
+      "taskId": "910e0a00-2696-4c94-bd5e-1dc3dd0d011d",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-supply-pallet.png",
+      "faceLimit": 1800,
+      "prompt": "One squat rectangular rough timber supply pallet holding a folded heavy tan canvas tarpaulin, a thick coil of brown rope and one square brown wooden toolbox with a dark iron handle. Rectilinear carpentry with broad coarse wood grain. No text, no painted color accents.",
+      "bytes": 3159008,
+      "triangles": 1671,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "pit-tool-wall",
+      "taskId": "b871bac4-8e7a-4bd3-a10f-5f44b75386f1",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-tool-wall.png",
+      "faceLimit": 2600,
+      "prompt": "One large rectangular freestanding mining tool rack made from vertical rough brown timber boards with two stout square feet. Three large tools hung clearly against the board: iron pickaxe, broad shovel, and sledgehammer. Two small iron hooks and a thick lower shelf. Squared construction, coarse wood grain, no roof, no curves, no painted trim.",
+      "bytes": 3603412,
+      "triangles": 2218,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "pit-track",
+      "taskId": "f523efd3-c6be-436d-88b9-5c190cdbb0a7",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-track.png",
+      "faceLimit": 1400,
+      "prompt": "One straight short mining railway segment on FIVE thick square cut brown timber sleepers. Two continuous straight dark iron rails, rectangular low profile, elongated horizontal silhouette. Rails run from LEFT to RIGHT across the image, length four times width. No wagon, no ground base.",
+      "bytes": 2486900,
+      "triangles": 1278,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "pit-winch",
+      "taskId": "3857c9e5-3ffd-4719-a9e8-da7c609cf353",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/mine-worksite/pit-winch.png",
+      "faceLimit": 2500,
+      "prompt": "One squat hand operated mining winch: thick squared oak frame with a large horizontal wooden cable drum, short crank handle and two iron brackets. Rectilinear chunky frame, broad visible coarse wood grain and iron fasteners. No long cable extending away from object.",
+      "bytes": 3880256,
+      "triangles": 2314,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "rail-buffer",
+      "taskId": "223619fb-6d41-4f24-bd5f-1d136fd08d07",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 1600,
+      "prompt": "Short mining track end buffer, two broad iron rails fixed to three thick rounded wooden sleepers and one strong timber stop beam. One compact connected prop. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2752028,
+      "triangles": 1445,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "ridge-shoulder",
+      "taskId": "b28bc3b9-b58d-43a4-a9c5-076b973c80c4",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "faceLimit": 4500,
+      "prompt": "One wide stylized grassy hill landscape component for a colorful Roblox mining game. A single flowing asymmetrical hill with a broad lush spring-green smooth grass cap over two broad rounded warm cream sandstone ledges. Low sweeping saddle silhouette, broad base, soft beautifully sculpted continuous contours. Big readable shapes, clean matte hand painted colors, no tiny rock fragments, no realistic texture noise, no trees, no individual grass blades, no architecture. Standalone full component.",
+      "bytes": 6678420,
+      "triangles": 4230,
+      "meshes": 1,
+      "materials": 1,
+      "output": {
+        "generated_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/b28bc3b9-b58d-43a4-a9c5-076b973c80c4/text2image_b28bc3b9-b58d-43a4-a9c5-076b973c80c4.jpeg?auth_key=1791158400-ZB9GIqZi-0-7c44b0d77a1216c1f5b03ec11b4df42a",
+        "rendered_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/b28bc3b9-b58d-43a4-a9c5-076b973c80c4/legacy_mesh.webp?auth_key=1791158400-ZB9GIqZi-0-5faa8da175b266f2312591fc328ddaa8"
+      }
+    },
+    {
+      "name": "rounded-ridge",
+      "taskId": "83ea2186-5ac4-4820-8952-beb95efebff7",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/camp-v2/rounded-ridge.png",
+      "faceLimit": 6000,
+      "prompt": "New image-guided broad smooth sandstone ridge with four large shoulders.",
+      "bytes": 2830868,
+      "triangles": 5958,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "sack-stack",
+      "taskId": "455f1ca1-346a-4d7e-8dcc-4411a82a6a14",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 1600,
+      "prompt": "Three plump cream canvas ore sacks with simple folded mouths and one large turquoise mineral chunk alongside, rounded matte shapes. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2040040,
+      "triangles": 1532,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "sapling-pair",
+      "taskId": "4ac1db34-c2d3-4d9b-8f3c-ebb88b0b18c5",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/camp-expansion/sapling-pair.png",
+      "faceLimit": 2200,
+      "prompt": "Two small saplings sharing a low root base, each with one smooth round lime green crown. A sculpted toy-like tree: thick short trunk supporting TWO OR THREE HUGE SOLID SMOOTH CANOPY VOLUMES. Canopy surfaces continuous like inflated cushions, absolutely NO individual leaves, leaf cards, visible twigs, thin branches, spiky foliage or detailed leaf texture.  Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 1956972,
+      "triangles": 2078,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "shaft-kiln-frame",
+      "taskId": "2508c35d-a3c7-4a6a-9280-24621f200a97",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/shaft-enclosure/shaft-kiln-frame.png",
+      "faceLimit": 10000,
+      "prompt": "A large roofless square mine kiln enclosure, chunky squared stone masonry piers and rough oak braces surrounding an EMPTY square mining shaft. Four corner piers, tall rear stone arch, low side walls, wide open front entry. No floor, no roof over the center. Minecraft-inspired rough stone and timber.",
+      "bytes": 5591512,
+      "triangles": 8935,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "shaft-roblox-mine",
+      "taskId": "05e11380-312c-4cb9-b832-2d1d737cda8b",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/roblox-mine/shaft-roblox-mine.png",
+      "faceLimit": 10000,
+      "prompt": "Modern Roblox Mining Simulator 2 style open mining pavilion. Full green gabled roof covering the entire square footprint, tall honey oak square posts, chunky clean ivory stone footings. Bright clean stylized Roblox game architecture. Open front, empty center, no floor. No medieval ruins, no realistic weathered stone, no World of Warcraft style.",
+      "bytes": 3187132,
+      "triangles": 8128,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "shrub-berry",
+      "taskId": "c7d59009-d5c4-4464-935a-297c31cc1a89",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 1200,
+      "prompt": "Low smooth dark green two-lobed hedge with six oversized coral berry spheres tucked into crown. No individual leaves. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 1798652,
+      "triangles": 1108,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "shrub-flower",
+      "taskId": "4516203e-7e83-40e0-a809-9cd5ebdaeebe",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 1400,
+      "prompt": "Low solid emerald cushion hedge with five oversized simple yellow five-petal flowers embedded in its upper surface. No separate leaves. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2100952,
+      "triangles": 1298,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "shrub-round",
+      "taskId": "6b0c439d-59e8-4fed-a1e2-98fae87b4ae6",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 1100,
+      "prompt": "Low hedge made from three large continuous smooth lime-green pillow volumes, no individual leaves or stems. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2187240,
+      "triangles": 1021,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "simulator-exchange",
+      "taskId": "6d3bf76e-2393-4ea3-bb6f-65b731fcf61a",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/simulator-facilities/simulator-exchange.png",
+      "faceLimit": 6000,
+      "prompt": "Modern Roblox Mining Simulator 2 orange roof sell kiosk with giant gold coin emblem, ivory trims and honey-yellow posts. Open service counter.",
+      "bytes": 2519468,
+      "triangles": 4720,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "simulator-mine",
+      "taskId": "80aeb00e-5dd1-42fd-913c-0ef3c3ee461d",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/simulator-facilities/simulator-mine.png",
+      "faceLimit": 10000,
+      "prompt": "Modern Roblox Mining Simulator 2 blue roof mine pavilion, huge cyan gem crest, ivory thick trims and honey-yellow square posts. Complete roof, open front, empty 18m inner square. No floor or underground pit.",
+      "bytes": 2988448,
+      "triangles": 8497,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "simulator-upgrade",
+      "taskId": "177a1b15-d6f6-4d03-a899-756e38994554",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/simulator-facilities/simulator-upgrade.png",
+      "faceLimit": 6000,
+      "prompt": "Modern Roblox Mining Simulator 2 blue roof upgrade kiosk with giant cyan pickaxe emblem, ivory trims and honey-yellow posts. Open service counter.",
+      "bytes": 2643108,
+      "triangles": 4764,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "soft-shrub",
+      "taskId": "68f13b1a-e2b2-40ec-8e14-14427654ed96",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/camp-v2/soft-shrub.png",
+      "faceLimit": 1000,
+      "prompt": "Image-guided three connected soft shrub lobes without individual leaf geometry.",
+      "bytes": 1787000,
+      "triangles": 968,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "supply-awning",
+      "taskId": "207e6c89-7611-4e7e-8eff-e25f738bef01",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 4200,
+      "prompt": "Compact honey wood supply stall with rounded coral canvas awning and a broad counter, two squat storage drawers, open front. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2215120,
+      "triangles": 4040,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "terrain-slab",
+      "taskId": "644925ed-966c-425f-bc52-40a44f1fa567",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "faceLimit": 5000,
+      "prompt": "A single large flat stylized Roblox-inspired game terrain slab for an outdoor mining yard. Broad low rounded meadow landform with packed warm soil, inset irregular pale stone pavers, a few broad grass clumps and low smooth stones. Completely flat and walkable through the centre, no raised island base, no buildings, no trees, no fences, no water, no text, no logos. The asset must have a clean flat underside and one consistent ground datum, with softly sculpted organic edges rather than square tiles or visible modular seams.",
+      "bytes": 15072224,
+      "triangles": 4696,
+      "meshes": 1,
+      "materials": 1,
+      "output": {
+        "generated_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/644925ed-966c-425f-bc52-40a44f1fa567/text2image_644925ed-966c-425f-bc52-40a44f1fa567.jpeg?auth_key=1791158400-ZB9GIqZi-0-484d5e75c5c8ca78cb2462e48d97fd05",
+        "rendered_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/644925ed-966c-425f-bc52-40a44f1fa567/legacy_mesh.webp?auth_key=1791158400-ZB9GIqZi-0-25223ee7177a826af84eeac80b9290e7"
+      }
+    },
+    {
+      "name": "tool-rack",
+      "taskId": "ca5630b9-1a36-478c-a972-564f47dd29c7",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 2300,
+      "prompt": "Stout freestanding timber tool rack holding three oversized mining tools, a shovel, a broad pick and a wooden mallet. Rounded robust forms. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2112388,
+      "triangles": 2138,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "warehouse-shed",
+      "taskId": "5c16242a-a150-4cf3-a3be-1bb06c207869",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 6000,
+      "prompt": "Small low ore storage shed, broad honey timber facade, moss green curved roof, open double doorway, rounded sandstone footings. One building. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2657752,
+      "triangles": 5349,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "waystone-crystal",
+      "taskId": "1d9ff20c-ed53-4699-94aa-fa7f5e54ca8b",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 2400,
+      "prompt": "Compact fantasy waystone, one large smooth turquoise crystal seated in a low rounded cream sandstone socket, three broad stone lobes, no runes. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2228036,
+      "triangles": 2235,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "well-stone",
+      "taskId": "43ed3e8d-b8fd-4145-b7c9-dc93cfe32811",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 3000,
+      "prompt": "Low round sandstone well with broad wooden roof on two thick posts, simple large wooden bucket, no thin ropes. Cozy stylized prop. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2555744,
+      "triangles": 2684,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "wheelbarrow",
+      "taskId": "6fb72cab-015a-45d8-a3b9-bad664959b0b",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 2300,
+      "prompt": "Chunky honey wood wheelbarrow with one thick teal front wheel and three pale stone chunks, short robust handles, no thin rods. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 1941168,
+      "triangles": 2106,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "willow-dome",
+      "taskId": "d6c9af12-1d21-49a0-8422-5c031c41e4ee",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "image_to_model",
+      "reference": "output/imagegen/camp-expansion/willow-dome.png",
+      "faceLimit": 2800,
+      "prompt": "Willow with a huge continuous drooping smooth dome canopy, three thick rounded scallops, short trunk. No strands. A sculpted toy-like tree: thick short trunk supporting TWO OR THREE HUGE SOLID SMOOTH CANOPY VOLUMES. Canopy surfaces continuous like inflated cushions, absolutely NO individual leaves, leaf cards, visible twigs, thin branches, spiky foliage or detailed leaf texture.  Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 1999148,
+      "triangles": 2732,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "workbench",
+      "taskId": "f5615493-cea3-4af2-95ea-a19bb6e43ccb",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 2600,
+      "prompt": "Heavy wooden workbench with thick legs, one broad iron vise and two oversized stone samples, chunky simple crafted shapes. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2700640,
+      "triangles": 2475,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    },
+    {
+      "name": "workshop-hut",
+      "taskId": "931942d1-f4fd-467e-8309-22a5baf627c1",
+      "status": "success",
+      "modelVersion": "v3.1-20260211",
+      "type": "text_to_model",
+      "faceLimit": 6500,
+      "prompt": "Small cozy mining equipment workshop, open broad timber front, teal curved gable roof, sandstone lower walls, chunky workbench visible in front. No tall chimney. One building, no surrounding scene. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+      "bytes": 2851588,
+      "triangles": 5795,
+      "meshes": 1,
+      "materials": 1,
+      "outputFields": [
+        "pbr_model",
+        "generated_image",
+        "rendered_image"
+      ]
+    }
+  ]
+}

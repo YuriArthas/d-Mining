@@ -1,0 +1,8 @@
+{
+  "task_id": "68f13b1a-e2b2-40ec-8e14-14427654ed96",
+  "type": "image_to_model",
+  "reference": "output/imagegen/camp-v2/soft-shrub.png",
+  "model_version": "v3.1-20260211",
+  "face_limit": 1000,
+  "prompt": "Image-guided three connected soft shrub lobes without individual leaf geometry."
+}

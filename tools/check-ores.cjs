@@ -15,7 +15,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'../../d-Block-Blast/nod
   for(let i=0;i<3;i++){
    await p.getByRole('button',{name:new RegExp('^'+names[i]+' R')}).click();await ready();
    await p.waitForFunction(({i,n})=>{const s=window.__miningValidation.snapshot();return s.samples[i].renderTriangles===n&&s.samples[i].collisionTriangles===8},{i,n:expected[i]});
-   const s=await snap();assert.equal(s.cellBytes,0);assert.equal(s.error,null);assert.equal(s.terrainVisuals.atlases,1);assert.equal(s.terrainVisuals.materials,1);assert.equal(s.terrainVisuals.atlasBytes,28672);
+   const s=await snap();assert.equal(s.cellBytes,0);assert.equal(s.error,null);assert.equal(s.terrainVisuals.atlases,1);assert.equal(s.terrainVisuals.materials,1);assert.equal(s.terrainVisuals.atlasBytes,1310720);
    samples.push({phase:kinds[i],...s});
    await p.locator('.ore-samples summary').click();await p.screenshot({path:`artifacts/${label}-${kinds[i]}.png`});
    await p.locator('.ore-samples summary').click();await p.getByRole('button',{name:'网格线关',exact:true}).click();

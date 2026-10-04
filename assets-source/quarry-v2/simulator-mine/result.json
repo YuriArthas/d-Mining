@@ -1,0 +1,17 @@
+{
+  "taskId": "80aeb00e-5dd1-42fd-913c-0ef3c3ee461d",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "image_to_model",
+  "reference": "output/imagegen/simulator-facilities/simulator-mine.png",
+  "faceLimit": 10000,
+  "prompt": "Modern Roblox Mining Simulator 2 blue roof mine pavilion, huge cyan gem crest, ivory thick trims and honey-yellow square posts. Complete roof, open front, empty 18m inner square. No floor or underground pit.",
+  "bytes": 2988448,
+  "triangles": 8497,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "rendered_image"
+  ]
+}

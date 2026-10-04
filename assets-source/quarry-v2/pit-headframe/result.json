@@ -1,0 +1,17 @@
+{
+  "taskId": "a92d4214-35c8-4954-9042-8b0369c8322c",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "image_to_model",
+  "reference": "output/imagegen/mine-worksite/pit-headframe.png",
+  "faceLimit": 4000,
+  "prompt": "One compact mine hoist tower: four stout SQUARE timber posts, rectangular top beam, diagonal wooden cross braces, one dark iron pulley wheel at the top, a small winding drum mounted between the two rear posts. The center is OPEN, no walls. Angular timber construction with visible mortise joints and square metal fasteners. Width slightly less than height. No ground platform, no long hanging ropes, no dangling bucket.",
+  "bytes": 3648616,
+  "triangles": 3648,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "rendered_image"
+  ]
+}

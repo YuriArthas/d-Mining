@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "well-stone.000.part"
+  ],
+  "bytes": 392408,
+  "sha256": "6ec8af4a85396296c96d1b5197a816c5e95c5f7900856ac2f917b96d0d3e4ced",
+  "taskId": "43ed3e8d-b8fd-4145-b7c9-dc93cfe32811",
+  "sourceSha256": "37090690d279211f03231a017af650c6d238140b077e526b5c56c511b6cf4acd",
+  "triangles": 2684,
+  "faceLimit": 3000,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

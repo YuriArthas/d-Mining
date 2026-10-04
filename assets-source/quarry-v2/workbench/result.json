@@ -1,0 +1,17 @@
+{
+  "taskId": "f5615493-cea3-4af2-95ea-a19bb6e43ccb",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "text_to_model",
+  "faceLimit": 2600,
+  "prompt": "Heavy wooden workbench with thick legs, one broad iron vise and two oversized stone samples, chunky simple crafted shapes. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+  "bytes": 2700640,
+  "triangles": 2475,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "generated_image",
+    "rendered_image"
+  ]
+}

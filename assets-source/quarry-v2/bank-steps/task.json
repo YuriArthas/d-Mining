@@ -1,0 +1,8 @@
+{
+  "task_id": "e6c1fb6a-4d12-4194-974b-40b765cb7526",
+  "type": "image_to_model",
+  "reference": "output/imagegen/timber-boundary/bank-steps.png",
+  "model_version": "v3.1-20260211",
+  "face_limit": 1200,
+  "prompt": "One modular small grassy earth terrace comprising two broad RECTANGULAR solid steps, overall width 4 metres, depth 4 metres, height 2 metres. Two perfectly flat green grass treads. Straight dark brown vertical soil risers, lower front riser reinforced with straight horizontal rough oak sleepers and short square posts. Minecraft-like square terracing, no rounded slopes, no boulders."
+}

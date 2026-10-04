@@ -1,0 +1,13 @@
+{
+  "parts": [
+    "ridge-shoulder.000.part"
+  ],
+  "bytes": 335029,
+  "sha256": "5668cdd98ac28232646cf22ea6d67b2a8dba8c7e66edd6ada710e920f27c8efb",
+  "taskId": "b28bc3b9-b58d-43a4-a9c5-076b973c80c4",
+  "sourceSha256": "d76aeedcb213e7ab455b996fa85d5f14681396af14b7f4401adc1fb8ccbb6473",
+  "triangles": 4230,
+  "faceLimit": 4500,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false
+}

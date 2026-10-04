@@ -1,0 +1,17 @@
+{
+  "taskId": "ca5630b9-1a36-478c-a972-564f47dd29c7",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "type": "text_to_model",
+  "faceLimit": 2300,
+  "prompt": "Stout freestanding timber tool rack holding three oversized mining tools, a shovel, a broad pick and a wooden mallet. Rounded robust forms. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. ",
+  "bytes": 2112388,
+  "triangles": 2138,
+  "meshes": 1,
+  "materials": 1,
+  "outputFields": [
+    "pbr_model",
+    "generated_image",
+    "rendered_image"
+  ]
+}

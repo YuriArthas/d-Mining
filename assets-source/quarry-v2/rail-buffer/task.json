@@ -1,0 +1,7 @@
+{
+  "task_id": "223619fb-6d41-4f24-bd5f-1d136fd08d07",
+  "type": "text_to_model",
+  "model_version": "v3.1-20260211",
+  "face_limit": 1600,
+  "prompt": "Short mining track end buffer, two broad iron rails fixed to three thick rounded wooden sleepers and one strong timber stop beam. One compact connected prop. Single isolated complete 3D game asset, modern colorful Roblox mining valley art, rounded well crafted silhouette, broad simple forms, matte hand painted colors. Use only the object described, with warm clean natural colors and restrained teal accents. No surrounding scene or extra objects. Smooth curved edges, no tiny surface noise, no text, logos, characters or floating diorama plinth. Flat ground datum. "
+}

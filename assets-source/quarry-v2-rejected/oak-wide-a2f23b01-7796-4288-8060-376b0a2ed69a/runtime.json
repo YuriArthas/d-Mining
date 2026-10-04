@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "oak-wide.000.part"
+  ],
+  "bytes": 353943,
+  "sha256": "f1789d1ce9b154bbfc88b450df19979e0fa3b54bbadc63691df087660329881e",
+  "taskId": "a2f23b01-7796-4288-8060-376b0a2ed69a",
+  "sourceSha256": "a7e564be6c1e1cb2b9f0374759da98894dc17d063b2a2074cc700a7814dd75eb",
+  "triangles": 2606,
+  "faceLimit": 2800,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

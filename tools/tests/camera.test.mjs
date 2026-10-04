@@ -5,7 +5,7 @@ import { ThirdPersonCamera, cameraClearance } from '../../src/game/ThirdPersonCa
 import { CharacterPhysics, initPhysics, RAPIER } from '../../src/game/validation/physics.ts';
 import { GAME_CONFIG } from '../../src/game/config.ts';
 import { buildRegion } from '../../src/game/terrain/meshing.ts';
-import { CELL, RENDER_SIZE as CHUNK } from '../../src/game/terrain/SparseWorld.ts';
+import { CELL, WORLD_GENERATION, RENDER_SIZE as CHUNK } from '../../src/game/terrain/SparseWorld.ts';
 await initPhysics();
 const ID={x:0,y:0,z:0,w:1};
 function setup(){const p=new CharacterPhysics();p.world.createCollider(RAPIER.ColliderDesc.cuboid(90,.5,90).setTranslation(0,-.5,0));p.world.step();return p;}
@@ -34,12 +34,12 @@ test('open orbit uses requested yaw/pitch, including near-vertical and upward vi
 });
 test('wall contraction is immediate and removal recovers monotonically without teleporting the boom',()=>{
  const p=setup(),r=new ThirdPersonCamera();try{
-  r.update(p.world,p.collider,[40,.027,40],0,0,1/60,844/390);assert.equal(r.distance,7.5);
+  r.update(p.world,p.collider,[40,.027,40],0,0,1/60,844/390);assert.equal(r.distance,GAME_CONFIG.camera.distance);
   const wall=p.world.createCollider(RAPIER.ColliderDesc.cuboid(3,4,.1).setTranslation(40,2,42));p.world.step();
   r.update(p.world,p.collider,[40,.027,40],0,0,1/60,844/390);check(r,p);assert.ok(r.distance<1.8);
   p.world.removeCollider(wall,false);p.world.step();let previous=r.distance;
-  for(let i=0;i<90;i++){r.update(p.world,p.collider,[40,.027,40],0,0,1/60,844/390);assert.ok(r.distance>=previous);assert.ok(r.distance-previous<.6);check(r,p);previous=r.distance;}
-  assert.ok(r.distance>7.49);
+  for(let i=0;i<90;i++){r.update(p.world,p.collider,[40,.027,40],0,0,1/60,844/390);assert.ok(r.distance>=previous);assert.ok(r.distance-previous<.85);check(r,p);previous=r.distance;}
+  assert.ok(r.distance>GAME_CONFIG.camera.distance-.01);
  }finally{p.dispose();}
 });
 test('low ceiling jump keeps pivot and near plane in free space and fades the nearby avatar',()=>{
@@ -62,7 +62,7 @@ test('inner/outer corners and narrow corridor remain clear throughout a complete
 });
 test('actual voxel shaft descent and steep pitch preserve camera clearance',()=>{
  const p=new CharacterPhysics(),r=new ThirdPersonCamera();try{
-  for(const z of [-1,0]){const data=buildRegion('collision',[-1,-1,z],CHUNK,[],{version:5,seed:0,samples:true}),m=data.mesh;p.world.createCollider(RAPIER.ColliderDesc.trimesh(m.positions,m.indices,RAPIER.TriMeshFlags.FIX_INTERNAL_EDGES).setTranslation(-CELL*CHUNK,-CELL*CHUNK,z*CELL*CHUNK));}
+  for(const z of [-1,0]){const data=buildRegion('collision',[-1,-1,z],CHUNK,[],{...WORLD_GENERATION,samples:true}),m=data.mesh;p.world.createCollider(RAPIER.ColliderDesc.trimesh(m.positions,m.indices,RAPIER.TriMeshFlags.FIX_INTERNAL_EDGES).setTranslation(-CELL*CHUNK,-CELL*CHUNK,z*CELL*CHUNK));}
   p.teleport([-23,.05,0]);
   for(let i=0;i<100;i++){p.tick(0,0,0,false,true);r.update(p.world,p.collider,p.feet(),i*.08,i<60?1.4:-.4,1/60,844/390);check(r,p);}
   assert.ok(p.grounded&&p.feet()[1]<-7.9);
@@ -74,7 +74,7 @@ test('recovery duration is frame-rate independent; reset removes old target lag'
   const p=setup(),r=new ThirdPersonCamera();try{
    const wall=p.world.createCollider(RAPIER.ColliderDesc.cuboid(3,4,.1).setTranslation(40,2,42));p.world.step();r.update(p.world,p.collider,[40,.027,40],0,0,1/hz,844/390);
    p.world.removeCollider(wall,false);p.world.step();for(let i=0;i<hz;i++)r.update(p.world,p.collider,[40,.027,40],0,0,1/hz,844/390);values.push(r.distance);
-   r.reset();r.update(p.world,p.collider,[50,10,50],0,.45,1/hz,844/390);assert.ok(Math.abs(r.target.y-11.9)<1e-6);assert.equal(r.distance,7.5);
+   r.reset();r.update(p.world,p.collider,[50,10,50],0,.45,1/hz,844/390);assert.ok(Math.abs(r.target.y-11.9)<1e-6);assert.equal(r.distance,GAME_CONFIG.camera.distance);
   }finally{p.dispose();}
  }
  assert.ok(Math.max(...values)-Math.min(...values)<1e-8);

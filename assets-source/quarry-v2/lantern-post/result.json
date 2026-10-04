@@ -1,0 +1,15 @@
+{
+  "taskId": "f23b7b64-c198-4c78-87fe-532fbdf7afb6",
+  "status": "success",
+  "modelVersion": "v3.1-20260211",
+  "faceLimit": 2000,
+  "prompt": "A single stylized mining yard lantern post prop. Short thick carved timber post, broad stone foot, one chunky warm metal lantern with simple glass, rounded premium Roblox game shape, matte wood and stone. No thin wires, no text, no logos, no ground island, no extra props.",
+  "bytes": 7080112,
+  "triangles": 1908,
+  "meshes": 1,
+  "materials": 1,
+  "output": {
+    "generated_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/f23b7b64-c198-4c78-87fe-532fbdf7afb6/text2image_f23b7b64-c198-4c78-87fe-532fbdf7afb6.jpeg?auth_key=1791158400-ZB9GIqZi-0-79af42acd641cc0739e53dd2d3efb006",
+    "rendered_image": "https://openapi.cdn.tripo3d.com/tcli_0a9b6b446e7645baa0dbed84e7098f4d/20261004/f23b7b64-c198-4c78-87fe-532fbdf7afb6/legacy_mesh.webp?auth_key=1791158400-ZB9GIqZi-0-892ee3253d3b28fc0df66b1edbe1ad68"
+  }
+}

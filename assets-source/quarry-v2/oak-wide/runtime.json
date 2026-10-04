@@ -1,0 +1,15 @@
+{
+  "parts": [
+    "oak-wide.000.part"
+  ],
+  "bytes": 369191,
+  "sha256": "47ff93bd762b1eaabcd0ec51416f54bea7f533a01e0635d6d73c99c957c3df0f",
+  "taskId": "7d1c2e59-3348-4749-876f-5b72e021a923",
+  "sourceSha256": "9275a9da08f1ee594dd3140154f5fe3ad74d016c1ff66c978837a3c0228cae54",
+  "triangles": 2663,
+  "faceLimit": 2800,
+  "source": "new Tripo image_to_model",
+  "reference": "output/imagegen/camp-expansion/oak-wide.png",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}

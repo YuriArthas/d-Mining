@@ -1,0 +1,14 @@
+{
+  "parts": [
+    "notice-board.000.part"
+  ],
+  "bytes": 387595,
+  "sha256": "82eb725a875a237aae4b44058071c71e06def96e3992fe27d11541bbfc51280f",
+  "taskId": "1ed98408-9ea5-4703-b4b9-bcaf3e242659",
+  "sourceSha256": "73e38b2730613082bff62291dca6a60feb7e2f3e27b282cd7ad544463456f57f",
+  "triangles": 1997,
+  "faceLimit": 2200,
+  "source": "new Tripo text_to_model",
+  "geometryEdits": false,
+  "positionQuantizationBits": 16
+}
