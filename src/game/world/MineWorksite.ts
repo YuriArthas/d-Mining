@@ -13,7 +13,7 @@ export const WORKSITE_PLACEMENTS:readonly WorksitePlacement[]=[
  {asset:'pit-headframe',x:14.5,z:-17.5,width:4.5,depth:3.3,height:6.2,yaw:-.15},
  {asset:'pit-winch',x:13,z:-6.8,width:2.8,depth:1.8,height:1.7,yaw:-Math.PI/2},
  {asset:'pit-lumber-stack',x:-15.5,z:-5.5,width:4,depth:1.7,height:1.1,yaw:Math.PI/2},
- {asset:'pit-lumber-stack',x:19,z:-17.5,width:3.5,depth:1.7,height:.9},
+ {asset:'pit-lumber-stack',x:13,z:-25,width:3.5,depth:1.7,height:.9},
  {asset:'pit-tool-wall',x:-12.7,z:-.5,width:3.5,depth:.7,height:2.6,yaw:Math.PI/2},
  {asset:'pit-sorting-table',x:13,z:3,width:3.3,depth:1.5,height:1.3,yaw:-Math.PI/2},
  {asset:'pit-crates',x:-13.4,z:5,width:2.4,depth:2,height:1.6},

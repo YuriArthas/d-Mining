@@ -31,14 +31,14 @@ test('shipped quarry models use role-sized GPU-compressed mip chains and exact t
    authoredModels++;
    assert.equal(manifest.source,'Blender authored mesh and texture');
    assert.ok(manifest.generationId);assert.equal(manifest.taskId,undefined);
-   assert.ok(count<=128);assert.equal(document.images.length,1);
+   assert.ok(count<=(file.startsWith('egg-')?1600:128));assert.equal(document.images.length,1);
    for(const material of document.materials){assert.equal(material.normalTexture,undefined);assert.equal(material.pbrMetallicRoughness.metallicRoughnessTexture,undefined);}
   }else texturedModels++;
   assert.ok(document.extensionsRequired.includes('KHR_texture_basisu'));
   const dimensions=new Map(),scale=(file.startsWith('portal-')||file.startsWith('egg-')||file.startsWith('bank-')||file.startsWith('grid-mine-')||file.startsWith('mine-pendant'))?.5:1;
   const source=index=>document.textures[index].extensions.KHR_texture_basisu.source;
   for(const material of document.materials){
-   dimensions.set(source(material.pbrMetallicRoughness.baseColorTexture.index),manifest.materialProfile==='authored-color'?128:512*scale);
+   if(material.pbrMetallicRoughness.baseColorTexture)dimensions.set(source(material.pbrMetallicRoughness.baseColorTexture.index),manifest.materialProfile==='authored-color'?128:512*scale);
    if(manifest.materialProfile==='authored-color')continue;
    dimensions.set(source(material.pbrMetallicRoughness.metallicRoughnessTexture.index),128*scale);
    dimensions.set(source(material.normalTexture.index),256*scale);
@@ -58,4 +58,24 @@ test('shipped quarry models use role-sized GPU-compressed mip chains and exact t
  assert.ok(placed<675_000,`${placed} placed triangles`);
  assert.ok(triangles<190_000,`Surface meshes contain ${triangles} unique triangles`);
  assert.ok(downloadBytes<26*1024*1024,`Surface download unexpectedly uses ${downloadBytes} bytes`);
+});
+
+test('surface material and shadow samplers fit the WebGL2 minimum with headroom',async()=>{
+ const {SceneLightingRig}=await import('../../src/game/presentation/SceneLightingRig.ts');
+ const rig=new SceneLightingRig();
+ try{
+  // Each Three material uniform allocates a unit, even if ORM channels share an image.
+  const shadowSamplers=1+[rig.key,...rig.fills].filter(light=>light.castShadow).length; // moon + spotlights
+  const directory=new URL('../../src/game/assets/camp/',import.meta.url);
+  for(const name of new Set(QUARRY_PLACEMENTS.map(p=>p.asset))){
+   const manifest=JSON.parse(readFileSync(new URL(`${name}.manifest.json`,directory)));
+   const glb=gunzipSync(Buffer.concat(manifest.parts.map(p=>readFileSync(new URL(p,directory)))));
+   const document=JSON.parse(glb.subarray(20,20+glb.readUInt32LE(12)));
+   for(const m of document.materials){
+    const pbr=m.pbrMetallicRoughness??{};
+    const materialSamplers=Number(!!pbr.baseColorTexture)+2*Number(!!pbr.metallicRoughnessTexture)+Number(!!m.normalTexture)+Number(!!m.occlusionTexture)+Number(!!m.emissiveTexture);
+    assert.ok(shadowSamplers+materialSamplers+2<=14,`${name}: ${shadowSamplers+materialSamplers+2} samplers, keep 2 of the guaranteed 16 spare`); // environment + Three r186 DFG lookup
+   }
+  }
+ }finally{rig.dispose();}
 });

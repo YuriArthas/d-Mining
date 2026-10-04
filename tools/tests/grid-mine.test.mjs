@@ -47,6 +47,6 @@ test('mine downlight illuminates the shaft and releases its shadow resources',as
  assert.ok(light.angle>.6&&light.angle<1);assert.equal(light.shadow.mapSize.x,1024);
  assert.equal(rig.diagnostics().independentOfDecorations,true);
  assert.equal(rig.setSurfaceActive(false),true);assert.equal(rig.diagnostics().active,false);
- assert.equal(rig.fills.length,8);
- let released=0;for(const entry of [light,...rig.fills])entry.shadow.dispose=()=>released++;rig.dispose();assert.equal(released,9);
+ assert.equal(rig.fills.length,9);
+ let released=0;for(const entry of [light,...rig.fills])entry.shadow.dispose=()=>released++;rig.dispose();assert.equal(released,10);
 });

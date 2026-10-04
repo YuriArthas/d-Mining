@@ -10,6 +10,7 @@ export function paintCampGround(material:MeshStandardMaterial){
   shader.fragmentShader=`
 float campHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float campNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(campHash(i),campHash(i+vec2(1,0)),f.x),mix(campHash(i+vec2(0,1)),campHash(i+vec2(1,1)),f.x),f.y);}
+float campCourt(vec2 p,vec2 center,vec2 halfSize){vec2 q=abs(p-center)-halfSize+1.;return length(max(q,0.))+min(max(q.x,q.y),0.)-1.;}
 float campSegment(vec2 p,vec2 a,vec2 b){vec2 d=b-a;return length(p-a-d*clamp(dot(p-a,d)/dot(d,d),0.0,1.0));}
 `+shader.fragmentShader;
   shader.fragmentShader=shader.fragmentShader.replace('#include <map_fragment>',`#include <map_fragment>
@@ -24,7 +25,8 @@ float fleck=(1.-smoothstep(.11,.15,abs(grassSlant.x)))*(1.-smoothstep(.23,.27,ab
 diffuseColor.rgb=grassTone*(.96+campFine*.06+fleck*.12);
 float pathDistance=1000.0;
 ${segments}
-pathDistance=min(pathDistance,(length((campWorld.xz-vec2(0.,27.))/vec2(1.1,1.))-9.0));
+pathDistance=min(pathDistance,campCourt(campWorld.xz,vec2(-21.,30.),vec2(3.5,13.)));
+pathDistance=min(pathDistance,(length((campWorld.xz-vec2(0.,19.))/vec2(1.1,1.))-5.0));
 float campPath=1.0-smoothstep(-.2,.45,pathDistance+(campNoise(campWorld.xz*1.4)-.5)*.38);
 vec3 campSoil=mix(vec3(.49,.355,.19),vec3(.61,.46,.27),campBroad)*(.95+campFine*.1);
 diffuseColor.rgb=mix(diffuseColor.rgb,campSoil,campPath);
@@ -37,5 +39,5 @@ vec3 campPackedEarth=mix(vec3(.23,.17,.105),vec3(.36,.295,.19),campBroad)*(.9+ca
 diffuseColor.rgb=mix(diffuseColor.rgb,campPackedEarth,campWork*.95);
 `);
  };
- material.customProgramCacheKey=()=> 'camp-tripo-ground-shaft-hub-v5';
+ material.customProgramCacheKey=()=> 'camp-tripo-ground-tiered-site-v8';
 }

@@ -36,3 +36,46 @@ test('each pad uses its own destination rather than a shared fixed spawn',()=>{
  }
  assert.equal(calls.length,ROOMS.length);
 });
+
+test('landmark stands inside its own activation area with clearance for the player capsule',async()=>{
+ const {PORTAL_MODEL}=await import('../../src/game/world/SurfaceHub.ts');
+ const corner=Math.hypot(PORTAL_MODEL.width/2,PORTAL_MODEL.depth/2);
+ for(const p of SURFACE_PORTALS){assert.equal(p.x,p.zone.x);assert.equal(p.z,p.zone.z);assert.ok(p.zone.radius>corner+.4);}
+});
+test('eighteen eggs occupy three supported ascending tiers with separate browsing aisles',async()=>{
+ const {PET_DISPLAYS,PET_AREA,HUB_PLACEMENTS}=await import('../../src/game/world/SurfaceHub.ts');
+ const {PET_TIERS,PET_TERRACE_SOLIDS}=await import('../../src/game/world/PetTerraces.ts');
+ assert.equal(PET_DISPLAYS.length,18);
+ assert.deepEqual(PET_TIERS.map(t=>PET_DISPLAYS.filter(p=>p.tier===t.tier).length),[6,6,6]);
+ const eggs=HUB_PLACEMENTS.filter(p=>p.asset.startsWith('egg-'));
+ for(const [i,p] of eggs.entries()){
+  assert.ok(p.x-p.width/2>PET_AREA.minX&&p.x+p.width/2<PET_AREA.maxX);
+  assert.ok(PET_TERRACE_SOLIDS.some(s=>Math.abs(s.at[1]+s.half[1]-p.y)<.001&&Math.abs(p.x-s.at[0])+p.width/2<=s.half[0]&&Math.abs(p.z-s.at[2])+p.depth/2<=s.half[2]),'egg must stand on its platform');
+  for(const q of eggs.slice(i+1))assert.ok(Math.hypot(p.x-q.x,p.z-q.z)>=4);
+ }
+ for(let i=1;i<PET_TIERS.length;i++){
+  assert.ok(PET_TIERS[i].x<PET_TIERS[i-1].x);assert.ok(PET_TIERS[i].y>PET_TIERS[i-1].y);
+ }
+});
+test('decorations do not occupy the pet court, portal court or central approach',async()=>{
+ const {CAMP_DECORATIONS}=await import('../../src/game/world/QuarryLayout.ts');
+ const {HUB_CLEARANCES,footprint,intersects}=await import('../../src/game/world/CampLayout.ts');
+ for(const p of CAMP_DECORATIONS){
+  // Terrace planting is behind the enclosing bank, outside the playable floor.
+  if((p.y??0)>3)continue;
+  assert.ok(!HUB_CLEARANCES.some(r=>intersects(r,footprint(p))),p.asset+' blocks a reserved bay');
+ }
+});
+
+test('courtyard circulation stays outside unlocked portal triggers, including hysteresis',()=>{
+ const {s,calls}=setup();s.updatePosition([90,-4000,90],false);
+ const points=[];
+ for(let x=0;x<=35;x++)for(const z of [30,33,36])points.push([x,0,z]);
+ for(const point of points){
+  for(const p of SURFACE_PORTALS)assert.ok(Math.hypot(point[0]-p.x,point[2]-p.z)>p.zone.radius+p.zone.hysteresis+.4);
+  s.updatePosition(point,true);
+ }
+ assert.equal(calls.length,0,'browsing must not teleport');
+ const xs=SURFACE_PORTALS.map(p=>p.x),zs=SURFACE_PORTALS.map(p=>p.z);
+ assert.ok(Math.max(...xs)-Math.min(...xs)<=27);assert.ok(Math.max(...zs)-Math.min(...zs)<=18);
+});

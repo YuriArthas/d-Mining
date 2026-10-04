@@ -1,5 +1,5 @@
 import {Color,Group,Mesh,MeshBasicMaterial,MeshStandardMaterial,RingGeometry,CircleGeometry} from 'three';
-import {SURFACE_PORTALS} from '../world/SurfaceHub.ts';
+import {SURFACE_PORTALS,PET_DISPLAYS} from '../world/SurfaceHub.ts';
 import {createWorldText} from './WorldText.ts';
 // Presentation consumes progress snapshots only. It neither unlocks nor teleports.
 export class SurfaceHubView {
@@ -8,11 +8,11 @@ export class SurfaceHubView {
   for(const p of SURFACE_PORTALS){
    const group=new Group();group.name='destination:'+p.id;
    const ring=new MeshBasicMaterial({color:'#546578'}),fill=new MeshBasicMaterial({color:'#162333'});
-   const outer=new Mesh(new RingGeometry(1.76,2.05,64),ring),inner=new Mesh(new CircleGeometry(1.72,64),fill);
+   const outer=new Mesh(new RingGeometry(p.zone.radius+.05,p.zone.radius+.22,64),ring),inner=new Mesh(new CircleGeometry(p.zone.radius+.01,64),fill);
    for(const mesh of [outer,inner]){mesh.rotation.x=-Math.PI/2;mesh.position.set(p.zone.x,.07,p.z);group.add(mesh);}
-   const label=(title:string,y:number,color:string,width:number,subtitle='')=>createWorldText({at:[30.8,y,p.z],yaw:-Math.PI/2,width,title,subtitle,color,background:'#18283d'});
-   group.add(label(p.name,5,p.color,4,`${p.depth} m`));
-   const locked=label('LOCKED',2.8,'#aab9cb',2.4),enter=label('ENTER',2.8,p.color,2.2);
+   const label=(title:string,y:number,color:string,width:number,subtitle='')=>createWorldText({at:[p.x+Math.sin(p.yaw)*1.55,y,p.z+Math.cos(p.yaw)*1.55],yaw:p.yaw,width,title,subtitle,color,background:'#18283d'});
+   group.add(label(p.name,4.8,p.color,2.8,`${p.depth} m`));
+   const locked=label('LOCKED',2.8,'#aab9cb',1.7),enter=label('ENTER',2.8,p.color,1.7);
    group.add(locked,enter);surface.add(group);
    const materials:MeshStandardMaterial[]=[],colors:Color[]=[];
    for(const prop of surface.children)if(prop.userData.portalId===p.id)prop.traverse(o=>{
@@ -30,6 +30,6 @@ export class SurfaceHubView {
    e.ring.color.set(d.unlocked?p.color:'#657b92');e.fill.color.set(d.unlocked?p.color:'#192a3b').multiplyScalar(d.unlocked?.24:1);
    e.locked.visible=!d.unlocked;e.enter.visible=d.unlocked;
   }
-  this.surface.userData.hub={petDisplayOnly:true,portals:SURFACE_PORTALS.map(p=>({id:p.id,depth:p.depth,zone:p.zone,unlocked:this.entries.get(p.id)?.active===true}))};
+  this.surface.userData.hub={petDisplayOnly:true,petStations:PET_DISPLAYS,portals:SURFACE_PORTALS.map(p=>({id:p.id,depth:p.depth,modelCenter:[p.x,0,p.z],zone:p.zone,unlocked:this.entries.get(p.id)?.active===true}))};
  }
 }

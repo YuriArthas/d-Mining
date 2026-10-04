@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="880" viewBox="0 0 920 880"><rect width="920" height="880" fill="#eef1e4"/>
+<rect x="18.500000000000014" y="18.500000000000014" width="883" height="843" transform="rotate(0 460 440)" fill="#597b43" stroke="#4b5355"/>
+<rect x="58.500000000000014" y="58.500000000000014" width="803" height="763" transform="rotate(0 460 440)" fill="#729456" stroke="#4b5355"/>
+<rect x="98.50000000000001" y="98.50000000000001" width="723" height="683" transform="rotate(0 460 440)" fill="#83a666" stroke="#4b5355"/>
+<rect x="138.5" y="138.5" width="643" height="603" transform="rotate(0 460 440)" fill="#a3ba75" stroke="#4b5355"/>
+<rect x="181.5" y="181.5" width="557" height="517" transform="rotate(0 460 440)" fill="#c9dca8" stroke="#4b5355"/>
+<polyline points="460,570 460,475 460,430" fill="none" stroke="#f7e5b4" stroke-width="27.5" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="350,530 460,530 635,545" fill="none" stroke="#f7e5b4" stroke-width="25" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="359.8999269231549,442.0037723857078 460,465 560.1000730768451,442.0037723857078" fill="none" stroke="#f7e5b4" stroke-width="19" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="350,457.5 350,602.5" fill="none" stroke="#f7e5b4" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="350,457.5 335,457.5" fill="none" stroke="#f7e5b4" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="350,602.5 335,602.5" fill="none" stroke="#f7e5b4" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="535,530 635,530 635,560 535,560" fill="none" stroke="#f7e5b4" stroke-width="19" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="535,530 535,500" fill="none" stroke="#f7e5b4" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="535,560 535,590" fill="none" stroke="#f7e5b4" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="580,530 580,500" fill="none" stroke="#f7e5b4" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="580,560 580,590" fill="none" stroke="#f7e5b4" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="625,530 625,500" fill="none" stroke="#f7e5b4" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="625,560 625,590" fill="none" stroke="#f7e5b4" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="635,500 670,500" fill="none" stroke="#f7e5b4" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="635,545 670,545" fill="none" stroke="#f7e5b4" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="635,590 670,590" fill="none" stroke="#f7e5b4" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="395" y="315" width="130" height="130" transform="rotate(0 460 380)" fill="#aac1d5" stroke="#4b5355"/>
+<rect x="420" y="340" width="80" height="80" transform="rotate(0 460 380)" fill="#777f89" stroke="#4b5355"/>
+<text x="460" y="380" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">8×8 矿口</text>
+<rect x="325" y="390" width="50" height="40" transform="rotate(-17.188733853924695 350 410)" fill="#d5b795" stroke="#4b5355"/>
+<text x="350" y="410" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">售卖</text>
+<rect x="545" y="390" width="50" height="40" transform="rotate(17.188733853924695 570 410)" fill="#d5b795" stroke="#4b5355"/>
+<text x="570" y="410" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">商店</text>
+<circle cx="560.1000730768451" cy="442.0037723857078" r="8.5" fill="#ffcf61"/>
+<circle cx="359.8999269231549" cy="442.0037723857078" r="8.5" fill="#ffcf61"/>
+<rect x="218" y="474.3" width="29" height="1.4000000000000001" transform="rotate(-90 232.5 475)" fill="#946c43" stroke="#4b5355"/>
+<rect x="218" y="504.3" width="29" height="1.4000000000000001" transform="rotate(-90 232.5 505)" fill="#946c43" stroke="#4b5355"/>
+<rect x="218" y="534.3" width="29" height="1.4000000000000001" transform="rotate(-90 232.5 535)" fill="#946c43" stroke="#4b5355"/>
+<rect x="218" y="564.3" width="29" height="1.4000000000000001" transform="rotate(-90 232.5 565)" fill="#946c43" stroke="#4b5355"/>
+<rect x="218" y="594.3" width="29" height="1.4000000000000001" transform="rotate(-90 232.5 595)" fill="#946c43" stroke="#4b5355"/>
+<rect x="530.5" y="474.3" width="29" height="1.4000000000000001" transform="rotate(0 545 475)" fill="#946c43" stroke="#4b5355"/>
+<rect x="560.5" y="474.3" width="29" height="1.4000000000000001" transform="rotate(0 575 475)" fill="#946c43" stroke="#4b5355"/>
+<rect x="590.5" y="474.3" width="29" height="1.4000000000000001" transform="rotate(0 605 475)" fill="#946c43" stroke="#4b5355"/>
+<rect x="620.5" y="474.3" width="29" height="1.4000000000000001" transform="rotate(0 635 475)" fill="#946c43" stroke="#4b5355"/>
+<rect x="650.5" y="474.3" width="29" height="1.4000000000000001" transform="rotate(0 665 475)" fill="#946c43" stroke="#4b5355"/>
+<rect x="530.5" y="614.3" width="29" height="1.4000000000000001" transform="rotate(0 545 615)" fill="#946c43" stroke="#4b5355"/>
+<rect x="560.5" y="614.3" width="29" height="1.4000000000000001" transform="rotate(0 575 615)" fill="#946c43" stroke="#4b5355"/>
+<rect x="590.5" y="614.3" width="29" height="1.4000000000000001" transform="rotate(0 605 615)" fill="#946c43" stroke="#4b5355"/>
+<rect x="620.5" y="614.3" width="29" height="1.4000000000000001" transform="rotate(0 635 615)" fill="#946c43" stroke="#4b5355"/>
+<rect x="650.5" y="614.3" width="29" height="1.4000000000000001" transform="rotate(0 665 615)" fill="#946c43" stroke="#4b5355"/>
+<rect x="680.5" y="494.3" width="29" height="1.4000000000000001" transform="rotate(-90 695 495)" fill="#946c43" stroke="#4b5355"/>
+<rect x="680.5" y="524.3" width="29" height="1.4000000000000001" transform="rotate(-90 695 525)" fill="#946c43" stroke="#4b5355"/>
+<rect x="680.5" y="554.3" width="29" height="1.4000000000000001" transform="rotate(-90 695 555)" fill="#946c43" stroke="#4b5355"/>
+<rect x="680.5" y="584.3" width="29" height="1.4000000000000001" transform="rotate(-90 695 585)" fill="#946c43" stroke="#4b5355"/>
+<rect x="305" y="465" width="30" height="130" transform="rotate(0 320 530)" fill="#f9eacb" stroke="#4b5355"/>
+<text x="320" y="440" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">0.4m</text>
+<rect x="275" y="465" width="30" height="130" transform="rotate(0 290 530)" fill="#e0d0ba" stroke="#4b5355"/>
+<text x="290" y="440" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">2.2m</text>
+<rect x="245" y="465" width="30" height="130" transform="rotate(0 260 530)" fill="#c5b395" stroke="#4b5355"/>
+<text x="260" y="440" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">4m</text>
+<rect x="245" y="450" width="90" height="15" transform="rotate(0 290 457.5)" fill="#d0b886" stroke="#4b5355"/>
+<rect x="245" y="595" width="90" height="15" transform="rotate(0 290 602.5)" fill="#d0b886" stroke="#4b5355"/>
+<rect x="313.25" y="473.25" width="13.5" height="13.5" transform="rotate(0 320 480)" fill="#9ce866" stroke="#4b5355"/>
+<text x="320" y="482.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">1</text>
+<rect x="313.25" y="493.25" width="13.5" height="13.5" transform="rotate(0 320 500)" fill="#a597ff" stroke="#4b5355"/>
+<text x="320" y="502.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">2</text>
+<rect x="313.25" y="513.25" width="13.5" height="13.5" transform="rotate(0 320 520)" fill="#ffa456" stroke="#4b5355"/>
+<text x="320" y="522.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">3</text>
+<rect x="313.25" y="533.25" width="13.5" height="13.5" transform="rotate(0 320 540)" fill="#66d8de" stroke="#4b5355"/>
+<text x="320" y="542.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">4</text>
+<rect x="313.25" y="553.25" width="13.5" height="13.5" transform="rotate(0 320 560)" fill="#f5dc96" stroke="#4b5355"/>
+<text x="320" y="562.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">5</text>
+<rect x="313.25" y="573.25" width="13.5" height="13.5" transform="rotate(0 320 580)" fill="#ffcc61" stroke="#4b5355"/>
+<text x="320" y="582.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">6</text>
+<rect x="283.25" y="473.25" width="13.5" height="13.5" transform="rotate(0 290 480)" fill="#ffa456" stroke="#4b5355"/>
+<text x="290" y="482.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">7</text>
+<rect x="283.25" y="493.25" width="13.5" height="13.5" transform="rotate(0 290 500)" fill="#66d8de" stroke="#4b5355"/>
+<text x="290" y="502.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">8</text>
+<rect x="283.25" y="513.25" width="13.5" height="13.5" transform="rotate(0 290 520)" fill="#f5dc96" stroke="#4b5355"/>
+<text x="290" y="522.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">9</text>
+<rect x="283.25" y="533.25" width="13.5" height="13.5" transform="rotate(0 290 540)" fill="#ffcc61" stroke="#4b5355"/>
+<text x="290" y="542.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">10</text>
+<rect x="283.25" y="553.25" width="13.5" height="13.5" transform="rotate(0 290 560)" fill="#9ce866" stroke="#4b5355"/>
+<text x="290" y="562.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">11</text>
+<rect x="283.25" y="573.25" width="13.5" height="13.5" transform="rotate(0 290 580)" fill="#a597ff" stroke="#4b5355"/>
+<text x="290" y="582.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">12</text>
+<rect x="253.25" y="473.25" width="13.5" height="13.5" transform="rotate(0 260 480)" fill="#f5dc96" stroke="#4b5355"/>
+<text x="260" y="482.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">13</text>
+<rect x="253.25" y="493.25" width="13.5" height="13.5" transform="rotate(0 260 500)" fill="#ffcc61" stroke="#4b5355"/>
+<text x="260" y="502.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">14</text>
+<rect x="253.25" y="513.25" width="13.5" height="13.5" transform="rotate(0 260 520)" fill="#9ce866" stroke="#4b5355"/>
+<text x="260" y="522.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">15</text>
+<rect x="253.25" y="533.25" width="13.5" height="13.5" transform="rotate(0 260 540)" fill="#a597ff" stroke="#4b5355"/>
+<text x="260" y="542.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">16</text>
+<rect x="253.25" y="553.25" width="13.5" height="13.5" transform="rotate(0 260 560)" fill="#ffa456" stroke="#4b5355"/>
+<text x="260" y="562.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">17</text>
+<rect x="253.25" y="573.25" width="13.5" height="13.5" transform="rotate(0 260 580)" fill="#66d8de" stroke="#4b5355"/>
+<text x="260" y="582.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">18</text>
+<text x="295" y="635" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">三层 × 六蛋 · 两侧楼梯</text>
+<circle cx="535" cy="500" r="16.5" fill="#ffc778" fill-opacity=".4" stroke="#65868f"/>
+<rect x="523.75" y="493" width="22.5" height="14" transform="rotate(0 535 500)" fill="#809d99" stroke="#4b5355"/>
+<text x="535" y="502.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">400</text>
+<circle cx="580" cy="500" r="16.5" fill="#97e2c5" fill-opacity=".4" stroke="#65868f"/>
+<rect x="568.75" y="493" width="22.5" height="14" transform="rotate(0 580 500)" fill="#809d99" stroke="#4b5355"/>
+<text x="580" y="502.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">800</text>
+<circle cx="625" cy="500" r="16.5" fill="#b9b2fb" fill-opacity=".4" stroke="#65868f"/>
+<rect x="613.75" y="493" width="22.5" height="14" transform="rotate(0 625 500)" fill="#809d99" stroke="#4b5355"/>
+<text x="625" y="502.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">1200</text>
+<circle cx="670" cy="500" r="16.5" fill="#9ed8c6" fill-opacity=".4" stroke="#65868f"/>
+<rect x="658.75" y="493" width="22.5" height="14" transform="rotate(90 670 500)" fill="#809d99" stroke="#4b5355"/>
+<text x="670" y="502.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">1600</text>
+<circle cx="670" cy="545" r="16.5" fill="#dcf5f4" fill-opacity=".4" stroke="#65868f"/>
+<rect x="658.75" y="538" width="22.5" height="14" transform="rotate(90 670 545)" fill="#809d99" stroke="#4b5355"/>
+<text x="670" y="547.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">2000</text>
+<circle cx="670" cy="590" r="16.5" fill="#f2a267" fill-opacity=".4" stroke="#65868f"/>
+<rect x="658.75" y="583" width="22.5" height="14" transform="rotate(90 670 590)" fill="#809d99" stroke="#4b5355"/>
+<text x="670" y="592.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">2400</text>
+<circle cx="625" cy="590" r="16.5" fill="#ecd9ae" fill-opacity=".4" stroke="#65868f"/>
+<rect x="613.75" y="583" width="22.5" height="14" transform="rotate(-180 625 590)" fill="#809d99" stroke="#4b5355"/>
+<text x="625" y="592.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">2800</text>
+<circle cx="580" cy="590" r="16.5" fill="#7ae1d0" fill-opacity=".4" stroke="#65868f"/>
+<rect x="568.75" y="583" width="22.5" height="14" transform="rotate(-180 580 590)" fill="#809d99" stroke="#4b5355"/>
+<text x="580" y="592.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">3200</text>
+<circle cx="535" cy="590" r="16.5" fill="#f5da9b" fill-opacity=".4" stroke="#65868f"/>
+<rect x="523.75" y="583" width="22.5" height="14" transform="rotate(-180 535 590)" fill="#809d99" stroke="#4b5355"/>
+<text x="535" y="592.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">3600</text>
+<text x="600" y="552.5" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">安全浏览区</text>
+<text x="460" y="665" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">外围退让 ≥ 8m · 功能区和植被分开</text>
+<circle cx="460" cy="530" r="5" fill="#e68b27"/>
+<text x="460" y="550" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a2935">出生</text>
+</svg>

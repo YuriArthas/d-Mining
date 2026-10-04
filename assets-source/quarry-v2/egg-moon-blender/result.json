@@ -1,0 +1,11 @@
+{
+  "status": "success",
+  "generator": "Blender",
+  "generationId": "egg-moon-blender-v1",
+  "type": "authored_mesh",
+  "faceLimit": 1600,
+  "triangles": 1432,
+  "textureSize": 128,
+  "reference": "tools/blender/build-pet-eggs.py",
+  "recipeSha256": "63f3af141b95cc15b5b24510f6ca0fdb51dee424c2f7808601950f33ccc60071"
+}

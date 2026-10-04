@@ -1,4 +1,4 @@
-import { Color, Box3, Group, Mesh, MeshStandardMaterial, Texture, CompressedTexture, RGBAFormat, RGBFormat, Vector3, type WebGLRenderer } from 'three';
+import { Box3, Group, Mesh, MeshStandardMaterial, Texture, CompressedTexture, RGBAFormat, RGBFormat, Vector3, type WebGLRenderer } from 'three';
 import { fetchAssetParts } from '../assets/fetchAssetParts.ts';
 import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -98,18 +98,11 @@ export async function loadStaticSurface(renderer:WebGLRenderer,signal:AbortSigna
    o.raycast=function(ray,hits){const collected:typeof hits=[];raycast.call(this,ray,collected);hits.push(...collected.filter(h=>Math.abs(h.point.x)>=8||Math.abs(h.point.z)>=8));};
   });
   if(p.portalId)instance.userData.portalId=p.portalId;
-  if(p.tint||p.eggColor)instance.traverse(o=>{
+  if(p.tint)instance.traverse(o=>{
    if(!(o instanceof Mesh))return;
    const style=(source:MeshStandardMaterial)=>{
     const m=source.clone();m.onBeforeCompile=source.onBeforeCompile;m.customProgramCacheKey=source.customProgramCacheKey;
     if(p.tint)m.color.set(p.tint);
-    if(p.eggColor){
-     const color=new Color(p.eggColor),compile=m.onBeforeCompile;
-     m.onBeforeCompile=(shader,renderer)=>{compile.call(m,shader,renderer);shader.uniforms.eggColor={value:color};shader.fragmentShader='uniform vec3 eggColor;\n'+shader.fragmentShader;shader.fragmentShader=shader.fragmentShader.replace('#include <map_fragment>',`#include <map_fragment>
-      float eggPatch=smoothstep(.015,.1,diffuseColor.g-max(diffuseColor.r,diffuseColor.b));
-      diffuseColor.rgb=mix(diffuseColor.rgb,eggColor,eggPatch);`);};
-     m.customProgramCacheKey=()=> 'hub-egg-palette';
-    }
     return m;
    };
    o.material=Array.isArray(o.material)?o.material.map(m=>style(m as MeshStandardMaterial)):style(o.material as MeshStandardMaterial);
