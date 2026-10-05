@@ -3,18 +3,21 @@ import assert from 'node:assert/strict';
 import { ThirdPersonCamera } from '../../src/game/ThirdPersonCamera.ts';
 import { MINE_PAVILION_SOLIDS } from '../../src/game/world/MinePavilion.ts';
 import { surfacePlan } from '../../src/game/world/SurfaceAssetPlan.ts';
+import { CURB_SOLIDS } from '../../src/game/world/SurfaceRoads.ts';
+import { POND_SOLIDS } from '../../src/game/world/SurfacePonds.ts';
 import { SURFACE_SPAWN, SURFACE_SALE, SURFACE_SHOP, SURFACE_BUILDINGS } from '../../src/game/world/surfaceLayout.ts';
 import { RAPIER, initPhysics } from '../../src/game/validation/physics.ts';
 
 test('quarry collision keeps spawn, sale and the full shaft clear; buildings remain solid',async()=>{
  await initPhysics();
- const plan=surfacePlan(),world=new RAPIER.World({x:0,y:-9.8,z:0});
+ const plan=surfacePlan(),world=new RAPIER.World({x:0,y:-9.8,z:0}),curbs=new Set();
  try{
   for(const s of plan.solids){
    const {at,half,yaw}=s;
    assert.ok([...at,...half,yaw].every(Number.isFinite));
    const desc=s.triangles?RAPIER.ColliderDesc.trimesh(new Float32Array(s.triangles.vertices),new Uint32Array(s.triangles.indices),RAPIER.TriMeshFlags.FIX_INTERNAL_EDGES):s.hull?RAPIER.ColliderDesc.convexHull(new Float32Array(s.hull)):RAPIER.ColliderDesc.cuboid(...half);
-   world.createCollider(desc.setTranslation(...at).setRotation({x:0,y:Math.sin(yaw/2),z:0,w:Math.cos(yaw/2)}));
+   const collider=world.createCollider(desc.setTranslation(...at).setRotation({x:0,y:Math.sin(yaw/2),z:0,w:Math.cos(yaw/2)}));
+   if(CURB_SOLIDS.includes(s)||POND_SOLIDS.includes(s))curbs.add(collider.handle);
    if(s.triangles){
     const {vertices:v,indices:ix}=s.triangles;
     for(let i=0;i<ix.length;i+=3){const a=ix[i]*3,b=ix[i+1]*3,c=ix[i+2]*3;assert.ok((v[b+2]-v[a+2])*(v[c]-v[a])-(v[b]-v[a])*(v[c+2]-v[a+2])>0);}
@@ -28,11 +31,12 @@ test('quarry collision keeps spawn, sale and the full shaft clear; buildings rem
   for(let x=-7;x<8;x+=2)for(let z=-7;z<8;z+=2)assert.equal(ray(x,z),null);
   const clear=[];
   for(const x of [-1,0,1])for(let z=12;z<=40;z+=2)clear.push([x,z]);
-  for(const x of [6,12,18,24,29,35])for(const z of [30,33,36])clear.push([x,z]);
-  for(const x of [-23,-20,-15,-10,-5])for(const z of [26,30,35])clear.push([x,z]);
+  for(const x of [6,12,18,22])for(const z of [30,33,36])clear.push([x,z]);
+  for(const x of [-24,-22,-20,-15,-10,-5])for(const z of [26,30,35])clear.push([x,z]);
   for(const p of [SURFACE_SALE,SURFACE_SHOP])for(let t=0;t<=1;t+=.1)clear.push([p.x*t,17+(p.z-17)*t]);
-  for(const [x,z] of clear)assert.equal(ray(x,z),null,`courtyard approach blocked at ${x},${z}`);
-  for(const [x,z] of [[-11,-11],...Object.values(SURFACE_BUILDINGS).map(p=>[p.x,p.z]),[2,-44]]) {
+  // Low curbs and pond banks are traversable, proven by real capsule tests.
+  for(const [x,z] of clear){const hit=ray(x,z);assert.ok(!hit||curbs.has(hit.collider.handle),`courtyard approach blocked at ${x},${z}`);}
+  for(const [x,z] of [[-11,-11],...Object.values(SURFACE_BUILDINGS).map(p=>[p.x,p.z]),[2,-31]]) {
    const hit=world.castRay(new RAPIER.Ray({x,y:30,z},{x:0,y:-1,z:0}),30,true);assert.ok(hit);
   }
  }finally{world.free();}

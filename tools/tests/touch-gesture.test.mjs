@@ -29,3 +29,18 @@ test('diagonal displacement and exact threshold use one consistent role boundary
   g.move(threshold,1); assert.equal(g.phase,'look');
   const h = new TouchGesture(0,0,0); h.move(threshold*.8,threshold*.8); assert.equal(h.phase,'look');
 });
+
+test('only a completed pending gesture is a tap, never a drag, hold, cancel or duplicate release', () => {
+  const tap = new TouchGesture(100, 200, 0);
+  tap.move(102, 201);
+  assert.equal(tap.end(true), true);
+  assert.equal(tap.end(true), false);
+  const cancelled = new TouchGesture(0, 0, 0);
+  assert.equal(cancelled.end(), false);
+  const drag = new TouchGesture(0, 0, 0);
+  drag.move(threshold + 1, 0);
+  assert.equal(drag.end(true), false);
+  const held = new TouchGesture(0, 0, 0);
+  held.hold(delay);
+  assert.equal(held.end(true), false);
+});

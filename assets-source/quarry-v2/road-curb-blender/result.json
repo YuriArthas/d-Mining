@@ -1,0 +1,16 @@
+{
+  "generator": "Blender",
+  "generationId": "road-curb-blender-v1",
+  "script": "tools/blender/build-road-curb.py",
+  "source": "assets-source/quarry-v2/road-curb-blender/source.blend",
+  "triangles": 44,
+  "dimensions": [
+    1,
+    0.12,
+    0.28
+  ],
+  "textures": [],
+  "runtimeSha256": "d020ef07127d4f5140b2e0a4b345706b14574f23f0bfb58d1801fc9440447a0e",
+  "blendSha256": "f1a08a4ee24dc3d70bbe90e137d85dfb07e6be5d7c614073c1e2d19b7a336718",
+  "scriptSha256": "706b8d0978ba402a9e99bd40e43c80a3593c4bc70b0bad1165ea2a8c474a7ee1"
+}

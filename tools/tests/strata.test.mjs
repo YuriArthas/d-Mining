@@ -49,7 +49,7 @@ test('individual cell rolls are deterministic and neighboring ores are not quant
 test('worker render and collision use the exact same generation source across layer seams', () => {
  for(const generation of [WORLD_GENERATION,{...WORLD_GENERATION,samples:true,seed:73}]){
   const world=new SparseWorld(generation);
-  for(const cell of [[2,-200,35],[2,-201,35],[2,-400,35],[2,-401,35],[14,-1,-25]]){
+  for(const cell of [[0,-1,0],[0,-5,-1],[2,-200,35],[2,-201,35],[2,-400,35],[2,-401,35],[14,-1,-25]]){
    world.remove([cell]);
    for(const [kind,size] of [['render',16],['collision',8]]){
     const coord=regionOf(cell,size),snapshot=world.snapshot(coord,size);

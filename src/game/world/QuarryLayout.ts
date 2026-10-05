@@ -1,4 +1,5 @@
 import {SURFACE_SITE} from './SurfaceSite.ts';
+import {STREET_LIGHTS,SUPPORT_LANTERNS} from './StreetLights.ts';
 import {PET_TERRACE_PLACEMENTS,PET_TERRACE_SOLIDS} from './PetTerraces.ts';
 import {SURFACE_BUILDINGS} from './surfaceLayout.ts';
 import {layoutDecorations} from './CampLayout.ts';
@@ -9,7 +10,7 @@ import type { Solid } from './sceneryKit.ts';
 import {WORKSITE_ASSETS, WORKSITE_PLACEMENTS, WORKSITE_SOLIDS} from './MineWorksite.ts';
 import { CAMP_EXPANSION, EXPANSION_ASSETS } from './CampExpansion.ts';
 export type QuarryAsset=typeof HUB_ASSETS[number]|typeof BOUNDARY_ASSETS[number]|typeof WORKSITE_ASSETS[number]|typeof EXPANSION_ASSETS[number]|'mine-badge'|'mine-pendant'|'meadow-base'|typeof MINE_BLOCK_ASSETS[number]|'simulator-exchange'|'simulator-upgrade'|'terrain-slab'|'crown-tree'|'soft-shrub'|'ore-cart'|'lantern-post';
-export type QuarryPlacement={asset:QuarryAsset;x:number;z:number;width:number;yaw?:number;y?:number;height?:number;depth?:number;portalId?:string;tint?:string;eggColor?:string};
+export type QuarryPlacement={asset:QuarryAsset;x:number;z:number;width:number;yaw?:number;y?:number;height?:number;depth?:number;portalId?:string;portalAccent?:string;tint?:string;eggColor?:string;boundaryClip?:{minX?:number;maxX?:number;minZ?:number;maxZ?:number;maxY?:number}};
 // Tripo environment assembly with authored Blender mine blocks.
 // The central 16m square is the gameplay shaft; surrounding ground is a generated mesh.
 const originalPlacements:readonly QuarryPlacement[]=[
@@ -49,9 +50,10 @@ const originalPlacements:readonly QuarryPlacement[]=[
 const fixed=originalPlacements.filter(p=>p.asset==='meadow-base'||p.asset.startsWith('bank-')||p.asset.startsWith('grid-mine-')||p.asset.startsWith('pit-')||p.asset.startsWith('mine-')||p.asset.startsWith('simulator-'));
 const fixedSet=new Set(fixed);
 export const CAMP_DECORATIONS=layoutDecorations(originalPlacements.filter(p=>!fixedSet.has(p)).sort((a,b)=>b.width-a.width),fixed);
-export const QUARRY_PLACEMENTS:readonly QuarryPlacement[]=[...fixed,...CAMP_DECORATIONS,...HUB_PLACEMENTS];
+export const QUARRY_PLACEMENTS:readonly QuarryPlacement[]=[...fixed,...CAMP_DECORATIONS,...HUB_PLACEMENTS,...STREET_LIGHTS.map(p=>p.fixture),...SUPPORT_LANTERNS.map(p=>p.fixture)];
 // Gameplay collision is deliberately independent from render topology.
 export const QUARRY_SOLIDS:Solid[]=[
+ ...[...STREET_LIGHTS,...SUPPORT_LANTERNS].map(({fixture:p})=>({at:[p.x,p.y+p.height/2,p.z] as [number,number,number],half:[.3,p.height/2,.3] as [number,number,number],yaw:0})),
  ...HUB_PLACEMENTS.map(p=>({at:[p.x,(p.y??0)+p.height/2,p.z] as [number,number,number],half:[p.width/2,p.height/2,p.depth/2] as [number,number,number],yaw:p.yaw})),
  ...WORKSITE_SOLIDS,
  ...PET_TERRACE_SOLIDS,

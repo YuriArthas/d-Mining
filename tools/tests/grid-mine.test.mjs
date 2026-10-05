@@ -41,7 +41,7 @@ test('mine instancing preserves model transforms and releases instance buffers',
 test('mine downlight illuminates the shaft and releases its shadow resources',async()=>{
  const {SceneLightingRig}=await import('../../src/game/presentation/SceneLightingRig.ts');
  const rig=new SceneLightingRig(),light=rig.key;
- assert.ok(light.isSpotLight);assert.equal(light.castShadow,true);
+ assert.ok(light.isSpotLight);assert.equal(light.castShadow,false);
  assert.ok(light.position.y>8);assert.ok(light.target.position.y<0);
  assert.ok(Math.hypot(light.position.x,light.position.z)<8);
  assert.ok(light.angle>.6&&light.angle<1);assert.equal(light.shadow.mapSize.x,1024);
@@ -49,4 +49,28 @@ test('mine downlight illuminates the shaft and releases its shadow resources',as
  assert.equal(rig.setSurfaceActive(false),true);assert.equal(rig.diagnostics().active,false);
  assert.equal(rig.fills.length,9);
  let released=0;for(const entry of [light,...rig.fills])entry.shadow.dispose=()=>released++;rig.dispose();assert.equal(released,10);
+});
+
+test('day/night changes fill strength in place and restores the authored night rig',async()=>{
+ const {SceneLightingRig}=await import('../../src/game/presentation/SceneLightingRig.ts');
+ const {SURFACE_FILL_LIGHTS}=await import('../../src/game/world/SceneLighting.ts');
+ const rig=new SceneLightingRig(),lights=[...rig.fills];
+ try{
+  assert.equal(rig.diagnostics().time,'day');
+  assert.equal(rig.diagnostics().activeLights,0);
+  assert.equal(rig.diagnostics().activeShadowLights,0);
+  assert.ok([rig.key,...rig.fills,...rig.streetLights].every(p=>!p.visible));
+  assert.ok(rig.fills.every((p,i)=>p.intensity===0));
+  assert.equal(rig.setTime('night'),true);
+  assert.ok(rig.fills.every((p,i)=>p===lights[i]&&p.intensity===SURFACE_FILL_LIGHTS[i].intensity));
+  assert.equal(rig.diagnostics().activeLights,12);
+  assert.equal(rig.diagnostics().activeShadowLights,0);
+  assert.ok([rig.key,...rig.fills,...rig.streetLights].every(p=>p.visible));
+  assert.ok(rig.fills.every(p=>!p.castShadow));
+  rig.setSurfaceActive(false);assert.equal(rig.diagnostics().activeLights,0);
+  rig.setSurfaceActive(true);assert.equal(rig.diagnostics().activeLights,12);
+  assert.equal(rig.setTime('night'),false);rig.setTime('day');
+  assert.equal(rig.diagnostics().activeLights,0);
+  assert.ok(rig.fills.every((p,i)=>p===lights[i]&&p.castShadow===SURFACE_FILL_LIGHTS[i].castShadow));
+ }finally{rig.dispose();}
 });

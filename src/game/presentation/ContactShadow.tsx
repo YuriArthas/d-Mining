@@ -10,7 +10,9 @@ export function ContactShadow({shadowRef}:{shadowRef:RefObject<Mesh|null>}) {
     ctx.fillStyle=gradient;ctx.fillRect(0,0,64,64);return new CanvasTexture(canvas);
   },[]);
   useEffect(()=>()=>texture.dispose(),[texture]);
-  return <mesh ref={shadowRef} position={[0,-.018,0]} rotation={[-Math.PI/2,0,0]} renderOrder={1}>
+  // Feet include ~.027m collision skin; the authored meadow surface reaches .022m.
+  // Keep the decal above that visible surface rather than buried beneath it.
+  return <mesh ref={shadowRef} position={[0,-.002,0]} rotation={[-Math.PI/2,0,0]} renderOrder={1}>
     <planeGeometry args={[1.55,1.55]} />
     <meshBasicMaterial map={texture} transparent depthWrite={false} polygonOffset polygonOffsetFactor={-1} />
   </mesh>;

@@ -25,7 +25,7 @@ export function Controls({ input, surface }: { input: GameInput; surface: RefObj
     </div>
     <div className="control-hint">
       <span className="desktop-hint">WASD 移动 · 空格跳跃 · 右键观察 · 鼠标指向 · 左键挖掘</span>
-      <span className="touch-hint">左侧移动 · 拖动观察 · 长按方块挖掘</span>
+      <span className="touch-hint">左侧移动 · 拖动观察 · 点按敲击 · 长按挖掘</span>
     </div>
   </>;
 }

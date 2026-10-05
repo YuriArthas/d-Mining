@@ -1,10 +1,10 @@
 {
   "version": "camp-tripo-v2-expanded",
-  "uniqueModels": 77,
-  "instances": 1394,
-  "uniqueTriangles": 145046,
-  "placedTriangles": 520010,
-  "downloadBytes": 21178454,
+  "uniqueModels": 78,
+  "instances": 1335,
+  "uniqueTriangles": 145182,
+  "placedTriangles": 500684,
+  "downloadBytes": 21195157,
   "components": [
     {
       "name": "bank-braced",
@@ -21,7 +21,7 @@
       "reference": "output/imagegen/timber-boundary/bank-braced.png",
       "geometryEdits": false,
       "positionQuantizationBits": 16,
-      "instances": 15
+      "instances": 13
     },
     {
       "name": "bank-steps",
@@ -38,7 +38,7 @@
       "reference": "output/imagegen/timber-boundary/bank-steps.png",
       "geometryEdits": false,
       "positionQuantizationBits": 16,
-      "instances": 13
+      "instances": 12
     },
     {
       "name": "bank-timber",
@@ -55,7 +55,7 @@
       "reference": "output/imagegen/timber-boundary/bank-timber.png",
       "geometryEdits": false,
       "positionQuantizationBits": 16,
-      "instances": 30
+      "instances": 25
     },
     {
       "name": "bank-turf",
@@ -72,7 +72,7 @@
       "reference": "output/imagegen/timber-boundary/bank-turf.png",
       "geometryEdits": false,
       "positionQuantizationBits": 16,
-      "instances": 222
+      "instances": 198
     },
     {
       "name": "grid-mine-timber-blender",
@@ -92,7 +92,7 @@
       "reference": "tools/blender/build-mine-blocks.py",
       "geometryEdits": false,
       "positionQuantizationBits": 16,
-      "instances": 499
+      "instances": 475
     },
     {
       "name": "bank-fence",
@@ -109,7 +109,7 @@
       "reference": "output/imagegen/timber-boundary/bank-fence.png",
       "geometryEdits": false,
       "positionQuantizationBits": 16,
-      "instances": 55
+      "instances": 50
     },
     {
       "name": "mine-fence",
@@ -128,7 +128,7 @@
       "reference": "output/imagegen/mine-material-light/mine-fence.png",
       "geometryEdits": false,
       "positionQuantizationBits": 16,
-      "instances": 35
+      "instances": 26
     },
     {
       "name": "grid-mine-trim-blender",
@@ -1077,7 +1077,27 @@
       "source": "new Tripo text_to_model",
       "geometryEdits": false,
       "positionQuantizationBits": 16,
-      "instances": 7
+      "instances": 9
+    },
+    {
+      "name": "portal-plinth-blender",
+      "materialProfile": "authored-color",
+      "solidColor": null,
+      "parts": [
+        "portal-plinth-blender.000.part"
+      ],
+      "bytes": 16703,
+      "sha256": "cf24f305bde7a45fa29128676756e105f08681ec81b45a70efc3daa59bc4b907",
+      "generationId": "portal-plinth-blender-v1",
+      "textureSize": 128,
+      "sourceSha256": "b69a7c6b0caf790ca8aa5a6f6f282ad76a59299b1e93680dac09c6e4fa54858c",
+      "triangles": 136,
+      "faceLimit": 192,
+      "source": "Blender authored mesh and texture",
+      "reference": "tools/blender/build-portal-plinth.py",
+      "geometryEdits": false,
+      "positionQuantizationBits": 16,
+      "instances": 9
     },
     {
       "name": "portal-timber",
@@ -1325,5 +1345,30 @@
       "positionQuantizationBits": 16,
       "instances": 3
     }
-  ]
+  ],
+  "bakedContact": {
+    "sourceFile": "assets-source/quarry-v2/contact-bake/source.blend",
+    "script": "tools/blender/bake-contact-shadows.py",
+    "geometryExporter": "tools/export-contact-bake.mjs",
+    "textureSizeBytes": 262144,
+    "generator": "Blender Cycles AO emit bake",
+    "version": "selected-ground-contact-v1",
+    "selectionCount": 10,
+    "triangles": 9836,
+    "textureSize": [
+      512,
+      512
+    ],
+    "runtimeFormat": "R8 + generated mipmaps",
+    "gpuBytesWithMipmaps": 349526,
+    "nonWhitePixels": 12597,
+    "minimum": 0,
+    "scriptSha256": "47f73bafb1a3ec233345d476ff07bdc0f7739fdf32c2e95014f7f3a21f1eb5f2",
+    "geometrySha256": "99bea7bd9612d639d2e9d3a048dbeb40a3c307ea75af0918d8386424870d4184",
+    "runtimeSha256": "cea3ef2a709542bfc76621bae07e7a254ae72a7cbfe0b40a230ba3d401460779",
+    "blendSha256": "1e8abdbcbb61132a5d4d8c11bbbb313682293d6b901d711b73e47a4eb2a1c705",
+    "runtime": "src/game/assets/ground-details/contact-shadow.json",
+    "jsonBytes": 349633,
+    "gzipBytes": 14615
+  }
 }

@@ -31,7 +31,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs/promises');
   await page.goto('https://w-sunjun-public.dev.clock-p.com/games/mining-test/index.html?debug=1');
   await page.waitForFunction(()=>window.__miningValidation?.snapshot().ready);
   await page.addStyleTag({content:'.validation-panel,.input-monitor{display:none}'});
-  for(const [name,position,yaw,pitch] of [['arrival',[0,.1,30],0,.12],['portal-models',[18,.1,33],-Math.PI/2,.35],['pet-models',[-15,.1,30],Math.PI/2,.3]]){
+  for(const [name,position,yaw,pitch] of [['arrival',[0,.1,30],0,.12],['portal-models',[-19,.1,32],Math.PI/2,.3],['pet-models',[15,.1,30],-Math.PI/2,.3]].filter(([name])=>!process.env.VIEW_NAMES||process.env.VIEW_NAMES.split(',').includes(name))){
    await page.evaluate(({position,yaw,pitch})=>{window.__miningValidation.teleport(position);window.__miningValidation.look(yaw,pitch)},{position,yaw,pitch});
    await page.waitForFunction(()=>{const s=window.__miningValidation.snapshot();return s.ready&&s.grounded&&!s.queue&&!s.inFlight});
    const frame=await page.evaluate(()=>window.__miningValidation.snapshot().renderer.submission.submitted);

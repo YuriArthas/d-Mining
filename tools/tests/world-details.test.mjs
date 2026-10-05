@@ -12,7 +12,7 @@ test('all world signs are genuine extruded glyphs with fronts, backs and sides',
   const group=createWorldText(sign);
   try{
    assert.ok(group.children.length>0);
-   for(const mesh of group.children){assert.ok(mesh instanceof Mesh);assert.equal(mesh.geometry.type,'TextGeometry');const size=new Box3().setFromBufferAttribute(mesh.geometry.attributes.position);assert.ok(size.max.z-size.min.z>.05);assert.equal(mesh.material.length,2);assert.ok(mesh.material.every(m=>!m.map));}
+   for(const mesh of group.children){assert.ok(mesh instanceof Mesh);assert.equal(mesh.geometry.type,'TextGeometry');const size=new Box3().setFromBufferAttribute(mesh.geometry.attributes.position);assert.ok(size.max.z-size.min.z>.05);assert.equal(mesh.material.length,2);assert.equal(mesh.geometry.groups.length,2);assert.equal(mesh.geometry.groups.reduce((n,g)=>n+g.count,0),mesh.geometry.index.count);assert.ok(mesh.material.every(m=>!m.map));}
   }finally{disposeScenery(group);}
  }
 });

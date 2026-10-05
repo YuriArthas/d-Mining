@@ -76,3 +76,14 @@ test('touch mining has no deferred click after release or reset', () => {
   input.mine('pointer:1',false); assert.equal(input.consumeMinePress(),null);
   input.reset(); assert.equal(input.getAim().active,false); assert.equal(input.resetRevision,1);
 });
+
+test('explicit touch tap keeps its aim after release, consumes once and obeys reset', () => {
+  const input = new GameInput();
+  input.touchAim(.25, -.4, true); input.pressMine(); input.touchAim();
+  assert.deepEqual(input.consumeMinePress(), {x:.25, y:-.4, active:true, mode:'touch'});
+  assert.equal(input.consumeMinePress(), null);
+  assert.equal(input.getSnapshot().mining, false);
+  input.pressMine(); assert.equal(input.consumeMinePress(), null);
+  input.touchAim(.1,.2,true); input.pressMine(); input.reset();
+  assert.equal(input.consumeMinePress(), null);
+});

@@ -12,7 +12,7 @@ export class RenderTerrain {
   diagnostics() {
     const meshes = [...this.pipeline.residents.values()].flatMap(r => r.resource.mesh ? [r.resource.mesh] : []);
     return { materials: new Set(meshes.map(m => m.material)).size, atlases: new Set(meshes.map(m => (m.material as typeof this.surface.material).map)).size,
-      atlasBytes: this.surface.atlasBytes, responseAtlasBytes:this.surface.responseAtlasBytes, regionMeshes: meshes.length };
+      shadowReceivers:meshes.filter(m=>m.receiveShadow).length,shadowCasters:meshes.filter(m=>m.castShadow).length,atlasBytes: this.surface.atlasBytes, responseAtlasBytes:this.surface.responseAtlasBytes, regionMeshes: meshes.length };
   }
   private wireframe = false;
   private readonly wireMaterial = new MeshBasicMaterial({ color: '#213746', wireframe: true, depthWrite: false });
@@ -39,7 +39,7 @@ export class RenderTerrain {
           const geometry = new BufferGeometry();
           geometry.setAttribute('position', new BufferAttribute(m.positions, 3)); geometry.setAttribute('normal', new BufferAttribute(m.normals, 3));
           geometry.setAttribute('uv', new BufferAttribute(m.uvs, 2)); geometry.setAttribute('oreTile', new BufferAttribute(m.tiles, 1)); geometry.setIndex(new BufferAttribute(m.indices, 1)); geometry.computeBoundingSphere();
-          resource.mesh = new Mesh(geometry, this.surface.material); resource.mesh.receiveShadow=true; resource.mesh.position.set(...coord.map(v => v * RENDER_SIZE * CELL) as [number, number, number]);
+          resource.mesh = new Mesh(geometry, this.surface.material); resource.mesh.receiveShadow=false; resource.mesh.castShadow=false; resource.mesh.position.set(...coord.map(v => v * RENDER_SIZE * CELL) as [number, number, number]);
         }
         return resource;
       },

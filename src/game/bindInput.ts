@@ -119,7 +119,17 @@ export function bindInput(input: GameInput, elements: Elements) {
         } else aimTouch(owner);
       }
     }) as EventListener);
-    for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+    listen(element, 'pointerup', ((event: PointerEvent) => {
+      const owner = owners.get(event.pointerId);
+      if (owner?.gesture && owner.element === element && onSurface(event.clientX, event.clientY)) {
+        // Include final displacement even if the browser coalesced the last move.
+        owner.gesture.move(event.clientX, event.clientY);
+        owner.x = event.clientX; owner.y = event.clientY;
+        if (owner.gesture.end(true)) { aimTouch(owner); input.pressMine(); }
+      }
+      finishPointer(event.pointerId);
+    }) as EventListener);
+    for (const type of ['pointercancel', 'lostpointercapture']) {
       listen(element, type, ((event: PointerEvent) => finishPointer(event.pointerId)) as EventListener);
     }
   };

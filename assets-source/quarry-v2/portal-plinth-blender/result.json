@@ -1,0 +1,11 @@
+{
+  "status": "success",
+  "generator": "Blender",
+  "generationId": "portal-plinth-blender-v1",
+  "type": "authored_mesh",
+  "faceLimit": 192,
+  "triangles": 136,
+  "textureSize": 128,
+  "reference": "tools/blender/build-portal-plinth.py",
+  "recipeSha256": "28086eab185bb328fd767af12e056589d9b8ca1c17160c9133e4e4e0126efae2"
+}

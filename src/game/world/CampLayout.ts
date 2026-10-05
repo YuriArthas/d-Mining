@@ -1,3 +1,4 @@
+import {BOUNDARY_SOLIDS} from './TimberBoundary.ts';
 import {SURFACE_SITE} from './SurfaceSite.ts';
 import sizes from './campModelBounds.json' with {type:'json'};
 import {PET_AREA,PORTAL_AREA} from './SurfaceHub.ts';
@@ -12,8 +13,19 @@ export function footprint(p:QuarryPlacement,padding=0):Rect{
  return {minX:p.x-hx,maxX:p.x+hx,minZ:p.z-hz,maxZ:p.z+hz};
 }
 export const intersects=(a:Rect,b:Rect)=>a.minX<b.maxX&&a.maxX>b.minX&&a.minZ<b.maxZ&&a.maxZ>b.minZ;
-export const HUB_CLEARANCES:readonly Rect[]=[PET_AREA,PORTAL_AREA,{minX:-16,maxX:11,minZ:14,maxZ:49},{minX:-25,maxX:25,minZ:11.5,maxZ:17}];
+export const HUB_CLEARANCES:readonly Rect[]=[PET_AREA,PORTAL_AREA,SURFACE_SITE.plaza,SURFACE_SITE.sale,SURFACE_SITE.shop,
+ {minX:-25,maxX:25,minZ:13,maxZ:17},
+ {minX:-19,maxX:19,minZ:44,maxZ:62},
+];
 const trees=new Set(['crown-tree','oak-wide','oak-tall','maple-gold','maple-coral','birch-round','cedar-pillow','willow-dome','sapling-pair']);
+// Place vegetation on the actual authored step height, including low timber steps.
+function terraceHeight(x:number,z:number){
+ let height=0;
+ for(const s of BOUNDARY_SOLIDS){const dx=x-s.at[0],dz=z-s.at[2],c=Math.cos(s.yaw),n=Math.sin(s.yaw);
+  if(Math.abs(c*dx-n*dz)<=s.half[0]&&Math.abs(n*dx+c*dz)<=s.half[2])height=Math.max(height,s.at[1]+s.half[1]);
+ }
+ return height;
+}
 const planting=new Set(['soft-shrub','shrub-round','shrub-flower','shrub-berry','flower-daisies','grass-tussock','mushroom-cluster']);
 // Plan the complete decorative pass against measured model footprints, not
 // centre points. Occupied gameplay bays are deliberately unavailable for props.
@@ -21,24 +33,26 @@ export function layoutDecorations(input:readonly QuarryPlacement[],fixed:readonl
  const occupied=fixed.filter(p=>p.asset!=='meadow-base'&&!p.asset.startsWith('bank-')).map(p=>footprint(p,.3));
  const result:QuarryPlacement[]=[];let tree=0,plant=0;
  const b=SURFACE_SITE.boundary;
- const treeSlots=[...[b.left,b.right].flatMap(x=>[-28,-8,12,32,52].map(z=>({x,z}))),...[-40,-20,0,20,40].map(x=>({x,z:b.back})),...[-32,0,32].map(x=>({x,z:b.front}))];
+ const inset=b.module/2-b.setback/2;
+ const treeSlots=[...[b.left+inset,b.right-inset].flatMap(x=>[-15,3,21,39,57].map(z=>({x,z}))),...[-23,-7,9,25,41].map(x=>({x,z:b.back+inset})),...[-15,9,33].map(x=>({x,z:b.front-inset}))];
  for(const p of input){
   if(trees.has(p.asset)){
    const at=treeSlots[tree++];if(!at)throw Error('Tree terrace capacity exceeded');
-   result.push({...p,...at,y:3.3});continue;
+   result.push({...p,...at,y:terraceHeight(at.x,at.z)-.05});continue;
   }
   if(planting.has(p.asset)){
-   const i=plant++,side=i%2?b.right:b.left,z=b.back+8+Math.floor(i/2)%14*6.7;
-   result.push({...p,x:side+(Math.floor(i/28)%2)*2,z,y:3.32});continue;
+   const i=plant++,side=i%2?b.right-inset:b.left+inset,z=b.back+8+(Math.floor(i/2)%14)*(b.front-b.back-16)/13;
+   const x=side+(i%2?-1:1)*(Math.floor(i/28)%2)*.5;
+   result.push({...p,x,z,y:terraceHeight(x,z)-.03});continue;
   }
   const free=(candidate:QuarryPlacement)=>{
    const r=footprint(candidate,.35);
-   return r.minX>=-39.4&&r.maxX<=39.4&&r.minZ>=-31.4&&r.maxZ<=47.4&&!HUB_CLEARANCES.some(a=>intersects(a,r))&&!occupied.some(a=>intersects(a,r));
+   return r.minX>=-32&&r.maxX<=49&&r.minZ>=-24&&r.maxZ<=64&&!HUB_CLEARANCES.some(a=>intersects(a,r))&&!occupied.some(a=>intersects(a,r));
   };
   let chosen:QuarryPlacement|undefined=free(p)?p:undefined;
   if(!chosen){
    // Rear workyard, then western service strip. Largest assets placed first.
-   outer:for(let z=-27;z<=15;z+=2)for(let x=-35;x<=35;x+=2){
+   outer:for(let z=-22;z<=12;z+=2)for(let x=-30;x<=47;x+=2){
     const candidate={...p,x,z};if(free(candidate)){chosen=candidate;break outer;}
    }
   }

@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import type {RenderRate} from './game/movement.ts';
+import type {SurfaceTime} from './game/world/SceneLighting.ts';
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { flushSync } from 'react-dom';
 import { NeutralToneMapping } from 'three';
 import { Canvas, unmountComponentAtNode, type RootState } from '@react-three/fiber';
@@ -8,6 +10,9 @@ import { InputMonitor, ValidationPanel } from './game/Controls.tsx';
 import { ValidationScene } from './game/validation/ValidationScene.tsx';
 import { GameSession } from './game/application/GameSession.ts';
 import { SessionUi } from './game/ui/SessionUi.tsx';
+import {PerformanceProbeUi} from './game/ui/PerformanceProbeUi.tsx';
+import type {ProbeMode} from './game/presentation/PerformanceProbe.ts';
+import type {PerformanceSnapshot} from './game/presentation/PerformanceMeter.ts';
 
 declare global {
   interface Window {
@@ -25,9 +30,15 @@ export function App() {
   const scene = useRef<RootState | null>(null);
   const exiting = useRef(false);
   const [exited, setExited] = useState(false);
+  const [timeOfDay,setTimeOfDay]=useState<SurfaceTime>('night');
+  const [shadowsEnabled,setShadowsEnabled]=useState(true);
+  const [renderRate,setRenderRate]=useState<RenderRate>('display');
   const [status, setStatus] = useState('正在准备地形');
+  const [performanceStats,setPerformanceStats]=useState<PerformanceSnapshot|null>(null);
   const [input] = useState(() => new GameInput());
   const [session] = useState(() => new GameSession());
+  const [probeMode,setProbeMode]=useState<ProbeMode>('normal');
+  const changeProbeMode=useCallback((mode:ProbeMode)=>{input.reset();setProbeMode(mode);},[input]);
   const surface = useRef<HTMLDivElement>(null);
   const debug = new URLSearchParams(window.location.search).get('debug') === '1';
 
@@ -78,23 +89,38 @@ export function App() {
 
   return (
     <main className="game-shell game-shell--active" aria-label="Mining 游戏" style={{ '--scene-background': GAME_CONFIG.background } as CSSProperties}>
-      <div ref={surface} className="scene" tabIndex={0} aria-label="游戏视角，拖动观察，长按方块挖掘">
+      <div ref={surface} className="scene" tabIndex={0} aria-label="游戏视角，拖动观察，点按敲击，长按方块挖掘">
         <Canvas
           ref={canvas}
           onCreated={state => { scene.current = state; state.gl.toneMapping=NeutralToneMapping; state.gl.toneMappingExposure=1.08; }}
           frameloop="never"
-          shadows
+          shadows={false}
           resize={{ offsetSize: true }}
-          dpr={[1, GAME_CONFIG.pixelRatioMax]}
+          dpr={probeMode==='low-resolution'?Math.min(Math.max(window.devicePixelRatio,1),GAME_CONFIG.pixelRatioMax)*.5:[1,GAME_CONFIG.pixelRatioMax]}
           camera={{ fov: GAME_CONFIG.camera.fov, near: GAME_CONFIG.camera.near, far: 10000 }}
           gl={{ antialias: true }}
           fallback={<p className="graphics-error">当前浏览器无法启动 3D 画面，请使用支持 WebGL2 的浏览器。</p>}
         >
-          <ValidationScene input={input} onStatus={setStatus} session={session} />
+          <ValidationScene renderRate={renderRate} shadowsEnabled={shadowsEnabled} probeMode={probeMode} input={input} onStatus={setStatus} onPerformance={setPerformanceStats} session={session} timeOfDay={timeOfDay} />
         </Canvas>
       </div>
       <header className="game-header">
-        <div><span className="wordmark">MINING</span><span className="stage-label">{status}</span></div>
+        <div><span className="wordmark">MINING</span><span className="stage-label">{status}</span>
+          <div className="performance-hud" aria-label="实时性能" title="帧率模式可切换60帧上限或跟随屏幕回调；FPS 按实际提交的主画面计数；CPU 是每次逻辑更新均值，提交是实际绘制的主线程均值（含反射）。RAF 是浏览器回调频率，调度是游戏限帧的跳过比例；GPU 计时需显式开启；绘制次数拆为主画面 / 反射，三角面含两个通道。">
+            <div>{performanceStats?`${performanceStats.fps.toFixed(1)} FPS · ${performanceStats.frameMs?.toFixed(1)??'—'} ms`:'FPS — · — ms'}</div>
+            <details className="performance-details"><summary>详情</summary><div className="performance-expanded">
+            <div className="performance-detail">{performanceStats?`CPU ${performanceStats.logicCpuMs.toFixed(1)} ms · 提交 ${performanceStats.renderCpuMs?.toFixed(1)??'—'} ms · GPU ${performanceStats.gpu?.totalMs?.toFixed(1)??'—'} ms`:'正在采样性能…'}</div>
+            {performanceStats&&<div className="performance-detail">{`绘制 ${performanceStats.mainCalls} / ${performanceStats.reflectionCalls} · 三角 ${(performanceStats.triangles/10000).toFixed(1)}万 · GPU 等待跳帧 ${performanceStats.skipPercent.toFixed(0)}%`}</div>}
+            {performanceStats&&<div className="performance-detail">{`RAF ${performanceStats.rafFps.toFixed(1)} · 调度跳过 ${performanceStats.scheduleSkipPercent.toFixed(0)}% · 同步 ${performanceStats.waitCpuMs.toFixed(1)} ms`}</div>}
+            {performanceStats&&<div className="performance-detail">{!performanceStats.gpu?.enabled?'GPU 计时关闭（避免同步查询干扰）':performanceStats.gpu?.supported?`GPU 主画面 ${performanceStats.gpu.mainMs?.toFixed(1)??'—'} / 反射 ${performanceStats.gpu.reflectionMs?.toFixed(1)??'—'} ms`:'GPU 计时：此浏览器不支持'}</div>}
+            <PerformanceProbeUi renderRate={renderRate} shadowsEnabled={shadowsEnabled} stats={performanceStats} onMode={changeProbeMode} />
+            </div></details>
+          </div>
+        </div>
+        <nav className="scene-actions" aria-label="场景设置">
+        <button type="button" aria-label={renderRate==='display'?'切换为60帧上限':'跟随屏幕刷新率'} onClick={()=>{input.reset();setRenderRate(r=>r==='display'?'60':'display');surface.current?.focus();}}>帧率：{renderRate==='display'?'屏幕':'60'}</button>
+        <button type="button" aria-label={shadowsEnabled?'关闭烘焙阴影':'开启烘焙阴影'} aria-pressed={shadowsEnabled} onClick={()=>{input.reset();setShadowsEnabled(v=>!v);surface.current?.focus();}}>阴影：{shadowsEnabled?'烘焙':'关'}</button>
+        <button type="button" aria-label={timeOfDay==='day'?'切换到夜晚':'切换到白天'} onClick={()=>{input.reset();setTimeOfDay(t=>t==='day'?'night':'day');surface.current?.focus();}}>{timeOfDay==='day'?'☀ 白天':'☾ 夜晚'}</button>
         <button type="button" onClick={exit}
           onPointerDown={event => { if (event.pointerType !== 'mouse') event.preventDefault(); }}
           onPointerUp={event => {
@@ -103,6 +129,7 @@ export function App() {
           }} aria-label={hosted ? '退出游戏，返回游戏列表' : '退出游戏'}>
           退出游戏
         </button>
+        </nav>
       </header>
       <SessionUi session={session} input={input} surface={surface} />
       {debug && <><InputMonitor input={input} /><ValidationPanel /></>}

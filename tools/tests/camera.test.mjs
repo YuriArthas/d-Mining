@@ -74,7 +74,7 @@ test('recovery duration is frame-rate independent; reset removes old target lag'
   const p=setup(),r=new ThirdPersonCamera();try{
    const wall=p.world.createCollider(RAPIER.ColliderDesc.cuboid(3,4,.1).setTranslation(40,2,42));p.world.step();r.update(p.world,p.collider,[40,.027,40],0,0,1/hz,844/390);
    p.world.removeCollider(wall,false);p.world.step();for(let i=0;i<hz;i++)r.update(p.world,p.collider,[40,.027,40],0,0,1/hz,844/390);values.push(r.distance);
-   r.reset();r.update(p.world,p.collider,[50,10,50],0,.45,1/hz,844/390);assert.ok(Math.abs(r.target.y-11.9)<1e-6);assert.equal(r.distance,GAME_CONFIG.camera.distance);
+   r.reset();r.update(p.world,p.collider,[50,10,50],0,.45,1/hz,844/390);assert.ok(Math.abs(r.target.y-(10+GAME_CONFIG.camera.targetHeight))<1e-6);assert.equal(r.distance,GAME_CONFIG.camera.distance);
   }finally{p.dispose();}
  }
  assert.ok(Math.max(...values)-Math.min(...values)<1e-8);

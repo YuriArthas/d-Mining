@@ -28,13 +28,13 @@ test('both staircases can be climbed and descended with the real capsule, withou
   try{
    p.world.createCollider(RAPIER.ColliderDesc.cuboid(90,.5,90).setTranslation(0,-.5,0));
    for(const s of QUARRY_SOLIDS)p.world.createCollider(RAPIER.ColliderDesc.cuboid(...s.half).setTranslation(...s.at).setRotation({x:0,y:Math.sin(s.yaw/2),z:0,w:Math.cos(s.yaw/2)}));
-   p.teleport([-23.5,.1,z]);for(let i=0;i<20;i++)p.tick(0,0,0,false,true);
-   for(let i=0;i<500&&p.feet()[0]>-42.5;i++)p.tick(-1,0,0,false,true);
-   assert.ok(p.feet()[0]<-42.5,`stuck ascending ${JSON.stringify(p.feet())}`);
+   p.teleport([23.5,.1,z]);for(let i=0;i<20;i++)p.tick(0,0,0,false,true);
+   for(let i=0;i<500&&p.feet()[0]<42.5;i++)p.tick(1,0,0,false,true);
+   assert.ok(p.feet()[0]>42.5,`stuck ascending ${JSON.stringify(p.feet())}`);
    assert.ok(p.feet()[1]>3.9&&p.feet()[1]<4.2);
-   for(let i=0;i<500&&p.feet()[0]<-23.5;i++)p.tick(1,0,0,false,true);
+   for(let i=0;i<500&&p.feet()[0]>23.5;i++)p.tick(-1,0,0,false,true);
    for(let i=0;i<20;i++)p.tick(0,0,0,false,true);
-   assert.ok(p.feet()[0]>-23.5,`stuck descending ${JSON.stringify(p.feet())}`);
+   assert.ok(p.feet()[0]<23.5,`stuck descending ${JSON.stringify(p.feet())}`);
    assert.ok(p.feet()[1]<.1);
   }finally{p.dispose();}
  }

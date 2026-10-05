@@ -1,9 +1,12 @@
+import {yieldLoadingTask} from './prepareShaders.ts';
 import { Group, Mesh, Raycaster, Vector3 } from 'three';
 import { RAPIER, type CharacterPhysics } from '../validation/physics.ts';
 import { ROOMS } from '../world/rooms.ts';
 import { roomPlan, type SceneryPlan } from '../world/scenery.ts';
 import { surfacePlan } from '../world/SurfaceAssetPlan.ts';
 import { createScenery, disposeScenery } from './SceneryMesh.ts';
+import type {SurfaceDetails} from './SurfaceDetails.ts';
+import type {SurfaceTime} from '../world/SceneLighting.ts';
 import { sceneryGeometryMemory } from './sceneryGeometryMemory.ts';
 
 // Ordinary scene props use independent visual/physical residency. The voxel floor
@@ -23,13 +26,21 @@ export class RoomFacilities {
     if(!plan){plan=id==='surface'?surfacePlan():roomPlan(ROOMS.find(r=>r.id===id)!);this.plans.set(id,plan);}
     return plan;
   }
+  private ensureVisual(site:{id:string;depth:number}){
+    if(this.visuals.has(site.id))return;
+    const view=createScenery(this.plan(site.id));view.position.y=-site.depth;
+    this.visuals.set(site.id,view);this.group.add(view);this.revision++;
+    this.geometryMemory.set(site.id,sceneryGeometryMemory(view));
+  }
+  async prepare(signal:AbortSignal,onProgress:(done:number,total:number)=>void){
+    for(const [i,site] of this.sites.entries()){
+      await yieldLoadingTask(signal);this.ensureVisual(site);onProgress(i+1,this.sites.length);
+    }
+  }
   sync(feet:readonly number[]){
     for(const site of this.sites){
       const plan=this.plan(site.id);
-      if(!this.visuals.has(site.id)){
-        const view=createScenery(plan);view.position.y=-site.depth;this.visuals.set(site.id,view);this.group.add(view);this.revision++;
-        this.geometryMemory.set(site.id,sceneryGeometryMemory(view));
-      }
+      this.ensureVisual(site);
       // All authored scenery remains resident for the session; distance never controls visibility.
       // Per-prop culling keeps distant physics off even within a large site.
       for(const [i,solid] of plan.solids.entries()){
@@ -46,12 +57,14 @@ export class RoomFacilities {
 
     }
   }
+  updateSurface(time:SurfaceTime,elapsed:number,bakedShadowsEnabled:boolean){(this.visuals.get('surface')?.userData.surfaceDetails as SurfaceDetails|undefined)?.update(time,elapsed,bakedShadowsEnabled);}
+  beginSurfaceDraw(){(this.visuals.get('surface')?.userData.surfaceDetails as SurfaceDetails|undefined)?.beginDraw();}
   surfaceHeight(x:number,z:number){
     const surface=this.visuals.get('surface');if(!surface)return null;surface.updateMatrixWorld(true);
     const ray=new Raycaster(new Vector3(x,250,z),new Vector3(0,-1,0)),ground:Mesh[]=[];
     surface.traverse(o=>{if(o instanceof Mesh&&o.userData.surfaceGround===true)ground.push(o);});
     return ray.intersectObjects(ground,false)[0]?.point.y??null;
   }
-  diagnostics(){return {surfaceHub:this.visuals.get('surface')?.userData.hub??null,visuals:[...this.visuals.keys()],geometryMemory:Object.fromEntries(this.geometryMemory),colliders:this.physical.size,surfaceShading:this.visuals.get('surface')?.userData.surfaceShading??null};}
+  diagnostics(){return {ponds:this.visuals.get('surface')?.userData.ponds??null,boundaryStitching:this.visuals.get('surface')?.userData.boundaryStitching??null,surfaceDetails:(this.visuals.get('surface')?.userData.surfaceDetails as SurfaceDetails|undefined)?.diagnostics()??null,surfaceHub:this.visuals.get('surface')?.userData.hub??null,visuals:[...this.visuals.keys()],geometryMemory:Object.fromEntries(this.geometryMemory),colliders:this.physical.size,surfaceShading:this.visuals.get('surface')?.userData.surfaceShading??null};}
   dispose(){for(const g of this.visuals.values())disposeScenery(g);this.visuals.clear();for(const list of this.physical.values())for(const c of list)this.physics.world.removeCollider(c,false);this.physical.clear();this.plans.clear();this.geometryMemory.clear();}
 }

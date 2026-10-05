@@ -1,0 +1,18 @@
+{
+  "generator": "Blender",
+  "generationId": "grid-pond-bank-blender-v3",
+  "script": "tools/blender/build-pond-bank.py",
+  "source": "assets-source/quarry-v2/pond-bank-blender/source.blend",
+  "triangles": 226,
+  "waterTriangles": 16,
+  "dimensions": [
+    12,
+    0.38,
+    10
+  ],
+  "textures": [],
+  "surfaceDetail": "shared 128px ground atlas; procedural 16px-per-tile animated water",
+  "runtimeSha256": "f88378226582a6bf7e2e36bdf619aa453d24243461486a2ea4c4b6cc7e17fb4a",
+  "blendSha256": "22aaa1b8d01e65426e79430a8dfd0759516b9a360108f29d1c6c6f14f668fe21",
+  "scriptSha256": "9cac8a2a7dcb77d8889e8979c1d74933f3132330c1cc7e964e1251f4d2ea3649"
+}

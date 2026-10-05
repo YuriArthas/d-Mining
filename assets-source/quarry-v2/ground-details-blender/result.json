@@ -1,0 +1,13 @@
+{
+  "generator": "Blender",
+  "generationId": "ground-details-blender-v1",
+  "script": "tools/blender/build-ground-details.py",
+  "source": "assets-source/quarry-v2/ground-details-blender/source.blend",
+  "triangles": [
+    18,
+    24
+  ],
+  "runtimeSha256": "62321bd1d211b9a921cf5789610aada0df367e6a0b631d67a36a57297e4e9a6a",
+  "blendSha256": "77a6d2c60f5307dfee7708f819226fbeb5d5acb534a9cf86829e24d8dc7f940c",
+  "scriptSha256": "15f689b17b1961ec340191794edad0a4ede3d0e1320f9806c34e431ec42cdb2b"
+}

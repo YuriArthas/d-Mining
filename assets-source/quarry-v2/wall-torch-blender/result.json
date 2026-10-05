@@ -1,0 +1,12 @@
+{
+  "generator": "Blender",
+  "generationId": "wall-torch-blender-v1",
+  "source": "assets-source/quarry-v2/wall-torch-blender/source.blend",
+  "script": "tools/blender/build-wall-torch.py",
+  "triangles": 192,
+  "textures": [],
+  "palette": "authored vertex colors, no texture allocation",
+  "runtimeSha256": "b08534fdc1b526bfbe8a719aadefbf318282b95cbfaf9d39f44cf77d439614bd",
+  "blendSha256": "ff27edeca9507369d8b30ae79da6373fc3bceaaa406f376f041cea55664ad50b",
+  "scriptSha256": "929f7d3cdbe0a18ec8e5f89f4ee7b5488acc8f913146f38c78dc5dad696e4770"
+}

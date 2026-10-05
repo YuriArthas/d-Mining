@@ -6,7 +6,7 @@ function setup(){const p=new CharacterPhysics();const floor=p.world.createCollid
 function tick(p,n,x=0,y=0,jump=false){for(let i=0;i<n;i++)p.tick(x,y,0,jump&&i===0,true);}
 test('production spawn and former deck footprint are flat without invisible ramp colliders',()=>{
  const p=new CharacterPhysics(false);try{
-  p.world.createCollider(RAPIER.ColliderDesc.cuboid(40,.5,40).setTranslation(0,-.5,0));
+  p.world.createCollider(RAPIER.ColliderDesc.cuboid(80,.5,80).setTranslation(0,-.5,0));
   tick(p,30);assert.ok(p.grounded);assert.ok(p.feet()[1]<.05);
   p.teleport([0,.05,6.5]);tick(p,20);
   for(let i=0;i<120;i++){tick(p,1,0,-1);assert.ok(p.grounded);assert.ok(p.feet()[1]>=0&&p.feet()[1]<.05);}

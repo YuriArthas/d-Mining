@@ -1,10 +1,15 @@
-// One site envelope for scenery, planting and functional-area clearances.
-// Distances are metres. The mining grid remains independent and unchanged.
+// Approved V3 plan: from spawn facing the mine, portals LEFT, eggs RIGHT.
+// Flat construction envelope is 81 x 90 m. Terrain modules sit outside it.
 export const SURFACE_SITE={
- boundary:{left:-60,right:60,back:-44,front:68,pitch:8,module:8.6,levels:4,rise:3.35,base:-.25},
- interior:{minX:-55.7,maxX:55.7,minZ:-39.7,maxZ:63.7},
+ boundary:{left:-39,right:57,back:-31,front:73,pitch:8,setback:4,module:8.6,levels:4,rise:3.35,base:-.25},
+ interior:{minX:-34.7,maxX:52.7,minZ:-26.7,maxZ:68.7},
+ construction:{minX:-34,maxX:47,minZ:-24,maxZ:66},
  grounds:{width:208,depth:208},
- buffer:8,
- pet:{minX:-47,maxX:-16,minZ:13,maxZ:49},
- portal:{minX:11,maxX:47.5,minZ:19,maxZ:48},
+ buffer:4,
+ redLine:13,
+ pet:{minX:19,maxX:43,minZ:14,maxZ:46},
+ portal:{minX:-30,maxX:-20,minZ:14,maxZ:50},
+ plaza:{minX:-19,maxX:19,minZ:14,maxZ:46},
+ sale:{minX:-19,maxX:-5,minZ:46,maxZ:62},
+ shop:{minX:5,maxX:19,minZ:46,maxZ:62},
 } as const;

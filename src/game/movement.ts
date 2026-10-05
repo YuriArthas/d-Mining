@@ -38,14 +38,21 @@ export class FixedStepClock {
   }
 }
 
-// Deadlines preserve an average 60 Hz cadence on e.g. 90 Hz screens (alternating RAF intervals).
+// Choose the RAF nearest each 60 Hz deadline. A half-interval window tolerates
+// vsync timestamp jitter without losing frames or shifting the clock every tick.
+export type RenderRate='60'|'display';
 export class RenderSchedule {
   private next: number | null = null;
-  due(nowMs: number) {
-    if (this.next === null) this.next = nowMs;
-    if (nowMs < this.next - 0.25) return false;
-    this.next += 1000 / 60;
-    if (this.next <= nowMs) this.next = nowMs + 1000 / 60;
+  due(nowMs: number,rate:RenderRate='60') {
+    // Display mode follows every browser RAF; do not create a timer busy loop.
+    // Reset the old deadline so returning to 60 Hz starts immediately.
+    if(rate==='display'){this.next=null;return true;}
+    const interval=1000/60,tolerance=interval/2;
+    if(this.next===null){this.next=nowMs+interval;return true;}
+    if(nowMs<this.next-tolerance)return false;
+    this.next+=interval;
+    // A genuine missed interval/pause must not cause a burst of catch-up draws.
+    if(this.next<nowMs-tolerance)this.next=nowMs+interval;
     return true;
   }
 }

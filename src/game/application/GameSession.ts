@@ -170,6 +170,6 @@ export class GameSession {
   returnToSurface = () => {
     if (!this.world) return;
     this.world.cancelMining(); this.world.returnToSurface(); this.resetPosition();
-    this.notice = '走进金色圆圈出售，或踩右侧圆盘前往已解锁层'; this.publish();
+    this.notice = '走进金色圆圈出售，或踩左侧圆盘前往已解锁层'; this.publish();
   };
 }

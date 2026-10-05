@@ -31,7 +31,7 @@ test('shipped quarry models use role-sized GPU-compressed mip chains and exact t
    authoredModels++;
    assert.equal(manifest.source,'Blender authored mesh and texture');
    assert.ok(manifest.generationId);assert.equal(manifest.taskId,undefined);
-   assert.ok(count<=(file.startsWith('egg-')?1600:128));assert.equal(document.images.length,1);
+   assert.ok(count<=(file.startsWith('egg-')?1600:file==='portal-plinth-blender.manifest.json'?192:128));assert.equal(document.images.length,1);
    for(const material of document.materials){assert.equal(material.normalTexture,undefined);assert.equal(material.pbrMetallicRoughness.metallicRoughnessTexture,undefined);}
   }else texturedModels++;
   assert.ok(document.extensionsRequired.includes('KHR_texture_basisu'));

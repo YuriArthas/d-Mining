@@ -38,9 +38,11 @@ test('each pad uses its own destination rather than a shared fixed spawn',()=>{
 });
 
 test('landmark stands inside its own activation area with clearance for the player capsule',async()=>{
- const {PORTAL_MODEL}=await import('../../src/game/world/SurfaceHub.ts');
+ const {PORTAL_MODEL,PORTAL_BASE_HEIGHT,HUB_PLACEMENTS}=await import('../../src/game/world/SurfaceHub.ts');
+ assert.ok(PORTAL_BASE_HEIGHT+.04<SURFACE_PORTALS[0].zone.heightTolerance,'standing on the low plinth must still activate travel');
+ assert.equal(HUB_PLACEMENTS.filter(p=>p.asset==='portal-plinth-blender').length,SURFACE_PORTALS.length);
  const corner=Math.hypot(PORTAL_MODEL.width/2,PORTAL_MODEL.depth/2);
- for(const p of SURFACE_PORTALS){assert.equal(p.x,p.zone.x);assert.equal(p.z,p.zone.z);assert.ok(p.zone.radius>corner+.4);}
+ for(const p of SURFACE_PORTALS){assert.equal(p.x,p.zone.x);assert.equal(p.z,p.zone.z);assert.ok(p.zone.radius>corner);assert.ok(p.zone.radius>PORTAL_MODEL.depth/2+.4);}
 });
 test('eighteen eggs occupy three supported ascending tiers with separate browsing aisles',async()=>{
  const {PET_DISPLAYS,PET_AREA,HUB_PLACEMENTS}=await import('../../src/game/world/SurfaceHub.ts');
@@ -54,7 +56,7 @@ test('eighteen eggs occupy three supported ascending tiers with separate browsin
   for(const q of eggs.slice(i+1))assert.ok(Math.hypot(p.x-q.x,p.z-q.z)>=4);
  }
  for(let i=1;i<PET_TIERS.length;i++){
-  assert.ok(PET_TIERS[i].x<PET_TIERS[i-1].x);assert.ok(PET_TIERS[i].y>PET_TIERS[i-1].y);
+  assert.ok(PET_TIERS[i].x>PET_TIERS[i-1].x);assert.ok(PET_TIERS[i].y>PET_TIERS[i-1].y);
  }
 });
 test('decorations do not occupy the pet court, portal court or central approach',async()=>{
@@ -67,15 +69,25 @@ test('decorations do not occupy the pet court, portal court or central approach'
  }
 });
 
-test('courtyard circulation stays outside unlocked portal triggers, including hysteresis',()=>{
+test('approved left portal lane stays clear, including hysteresis and player radius',()=>{
  const {s,calls}=setup();s.updatePosition([90,-4000,90],false);
- const points=[];
- for(let x=0;x<=35;x++)for(const z of [30,33,36])points.push([x,0,z]);
- for(const point of points){
-  for(const p of SURFACE_PORTALS)assert.ok(Math.hypot(point[0]-p.x,point[2]-p.z)>p.zone.radius+p.zone.hysteresis+.4);
-  s.updatePosition(point,true);
+ for(let z=14;z<=50;z+=.5)for(const x of [-24,-22,-20]){
+  for(const p of SURFACE_PORTALS)assert.ok(Math.hypot(x-p.x,z-p.z)>p.zone.radius+p.zone.hysteresis+.4);
+  s.updatePosition([x,0,z],true);
  }
  assert.equal(calls.length,0,'browsing must not teleport');
- const xs=SURFACE_PORTALS.map(p=>p.x),zs=SURFACE_PORTALS.map(p=>p.z);
- assert.ok(Math.max(...xs)-Math.min(...xs)<=27);assert.ok(Math.max(...zs)-Math.min(...zs)<=18);
+ assert.ok(SURFACE_PORTALS.every(p=>p.x===-27&&p.z-p.zone.radius-p.zone.hysteresis>=14&&p.z+p.zone.radius+p.zone.hysteresis<=50));
+ assert.equal(Math.max(...SURFACE_PORTALS.map(p=>p.z))-Math.min(...SURFACE_PORTALS.map(p=>p.z)),32);
+});
+
+test('approved functional orientation and red line include actual rendered geometry',async()=>{
+ const {PET_DISPLAYS,HUB_PLACEMENTS}=await import('../../src/game/world/SurfaceHub.ts');
+ const {SURFACE_BUILDINGS,SURFACE_SALE,SURFACE_SHOP}=await import('../../src/game/world/surfaceLayout.ts');
+ const {footprint}=await import('../../src/game/world/CampLayout.ts');
+ assert.ok(PET_DISPLAYS.every(p=>p.x>0&&p.yaw===-Math.PI/2));
+ for(const p of HUB_PLACEMENTS.filter(p=>p.portalId)){
+  const r=footprint(p);assert.ok(r.maxX<0&&r.minZ>=14&&r.maxZ<=50);
+ }
+ for(const b of Object.values(SURFACE_BUILDINGS)){assert.equal(b.z,56);assert.equal(b.yaw,Math.PI);}
+ for(const z of [SURFACE_SALE,SURFACE_SHOP])assert.ok(Math.abs(z.z-49.3)<.0001);
 });

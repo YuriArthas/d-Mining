@@ -3,17 +3,17 @@ import { SURFACE_SPAWN } from './world/surfaceLayout.ts';
 export const GAME_CONFIG = {
   background: '#0b1233',
   pixelRatioMax: 1.5, // Device pixel ratio cap; positive, normally 1–2.
-  player: { radius: 0.4, height: 1.65, spawn: SURFACE_SPAWN },
+  player: { radius: 0.44, height: 1.85, spawn: SURFACE_SPAWN },
   camera: {
-    distance: 10.5, // Metres from the player's observation target.
-    targetHeight: 1.9, // Keep the initial crosshair above the cylinder rather than on its back.
+    distance: 8.5, // Metres from the player's observation target.
+    targetHeight: 2.05, // Keep the initial crosshair above the cylinder rather than on its back.
     initialYaw: 0,
-    initialPitch: 0.04,
+    initialPitch: 0.22,
     minPitch: -0.55, // Radians; look upward from a shaft without crossing the floor.
     maxPitch: 1.45, // Almost straight down, with a stable horizontal heading.
     near: 0.08, // Metres; reduced only for extreme landscape aspect ratios.
     minProbeRadius: 0.18,
-    maxProbeRadius: 0.28, // Must fit inside the 0.4 m player capsule.
+    maxProbeRadius: 0.28, // Must fit inside the 0.44 m player capsule.
     clearance: 0.025,
     followSharpness: 14, // Exponential vertical follow rate, per second.
     maxVerticalLag: 0.4, // Metres; bound lag while falling.

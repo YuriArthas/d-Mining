@@ -34,6 +34,8 @@ export class GameInput {
   private aim = { x: 0, y: 0, active: false, mode: 'touch' as 'touch' | 'mouse' };
   private minePress: typeof this.aim | null = null;
   getAim = () => this.aim;
+  // A completed tap survives release until the next frame, just like a mouse click.
+  pressMine() { if (this.aim.active) this.minePress = { ...this.aim }; }
   consumeMinePress() { const press = this.minePress; this.minePress = null; return press; }
   // Pointer motion is polled by the scene, without publishing React state each event.
   point(x: number, y: number, active: boolean) { this.aim = { x, y, active, mode: 'mouse' }; }

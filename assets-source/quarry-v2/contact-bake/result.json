@@ -1,0 +1,22 @@
+{
+  "sourceFile": "assets-source/quarry-v2/contact-bake/source.blend",
+  "script": "tools/blender/bake-contact-shadows.py",
+  "geometryExporter": "tools/export-contact-bake.mjs",
+  "textureSizeBytes": 262144,
+  "generator": "Blender Cycles AO emit bake",
+  "version": "selected-ground-contact-v1",
+  "selectionCount": 10,
+  "triangles": 9836,
+  "textureSize": [
+    512,
+    512
+  ],
+  "runtimeFormat": "R8 + generated mipmaps",
+  "gpuBytesWithMipmaps": 349526,
+  "nonWhitePixels": 12597,
+  "minimum": 0,
+  "scriptSha256": "47f73bafb1a3ec233345d476ff07bdc0f7739fdf32c2e95014f7f3a21f1eb5f2",
+  "geometrySha256": "99bea7bd9612d639d2e9d3a048dbeb40a3c307ea75af0918d8386424870d4184",
+  "runtimeSha256": "cea3ef2a709542bfc76621bae07e7a254ae72a7cbfe0b40a230ba3d401460779",
+  "blendSha256": "1e8abdbcbb61132a5d4d8c11bbbb313682293d6b901d711b73e47a4eb2a1c705"
+}

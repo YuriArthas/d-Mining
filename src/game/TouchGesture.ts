@@ -25,5 +25,9 @@ export class TouchGesture {
     this.x = x; this.y = y;
     return this.phase === 'look' ? { x: dx, y: dy } : { x: 0, y: 0 };
   }
-  end() { this.phase = 'ended'; }
+  end(released = false) {
+    const tap = released && this.phase === 'pending';
+    this.phase = 'ended';
+    return tap;
+  }
 }

@@ -38,7 +38,8 @@ test('holes and irregular solids match an independent six-neighbor exposed-face 
  assert.equal(surfaceArea(greedyMesh(get,size)),faces*CELL**2);
 });
 test('chunk boundaries never emit internal faces or geometry owned by neighbors',()=>{
- const a=buildRegion('collision',[0,-1,0],CHUNK,[]),b=buildRegion('collision',[1,-1,0],CHUNK,[]);
+ // Flat floor away from the authored surface excavation.
+ const a=buildRegion('collision',[1,-1,1],CHUNK,[]),b=buildRegion('collision',[2,-1,1],CHUNK,[]);
  assert.equal(a.mesh.indices.length,6);assert.equal(b.mesh.indices.length,6);
  assert.ok(Array.from(a.mesh.positions).filter((_,i)=>i%3===1).every(v=>v===32));
  const empty=greedyMesh((x,y,z)=>x===-1?1:0,16);assert.equal(empty.indices.length,0);

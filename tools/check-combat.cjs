@@ -23,18 +23,19 @@ const {digCells}=require('./combat-browser.cjs');
    await page.screenshot({path:`artifacts/${label}-${layout}-upgrade.png`});await press('背包');assert.ok(await page.getByRole('button',{name:'还差 20 金币',exact:true}).isDisabled());await press('关闭升级界面');
    await teleport('bands');const cell=[8,-1,-25],point=await project([17,0,-49]);
    const cdp=await page.context().newCDPSession(page),send=(type,points=[])=>cdp.send('Input.dispatchTouchEvent',{type,touchPoints:points});
-   if(touch){await send('touchStart',[point]);await send('touchEnd');await page.waitForTimeout(230);assert.equal(await hp(cell),90);await send('touchStart',[point]);}
+   if(touch){await send('touchStart',[point]);await send('touchEnd');await page.waitForFunction(()=>window.__miningValidation.health([8,-1,-25])===80);await page.waitForTimeout(600);await send('touchStart',[point]);}
    else {await page.mouse.move(point.x,point.y);await page.mouse.down();}
-   await page.waitForFunction(()=>window.__miningValidation.health([8,-1,-25])===80);
-   await page.getByTestId('target-hp').filter({hasText:'80 / 90'}).waitFor();
+   const expectedHp=touch?70:80;
+   await page.waitForFunction(hp=>window.__miningValidation.health([8,-1,-25])===hp,expectedHp);
+   await page.getByTestId('target-hp').filter({hasText:`${expectedHp} / 90`}).waitFor();
    if(touch)await send('touchEnd');else await page.mouse.up();
-   assert.equal((await snap()).economy.inventory.used,0);assert.equal(await hp(cell),80);
+   assert.equal((await snap()).economy.inventory.used,0);assert.equal(await hp(cell),expectedHp);
    // Retap and change target in the existing cooldown; both must preserve HP.
    if(!touch)await page.mouse.click(point.x,point.y);
-   assert.equal((await page.evaluate(()=>window.__miningValidation.hit([9,-1,-25]))).status,'cooldown');assert.equal(await hp(cell),80);assert.equal(await hp([9,-1,-25]),90);
+   assert.equal((await page.evaluate(()=>window.__miningValidation.hit([9,-1,-25]))).status,'cooldown');assert.equal(await hp(cell),expectedHp);assert.equal(await hp([9,-1,-25]),90);
    if(!touch)await page.getByTestId('target-hp').filter({hasText:'80 / 90'}).waitFor();
    if(!touch)await page.screenshot({path:`artifacts/${label}-${layout}-hp.png`});
-   await teleport('deep');assert.equal(await hp(cell),80);await teleport('bands');assert.equal(await hp(cell),80);
+   await teleport('deep');assert.equal(await hp(cell),expectedHp);await teleport('bands');assert.equal(await hp(cell),expectedHp);
    const again=await project([17,0,-49]);if(touch)await send('touchStart',[again]);else {await page.mouse.move(again.x,again.y);await page.mouse.down();}
    await page.waitForFunction(()=>window.__miningValidation.cell([8,-1,-25])===0);if(touch)await send('touchEnd');else await page.mouse.up();await ready();
    assert.equal((await snap()).economy.inventory.used,5);assert.equal((await snap()).combat.damagedCells,0);

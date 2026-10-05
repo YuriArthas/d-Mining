@@ -6,12 +6,17 @@ import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { QUARRY_PLACEMENTS, type QuarryAsset } from '../world/QuarryLayout.ts';
 import { surfacePlan } from '../world/SurfaceAssetPlan.ts';
 import { createScenery, disposeScenery } from './SceneryMesh.ts';
+import {pruneInactiveMaps} from './MaterialPreparation.ts';
 import { stabilizeShadows } from './stableShadow.ts';
 import { uploadSurfaceTexture } from './uploadSurfaceTexture.ts';
 import { surfaceTextureMemory } from './surfaceTextureMemory.ts';
 import {styleMineBlock, styleMineLens, styleMineBadge} from './MineAtmosphere.ts';
+import {instanceStaticProps} from './instanceStaticProps.ts';
 import { instanceMineBlocks } from './instanceMineBlocks.ts';
+import { SurfaceDetails } from './SurfaceDetails.ts';
 import { paintCampGround } from './campGround.ts';
+import {createBoundaryCore} from './BoundaryCore.ts';
+import {BoundaryStitcher} from './BoundaryStitcher.ts';
 const urls=import.meta.glob('../assets/camp/*.part',{eager:true,query:'?url',import:'default'}) as Record<string,string>;
 const manifests=import.meta.glob('../assets/camp/*.manifest.json',{eager:true,import:'default'}) as Record<string,{parts:string[];bytes:number;taskId?:string;generationId?:string;materialProfile?:string;source:string}>;
 
@@ -19,6 +24,7 @@ const manifests=import.meta.glob('../assets/camp/*.manifest.json',{eager:true,im
 // Normalize models once; repeated scene instances share geometry and textures.
 export async function loadStaticSurface(renderer:WebGLRenderer,signal:AbortSignal,onProgress?:(done:number,total:number)=>void):Promise<Group>{
  const start=performance.now(),group=new Group();group.name='camp-tripo-v2';
+ const details=new SurfaceDetails();group.userData.surfaceDetails=details;group.userData.disposeSurfaceNoise=()=>details.dispose();
  const names=[...new Set(QUARRY_PLACEMENTS.map(p=>p.asset))],templates=new Map<QuarryAsset,Group>(),stats:Record<string,unknown>[]=[];
  const ktx=new KTX2Loader().setWorkerLimit(1).detectSupport(renderer);
  const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).setKTX2Loader(ktx);
@@ -45,7 +51,7 @@ export async function loadStaticSurface(renderer:WebGLRenderer,signal:AbortSigna
    root.userData.width=size.x;root.userData.height=size.y;root.userData.depth=size.z;let triangles=0;const pendingTextures=new Set<Texture>();
    root.traverse(o=>{
     if(!(o instanceof Mesh))return;
-    o.castShadow=true;o.receiveShadow=true;
+    o.castShadow=false;o.receiveShadow=false;
     for(const m of (Array.isArray(o.material)?o.material:[o.material]) as MeshStandardMaterial[]){
      // Tripo's ORM is retained. Bound specular response for painted wood/stone;
      // generated metal masks must not turn limestone and foliage into metal.
@@ -53,8 +59,9 @@ export async function loadStaticSurface(renderer:WebGLRenderer,signal:AbortSigna
      // Planar building blocks: generated bump detail must not read as dented metal.
      if(name==='mine-fence')styleMineBlock(m);
      if(manifest.materialProfile==='authored-color'){m.roughness=.86;m.envMapIntensity=.35;}
-     if(name==='mine-pendant')styleMineLens(m);
+     if(name==='mine-pendant')styleMineLens(m,details.night);
      if(name==='mine-badge')styleMineBadge(m);
+     pruneInactiveMaps(m);
      stabilizeShadows(m);
      for(const v of Object.values(m))if(v instanceof Texture){
       if(!(v instanceof CompressedTexture)||Number(v.format)===RGBAFormat||Number(v.format)===RGBFormat)throw new Error('当前显卡未使用 GPU 压缩纹理，停止加载以避免内存耗尽');
@@ -64,6 +71,7 @@ export async function loadStaticSurface(renderer:WebGLRenderer,signal:AbortSigna
     triangles+=(o.geometry.index?.count??o.geometry.attributes.position.count)/3;
    });
    for(const texture of pendingTextures)await uploadSurfaceTexture(renderer,texture,signal);
+   if(name==='lantern-post'||name==='pit-box-lantern'){const done=new Set<MeshStandardMaterial>();root.traverse(o=>{if(!(o instanceof Mesh))return;for(const m of (Array.isArray(o.material)?o.material:[o.material]) as MeshStandardMaterial[])if(!done.has(m)){done.add(m);details.installLamp(m,name==='lantern-post'?'post':'box');}});}
    signal.throwIfAborted();onProgress?.(templates.size,names.length);stats.push({name,taskId:manifest.taskId,generationId:manifest.generationId,source:manifest.source,bytes,triangles,downloadMs,decodeMs:performance.now()-decodeStart,normalizedFront:'+Z',originalSize:size.toArray(),instances:QUARRY_PLACEMENTS.filter(p=>p.asset===name).length});
    await new Promise(resolve=>setTimeout(resolve,0));
   }
@@ -71,11 +79,13 @@ export async function loadStaticSurface(renderer:WebGLRenderer,signal:AbortSigna
  finally{ktx.dispose();}
  if(signal.aborted){cleanup();signal.throwIfAborted();}
  const groundMaterials=new Set<MeshStandardMaterial>();
+ const boundaryStitcher=new BoundaryStitcher();
  try { for(const p of QUARRY_PLACEMENTS){
   const source=templates.get(p.asset)!,instance=source.clone(true),scale=p.width/source.userData.width;
   instance.name=`${p.asset}@${p.x},${p.z}`;
   instance.scale.set(scale,p.height===undefined?scale:p.height/source.userData.height,p.depth===undefined?scale:p.depth/source.userData.depth);
   instance.rotation.y=p.yaw??0;instance.position.set(p.x,p.y??-.08,p.z);
+  boundaryStitcher.apply(instance,p);
   if(p.asset==='meadow-base'||p.asset==='terrain-slab')instance.traverse(o=>{
    if(!(o instanceof Mesh))return;
    o.castShadow=false;o.userData.surfaceGround=true;
@@ -91,18 +101,19 @@ export async function loadStaticSurface(renderer:WebGLRenderer,signal:AbortSigna
      shader.fragmentShader=shader.fragmentShader.replace('#include <clipping_planes_fragment>','#include <clipping_planes_fragment>\nif(abs(campWorld.x)<8.0 && abs(campWorld.z)<8.0)discard;');
     };
     m.customProgramCacheKey=()=> 'camp-tripo-ground-shaft-v2';
-    paintCampGround(m);
+    paintCampGround(m,details.atlas,details.bakedContact);
    }
    // Mirror the shader's shaft cut in diagnostic raycasts; no mesh is created.
    const raycast=o.raycast;
    o.raycast=function(ray,hits){const collected:typeof hits=[];raycast.call(this,ray,collected);hits.push(...collected.filter(h=>Math.abs(h.point.x)>=8||Math.abs(h.point.z)>=8));};
   });
   if(p.portalId)instance.userData.portalId=p.portalId;
-  if(p.tint)instance.traverse(o=>{
+  if(p.tint||p.portalAccent)instance.traverse(o=>{
    if(!(o instanceof Mesh))return;
    const style=(source:MeshStandardMaterial)=>{
     const m=source.clone();m.onBeforeCompile=source.onBeforeCompile;m.customProgramCacheKey=source.customProgramCacheKey;
     if(p.tint)m.color.set(p.tint);
+    if(p.portalAccent&&m.name==='portal-accent'){m.color.set(p.portalAccent);m.emissive.set(p.portalAccent);m.emissiveIntensity=.12;}
     return m;
    };
    o.material=Array.isArray(o.material)?o.material.map(m=>style(m as MeshStandardMaterial)):style(o.material as MeshStandardMaterial);
@@ -110,8 +121,14 @@ export async function loadStaticSurface(renderer:WebGLRenderer,signal:AbortSigna
   group.add(instance);
  }
  } catch(error){cleanup();throw error;}
+ try {
  const mineBatching=instanceMineBlocks(group);
- group.add(createScenery(surfacePlan()));
- group.userData.surfaceShading={decorativeLights:{emitLight:false,fixture:'mine-pendant'},mineMaterials:'blender-authored-128px',mineBatching,version:'camp-tripo-v2',asset:'tripo-environment-blender-mine',generator:'Tripo v3.1 and authored Blender mine blocks',assets:stats,instances:QUARRY_PLACEMENTS.length,bytes:stats.reduce((n,s)=>n+Number(s.bytes),0),prepareMs:performance.now()-start,runtimeOcclusionProbes:0,compression:'KTX2 UASTC + Meshopt + gzip',textureMemory:surfaceTextureMemory(textures),maxConcurrentModelDecodes:1,maxTextureWorkers:1,distanceUnloading:false};
+ const staticBatching=instanceStaticProps(group,new URLSearchParams(location.search).get('batching')!=='0');
+ group.userData.boundaryStitching={...boundaryStitcher.stats,continuousCore:true,woodFillers:0};
+ const ponds=details.createPonds();group.userData.ponds=ponds.userData.ponds;
+ group.add(createScenery(surfacePlan()),details.createGrass(),details.createCurbs(),ponds,details.wallTorches.group,createBoundaryCore());
+ group.traverse(o=>{if(o instanceof Mesh){o.castShadow=false;o.receiveShadow=false;}});
+ group.userData.surfaceShading={decorativeLights:{emitLight:false,fixture:'mine-pendant'},mineMaterials:'blender-authored-128px',mineBatching,staticBatching,version:'camp-tripo-v2',asset:'tripo-environment-blender-mine',generator:'Tripo v3.1 and authored Blender mine blocks',assets:stats,instances:QUARRY_PLACEMENTS.length,bytes:stats.reduce((n,s)=>n+Number(s.bytes),0),prepareMs:performance.now()-start,runtimeOcclusionProbes:0,compression:'KTX2 UASTC + Meshopt + gzip',textureMemory:surfaceTextureMemory(textures),maxConcurrentModelDecodes:1,maxTextureWorkers:1,distanceUnloading:false};
  return group;
+ }catch(error){cleanup();throw error;}
 }

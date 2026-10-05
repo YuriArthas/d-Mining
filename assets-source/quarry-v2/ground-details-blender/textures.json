@@ -1,0 +1,21 @@
+{
+  "generator": "authored Python/Pillow",
+  "script": "tools/blender/paint-ground-details.py",
+  "textures": [
+    {
+      "file": "src/game/assets/ground-details/ground-atlas.json",
+      "sha256": "5c58ad39661991424a7a2e65e14d08ccf15a3d7ae26b7aacaba6ea883e4704dd",
+      "size": 128
+    },
+    {
+      "file": "src/game/assets/ground-details/lantern-post-emission.json",
+      "sha256": "6d9d75019dc8412339780deba4f046e0f9bea62d47fd3cca754c72c1d46ef441",
+      "size": 128
+    },
+    {
+      "file": "src/game/assets/ground-details/pit-box-lantern-emission.json",
+      "sha256": "a80c3c2d535e53098e70ee6c820b33c46d1a500ae6201e2d49162c6380435937",
+      "size": 128
+    }
+  ]
+}

@@ -4,13 +4,13 @@
 
 |模型|任务 / Blender 生成标识|三角面|实例|传输 KiB|
 |---|---|---:|---:|---:|
-|bank-braced|ea100a0e-698e-470f-98d8-a22c532f365e|802|15|104.4|
-|bank-steps|e6c1fb6a-4d12-4194-974b-40b765cb7526|1104|13|105.5|
-|bank-timber|b4764231-d64e-4271-b1c4-76279d7939b9|673|30|103.5|
-|bank-turf|a68d7651-9af0-4a7c-adcb-c7246ab3786b|529|222|98.3|
-|grid-mine-timber-blender|grid-mine-timber-blender-v1|44|499|5.0|
-|bank-fence|d1cc28e7-f917-46e2-ae5c-6442d30c7ddf|325|55|101.7|
-|mine-fence|b84a3c88-d25b-4296-b136-5604bc9c5561|324|35|4.5|
+|bank-braced|ea100a0e-698e-470f-98d8-a22c532f365e|802|13|104.4|
+|bank-steps|e6c1fb6a-4d12-4194-974b-40b765cb7526|1104|12|105.5|
+|bank-timber|b4764231-d64e-4271-b1c4-76279d7939b9|673|25|103.5|
+|bank-turf|a68d7651-9af0-4a7c-adcb-c7246ab3786b|529|198|98.3|
+|grid-mine-timber-blender|grid-mine-timber-blender-v1|44|475|5.0|
+|bank-fence|d1cc28e7-f917-46e2-ae5c-6442d30c7ddf|325|50|101.7|
+|mine-fence|b84a3c88-d25b-4296-b136-5604bc9c5561|324|26|4.5|
 |grid-mine-trim-blender|grid-mine-trim-blender-v1|44|175|1.9|
 |pit-plank-deck|031f3df9-8ede-4bee-b309-ba51c05955ec|1726|8|379.4|
 |pit-headframe|a92d4214-35c8-4954-9042-8b0369c8322c|3648|1|403.1|
@@ -67,7 +67,8 @@
 |grass-tussock|0c85ff6c-ad50-49ed-86bc-da0fcdbe8635|860|37|328.3|
 |mushroom-cluster|4ac7f0db-50b9-4d9b-b879-96bcd56fd5fe|1184|3|350.1|
 |anvil-stump|ec510f45-97b3-48b8-ae80-a0967007e87c|1772|1|329.8|
-|lantern-post|f23b7b64-c198-4c78-87fe-532fbdf7afb6|1908|7|396.2|
+|lantern-post|f23b7b64-c198-4c78-87fe-532fbdf7afb6|1908|9|396.2|
+|portal-plinth-blender|portal-plinth-blender-v1|136|9|16.3|
 |portal-timber|389594c5-ea96-4f0d-8f11-6834a2bdb9e8|1067|3|102.6|
 |portal-fungal|021a12ec-1f0f-48c8-a97e-f9e576dcaf90|1116|1|102.9|
 |portal-crystal|ebce8d5d-0c67-43be-adb3-823f1476b1f8|1110|1|100.6|
@@ -81,3 +82,9 @@
 |egg-tide-blender|egg-tide-blender-v1|1432|3|8.7|
 |egg-moon-blender|egg-moon-blender-v1|1432|3|9.8|
 |egg-core-blender|egg-core-blender-v1|1432|3|10.0|
+
+V24 局部接触阴影：Blender Cycles 离线 AO 烘焙，来源为当前发货模型的精确几何和变换，4 个矿棚柱脚（8 件积木）+ 2 间服务房。512×512 R8、含 mipmap 约 341 KiB；没有新增模型、碰撞或绘制批次。源文件 `assets-source/quarry-v2/contact-bake/source.blend`，导出/烘焙脚本 `tools/export-contact-bake.mjs`、`tools/blender/bake-contact-shadows.py`，哈希与原模型来源见同目录 `result.json`、`selection.json`。这不是新 Tripo 模型，没有新 Tripo 任务 ID。
+
+V27 壁挂火把：Blender 新建 192 三角面模型，8 个实例（1,536 三角），3 个实例化批次；手工顶点配色，无贴图。规则对称组件自制，不使用 Tripo ID。脚本 `tools/blender/build-wall-torch.py`，源文件、模型/脚本 SHA-256 见 `assets-source/quarry-v2/wall-torch-blender/result.json`；布局、独立点光参数及验证见 `wall-torches-v27.md`。
+
+V28 同一 Blender 火把模型改为 22 实例（4,224 三角），全部置于第三层；不重新生成资产、不增加纹理。另复用本次重建资产增加 lantern-post 4 实例和 pit-box-lantern 4 实例。准确坐标、光照规格与验证见 `wall-lighting-v28.md`。
