@@ -37,22 +37,6 @@ export function polishRoom(p:Planner,t:Theme,room:RestRoom){
       if(i%3===1 && Math.abs(x)>5)p.lantern(x,y-.6,-16,t);
     }
   }
-  if(t.motif==='timber'){
-    barrel(p,-14,-10);barrel(p,-15.3,-11.6);
-    // A tool rack, stacked timber and a real winding drum tell a working-mine story.
-    for(const x of [-16.5,-10.5])p.box([x,2.2,-17.8],[.18,4.4,.18],WOOD,true);
-    for(const y of [1.5,3.5])p.box([-13.5,y,-17.8],[6.3,.22,.2],WOOD);
-    for(let i=0;i<4;i++){
-      const x=-16+i*1.45;p.beam([x,1.5,-17.5],[x+.3,3.35,-17.5],.12,CREAM);
-      p.box([x+.28,3.2,-17.5],[.85,.2,.18],METAL,false,[0,0,.1]);
-    }
-    for(let i=0;i<6;i++)p.shape('cylinder',[11+(i%3)*.9,.5+Math.floor(i/3)*.75,-17],[.43,3,.43],WOOD,[Math.PI/2,0,0]);
-    for(const x of [-3,3])p.box([x,1.6,-17],[.4,3.2,.7],METAL,true);
-    p.shape('cylinder',[0,2.3,-17],[1.1,5.5,1.1],'#aa8d60',[0,0,Math.PI/2]);
-    p.plan.solids.push({at:[0,2.3,-17],half:[2.7,1.1,1.1],yaw:0});
-    for(const x of [-2.6,2.6])p.shape('cylinder',[x,2.3,-17],[1.4,.2,1.4],METAL,[0,0,Math.PI/2]);
-    for(let x=-2;x<=2;x+=.2)p.shape('torus',[x,2.3,-17],[1.13,.04,Math.PI*2],'#745738',[0,Math.PI/2,0]);
-  }
   if(t.motif==='mushroom'){
     // Dense little colonies and gills make the giants belong to an ecosystem.
     for(let i=0;i<28;i++){

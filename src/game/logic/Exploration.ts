@@ -3,7 +3,13 @@ export class Exploration {
   private maximum = 0;
   private unlocked = new Set<string>();
   private readonly milestones: readonly Readonly<{ id: string; depth: number }>[];
-  constructor(milestones: readonly Readonly<{ id: string; depth: number }>[]) { this.milestones = milestones; }
+  constructor(milestones: readonly Readonly<{ id: string; depth: number }>[], initiallyUnlocked:readonly string[] = []) {
+    this.milestones = milestones;
+    for(const id of initiallyUnlocked){
+      if(!milestones.some(m=>m.id===id))throw Error(`未知初始解锁目的地: ${id}`);
+      this.unlocked.add(id);
+    }
+  }
   visit(depth: number) {
     if (!Number.isFinite(depth) || depth < 0) return [];
     this.maximum = Math.max(this.maximum, depth);

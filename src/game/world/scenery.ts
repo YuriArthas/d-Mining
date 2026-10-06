@@ -5,10 +5,7 @@ import { Planner, WOOD, DARK, METAL, CREAM, type SceneryPlan } from './sceneryKi
 export type { V3, Shape, Solid, Sign, SceneryPlan } from './sceneryKit.ts';
 export { surfacePlan } from './SurfaceAssetPlan.ts';
 import { polishRoom } from './undergroundArt.ts';
-function tracks(p:Planner,x:number,z:number,length:number) {
-  for(let a=-length/2;a<length/2;a+=1.1)p.box([x,.06,z+a],[2.4,.12,.32],WOOD);
-  for(const dx of [-.8,.8])p.box([x+dx,.17,z],[.12,.13,length],METAL);
-}
+import { authoredRoomPlan } from './authoredRoomPlan.ts';
 function buildRoomPlan(room:RestRoom):SceneryPlan {
   const p=new Planner(),t=themeById(room.theme);p.rim(t);
   p.booth(room.sell.x,0,room.sell.z,t,false,room.sell.radius);
@@ -26,13 +23,6 @@ function buildRoomPlan(room:RestRoom):SceneryPlan {
     for(const x of [-18.6,18.6])p.beam([x,6.7,z],[x-Math.sign(x)*2.5,8.8,z],.5,t.wood);
   }
   for(const x of [-15,15])p.crate(x,0,16,1.25);
-  if(t.motif==='timber') {
-    tracks(p,13,-7,16);
-    p.box([13,1.2,-13],[2.5,2,3.4],METAL,true);
-    for(let i=0;i<5;i++)p.shape('rock',[12.3+i%2*1.2,2.15,-14+Math.floor(i/2)*.7],[.8,.6,.7],i%2?t.accent:t.rock);
-    for(const x of [-13,-11])p.crate(x,0,-15,1.8);
-    p.crate(-13,1.8,-15,1.6);
-  }
   if(t.motif==='mushroom')for(const [x,z,h] of [[-14,-13,5],[13,-14,6],[-15,1,3],[14,1,2.5],[-11,-16,2.5]]){
     p.shape('cylinder',[x,h*.4,z],[.45,h*.8,.45],'#d4c7b4');
     p.plan.solids.push({at:[x,h*.35,z],half:[.45,h*.35,.45],yaw:0});
@@ -88,6 +78,7 @@ function buildRoomPlan(room:RestRoom):SceneryPlan {
 
 // A reusable room kit is authored around a canonical 20×20×10-cell cavity.
 export function roomPlan(room:RestRoom):SceneryPlan {
+ if(room.scene)return authoredRoomPlan(room);
  const sx=room.layout.widthCells/20,sy=room.layout.heightCells/10,sz=room.layout.depthCells/20;
  const canonical={...room,x:0,z:0,sell:{...room.sell,x:-12,z:12},shop:room.shop?{...room.shop,x:12,z:12}:null};
  const plan=buildRoomPlan(canonical);

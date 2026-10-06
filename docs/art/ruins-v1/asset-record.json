@@ -1,0 +1,18 @@
+{
+  "generator": "Blender",
+  "recipe": "tools/blender/build-chamber.py",
+  "exporter": "tools/blender/room_export.py",
+  "source": "assets-source/ruins-v1/source.blend",
+  "layout": "src/game/content/rooms/ruins.layout.json",
+  "sceneDefinition": "src/game/content/rooms/ruins.scene.json",
+  "instances": 214,
+  "triangles": 4768,
+  "uniqueMeshes": 4,
+  "textureSize": 64,
+  "assetSha256": "ab619c8f002d82fac5d3c7e24c9f96a117a94b3a31ef42c982430247f2d4a74b",
+  "recipeSha256": "76d8caa4c9ec43af5566304c5616a268a25476528b035a5071426fe1a1d3833e",
+  "exporterSha256": "71a3d8eb9d058e08a0fd8e2cbad55da95993aa380c46755fdf027b6642eb7239",
+  "sourceSha256": "6b62b39ac1b7b65b3aab6012f9ed4fc3d3c47bbf5236416e5438aa51ec2f30bf",
+  "layoutSha256": "f94a88a3b7831bb4d0ccb0a538145e893cea497c0da33a935d4bb72e630c0dd5",
+  "sceneSha256": "9f035547217420bf7cc9d4f9b2cd8f692e64aa3317a8091302e8064d498f69e1"
+}

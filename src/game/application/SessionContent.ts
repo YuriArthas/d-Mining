@@ -7,6 +7,7 @@ export type Destination = Readonly<{
   spawn: Coord;
 }>;
 export type SessionContent = Readonly<{
+  initiallyUnlocked?: readonly string[];
   destinations: readonly Destination[];
   sales: readonly ZoneConfig[];
   shops: readonly Readonly<{ id: string; zone: ZoneConfig }>[];

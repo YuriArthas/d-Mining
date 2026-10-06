@@ -1,0 +1,18 @@
+{
+  "generator": "Blender",
+  "recipe": "tools/blender/build-chamber.py",
+  "exporter": "tools/blender/room_export.py",
+  "source": "assets-source/volcanic-v1/source.blend",
+  "layout": "src/game/content/rooms/volcanic.layout.json",
+  "sceneDefinition": "src/game/content/rooms/volcanic.scene.json",
+  "instances": 218,
+  "triangles": 4176,
+  "uniqueMeshes": 4,
+  "textureSize": 64,
+  "assetSha256": "5c34696ad5f4a2b4d89f48db6b61587ae6b1568cdfff6441a5d84c533f179568",
+  "recipeSha256": "76d8caa4c9ec43af5566304c5616a268a25476528b035a5071426fe1a1d3833e",
+  "exporterSha256": "71a3d8eb9d058e08a0fd8e2cbad55da95993aa380c46755fdf027b6642eb7239",
+  "sourceSha256": "480506733c6e7a12c60de293ee40ddd2f85f7c5f16ae970bbe2a3e8d3d08a98c",
+  "layoutSha256": "c8633b887ba1394932287e8294e2982b5b55b414cd91f42a14f4e0929a0a1983",
+  "sceneSha256": "ed3465f1ffebcd8835b85e0fe7b26efbe9c11ecbe8e0f5213f826330e3539086"
+}

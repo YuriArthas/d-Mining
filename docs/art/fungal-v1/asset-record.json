@@ -1,0 +1,24 @@
+{
+  "generator": "Blender",
+  "recipe": "tools/blender/build-fungal.py",
+  "source": "assets-source/fungal-v1/source.blend",
+  "layout": "src/game/content/rooms/fungal.layout.json",
+  "sceneDefinition": "src/game/content/rooms/fungal.scene.json",
+  "instances": 590,
+  "triangles": 53508,
+  "uniqueMeshes": 6,
+  "textureSize": 64,
+  "meshTriangles": {
+    "block": 12,
+    "cap": 512,
+    "stem": 192,
+    "gills": 336,
+    "pebble": 20,
+    "sprout": 24
+  },
+  "assetSha256": "7728e6a273688865b33aa04bb4dae7b4183ca64455fb35a324061e745dcdf971",
+  "recipeSha256": "9d768e8166cdeb8fb0cf874dd706a23564f56409c3da036783bbcba7e7339e5b",
+  "sourceSha256": "d9e7aeda5a0f791f21d2c51da16f8309dcc7b03510d73a8ee0790f0f91cf5078",
+  "layoutSha256": "d9162549dc4b21c6aca0b61ea08eaa18ab14f0fef98a3a956da1feca0fbb324f",
+  "sceneSha256": "7d83f1acd7297c28a4923310e65f106e0580580c2920ce4a0e3f65504113038b"
+}

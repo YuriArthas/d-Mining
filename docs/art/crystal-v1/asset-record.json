@@ -1,0 +1,18 @@
+{
+  "generator": "Blender",
+  "recipe": "tools/blender/build-crystal.py",
+  "exporter": "tools/blender/room_export.py",
+  "source": "assets-source/crystal-v1/source.blend",
+  "layout": "src/game/content/rooms/crystal.layout.json",
+  "sceneDefinition": "src/game/content/rooms/crystal.scene.json",
+  "instances": 283,
+  "triangles": 8246,
+  "uniqueMeshes": 5,
+  "textureSize": 64,
+  "assetSha256": "6e65dc0434d89835b704f40e7b0713abcabaf25b02909442bd662a7ddb0dc93d",
+  "recipeSha256": "629fb93112f6d4063c100ceec5a77e2f443df1454cbb00b99058b4dfaf7fc59e",
+  "exporterSha256": "71a3d8eb9d058e08a0fd8e2cbad55da95993aa380c46755fdf027b6642eb7239",
+  "sourceSha256": "0f8ac7ee8a968cdc0b914187ce40cc8bb5ab6752e7fc0e1f4316afde9e3fddc0",
+  "layoutSha256": "cfc790f67af7e0dd6e87c944420f95f067f92eade84ae2443c4d49e114c85802",
+  "sceneSha256": "f706294ff1044006e70a59038d195f15cb82f00e65f9a59ad648714be642e0e3"
+}

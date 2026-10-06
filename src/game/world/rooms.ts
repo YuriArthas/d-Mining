@@ -1,17 +1,32 @@
+import {roomScene, ROOM_SCENES, LEGACY_ROOM_REFERENCE, LEGACY_ROOM_FACILITIES} from '../content/rooms/sceneDefinitions.ts';
+import type {RoomSceneDefinition, RoomZone} from '../content/rooms/authoredRoom.ts';
 import {ROOM_LAYOUT} from '../content/roomLayout.ts';
 import { SURFACE_HOME, SURFACE_SALE } from './surfaceLayout.ts';
 import { LAYERS, layerAtDepth, type Layer } from '../content/layers.ts';
 import { CELL } from '../terrain/grid.ts';
+import {ENTRANCE_WORLD} from './entrance.ts';
 import type { ZoneConfig } from '../logic/ZoneDetector.ts';
 
-const zone = (x: number, y: number, z: number): ZoneConfig => ({ x, y, z, radius: 1.7, heightTolerance: 0.25, hysteresis: 0.25 });
-export function roomsFor(layers: readonly Layer[]) {
- return Object.freeze(layers.slice(1).map(l=>{
+export function roomsFor(layers: readonly Layer[],definitions:Readonly<Record<string,RoomSceneDefinition>>=ROOM_SCENES) {
+ return Object.freeze(layers.slice(1).map((l,index)=>{
   const layout=l.room??ROOM_LAYOUT,x=layout.centerX*CELL,z=layout.centerZ*CELL;
-  const sx=layout.widthCells/20,sz=layout.depthCells/20;
-  return Object.freeze({id:l.id,name:l.name,depth:l.from,x,z,width:layout.widthCells,height:layout.heightCells,
-   layout,theme:l.theme,spawn:[x,-l.from+.1,z+11*sz] as const,
-   sell:zone(x-12*sx,-l.from,z+12*sz),shop:l.shop?zone(x+12*sx,-l.from,z+12*sz):null});
+  const sceneDefinition=l.scene?roomScene(l.scene,definitions):undefined;
+  const reference=sceneDefinition?.referenceSize??LEGACY_ROOM_REFERENCE;
+  const scale=[layout.widthCells*CELL/reference[0],layout.heightCells*CELL/reference[1],layout.depthCells*CELL/reference[2]];
+  const facilities=sceneDefinition?.facilities??LEGACY_ROOM_FACILITIES;
+  if(l.shop&&!facilities.shop)throw Error(`房间缺少商店位置: ${l.id}`);
+  const point=(at:readonly number[])=>[x+at[0]*scale[0],-l.from+at[1]*scale[1],z+at[2]*scale[2]] as const;
+  if(sceneDefinition)for(const [name,facility] of Object.entries(facilities)){
+    if(!facility||(name==='shop'&&!l.shop))continue;
+    const [px,py,pz]=point(facility.at);
+    if(Math.abs(px-x)>=layout.widthCells*CELL/2||Math.abs(pz-z)>=layout.depthCells*CELL/2||py< -l.from||py>= -l.from+layout.heightCells*CELL)throw Error(`房间功能点越界 ${l.id}: ${name}`);
+    if(px>ENTRANCE_WORLD.minX&&px<ENTRANCE_WORLD.maxX&&pz>ENTRANCE_WORLD.minZ&&pz<ENTRANCE_WORLD.maxZ)throw Error(`房间功能点占用垂直入口 ${l.id}: ${name}`);
+  }
+  const zone=(source:RoomZone):ZoneConfig=>{const [x,y,z]=point(source.at);return {x,y,z,radius:source.radius,heightTolerance:source.heightTolerance,hysteresis:source.hysteresis};};
+  const spawn=point(facilities.spawn.at);
+  return Object.freeze({id:l.id,name:l.name,number:index+2,depth:l.from,x,z,width:layout.widthCells,height:layout.heightCells,
+   layout,theme:l.theme,scene:l.scene,sceneDefinition,spawn:[spawn[0],spawn[1]+facilities.spawn.clearance,spawn[2]] as const,
+   sell:zone(facilities.sell),shop:l.shop?zone(facilities.shop!):null});
  }));
 }
 export const ROOMS = roomsFor(LAYERS);

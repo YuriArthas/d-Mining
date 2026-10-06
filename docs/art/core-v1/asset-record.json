@@ -1,0 +1,18 @@
+{
+  "generator": "Blender",
+  "recipe": "tools/blender/build-chamber.py",
+  "exporter": "tools/blender/room_export.py",
+  "source": "assets-source/core-v1/source.blend",
+  "layout": "src/game/content/rooms/core.layout.json",
+  "sceneDefinition": "src/game/content/rooms/core.scene.json",
+  "instances": 204,
+  "triangles": 13346,
+  "uniqueMeshes": 5,
+  "textureSize": 64,
+  "assetSha256": "c8e4ef73f463cd13fb1f9a50755931d76461268f8623811539a4830da09dd7b4",
+  "recipeSha256": "76d8caa4c9ec43af5566304c5616a268a25476528b035a5071426fe1a1d3833e",
+  "exporterSha256": "71a3d8eb9d058e08a0fd8e2cbad55da95993aa380c46755fdf027b6642eb7239",
+  "sourceSha256": "0577b1d73bfc172cdef2689273d1e66c7b85efc1c0fb0810274559e65cbfdd7b",
+  "layoutSha256": "7960e9a71f772d1d7e4ef2605d78bde1378d550a5df3c5452297b00f46a882d8",
+  "sceneSha256": "4f6569e2cde93c00ae02a9361f99fcca4d54fc828cad89ed8eb99f411ecfc6a6"
+}

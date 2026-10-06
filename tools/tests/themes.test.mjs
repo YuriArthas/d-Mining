@@ -52,8 +52,8 @@ test('scene plans have finite geometry and keep landing and service centers out 
  const plans=[surfacePlan(),...ROOMS.map(roomPlan)];
  for(const plan of plans){assert.ok(plan.shapes.length>0);for(const s of plan.shapes){assert.ok([...s.at,...s.size,...(s.rotation??[])].every(Number.isFinite));assert.ok(s.size.every(v=>v>0));}}
  for(const room of ROOMS){const plan=roomPlan(room);
-  for(const p of [[room.spawn[0],0,room.spawn[2]],[room.sell.x,0,room.sell.z],...(room.shop?[[room.shop.x,0,room.shop.z]]:[])]){
-   for(const s of plan.solids)assert.ok(Math.abs(p[0]-s.at[0])>s.half[0]+.4||Math.abs(p[2]-s.at[2])>s.half[2]+.4||s.at[1]-s.half[1]>1.8,'facility/landing blocked');
+  for(const p of [[room.spawn[0],room.spawn[1]+room.depth,room.spawn[2]],[room.sell.x,0,room.sell.z],...(room.shop?[[room.shop.x,0,room.shop.z]]:[])]){
+   for(const s of plan.solids)assert.ok(Math.abs(p[0]-s.at[0])>s.half[0]+.4||Math.abs(p[2]-s.at[2])>s.half[2]+.4||s.at[1]-s.half[1]>p[1]+1.8||s.at[1]+s.half[1]<=p[1],`facility/landing blocked: ${room.id}`);
   }
   for(const s of plan.solids)if(s.at[1]-s.half[1]<2)assert.ok(Math.abs(s.at[0])-s.half[0]>=8||Math.abs(s.at[2])-s.half[2]>=8,'entrance obstructed');
  }

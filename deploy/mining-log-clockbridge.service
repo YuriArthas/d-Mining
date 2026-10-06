@@ -1,0 +1,20 @@
+[Unit]
+Description=Public Clockbridge tunnel for Mining logs
+After=network-online.target mining-log.service
+Wants=network-online.target
+Requires=mining-log.service
+PartOf=mining-log.service
+
+[Service]
+Type=simple
+WorkingDirectory=/root/threejs_space/d-Mining
+Environment=CLOCKBRIDGE_INSTANCE_PREFIX=mining-log
+Environment=CLOCKBRIDGE_POLICY=public
+Environment=CLOCKBRIDGE_USER_ID=sunjun
+Environment=CLOCKBRIDGE_TARGET_URL=http://127.0.0.1:4186/
+ExecStart=/usr/local/bin/start-clockbridge-proxy.sh
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

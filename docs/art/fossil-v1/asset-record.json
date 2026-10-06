@@ -1,0 +1,18 @@
+{
+  "generator": "Blender",
+  "recipe": "tools/blender/build-chamber.py",
+  "exporter": "tools/blender/room_export.py",
+  "source": "assets-source/fossil-v1/source.blend",
+  "layout": "src/game/content/rooms/fossil.layout.json",
+  "sceneDefinition": "src/game/content/rooms/fossil.scene.json",
+  "instances": 236,
+  "triangles": 12596,
+  "uniqueMeshes": 5,
+  "textureSize": 64,
+  "assetSha256": "0e201dcd286b51fa5c1bdc6f4806ba5f69f97bbd2d4464dd107e2b0c595645d1",
+  "recipeSha256": "76d8caa4c9ec43af5566304c5616a268a25476528b035a5071426fe1a1d3833e",
+  "exporterSha256": "71a3d8eb9d058e08a0fd8e2cbad55da95993aa380c46755fdf027b6642eb7239",
+  "sourceSha256": "edf2180f7321038290879612f020ebd95368d4c80448ae0ed75f4847c6adae88",
+  "layoutSha256": "61d091041d503281d6d2202df36a355da397de13f805793dd6ec5ec65a39640a",
+  "sceneSha256": "a7182a1d99433454e8045984191225a4e4e3aeae2d506f94a3150410c08e4571"
+}

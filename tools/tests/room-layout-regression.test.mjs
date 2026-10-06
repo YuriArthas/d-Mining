@@ -4,28 +4,32 @@ import {createCampContent} from '../../src/game/content/campContent.ts';
 import {LAYERS} from '../../src/game/content/layers.ts';
 import {PORTAL_SLOTS} from '../../src/game/content/portalSlots.ts';
 import {roomPlan} from '../../src/game/world/scenery.ts';
-import {sceneryShapeGeometry} from '../../src/game/presentation/SceneryMesh.ts';
+import {Matrix4} from 'three';
+import {createScenery,disposeScenery,sceneryShapeGeometry} from '../../src/game/presentation/SceneryMesh.ts';
 import {ZoneDetector} from '../../src/game/logic/ZoneDetector.ts';
 const campWithRoom=room=>createCampContent(LAYERS.map(l=>l.id==='old_mine'?{...l,room}:l));
 const bounds=s=>{const g=sceneryShapeGeometry(s);g.computeBoundingBox();const b=g.boundingBox.clone();g.dispose();return b;};
 
-test('room nonuniform scaling acts after rotation, preserving primitive parameters and matching colliders',()=>{
+test('authored room scales rotated instances and colliders together while preserving the global shaft',()=>{
  const room=campWithRoom({centerX:0,centerZ:0,widthCells:40,depthCells:24,heightCells:12}).rooms[0];
  const plan=roomPlan(room),before=roomPlan(createCampContent().rooms[0]);
- const drumIndex=before.shapes.findIndex(s=>s.type==='cylinder'&&s.at[0]===0&&s.at[1]===2.3&&s.at[2]===-17);
- const a=bounds(before.shapes[drumIndex]),b=bounds(plan.shapes[drumIndex]);
- for(const [axis,k] of [['x',2],['y',1.2],['z',1.2]]){
-  assert.ok(Math.abs(b.min[axis]-a.min[axis]*k)<1e-5);
-  assert.ok(Math.abs(b.max[axis]-a.max[axis]*k)<1e-5);
- }
- assert.ok(Math.abs(b.max.x-b.min.x-11)<1e-5);
- const collider=plan.solids.find(s=>s.at[0]===0&&Math.abs(s.at[1]-2.76)<1e-6&&Math.abs(s.at[2]+20.4)<1e-6);
- assert.equal(collider.half[0]*2,10.8); // Existing intentional approximation scales with the visible drum.
- const torus=before.shapes.findIndex(s=>s.type==='torus');
- assert.deepEqual(plan.shapes[torus].size,before.shapes[torus].size); // Arc is an angle, not a Z dimension.
- const beam=before.shapes.findIndex(s=>s.type==='box'&&s.rotation.some(r=>r!==0));
- const beamA=bounds(before.shapes[beam]),beamB=bounds(plan.shapes[beam]);
- assert.ok(Math.abs(beamB.max.x-beamA.max.x*2)<1e-5);
+ const a=createScenery({...before,signs:[]}),b=createScenery({...plan,signs:[]});
+ try{
+  const base=a.children.find(m=>m.name==='old-mine-v2:block:copper');
+  const scaled=b.children.find(m=>m.name===base.name);
+  const scale=new Matrix4().makeScale(2,1.2,1.2),m=new Matrix4(),n=new Matrix4();
+  for(let i=0;i<base.count;i++){
+   base.getMatrixAt(i,m);scaled.getMatrixAt(i,n);m.premultiply(scale);
+   m.elements.forEach((v,j)=>assert.ok(Math.abs(v-n.elements[j])<1e-5));
+  }
+  const solid=before.solids.find(s=>s.at[0]===-17.8&&s.at[1]===5);
+  const moved=plan.solids.find(s=>s.at[0]===-35.6&&s.at[1]===6);
+  assert.deepEqual(moved.half,solid.half.map((v,i)=>v*[2,1.2,1.2][i]));
+  assert.deepEqual(plan.authored.instances.filter(p=>p.fixed&&!p.floor),before.authored.instances.filter(p=>p.fixed&&!p.floor));
+  for(const p of plan.authored.instances.filter(p=>p.floor)){
+   assert.ok(p.at[0]+p.scale[0]/2<=-8||p.at[0]-p.scale[0]/2>=8||p.at[2]+p.scale[2]/2<=-8||p.at[2]-p.scale[2]/2>=8);
+  }
+ }finally{disposeScenery(a);disposeScenery(b)}
 });
 
 test('scaled rooms keep the sale ring and actual trigger radius aligned',()=>{

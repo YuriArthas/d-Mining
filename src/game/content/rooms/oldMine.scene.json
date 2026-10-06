@@ -1,0 +1,110 @@
+{
+  "asset": "old-mine-v2",
+  "referenceSize": [
+    40,
+    20,
+    40
+  ],
+  "facilities": {
+    "spawn": {
+      "at": [
+        0,
+        0,
+        11
+      ],
+      "clearance": 0.1
+    },
+    "sell": {
+      "at": [
+        -12,
+        0,
+        12
+      ],
+      "radius": 1.7,
+      "heightTolerance": 0.25,
+      "hysteresis": 0.25
+    },
+    "shop": null
+  },
+  "signs": [
+    {
+      "anchor": "room",
+      "offset": [
+        0,
+        8.1,
+        -14.13
+      ],
+      "width": 4.4,
+      "title": "{name}",
+      "subtitle": "{number} / {depth} M",
+      "color": "#f5ce8a",
+      "background": "#3c4653"
+    },
+    {
+      "anchor": "sell",
+      "offset": [
+        0,
+        4.3,
+        -1.7
+      ],
+      "width": 3.7,
+      "title": "SELL",
+      "subtitle": "",
+      "color": "#fff0bf",
+      "background": "#695038"
+    }
+  ],
+  "rings": [
+    {
+      "anchor": "sell",
+      "offset": [
+        0,
+        0.035,
+        0
+      ],
+      "height": 0.12,
+      "color": "#ffd281",
+      "glow": true
+    }
+  ],
+  "render": {
+    "atlas": {
+      "columns": 2,
+      "rows": 2,
+      "gutter": 1,
+      "repeat": 0.28
+    },
+    "surface": {
+      "roughness": 1,
+      "metalness": 0,
+      "envMapIntensity": 0,
+      "glowIntensity": 1.6
+    },
+    "lighting": {
+      "resolution": 64,
+      "lampStrength": 0.58,
+      "horizontalFalloff": 20,
+      "color": [
+        0.68,
+        0.4,
+        0.18
+      ],
+      "height": 3.2,
+      "verticalFalloff": 0.14,
+      "ceiling": {
+        "bottomBrightness": 0.98,
+        "topBrightness": 0.6,
+        "from": 6,
+        "to": 18
+      },
+      "contact": {
+        "floorThreshold": 0.1,
+        "maxHalfHeight": 6,
+        "strength": 0.3,
+        "falloff": 5,
+        "fadeFrom": 0.1,
+        "fadeTo": 1.3
+      }
+    }
+  }
+}

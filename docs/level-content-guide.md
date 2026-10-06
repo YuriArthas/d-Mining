@@ -50,3 +50,60 @@
 - 房间普通碰撞不得占用固定 8×8 入口；非法平移在内容装配阶段报错，不自动修复布局。
 - 传送点之间至少留出两个“触发半径 + 退出滞回”的距离，同时避免模型重叠。
 - `content/surfaceDetails.ts` 在内容装配阶段生成草、路沿、池塘、火把、地面涂绘及围墙数据；对应表现模块消费 `surface.details`，不再自行读取当前地图。改源配置后仍需重新构建；烘焙与局部点光表的既有约束不变。
+
+## 独立地下场景（第二层开始）
+
+`Layer.scene` 选择场景资产，和深度、主题配色及矿物独立。第二层的 `timber-station-v2` 已迁出原主题分支：
+
+- `content/rooms/oldMine.scene.json` 定义参考尺寸、出生/售卖/商店位置、招牌、交互圈、图集采样与局部照明参数。`sceneDefinitions.ts` 只注册轻量元数据，体素 Worker 不导入网格或布景实例。
+- `content/rooms/oldMine.layout.json` 定义材质，以及墙体、支撑、矿口、升降机、售卖台、仓储、轨道、工坊、矿脉九个组的摆放、独立碰撞和照明采样点。
+- `content/rooms/sceneAssets.ts` 单独注册重资源；`assets/rooms/old-mine-v2.json` 仅保存 Blender 网格和小图集像素。
+- `world/authoredRoomPlan.ts` 按配置展开各组与功能位置，生成实例、碰撞和标识。层号由楼层顺序派生，深度由 Layer 派生；中央 8×8 入口固定，地板按房间边界铺到入口边缘，业务圈保持原触发半径。
+- `presentation/AuthoredRoomView.ts` 仅消费组件数据，按网格/材质实例化；静态照明贴图只影响对应房间材质，释放由场景所有者管理。`roomIllumination.ts` 根据该场景的照明配置生成局部光照数据，不根据灯具模型自动创建真实灯。
+- `content/initialAccess.ts` 配置当前美术测试版本初始开放的层（全部九个地下层，方便逐层检查），正式版与测试版共用，不能根据发布路径改变访问权限；`Exploration` 不因此伪造最大探索深度。
+
+第三层到第十层现在也全部使用独立的 scene/layout JSON。当前九个地下层都绑定 `Layer.scene`，不再进入旧主题生成器；旧生成器仅作为未配置独立场景的兼容路径保留。售卖和升级分别绑定 sell/shop 锚点，具体阶段、主题和生成命令见 `art/underground-rollout.md`。
+
+
+### 第二层的具体编辑方式
+
+| 修改目标 | 修改位置 | 需要重新导出网格吗 |
+| --- | --- | --- |
+| 柜台及售卖触发区一起移动 | `oldMine.scene.json → facilities.sell.at` | 不需要 |
+| 移动一组道具 | `oldMine.layout.json → groups[].offset` | 不需要 |
+| 某件道具的位置、尺寸、旋转或颜色 | 对应组的 `instances` / 顶层 `materials` | 不需要 |
+| 某件道具的碰撞 | 对应组的 `solids`，与视觉独立编辑 | 不需要 |
+| 局部灯位、强度、冷暖、衰减、顶部压暗 | 组内 `lamps` / 场景 `render.lighting` | 不需要 |
+| 图集平铺密度、行列、边距、材质粗糙度 | 场景 `render.atlas` / `render.surface` | 不需要，图集内容必须匹配规格 |
+| 新造型或图集像素 | Blender 生成脚本 | 需要 |
+
+所有配置仍在构建时生效，随后发布测试版；没有运行时热编辑。
+
+坐标约定：`referenceSize` 和位置使用米，X/Y-up/Z，Y=0 是本层地板；Layer 的房间尺寸仍使用格子。
+`groups[].anchor` 显式选择 `room`、`spawn`、`sell` 或 `shop`，`offset` 和每个实例的位置相对此基准。
+售卖组绑定 `sell`，因此改售卖位置会同步移动柜台、该组碰撞和灯位；单改组 offset 则只改变布景相对触发点的位置。
+组内视觉、碰撞、照明采样点分别声明，不从模型外形推断功能。
+
+`fixed: true` 保留全局矿口对齐，不随房间缩放平移；`floor` 标记让四块地板围绕固定入口铺开。
+普通实例随参考尺寸映射到实际房间。招牌、圈和功能点采用同一基准，但触发半径、容差和出生悬空间隙保持米制。
+招牌模板支持 `{name}`、`{number}`、`{depth}`；不再在公共实现内写第二层编号。
+
+`tools/blender/build-old-mine.py` 读取同一份 scene/layout JSON，创建 Blender 场景并导出网格与图集。
+摆放或材质参数改动不需要重导运行时网格；需要同步 `.blend` 源场景与资源记录时重新运行该脚本。
+`asset-record.json` 分别记录模型、脚本、布局、场景定义和 Blender 源文件的哈希。
+
+### 继续迁移下一层
+
+1. 为该层新增自己的 scene JSON、layout JSON 和资产生成脚本/资源。
+2. 在 `sceneDefinitions.ts` 注册元数据，在 `sceneAssets.ts` 注册资产；通过 `Layer.scene` 绑定。
+3. 填写功能位置、招牌和局部渲染参数；若 `Layer.shop=true`，必须配置商店位置。
+4. 运行内容检查，发布公开测试版，再验证落点、碰撞、采矿、售卖/商店与返回。
+
+当前 renderer 支持既有实例化网格、正方形 RGBA 图集、局部静态光照场；需要水、粒子或全新 shader 时仍需新增相应表现实现。
+房间空洞仍由矩形规格定义；任意洞穴轮廓不属于本次配置拆分。
+
+### 第四至第十层编辑入口
+
+`crystal`、`ruins`、`frozen`、`volcanic`、`fossil`、`machinery`、`core` 均在 `content/rooms/<id>.scene.json` 配置设施和局部照明，在同名 `.layout.json` 编辑组件、独立碰撞和灯位。`build-crystal.py` 与 `build-chamber.py -- <id>` 读取这些布局，生成各自的新网格、64×64图集和Blender源文件。`room_export.py` 共享打包流程，各层模型独立。
+
+美术测试初始全解锁不会修改最大探索深度。恢复正式探索进度时显式调整 `initialAccess.ts`，不要根据正式/测试URL偷偷改变解锁规则。

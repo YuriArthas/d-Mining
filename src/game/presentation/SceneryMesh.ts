@@ -1,3 +1,4 @@
+import {addAuthoredRoom} from './AuthoredRoomView.ts';
 import {createWorldText} from './WorldText.ts';
 import { createMeadowGround } from './MeadowGround.ts';
 import { compactSceneryGeometry } from './compactSceneryGeometry.ts';
@@ -85,6 +86,7 @@ export function createScenery(plan:SceneryPlan):Group {
     mesh.castShadow=!glow&&!['water','trail','grass','ground'].includes(category);mesh.receiveShadow=!glow;group.add(mesh);
   }
   if(plan.meadow)group.add(createMeadowGround(noise!));
+  if(plan.authored)addAuthoredRoom(group,plan.authored);
   for(const sign of plan.signs)group.add(createWorldText(sign));
   return group;
 }

@@ -1,0 +1,24 @@
+[Unit]
+Description=Mining browser log receiver
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/threejs_space/d-Mining
+ExecStart=/root/.nvm/versions/node/v24.16.0/bin/node server/logs/receiver.mjs
+Environment=PORT=4186
+Environment=MINING_LOG_DIR=/var/lib/mining-log
+Environment=MINING_LOG_ORIGINS=https://w-sunjun-public.dev.clock-p.com
+StateDirectory=mining-log
+StateDirectoryMode=0700
+UMask=0077
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/mining-log
+MemoryMax=192M
+TasksMax=64
+
+[Install]
+WantedBy=multi-user.target

@@ -30,7 +30,9 @@ test('changed depth, theme and room dimensions agree across physics generation, 
  for(const cell of [[11,-450,0],[11,-439,0],[12,-450,0],[11,-438,0],[11,-451,0]])assert.equal(world.cell(cell),workerWorld.cell(cell));
  assert.equal(world.cell([11,-450,0]),0);assert.equal(world.cell([11,-451,0]),7);assert.notEqual(world.cell([12,-450,0]),0);
  assert.equal(room.spawn[1],-899.9);assert.ok(Math.abs(room.sell.x+14.4)<1e-9);
- assert.ok(roomPlan(room).shapes.some(s=>s.at[0]>20));
+ const plan=roomPlan(room);
+ assert.ok(plan.authored.instances.some(p=>!p.fixed&&p.at[0]*plan.authored.scale[0]+plan.authored.origin[0]>20));
+ assert.deepEqual(plan.authored.scale,[1.2,1.2,1.1]);
  assert.equal(camp.hub.portals.find(p=>p.id==='fungal').depth,900);
  const session=new GameSession(camp.session),travel=[];
  session.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining(){},returnToSurface(){},travelTo:p=>travel.push(p)});

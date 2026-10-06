@@ -67,7 +67,7 @@ export class GameSession {
       id: p.id,
       detector: new ZoneDetector(p.zone),
     }));
-    this.exploration = new Exploration(content.destinations);
+    this.exploration = new Exploration(content.destinations, content.initiallyUnlocked);
     this.clock = clock;
     this.inventory = new Inventory(capacity, itemVolume);
     this.mining = new Mining(

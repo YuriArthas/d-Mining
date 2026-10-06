@@ -1,0 +1,18 @@
+{
+  "generator": "Blender",
+  "recipe": "tools/blender/build-chamber.py",
+  "exporter": "tools/blender/room_export.py",
+  "source": "assets-source/frozen-v1/source.blend",
+  "layout": "src/game/content/rooms/frozen.layout.json",
+  "sceneDefinition": "src/game/content/rooms/frozen.scene.json",
+  "instances": 210,
+  "triangles": 4158,
+  "uniqueMeshes": 4,
+  "textureSize": 64,
+  "assetSha256": "25fdeb468d77e6d6e179a1466f09eaf8257e700e35b2548bbc229b7ee68ddb4d",
+  "recipeSha256": "76d8caa4c9ec43af5566304c5616a268a25476528b035a5071426fe1a1d3833e",
+  "exporterSha256": "71a3d8eb9d058e08a0fd8e2cbad55da95993aa380c46755fdf027b6642eb7239",
+  "sourceSha256": "1b2acf9aa24e19d19a0d377480993ecca62a5dabb9375f0f125745a34d790d55",
+  "layoutSha256": "f1f3901803ea41db7ce8cadbc81c525b7bbbc98c8d99e7f18432d4ff096aeba9",
+  "sceneSha256": "888d2bdf1592a2382835493f8a76d4b27aab8d13690a085389facfaeef2f84e4"
+}

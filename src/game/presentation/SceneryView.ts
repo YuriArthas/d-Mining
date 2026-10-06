@@ -75,6 +75,7 @@ export class SceneryView {
       surfaceDetails: this.surface.details.diagnostics() ?? null,
       surfaceHub: this.visuals.get("surface")?.userData.hub ?? null,
       visuals: [...this.visuals.keys()],
+      authoredRooms: Object.fromEntries([...this.visuals].filter(([,g])=>g.userData.authoredRoom).map(([id,g])=>[id,g.userData.authoredRoom])),
       geometryMemory: Object.fromEntries(this.geometryMemory),
       surfaceShading:
         this.visuals.get("surface")?.userData.surfaceShading ?? null,

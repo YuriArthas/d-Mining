@@ -1,0 +1,16 @@
+{
+  "generator": "Blender",
+  "recipe": "tools/blender/build-old-mine.py",
+  "source": "assets-source/old-mine-v2/source.blend",
+  "layout": "src/game/content/rooms/oldMine.layout.json",
+  "sceneDefinition": "src/game/content/rooms/oldMine.scene.json",
+  "instances": 1297,
+  "triangles": 47232,
+  "uniqueMeshes": 4,
+  "textureSize": 64,
+  "assetSha256": "938ea6ccf74123cf376239cbc79fd584865e801a6084d70e248681a35b0c5019",
+  "recipeSha256": "13a4b41abf47ab597987886e39f5f774ce493739d785d5c632032cc46065f56d",
+  "sourceSha256": "82d3471bdd08556c8d2f89b29ff53d335197ba6bb1d63ea83df05e7052679e47",
+  "layoutSha256": "800a3602bff71cc125f76d50e34181b33c5532d81995af36fc2c2e2e1613a43b",
+  "sceneSha256": "f1bfa1678776e1f7923e84a4f3988347966e34460e8d65a08277d915df2005a1"
+}

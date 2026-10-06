@@ -1,6 +1,7 @@
+import {withInitialAccess} from "./game/content/initialAccess.ts";
 import {CAMP_CONTENT} from './game/content/campContent.ts';
 import {LoadingScreen,LoadingBoundary} from './game/ui/LoadingScreen.tsx';
-import {initialLoading,updateLoading} from './game/ui/loadingState.ts';
+import {initialLoading,updateLoading,type LoadingEvent} from './game/ui/loadingState.ts';
 import type {RenderRate} from './game/movement.ts';
 import type {SurfaceTime} from './game/world/SceneLighting.ts';
 import { useCallback, useReducer, useEffect, useRef, useState, type CSSProperties } from 'react';
@@ -37,7 +38,15 @@ export function App() {
   const [shadowsEnabled,setShadowsEnabled]=useState(true);
   const [stylized,setStylized]=useState(()=>new URLSearchParams(location.search).get('look')!=='original');
   const [renderRate,setRenderRate]=useState<RenderRate>('display');
-  const [loading,onLoading]=useReducer(updateLoading,undefined,initialLoading);
+  const [loading,dispatchLoading]=useReducer(updateLoading,undefined,initialLoading);
+  const onLoading=useCallback((event:LoadingEvent)=>{
+    dispatchLoading(event);
+    const log=window.__MINING_LOG__;
+    if('error' in event)log?.write('loading.error',event.error);
+    else if('ready' in event)log?.ready();
+    else if('stage' in event)log?.phase(event.stage,{...event,bucket:event.complete?'complete':Math.floor(event.done/Math.max(1,event.total)*10)});
+  },[]);
+  useEffect(()=>{window.__MINING_LOG__?.write('game.ui-mounted');},[]);
   const [loadingVisible,setLoadingVisible]=useState(true);
   const showLoading=!loading.ready||loadingVisible;
   useEffect(()=>{
@@ -50,7 +59,7 @@ export function App() {
   const [status, setStatus] = useState('正在准备地形');
   const [performanceStats,setPerformanceStats]=useState<PerformanceSnapshot|null>(null);
   const [input] = useState(() => new GameInput());
-  const [session] = useState(() => new GameSession(CAMP_CONTENT.session));
+  const [session] = useState(() => new GameSession(withInitialAccess(CAMP_CONTENT.session)));
   const [probeMode,setProbeMode]=useState<ProbeMode>('normal');
   const changeProbeMode=useCallback((mode:ProbeMode)=>{input.reset();setProbeMode(mode);},[input]);
   const surface = useRef<HTMLDivElement>(null);
