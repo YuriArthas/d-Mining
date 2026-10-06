@@ -1,3 +1,4 @@
+import {createSurfaceDetailContent} from '../../src/game/content/surfaceDetails.ts';
 import {isDeepStrictEqual} from 'node:util';
 import {geometryHash} from '../lib/glbBuffers.mjs';
 import {gunzipSync} from 'node:zlib';
@@ -27,7 +28,7 @@ test('UV orientation places occlusion at the posts/buildings and leaves spawn/sh
  assert.ok(bytes.filter(x=>x<253).length/bytes.length<.06,'bake must stay local');
 });
 test('bake toggle changes only uniform strength, is reusable across day/night and disposes texture',()=>{
- const details=new SurfaceDetails(),map=details.bakedContact.texture,uniform=details.bakedContact.strength;
+ const details=new SurfaceDetails(createSurfaceDetailContent()),map=details.bakedContact.texture,uniform=details.bakedContact.strength;
  assert.equal(map.image.data.length,512*512);let disposed=false;map.addEventListener('dispose',()=>disposed=true);
  details.update('night',0,true);assert.ok(uniform.value>0);
  details.update('day',1,false);assert.equal(uniform.value,0);

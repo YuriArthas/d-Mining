@@ -10,7 +10,7 @@ import { BoxGeometry, BufferAttribute, BufferGeometry, CanvasTexture, Color, Con
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { SceneryPlan, Shape } from '../world/scenery.ts';
 
-function geometry(s:Shape,smooth:boolean,plastic:boolean,sculpted:boolean) {
+export function sceneryShapeGeometry(s:Shape,smooth=false,plastic=false,sculpted=false) {
   let g:BufferGeometry;
   switch(s.type){
     case 'trail':g=trailGeometry(s.path!,s.size[0]);break;
@@ -60,12 +60,14 @@ function geometry(s:Shape,smooth:boolean,plastic:boolean,sculpted:boolean) {
     colors[i]=color.r*variation;colors[i+1]=color.g*variation;colors[i+2]=color.b*variation;
   }
   g.setAttribute('color',new BufferAttribute(colors,3));
-  g.applyMatrix4(new Matrix4().compose(new Vector3(...s.at),new Quaternion().setFromEuler(new Euler(...(s.rotation??[0,0,0]))),new Vector3(1,1,1)));
+  g.applyMatrix4(new Matrix4().makeRotationFromEuler(new Euler(...(s.rotation??[0,0,0]))));
+  if(s.worldScale)g.scale(...s.worldScale);
+  g.translate(...s.at);
   return compactSceneryGeometry(g);
 }
 export function createScenery(plan:SceneryPlan):Group {
   const group=new Group(),plastic=plan.style==='plastic',sculpted=plan.style==='sculpted',smooth=sculpted||plastic||plan.style==='smooth';
-  const prepared=plan.shapes.map(shape=>({shape,geometry:geometry(shape,smooth,plastic,sculpted)}));
+  const prepared=plan.shapes.map(shape=>({shape,geometry:sceneryShapeGeometry(shape,smooth,plastic,sculpted)}));
   const noise=sculpted?createSurfaceNoise():null;
   if(sculpted){
     group.userData.surfaceShading={version:SURFACE_SHADER_VERSION,...bakeSurfaceOcclusion(prepared),contactMapSize:512};

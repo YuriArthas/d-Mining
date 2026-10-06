@@ -1,14 +1,17 @@
 import {BufferGeometry,Float32BufferAttribute,Group,InstancedMesh,MeshBasicMaterial,MeshStandardMaterial,Object3D} from 'three';
 import {stabilizeShadows} from './stableShadow.ts';
 import data from '../assets/ground-details/wall-torch.json' with {type:'json'};
-import {WALL_TORCHES,WALL_TORCH_LEVEL} from '../world/WallTorches.ts';
+import type {SurfaceDetailContent} from '../content/surfaceDetails.ts';
 import type {SurfaceTime} from '../world/SceneLighting.ts';
 // Decoration owns only the fixture/flame. Actual lights belong to SceneLightingRig.
 export class WallTorchView {
  readonly group=new Group();
  private readonly flames:InstancedMesh[]=[];
  private readonly clock={value:0};
- constructor(){
+ private readonly content:SurfaceDetailContent['torches'];
+ constructor(content:SurfaceDetailContent['torches']){
+  this.content=content;
+  const WALL_TORCHES=content.fixtures;
   this.group.name='blender-wall-torches';const pose=new Object3D();
   for(const [part,d] of Object.entries(data)){
    const g=new BufferGeometry();g.setAttribute('position',new Float32BufferAttribute(d.positions,3));g.setAttribute('normal',new Float32BufferAttribute(d.normals,3));g.setAttribute('color',new Float32BufferAttribute(d.colors,3));
@@ -34,5 +37,5 @@ export class WallTorchView {
   }
  }
  update(time:SurfaceTime,elapsed:number){this.clock.value=elapsed;for(const mesh of this.flames)mesh.visible=time==='night';}
- diagnostics(){return {count:WALL_TORCHES.length,level:WALL_TORCH_LEVEL+1,perWall:Object.fromEntries(['front','back','left','right'].map(side=>[side,WALL_TORCHES.filter(t=>t.side===side).length])),trianglesPerTorch:Object.values(data).reduce((sum,d)=>sum+d.triangles,0),batches:this.group.children.length,textureBytes:0,flamesVisible:this.flames.every(m=>m.visible),castsShadow:false};}
+ diagnostics(){const {fixtures:WALL_TORCHES,level:WALL_TORCH_LEVEL}=this.content;return {count:WALL_TORCHES.length,level:WALL_TORCH_LEVEL+1,perWall:Object.fromEntries(['front','back','left','right'].map(side=>[side,WALL_TORCHES.filter(t=>t.side===side).length])),trianglesPerTorch:Object.values(data).reduce((sum,d)=>sum+d.triangles,0),batches:this.group.children.length,textureBytes:0,flamesVisible:this.flames.every(m=>m.visible),castsShadow:false};}
 }

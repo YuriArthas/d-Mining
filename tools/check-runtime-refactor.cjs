@@ -10,7 +10,9 @@ const fs=require('node:fs/promises'),assert=require('node:assert/strict');
   await page.goto('https://w-sunjun-public.dev.clock-p.com/games/mining-test/index.html?debug=1',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>!document.querySelector('.loading-screen')&&window.__miningValidation?.snapshot().ready,undefined,{polling:100});
   const snapshot=()=>page.evaluate(()=>window.__miningValidation.snapshot());
+  console.log('public surface ready');
   report.surface=await snapshot();assert.equal(report.surface.startup.sky.time,'night');assert.equal(report.surface.facilities.visuals.length,10);
+  if(process.env.CAPTURE)await page.screenshot({path:out+'/surface.png'});
   if(process.env.STARTUP_ONLY){
    assert.equal(report.surface.content.layers.find(l=>l.id==='old_mine').depth,400);
    assert.equal(report.surface.content.layers.find(l=>l.id==='old_mine').theme,'timber_mine');
@@ -24,12 +26,16 @@ const fs=require('node:fs/promises'),assert=require('node:assert/strict');
   }
   await page.getByRole('button',{name:'切换到白天',exact:true}).click();
   await page.waitForFunction(()=>window.__miningValidation.snapshot().startup.sky.time==='day',undefined,{polling:100});
+  console.log('public daytime ready');
   report.day=await snapshot();assert.equal(report.day.lighting.surfaceArea.activeLights,0);
   await page.getByRole('button',{name:'切换到夜晚',exact:true}).click();
   await page.waitForFunction(()=>window.__miningValidation.snapshot().startup.sky.time==='night',undefined,{polling:100});
+  console.log('public night restored');
   // Same public debug command used by the UI's travel adapter; waits for collision-ready destination.
   await page.evaluate(()=>window.__miningValidation.teleport('deep'));
   await page.waitForFunction(()=>{const s=window.__miningValidation.snapshot();return s.ready&&s.grounded&&s.position[1]<-3500;},undefined,{polling:100});
+  if(process.env.CAPTURE)await page.screenshot({path:out+'/deep.png'});
+  console.log('public deep destination ready');
   report.deep=await snapshot();assert.equal(report.deep.lighting.surfaceArea.active,false);assert.equal(report.deep.lighting.surfaceFog,true);
   assert.equal(report.deep.facilities.visuals.length,10);assert.equal(report.deep.economy.destinations.every(d=>d.unlocked),true);
   await page.evaluate(()=>window.__miningValidation.teleport('surface'));

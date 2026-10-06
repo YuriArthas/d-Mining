@@ -1,11 +1,12 @@
 import {BufferGeometry,Float32BufferAttribute,Group,Mesh,MeshPhysicalMaterial,MeshStandardMaterial,type Texture} from 'three';
 import bank from '../assets/ground-details/pond-bank.json' with {type:'json'};
-import {SURFACE_PONDS,POND} from '../world/SurfacePonds.ts';
+import type {SurfaceDetailContent} from '../content/surfaceDetails.ts';
 import {stabilizeShadows,compileStableShadow} from './stableShadow.ts';
 import {PondReflection} from './PondReflection.ts';
 
 // Clear shallow water over a visible bed, with one shared real planar reflection.
-export function createSurfacePonds(clock:{value:number},groundAtlas?:Texture){
+export function createSurfacePonds(content:SurfaceDetailContent['ponds'],clock:{value:number},groundAtlas?:Texture){
+ const {placements:SURFACE_PONDS,shape:POND}=content;
  const root=new Group();root.name='grid-grass-ponds';
  const bankGeometry=new BufferGeometry();bankGeometry.setAttribute('position',new Float32BufferAttribute(bank.positions,3));bankGeometry.setAttribute('normal',new Float32BufferAttribute(bank.normals,3));
  const shore=stabilizeShadows(new MeshStandardMaterial({color:'#ffffff',roughness:1,metalness:0,envMapIntensity:0}));
@@ -85,6 +86,6 @@ export function createSurfacePonds(clock:{value:number},groundAtlas?:Texture){
   surfaces.push(surface);surface.onBeforeRender=(renderer,scene,camera)=>reflection.capture(renderer,scene,camera,surfaces);
   root.add(rim,surface);
  }
- root.userData.ponds={version:'deeper-planar-ponds-v16',count:2,waterY:POND.waterY,waterDepth:POND.depth,bankHeight:POND.bankHeight,bankTriangles:bank.triangles,waterTriangles:bank.waterPositions.length/9,drawCalls:4,extraTextures:0,reflection:'shared-planar-scene',reflectionTarget:reflection.stats,specular:true,waterIor:water.ior,roughness:water.roughness,clearcoat:water.clearcoat,maxRippleSlope:.011,swimming:false};
+ root.userData.ponds={version:'deeper-planar-ponds-v16',count:SURFACE_PONDS.length,waterY:POND.waterY,waterDepth:POND.depth,bankHeight:POND.bankHeight,bankTriangles:bank.triangles,waterTriangles:bank.waterPositions.length/9,drawCalls:SURFACE_PONDS.length*2,extraTextures:0,reflection:'shared-planar-scene',reflectionTarget:reflection.stats,specular:true,waterIor:water.ior,roughness:water.roughness,clearcoat:water.clearcoat,maxRippleSlope:.011,swimming:false};
  return root;
 }

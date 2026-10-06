@@ -6,7 +6,7 @@ import {BOUNDARY_TIERS,TERRACE_SOLIDS} from '../../src/game/world/BoundaryProfil
 import {BOUNDARY_PLACEMENTS} from '../../src/game/world/TimberBoundary.ts';
 
 test('terrace core is closed at all edges and has no exposed timber filler or stair holes',()=>{
- const g=boundaryCoreGeometry(),p=g.attributes.position,edges=new Map();
+ const g=boundaryCoreGeometry(BOUNDARY_TIERS),p=g.attributes.position,edges=new Map();
  for(let i=0;i<p.count;i+=3){
   const v=[0,1,2].map(j=>[p.getX(i+j),p.getY(i+j),p.getZ(i+j)].map(n=>n.toFixed(4)).join(','));
   for(let j=0;j<3;j++){const key=[v[j],v[(j+1)%3]].sort().join('|');edges.set(key,(edges.get(key)??0)+1);}
@@ -15,7 +15,7 @@ test('terrace core is closed at all edges and has no exposed timber filler or st
  assert.ok(BOUNDARY_PLACEMENTS.every(p=>p.asset!=='bank-steps'&&p.asset!=='grid-mine-timber-blender'));g.dispose();
 });
 test('dense downward scans across every narrow terrace hit exactly its continuous top',()=>{
- const g=boundaryCoreGeometry(),m=new Mesh(g,new MeshBasicMaterial());m.updateMatrixWorld();const ray=new Raycaster();
+ const g=boundaryCoreGeometry(BOUNDARY_TIERS),m=new Mesh(g,new MeshBasicMaterial());m.updateMatrixWorld();const ray=new Raycaster();
  for(const [level,t] of BOUNDARY_TIERS.entries()){
   for(let a=0;a<=40;a++)for(const edge of ['left','right','back','front']){
    const f=a/40,x=edge==='left'?t.inner.left-1:edge==='right'?t.inner.right+1:t.inner.left+1+(t.inner.right-t.inner.left-2)*f;

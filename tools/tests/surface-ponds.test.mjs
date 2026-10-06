@@ -1,3 +1,4 @@
+import {createSurfaceDetailContent} from '../../src/game/content/surfaceDetails.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {SURFACE_PONDS,POND_SOLIDS,pondDistance} from '../../src/game/world/SurfacePonds.ts';
@@ -12,7 +13,7 @@ test('ponds leave mine approach and side paths clear; grass never grows under wa
   assert.ok(p.x+6<=r.minX||p.x-6>=r.maxX||p.z+5<=r.minZ||p.z-5>=r.maxZ);
  }
  assert.ok(planGrass().every(p=>pondDistance(p.x,p.z)>=1.35));
- const root=createSurfacePonds({value:0});
+ const root=createSurfacePonds(createSurfaceDetailContent().ponds,{value:0});
  try{
   assert.equal(root.children.length,4);
   assert.equal(root.children[0].geometry,root.children[2].geometry);

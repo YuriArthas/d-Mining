@@ -61,7 +61,7 @@ export async function loadStaticSurface(
   onProgress?: (done: number, total: number) => void,
 ) {
   const start = performance.now(),
-    details = new SurfaceDetails();
+    details = new SurfaceDetails(content.details);
   const names = [...new Set(content.placements.map((p) => p.asset))];
   try {
     const requests = names.map((name) => {

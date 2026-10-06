@@ -1,6 +1,6 @@
 import type { Theme } from '../content/themes.ts';
 export type V3 = [number,number,number];
-export type Shape = { type:'box'|'cone'|'rock'|'cylinder'|'ring'|'foliage'|'cap'|'torus'|'crystal'|'gable'|'crown'|'cutRock'|'horizon'|'terrainBackdrop'|'trunk'|'arch'|'awning'|'gem'|'bluff'|'grassTop'|'lathe'|'sweep'|'slab'|'plaque'|'leaf'|'cartShell'|'trail'; at:V3; size:V3; color:string; rotation?:V3; glow?:boolean; bevel?:number; material?:'stone'|'leaves'|'metal'|'water'|'wood'|'canvas'|'trail'|'ground'|'grass'; contour?:[number,number][]; path?:V3[]; radii?:number[] };
+export type Shape = { type:'box'|'cone'|'rock'|'cylinder'|'ring'|'foliage'|'cap'|'torus'|'crystal'|'gable'|'crown'|'cutRock'|'horizon'|'terrainBackdrop'|'trunk'|'arch'|'awning'|'gem'|'bluff'|'grassTop'|'lathe'|'sweep'|'slab'|'plaque'|'leaf'|'cartShell'|'trail'; at:V3; size:V3; color:string; worldScale?:V3; interaction?:boolean; rotation?:V3; glow?:boolean; bevel?:number; material?:'stone'|'leaves'|'metal'|'water'|'wood'|'canvas'|'trail'|'ground'|'grass'; contour?:[number,number][]; path?:V3[]; radii?:number[] };
 export type Solid = { at:V3; half:V3; yaw:number; hull?:number[]; triangles?:{vertices:number[];indices:number[]} };
 export type Sign = { at:V3; width:number; title:string; subtitle:string; color:string; background:string; style?:'facility'; yaw?:number };
 export type SceneryPlan = { shapes:Shape[]; solids:Solid[]; signs:Sign[]; style?:'smooth'|'plastic'|'sculpted'; meadow?:boolean };
@@ -12,7 +12,7 @@ export class Planner {
     this.plan.shapes.push({type:'box',at,size,color,rotation,glow});
     if(solid)this.plan.solids.push({at,half:size.map(v=>v/2) as V3,yaw:rotation[1]});
   }
-  shape(type:Shape['type'],at:V3,size:V3,color:string,rotation:V3=[0,0,0],glow=false) { this.plan.shapes.push({type,at,size,color,rotation,glow}); }
+  shape(type:Shape['type'],at:V3,size:V3,color:string,rotation:V3=[0,0,0],glow=false) { const shape:Shape={type,at,size,color,rotation,glow};this.plan.shapes.push(shape);return shape; }
   beam(a:V3,b:V3,width:number,color:string) {
     const dx=b[0]-a[0],dy=b[1]-a[1],dz=b[2]-a[2],length=Math.hypot(dx,dy,dz);
     this.box(a.map((v,i)=>(v+b[i])/2) as V3,[width,length,width],color,false,[Math.atan2(dz,dy),0,-Math.asin(dx/length)]);
@@ -45,7 +45,7 @@ export class Planner {
   crystal(x:number,y:number,z:number,h:number,color:string) {
     this.shape('crystal',[x,y,z],[h*.23,h,h*.23],color,[0,x*.17,.09*Math.sin(x+z)]);
   }
-  booth(x:number,y:number,z:number,t:Theme,shop:boolean) {
+  booth(x:number,y:number,z:number,t:Theme,shop:boolean,radius=1.7) {
     // The activation circle sits IN FRONT of the counter, never inside its collider.
     const rear=z-3.4;
     for(const dx of [-2,2])this.box([x+dx,y+2.3,rear],[.3,4.6,.3],t.wood,true);
@@ -55,8 +55,8 @@ export class Planner {
     this.box([x,y+3.82,rear+1.42],[4.2,.38,.12],shop?'#659e96':'#bf7955');
     this.sign([x,y+3,rear+.85],3.6,shop?'SHOP':'SELL','',t);
     for(const dx of [-1.25,1.25])this.lantern(x+dx,y+3,rear+1,t);
-    this.shape('ring',[x,y+.045,z],[1.7,.12,1.7],shop?'#95d9c6':'#f1ca76',[0,0,0],true);
-    this.shape('ring',[x,y+.035,z],[1.95,.025,1.95],shop?'#95d9c6':'#f1ca76',[0,0,0],true);
+    this.shape('ring',[x,y+.045,z],[radius,.12,radius],shop?'#95d9c6':'#f1ca76',[0,0,0],true).interaction=true;
+    this.shape('ring',[x,y+.035,z],[radius+.25,.025,radius+.25],shop?'#95d9c6':'#f1ca76',[0,0,0],true).interaction=true;
     for(let i=0;i<3;i++)this.shape('rock',[x-.8+i*.7,y+2.3,rear],[.4,.35,.35],shop?METAL:['#e6b956','#bcdce0','#c4774d'][i]);
     this.crate(x-3,y,rear,.95);
     this.barrel(x+3,y,rear);

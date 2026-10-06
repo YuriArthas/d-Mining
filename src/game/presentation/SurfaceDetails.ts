@@ -1,3 +1,4 @@
+import type {SurfaceDetailContent} from '../content/surfaceDetails.ts';
 import {BufferGeometry,Color,DataTexture,DoubleSide,Float32BufferAttribute,Group,InstancedMesh,LinearFilter,LinearMipmapLinearFilter,MeshStandardMaterial,NearestFilter,NoColorSpace,Object3D,RedFormat,UnsignedByteType} from 'three';
 import {WallTorchView} from './WallTorchView.ts';
 import contactData from '../assets/ground-details/contact-shadow.json' with {type:'json'};
@@ -6,8 +7,6 @@ import postMask from '../assets/ground-details/lantern-post-emission.json' with 
 import boxMask from '../assets/ground-details/pit-box-lantern-emission.json' with {type:'json'};
 import grassData from '../assets/ground-details/grass.json' with {type:'json'};
 import curbData from '../assets/ground-details/curb.json' with {type:'json'};
-import {CURB,CURB_BLOCKS,CURB_SOLIDS} from '../world/SurfaceRoads.ts';
-import {planGrass} from '../world/GrassLayout.ts';
 import type {SurfaceTime} from '../world/SceneLighting.ts';
 import {stabilizeShadows} from './stableShadow.ts';
 import {createSurfacePonds} from './SurfacePondsView.ts';
@@ -18,16 +17,18 @@ function texture(data:{size:number;data:string},pixel=false){
 }
 export class SurfaceDetails {
  private disposed=false;
- readonly wallTorches=new WallTorchView();
+ readonly wallTorches:WallTorchView;
  readonly bakedContact={texture:texture(contactData),strength:{value:.65},bounds:contactData.bounds,floorY:contactData.floorY};
  readonly night={value:1};readonly wind={value:0};readonly atlas=texture(atlasData,true);
  private readonly masks={post:texture(postMask),box:texture(boxMask)};
  private readonly lampMaterials:MeshStandardMaterial[]=[];
  private time:SurfaceTime='night';
  readonly stats={version:'pixel-meadow-v1',atlasSize:128,maskSize:128,detailTextureBytes:3*128*128*4/3,grassInstances:0,grassTriangles:0,grassBatches:0,grassBufferBytes:0,grassDrawCalls:0,grassDrawnTriangles:0,grassDrawnInstances:0,grassCastsShadow:false,grassHasCollision:false,distanceUnloading:false};
- constructor(){this.atlas.name='authored-pixel-ground-128';}
- createPonds(){return createSurfacePonds(this.wind,this.atlas);}
+ private readonly content:SurfaceDetailContent;
+ constructor(content:SurfaceDetailContent){this.content=content;this.wallTorches=new WallTorchView(content.torches);this.atlas.name='authored-pixel-ground-128';}
+ createPonds(){return createSurfacePonds(this.content.ponds,this.wind,this.atlas);}
  createCurbs(){
+  const {style:CURB,blocks:CURB_BLOCKS}=this.content.curbs;
   const geometry=new BufferGeometry();geometry.setAttribute('position',new Float32BufferAttribute(curbData.positions,3));geometry.setAttribute('normal',new Float32BufferAttribute(curbData.normals,3));
   const material=stabilizeShadows(new MeshStandardMaterial({color:'#a89b7f',roughness:1,metalness:0,envMapIntensity:0}));
   const mesh=new InstancedMesh(geometry,material,CURB_BLOCKS.length),object=new Object3D();mesh.name='blender-modular-road-curbs';
@@ -50,7 +51,7 @@ export class SurfaceDetails {
   material.customProgramCacheKey=()=>`lantern-pane-${kind}-v1`;
  }
  createGrass(){
-  const root=new Group();root.name='instanced-wide-grass';const placements=planGrass();
+  const root=new Group();root.name='instanced-wide-grass';const placements=this.content.grass;
   const geometries=grassData.map(p=>{const g=new BufferGeometry();g.setAttribute('position',new Float32BufferAttribute(p.positions,3));g.setAttribute('normal',new Float32BufferAttribute(p.normals,3));g.setAttribute('color',new Float32BufferAttribute(p.colors,3));return g;});
   const material=stabilizeShadows(new MeshStandardMaterial({color:'#ffffff',vertexColors:true,side:DoubleSide,roughness:1,metalness:0,envMapIntensity:0}));
   const compile=material.onBeforeCompile;
@@ -83,7 +84,7 @@ export class SurfaceDetails {
   this.wind.value=elapsed;this.wallTorches.update(time,elapsed);
   if(time!==this.time){this.time=time;this.night.value=time==='night'?1:0;for(const m of this.lampMaterials)m.emissiveIntensity=time==='night'?2.5:0;}
  }
- diagnostics(){return {...this.stats,wallTorches:this.wallTorches.diagnostics(),bakedShadows:{enabled:this.bakedContact.strength.value>0,strength:this.bakedContact.strength.value,version:'selected-ground-contact-v1',sites:6,size:contactData.size,gpuBytesWithMipmaps:349525,drawCalls:0,receiver:'ground-only',realtimeShadowMaps:0},roads:{version:'block-paths-v1',curbInstances:CURB_BLOCKS.length,curbHeight:CURB.height,curbTriangles:curbData.triangles*CURB_BLOCKS.length,curbBatches:1,collisionEdges:CURB_SOLIDS.length},time:this.time,lampMaterialCount:this.lampMaterials.length,windowEmissiveIntensity:this.time==='night'?2.5:0,pendantEmissiveMultiplier:this.night.value};}
+ diagnostics(){return {...this.stats,wallTorches:this.wallTorches.diagnostics(),bakedShadows:{enabled:this.bakedContact.strength.value>0,strength:this.bakedContact.strength.value,version:'selected-ground-contact-v1',sites:6,size:contactData.size,gpuBytesWithMipmaps:349525,drawCalls:0,receiver:'ground-only',realtimeShadowMaps:0},roads:{version:'block-paths-v1',curbInstances:this.content.curbs.blocks.length,curbHeight:this.content.curbs.style.height,curbTriangles:curbData.triangles*this.content.curbs.blocks.length,curbBatches:1,collisionEdges:this.content.curbs.collisionEdges},time:this.time,lampMaterialCount:this.lampMaterials.length,windowEmissiveIntensity:this.time==='night'?2.5:0,pendantEmissiveMultiplier:this.night.value};}
  get ownedTextures(){return new Set([this.bakedContact.texture,this.atlas,this.masks.post,this.masks.box]);}
  dispose(){if(this.disposed)return;this.disposed=true;this.bakedContact.texture.dispose();this.atlas.dispose();this.masks.post.dispose();this.masks.box.dispose();}
 }

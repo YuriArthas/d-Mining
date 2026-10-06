@@ -1,17 +1,18 @@
+import type {SurfaceDetailContent} from '../content/surfaceDetails.ts';
 import {BufferGeometry,Float32BufferAttribute,Mesh,MeshStandardMaterial,DataTexture,RGBAFormat,SRGBColorSpace,NearestFilter,LinearMipmapLinearFilter,RepeatWrapping} from 'three';
-import {BOUNDARY_TIERS,expandBoundary,type BoundaryRect} from '../world/BoundaryProfile.ts';
+import {expandBoundary,type BoundaryRect} from '../world/BoundaryProfile.ts';
 import {stabilizeShadows} from './stableShadow.ts';
 // One closed stepped earth body. Facades are decoration, never the terrain seal.
-export function boundaryCoreGeometry(){
- const profiles:{rect:BoundaryRect;y:number;material:number}[]=[],first=BOUNDARY_TIERS[0];
+export function boundaryCoreGeometry(tiers:SurfaceDetailContent['boundary']){
+ const profiles:{rect:BoundaryRect;y:number;material:number}[]=[],first=tiers[0];
  profiles.push({rect:expandBoundary(first.inner,2.4),y:first.base,material:0});
- for(const t of BOUNDARY_TIERS){
+ for(const t of tiers){
   // A solid timber cap covers the wall; grass starts only above supported soil.
   profiles.push({rect:expandBoundary(t.inner,2.4),y:t.top-.32,material:2},{rect:t.inner,y:t.top-.32,material:2},{rect:t.inner,y:t.top,material:2});
   profiles.push({rect:expandBoundary(t.inner,2.4),y:t.top,material:1});
-  profiles.push({rect:t===BOUNDARY_TIERS.at(-1)?t.outer:expandBoundary(t.outer,2.4),y:t.top,material:0});
+  profiles.push({rect:t===tiers.at(-1)?t.outer:expandBoundary(t.outer,2.4),y:t.top,material:0});
  }
- profiles.push({rect:BOUNDARY_TIERS.at(-1)!.outer,y:first.base,material:0});
+ profiles.push({rect:tiers.at(-1)!.outer,y:first.base,material:0});
  const corners=({rect:r,y}:{rect:BoundaryRect;y:number})=>[[r.left,y,r.back],[r.right,y,r.back],[r.right,y,r.front],[r.left,y,r.front]];
  const positions:number[]=[],uvs:number[]=[],g=new BufferGeometry();
  for(let i=0;i<profiles.length;i++){
@@ -46,9 +47,9 @@ function timberTexture(){
  }
  const t=new DataTexture(data,size,size,RGBAFormat);t.colorSpace=SRGBColorSpace;t.magFilter=NearestFilter;t.minFilter=LinearMipmapLinearFilter;t.generateMipmaps=true;t.wrapS=t.wrapT=RepeatWrapping;t.needsUpdate=true;t.name='terrace-timber-cap-64';return t;
 }
-export function createBoundaryCore(){
+export function createBoundaryCore(tiers:SurfaceDetailContent['boundary']){
  const materials=[pixelTexture(false),pixelTexture(true),timberTexture()].map(map=>stabilizeShadows(new MeshStandardMaterial({map,roughness:1,metalness:0,envMapIntensity:.35})));
- const g=boundaryCoreGeometry();
+ const g=boundaryCoreGeometry(tiers);
  // Batch by material: soil, grass and timber, not one draw per strip.
  const p=g.getAttribute('position'),uv=g.getAttribute('uv'),n=g.getAttribute('normal'),pos:number[]=[],tex:number[]=[],norm:number[]=[];const groups=[...g.groups];g.clearGroups();
  for(let material=0;material<materials.length;material++){const start=pos.length/3;for(const group of groups.filter(s=>s.materialIndex===material))for(let i=group.start;i<group.start+group.count;i++){pos.push(p.getX(i),p.getY(i),p.getZ(i));tex.push(uv.getX(i),uv.getY(i));norm.push(n.getX(i),n.getY(i),n.getZ(i));}g.addGroup(start,pos.length/3-start,material);}

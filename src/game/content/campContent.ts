@@ -1,3 +1,5 @@
+import { createSurfaceDetailContent, type SurfaceDetailContent } from './surfaceDetails.ts';
+import { roomPlan } from '../world/scenery.ts';
 import { MATERIAL_PRESETS, type MaterialPresets } from "./materialPresets.ts";
 import { PORTAL_SLOTS, type PortalSlot } from "./portalSlots.ts";
 import { LAYERS, validateLayers, type Layer } from "./layers.ts";
@@ -30,6 +32,7 @@ import type { SceneryPlan } from "../world/sceneryKit.ts";
 import type { AssetProfile } from "./assetProfiles.ts";
 
 export type SurfaceContent = Readonly<{
+  details: SurfaceDetailContent;
   placements: readonly QuarryPlacement[];
   plan: SceneryPlan;
   profiles: Readonly<Record<string, AssetProfile>>;
@@ -47,6 +50,7 @@ export function createCampContent(
       layers === LAYERS && slots === PORTAL_SLOTS
         ? SURFACE_PORTALS
         : portalsFor(layers, slots);
+  for (const room of rooms) roomPlan(room);
   const session =
     layers === LAYERS && slots === PORTAL_SLOTS
       ? SESSION_CONTENT
@@ -71,6 +75,7 @@ export function createCampContent(
     ];
   }
   const surface: SurfaceContent = {
+    details: createSurfaceDetailContent(),
     placements,
     plan,
     profiles: ASSET_PROFILES,

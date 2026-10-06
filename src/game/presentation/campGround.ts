@@ -1,9 +1,9 @@
 import type { MeshStandardMaterial, Texture } from 'three';
-import { SURFACE_ROADS } from '../world/surfaceLayout.ts';
-import {POND_DISTANCE_GLSL} from '../world/SurfacePonds.ts';
+import type {SurfaceDetailContent} from '../content/surfaceDetails.ts';
 // Paint the generated Tripo ground mesh in world space. No additional meshes,
 // distance-dependent resources; one shared pixel atlas, preserve the open voxel shaft.
-export function paintCampGround(material:MeshStandardMaterial,atlas:Texture,contact:{texture:Texture;strength:{value:number};bounds:{minX:number;maxX:number;minZ:number;maxZ:number};floorY:number}){
+export function paintCampGround(content:SurfaceDetailContent['ground'],material:MeshStandardMaterial,atlas:Texture,contact:{texture:Texture;strength:{value:number};bounds:{minX:number;maxX:number;minZ:number;maxZ:number};floorY:number}){
+ const {roads:SURFACE_ROADS,pondDistanceGLSL:POND_DISTANCE_GLSL}=content;
  // World-space painted ground has its own surface response. Imported meadow
  // normal/ORM/AO maps describe a different material and caused muddy grazing highlights.
  material.map=null;material.normalMap=null;material.bumpMap=null;

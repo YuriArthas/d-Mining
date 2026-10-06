@@ -11,13 +11,15 @@ export const PORTAL_BASE_HEIGHT=.16;
 export const PORTAL_MODEL={width:2.25,depth:1.4,height:1.9} as const;
 export const PORTAL_PLINTH={width:2.55,depth:1.95,height:PORTAL_BASE_HEIGHT} as const;
 export function portalsFor(layers:readonly Layer[],slots:Readonly<Record<string,PortalSlot>>=PORTAL_SLOTS){
- const occupied=new Set<string>();
+ const occupied:{id:string;x:number;z:number}[]=[];
  return layers.slice(1).map(layer=>{
   const slot=slots[layer.id];if(!slot)throw Error(`传送庭院展位不足: ${layer.id}`);
-  const key=`${slot.x},${slot.z}`;
-  if(occupied.has(key)||![slot.x,slot.z,slot.yaw].every(Number.isFinite))throw Error(`无效传送展位: ${layer.id}`);
+  if(![slot.x,slot.z,slot.yaw].every(Number.isFinite))throw Error(`无效传送展位: ${layer.id}`);
   if(slot.x-1.6<PORTAL_AREA.minX||slot.x+1.6>PORTAL_AREA.maxX||slot.z-1.6<Math.max(PORTAL_AREA.minZ,SURFACE_SITE.redLine)||slot.z+1.6>PORTAL_AREA.maxZ)throw Error(`传送展位超出庭院边界: ${layer.id}`);
-  occupied.add(key);
+  // Include exit hysteresis; the resulting clearance also separates model footprints.
+  for(const other of occupied)if(Math.hypot(slot.x-other.x,slot.z-other.z)<3.8)
+   throw Error(`传送展位重叠: ${other.id} / ${layer.id}`);
+  occupied.push({id:layer.id,x:slot.x,z:slot.z});
   return {id:layer.id,name:layer.name,depth:layer.from,color:themeById(layer.theme).accent,...slot,
    zone:{x:slot.x,y:0,z:slot.z,radius:1.6,heightTolerance:.25,hysteresis:.3}};
  });

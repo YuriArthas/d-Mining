@@ -1,3 +1,4 @@
+import { ENTRANCE_WORLD } from './entrance.ts';
 import { THEMES, themeById } from '../content/themes.ts';
 import { type RestRoom } from './rooms.ts';
 import { Planner, WOOD, DARK, METAL, CREAM, type SceneryPlan } from './sceneryKit.ts';
@@ -10,8 +11,8 @@ function tracks(p:Planner,x:number,z:number,length:number) {
 }
 function buildRoomPlan(room:RestRoom):SceneryPlan {
   const p=new Planner(),t=themeById(room.theme);p.rim(t);
-  p.booth(room.sell.x,0,room.sell.z,t,false);
-  if(room.shop)p.booth(room.shop.x,0,room.shop.z,t,true);
+  p.booth(room.sell.x,0,room.sell.z,t,false,room.sell.radius);
+  if(room.shop)p.booth(room.shop.x,0,room.shop.z,t,true,room.shop.radius);
   const sideSign=t.motif==='fossil'||t.motif==='core';
   p.sign([sideSign?-7.5:0,6.2,-18.8],sideSign?6:9,t.name,`${String(THEMES.indexOf(t)+1).padStart(2,'0')}  /  ${room.depth} M`,t);
   // Wall footings and supports leave both circulation and the open mine ceiling clear.
@@ -93,8 +94,16 @@ export function roomPlan(room:RestRoom):SceneryPlan {
  // Rim is aligned with the global 8×8 shaft, independently of room dimensions.
  const rim=new Planner();rim.rim(themeById(room.theme));
  const rimShapes=plan.shapes.splice(0,rim.plan.shapes.length),rimSolids=plan.solids.splice(0,rim.plan.solids.length);
- for(const shape of plan.shapes){shape.at=[room.x+shape.at[0]*sx,shape.at[1]*sy,room.z+shape.at[2]*sz];shape.size=[shape.size[0]*sx,shape.size[1]*sy,shape.size[2]*sz];}
+ for(const shape of plan.shapes){shape.at=[room.x+shape.at[0]*sx,shape.at[1]*sy,room.z+shape.at[2]*sz];if(!shape.interaction&&(sx!==1||sy!==1||sz!==1))shape.worldScale=[sx,sy,sz];}
  for(const solid of plan.solids){solid.at=[room.x+solid.at[0]*sx,solid.at[1]*sy,room.z+solid.at[2]*sz];solid.half=[solid.half[0]*sx,solid.half[1]*sy,solid.half[2]*sz];}
  for(const sign of plan.signs){sign.at=[room.x+sign.at[0]*sx,sign.at[1]*sy,room.z+sign.at[2]*sz];sign.width*=sx;}
+ // Reject blocked entrances; never silently relocate authored facilities.
+ for(const solid of plan.solids){
+  const c=Math.abs(Math.cos(solid.yaw)),s=Math.abs(Math.sin(solid.yaw));
+  const hx=c*solid.half[0]+s*solid.half[2],hz=s*solid.half[0]+c*solid.half[2];
+  if(solid.at[0]+hx>ENTRANCE_WORLD.minX&&solid.at[0]-hx<ENTRANCE_WORLD.maxX
+   &&solid.at[2]+hz>ENTRANCE_WORLD.minZ&&solid.at[2]-hz<ENTRANCE_WORLD.maxZ)
+   throw Error(`休整层布景占用垂直入口: ${room.id}`);
+ }
  plan.shapes.unshift(...rimShapes);plan.solids.unshift(...rimSolids);return plan;
 }

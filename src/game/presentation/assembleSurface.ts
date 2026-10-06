@@ -87,7 +87,7 @@ export function assembleSurface(
               );
             };
             m.customProgramCacheKey = () => "camp-tripo-ground-shaft-v2";
-            paintCampGround(m, details.atlas, details.bakedContact);
+            paintCampGround(content.details.ground,m, details.atlas, details.bakedContact);
           }
           // Mirror the shader's shaft cut in diagnostic raycasts; no mesh is created.
           const raycast = o.raycast;
@@ -147,7 +147,7 @@ export function assembleSurface(
       details.createCurbs(),
       ponds,
       details.wallTorches.group,
-      createBoundaryCore(),
+      createBoundaryCore(content.details.boundary),
     );
     group.traverse((o) => {
       if (o instanceof Mesh) {
