@@ -2,8 +2,8 @@
   "parts": [
     "soft-shrub.000.part"
   ],
-  "bytes": 324307,
-  "sha256": "d8c302873ee20b98ee2e443ba2a4a5a465bab8a195559044e6d41a43f9dc609d",
+  "bytes": 101302,
+  "sha256": "c94f82d4fd507298de378e1a899bf1ba0acfb76a8276f689bef22e9a8f60adf4",
   "taskId": "68f13b1a-e2b2-40ec-8e14-14427654ed96",
   "sourceSha256": "ddc1091fe00a412646d9281c72656a5a9fb8419a4879ee0b15e75dd392205dd6",
   "triangles": 968,
@@ -11,5 +11,13 @@
   "source": "new Tripo image_to_model",
   "reference": "output/imagegen/camp-v2/soft-shrub.png",
   "geometryEdits": false,
-  "positionQuantizationBits": 16
+  "positionQuantizationBits": 16,
+  "decodedBytes": 104824,
+  "geometrySha256": "244180e87cc1adf25ebc279b651225953b3d8169c69ee1f615f32bea9cb0ff21",
+  "colorEncoding": {
+    "codec": "ETC1S",
+    "quality": 200,
+    "compressionLevel": 2,
+    "resize": false
+  }
 }

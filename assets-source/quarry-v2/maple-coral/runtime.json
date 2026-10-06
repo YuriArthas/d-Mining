@@ -2,8 +2,8 @@
   "parts": [
     "maple-coral.000.part"
   ],
-  "bytes": 336740,
-  "sha256": "293ba5f56fa0b10c220640a9d21d9474fb476c8e29e2d4988762c76d3edbb326",
+  "bytes": 111198,
+  "sha256": "070d1cf1887a1d5b3fe7553b0f90ac0610001331f359b86ffa26e7304517683e",
   "taskId": "afb147ad-fe8d-466a-8140-2ca77a8b88b9",
   "sourceSha256": "3dff1a1d664040ed82340b50312b983efcb363b99a2df1520c60bf07cb8a08f6",
   "triangles": 2657,
@@ -11,5 +11,13 @@
   "source": "new Tripo image_to_model",
   "reference": "output/imagegen/camp-expansion/maple-coral.png",
   "geometryEdits": false,
-  "positionQuantizationBits": 16
+  "positionQuantizationBits": 16,
+  "decodedBytes": 116068,
+  "geometrySha256": "1c8064ca415fc0784e7da8cbfb6a7d2f429c2b141209daae7c554a0e777f1ca0",
+  "colorEncoding": {
+    "codec": "ETC1S",
+    "quality": 200,
+    "compressionLevel": 2,
+    "resize": false
+  }
 }

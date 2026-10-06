@@ -2,8 +2,8 @@
   "parts": [
     "sapling-pair.000.part"
   ],
-  "bytes": 303112,
-  "sha256": "6140f72e246ddf63d05209faf557202af9bd999803ba7c818ae99d458be2ff1d",
+  "bytes": 104246,
+  "sha256": "c7dc2ab9a4bb04f3f269891a2620ed1812c411716146a0896e3697d2a39544eb",
   "taskId": "4ac1db34-c2d3-4d9b-8f3c-ebb88b0b18c5",
   "sourceSha256": "692d96d1a44e25de7bcd04f7c6a3f7c9bfc2a8389cf656ce5629df3df1743180",
   "triangles": 2078,
@@ -11,5 +11,13 @@
   "source": "new Tripo image_to_model",
   "reference": "output/imagegen/camp-expansion/sapling-pair.png",
   "geometryEdits": false,
-  "positionQuantizationBits": 16
+  "positionQuantizationBits": 16,
+  "decodedBytes": 108916,
+  "geometrySha256": "a1380160cafa3bc6e939da885f42e49978a27aed50940934545213c3570ebcf0",
+  "colorEncoding": {
+    "codec": "ETC1S",
+    "quality": 200,
+    "compressionLevel": 2,
+    "resize": false
+  }
 }

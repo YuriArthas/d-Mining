@@ -96,25 +96,29 @@
       "asset": "grid-mine-trim-blender",
       "transportSha256": "a50b2331f046b3b51af2155ec996706cf1f9da3a45fd945c9f04ba2544a6b4f1",
       "taskId": null,
-      "source": "Blender authored mesh and texture"
+      "source": "Blender authored mesh and texture",
+      "geometrySha256": "113a88730962ff6177ecef5e048cf4e4f0b2259f4932decc15420c97468a32f2"
     },
     {
       "asset": "grid-mine-timber-blender",
       "transportSha256": "d6fd60b5e9d15b5287c8782f7f5b17ff0a2d8916a1e4e799557f9bbe1f2a788f",
       "taskId": null,
-      "source": "Blender authored mesh and texture"
+      "source": "Blender authored mesh and texture",
+      "geometrySha256": "f44bf7d68d900b75e4ff6c50db6bc9e14a15017d1a7ecc6f3cbaf2dae25f0552"
     },
     {
       "asset": "simulator-exchange",
       "transportSha256": "a28eb7214f453b15672fbc468904e6530f0ba9ebab5f7c6f56895f83f645985a",
       "taskId": "6d3bf76e-2393-4ea3-bb6f-65b731fcf61a",
-      "source": "new Tripo image_to_model"
+      "source": "new Tripo image_to_model",
+      "geometrySha256": "cd75eb7ef0f2130faf59e52a3301cda725b613378305a8d91bae4b08ce2b4c11"
     },
     {
       "asset": "simulator-upgrade",
       "transportSha256": "1cc7d8643f4428427b3991bfb812d8c6bec945808ad10ddf054f4347ba2c6b8c",
       "taskId": "177a1b15-d6f6-4d03-a899-756e38994554",
-      "source": "new Tripo image_to_model"
+      "source": "new Tripo image_to_model",
+      "geometrySha256": "2c7a7d494baa7bcab516f7e9d542707fe8c243730b857708cec48ae47a6b3cc2"
     }
   ],
   "geometrySha256": "99bea7bd9612d639d2e9d3a048dbeb40a3c307ea75af0918d8386424870d4184"

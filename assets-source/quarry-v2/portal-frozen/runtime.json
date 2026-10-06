@@ -4,13 +4,21 @@
   "parts": [
     "portal-frozen.000.part"
   ],
-  "bytes": 108593,
-  "sha256": "b4edc5cb6b2a98ec797cc9e39bb9ed59ae3189484d99bfd6b3fe9dd60feb401f",
+  "bytes": 51504,
+  "sha256": "f04ababb1429b18ef1224ed7b8d53401e8c1628b8af12e09338a77e1822a461e",
   "taskId": "72a444ef-8b45-4cf9-9d29-ed944669b7a9",
   "sourceSha256": "4d0cd96d91df566f3488973acaf33cda15f7e4da77072e1014b802c1c06875ee",
   "triangles": 1150,
   "faceLimit": 1200,
   "source": "new Tripo text_to_model",
   "geometryEdits": false,
-  "positionQuantizationBits": 16
+  "positionQuantizationBits": 16,
+  "decodedBytes": 55084,
+  "geometrySha256": "42f4195610a03591d5800aa252e9f483c8cd00917fc3a6f814c54784da4b9af8",
+  "colorEncoding": {
+    "codec": "ETC1S",
+    "quality": 200,
+    "compressionLevel": 2,
+    "resize": false
+  }
 }

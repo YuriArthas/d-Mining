@@ -2,8 +2,8 @@
   "parts": [
     "pit-spoil.000.part"
   ],
-  "bytes": 396204,
-  "sha256": "f0fe7e7e32b35c1a22719812d7acdada4fedc2c078dd1c4905435c28c99b4239",
+  "bytes": 165143,
+  "sha256": "d3ddeff7ca423e349947c6ca40aff0fbb4e8688e16be359ba197a763743a7b54",
   "taskId": "f4dfc3b1-1095-485b-a6f0-fd9341f9d10d",
   "sourceSha256": "27301549cc13879282ea7bb6eae5f551b14bbb81df145a9b40c44072124e54ad",
   "triangles": 1909,
@@ -11,5 +11,13 @@
   "source": "new Tripo image_to_model",
   "reference": "output/imagegen/mine-worksite/pit-spoil.png",
   "geometryEdits": false,
-  "positionQuantizationBits": 16
+  "positionQuantizationBits": 16,
+  "decodedBytes": 169240,
+  "geometrySha256": "ea8d18d1e2bcaaea4e24f9402b5837140780c82ade190fd308e90e7b5333118a",
+  "colorEncoding": {
+    "codec": "ETC1S",
+    "quality": 200,
+    "compressionLevel": 2,
+    "resize": false
+  }
 }

@@ -1,6 +1,7 @@
+import {ROOM_LAYOUT,type RoomLayout} from './roomLayout.ts';
 import { resourceByKind } from './resources.ts';
 import { themeById } from './themes.ts';
-export type Layer = Readonly<{ id: string; name: string; from: number; theme: string; base: number; ores: readonly Readonly<{kind:number;weight:number}>[]; shop: boolean }>;
+export type Layer = Readonly<{ id: string; name: string; from: number; theme: string; base: number; ores: readonly Readonly<{kind:number;weight:number}>[]; shop: boolean; room?:RoomLayout }>;
 export const WORLD_DEPTH = 4000;
 // The sole depth schedule. IDs remain stable when a layer moves.
 export const LAYERS: readonly Layer[] = Object.freeze([
@@ -19,6 +20,13 @@ export function validateLayers(layers: readonly Layer[]) {
   const ids = new Set<string>();
   for (const [i,l] of layers.entries()) {
     if(ids.has(l.id) || !Number.isInteger(l.from/2) || l.from<0 || l.from>=WORLD_DEPTH || (i===0?l.from!==0:l.from<=layers[i-1].from+20)) throw new Error(`无效楼层 ${l.id}`);
+    const room=l.room??ROOM_LAYOUT;
+    if(![room.centerX,room.centerZ,room.widthCells,room.depthCells,room.heightCells].every(Number.isInteger)
+      ||room.widthCells<20||room.depthCells<20||room.heightCells<10||room.widthCells%2||room.depthCells%2
+      ||Math.abs(room.centerX)+room.widthCells/2>48||Math.abs(room.centerZ)+room.depthCells/2>48)
+      throw Error(`无效休整层尺寸 ${l.id}`);
+    if(i>0&&l.from-room.heightCells*2<=layers[i-1].from)throw Error(`休整层高度重叠 ${l.id}`);
+    if(i>0&&(room.centerX-room.widthCells/2>-4||room.centerX+room.widthCells/2<4||room.centerZ-room.depthCells/2>-4||room.centerZ+room.depthCells/2<4))throw Error(`休整层必须包含垂直入口 ${l.id}`);
     ids.add(l.id); themeById(l.theme); resourceByKind(l.base);
     const kinds=new Set([l.base]); let sum=0;
     for(const ore of l.ores) { resourceByKind(ore.kind); if(kinds.has(ore.kind)||!Number.isFinite(ore.weight)||ore.weight<=0)throw new Error(`无效矿物分布 ${l.id}`); kinds.add(ore.kind);sum+=ore.weight; }

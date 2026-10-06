@@ -17,6 +17,7 @@ function texture(data:{size:number;data:string},pixel=false){
  t.colorSpace=NoColorSpace;t.magFilter=pixel?NearestFilter:LinearFilter;t.minFilter=LinearMipmapLinearFilter;t.generateMipmaps=true;t.flipY=false;t.needsUpdate=true;return t;
 }
 export class SurfaceDetails {
+ private disposed=false;
  readonly wallTorches=new WallTorchView();
  readonly bakedContact={texture:texture(contactData),strength:{value:.65},bounds:contactData.bounds,floorY:contactData.floorY};
  readonly night={value:1};readonly wind={value:0};readonly atlas=texture(atlasData,true);
@@ -83,5 +84,6 @@ export class SurfaceDetails {
   if(time!==this.time){this.time=time;this.night.value=time==='night'?1:0;for(const m of this.lampMaterials)m.emissiveIntensity=time==='night'?2.5:0;}
  }
  diagnostics(){return {...this.stats,wallTorches:this.wallTorches.diagnostics(),bakedShadows:{enabled:this.bakedContact.strength.value>0,strength:this.bakedContact.strength.value,version:'selected-ground-contact-v1',sites:6,size:contactData.size,gpuBytesWithMipmaps:349525,drawCalls:0,receiver:'ground-only',realtimeShadowMaps:0},roads:{version:'block-paths-v1',curbInstances:CURB_BLOCKS.length,curbHeight:CURB.height,curbTriangles:curbData.triangles*CURB_BLOCKS.length,curbBatches:1,collisionEdges:CURB_SOLIDS.length},time:this.time,lampMaterialCount:this.lampMaterials.length,windowEmissiveIntensity:this.time==='night'?2.5:0,pendantEmissiveMultiplier:this.night.value};}
- dispose(){this.bakedContact.texture.dispose();this.atlas.dispose();this.masks.post.dispose();this.masks.box.dispose();}
+ get ownedTextures(){return new Set([this.bakedContact.texture,this.atlas,this.masks.post,this.masks.box]);}
+ dispose(){if(this.disposed)return;this.disposed=true;this.bakedContact.texture.dispose();this.atlas.dispose();this.masks.post.dispose();this.masks.box.dispose();}
 }

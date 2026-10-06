@@ -1,3 +1,4 @@
+import {PORTAL_SLOTS,type PortalSlot} from '../content/portalSlots.ts';
 import {SURFACE_SITE} from './SurfaceSite.ts';
 import {PET_TIERS,PET_COLUMNS} from './PetTerraces.ts';
 import {LAYERS,type Layer} from '../content/layers.ts';
@@ -9,22 +10,27 @@ export const PORTAL_AREA=SURFACE_SITE.portal;
 export const PORTAL_BASE_HEIGHT=.16;
 export const PORTAL_MODEL={width:2.25,depth:1.4,height:1.9} as const;
 export const PORTAL_PLINTH={width:2.55,depth:1.95,height:PORTAL_BASE_HEIGHT} as const;
-const models=['portal-timber','portal-fungal','portal-crystal','portal-timber','portal-frozen','portal-volcanic','portal-fossil','portal-timber','portal-core'] as const;
-// Left of spawn; every station faces east into the shared plaza. All bounds Z >= 14.
-const portalSlots=Array.from({length:9},(_,i)=>({x:-27,z:48-i*4,yaw:Math.PI/2}));
-export function portalsFor(layers:readonly Layer[]){return layers.slice(1).map((layer,i)=>{
- const slot=portalSlots[i];if(!slot)throw Error('传送庭院展位不足，请扩展布局');
- return {id:layer.id,name:layer.name,depth:layer.from,color:themeById(layer.theme).accent,
- model:models[i%models.length],...slot,
- tint:layer.id==='ruins'?'#ffe4ad':layer.id==='machinery'?'#8db5bd':undefined,
- zone:{x:slot.x,y:0,z:slot.z,radius:1.6,heightTolerance:.25,hysteresis:.3}};
-});}
+export function portalsFor(layers:readonly Layer[],slots:Readonly<Record<string,PortalSlot>>=PORTAL_SLOTS){
+ const occupied=new Set<string>();
+ return layers.slice(1).map(layer=>{
+  const slot=slots[layer.id];if(!slot)throw Error(`传送庭院展位不足: ${layer.id}`);
+  const key=`${slot.x},${slot.z}`;
+  if(occupied.has(key)||![slot.x,slot.z,slot.yaw].every(Number.isFinite))throw Error(`无效传送展位: ${layer.id}`);
+  if(slot.x-1.6<PORTAL_AREA.minX||slot.x+1.6>PORTAL_AREA.maxX||slot.z-1.6<Math.max(PORTAL_AREA.minZ,SURFACE_SITE.redLine)||slot.z+1.6>PORTAL_AREA.maxZ)throw Error(`传送展位超出庭院边界: ${layer.id}`);
+  occupied.add(key);
+  return {id:layer.id,name:layer.name,depth:layer.from,color:themeById(layer.theme).accent,...slot,
+   zone:{x:slot.x,y:0,z:slot.z,radius:1.6,heightTolerance:.25,hysteresis:.3}};
+ });
+}
 export const SURFACE_PORTALS=portalsFor(LAYERS);
 // Every tier contains six eggs, progressively higher and further east.
 export const PET_DISPLAYS=PET_TIERS.flatMap(t=>PET_COLUMNS.map((z,i)=>({...t,z,yaw:-Math.PI/2,asset:EGG_ASSETS[(i+t.tier*2)%6],color:['#9ce866','#a597ff','#ffa456','#66d8de','#f5dc96','#ffcc61'][(i+t.tier*2)%6]})));
+export function portalPlacementsFor(portals:ReturnType<typeof portalsFor>){return [
+ ...portals.map(p=>({asset:'portal-plinth-blender' as const,x:p.x,z:p.z,...PORTAL_PLINTH,y:0,yaw:p.yaw,portalId:p.id,portalAccent:p.color})),
+ ...portals.map(p=>({asset:p.model,x:p.x,z:p.z,...PORTAL_MODEL,y:PORTAL_BASE_HEIGHT,yaw:p.yaw,portalId:p.id,tint:p.tint})),
+];}
 export const HUB_PLACEMENTS=[
- ...SURFACE_PORTALS.map(p=>({asset:'portal-plinth-blender' as const,x:p.x,z:p.z,...PORTAL_PLINTH,y:0,yaw:p.yaw,portalId:p.id,portalAccent:p.color})),
- ...SURFACE_PORTALS.map(p=>({asset:p.model,x:p.x,z:p.z,...PORTAL_MODEL,y:PORTAL_BASE_HEIGHT,yaw:p.yaw,portalId:p.id,tint:p.tint})),
+ ...portalPlacementsFor(SURFACE_PORTALS),
  ...PET_DISPLAYS.map(p=>({asset:p.asset,x:p.x,z:p.z,width:2.7,depth:2.7,height:3.02,y:p.y,yaw:p.yaw})),
 ];
 // Reassemble the existing low mining fence kit; courtyard entrances stay open.

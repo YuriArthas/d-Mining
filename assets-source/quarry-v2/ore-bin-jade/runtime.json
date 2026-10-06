@@ -2,13 +2,21 @@
   "parts": [
     "ore-bin-jade.000.part"
   ],
-  "bytes": 369974,
-  "sha256": "97b4d87f8154f09730fbb8234b5ef26dd9a48579107cc02e8673fc0bb0a8438b",
+  "bytes": 134183,
+  "sha256": "8d29eb7e956298f123fc6852300ff0aadde4998b2e4ee28165954b587d095552",
   "taskId": "a7a2880b-2f97-42e2-8c2d-0aea2580b5df",
   "sourceSha256": "aa34a67da7909da9e0d6e3d19e13c3bcc59863786a12f996d03855dfa2edd1d4",
   "triangles": 1789,
   "faceLimit": 2000,
   "source": "new Tripo text_to_model",
   "geometryEdits": false,
-  "positionQuantizationBits": 16
+  "positionQuantizationBits": 16,
+  "decodedBytes": 138516,
+  "geometrySha256": "0584cbd5718a10428e94f06d9273856c846bef43057778066c582d33f40158b3",
+  "colorEncoding": {
+    "codec": "ETC1S",
+    "quality": 200,
+    "compressionLevel": 2,
+    "resize": false
+  }
 }

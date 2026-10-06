@@ -1,3 +1,5 @@
+import {encodeColorTextures,COLOR_ENCODING} from './lib/encodeColorTextures.mjs';
+import {geometryHash} from './lib/glbBuffers.mjs';
 import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 import {gzipSync} from 'node:zlib';
 import {createHash} from 'node:crypto';
@@ -24,9 +26,11 @@ for(const name of process.argv.slice(2)){
   cli(['uastc',`${base}/textures.glb`,`${base}/ktx.glb`,'--level','2','--zstd','18','--jobs','1']);
  }
  cli(['meshopt',`${base}/ktx.glb`,`${base}/runtime.glb`,'--quantize-position','16']);
- const buffer=readFileSync(`${base}/runtime.glb`),download=gzipSync(buffer,{level:9}),doc=json(buffer);
+ let buffer=readFileSync(`${base}/runtime.glb`);
+ if(!authored&&!solidColor){buffer=encodeColorTextures(buffer,readFileSync(`${base}/textures.glb`),`${base}/color-encoding`);writeFileSync(`${base}/runtime.glb`,buffer);}
+ const download=gzipSync(buffer,{level:9}),doc=json(buffer);
  if(tris(doc)!==tris(json(source)))throw Error('Packing changed topology');
  const parts=[];for(let off=0;off<download.length;off+=4*1024*1024){const file=`${name}.${String(parts.length).padStart(3,'0')}.part`;writeFileSync(`${dir}/${file}`,download.subarray(off,off+4*1024*1024));parts.push(file)}
- const manifest={materialProfile:authored?'authored-color':solidColor?'solid-color':'generated-textures',solidColor,parts,bytes:download.length,sha256:createHash('sha256').update(download).digest('hex'),taskId:task.taskId,generationId:task.generationId,textureSize:authored?task.textureSize:undefined,sourceSha256:createHash('sha256').update(source).digest('hex'),triangles:tris(doc),faceLimit:task.faceLimit,source:authored?'Blender authored mesh and texture':`new Tripo ${task.type??'text_to_model'}`,reference:task.reference,geometryEdits:false,positionQuantizationBits:16};
+ const manifest={colorEncoding:!authored&&!solidColor?COLOR_ENCODING:undefined,geometrySha256:geometryHash(buffer),materialProfile:authored?'authored-color':solidColor?'solid-color':'generated-textures',solidColor,parts,bytes:download.length,decodedBytes:buffer.length,sha256:createHash('sha256').update(download).digest('hex'),taskId:task.taskId,generationId:task.generationId,textureSize:authored?task.textureSize:undefined,sourceSha256:createHash('sha256').update(source).digest('hex'),triangles:tris(doc),faceLimit:task.faceLimit,source:authored?'Blender authored mesh and texture':`new Tripo ${task.type??'text_to_model'}`,reference:task.reference,geometryEdits:false,positionQuantizationBits:16};
  writeFileSync(`${dir}/${name}.manifest.json`,JSON.stringify(manifest));writeFileSync(`${base}/runtime.json`,JSON.stringify(manifest,null,2));console.log(name,manifest.triangles,manifest.bytes);
 }

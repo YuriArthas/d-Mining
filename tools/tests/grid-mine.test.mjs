@@ -24,7 +24,7 @@ test('mine instancing preserves model transforms and releases instance buffers',
  const group=new Group(),geometry=new BoxGeometry(),material=new MeshBasicMaterial();
  const expected=[];
  for(let i=0;i<3;i++){
-  const root=new Group();root.name='grid-mine-timber@'+i;root.position.set(i*2,2,3);root.scale.set(2,1,2);
+  const root=new Group();root.name='arbitrary-module@'+i;root.userData.mineBatch=true;root.position.set(i*2,2,3);root.scale.set(2,1,2);
   const model=new Mesh(geometry,material);model.position.y=.5;model.rotation.y=Math.PI/2;root.add(model);group.add(root);
   root.updateMatrixWorld(true);expected.push(model.matrixWorld.clone());
  }

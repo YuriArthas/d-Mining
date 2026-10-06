@@ -4,8 +4,8 @@
   "parts": [
     "mine-pendant.000.part"
   ],
-  "bytes": 100806,
-  "sha256": "29742105e617efff7230ec03a0371aa8a30a29606d574cde1e97709d399555a8",
+  "bytes": 50455,
+  "sha256": "9b84f2e5324dd062d5ce1e7ab9646c1a449ad3b65932ce983b166487b6a7b7b7",
   "taskId": "51eee6cc-af2f-457d-8724-0913a669a61b",
   "sourceSha256": "fa8eb242248f728e70063c5883e3d5db979eb1cd76e7d0ddfef4f60d62e554d2",
   "triangles": 1699,
@@ -13,5 +13,13 @@
   "source": "new Tripo image_to_model",
   "reference": "output/imagegen/mine-material-light/mine-pendant.png",
   "geometryEdits": false,
-  "positionQuantizationBits": 16
+  "positionQuantizationBits": 16,
+  "decodedBytes": 54820,
+  "geometrySha256": "22a856c40bbbde18998346be69cc025765096d9996716da81ce63162a41007cd",
+  "colorEncoding": {
+    "codec": "ETC1S",
+    "quality": 200,
+    "compressionLevel": 2,
+    "resize": false
+  }
 }

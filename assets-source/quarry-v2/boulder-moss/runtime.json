@@ -2,13 +2,21 @@
   "parts": [
     "boulder-moss.000.part"
   ],
-  "bytes": 360148,
-  "sha256": "8c554022b478acf889cc5df30b8fe22973bf59075df8bfe30a20c06b6a375f35",
+  "bytes": 125548,
+  "sha256": "cd7c9426ac9c68a4ce8eccbf280b82233b861939e1eb0e7912dc4a10914b5748",
   "taskId": "1d12c26f-8bc6-442b-88a5-b39dce830dba",
   "sourceSha256": "a13bb284b01d0292491a765a4d46e5bfacb13c33ac4aea1b313e63f5865aa7ac",
   "triangles": 1708,
   "faceLimit": 1800,
   "source": "new Tripo text_to_model",
   "geometryEdits": false,
-  "positionQuantizationBits": 16
+  "positionQuantizationBits": 16,
+  "decodedBytes": 129532,
+  "geometrySha256": "78aec1fe41d84fb0ad0de183d0e0a71a5351d22cc4fb8e61364782d9c4b69b1c",
+  "colorEncoding": {
+    "codec": "ETC1S",
+    "quality": 200,
+    "compressionLevel": 2,
+    "resize": false
+  }
 }

@@ -8,7 +8,9 @@ import { QUARRY_PLACEMENTS } from '../../src/game/world/QuarryLayout.ts';
 test('shipped quarry models use role-sized GPU-compressed mip chains and exact transport parts',()=>{
  const directory=new URL('../../src/game/assets/camp/',import.meta.url);
  const files=readdirSync(directory).filter(name=>name.endsWith('.manifest.json'));
- assert.deepEqual(files.map(f=>f.replace('.manifest.json','')).sort(),[...new Set(QUARRY_PLACEMENTS.map(p=>p.asset))].sort());let textures=0,texturedModels=0,authoredModels=0,triangles=0,downloadBytes=0;
+ // bank-steps remains in the asset library but is no longer placed or downloaded.
+ // Keep an explicit inventory so unexpected missing/extra assets still fail.
+ assert.deepEqual(files.map(f=>f.replace('.manifest.json','')).sort(),[...new Set(QUARRY_PLACEMENTS.map(p=>p.asset)),'bank-steps'].sort());let textures=0,texturedModels=0,authoredModels=0,triangles=0,downloadBytes=0;
  for(const file of files){
   const manifest=JSON.parse(readFileSync(new URL(file,directory)));
   const packed=Buffer.concat(manifest.parts.map(name=>readFileSync(new URL(name,directory))));

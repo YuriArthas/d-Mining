@@ -2,8 +2,8 @@
   "parts": [
     "pit-crates.000.part"
   ],
-  "bytes": 401699,
-  "sha256": "750d90c8deed0920003a769ba0b1e0cf2893545f58d15fe91772b4735442c0b8",
+  "bytes": 162048,
+  "sha256": "1da1b149025c51a994353417ce9700789bf2f2f5ee28df7a9b3c9bbc7e4057b6",
   "taskId": "a1ed8067-279d-4df6-9563-50b43d16261e",
   "sourceSha256": "d19b1ebf1d6030f729e9dd83b5118609fee5ac90497641bedf7d68d2a40a944f",
   "triangles": 1508,
@@ -11,5 +11,13 @@
   "source": "new Tripo image_to_model",
   "reference": "output/imagegen/mine-worksite/pit-crates.png",
   "geometryEdits": false,
-  "positionQuantizationBits": 16
+  "positionQuantizationBits": 16,
+  "decodedBytes": 166168,
+  "geometrySha256": "35f5a877d826b4cbad80a6f5a513f9659042bac344b0181166773b2eb2b4ccda",
+  "colorEncoding": {
+    "codec": "ETC1S",
+    "quality": 200,
+    "compressionLevel": 2,
+    "resize": false
+  }
 }

@@ -1,7 +1,8 @@
 import { SpotLight, InstancedMesh, Mesh, Texture, type Group, type BufferGeometry, type Material } from 'three';
 
-export function disposeScenery(group:Group) {
-  const geometries=new Set<BufferGeometry>(),materials=new Set<Material>(),textures=new Set<Texture>(),images=new Set<{close:()=>void}>();
+export type SceneryResources={geometries:Set<BufferGeometry>;materials:Set<Material>;textures:Set<Texture>};
+export function disposeScenery(group:Group,retained?:SceneryResources,externalTextures:ReadonlySet<Texture>=new Set()) {
+  const geometries=retained?.geometries??new Set<BufferGeometry>(),materials=retained?.materials??new Set<Material>(),textures=retained?.textures??new Set<Texture>(),images=new Set<{close:()=>void}>();
   group.traverse(object=>{
     if(object instanceof InstancedMesh)object.dispose();
     if(object instanceof SpotLight)object.dispose();
@@ -17,6 +18,7 @@ export function disposeScenery(group:Group) {
     disposeNoise?.();
   });
   for(const texture of textures){
+    if(externalTextures.has(texture))continue;
     const image=texture.source.data as {close?:()=>void}|null;
     if(image&&typeof image.close==='function')images.add(image as {close:()=>void});
     texture.dispose();

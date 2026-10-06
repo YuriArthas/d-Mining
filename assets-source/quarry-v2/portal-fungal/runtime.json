@@ -4,13 +4,21 @@
   "parts": [
     "portal-fungal.000.part"
   ],
-  "bytes": 105403,
-  "sha256": "3d95334417e35e940bd582653300fd725bf234d729d40695290f6a4371b45822",
+  "bytes": 47570,
+  "sha256": "6d061a77be5a8fb03b4855d365117199dba9a77bbfdd2ccc0e42d70102173b6f",
   "taskId": "021a12ec-1f0f-48c8-a97e-f9e576dcaf90",
   "sourceSha256": "fce1a9ef7b2c1e315e3e2cd0fe67a63e5e8d15330d55848b0c8841fcd229f1a4",
   "triangles": 1116,
   "faceLimit": 1200,
   "source": "new Tripo text_to_model",
   "geometryEdits": false,
-  "positionQuantizationBits": 16
+  "positionQuantizationBits": 16,
+  "decodedBytes": 51340,
+  "geometrySha256": "2d493314a1fd92c7e2047b4c3a25889e602c27a951b0c0ca5fed8a20ddd6d853",
+  "colorEncoding": {
+    "codec": "ETC1S",
+    "quality": 200,
+    "compressionLevel": 2,
+    "resize": false
+  }
 }

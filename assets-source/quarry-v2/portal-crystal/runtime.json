@@ -4,13 +4,21 @@
   "parts": [
     "portal-crystal.000.part"
   ],
-  "bytes": 102986,
-  "sha256": "29d8933375f97a57feba8bd1c4684e4ea5706dfdec569e94013935ee77b53b13",
+  "bytes": 46833,
+  "sha256": "393a68362ebc36d6b83e304c4df0573bd9e06871ca5e9a458dd672ff00773445",
   "taskId": "ebce8d5d-0c67-43be-adb3-823f1476b1f8",
   "sourceSha256": "01ae692281d5933dfbfacd64debaaff73924c59910291222e450c63c50e4e9da",
   "triangles": 1110,
   "faceLimit": 1200,
   "source": "new Tripo text_to_model",
   "geometryEdits": false,
-  "positionQuantizationBits": 16
+  "positionQuantizationBits": 16,
+  "decodedBytes": 50588,
+  "geometrySha256": "452468fa3376af9797f064e76dd69c45f12f630d76f4d3620271f907399a3bcb",
+  "colorEncoding": {
+    "codec": "ETC1S",
+    "quality": 200,
+    "compressionLevel": 2,
+    "resize": false
+  }
 }

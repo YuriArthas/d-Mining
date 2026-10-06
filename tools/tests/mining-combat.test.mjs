@@ -1,3 +1,5 @@
+import {SURFACE_SELL as SELL_ZONE} from '../../src/game/world/rooms.ts';
+import {SESSION_CONTENT} from '../../src/game/world/sessionContent.ts';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { BlockHealth } from '../../src/game/logic/BlockHealth.ts';
@@ -6,7 +8,7 @@ import { Pickaxe, pickaxeStats } from '../../src/game/logic/Pickaxe.ts';
 import { pickaxeOffer, upgradePickaxe } from '../../src/game/application/PickaxeUpgrade.ts';
 import { Wallet } from '../../src/game/logic/Wallet.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
-import { SELL_ZONE, ORE_ITEMS } from '../../src/game/application/items.ts';
+import { ORE_ITEMS } from '../../src/game/application/items.ts';
 function setup(maximum=30){
  const pending=new Set(),removed=new Set(),requests=[],axe=new Pickaxe();let full=false,accept=true;
  const combat=new MiningCombat({isFull:()=>full,stats:axe.getSnapshot,read:key=>removed.has(key)?null:{key,maximum},pending:key=>pending.has(key),destroy:key=>{if(!accept)return false;pending.add(key);requests.push(key);return true}});
@@ -74,7 +76,7 @@ test('all configured minerals take exactly ceil(HP / power) blows',()=>{
  }
 });
 test('session publishes target changes only when needed; partial HP survives travel and targets',()=>{
- let now=0;const s=new GameSession(50,()=>now),changes=[];s.attach({cell:()=>4,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{}});
+ let now=0;const s=new GameSession(SESSION_CONTENT, 50,()=>now),changes=[];s.attach({cell:()=>4,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{}});
  const a=[8,-1,-25],b=[9,-1,-25];const unsub=s.subscribe(()=>changes.push(s.getSnapshot()));
  s.selectTarget(a);for(let i=0;i<100;i++)s.selectTarget([...a]);assert.equal(changes.length,1);
  assert.equal(s.hit(a).status,'hit');assert.equal(s.getSnapshot().target.hp,80);assert.equal(s.getSnapshot().inventory.used,0);
@@ -82,14 +84,14 @@ test('session publishes target changes only when needed; partial HP survives tra
  now=.5;assert.equal(s.hit(a).remaining,70);unsub();
 });
 test('session accepts only one target and credits destroyed results even when already full',()=>{
- let now=0,solid=true,pending=false;const s=new GameSession(1,()=>now);
+ let now=0,solid=true,pending=false;const s=new GameSession(SESSION_CONTENT, 1,()=>now);
  s.attach({cell:()=>solid?3:0,pending:()=>pending,mine:()=>{pending=true;return true},cancelMining:()=>{pending=false},returnToSurface:()=>{}});
  const a=[6,-1,-25];assert.equal(s.requestMine([a,[7,-1,-25]]),false);assert.equal(s.combatDebug().damagedCells,0);
  for(let i=0;i<4;i++){now=i*.5;assert.equal(s.hit(a).status,'hit')}now=2;assert.equal(s.hit(a).status,'breaking');assert.equal(s.getSnapshot().inventory.used,0);
  s.collected([{kind:1}]);solid=false;s.collected([{cell:a,kind:3}]);assert.equal(s.getSnapshot().inventory.used,4);assert.equal(s.combatDebug().damagedCells,0);
 });
 test('session pickaxe purchase publishes consistent level/coins without changing running cooldown',()=>{
- let now=0;const s=new GameSession(50,()=>now);s.attach({cell:()=>6,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{}});
+ let now=0;const s=new GameSession(SESSION_CONTENT, 50,()=>now);s.attach({cell:()=>6,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{}});
  s.collected(Array.from({length:5},()=>({kind:1})));s.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);s.resetPosition();
  const a=[14,-1,-25];s.hit(a);const snapshots=[];s.subscribe(()=>snapshots.push(s.getSnapshot()));
  assert.equal(s.upgradePickaxe(1).status,'upgraded');assert.equal(snapshots.length,1);assert.equal(snapshots[0].coins,0);assert.equal(snapshots[0].pickaxe.power,15);

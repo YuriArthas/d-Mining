@@ -2,13 +2,21 @@
   "parts": [
     "tool-rack.000.part"
   ],
-  "bytes": 385276,
-  "sha256": "1bea7e5834f4ec6634be6916110422457eb9a5176b92de3b28527d36ae039dc5",
+  "bytes": 145842,
+  "sha256": "2f6ac26429d0706170115a3b350c33f707e6294123e4be0bc485bdf9369516b3",
   "taskId": "ca5630b9-1a36-478c-a972-564f47dd29c7",
   "sourceSha256": "bed61da78d50eb10d111b7f3569564048f166fc752db49e4def8d061b9c2db41",
   "triangles": 2138,
   "faceLimit": 2300,
   "source": "new Tripo text_to_model",
   "geometryEdits": false,
-  "positionQuantizationBits": 16
+  "positionQuantizationBits": 16,
+  "decodedBytes": 150352,
+  "geometrySha256": "e1ed211dd8b2f2abbe1877ee58e2740f39b092d8e8a584502c3dba8ab6a90c4a",
+  "colorEncoding": {
+    "codec": "ETC1S",
+    "quality": 200,
+    "compressionLevel": 2,
+    "resize": false
+  }
 }

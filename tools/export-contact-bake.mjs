@@ -1,3 +1,4 @@
+import {geometryHash} from './lib/glbBuffers.mjs';
 import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 import {gunzipSync} from 'node:zlib';
 import {createHash} from 'node:crypto';
@@ -23,7 +24,7 @@ for(const name of new Set(selected.map(p=>p.asset))){
  const root=new Group();gltf.scene.rotation.y=-Math.PI/2;root.add(gltf.scene);root.updateMatrixWorld(true);
  const box=new Box3().setFromObject(root),size=box.getSize(new Vector3()),center=box.getCenter(new Vector3());
  gltf.scene.position.set(-center.x,-box.min.y,-center.z);root.userData.size=size.toArray();templates.set(name,root);
- sources.push({asset:name,transportSha256:m.sha256,taskId:m.taskId??null,source:m.source});
+ sources.push({asset:name,geometrySha256:geometryHash(binary),transportSha256:m.sha256,taskId:m.taskId??null,source:m.source});
 }
 const objects=[];
 for(const p of selected){

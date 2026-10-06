@@ -31,17 +31,29 @@ function renderer(){
  return {gl,getContext:()=>gl,initTexture(){uploads++},stats:()=>({uploads,deletes})};
 }
 test('texture staging waits asynchronously and always releases its fence',async()=>{
- const r=renderer();await uploadSurfaceTexture(r,new Texture(),new AbortController().signal);
+ const r=renderer();await uploadSurfaceTexture(r,new Texture({width:1,height:1}),new AbortController().signal);
  assert.deepEqual(r.stats(),{uploads:1,deletes:1});
  const abort=new AbortController();abort.abort();
- await assert.rejects(uploadSurfaceTexture(r,new Texture(),abort.signal),{name:'AbortError'});
+ await assert.rejects(uploadSurfaceTexture(r,new Texture({width:1,height:1}),abort.signal),{name:'AbortError'});
  assert.deepEqual(r.stats(),{uploads:1,deletes:1});
 });
 test('cancel during an upload and GPU failures release staging fences',async()=>{
  for(const mode of ['abort','failed']){
   const r=renderer(),abort=new AbortController();
   r.gl.clientWaitSync=()=>{if(mode==='abort')abort.abort();return mode==='abort'?2:3};
-  await assert.rejects(uploadSurfaceTexture(r,new Texture(),abort.signal));
+  await assert.rejects(uploadSurfaceTexture(r,new Texture({width:1,height:1}),abort.signal));
   assert.deepEqual(r.stats(),{uploads:1,deletes:1});
  }
+});
+
+test('asset bundle retains displaced materials and releases shared textures once; borrowed maps stay external',async()=>{
+ const {SceneAssetBundle}=await import('../../src/game/presentation/SceneAssetBundle.ts');
+ const geometry=new BoxGeometry(),map=new Texture(),borrowed=new Texture();
+ const original=new MeshStandardMaterial({map,emissiveMap:borrowed}),clone=original.clone();
+ const root=new Group(),mesh=new Mesh(geometry,original);root.add(mesh);
+ const counts=new Map();for(const resource of [geometry,map,borrowed,original,clone])resource.addEventListener('dispose',()=>counts.set(resource,(counts.get(resource)??0)+1));
+ const bundle=new SceneAssetBundle();bundle.retain(root);mesh.material=clone;
+ bundle.dispose(root,new Set([borrowed]));bundle.dispose(root,new Set([borrowed]));
+ for(const resource of [geometry,map,original,clone])assert.equal(counts.get(resource),1);
+ assert.equal(counts.get(borrowed),undefined);borrowed.dispose();assert.equal(counts.get(borrowed),1);
 });

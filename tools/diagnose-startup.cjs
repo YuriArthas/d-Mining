@@ -32,6 +32,7 @@ const fs=require('node:fs/promises');
    });
   });
   const cdp=await page.context().newCDPSession(page);await cdp.send('Profiler.enable');
+  if(process.env.NETWORK_LATENCY_MS){await cdp.send('Network.enable');await cdp.send('Network.emulateNetworkConditions',{offline:false,latency:Number(process.env.NETWORK_LATENCY_MS),downloadThroughput:2.5*1024*1024,uploadThroughput:1024*1024});}
   await cdp.send('Profiler.setSamplingInterval',{interval:1000});
   for(const name of (process.env.SINGLE?['cold']:['cold','warm'])){
    await cdp.send('Profiler.start');
@@ -40,7 +41,7 @@ const fs=require('node:fs/promises');
    const {profile}=await cdp.send('Profiler.stop');
    const data=await page.evaluate(()=>({...window.__startupAudit,resources:performance.getEntriesByType('resource').map(e=>({name:e.name,start:e.startTime,end:e.responseEnd,duration:e.duration,transfer:e.transferSize,encoded:e.encodedBodySize,decoded:e.decodedBodySize})),navigation:performance.getEntriesByType('navigation').map(e=>e.toJSON())}));
    data.errors=errors;await fs.writeFile(`${dir}/${name}.json`,JSON.stringify(data,null,2));await fs.writeFile(`${dir}/${name}.cpuprofile`,JSON.stringify(profile));
-   const a=data.snapshot.assets;console.log(JSON.stringify({name,finished:data.finished,startup:data.snapshot.startup,models:a.assets.length,downloadMs:a.assets.reduce((n,a)=>n+a.downloadMs,0),decodeUploadMs:a.assets.reduce((n,a)=>n+a.decodeMs,0),prepareMs:a.prepareMs,gl:data.gl,longTasks:data.longTasks,raf:data.raf},null,2));
+   const a=data.snapshot.assets;console.log(JSON.stringify({name,finished:data.finished,startup:data.snapshot.startup,models:a.assets.length,downloadTaskMsSum:a.assets.reduce((n,a)=>n+a.downloadMs,0),decodeUploadMs:a.assets.reduce((n,a)=>n+a.decodeMs,0),prepareMs:a.prepareMs,gl:data.gl,longTasks:data.longTasks,raf:data.raf},null,2));
   }
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

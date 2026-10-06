@@ -1,3 +1,5 @@
+import {SURFACE_SELL as SELL_ZONE} from '../../src/game/world/rooms.ts';
+import {SESSION_CONTENT} from '../../src/game/world/sessionContent.ts';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { Inventory } from '../../src/game/logic/Inventory.ts';
@@ -5,7 +7,7 @@ import { Wallet } from '../../src/game/logic/Wallet.ts';
 import { Mining } from '../../src/game/application/Mining.ts';
 import { quoteSale, sellAll } from '../../src/game/application/Sale.ts';
 import { upgradeBackpack } from '../../src/game/application/BackpackUpgrade.ts';
-import { ORE_ITEMS, itemVolume, itemPrice, itemDefinition, SELL_ZONE } from '../../src/game/application/items.ts';
+import { ORE_ITEMS, itemVolume, itemPrice, itemDefinition } from '../../src/game/application/items.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
 const batch=(count,itemId='stone')=>[{itemId,count}];
 const volume=id=>{const n={stone:1,gold:10,gem:15,large:80}[id];if(n===undefined)throw Error('unknown item');return n};
@@ -74,7 +76,7 @@ test('original mineral progression is retained and all resource definitions are 
  assert.throws(()=>{ORE_ITEMS[0].volume=99});assert.throws(()=>itemDefinition('unknown'));
 });
 test('session shows mixed-unit snapshots and sells completed overflow at independent prices once',()=>{
- let now=0,solid=true;const session=new GameSession(50,()=>now);
+ let now=0,solid=true;const session=new GameSession(SESSION_CONTENT, 50,()=>now);
  session.attach({cell:()=>solid?5:0,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{}});
  session.collected(Array.from({length:47},()=>({kind:1})));const cell=[11,-1,-25];session.selectTarget(cell);
  assert.equal(session.getSnapshot().target.volume,10);assert.equal(session.getSnapshot().target.price,40);

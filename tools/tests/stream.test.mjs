@@ -1,3 +1,4 @@
+import {SESSION_CONTENT} from '../../src/game/world/sessionContent.ts';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { TerrainStream } from '../../src/game/validation/TerrainStream.ts';
@@ -85,7 +86,7 @@ test('cancelled and late terrain results do not reward; cancellation preserves c
 
 test('combat damage survives streaming; actual removal alone awards and clears HP', async()=>{
  const {GameSession}=await import('../../src/game/application/GameSession.ts');
- let now=0;const session=new GameSession(1,()=>now),receipts=[];
+ let now=0;const session=new GameSession(SESSION_CONTENT, 1,()=>now),receipts=[];
  const f=setup(resources=>{receipts.push(resources);session.collected(resources)}),s=f.stream;
  session.attach({cell:c=>s.cell(c),pending:c=>s.pending(c),mine:cs=>s.mineMany(cs),cancelMining:()=>s.cancelPending(),returnToSurface:()=>{}});
  try{
@@ -105,7 +106,7 @@ test('combat damage survives streaming; actual removal alone awards and clears H
 });
 test('cancelled lethal strike keeps sparse damage and retries without duplicate rewards',async()=>{
  const {GameSession}=await import('../../src/game/application/GameSession.ts');
- let now=0;const session=new GameSession(50,()=>now),receipts=[];
+ let now=0;const session=new GameSession(SESSION_CONTENT, 50,()=>now),receipts=[];
  const f=setup(resources=>{receipts.push(resources);session.collected(resources)}),s=f.stream;
  session.attach({cell:c=>s.cell(c),pending:c=>s.pending(c),mine:cs=>s.mineMany(cs),cancelMining:()=>s.cancelPending(),returnToSurface:()=>{}});
  try{

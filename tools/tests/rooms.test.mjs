@@ -1,3 +1,4 @@
+import {SESSION_CONTENT} from '../../src/game/world/sessionContent.ts';
 import { SURFACE_SHOP } from '../../src/game/world/surfaceLayout.ts';
 import assert from 'node:assert/strict';
 import test from 'node:test';
@@ -33,7 +34,7 @@ test('depth milestones unlock independently of rooms and retain progress on asce
  assert.equal(p.maxDepth,801);assert.equal(new Exploration(ROOMS).has('old_mine'),false);
 });
 function setup() {
- const s=new GameSession(),calls=[];
+ const s=new GameSession(SESSION_CONTENT),calls=[];
  s.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{},travelTo:p=>calls.push(p)});
  return {s,calls};
 }
@@ -63,7 +64,7 @@ test('each underground sale zone sells once per entry; shops exit independently'
 });
 
 test('surface upgrade kiosk reuses shop lifecycle and survives direct transfers between shops',()=>{
- const s=new GameSession(),u=SURFACE_SHOP,r=ROOMS.find(r=>r.shop);
+ const s=new GameSession(SESSION_CONTENT),u=SURFACE_SHOP,r=ROOMS.find(r=>r.shop);
  s.updatePosition([u.x,0,u.z],true);assert.equal(s.getSnapshot().shopId,'surface-upgrade');assert.equal(s.getSnapshot().inSellZone,false);
  s.updatePosition([r.shop.x,r.shop.y,r.shop.z],true);assert.equal(s.getSnapshot().shopId,r.id);
  s.updatePosition([u.x,0,u.z],true);assert.equal(s.getSnapshot().shopId,'surface-upgrade');

@@ -2,8 +2,8 @@
   "parts": [
     "pit-sorting-table.000.part"
   ],
-  "bytes": 396622,
-  "sha256": "a9d0f3dfd19f89069b2dd4da4695607ca9bce0aeb40738b33bd12edb0a7ab626",
+  "bytes": 162673,
+  "sha256": "73820cdff819ad67da438042262949910fc06581d0c3cf6e05219a06e856d763",
   "taskId": "9d4e402f-2beb-43be-aab8-33b844c473a6",
   "sourceSha256": "1bcee295e2f91ccb0e5278a310abe61e4ffb8369057192e85a231438749b5192",
   "triangles": 2114,
@@ -11,5 +11,13 @@
   "source": "new Tripo image_to_model",
   "reference": "output/imagegen/mine-worksite/pit-sorting-table.png",
   "geometryEdits": false,
-  "positionQuantizationBits": 16
+  "positionQuantizationBits": 16,
+  "decodedBytes": 167140,
+  "geometrySha256": "96af714756263bf98c27aa01840740693d6bae0fa805c3559fee4d0e5bd10388",
+  "colorEncoding": {
+    "codec": "ETC1S",
+    "quality": 200,
+    "compressionLevel": 2,
+    "resize": false
+  }
 }

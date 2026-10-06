@@ -2,8 +2,8 @@
   "parts": [
     "simulator-exchange.000.part"
   ],
-  "bytes": 416858,
-  "sha256": "a28eb7214f453b15672fbc468904e6530f0ba9ebab5f7c6f56895f83f645985a",
+  "bytes": 181093,
+  "sha256": "977b22333e0c111bc442457b35037f5e9ff201b1771d226e7f2d032536c207e8",
   "taskId": "6d3bf76e-2393-4ea3-bb6f-65b731fcf61a",
   "sourceSha256": "8533df76be42cd0027aabff2b4156a9b8ffb6a8c62ae9f6077dbb65e10e9c0f2",
   "triangles": 4720,
@@ -11,5 +11,13 @@
   "source": "new Tripo image_to_model",
   "reference": "output/imagegen/simulator-facilities/simulator-exchange.png",
   "geometryEdits": false,
-  "positionQuantizationBits": 16
+  "positionQuantizationBits": 16,
+  "decodedBytes": 188300,
+  "geometrySha256": "cd75eb7ef0f2130faf59e52a3301cda725b613378305a8d91bae4b08ce2b4c11",
+  "colorEncoding": {
+    "codec": "ETC1S",
+    "quality": 200,
+    "compressionLevel": 2,
+    "resize": false
+  }
 }

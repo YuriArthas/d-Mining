@@ -2,13 +2,21 @@
   "parts": [
     "grass-tussock.000.part"
   ],
-  "bytes": 336226,
-  "sha256": "1ef8ce04c36cf8085373d5c9175b8f0ab47d45f63b3f0e47628b37e1561010e9",
+  "bytes": 104239,
+  "sha256": "9a0cae6998c226504827afd64077c61b559bd463dca4f6ae6862b651e05c5cf3",
   "taskId": "0c85ff6c-ad50-49ed-86bc-da0fcdbe8635",
   "sourceSha256": "0e6272caa54e455bb1c2c4d88e071f9a6029eb7da0fe148877972f57becae22e",
   "triangles": 860,
   "faceLimit": 900,
   "source": "new Tripo text_to_model",
   "geometryEdits": false,
-  "positionQuantizationBits": 16
+  "positionQuantizationBits": 16,
+  "decodedBytes": 107740,
+  "geometrySha256": "95affc1a2b0e0ef203d36fe4f4a2c1ea6c2cc64d9cdb15b5f2c2ed4be3bd9ef6",
+  "colorEncoding": {
+    "codec": "ETC1S",
+    "quality": 200,
+    "compressionLevel": 2,
+    "resize": false
+  }
 }

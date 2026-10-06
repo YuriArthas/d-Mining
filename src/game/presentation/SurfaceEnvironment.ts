@@ -1,11 +1,16 @@
 import { BackSide, Color, CubeCamera, HalfFloatType, Mesh, Scene, ShaderMaterial, SphereGeometry, Vector3, WebGLCubeRenderTarget, type WebGLRenderer } from 'three';
-import {SURFACE_NIGHT,SURFACE_LIGHTING,type SurfaceTime} from '../world/SceneLighting.ts';
+import type {SurfaceTime} from '../world/SceneLighting.ts';
 
-export const MOON_DIRECTION=new Vector3(...SURFACE_NIGHT.moonPosition).normalize();
+export type SkyConfig=Readonly<{
+ dayZenith:string;dayHorizon:string;nightZenith:string;nightHorizon:string;
+ lighting:Readonly<Record<SurfaceTime,Readonly<{moonPosition:readonly [number,number,number];environmentIntensity:number}>>>;
+}>;
 const SKY_SIZE=128;
 // Retain both authored skies; background and material lighting use the same mode.
 // No external panoramic image downloads; the static capture is released on exit.
 export class SurfaceEnvironment {
+  private readonly config:SkyConfig;
+  private readonly moonDirection:Vector3;
   private readonly previous;
   private readonly intensity;
   private readonly background;
@@ -14,12 +19,13 @@ export class SurfaceEnvironment {
   private enabled = false;
   private readonly dome:Mesh<SphereGeometry,ShaderMaterial>;
   readonly bakeMs: number;
-  constructor(renderer: WebGLRenderer, private readonly scene: Scene) {
+  constructor(renderer: WebGLRenderer, private readonly scene: Scene, config:SkyConfig) {
+    this.config=config;this.moonDirection=new Vector3(...config.lighting.night.moonPosition).normalize();
     const start = performance.now();
     this.previous = scene.environment; this.intensity = scene.environmentIntensity; this.background = scene.background;
     const material = new ShaderMaterial({
       side: BackSide, depthWrite: false, depthTest:true, toneMapped: false,
-      uniforms: { daytime:{value:1},dayZenith:{value:new Color('#358edf')},dayHorizon:{value:new Color('#c5ebff')},moonDirection: { value: MOON_DIRECTION }, zenith: { value: new Color('#24385f') }, horizon: { value: new Color('#647fa4') } },
+      uniforms: { daytime:{value:1},dayZenith:{value:new Color(config.dayZenith)},dayHorizon:{value:new Color(config.dayHorizon)},moonDirection: { value: this.moonDirection }, zenith: { value: new Color(config.nightZenith) }, horizon: { value: new Color(config.nightHorizon) } },
       vertexShader: `varying vec3 vDirection;
         void main(){vDirection=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
       fragmentShader: `uniform float daytime;uniform vec3 dayZenith;uniform vec3 dayHorizon;uniform vec3 moonDirection;uniform vec3 zenith;uniform vec3 horizon;varying vec3 vDirection;
@@ -71,7 +77,7 @@ export class SurfaceEnvironment {
     sphere.frustumCulled=false; capture.add(sphere);
     for(const time of ['night','day'] as const){
       material.uniforms.daytime.value=time==='day'?1:0;
-      material.uniforms.moonDirection.value=new Vector3(...SURFACE_LIGHTING[time].moonPosition).normalize();
+      material.uniforms.moonDirection.value=new Vector3(...this.config.lighting[time].moonPosition).normalize();
       new CubeCamera(.1,10,this.cubes[time]).update(renderer,capture);
     }
     sphere.geometry.dispose();
@@ -87,16 +93,16 @@ export class SurfaceEnvironment {
     if(this.time===time)return false;
     this.time=time;
     this.dome.material.uniforms.daytime.value=time==='day'?1:0;
-    this.dome.material.uniforms.moonDirection.value.set(...SURFACE_LIGHTING[time].moonPosition).normalize();
+    this.dome.material.uniforms.moonDirection.value.set(...this.config.lighting[time].moonPosition).normalize();
     this.setEnabled(this.enabled);return true;
   }
   setEnabled(enabled: boolean) {
     this.enabled=enabled;this.dome.visible=enabled;
     this.scene.background=enabled?null:this.scene.background;
     this.scene.environment=enabled?this.cubes[this.time].texture:this.previous;
-    this.scene.environmentIntensity=enabled?SURFACE_LIGHTING[this.time].environmentIntensity:this.intensity;
+    this.scene.environmentIntensity=enabled?this.config.lighting[this.time].environmentIntensity:this.intensity;
   }
   get active(){return this.enabled;}
-  diagnostics(){return {version:'camp-day-night-v1',time:this.time,nightVersion:'silver-moon-v12',retainedModes:['day','night'],visibleSky:'analytic-shader',skyDepthTest:this.dome.material.depthTest,skyRenderOrder:this.dome.renderOrder,cubeSize:SKY_SIZE,sharedSkyLighting:true,moonDirection:MOON_DIRECTION.toArray(),bakeMs:this.bakeMs};}
+  diagnostics(){return {version:'camp-day-night-v1',time:this.time,nightVersion:'silver-moon-v12',retainedModes:['day','night'],visibleSky:'analytic-shader',skyDepthTest:this.dome.material.depthTest,skyRenderOrder:this.dome.renderOrder,cubeSize:SKY_SIZE,sharedSkyLighting:true,moonDirection:this.moonDirection.toArray(),bakeMs:this.bakeMs};}
   dispose(){this.scene.background=this.background;this.scene.environment=this.previous;this.scene.environmentIntensity=this.intensity;this.cubes.day.dispose();this.cubes.night.dispose();this.dome.removeFromParent();this.dome.geometry.dispose();this.dome.material.dispose();}
 }

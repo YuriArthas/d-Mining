@@ -2,8 +2,8 @@
   "parts": [
     "bank-turf.000.part"
   ],
-  "bytes": 100704,
-  "sha256": "f0ce68f1d70d2a75d8f7a55edc9cbe7bc5fe6a6a532762c56bf07dc18ded5865",
+  "bytes": 43655,
+  "sha256": "a1d64a3ef0455d763656c864b509264f473061c9d75cf4591bec7837c925c56d",
   "taskId": "a68d7651-9af0-4a7c-adcb-c7246ab3786b",
   "sourceSha256": "e63143867a665eea468244c8ee2ae267f3b693b8f3d7490763cebf9c17cd7881",
   "triangles": 529,
@@ -11,5 +11,13 @@
   "source": "new Tripo image_to_model",
   "reference": "output/imagegen/timber-boundary/bank-turf.png",
   "geometryEdits": false,
-  "positionQuantizationBits": 16
+  "positionQuantizationBits": 16,
+  "decodedBytes": 46824,
+  "geometrySha256": "01ac3c4ec4eded5ab5ce678e6d1bd177907563d6ba29a382b70036158364f77f",
+  "colorEncoding": {
+    "codec": "ETC1S",
+    "quality": 200,
+    "compressionLevel": 2,
+    "resize": false
+  }
 }

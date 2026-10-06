@@ -4,13 +4,21 @@
   "parts": [
     "portal-volcanic.000.part"
   ],
-  "bytes": 99921,
-  "sha256": "413f8245ea0bc6f622408fcafe2630e6e2460fd9e74e1ff1c6d8895b2c370077",
+  "bytes": 48604,
+  "sha256": "5c20134f8daef1a35050e27a8400a0f8994881fe15543bb70341af1fd510f799",
   "taskId": "004bdac5-5500-4fe8-a7c4-8a5a5d9212f0",
   "sourceSha256": "b473688946608af094b73e94a023ab29a90ffb76fd48368b0c520756f6dbca12",
   "triangles": 1356,
   "faceLimit": 1400,
   "source": "new Tripo text_to_model",
   "geometryEdits": false,
-  "positionQuantizationBits": 16
+  "positionQuantizationBits": 16,
+  "decodedBytes": 52472,
+  "geometrySha256": "8ebac5bd928ed6eb785b278a323ddb50b2054a1bb4b6d0907b6043a5d3cf5636",
+  "colorEncoding": {
+    "codec": "ETC1S",
+    "quality": 200,
+    "compressionLevel": 2,
+    "resize": false
+  }
 }

@@ -4,8 +4,8 @@
   "parts": [
     "mine-badge.000.part"
   ],
-  "bytes": 350281,
-  "sha256": "eff2e15758bc7a666453ea752c34234c175ac4a4685abe555c6a633083d1539a",
+  "bytes": 134331,
+  "sha256": "9510a1aa0489e4ebe8c5b0b7dfc8fb3604ee658b7a60133ab2be145f98a7df53",
   "taskId": "3e63c078-3bb7-43fe-b703-faafa3403c64",
   "sourceSha256": "30aa6b53a8141ec2bd9f0c71f52b545181f50e7ac6fb0a41a3ea89bf0c2706ae",
   "triangles": 1886,
@@ -13,5 +13,13 @@
   "source": "new Tripo image_to_model",
   "reference": "output/imagegen/mine-material-light/mine-badge.png",
   "geometryEdits": false,
-  "positionQuantizationBits": 16
+  "positionQuantizationBits": 16,
+  "decodedBytes": 138872,
+  "geometrySha256": "e1831fbf150d9535c27efb8f011e7c5b704cd535f12d1e4a4a9b5a2719f4793f",
+  "colorEncoding": {
+    "codec": "ETC1S",
+    "quality": 200,
+    "compressionLevel": 2,
+    "resize": false
+  }
 }

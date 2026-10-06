@@ -2,8 +2,8 @@
   "parts": [
     "bank-braced.000.part"
   ],
-  "bytes": 106921,
-  "sha256": "1a89caa8675b4130eb15f96825d591ebeb8f734cc14d26cf34d1a9536c89a22f",
+  "bytes": 48882,
+  "sha256": "41637f3853d72c6b0fdc0e054bce02ee3ce409b46be6f59794f84e941b32d5d2",
   "taskId": "ea100a0e-698e-470f-98d8-a22c532f365e",
   "sourceSha256": "e54b9f5455a013a17e30e22974f0081234dafa35c5b276d411fa143d877dcf67",
   "triangles": 802,
@@ -11,5 +11,13 @@
   "source": "new Tripo image_to_model",
   "reference": "output/imagegen/timber-boundary/bank-braced.png",
   "geometryEdits": false,
-  "positionQuantizationBits": 16
+  "positionQuantizationBits": 16,
+  "decodedBytes": 52384,
+  "geometrySha256": "7bbbace66af7ce1b481d5de1f04dc3bb50677235539be6759437d6b17f7d6289",
+  "colorEncoding": {
+    "codec": "ETC1S",
+    "quality": 200,
+    "compressionLevel": 2,
+    "resize": false
+  }
 }

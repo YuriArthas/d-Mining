@@ -2,8 +2,8 @@
   "parts": [
     "pit-plank-deck.000.part"
   ],
-  "bytes": 388474,
-  "sha256": "9524f323753c5792adb39e098428476ddeb50d1ad1c56a57583af95e38bcd5aa",
+  "bytes": 156037,
+  "sha256": "a6de97acfabada05347e82cc99d6768b7eeaaf89e30e10becaed59db398c495c",
   "taskId": "031f3df9-8ede-4bee-b309-ba51c05955ec",
   "sourceSha256": "b1ec4cb6c25b96dcb7c32ee92e6bfe0e35762605143286a40cb58202589adedb",
   "triangles": 1726,
@@ -11,5 +11,13 @@
   "source": "new Tripo image_to_model",
   "reference": "output/imagegen/mine-worksite/pit-plank-deck.png",
   "geometryEdits": false,
-  "positionQuantizationBits": 16
+  "positionQuantizationBits": 16,
+  "decodedBytes": 160492,
+  "geometrySha256": "6e983acd8a915cac63ab4aebf3c4b704a294be297441258b4c3c714447a08f85",
+  "colorEncoding": {
+    "codec": "ETC1S",
+    "quality": 200,
+    "compressionLevel": 2,
+    "resize": false
+  }
 }

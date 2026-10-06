@@ -2,13 +2,21 @@
   "parts": [
     "barrel-pair.000.part"
   ],
-  "bytes": 404907,
-  "sha256": "4b3bafa676d4631409c0cd242fc56b19a0b3664fa33cf163686849f6b008daf4",
+  "bytes": 165337,
+  "sha256": "9b58e243fc174eb93e4528b61b8c9d8486003ff5c45738ff6752bc21c73d9912",
   "taskId": "38f92ce1-d10e-4b84-a988-cdf16f979f05",
   "sourceSha256": "1ec5b1740a8671e146f0c44a457088a5930ae5d06c0afed9c83c72d169dc24ae",
   "triangles": 1860,
   "faceLimit": 2000,
   "source": "new Tripo text_to_model",
   "geometryEdits": false,
-  "positionQuantizationBits": 16
+  "positionQuantizationBits": 16,
+  "decodedBytes": 169684,
+  "geometrySha256": "185f29345c48be2f292eda2a0acae8e421be204a3ca22c3cb582edd293652e05",
+  "colorEncoding": {
+    "codec": "ETC1S",
+    "quality": 200,
+    "compressionLevel": 2,
+    "resize": false
+  }
 }

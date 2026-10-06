@@ -8,7 +8,7 @@ function tracks(p:Planner,x:number,z:number,length:number) {
   for(let a=-length/2;a<length/2;a+=1.1)p.box([x,.06,z+a],[2.4,.12,.32],WOOD);
   for(const dx of [-.8,.8])p.box([x+dx,.17,z],[.12,.13,length],METAL);
 }
-export function roomPlan(room:RestRoom):SceneryPlan {
+function buildRoomPlan(room:RestRoom):SceneryPlan {
   const p=new Planner(),t=themeById(room.theme);p.rim(t);
   p.booth(room.sell.x,0,room.sell.z,t,false);
   if(room.shop)p.booth(room.shop.x,0,room.shop.z,t,true);
@@ -83,4 +83,18 @@ export function roomPlan(room:RestRoom):SceneryPlan {
   }
   polishRoom(p,t,room);
   return p.plan;
+}
+
+// A reusable room kit is authored around a canonical 20×20×10-cell cavity.
+export function roomPlan(room:RestRoom):SceneryPlan {
+ const sx=room.layout.widthCells/20,sy=room.layout.heightCells/10,sz=room.layout.depthCells/20;
+ const canonical={...room,x:0,z:0,sell:{...room.sell,x:-12,z:12},shop:room.shop?{...room.shop,x:12,z:12}:null};
+ const plan=buildRoomPlan(canonical);
+ // Rim is aligned with the global 8×8 shaft, independently of room dimensions.
+ const rim=new Planner();rim.rim(themeById(room.theme));
+ const rimShapes=plan.shapes.splice(0,rim.plan.shapes.length),rimSolids=plan.solids.splice(0,rim.plan.solids.length);
+ for(const shape of plan.shapes){shape.at=[room.x+shape.at[0]*sx,shape.at[1]*sy,room.z+shape.at[2]*sz];shape.size=[shape.size[0]*sx,shape.size[1]*sy,shape.size[2]*sz];}
+ for(const solid of plan.solids){solid.at=[room.x+solid.at[0]*sx,solid.at[1]*sy,room.z+solid.at[2]*sz];solid.half=[solid.half[0]*sx,solid.half[1]*sy,solid.half[2]*sz];}
+ for(const sign of plan.signs){sign.at=[room.x+sign.at[0]*sx,sign.at[1]*sy,room.z+sign.at[2]*sz];sign.width*=sx;}
+ plan.shapes.unshift(...rimShapes);plan.solids.unshift(...rimSolids);return plan;
 }

@@ -2,13 +2,21 @@
   "parts": [
     "shrub-flower.000.part"
   ],
-  "bytes": 344224,
-  "sha256": "f1c00232e17a11eaadc9f7f8f355c633415222e55a8f83cc961dedb88115ac0f",
+  "bytes": 114845,
+  "sha256": "0c8004bff394947740aa4a340022d30165696db15d46d6a43d3631c9d6f12a19",
   "taskId": "4516203e-7e83-40e0-a809-9cd5ebdaeebe",
   "sourceSha256": "da2def36eb077153387eea43d1d2736deb58e7d39475b3c75f061cab0eace08a",
   "triangles": 1298,
   "faceLimit": 1400,
   "source": "new Tripo text_to_model",
   "geometryEdits": false,
-  "positionQuantizationBits": 16
+  "positionQuantizationBits": 16,
+  "decodedBytes": 118700,
+  "geometrySha256": "f24403a47122d868467e0cdfd27851cdca1e3d3d2fe7384c3ef363636c9c582a",
+  "colorEncoding": {
+    "codec": "ETC1S",
+    "quality": 200,
+    "compressionLevel": 2,
+    "resize": false
+  }
 }

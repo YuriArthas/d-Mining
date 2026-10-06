@@ -1,3 +1,4 @@
+import {SESSION_CONTENT} from '../../src/game/world/sessionContent.ts';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { BlockHealth } from '../../src/game/logic/BlockHealth.ts';
@@ -52,7 +53,7 @@ test('distant damage allocates no meshes; negative/deep coordinates and cleanup 
  view.dispose();assert.equal(view.group.children.length,0);assert.equal(view.diagnostics().regions,0);
 });
 test('session damage projection persists across selection and clears only on actual removal',()=>{
- let now=0,solid=true;const session=new GameSession(50,()=>now),view=new BlockCracks();
+ let now=0,solid=true;const session=new GameSession(SESSION_CONTENT, 50,()=>now),view=new BlockCracks();
  const cell=[14,-1,-25];session.attach({cell:()=>solid?6:0,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{}});
  const off=session.observeBlockDamage(view.setDamage);
  session.hit(cell);view.sync(near);assert.equal(view.group.children[0].geometry.getAttribute('crackTile').getX(0),0);

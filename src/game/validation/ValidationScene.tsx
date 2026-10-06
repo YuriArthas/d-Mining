@@ -1,348 +1,353 @@
-import {prepareShaders} from '../presentation/prepareShaders.ts';
-import type {RenderRate} from '../movement.ts';
-import type {ProbeMode} from '../presentation/PerformanceProbe.ts';
-import {SurfaceHubView} from '../presentation/SurfaceHubView.ts';
-import {SURFACE_LIGHTING,type SurfaceTime} from '../world/SceneLighting.ts';
-import { compileStableShadow, SHADOW_FILTER_ID } from '../presentation/stableShadow.ts';
-import { ROOMS } from '../world/rooms.ts';
-import { loadStaticSurface } from '../presentation/StaticSurface.ts';
-import { disposeScenery } from '../presentation/SceneryMesh.ts';
-import {RenderProfiler} from '../presentation/RenderProfiler.ts';
-import { RenderSubmission } from '../presentation/RenderSubmission.ts';
-import {PerformanceMeter,type PerformanceSnapshot} from '../presentation/PerformanceMeter.ts';
-import { SurfaceEnvironment } from '../presentation/SurfaceEnvironment.ts';
-import { ContactShadow } from '../presentation/ContactShadow.tsx';
-import { useEffect, useRef } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
-import { BoxGeometry, EdgesGeometry, Group, LineBasicMaterial, LineSegments, Raycaster, Vector2, Mesh, MeshBasicMaterial, Material, PerspectiveCamera, Color, Fog, HemisphereLight, DirectionalLight } from 'three';
-import { GAME_CONFIG } from '../config.ts';
-import type { GameInput } from '../GameInput.ts';
-import { CharacterPhysics, initPhysics, BOXES, RAMP, PLAYER } from './physics.ts';
-import { FixedStepClock, RenderSchedule, MOVEMENT } from '../movement.ts';
-import { ThirdPersonCamera } from '../ThirdPersonCamera.ts';
-import { COURSE_SPAWN } from './course.ts';
-import { TerrainStream } from './TerrainStream.ts';
-import { prepareSpawnTerrain } from './prepareSpawnTerrain.ts';
-import { ORE_SAMPLES, mineralName } from '../terrain/minerals.ts';
-import { selectCell } from '../terrain/selection.ts';
-import { stratumAtDepth } from '../terrain/strata.ts';
-import { CELL, WORLD_GENERATION, type Coord } from '../terrain/SparseWorld.ts';
-import type { GameSession } from '../application/GameSession.ts';
-import { RoomFacilities } from '../presentation/RoomFacilities.ts';
-import {SceneLightingRig} from '../presentation/SceneLightingRig.ts';
-import {createSelectionOutline} from '../presentation/SelectionOutline.ts';
-import { BlockCracks } from '../presentation/BlockCracks.ts';
-import { themeById } from '../content/themes.ts';
-import { SELL_ZONE, SURFACE_RETURN } from '../application/items.ts';
+import type { CampContent } from "../content/campContent.ts";
+import { useEffect, useRef } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
+import {
+  Group,
+  Mesh,
+  MeshBasicMaterial,
+  PerspectiveCamera,
+  HemisphereLight,
+  DirectionalLight,
+} from "three";
+import { startGame, type PreparedGame } from "../runtime/startGame.ts";
+import { updateGame } from "../runtime/updateGame.ts";
+import { attachGameDebug } from "../runtime/debugGame.ts";
+import { RenderSchedule, type RenderRate } from "../movement.ts";
+import { RenderSubmission } from "../presentation/RenderSubmission.ts";
+import { RenderProfiler } from "../presentation/RenderProfiler.ts";
+import {
+  PerformanceMeter,
+  type PerformanceSnapshot,
+} from "../presentation/PerformanceMeter.ts";
+import type { ProbeMode } from "../presentation/PerformanceProbe.ts";
+import type { LoadingEvent } from "../ui/loadingState.ts";
+import type { SurfaceTime } from "../world/SceneLighting.ts";
+import type { GameInput } from "../GameInput.ts";
+import type { GameSession } from "../application/GameSession.ts";
+import { ContactShadow } from "../presentation/ContactShadow.tsx";
+import {
+  compileStableShadow,
+  SHADOW_FILTER_ID,
+} from "../presentation/stableShadow.ts";
+import { GAME_CONFIG } from "../config.ts";
+import { BOXES, RAMP } from "./physics.ts";
 
-export type ValidationDebug = {
-  snapshot: () => unknown;
-  performance: (options:{framesInFlight?:1|2;submission?:'browser'|'fenced';reflection?:'live'|'frozen'|'off'})=>void;
-  surfaceHeight: (x:number,z:number)=>number|null;
-  look: (yaw:number,pitch:number)=>void;
-  canMine: (coord: Coord) => boolean;
-  cell: (coord: Coord) => number | null;
-  mine: (coord: Coord) => boolean;
-  mineMany: (coords: readonly Coord[]) => boolean;
-  hit: GameSession['hit'];
-  health: GameSession['blockHealth'];
-  wireframe: (enabled: boolean) => void;
-  teleport: (location: 'surface' | 'deep' | 'course' | 'uniform' | 'bands' | 'checker' | readonly [number, number, number]) => void;
-};
-declare global { interface Window { __miningValidation?: ValidationDebug } }
-
-export function ValidationScene({ renderRate, shadowsEnabled:sceneShadowsEnabled, probeMode, input, onStatus, onPerformance, session, timeOfDay }: { renderRate:RenderRate; shadowsEnabled:boolean; probeMode:ProbeMode; timeOfDay:SurfaceTime; input: GameInput; onStatus: (text: string) => void; onPerformance:(value:PerformanceSnapshot)=>void; session: GameSession }) {
-  const params = new URLSearchParams(location.search), samples = params.get('debug') === '1' && params.get('samples') === '1';
-  const surfaceBoxes = samples ? BOXES : [], ramp = samples ? RAMP : null;
-  const root = useRef<Group>(null), avatar = useRef<Group>(null), fixtures = useRef<Group>(null);
-  const runtime = useRef<{ physics: CharacterPhysics; terrain: TerrainStream; cracks: BlockCracks; facilities: RoomFacilities } | null>(null);
-  const view = useRef({ yaw: Number(GAME_CONFIG.camera.initialYaw), pitch: Number(GAME_CONFIG.camera.initialPitch) });
-  const followCamera = useRef(new ThirdPersonCamera());
-  const shadowState=useRef({revision:-1,depth:NaN,updates:0,time:'day' as SurfaceTime});
-  const contactShadow=useRef<Mesh>(null);
-  const areaLighting=useRef<SceneLightingRig|null>(null);
-  const surfaceEnvironment=useRef<SurfaceEnvironment|null>(null);
-  const fixed = useRef(new FixedStepClock());
-  const facing = useRef(0);
-  const timing = useRef({ status: 0, frames: 0 });
-  const prepared=useRef(false),currentTime=useRef(timeOfDay);currentTime.current=timeOfDay;
-  const startup = useRef({started:0,physicsMs:0,assetsReadyMs:0,terrainReadyMs:0,sceneAttachMs:0,terrainPendingAtAttach:-1,firstPlayableMs:0,roomPrepareMs:0,warmupMs:0,warmupPrograms:0,warmupObjects:0,parallelShaderCompile:false});
-  const marker = useRef<ReturnType<typeof createSelectionOutline> | null>(null);
-  const error = useRef<string | null>(null);
-  const pickPoint = useRef(new Vector2());
-  const pickRay = useRef(new Raycaster());
-  const travelling = useRef<Coord | null>(null);
-  const selection = useRef<Coord | null>(null);
+export function ValidationScene({
+  content,
+  renderRate,
+  shadowsEnabled: sceneShadowsEnabled,
+  probeMode,
+  input,
+  onStatus,
+  onLoading,
+  onPerformance,
+  session,
+  timeOfDay,
+}: {
+  content: CampContent;
+  renderRate: RenderRate;
+  shadowsEnabled: boolean;
+  probeMode: ProbeMode;
+  timeOfDay: SurfaceTime;
+  input: GameInput;
+  onStatus: (text: string) => void;
+  onLoading: (event: LoadingEvent) => void;
+  onPerformance: (value: PerformanceSnapshot) => void;
+  session: GameSession;
+}) {
+  const params = new URLSearchParams(location.search),
+    samples = params.get("debug") === "1" && params.get("samples") === "1";
+  const surfaceBoxes = samples ? BOXES : [],
+    ramp = samples ? RAMP : null;
+  const root = useRef<Group>(null),
+    avatar = useRef<Group>(null),
+    fixtures = useRef<Group>(null);
+  const runtime = useRef<PreparedGame | null>(null);
+  const contactShadow = useRef<Mesh>(null);
+  const loadingReleased = useRef(false);
+  const settings = useRef({ timeOfDay, sceneShadowsEnabled });
+  settings.current = { timeOfDay, sceneShadowsEnabled };
   const { advance, gl, scene, camera: activeCamera } = useThree();
-  const activeRate=useRef(renderRate);activeRate.current=renderRate;
-  const activeProbe=useRef(probeMode);activeProbe.current=probeMode;
-  const unlit=useRef<MeshBasicMaterial|null>(null);
-  const submission=useRef<RenderSubmission|null>(null);
-  const profiler=useRef<RenderProfiler|null>(null);
-  const latestPerformance=useRef<PerformanceSnapshot|null>(null);
-  const sky=useRef(new Color(GAME_CONFIG.background)), themeColor=useRef(new Color()), ambient=useRef<HemisphereLight>(null), sun=useRef<DirectionalLight>(null);
+  const activeRate = useRef(renderRate);
+  activeRate.current = renderRate;
+  const activeProbe = useRef(probeMode);
+  activeProbe.current = probeMode;
+  const unlit = useRef<MeshBasicMaterial | null>(null);
+  const submission = useRef<RenderSubmission | null>(null);
+  const profiler = useRef<RenderProfiler | null>(null);
+  const latestPerformance = useRef<PerformanceSnapshot | null>(null);
+  const ambient = useRef<HemisphereLight>(null),
+    sun = useRef<DirectionalLight>(null);
 
   useEffect(() => {
-    let cancelled = false;prepared.current=false;
-    const controller=new AbortController();
-    startup.current={started:performance.now(),physicsMs:0,assetsReadyMs:0,terrainReadyMs:0,sceneAttachMs:0,terrainPendingAtAttach:-1,firstPlayableMs:0,roomPrepareMs:0,warmupMs:0,warmupPrograms:0,warmupObjects:0,parallelShaderCompile:false};
-    const previousFog=scene.fog, previousBackground=scene.background;
-    gl.shadowMap.autoUpdate=false;
-    surfaceEnvironment.current=new SurfaceEnvironment(gl,scene);
-    areaLighting.current=new SceneLightingRig();root.current!.add(areaLighting.current.group);
-    scene.fog=new Fog(GAME_CONFIG.background,38,74);
-    let detach = () => {};
-    let detachDamage = () => {};
-    let detachHub=()=>{};
-    let pendingSurface:Group|null=null;
-    let pendingWorld:{physics:CharacterPhysics;terrain:TerrainStream}|null=null;
-    const disposePending=()=>{
-      if(pendingSurface){disposeScenery(pendingSurface);pendingSurface=null;}
-      if(pendingWorld){pendingWorld.terrain.dispose();pendingWorld.physics.dispose();pendingWorld=null;}
-    };
-    let assetCount=0,assetTotal=0,terrainDone=false;
-    onStatus('正在载入矿场场景');
-    const preparedWorld=initPhysics().then(async()=>{
-      controller.signal.throwIfAborted();
-      startup.current.physicsMs=performance.now()-startup.current.started;
-      const generation={...WORLD_GENERATION,samples};
-      const physics=new CharacterPhysics(generation.samples),terrain=new TerrainStream(physics,undefined,session.collected,generation);
-      const world={physics,terrain};pendingWorld=world;
-      if(params.get('debug')==='1'&&params.has('layer')){
-        const room=ROOMS.find(r=>r.id===params.get('layer'));if(!room)throw new Error('未知预览楼层');
-        physics.teleport(room.spawn);
-      }
-      await prepareSpawnTerrain(terrain,physics.feet(),controller.signal,(done,total)=>{
-        if(!cancelled)onStatus(`正在准备出生点地形 ${done}/${total}`);
+    const controller = new AbortController();
+    let detachDebug = () => {};
+    loadingReleased.current = false;
+    onLoading({ reset: true });
+    startGame({
+      content,
+      renderer: gl,
+      scene,
+      root: root.current!,
+      ambient: ambient.current!,
+      sun: sun.current!,
+      camera: activeCamera as PerspectiveCamera,
+      avatar: avatar.current!,
+      input,
+      session,
+      samples,
+      previewLayer: params.get("debug") === "1" ? params.get("layer") : null,
+      signal: controller.signal,
+      settings: () => ({
+        time: settings.current.timeOfDay,
+        bakedShadows: settings.current.sceneShadowsEnabled,
+      }),
+      onStatus,
+      onLoading,
+    })
+      .then((game) => {
+        if (controller.signal.aborted) {
+          game.dispose();
+          return;
+        }
+        runtime.current = game;
+        if (params.get("debug") === "1")
+          detachDebug = attachGameDebug(
+            game,
+            gl,
+            scene,
+            activeCamera as PerspectiveCamera,
+            avatar.current!,
+            sun.current!,
+            input,
+            session,
+            () => ({
+              rate: activeRate.current,
+              probe: activeProbe.current,
+              performance: latestPerformance.current,
+              profiler: profiler.current,
+              submission: submission.current,
+            }),
+          );
+      })
+      .catch((reason) => {
+        if (controller.signal.aborted) return;
+        const error = `初始化失败：${String(reason)}`;
+        onStatus(error);
+        onLoading({ error });
       });
-      terrainDone=true;startup.current.terrainReadyMs=performance.now()-startup.current.started;
-      if(!cancelled)onStatus(`正在载入矿场场景 ${assetCount}${assetTotal?'/'+assetTotal:''}`);
-      return world;
-    });
-    const preparedSurface=loadStaticSurface(gl,controller.signal,(done,total)=>{
-      assetCount=done;assetTotal=total;if(!cancelled&&terrainDone)onStatus(`正在载入矿场场景 ${done}/${total}`);
-    }).then(surface=>{
-      if(cancelled||controller.signal.aborted){disposeScenery(surface);controller.signal.throwIfAborted();}
-      pendingSurface=surface;startup.current.assetsReadyMs=performance.now()-startup.current.started;return surface;
-    });
-    Promise.all([preparedWorld,preparedSurface]).then(async([{physics,terrain},surface])=>{
-      if(cancelled){disposePending();return;}
-      onStatus('正在准备画面');
-      const teleport = (feet: readonly number[]) => {
-        input.reset(); travelling.current = [...feet] as unknown as Coord; terrain.relocate(feet); fixed.current.reset(); session.resetPosition();
-      };
-      detach = session.attach({ cell: cell => terrain.cell(cell), canMine: cell => terrain.canMine(cell), pending: cell => terrain.pending(cell), mine: targets => terrain.mineMany(targets), cancelMining: () => terrain.cancelPending(), travelTo: teleport, returnToSurface: () => teleport(SURFACE_RETURN) });
-      const cracks = new BlockCracks(); detachDamage = session.observeBlockDamage(cracks.setDamage); root.current!.add(cracks.group);
-      const hub=new SurfaceHubView(surface);const updateHub=()=>hub.update(session.getSnapshot().destinations);updateHub();detachHub=session.subscribe(updateHub);
-      const facilities = new RoomFacilities(physics,surface); root.current!.add(facilities.group);
-      runtime.current = { physics, terrain, cracks, facilities }; root.current!.add(terrain.group);
-      pendingWorld=null;pendingSurface=null;
-      startup.current.sceneAttachMs=performance.now()-startup.current.started;
-      startup.current.terrainPendingAtAttach=terrain.snapshot().queue;
-      const outline=createSelectionOutline();
-      outline.visible = false; marker.current = outline; root.current!.add(outline);
-      const roomStart=performance.now();
-      await facilities.prepare(controller.signal,(done,total)=>onStatus(`正在准备场景 ${done}/${total}`));
-      startup.current.roomPrepareMs=performance.now()-roomStart;
-      facilities.sync(physics.feet());
-      // Apply the same state as the first gameplay frame, before compiling.
-      const feet=physics.feet(),layer=stratumAtDepth(Math.max(0,-feet[1]+.04)),theme=themeById(layer.theme),meadow=theme.motif==='meadow';
-      const lens=activeCamera as PerspectiveCamera;
-      followCamera.current.update(physics.world,physics.collider,feet,view.current.yaw,view.current.pitch,.1,lens.aspect);
-      lens.near=followCamera.current.near;lens.updateProjectionMatrix();lens.position.copy(followCamera.current.position);lens.lookAt(lens.position.clone().sub(followCamera.current.direction));
-      avatar.current!.position.set(...feet);
-      let warmTime:SurfaceTime;
-      do{
-        warmTime=currentTime.current;const light=SURFACE_LIGHTING[warmTime];
-        facilities.updateSurface(warmTime,performance.now()/1000,sceneShadowsEnabled&&feet[1]>-4);
-        areaLighting.current!.setTime(warmTime);areaLighting.current!.setSurfaceActive(feet[1]>-4);
-        surfaceEnvironment.current!.setTime(warmTime);surfaceEnvironment.current!.setEnabled(meadow);
-        if(meadow)scene.fog=null;else{scene.fog=new Fog(theme.sky,38,74);scene.background=new Color(theme.sky);}
-        ambient.current!.color.set(meadow?light.skyColor:'#eef4ef');ambient.current!.groundColor.set(meadow?light.groundColor:theme.groundLight);ambient.current!.intensity=meadow?light.ambientIntensity:1.15;
-        sun.current!.position.set(...(meadow?light.moonPosition:[-24,42-layer.from,20]) as [number,number,number]);sun.current!.target.position.set(0,-layer.from,0);sun.current!.target.updateMatrixWorld();sun.current!.color.set(meadow?light.moonColor:'#ffefd5');sun.current!.intensity=meadow?light.moonIntensity:2.5;
-        const warm=await prepareShaders(gl,scene,activeCamera,controller.signal,(done,total)=>onStatus(`正在准备材质 ${done}/${total}`));
-        startup.current.warmupMs+=warm.ms;startup.current.warmupPrograms+=warm.newPrograms;startup.current.warmupObjects+=warm.objects;startup.current.parallelShaderCompile=warm.parallel;
-      }while(warmTime!==currentTime.current);
-      controller.signal.throwIfAborted();prepared.current=true;
-      if (new URLSearchParams(location.search).get('debug') === '1') {
-        window.__miningValidation = {
-          snapshot: () => ({ ...terrain.snapshot(), player:{height:GAME_CONFIG.player.height,radius:GAME_CONFIG.player.radius,cameraDistance:GAME_CONFIG.camera.distance}, startup:{...startup.current,sky:surfaceEnvironment.current?.diagnostics()}, travelling: !!travelling.current, facilities: facilities.diagnostics(), lighting: {shadowEnabled:gl.shadowMap.enabled,sunCastsShadow:sun.current?.castShadow,shadowPolicy:'baked-ground-only',surfaceArea:areaLighting.current?.diagnostics(),cameraFar:(activeCamera as PerspectiveCamera).far,surfaceFog:!!scene.fog,lightingUpdates:shadowState.current.updates,shadowAutoUpdate:gl.shadowMap.autoUpdate,shadowMapSize:0,shadowFilter:'none',surfaceReflections:surfaceEnvironment.current?.active??false}, cracks: cracks.diagnostics(), economy: session.getSnapshot(), combat: session.combatDebug(), sellZone: SELL_ZONE, samples: terrain.sampleStats(), terrainVisuals: terrain.render.diagnostics(), position: physics.feet(), grounded: physics.grounded, ready: !travelling.current && terrain.ready(physics.feet()), physicsSteps: physics.steps, jumps: physics.jumps, verticalSpeed: physics.verticalSpeed, droppedSeconds: fixed.current.droppedSeconds, renderedPosition: avatar.current?.position.toArray(), facing: avatar.current?.rotation.y, frames: timing.current.frames, renderer: { renderRate:activeRate.current,probeMode:activeProbe.current,bufferSize:[gl.domElement.width,gl.domElement.height],pixelRatio:gl.getPixelRatio(), profile:profiler.current?.snapshot(),performance:latestPerformance.current, submission:submission.current?.snapshot(), calls: gl.info.render.calls, triangles: gl.info.render.triangles, geometries: gl.info.memory.geometries, textures: gl.info.memory.textures }, view: { ...view.current }, camera: { ...followCamera.current.snapshot(), obstructed: followCamera.current.obstructed(physics.world, physics.collider) }, aim: { ...input.getAim() }, mineral: selection.current ? mineralName(terrain.cell(selection.current) ?? 0) : null, target: selection.current }),
-          performance:options=>{if(options.submission)submission.current?.setMode(options.submission);if(options.framesInFlight)submission.current?.setMaxInFlight(options.framesInFlight);if(options.reflection&&profiler.current)profiler.current.reflectionMode=options.reflection;},
-          surfaceHeight:(x,z)=>facilities.surfaceHeight(x,z),
-          look:(yaw,pitch)=>{view.current={yaw,pitch:Math.max(GAME_CONFIG.camera.minPitch,Math.min(GAME_CONFIG.camera.maxPitch,pitch))};},
-          cell: coord => terrain.cell(coord), canMine: coord => terrain.canMine(coord),
-          hit: session.hit, health: session.blockHealth,
-          mine: coord => session.requestMine([coord]),
-          mineMany: coords => session.requestMine(coords),
-          wireframe: enabled => terrain.render.setWireframe(enabled),
-          teleport: location => {
-            const feet = location === 'surface' ? PLAYER.spawn : location === 'deep' ? ROOMS[ROOMS.length-1].spawn : location === 'course' ? COURSE_SPAWN : location === 'uniform' ? ORE_SAMPLES[0].spawn : location === 'bands' ? ORE_SAMPLES[1].spawn : location === 'checker' ? ORE_SAMPLES[2].spawn : location;
-            if (feet.some(v => !Number.isFinite(v)) || feet[0] < -95 || feet[0] > 103 || feet[2] < -95 || feet[2] > 103 || feet[1] < -3999 || feet[1] > 20) throw new Error('验证位置超出矿区');
-            teleport(feet);
-          },
-        };
-      }
-    }).catch(reason => { if(cancelled)return;controller.abort();disposePending();error.current = `初始化失败：${String(reason)}`; onStatus(error.current); });
     return () => {
-      areaLighting.current?.dispose();areaLighting.current=null;
-      surfaceEnvironment.current?.dispose();surfaceEnvironment.current=null;
-      scene.fog=previousFog;scene.background=previousBackground;
-      cancelled = true; controller.abort(); disposePending(); detachDamage();detachHub(); detach(); delete window.__miningValidation;
-      const current = runtime.current; runtime.current = null;
-      if (current) { current.facilities.group.removeFromParent(); current.facilities.dispose(); current.cracks.group.removeFromParent(); current.cracks.dispose(); current.terrain.group.removeFromParent(); current.terrain.dispose(); current.physics.dispose(); }
-      if (marker.current) { marker.current.removeFromParent(); marker.current.geometry.dispose(); marker.current.material.dispose(); marker.current = null; }
+      detachDebug();
+      controller.abort();
+      runtime.current?.dispose();
+      runtime.current = null;
     };
-  }, [input, gl, scene, onStatus, session]);
+  }, [content, input, gl, scene, onStatus, onLoading, session]);
 
-  useEffect(()=>{
-    const basic=new MeshBasicMaterial({color:'#a0a0a0'});unlit.current=basic;
-    const context=gl.getContext();
-    if(!('fenceSync' in context))throw new Error('需要 WebGL2 绘制同步支持');
-    const gate=new RenderSubmission(context,new URLSearchParams(location.search).get('framesInFlight')==='1'?1:2,new URLSearchParams(location.search).get('submission')==='fenced'?'fenced':'browser');submission.current=gate;
-    const profile=new RenderProfiler(gl,new URLSearchParams(location.search).get('gpuTiming')==='1');profiler.current=profile;
-    profile.scissorEnabled=new URLSearchParams(location.search).get('reflectionScissor')!=='0';
-    const reflectionMode=new URLSearchParams(location.search).get('reflection');
-    if(reflectionMode==='live'||reflectionMode==='frozen')profile.reflectionMode=reflectionMode;
-    return ()=>{basic.dispose();unlit.current=null;profile.dispose();profiler.current=null;gate.dispose();if(submission.current===gate)submission.current=null;};
-  },[gl]);
+  useEffect(() => {
+    const basic = new MeshBasicMaterial({ color: "#a0a0a0" });
+    unlit.current = basic;
+    const context = gl.getContext();
+    if (!("fenceSync" in context)) throw new Error("需要 WebGL2 绘制同步支持");
+    const gate = new RenderSubmission(
+      context,
+      new URLSearchParams(location.search).get("framesInFlight") === "1"
+        ? 1
+        : 2,
+      new URLSearchParams(location.search).get("submission") === "fenced"
+        ? "fenced"
+        : "browser",
+    );
+    submission.current = gate;
+    const profile = new RenderProfiler(
+      gl,
+      new URLSearchParams(location.search).get("gpuTiming") === "1",
+    );
+    profiler.current = profile;
+    profile.scissorEnabled =
+      new URLSearchParams(location.search).get("reflectionScissor") !== "0";
+    const reflectionMode = new URLSearchParams(location.search).get(
+      "reflection",
+    );
+    if (reflectionMode === "live" || reflectionMode === "frozen")
+      profile.reflectionMode = reflectionMode;
+    return () => {
+      basic.dispose();
+      unlit.current = null;
+      profile.dispose();
+      profiler.current = null;
+      gate.dispose();
+      if (submission.current === gate) submission.current = null;
+    };
+  }, [gl]);
 
   // Priority 1 owns drawing; ordinary useFrame callbacks still simulate every
   // scheduled tick, including when the GPU has not completed its previous draw.
-  useFrame(({gl,scene,camera})=>{
-    if(!prepared.current||probeMode==='idle')return;
-    try{submission.current?.draw(()=>{runtime.current?.facilities.beginSurfaceDraw();
-      const autoReset=gl.info.autoReset;gl.info.autoReset=false;gl.info.reset();profiler.current?.beginFrame();
-      const override=scene.overrideMaterial;if(probeMode==='unlit')scene.overrideMaterial=unlit.current;
-      try{gl.render(scene,camera);}finally{scene.overrideMaterial=override;profiler.current?.endFrame();gl.info.autoReset=autoReset;}});}
-    catch(reason){error.current=`渲染失败：${String(reason)}`;onStatus(error.current);throw reason;}
-  },1);
+  useFrame(({ gl, scene, camera }) => {
+    if (!runtime.current || probeMode === "idle") return;
+    try {
+      submission.current?.draw(() => {
+        runtime.current?.facilities.beginSurfaceDraw();
+        const autoReset = gl.info.autoReset;
+        gl.info.autoReset = false;
+        gl.info.reset();
+        profiler.current?.beginFrame();
+        const override = scene.overrideMaterial;
+        if (probeMode === "unlit") scene.overrideMaterial = unlit.current;
+        try {
+          gl.render(scene, camera);
+        } finally {
+          scene.overrideMaterial = override;
+          profiler.current?.endFrame();
+          gl.info.autoReset = autoReset;
+        }
+      });
+    } catch (reason) {
+      const error = `渲染失败：${String(reason)}`;
+      onStatus(error);
+      onLoading({ error });
+      throw reason;
+    }
+  }, 1);
 
   useEffect(() => {
-    let id = 0; const schedule = new RenderSchedule(),meter=new PerformanceMeter();
+    let id = 0;
+    const schedule = new RenderSchedule(),
+      meter = new PerformanceMeter();
     const frame = (now: number) => {
       // One RAF owner; render cap is independent from fixed 60 Hz physics.
-      const scheduled=schedule.due(now,activeRate.current);meter.recordRaf(scheduled);
+      const scheduled = schedule.due(now, activeRate.current);
+      meter.recordRaf(scheduled);
       if (scheduled) {
-        const before=submission.current?.submitted??0,start=performance.now();advance(now/1000);
-        const end=performance.now(),cpuMs=end-start;
-        runtime.current?.terrain.measurements.add('mainFrameMs',cpuMs);
-        const stats=meter.record(end,cpuMs,(submission.current?.submitted??0)>before,gl.info.render.calls,gl.info.render.triangles,profiler.current?.snapshot(),submission.current?.waitCpuMs??0,activeProbe.current==='idle');
-        if(stats){latestPerformance.current=stats;onPerformance(stats);}
+        const before = submission.current?.submitted ?? 0,
+          start = performance.now();
+        advance(now / 1000);
+        if (
+          !loadingReleased.current &&
+          runtime.current?.startup.firstPlayableMs &&
+          (submission.current?.submitted ?? 0) > before
+        ) {
+          loadingReleased.current = true;
+          input.reset();
+          onLoading({ ready: true });
+        }
+        const end = performance.now(),
+          cpuMs = end - start;
+        runtime.current?.terrain.measurements.add("mainFrameMs", cpuMs);
+        const stats = meter.record(
+          end,
+          cpuMs,
+          (submission.current?.submitted ?? 0) > before,
+          gl.info.render.calls,
+          gl.info.render.triangles,
+          profiler.current?.snapshot(),
+          submission.current?.waitCpuMs ?? 0,
+          activeProbe.current === "idle",
+        );
+        if (stats) {
+          latestPerformance.current = stats;
+          onPerformance(stats);
+        }
       }
       id = requestAnimationFrame(frame);
     };
     id = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(id);
-  }, [advance,gl,onPerformance]);
+  }, [advance, gl, onPerformance, onLoading, input]);
 
   useFrame(({ camera }, elapsed) => {
-    const delta = Math.min(Math.max(elapsed, 0), 0.1), look = input.consumeLook(), settings = GAME_CONFIG.camera;
-    view.current.yaw = (view.current.yaw - look.x) % (Math.PI * 2);
-    view.current.pitch = Math.max(settings.minPitch, Math.min(settings.maxPitch, view.current.pitch + look.y));
-    const current = runtime.current;
-    if (!prepared.current || !current || !avatar.current) return;
-    const start = performance.now(), { physics, terrain } = current, clock = timing.current;
-    clock.frames++; clock.status -= delta;
-    try {
-      let processedTerrain = false;
-      const currentFeet = travelling.current ?? physics.feet();
-      const sceneryStart=performance.now();
-      if(!samples)current.facilities.sync(currentFeet);
-      terrain.measurements.add('sceneResidencyMs',performance.now()-sceneryStart);
-      const layer=stratumAtDepth(Math.max(0,-currentFeet[1]+.04)),theme=themeById(layer.theme);
-      sky.current.lerp(themeColor.current.set(theme.sky),1-Math.exp(-delta*4));
-      const meadow=theme.motif==='meadow',surfaceLightingActive=currentFeet[1]>-4,surfaceLight=SURFACE_LIGHTING[timeOfDay];
-      surfaceEnvironment.current?.setTime(timeOfDay);
-      current.facilities.updateSurface(timeOfDay,performance.now()/1000,sceneShadowsEnabled&&surfaceLightingActive&&probeMode!=='no-shadows');
-      areaLighting.current?.setTime(timeOfDay);
-      // No realtime shadow pass or receivers: only the ground's offline contact mask.
-      gl.shadowMap.enabled=false;
-      if(sun.current)sun.current.castShadow=false;
-      areaLighting.current?.setSurfaceActive(surfaceLightingActive);
-      if(!meadow)scene.background=sky.current;
-      surfaceEnvironment.current?.setEnabled(meadow);
-      if(meadow)scene.fog=null;
-      else {if(!(scene.fog instanceof Fog))scene.fog=new Fog(theme.sky,38,74);scene.fog.color.copy(sky.current);}
-      if(ambient.current){ambient.current.groundColor.set(meadow?surfaceLight.groundColor:theme.groundLight);ambient.current.color.set(meadow?surfaceLight.skyColor:'#eef4ef');ambient.current.intensity=meadow?surfaceLight.ambientIntensity:1.15;}
-      if(sun.current && (shadowState.current.revision!==current.facilities.revision || shadowState.current.depth!==layer.from || shadowState.current.time!==timeOfDay)){
-        if(meadow)sun.current.position.set(surfaceLight.moonPosition[0],surfaceLight.moonPosition[1],surfaceLight.moonPosition[2]);else sun.current.position.set(-24,42-layer.from,20);sun.current.target.position.set(0,-layer.from,0);sun.current.target.updateMatrixWorld();
-        sun.current.color.set(meadow?surfaceLight.moonColor:'#ffefd5');sun.current.intensity=meadow?surfaceLight.moonIntensity:2.5;
-        shadowState.current={revision:current.facilities.revision,depth:layer.from,time:timeOfDay,updates:shadowState.current.updates+1};
-      }
-      physics.setSurfaceActive(currentFeet[1] > -48 && Math.abs(currentFeet[0]) < 64 && Math.abs(currentFeet[2] - 16) < 64);
-      fixed.current.advance(elapsed, () => {
-        const state = input.getSnapshot(); terrain.recenter(travelling.current ?? physics.feet());
-        // Commit only immediately before a physics step: Rapier refreshes scene
-        // queries in step(). Frames without a logic step defer resource installation.
-        if (!processedTerrain) { terrain.process(); processedTerrain = true; }
-        if (travelling.current) {
-          if (!terrain.ready(travelling.current)) return;
-          physics.teleport(travelling.current); travelling.current = null; followCamera.current.reset();
-        }
-        physics.tick(state.moveX, state.moveY, view.current.yaw, input.consumeJump(), terrain.ready(physics.feet()));
-        session.updatePosition(physics.feet(), physics.grounded);
-        if (state.moveX || state.moveY) facing.current = view.current.yaw + Math.atan2(-state.moveX, state.moveY);
-      });
-      if(!startup.current.firstPlayableMs&&!travelling.current&&terrain.ready(physics.feet())&&physics.grounded)startup.current.firstPlayableMs=performance.now()-startup.current.started;
-      const feet = physics.feet(), drawnFeet = physics.interpolatedFeet(fixed.current.alpha);
-      const turn = Math.atan2(Math.sin(facing.current - avatar.current.rotation.y), Math.cos(facing.current - avatar.current.rotation.y));
-      avatar.current.rotation.y += turn * (1 - Math.exp(-MOVEMENT.turnSharpness * delta));
-      avatar.current.position.set(...drawnFeet); fixtures.current!.visible = feet[1] > -64;
-      if(contactShadow.current)contactShadow.current.visible=surfaceLightingActive&&physics.grounded;
-      const rig = followCamera.current, lens = camera as PerspectiveCamera;
-      rig.update(physics.world, physics.collider, drawnFeet, view.current.yaw, view.current.pitch, delta, lens.aspect);
-      if (lens.near !== rig.near) { lens.near = rig.near; lens.updateProjectionMatrix(); }
-      camera.position.copy(rig.position);
-      camera.lookAt(rig.position.clone().sub(rig.direction));
-      avatar.current.visible = rig.avatarOpacity > 0.001;
-      avatar.current.traverse(object => {
-        if (object instanceof Mesh) {
-          const material = object.material as Material;
-          material.opacity = rig.avatarOpacity;
-          material.depthWrite = object!==contactShadow.current && rig.avatarOpacity >= 1;
-        }
-      });
-      const selectionStart = performance.now(), press = input.consumeMinePress(), aim = press ?? input.getAim();
-      let selected: Coord | null = null;
-      if (aim.active && !travelling.current && terrain.ready(feet)) {
-        // lookAt changes the local transform; picking must use this frame's camera.
-        camera.updateMatrixWorld();
-        pickRay.current.setFromCamera(pickPoint.current.set(aim.x, aim.y), lens);
-        const { origin, direction } = pickRay.current.ray;
-        selected = selectCell(origin.toArray(), direction.toArray(), [feet[0], feet[1] + 1, feet[2]],
-          cell => terrain.cell(cell));
-      }
-      if (selected && !terrain.canMine(selected)) selected = null;
-      terrain.measurements.add('selectionMs', performance.now() - selectionStart);
-      selection.current = selected;
-      session.selectTarget(selected);
-      marker.current!.visible = !!selected;
-      if (selected) marker.current!.position.set(...selected.map(v => (v + 0.5) * CELL) as [number, number, number]);
-      if (selected && (press || input.getSnapshot().mining)) session.hit(selected);
-      current.cracks.sync(terrain.render.pipeline.residents);
-      if (clock.status <= 0) {
-        const info = terrain.snapshot();
-        onStatus(terrain.error ?? (travelling.current || !terrain.ready(feet) ? '正在准备附近地形' : `深度 ${Math.max(0, Math.round(-feet[1]))} 米 · ${stratumAtDepth(Math.max(0, Math.round(-feet[1]))).name} · 已挖 ${info.committedEdits}${selected ? ' · ' + mineralName(terrain.cell(selected) ?? 0) : ''}`));
-        clock.status = 0.25;
-      }
-      terrain.measurements.add('frameCpuMs', performance.now() - start);
-      terrain.measurements.add('frameIntervalMs', elapsed * 1000);
-    } catch (reason) {
-      error.current = `验证运行失败：${String(reason)}`; onStatus(error.current); throw reason;
-    }
+    const game = runtime.current;
+    if (!game || !avatar.current || !fixtures.current) return;
+    updateGame(
+      game,
+      elapsed,
+      {
+        camera: camera as PerspectiveCamera,
+        avatar: avatar.current,
+        fixtures: fixtures.current,
+        contactShadow: contactShadow.current,
+      },
+      input,
+      gl,
+      { samples, timeOfDay, sceneShadowsEnabled, probeMode },
+      onStatus,
+      onLoading,
+    );
   });
 
-  return <group ref={root}>
-    <hemisphereLight ref={ambient} args={['#eef4ef', '#718574', 1.15]} />
-    <directionalLight ref={sun} castShadow={false} position={[-24,42,20]} color="#ffefd5" intensity={2.5} />
-    <group ref={fixtures}>
-      {surfaceBoxes.map((box, i) => <mesh receiveShadow key={i} position={box.center as [number, number, number]}><boxGeometry args={box.half.map(v => v * 2) as [number, number, number]} /><meshStandardMaterial color={box.color} roughness={1} onBeforeCompile={compileStableShadow} /></mesh>)}
-      {ramp && <mesh castShadow receiveShadow><bufferGeometry onUpdate={g => g.computeVertexNormals()}><bufferAttribute attach="attributes-position" args={[ramp.positions, 3]} /><bufferAttribute attach="index" args={[ramp.indices, 1]} /></bufferGeometry><meshStandardMaterial color="#dfd0ad" roughness={.85} flatShading onBeforeCompile={compileStableShadow} customProgramCacheKey={()=>`ramp-${SHADOW_FILTER_ID}`} /></mesh>}
+  return (
+    <group ref={root}>
+      <hemisphereLight ref={ambient} args={["#eef4ef", "#718574", 1.15]} />
+      <directionalLight
+        ref={sun}
+        castShadow={false}
+        position={[-24, 42, 20]}
+        color="#ffefd5"
+        intensity={2.5}
+      />
+      <group ref={fixtures}>
+        {surfaceBoxes.map((box, i) => (
+          <mesh
+            receiveShadow
+            key={i}
+            position={box.center as [number, number, number]}
+          >
+            <boxGeometry
+              args={box.half.map((v) => v * 2) as [number, number, number]}
+            />
+            <meshStandardMaterial
+              color={box.color}
+              roughness={1}
+              onBeforeCompile={compileStableShadow}
+            />
+          </mesh>
+        ))}
+        {ramp && (
+          <mesh castShadow receiveShadow>
+            <bufferGeometry onUpdate={(g) => g.computeVertexNormals()}>
+              <bufferAttribute
+                attach="attributes-position"
+                args={[ramp.positions, 3]}
+              />
+              <bufferAttribute attach="index" args={[ramp.indices, 1]} />
+            </bufferGeometry>
+            <meshStandardMaterial
+              color="#dfd0ad"
+              roughness={0.85}
+              flatShading
+              onBeforeCompile={compileStableShadow}
+              customProgramCacheKey={() => `ramp-${SHADOW_FILTER_ID}`}
+            />
+          </mesh>
+        )}
+      </group>
+      <group ref={avatar}>
+        <ContactShadow shadowRef={contactShadow} />
+        <mesh receiveShadow position={[0, GAME_CONFIG.player.height / 2, 0]}>
+          <cylinderGeometry
+            args={[
+              GAME_CONFIG.player.radius,
+              GAME_CONFIG.player.radius,
+              GAME_CONFIG.player.height,
+              32,
+            ]}
+          />
+          <meshStandardMaterial
+            color="#f0b45b"
+            roughness={0.9}
+            onBeforeCompile={compileStableShadow}
+            customProgramCacheKey={() => `avatar-${SHADOW_FILTER_ID}`}
+            transparent
+          />
+        </mesh>
+        <mesh
+          position={[0, GAME_CONFIG.player.height + 0.005, 0]}
+          rotation={[-Math.PI / 2, 0, Math.PI / 2]}
+        >
+          <circleGeometry args={[0.23, 3]} />
+          <meshBasicMaterial color="#253d45" transparent />
+        </mesh>
+      </group>
     </group>
-    <group ref={avatar}>
-      <ContactShadow shadowRef={contactShadow} />
-      <mesh receiveShadow position={[0, GAME_CONFIG.player.height / 2, 0]}><cylinderGeometry args={[GAME_CONFIG.player.radius, GAME_CONFIG.player.radius, GAME_CONFIG.player.height, 32]} /><meshStandardMaterial color="#f0b45b" roughness={.9} onBeforeCompile={compileStableShadow} customProgramCacheKey={()=>`avatar-${SHADOW_FILTER_ID}`} transparent /></mesh>
-      <mesh position={[0, GAME_CONFIG.player.height + 0.005, 0]} rotation={[-Math.PI / 2, 0, Math.PI / 2]}><circleGeometry args={[0.23, 3]} /><meshBasicMaterial color="#253d45" transparent /></mesh>
-    </group>
-  </group>;
+  );
 }

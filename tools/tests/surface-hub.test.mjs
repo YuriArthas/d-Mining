@@ -1,10 +1,11 @@
+import {SESSION_CONTENT} from '../../src/game/world/sessionContent.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {GameSession} from '../../src/game/application/GameSession.ts';
 import {SURFACE_PORTALS,portalsFor} from '../../src/game/world/SurfaceHub.ts';
 import {LAYERS} from '../../src/game/content/layers.ts';
 import {ROOMS} from '../../src/game/world/rooms.ts';
-function setup(){const s=new GameSession(),calls=[];s.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{},travelTo:p=>calls.push(p)});return {s,calls};}
+function setup(){const s=new GameSession(SESSION_CONTENT),calls=[];s.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{},travelTo:p=>calls.push(p)});return {s,calls};}
 const feet=p=>[p.zone.x,p.zone.y,p.zone.z];
 test('every layer has its own disjoint pad and follows configured unlock depth',()=>{
  assert.equal(SURFACE_PORTALS.length,ROOMS.length);

@@ -6,9 +6,16 @@
     <meta name="theme-color" content="#111c29" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <title>Mining</title>
+    <script>window.addEventListener('error',function(event){if(event.target instanceof HTMLScriptElement){var label=document.getElementById('boot-status');if(label)label.textContent='游戏资源下载失败，请刷新重试。';}},true);</script>
+    <style>
+      html,body{margin:0;width:100%;height:100%;background:#0d202e}
+      .boot-loading{position:fixed;inset:0;display:grid;place-content:center;text-align:center;color:#e8f0e8;font-family:system-ui,sans-serif;background:radial-gradient(ellipse at 50% 38%,#254c50,#0d202e 85%)}
+      .boot-loading h1{color:#fff1cf;font-size:58px;letter-spacing:.09em;margin:0 0 24px;text-shadow:0 4px 0 #416367}
+      .boot-loading p{font-size:13px;color:#96b8b7}.boot-loading a{color:#e3bd77;font-size:12px;margin-top:20px}
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><div class="boot-loading"><h1>MINING</h1><p id="boot-status">正在载入游戏…</p><a href="../../">返回游戏列表</a><noscript><p>请开启 JavaScript 后进入游戏。</p></noscript></div></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

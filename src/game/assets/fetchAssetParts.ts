@@ -1,8 +1,8 @@
 // Bounded transport chunks, read in order with stream backpressure. No joining
 // large ArrayBuffers or retaining all compressed downloads before decompression.
-export function fetchAssetParts(urls:readonly string[],signal:AbortSignal):ReadableStream<Uint8Array>{
- let index=0,reader:ReadableStreamDefaultReader<Uint8Array>|null=null,cancelled=false;
- return new ReadableStream<Uint8Array>({
+export function fetchAssetParts(urls:readonly string[],signal:AbortSignal):ReadableStream<Uint8Array<ArrayBuffer>>{
+ let index=0,reader:ReadableStreamDefaultReader<Uint8Array<ArrayBuffer>>|null=null,cancelled=false;
+ return new ReadableStream<Uint8Array<ArrayBuffer>>({
   async pull(controller){
    try{
     while(!cancelled){

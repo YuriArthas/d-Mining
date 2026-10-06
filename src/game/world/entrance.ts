@@ -1,5 +1,7 @@
+import {CELL} from '../terrain/grid.ts';
 // Grid coordinates, shared by every entrance. The floor is one cell thick.
 export const ENTRANCE = Object.freeze({ minX: -4, maxX: 3, minZ: -4, maxZ: 3 });
+export const ENTRANCE_WORLD={minX:ENTRANCE.minX*CELL,maxX:(ENTRANCE.maxX+1)*CELL,minZ:ENTRANCE.minZ*CELL,maxZ:(ENTRANCE.maxZ+1)*CELL} as const;
 export function inEntrance(x: number, z: number) {
   return x >= ENTRANCE.minX && x <= ENTRANCE.maxX && z >= ENTRANCE.minZ && z <= ENTRANCE.maxZ;
 }

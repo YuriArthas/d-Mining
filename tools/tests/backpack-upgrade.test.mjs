@@ -1,10 +1,12 @@
+import {SURFACE_SELL as SELL_ZONE} from '../../src/game/world/rooms.ts';
+import {SESSION_CONTENT} from '../../src/game/world/sessionContent.ts';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { Inventory } from '../../src/game/logic/Inventory.ts';
 import { Wallet } from '../../src/game/logic/Wallet.ts';
 import { BACKPACK_TIERS, backpackOffer, upgradeBackpack } from '../../src/game/application/BackpackUpgrade.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
-import { SELL_ZONE } from '../../src/game/application/items.ts';
+
 const seed=(bag,count)=>bag.add([{itemId:'ore',count}]);
 test('capacity API is independent of upgrades: increasing/decreasing preserves contents and unrestricted add',()=>{
  const bag=new Inventory(50);seed(bag,80);assert.ok(bag.isFull());bag.setCapacity(100);
@@ -40,7 +42,7 @@ test('tier progression and maximum derive from capacity; configuration is immuta
  assert.equal(backpackOffer(150,100).next.id,'bag-200');
 });
 test('session publishes one coherent purchase snapshot and mining immediately uses updated capacity',()=>{
- const session=new GameSession(),observed=[];session.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{}});
+ const session=new GameSession(SESSION_CONTENT),observed=[];session.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{}});
  session.collected(Array.from({length:20},()=>({kind:1})));session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);session.resetPosition();
  session.collected(Array.from({length:57},()=>({kind:1})));assert.equal(session.requestMine([[0,-1,0]]),false);
  const unsub=session.subscribe(()=>observed.push(session.getSnapshot()));

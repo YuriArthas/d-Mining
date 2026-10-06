@@ -2,8 +2,8 @@
   "parts": [
     "pit-lumber-stack.000.part"
   ],
-  "bytes": 393855,
-  "sha256": "b914add1e063e6fb3ce16b41d3d27470ccf6025acf2d2b9c461eb49bc863cd13",
+  "bytes": 153454,
+  "sha256": "464799eb31e7d334412cec673ac68f711809e629c54ccd345e81ca60a8a11a92",
   "taskId": "bebef70a-030b-4590-aa97-76fb8fcd9b72",
   "sourceSha256": "6af55fb837ccb19fbaabd45a8a6120630d07e6a654be00a85d3cf019d88a8871",
   "triangles": 1320,
@@ -11,5 +11,13 @@
   "source": "new Tripo image_to_model",
   "reference": "output/imagegen/mine-worksite/pit-lumber-stack.png",
   "geometryEdits": false,
-  "positionQuantizationBits": 16
+  "positionQuantizationBits": 16,
+  "decodedBytes": 157744,
+  "geometrySha256": "6810f80a234394a8797c9617d848d19b585a4aa8e30cbcafe0958230be9d8868",
+  "colorEncoding": {
+    "codec": "ETC1S",
+    "quality": 200,
+    "compressionLevel": 2,
+    "resize": false
+  }
 }

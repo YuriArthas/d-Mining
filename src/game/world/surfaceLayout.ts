@@ -1,24 +1,14 @@
+import {SURFACE_TRAILS} from '../content/trails.ts';
+import {SURFACE_FACILITIES} from '../content/surfaceFacilities.ts';
+import {deriveFacility} from './deriveFacility.ts';
 // Shared anchors keep visual buildings, interactions, lighting and collision aligned.
 export const SURFACE_SPAWN = [0, .1, 46] as const;
 export const SURFACE_HOME = {x:SURFACE_SPAWN[0],y:0,z:SURFACE_SPAWN[2],radius:4.5,heightTolerance:.3,hysteresis:.25} as const;
-export const SURFACE_BUILDINGS={
- sale:{x:-12,z:56,yaw:Math.PI},shop:{x:12,z:56,yaw:Math.PI},
-} as const;
-const doorstep=(p:{x:number;z:number;yaw:number})=>({x:p.x+Math.sin(p.yaw)*6.7,y:0,z:p.z+Math.cos(p.yaw)*6.7,radius:1.7,heightTolerance:.25,hysteresis:.25});
-export const SURFACE_SHOP=doorstep(SURFACE_BUILDINGS.shop);
-export const SURFACE_SALE=doorstep(SURFACE_BUILDINGS.sale);
-export type Trail = { points:[number,number,number][]; width:number };
-export const SURFACE_TRAILS:Trail[]=[
- {points:[[0,0,12],[0,0,51.3]],width:6},
- {points:[[-24,0,30],[25,0,30]],width:4},
- {points:[[-14,0,49.3],[14,0,49.3]],width:4},
- // Right: browsing apron and two unobstructed side stair landings.
- {points:[[22,0,14],[22,0,46]],width:6},
- ...[15.5,44.5].map(z=>({points:[[22,0,z],[25,0,z]] as [number,number,number][],width:3})),
- // Left: safe continuous lane; short branches alone enter destination triggers.
- {points:[[-22,0,14],[-22,0,50]],width:4},
- ...Array.from({length:9},(_,i)=>({points:[[-22,0,16+i*4],[-27,0,16+i*4]] as [number,number,number][],width:1.6})),
-];
+export const SURFACE_BUILDINGS={sale:SURFACE_FACILITIES.sale.anchor,shop:SURFACE_FACILITIES.shop.anchor};
+export const SURFACE_SERVICES={sale:deriveFacility(SURFACE_FACILITIES.sale),shop:deriveFacility(SURFACE_FACILITIES.shop)};
+export const SURFACE_SHOP=SURFACE_SERVICES.shop.trigger;
+export const SURFACE_SALE=SURFACE_SERVICES.sale.trigger;
+export {SURFACE_TRAILS,type Trail} from '../content/trails.ts';
 export type RoadRect={minX:number;maxX:number;minZ:number;maxZ:number};
 // Square-ended strips: the shader, curb union and grass exclusion share these bounds.
 export const SURFACE_ROADS:readonly RoadRect[]=SURFACE_TRAILS.flatMap(t=>t.points.slice(1).map((b,i)=>{

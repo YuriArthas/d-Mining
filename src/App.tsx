@@ -1,6 +1,9 @@
+import {CAMP_CONTENT} from './game/content/campContent.ts';
+import {LoadingScreen,LoadingBoundary} from './game/ui/LoadingScreen.tsx';
+import {initialLoading,updateLoading} from './game/ui/loadingState.ts';
 import type {RenderRate} from './game/movement.ts';
 import type {SurfaceTime} from './game/world/SceneLighting.ts';
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useCallback, useReducer, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { flushSync } from 'react-dom';
 import { NeutralToneMapping } from 'three';
 import { Canvas, unmountComponentAtNode, type RootState } from '@react-three/fiber';
@@ -33,10 +36,20 @@ export function App() {
   const [timeOfDay,setTimeOfDay]=useState<SurfaceTime>('night');
   const [shadowsEnabled,setShadowsEnabled]=useState(true);
   const [renderRate,setRenderRate]=useState<RenderRate>('display');
+  const [loading,onLoading]=useReducer(updateLoading,undefined,initialLoading);
+  const [loadingVisible,setLoadingVisible]=useState(true);
+  const showLoading=!loading.ready||loadingVisible;
+  useEffect(()=>{
+    if(!loading.ready){setLoadingVisible(true);return;}
+    // Let the bar reach its endpoint before revealing the already-rendered game.
+    const timer=setTimeout(()=>setLoadingVisible(false),220);
+    return ()=>clearTimeout(timer);
+  },[loading.ready]);
+  const failLoading=useCallback((error:string)=>onLoading({error}),[]);
   const [status, setStatus] = useState('正在准备地形');
   const [performanceStats,setPerformanceStats]=useState<PerformanceSnapshot|null>(null);
   const [input] = useState(() => new GameInput());
-  const [session] = useState(() => new GameSession());
+  const [session] = useState(() => new GameSession(CAMP_CONTENT.session));
   const [probeMode,setProbeMode]=useState<ProbeMode>('normal');
   const changeProbeMode=useCallback((mode:ProbeMode)=>{input.reset();setProbeMode(mode);},[input]);
   const surface = useRef<HTMLDivElement>(null);
@@ -89,8 +102,8 @@ export function App() {
 
   return (
     <main className="game-shell game-shell--active" aria-label="Mining 游戏" style={{ '--scene-background': GAME_CONFIG.background } as CSSProperties}>
-      <div ref={surface} className="scene" tabIndex={0} aria-label="游戏视角，拖动观察，点按敲击，长按方块挖掘">
-        <Canvas
+      <div inert={showLoading} ref={surface} className="scene" tabIndex={0} aria-label="游戏视角，拖动观察，点按敲击，长按方块挖掘">
+        <LoadingBoundary onFailure={failLoading}><Canvas
           ref={canvas}
           onCreated={state => { scene.current = state; state.gl.toneMapping=NeutralToneMapping; state.gl.toneMappingExposure=1.08; }}
           frameloop="never"
@@ -99,12 +112,12 @@ export function App() {
           dpr={probeMode==='low-resolution'?Math.min(Math.max(window.devicePixelRatio,1),GAME_CONFIG.pixelRatioMax)*.5:[1,GAME_CONFIG.pixelRatioMax]}
           camera={{ fov: GAME_CONFIG.camera.fov, near: GAME_CONFIG.camera.near, far: 10000 }}
           gl={{ antialias: true }}
-          fallback={<p className="graphics-error">当前浏览器无法启动 3D 画面，请使用支持 WebGL2 的浏览器。</p>}
+          fallback={<p>当前浏览器无法启动 3D 画面，请使用支持 WebGL2 的浏览器。</p>}
         >
-          <ValidationScene renderRate={renderRate} shadowsEnabled={shadowsEnabled} probeMode={probeMode} input={input} onStatus={setStatus} onPerformance={setPerformanceStats} session={session} timeOfDay={timeOfDay} />
-        </Canvas>
+          <ValidationScene content={CAMP_CONTENT} renderRate={renderRate} shadowsEnabled={shadowsEnabled} probeMode={probeMode} input={input} onStatus={setStatus} onLoading={onLoading} onPerformance={setPerformanceStats} session={session} timeOfDay={timeOfDay} />
+        </Canvas></LoadingBoundary>
       </div>
-      <header className="game-header">
+      <header className="game-header" style={{display:showLoading?'none':undefined}}>
         <div><span className="wordmark">MINING</span><span className="stage-label">{status}</span>
           <div className="performance-hud" aria-label="实时性能" title="帧率模式可切换60帧上限或跟随屏幕回调；FPS 按实际提交的主画面计数；CPU 是每次逻辑更新均值，提交是实际绘制的主线程均值（含反射）。RAF 是浏览器回调频率，调度是游戏限帧的跳过比例；GPU 计时需显式开启；绘制次数拆为主画面 / 反射，三角面含两个通道。">
             <div>{performanceStats?`${performanceStats.fps.toFixed(1)} FPS · ${performanceStats.frameMs?.toFixed(1)??'—'} ms`:'FPS — · — ms'}</div>
@@ -131,8 +144,9 @@ export function App() {
         </button>
         </nav>
       </header>
-      <SessionUi session={session} input={input} surface={surface} />
-      {debug && <><InputMonitor input={input} /><ValidationPanel /></>}
+      {!showLoading&&<SessionUi session={session} input={input} surface={surface} />}
+      {showLoading&&<LoadingScreen state={loading} onExit={exit} />}
+      {debug && !showLoading && <><InputMonitor input={input} /><ValidationPanel /></>}
     </main>
   );
 }

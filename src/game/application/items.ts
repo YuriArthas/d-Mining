@@ -5,5 +5,3 @@ export const oreDefinition = resourceByKind;
 export const itemVolume = (id: string) => resourceById(id).volume;
 export const itemPrice = (id: string) => resourceById(id).price;
 export function oreDrops(resources: readonly {kind:number}[]) { return resources.map(({kind})=>({itemId:resourceByKind(kind).itemId,count:1})); }
-export { SURFACE_SELL as SELL_ZONE } from '../world/rooms.ts';
-export { SURFACE_SPAWN as SURFACE_RETURN } from '../world/surfaceLayout.ts';

@@ -1,3 +1,5 @@
+import {SURFACE_SELL as SELL_ZONE} from '../../src/game/world/rooms.ts';
+import {SESSION_CONTENT} from '../../src/game/world/sessionContent.ts';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { Inventory } from '../../src/game/logic/Inventory.ts';
@@ -6,7 +8,7 @@ import { ZoneDetector } from '../../src/game/logic/ZoneDetector.ts';
 import { Mining } from '../../src/game/application/Mining.ts';
 import { sellAll } from '../../src/game/application/Sale.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
-import { SELL_ZONE, oreDrops } from '../../src/game/application/items.ts';
+import { oreDrops } from '../../src/game/application/items.ts';
 const item = (count, itemId='stone') => [{itemId, count}];
 test('inventory accepts batches before, at and beyond capacity; zero capacity is only information',()=>{
  const bag=new Inventory(50);bag.add(item(49));assert.equal(bag.isFull(),false);
@@ -84,7 +86,7 @@ test('zone reports only edges, uses grounded/height and radial hysteresis',()=>{
  assert.equal(zone.update([c.x+c.radius+0.1,c.y,c.z],true),null);assert.equal(zone.update(p,true),'enter');
 });
 test('session wires cancel-before-sale; snapshots publish only consistent inventory/wallet state',()=>{
- const session=new GameSession(1),events=[],observed=[];
+ const session=new GameSession(SESSION_CONTENT, 1),events=[],observed=[];
  const detach=session.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining:()=>events.push('cancel'),returnToSurface:()=>events.push('return')});
  const unsub=session.subscribe(()=>observed.push(session.getSnapshot()));
  session.collected([{kind:3},{kind:4}]);assert.equal(session.requestMine([[0,-1,0]]),false);
@@ -96,7 +98,7 @@ test('session wires cancel-before-sale; snapshots publish only consistent invent
  assert.equal(session.requestMine([[0,-1,0]]),true);unsub();detach();assert.equal(session.requestMine([[0,-1,0]]),false);
 });
 test('session completed yield is credited even if bag is already full; return preserves it',()=>{
- const session=new GameSession(1);session.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{}});
+ const session=new GameSession(SESSION_CONTENT, 1);session.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{}});
  assert.equal(session.requestMine([[0,-1,0]]),true);session.collected([{kind:1}]);session.collected([{kind:2},{kind:6}]);
  assert.equal(session.getSnapshot().inventory.used,18);session.returnToSurface();assert.equal(session.getSnapshot().inventory.used,18);
  assert.equal(oreDrops([{kind:1},{kind:2},{kind:3},{kind:4},{kind:5},{kind:6}]).length,6);

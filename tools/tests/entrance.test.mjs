@@ -1,3 +1,4 @@
+import {SESSION_CONTENT} from '../../src/game/world/sessionContent.ts';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { SparseWorld, regionOf, sampleXYZ, WORLD_GENERATION } from '../../src/game/terrain/SparseWorld.ts';
@@ -32,7 +33,7 @@ test('one-cell floor protection allows sideways excavation immediately below it'
  assert.ok(w.canMine([30,-201,30]));assert.ok(w.canMine([30,-401,30]));
 });
 test('protected floor is not a combat resource and consumes no HP, cooldown or capacity',()=>{
- const w=new SparseWorld(),s=new GameSession();
+ const w=new SparseWorld(),s=new GameSession(SESSION_CONTENT);
  s.attach({cell:c=>w.cell(c),canMine:c=>w.canMine(c),pending:()=>false,mine:cs=>w.remove(cs).length>0,cancelMining:()=>{},returnToSurface:()=>{}});
  const c=[5,-1,0];s.selectTarget(c);assert.equal(s.getSnapshot().target,null);assert.equal(s.blockHealth(c),null);
  const before=s.combatDebug().nextAttackAt;assert.equal(s.hit(c).status,'unavailable');

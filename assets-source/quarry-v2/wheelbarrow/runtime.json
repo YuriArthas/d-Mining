@@ -2,13 +2,21 @@
   "parts": [
     "wheelbarrow.000.part"
   ],
-  "bytes": 356655,
-  "sha256": "90249a63221c063e1dd94e044826bb2427d905c9b235940b2810ff52498caf34",
+  "bytes": 124241,
+  "sha256": "89d64d79ae1ec31f4be173ade24ab7811187323a8fec5f1f06457a45df1cb2b9",
   "taskId": "6fb72cab-015a-45d8-a3b9-bad664959b0b",
   "sourceSha256": "e18cda5bb913e3e472f410af162cfd13592244634ee2cc85c7220949cc1ddcc0",
   "triangles": 2106,
   "faceLimit": 2300,
   "source": "new Tripo text_to_model",
   "geometryEdits": false,
-  "positionQuantizationBits": 16
+  "positionQuantizationBits": 16,
+  "decodedBytes": 128816,
+  "geometrySha256": "55788841416cfa6555684a25287276e4972a0825ff4342a14bb015f5e8a3d682",
+  "colorEncoding": {
+    "codec": "ETC1S",
+    "quality": 200,
+    "compressionLevel": 2,
+    "resize": false
+  }
 }
