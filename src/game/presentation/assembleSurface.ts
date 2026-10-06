@@ -87,7 +87,7 @@ export function assembleSurface(
               );
             };
             m.customProgramCacheKey = () => "camp-tripo-ground-shaft-v2";
-            paintCampGround(content.details.ground,m, details.atlas, details.bakedContact);
+            paintCampGround(content.details.ground,m, details.atlas, details.roadStone, details.bakedContact);
           }
           // Mirror the shader's shaft cut in diagnostic raycasts; no mesh is created.
           const raycast = o.raycast;

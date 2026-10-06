@@ -1,3 +1,4 @@
+import { CAMERA_LOOKS } from '../content/cameraLook.ts';
 import type { CampContent } from "../content/campContent.ts";
 import { useEffect, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
@@ -43,12 +44,14 @@ export function ValidationScene({
   onPerformance,
   session,
   timeOfDay,
+  stylized,
 }: {
   content: CampContent;
   renderRate: RenderRate;
   shadowsEnabled: boolean;
   probeMode: ProbeMode;
   timeOfDay: SurfaceTime;
+  stylized: boolean;
   input: GameInput;
   onStatus: (text: string) => void;
   onLoading: (event: LoadingEvent) => void;
@@ -195,7 +198,7 @@ export function ValidationScene({
         const override = scene.overrideMaterial;
         if (probeMode === "unlit") scene.overrideMaterial = unlit.current;
         try {
-          gl.render(scene, camera);
+          runtime.current!.cameraGrade.draw(gl, scene, camera, stylized && probeMode !== "unlit", CAMERA_LOOKS[timeOfDay]);
         } finally {
           scene.overrideMaterial = override;
           profiler.current?.endFrame();

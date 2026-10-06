@@ -145,6 +145,8 @@ export function attachGameDebug(
       facing: avatar?.rotation.y,
       frames: timing.frames,
       renderer: {
+        cameraGrade: current.cameraGrade.diagnostics(),
+        programs: gl.info.programs?.length ?? 0,
         renderRate: renderState().rate,
         probeMode: renderState().probe,
         bufferSize: [gl.domElement.width, gl.domElement.height],

@@ -3,7 +3,7 @@ import {useEffect,useRef,useState} from 'react';
 import {PerformanceProbe,PROBE_STAGES,type ProbeMode,type ProbeResult} from '../presentation/PerformanceProbe.ts';
 import type {PerformanceSnapshot} from '../presentation/PerformanceMeter.ts';
 
-export function PerformanceProbeUi({stats,onMode,shadowsEnabled,renderRate}:{renderRate:RenderRate;shadowsEnabled:boolean;stats:PerformanceSnapshot|null;onMode:(mode:ProbeMode)=>void}){
+export function PerformanceProbeUi({stats,onMode,shadowsEnabled,renderRate,stylized}:{stylized:boolean;renderRate:RenderRate;shadowsEnabled:boolean;stats:PerformanceSnapshot|null;onMode:(mode:ProbeMode)=>void}){
  const [open,setOpen]=useState(false),[running,setRunning]=useState(false),[index,setIndex]=useState(0),[results,setResults]=useState<ProbeResult[]>([]),[notice,setNotice]=useState('');
  const probe=useRef<PerformanceProbe|null>(null);
  const stop=()=>{probe.current=null;setRunning(false);onMode('normal');};
@@ -20,10 +20,10 @@ export function PerformanceProbeUi({stats,onMode,shadowsEnabled,renderRate}:{ren
   return ()=>{document.removeEventListener('visibilitychange',hidden);onMode('normal');};
  },[onMode]);
  useEffect(()=>{
-  if(probe.current){probe.current=null;setRunning(false);onMode('normal');setNotice('帧率或阴影设置已改变，请重新开始诊断。');}
+  if(probe.current){probe.current=null;setRunning(false);onMode('normal');setNotice('画面、帧率或阴影设置已改变，请重新开始诊断。');}
   setResults([]);
- },[shadowsEnabled,renderRate,onMode]);
- const report=()=>[`Mining 性能对照（V25 · 帧率可切换）`, `烘焙阴影开关：${shadowsEnabled?'开':'关'}`, `帧率模式：${renderRate==='display'?'跟随屏幕':'60帧上限'}`,navigator.userAgent,...results.map(r=>!r.samples?`${r.label}: 无有效样本`:`${r.label}: RAF ${r.raf.toFixed(1)}, 提交FPS ${r.fps.toFixed(1)}, 逻辑 ${r.logic.toFixed(1)}ms, 绘制CPU ${r.submit.toFixed(1)}ms, 样本 ${r.samples}`)].join('\n');
+ },[shadowsEnabled,renderRate,stylized,onMode]);
+ const report=()=>[`Mining 性能对照（V25 · 帧率可切换）`, `画面：${stylized?'风格化':'原始'}`, `烘焙阴影开关：${shadowsEnabled?'开':'关'}`, `帧率模式：${renderRate==='display'?'跟随屏幕':'60帧上限'}`,navigator.userAgent,...results.map(r=>!r.samples?`${r.label}: 无有效样本`:`${r.label}: RAF ${r.raf.toFixed(1)}, 提交FPS ${r.fps.toFixed(1)}, 逻辑 ${r.logic.toFixed(1)}ms, 绘制CPU ${r.submit.toFixed(1)}ms, 样本 ${r.samples}`)].join('\n');
  return <>
   <button className="performance-probe-toggle" type="button" onClick={()=>{if(open)stop();setOpen(!open);}}>性能诊断</button>
   {open&&<section className="performance-probe" aria-label="性能诊断">

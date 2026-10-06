@@ -1,3 +1,4 @@
+import { CameraGrade } from '../presentation/CameraGrade.ts';
 import type { CampContent } from "../content/campContent.ts";
 import type {
   Group,
@@ -105,6 +106,8 @@ export async function startGame(options: StartGameOptions) {
   try {
     check();
     renderer.shadowMap.autoUpdate = false;
+    const cameraGrade = new CameraGrade();
+    scope.defer(() => cameraGrade.dispose());
     const sky = new SurfaceEnvironment(
       renderer,
       scene,
@@ -279,6 +282,8 @@ export async function startGame(options: StartGameOptions) {
       startup.parallelShaderCompile = warm.parallel;
     } while (warmTime !== options.settings().time);
     check();
+    await cameraGrade.prepare(renderer, abort.signal);
+    check();
     onLoading({ stage: "shaders", done: 1, total: 1, complete: true });
     return {
       content,
@@ -290,6 +295,7 @@ export async function startGame(options: StartGameOptions) {
       sceneryCollision,
       environment,
       cameraView,
+      cameraGrade,
       startup,
       timing: { status: 0, frames: 0 },
       dispose: () => {

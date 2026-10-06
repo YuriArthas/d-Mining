@@ -35,6 +35,7 @@ export function App() {
   const [exited, setExited] = useState(false);
   const [timeOfDay,setTimeOfDay]=useState<SurfaceTime>('night');
   const [shadowsEnabled,setShadowsEnabled]=useState(true);
+  const [stylized,setStylized]=useState(()=>new URLSearchParams(location.search).get('look')!=='original');
   const [renderRate,setRenderRate]=useState<RenderRate>('display');
   const [loading,onLoading]=useReducer(updateLoading,undefined,initialLoading);
   const [loadingVisible,setLoadingVisible]=useState(true);
@@ -114,7 +115,7 @@ export function App() {
           gl={{ antialias: true }}
           fallback={<p>当前浏览器无法启动 3D 画面，请使用支持 WebGL2 的浏览器。</p>}
         >
-          <ValidationScene content={CAMP_CONTENT} renderRate={renderRate} shadowsEnabled={shadowsEnabled} probeMode={probeMode} input={input} onStatus={setStatus} onLoading={onLoading} onPerformance={setPerformanceStats} session={session} timeOfDay={timeOfDay} />
+          <ValidationScene stylized={stylized} content={CAMP_CONTENT} renderRate={renderRate} shadowsEnabled={shadowsEnabled} probeMode={probeMode} input={input} onStatus={setStatus} onLoading={onLoading} onPerformance={setPerformanceStats} session={session} timeOfDay={timeOfDay} />
         </Canvas></LoadingBoundary>
       </div>
       <header className="game-header" style={{display:showLoading?'none':undefined}}>
@@ -126,12 +127,13 @@ export function App() {
             {performanceStats&&<div className="performance-detail">{`绘制 ${performanceStats.mainCalls} / ${performanceStats.reflectionCalls} · 三角 ${(performanceStats.triangles/10000).toFixed(1)}万 · GPU 等待跳帧 ${performanceStats.skipPercent.toFixed(0)}%`}</div>}
             {performanceStats&&<div className="performance-detail">{`RAF ${performanceStats.rafFps.toFixed(1)} · 调度跳过 ${performanceStats.scheduleSkipPercent.toFixed(0)}% · 同步 ${performanceStats.waitCpuMs.toFixed(1)} ms`}</div>}
             {performanceStats&&<div className="performance-detail">{!performanceStats.gpu?.enabled?'GPU 计时关闭（避免同步查询干扰）':performanceStats.gpu?.supported?`GPU 主画面 ${performanceStats.gpu.mainMs?.toFixed(1)??'—'} / 反射 ${performanceStats.gpu.reflectionMs?.toFixed(1)??'—'} ms`:'GPU 计时：此浏览器不支持'}</div>}
-            <PerformanceProbeUi renderRate={renderRate} shadowsEnabled={shadowsEnabled} stats={performanceStats} onMode={changeProbeMode} />
+            <PerformanceProbeUi stylized={stylized} renderRate={renderRate} shadowsEnabled={shadowsEnabled} stats={performanceStats} onMode={changeProbeMode} />
             </div></details>
           </div>
         </div>
         <nav className="scene-actions" aria-label="场景设置">
         <button type="button" aria-label={renderRate==='display'?'切换为60帧上限':'跟随屏幕刷新率'} onClick={()=>{input.reset();setRenderRate(r=>r==='display'?'60':'display');surface.current?.focus();}}>帧率：{renderRate==='display'?'屏幕':'60'}</button>
+        <button type="button" aria-label={stylized?'切换为原始画面':'切换为风格化画面'} aria-pressed={stylized} onClick={()=>{input.reset();setStylized(v=>!v);surface.current?.focus();}}>画面：{stylized?'风格化':'原始'}</button>
         <button type="button" aria-label={shadowsEnabled?'关闭烘焙阴影':'开启烘焙阴影'} aria-pressed={shadowsEnabled} onClick={()=>{input.reset();setShadowsEnabled(v=>!v);surface.current?.focus();}}>阴影：{shadowsEnabled?'烘焙':'关'}</button>
         <button type="button" aria-label={timeOfDay==='day'?'切换到夜晚':'切换到白天'} onClick={()=>{input.reset();setTimeOfDay(t=>t==='day'?'night':'day');surface.current?.focus();}}>{timeOfDay==='day'?'☀ 白天':'☾ 夜晚'}</button>
         <button type="button" onClick={exit}

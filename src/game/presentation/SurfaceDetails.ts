@@ -10,6 +10,7 @@ import curbData from '../assets/ground-details/curb.json' with {type:'json'};
 import type {SurfaceTime} from '../world/SceneLighting.ts';
 import {stabilizeShadows} from './stableShadow.ts';
 import {createSurfacePonds} from './SurfacePondsView.ts';
+import {createRoadStoneTexture,paintStoneCurbs} from './roadStone.ts';
 function texture(data:{size:number;data:string},pixel=false){
  const raw=atob(data.data),bytes=Uint8Array.from(raw,c=>c.charCodeAt(0));
  const t=new DataTexture(bytes,data.size,data.size,RedFormat,UnsignedByteType);
@@ -20,10 +21,11 @@ export class SurfaceDetails {
  readonly wallTorches:WallTorchView;
  readonly bakedContact={texture:texture(contactData),strength:{value:.65},bounds:contactData.bounds,floorY:contactData.floorY};
  readonly night={value:1};readonly wind={value:0};readonly atlas=texture(atlasData,true);
+ readonly roadStone=createRoadStoneTexture();
  private readonly masks={post:texture(postMask),box:texture(boxMask)};
  private readonly lampMaterials:MeshStandardMaterial[]=[];
  private time:SurfaceTime='night';
- readonly stats={version:'pixel-meadow-v1',atlasSize:128,maskSize:128,detailTextureBytes:3*128*128*4/3,grassInstances:0,grassTriangles:0,grassBatches:0,grassBufferBytes:0,grassDrawCalls:0,grassDrawnTriangles:0,grassDrawnInstances:0,grassCastsShadow:false,grassHasCollision:false,distanceUnloading:false};
+ readonly stats={version:'pixel-meadow-v1',atlasSize:128,maskSize:128,stoneAtlasSize:256,detailTextureBytes:(3*128*128+256*256*4)*4/3,grassInstances:0,grassTriangles:0,grassBatches:0,grassBufferBytes:0,grassDrawCalls:0,grassDrawnTriangles:0,grassDrawnInstances:0,grassCastsShadow:false,grassHasCollision:false,distanceUnloading:false};
  private readonly content:SurfaceDetailContent;
  constructor(content:SurfaceDetailContent){this.content=content;this.wallTorches=new WallTorchView(content.torches);this.atlas.name='authored-pixel-ground-128';}
  createPonds(){return createSurfacePonds(this.content.ponds,this.wind,this.atlas);}
@@ -31,6 +33,7 @@ export class SurfaceDetails {
   const {style:CURB,blocks:CURB_BLOCKS}=this.content.curbs;
   const geometry=new BufferGeometry();geometry.setAttribute('position',new Float32BufferAttribute(curbData.positions,3));geometry.setAttribute('normal',new Float32BufferAttribute(curbData.normals,3));
   const material=stabilizeShadows(new MeshStandardMaterial({color:'#a89b7f',roughness:1,metalness:0,envMapIntensity:0}));
+  paintStoneCurbs(material,this.roadStone);
   const mesh=new InstancedMesh(geometry,material,CURB_BLOCKS.length),object=new Object3D();mesh.name='blender-modular-road-curbs';
   CURB_BLOCKS.forEach((p,i)=>{
    object.position.set(p.x,CURB.base,p.z);object.rotation.y=p.yaw;object.scale.set(p.length,1,1);object.updateMatrix();mesh.setMatrixAt(i,object.matrix);
@@ -84,7 +87,7 @@ export class SurfaceDetails {
   this.wind.value=elapsed;this.wallTorches.update(time,elapsed);
   if(time!==this.time){this.time=time;this.night.value=time==='night'?1:0;for(const m of this.lampMaterials)m.emissiveIntensity=time==='night'?2.5:0;}
  }
- diagnostics(){return {...this.stats,wallTorches:this.wallTorches.diagnostics(),bakedShadows:{enabled:this.bakedContact.strength.value>0,strength:this.bakedContact.strength.value,version:'selected-ground-contact-v1',sites:6,size:contactData.size,gpuBytesWithMipmaps:349525,drawCalls:0,receiver:'ground-only',realtimeShadowMaps:0},roads:{version:'block-paths-v1',curbInstances:this.content.curbs.blocks.length,curbHeight:this.content.curbs.style.height,curbTriangles:curbData.triangles*this.content.curbs.blocks.length,curbBatches:1,collisionEdges:this.content.curbs.collisionEdges},time:this.time,lampMaterialCount:this.lampMaterials.length,windowEmissiveIntensity:this.time==='night'?2.5:0,pendantEmissiveMultiplier:this.night.value};}
- get ownedTextures(){return new Set([this.bakedContact.texture,this.atlas,this.masks.post,this.masks.box]);}
- dispose(){if(this.disposed)return;this.disposed=true;this.bakedContact.texture.dispose();this.atlas.dispose();this.masks.post.dispose();this.masks.box.dispose();}
+ diagnostics(){return {...this.stats,wallTorches:this.wallTorches.diagnostics(),bakedShadows:{enabled:this.bakedContact.strength.value>0,strength:this.bakedContact.strength.value,version:'selected-ground-contact-v1',sites:6,size:contactData.size,gpuBytesWithMipmaps:349525,drawCalls:0,receiver:'ground-only',realtimeShadowMaps:0},roads:{version:'pixel-stone-v2',stoneAtlasSize:256,stoneAtlasGpuBytes:349525,curbInstances:this.content.curbs.blocks.length,curbHeight:this.content.curbs.style.height,curbTriangles:curbData.triangles*this.content.curbs.blocks.length,curbBatches:1,collisionEdges:this.content.curbs.collisionEdges},time:this.time,lampMaterialCount:this.lampMaterials.length,windowEmissiveIntensity:this.time==='night'?2.5:0,pendantEmissiveMultiplier:this.night.value};}
+ get ownedTextures(){return new Set([this.bakedContact.texture,this.atlas,this.roadStone,this.masks.post,this.masks.box]);}
+ dispose(){if(this.disposed)return;this.disposed=true;this.bakedContact.texture.dispose();this.atlas.dispose();this.roadStone.dispose();this.masks.post.dispose();this.masks.box.dispose();}
 }
