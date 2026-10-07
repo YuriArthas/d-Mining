@@ -58,3 +58,9 @@ test('scene plans have finite geometry and keep landing and service centers out 
   for(const s of plan.solids)if(s.at[1]-s.half[1]<2)assert.ok(Math.abs(s.at[0])-s.half[0]>=8||Math.abs(s.at[2])-s.half[2]>=8,'entrance obstructed');
  }
 });
+
+test('layer validation rejects shared theme blocks and theme blocks hidden in ore pools',()=>{
+ assert.throws(()=>validateLayers(LAYERS.map((l,i)=>i===1?{...l,base:LAYERS[0].base}:l)), /不能跨层复用/);
+ assert.throws(()=>validateLayers(LAYERS.map((l,i)=>i===1?{...l,ores:[...l.ores,{kind:8,weight:1}]}:l)), /矿物池不能包含主题方块/);
+ assert.throws(()=>validateLayers(LAYERS.map((l,i)=>i===0?{...l,base:3}:l)), /不是主题方块/);
+});

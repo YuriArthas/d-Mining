@@ -94,6 +94,6 @@ test('session pickaxe purchase publishes consistent level/coins without changing
  let now=0;const s=new GameSession(SESSION_CONTENT, 50,()=>now);s.attach({cell:()=>6,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{}});
  s.collected(Array.from({length:5},()=>({kind:1})));s.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);s.resetPosition();
  const a=[14,-1,-25];s.hit(a);const snapshots=[];s.subscribe(()=>snapshots.push(s.getSnapshot()));
- assert.equal(s.upgradePickaxe(1).status,'upgraded');assert.equal(snapshots.length,1);assert.equal(snapshots[0].coins,0);assert.equal(snapshots[0].pickaxe.power,15);
+ assert.equal(s.upgradePickaxe(1).status,'upgraded');assert.equal(snapshots.length,1);assert.equal(snapshots[0].coins,SESSION_CONTENT.initialCoins);assert.equal(snapshots[0].pickaxe.power,15);
  now=.1;assert.equal(s.hit(a).status,'cooldown');now=.5;assert.equal(s.hit(a).remaining,325);
 });

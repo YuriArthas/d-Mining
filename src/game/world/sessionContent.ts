@@ -4,7 +4,8 @@ import type {
 } from "../application/SessionContent.ts";
 import { ROOMS, HOME_ZONE, SURFACE_SELL, type RestRoom } from "./rooms.ts";
 import { SURFACE_SHOP } from "./surfaceLayout.ts";
-import { SURFACE_PORTALS } from "./SurfaceHub.ts";
+import { PET_CONTENT } from "../content/pets.ts";
+import { PET_DISPLAYS, SURFACE_PORTALS } from "./SurfaceHub.ts";
 export function sessionContentFor(
   rooms: readonly RestRoom[],
   portals: SessionContent["portals"],
@@ -22,6 +23,14 @@ export function sessionContentFor(
   for (const portal of portals)
     if (!ids.has(portal.id)) throw Error("未知传送目的地: " + portal.id);
   return {
+    initialCoins: 200,
+    petContent: PET_CONTENT,
+    eggStations: PET_DISPLAYS.map(display => ({
+      id: display.id,
+      eggId: display.eggId,
+      promptAnchor: [display.x, display.y + 4.85, display.z] as const,
+      zone: { x: display.x - 2, y: display.y, z: display.z, radius: 1.3, heightTolerance: .35, hysteresis: .3 },
+    })),
     destinations: rooms,
     sales: [surface.sale, ...rooms.map((r) => r.sell)],
     shops: [

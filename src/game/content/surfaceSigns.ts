@@ -5,7 +5,7 @@ export const SURFACE_SIGNS: readonly Sign[] = [
     yaw: -Math.PI / 2,
     width: 6,
     title: "PETS",
-    subtitle: "宠物蛋展示",
+    subtitle: "",
     color: "#d9a1ff",
     background: "#613494",
   },

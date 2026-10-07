@@ -126,7 +126,7 @@ export class SurfaceHubView {
       e.enter.visible = d.unlocked;
     }
     this.surface.userData.hub = {
-      petDisplayOnly: true,
+      petDisplayOnly: false,
       petStations: PET_DISPLAYS,
       portals: SURFACE_PORTALS.map((p) => ({
         id: p.id,

@@ -17,9 +17,9 @@ test('one translated and rotated facility descriptor aligns model, collider, lab
  assert.equal(moved.sign.at[0],moved.trigger.x);assert.equal(moved.ring.at[2],moved.trigger.z);
  const camp=createCampContent(),session=new GameSession({...camp.session,sales:[moved.trigger]});
  session.collected([{kind:5}]);session.updatePosition([26.7,0,30],true);
- assert.equal(session.getSnapshot().inventory.used,0);assert.equal(session.getSnapshot().coins,40);
+ assert.equal(session.getSnapshot().inventory.used,0);assert.equal(session.getSnapshot().coins,camp.session.initialCoins+40);
  session.collected([{kind:5}]);session.updatePosition([26.7,0,30],true);
- assert.equal(session.getSnapshot().coins,40); // no second entry
+ assert.equal(session.getSnapshot().coins,camp.session.initialCoins+40); // no second entry
  const swapped=deriveFacility({...SURFACE_FACILITIES.sale,model:{...SURFACE_FACILITIES.sale.model,asset:'simulator-upgrade'}});
  assert.deepEqual(swapped.trigger,deriveFacility(SURFACE_FACILITIES.sale).trigger);
 });
@@ -40,10 +40,11 @@ test('changed depth, theme and room dimensions agree across physics generation, 
  assert.equal(session.travelTo('fungal'),'travelling');assert.deepEqual(travel,[room.spawn]);
 });
 test('adding a layer requires an explicit station, never a layer-name branch or index-based appearance',()=>{
- const layers=[...LAYERS,{...LAYERS.at(-1),id:'extra',name:'测试层',from:3900}];
+ // Start with nine layers so the added layer owns the remaining theme block.
+ const layers=[...LAYERS.slice(0,-1),{...LAYERS.at(-1),id:'extra',name:'测试层',from:3900}];
  assert.throws(()=>createCampContent(layers),/extra/);
  const camp=createCampContent(layers,{...PORTAL_SLOTS,extra:{x:-23,z:18,yaw:Math.PI/2,model:'portal-crystal'}});
- assert.equal(camp.rooms.length,10);assert.equal(camp.session.destinations.at(-1).id,'extra');
+ assert.equal(camp.rooms.length,9);assert.equal(camp.session.destinations.at(-1).id,'extra');
  assert.equal(camp.surface.placements.filter(p=>p.portalId==='extra').length,2);
  assert.equal(camp.hub.portals.at(-1).model,'portal-crystal');
  assert.equal(camp.surface.plan.solids.filter(s=>s.at[0]===-23&&s.at[2]===18).length,2);

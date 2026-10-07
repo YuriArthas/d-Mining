@@ -105,6 +105,7 @@ export function updateGame(
       camera as PerspectiveCamera,
       delta,
     );
+    current.petFollowers.update(drawnFeet, player.facing, camera, delta, !!player.travelling);
     interaction.update(
       camera as PerspectiveCamera,
       feet,

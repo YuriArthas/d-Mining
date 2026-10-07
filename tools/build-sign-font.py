@@ -6,8 +6,9 @@ from fontTools.ttLib import TTFont
 from fontTools.pens.basePen import BasePen
 font=TTFont('/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc',fontNumber=2)
 chars=set(chr(c) for c in range(32,127))
-for p in [Path('src/game/content/themes.ts'),Path('src/game/content/layers.ts'),Path('src/game/world/SurfaceHub.ts'),Path('src/game/world/SurfaceAssetPlan.ts'),Path('src/game/world/sceneryKit.ts')]:
+for p in [Path('src/game/content/themes.ts'),Path('src/game/content/pets.ts'),Path('src/game/content/petAppearance.ts'),Path('src/game/presentation/EggStandLabels.ts'),Path('src/game/content/surfaceSigns.ts'),Path('src/game/content/layers.ts'),Path('src/game/world/SurfaceHub.ts'),Path('src/game/world/SurfaceAssetPlan.ts'),Path('src/game/world/sceneryKit.ts')]:
  chars.update(re.findall(r'[\u4e00-\u9fff]',p.read_text()))
+chars.update(json.loads(Path('src/game/assets/sign-font.json').read_text())['glyphs'])
 cmap=font.getBestCmap();glyphset=font.getGlyphSet();glyphs={}
 class Pen(BasePen):
  def __init__(self):super().__init__(glyphset);self.parts=[];self.start=None

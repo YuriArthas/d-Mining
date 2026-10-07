@@ -47,7 +47,7 @@ test('session publishes one coherent purchase snapshot and mining immediately us
  session.collected(Array.from({length:57},()=>({kind:1})));assert.equal(session.requestMine([[0,-1,0]]),false);
  const unsub=session.subscribe(()=>observed.push(session.getSnapshot()));
  assert.equal(session.upgradeBackpack('bag-100').status,'upgraded');assert.equal(observed.length,1);
- assert.equal(observed[0].inventory.capacity,100);assert.equal(observed[0].inventory.used,57);assert.equal(observed[0].coins,0);
+ assert.equal(observed[0].inventory.capacity,100);assert.equal(observed[0].inventory.used,57);assert.equal(observed[0].coins,SESSION_CONTENT.initialCoins);
  assert.equal(session.upgradeBackpack('bag-100').status,'stale');assert.equal(observed.length,1);assert.equal(session.requestMine([[0,-1,0]]),true);
  unsub();
 });

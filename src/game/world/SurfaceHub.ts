@@ -1,5 +1,6 @@
 import {PORTAL_SLOTS,type PortalSlot} from '../content/portalSlots.ts';
 import {SURFACE_SITE} from './SurfaceSite.ts';
+import { EGG_DISPLAY_ROWS } from '../content/petAppearance.ts';
 import {PET_TIERS,PET_COLUMNS} from './PetTerraces.ts';
 import {LAYERS,type Layer} from '../content/layers.ts';
 import {themeById} from '../content/themes.ts';
@@ -26,7 +27,7 @@ export function portalsFor(layers:readonly Layer[],slots:Readonly<Record<string,
 }
 export const SURFACE_PORTALS=portalsFor(LAYERS);
 // Every tier contains six eggs, progressively higher and further east.
-export const PET_DISPLAYS=PET_TIERS.flatMap(t=>PET_COLUMNS.map((z,i)=>({...t,z,yaw:-Math.PI/2,asset:EGG_ASSETS[(i+t.tier*2)%6],color:['#9ce866','#a597ff','#ffa456','#66d8de','#f5dc96','#ffcc61'][(i+t.tier*2)%6]})));
+export const PET_DISPLAYS=PET_TIERS.flatMap(t=>PET_COLUMNS.map((z,i)=>({...t,z,id:`egg-stand-${t.tier}-${i}`,...EGG_DISPLAY_ROWS[t.tier][i],yaw:-Math.PI/2})));
 export function portalPlacementsFor(portals:ReturnType<typeof portalsFor>){return [
  ...portals.map(p=>({asset:'portal-plinth-blender' as const,x:p.x,z:p.z,...PORTAL_PLINTH,y:0,yaw:p.yaw,portalId:p.id,portalAccent:p.color})),
  ...portals.map(p=>({asset:p.model,x:p.x,z:p.z,...PORTAL_MODEL,y:PORTAL_BASE_HEIGHT,yaw:p.yaw,portalId:p.id,tint:p.tint})),

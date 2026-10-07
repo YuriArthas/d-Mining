@@ -2,7 +2,7 @@ import { useSyncExternalStore } from 'react';
 import type { GameSession } from '../application/GameSession.ts';
 import { GameButton } from './GameButton.tsx';
 import { ORE_ITEMS } from '../application/items.ts';
-export function InventoryHud({ session, onOpenUpgrade, onOpenTravel }: { session: Pick<GameSession, 'subscribe' | 'getSnapshot' | 'returnToSurface'>; onOpenUpgrade: () => void; onOpenTravel: () => void }) {
+export function InventoryHud({ session, onOpenUpgrade, onOpenTravel, onOpenPets }: { session: Pick<GameSession, 'subscribe' | 'getSnapshot' | 'returnToSurface'>; onOpenUpgrade: () => void; onOpenTravel: () => void; onOpenPets: () => void }) {
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot);
   const bag = state.inventory;
   return <aside className="inventory-hud" aria-label="背包与售卖">
@@ -12,6 +12,7 @@ export function InventoryHud({ session, onOpenUpgrade, onOpenTravel }: { session
       <GameButton onPress={session.returnToSurface}>返回地表</GameButton>
       {state.atHome && <GameButton onPress={onOpenTravel}>传送</GameButton>}
       <GameButton onPress={onOpenUpgrade}>升级</GameButton>
+      <GameButton onPress={onOpenPets}>宠物</GameButton>
     </div>
     <div className="sale-hint" data-testid="sale-quote">共 {bag.totalCount} 件 · {state.sale.status === 'quoted' ? `预计 ${state.sale.coins} 金币` : '售价超出数值范围'}</div>
     <output className="sale-notice" role="status">{state.notice || '走进金色圆圈自动出售'}</output>

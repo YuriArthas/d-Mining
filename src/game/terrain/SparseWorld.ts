@@ -8,7 +8,7 @@ import { roomAir, onRoomFloor } from '../world/rooms.ts';
 import { SHAFT } from '../validation/course.ts';
 export type Coord = readonly [number, number, number];
 export type WorldGeneration = Readonly<{ version: number; seed: number; samples: boolean; layers: readonly Layer[] }>;
-export const WORLD_GENERATION: WorldGeneration = Object.freeze({ version: 7, seed: 0, samples: false, layers: LAYERS });
+export const WORLD_GENERATION: WorldGeneration = Object.freeze({ version: 8, seed: 0, samples: false, layers: LAYERS });
 export const INDEX_SIZE = 16; // Sparse spatial index only; never a dense voxel allocation.
 export const RENDER_SIZE = 16;
 export const COLLISION_SIZE = 8;

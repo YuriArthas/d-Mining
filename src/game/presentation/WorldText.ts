@@ -7,11 +7,11 @@ import type {Sign} from '../world/sceneryKit.ts';
 const font=new FontLoader().parse(fontData);
 
 // Real extruded glyphs, including their backs and sides. No canvas or UI plane.
-export function createWorldText(sign:Sign){
+export function createWorldText(sign:Sign,detail:{bevel?:boolean}={}){
  const group=new Group();group.name='world-text:'+sign.title;
  function line(text:string,width:number,y:number){
   for(const c of text)if(!font.data.glyphs[c])throw Error(`标识缺少字形: ${c}`);
-  const geometry=new TextGeometry(text,{font,size:1,depth:.16,curveSegments:5,bevelEnabled:true,bevelThickness:.012,bevelSize:.01,bevelSegments:1});
+  const geometry=new TextGeometry(text,{font,size:1,depth:.16,curveSegments:5,bevelEnabled:detail.bevel??true,bevelThickness:.012,bevelSize:.01,bevelSegments:1});
   // ExtrudeGeometry emits front/side groups for every glyph contour. Collapse
   // identical material ranges: still real 3D text, exactly the same triangles.
   if(typeof location==='undefined'||new URLSearchParams(location.search).get('textGroups')!=='0')mergeGroups(geometry);

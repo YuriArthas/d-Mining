@@ -1,4 +1,7 @@
-import type { SessionContent, Destination } from "./SessionContent.ts";
+import type { SessionContent, Destination, EggStation } from "./SessionContent.ts";
+import { PetService } from "./PetService.ts";
+import { PetUiAdapter } from "./PetUiAdapter.ts";
+import { MiningAttributes } from "./MiningAttributes.ts";
 import { Exploration } from "../logic/Exploration.ts";
 import { Inventory } from "../logic/Inventory.ts";
 import { Wallet } from "../logic/Wallet.ts";
@@ -21,8 +24,13 @@ export type WorldCommands = {
   travelTo?(feet: Coord): void;
 };
 export class GameSession {
+  readonly pets: PetUiAdapter;
+  private readonly miningAttributes: MiningAttributes;
+  private readonly eggStations: { station: EggStation; detector: ZoneDetector }[];
+  private eggStation: EggStation | null = null;
+  private eggId: string | null = null;
   private inventory: Inventory;
-  private wallet = new Wallet();
+  private wallet: Wallet;
   private world: WorldCommands | null = null;
   private readonly content: SessionContent;
   private readonly zones: ZoneDetector[];
@@ -55,8 +63,28 @@ export class GameSession {
     content: SessionContent,
     capacity = 50,
     clock: () => number = () => performance.now() / 1000,
+    petDependencies: { random?: () => number; createPetId?: () => string } = {},
   ) {
     this.content = content;
+    this.wallet = new Wallet(content.initialCoins ?? 0);
+    const petService = new PetService({
+      content: content.petContent ?? { pets: [], eggs: [], equipSlots: 3 },
+      wallet: this.wallet,
+      random: petDependencies.random ?? Math.random,
+      createPetId: petDependencies.createPetId ?? (() => crypto.randomUUID()),
+    });
+    this.miningAttributes = new MiningAttributes(this.pickaxe.getSnapshot, petService.getBonus);
+    this.pets = new PetUiAdapter(petService, {
+      balance: () => this.wallet.getBalance(),
+      baseStats: this.pickaxe.getSnapshot,
+      effectiveStats: this.miningAttributes.getSnapshot,
+      publish: () => this.publish(),
+      subscribe: this.subscribe,
+    });
+    this.eggStations = (content.eggStations ?? []).map(station => {
+      if (!petService.catalog.egg(station.eggId)) throw Error(`蛋台引用未知蛋池: ${station.eggId}`);
+      return { station, detector: new ZoneDetector(station.zone) };
+    });
     this.zones = content.sales.map((zone) => new ZoneDetector(zone));
     this.portals = content.portals.map((p) => ({
       id: p.id,
@@ -77,7 +105,7 @@ export class GameSession {
     );
     this.combat = new MiningCombat({
       isFull: () => this.inventory.isFull(),
-      stats: this.pickaxe.getSnapshot,
+      stats: this.miningAttributes.getSnapshot,
       read: (cell) => {
         const kind = this.mineableKind(cell);
         return kind
@@ -97,6 +125,9 @@ export class GameSession {
       inSellZone: this.inSellZone,
       atHome: this.atHome,
       shopId: this.shopId,
+      eggId: this.eggId,
+      eggStation: this.eggStation,
+      miningStats: this.miningAttributes.getSnapshot(),
       depth: this.depth,
       destinations: this.content.destinations.map((r) => ({
         id: r.id,
@@ -265,6 +296,13 @@ export class GameSession {
       this.shopId = activeShop;
       changed = true;
     }
+    for (const station of this.eggStations) station.detector.update(feet, grounded);
+    const activeEgg = this.eggStations.find(entry => entry.detector.isInside)?.station ?? null;
+    if (activeEgg !== this.eggStation) {
+      this.eggStation = activeEgg;
+      this.eggId = activeEgg?.eggId ?? null;
+      changed = true;
+    }
     let entered = false;
     for (const zone of this.zones) {
       const event = zone.update(feet, grounded);
@@ -306,6 +344,9 @@ export class GameSession {
     this.targetView = null;
     for (const zone of this.zones) zone.reset();
     for (const shop of this.shops) shop.detector.reset();
+    for (const station of this.eggStations) station.detector.reset();
+    this.eggId = null;
+    this.eggStation = null;
     this.home.reset();
     this.atHome = false;
     this.shopId = null;

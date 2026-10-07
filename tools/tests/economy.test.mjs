@@ -91,10 +91,10 @@ test('session wires cancel-before-sale; snapshots publish only consistent invent
  const unsub=session.subscribe(()=>observed.push(session.getSnapshot()));
  session.collected([{kind:3},{kind:4}]);assert.equal(session.requestMine([[0,-1,0]]),false);
  session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);
- assert.deepEqual(events,['cancel']);assert.equal(observed.at(-1).coins,24);assert.equal(observed.at(-1).inventory.used,0);
+ assert.deepEqual(events,['cancel']);assert.equal(observed.at(-1).coins,SESSION_CONTENT.initialCoins+24);assert.equal(observed.at(-1).inventory.used,0);
  const count=observed.length;session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);assert.equal(observed.length,count);
  assert.equal(session.requestMine([[0,-1,0]]),false);
- session.returnToSurface();assert.deepEqual(events,['cancel','cancel','return']);assert.equal(session.getSnapshot().coins,24);
+ session.returnToSurface();assert.deepEqual(events,['cancel','cancel','return']);assert.equal(session.getSnapshot().coins,SESSION_CONTENT.initialCoins+24);
  assert.equal(session.requestMine([[0,-1,0]]),true);unsub();detach();assert.equal(session.requestMine([[0,-1,0]]),false);
 });
 test('session completed yield is credited even if bag is already full; return preserves it',()=>{

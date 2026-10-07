@@ -31,6 +31,7 @@ declare global {
 export function App() {
   const hosted = /\/games\/mining(?:-test)?\/(?:index\.html)?$/.test(window.location.pathname);
   const canvas = useRef<HTMLCanvasElement>(null);
+  const eggPrompt = useRef<HTMLButtonElement>(null);
   const scene = useRef<RootState | null>(null);
   const exiting = useRef(false);
   const [exited, setExited] = useState(false);
@@ -102,7 +103,7 @@ export function App() {
 
   if (exited) {
     return (
-      <main className="game-shell" aria-label="Mining 游戏">
+      <main onContextMenuCapture={event => event.preventDefault()} className="game-shell" aria-label="Mining 游戏">
         <section className="placeholder" role="status">
           <h1>已退出游戏</h1>
         </section>
@@ -111,7 +112,7 @@ export function App() {
   }
 
   return (
-    <main className="game-shell game-shell--active" aria-label="Mining 游戏" style={{ '--scene-background': GAME_CONFIG.background } as CSSProperties}>
+    <main onContextMenuCapture={event => event.preventDefault()} className="game-shell game-shell--active" aria-label="Mining 游戏" style={{ '--scene-background': GAME_CONFIG.background } as CSSProperties}>
       <div inert={showLoading} ref={surface} className="scene" tabIndex={0} aria-label="游戏视角，拖动观察，点按敲击，长按方块挖掘">
         <LoadingBoundary onFailure={failLoading}><Canvas
           ref={canvas}
@@ -124,7 +125,7 @@ export function App() {
           gl={{ antialias: true }}
           fallback={<p>当前浏览器无法启动 3D 画面，请使用支持 WebGL2 的浏览器。</p>}
         >
-          <ValidationScene stylized={stylized} content={CAMP_CONTENT} renderRate={renderRate} shadowsEnabled={shadowsEnabled} probeMode={probeMode} input={input} onStatus={setStatus} onLoading={onLoading} onPerformance={setPerformanceStats} session={session} timeOfDay={timeOfDay} />
+          <ValidationScene eggPrompt={eggPrompt} stylized={stylized} content={CAMP_CONTENT} renderRate={renderRate} shadowsEnabled={shadowsEnabled} probeMode={probeMode} input={input} onStatus={setStatus} onLoading={onLoading} onPerformance={setPerformanceStats} session={session} timeOfDay={timeOfDay} />
         </Canvas></LoadingBoundary>
       </div>
       <header className="game-header" style={{display:showLoading?'none':undefined}}>
@@ -155,7 +156,7 @@ export function App() {
         </button>
         </nav>
       </header>
-      {!showLoading&&<SessionUi session={session} input={input} surface={surface} />}
+      {!showLoading&&<SessionUi eggPrompt={eggPrompt} session={session} input={input} surface={surface} />}
       {showLoading&&<LoadingScreen state={loading} onExit={exit} />}
       {debug && !showLoading && <><InputMonitor input={input} /><ValidationPanel /></>}
     </main>

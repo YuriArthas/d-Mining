@@ -1,6 +1,7 @@
+import { WorldPromptProjector } from "../presentation/WorldPromptProjector.ts";
 import { CAMERA_LOOKS } from '../content/cameraLook.ts';
 import type { CampContent } from "../content/campContent.ts";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import {
   Group,
@@ -45,7 +46,9 @@ export function ValidationScene({
   session,
   timeOfDay,
   stylized,
+  eggPrompt,
 }: {
+  eggPrompt: RefObject<HTMLButtonElement | null>;
   content: CampContent;
   renderRate: RenderRate;
   shadowsEnabled: boolean;
@@ -68,6 +71,7 @@ export function ValidationScene({
   const runtime = useRef<PreparedGame | null>(null);
   const contactShadow = useRef<Mesh>(null);
   const loadingReleased = useRef(false);
+  const promptProjector = useRef(new WorldPromptProjector());
   const settings = useRef({ timeOfDay, sceneShadowsEnabled });
   settings.current = { timeOfDay, sceneShadowsEnabled };
   const { advance, gl, scene, camera: activeCamera } = useThree();
@@ -276,6 +280,7 @@ export function ValidationScene({
       onStatus,
       onLoading,
     );
+    promptProjector.current.update(camera, session.getSnapshot().eggStation?.promptAnchor ?? null, eggPrompt.current);
   });
 
   return (

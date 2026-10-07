@@ -24,6 +24,9 @@ import { SceneLightingRig } from "../presentation/SceneLightingRig.ts";
 import { EnvironmentController } from "../presentation/EnvironmentController.ts";
 import { SceneryView } from "../presentation/SceneryView.ts";
 import { SceneryCollision } from "../presentation/SceneryCollision.ts";
+import { PetFollowers } from "../presentation/PetFollowers.ts";
+import { EggStandLabels } from "../presentation/EggStandLabels.ts";
+import { disposeScenery } from "../presentation/disposeScenery.ts";
 import { SurfaceHubView } from "../presentation/SurfaceHubView.ts";
 import { prepareShaders } from "../presentation/prepareShaders.ts";
 import { createScenerySites } from "../world/createScenerySites.ts";
@@ -222,8 +225,20 @@ export async function startGame(options: StartGameOptions) {
     scope.defer(() => interaction.dispose());
     root.add(interaction.group);
     surface.retain();
+    const eggLabels = new EggStandLabels(content.hub.eggs, session.pets.getSnapshot().eggs);
+    root.add(eggLabels.group);
+    scope.defer(() => disposeScenery(eggLabels.group));
+    const petFollowers = new PetFollowers();
+    root.add(petFollowers.group);
+    scope.defer(() => petFollowers.dispose());
+    const updatePets = () => petFollowers.sync(session.pets.getSnapshot().pets.flatMap(card =>
+      card.equippedSlot === null ? [] : [{ ...card.pet, slot: card.equippedSlot }]));
+    updatePets();
+    scope.defer(session.pets.subscribe(updatePets));
     const hub = new SurfaceHubView(surface.group, content.hub),
-      updateHub = () => hub.update(session.getSnapshot().destinations);
+      updateHub = () => {
+        hub.update(session.getSnapshot().destinations);
+      };
     updateHub();
     scope.defer(session.subscribe(updateHub));
     const sites = createScenerySites(content.rooms, content.surface.plan),
@@ -296,6 +311,8 @@ export async function startGame(options: StartGameOptions) {
       environment,
       cameraView,
       cameraGrade,
+      eggLabels,
+      petFollowers,
       startup,
       timing: { status: 0, frames: 0 },
       dispose: () => {

@@ -60,7 +60,7 @@ test('each underground sale zone sells once per entry; shops exit independently'
  }
  const r=ROOMS[1];s.updatePosition([r.shop.x,r.shop.y,r.shop.z],true);assert.equal(s.getSnapshot().shopId,r.id);
  assert.equal(s.getSnapshot().inSellZone,false);s.updatePosition([r.x,-r.depth,r.z],true);assert.equal(s.getSnapshot().shopId,null);
- assert.equal(s.getSnapshot().coins,40*ROOMS.length);
+ assert.equal(s.getSnapshot().coins,SESSION_CONTENT.initialCoins+40*ROOMS.length);
 });
 
 test('surface upgrade kiosk reuses shop lifecycle and survives direct transfers between shops',()=>{

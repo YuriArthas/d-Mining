@@ -83,6 +83,6 @@ test('session shows mixed-unit snapshots and sells completed overflow at indepen
  for(let i=0;i<20;i++){now=i*.5;assert.equal(session.hit(cell).status,i===19?'breaking':'hit')}
  solid=false;session.collected([{cell,kind:5}]);let s=session.getSnapshot();assert.equal(s.inventory.used,57);assert.equal(s.inventory.totalCount,48);assert.deepEqual(s.sale,{status:'quoted',count:48,coins:87});
  solid=true;now+=.5;assert.equal(session.hit([12,-1,-25]).status,'full');assert.equal(session.blockHealth([12,-1,-25]),200);
- session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);s=session.getSnapshot();assert.equal(s.coins,87);assert.equal(s.inventory.totalCount,0);assert.match(s.notice,/48 件.*87 金币/);
- session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);assert.equal(session.getSnapshot().coins,87);
+ session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);s=session.getSnapshot();assert.equal(s.coins,SESSION_CONTENT.initialCoins+87);assert.equal(s.inventory.totalCount,0);assert.match(s.notice,/48 件.*87 金币/);
+ session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);assert.equal(session.getSnapshot().coins,SESSION_CONTENT.initialCoins+87);
 });

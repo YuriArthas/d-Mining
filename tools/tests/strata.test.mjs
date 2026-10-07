@@ -9,12 +9,12 @@ import {oreChanceAtDepth} from '../../src/game/content/oreDistribution.ts';
 test('layer boundaries use metres and the top face of each block', () => {
  assert.equal(stratumAtDepth(399.999).id,'surface');assert.equal(stratumAtDepth(400).id,'old_mine');
  assert.equal(stratumAtDepth(799.999).id,'old_mine');assert.equal(stratumAtDepth(800).id,'fungal');
- const allowed = [[-200,[1,8,3,4,16]],[-201,[2,1,3,4,16,17,5]],[-400,[2,1,3,4,16,17,5]],[-401,[9,2,4,17,18,25]]];
+ const allowed = [[-200,[8,3,4,16]],[-201,[1,3,4,16,17,5]],[-400,[1,3,4,16,17,5]],[-401,[9,4,17,18,25]]];
  for(const [y,ids] of allowed) for(let x=-48;x<=51;x++)for(let z=-48;z<=51;z++)assert.ok(ids.includes(generatedMineral(x,y,z,0)));
 });
 test('production shallow terrain excludes advanced minerals even at old sample coordinates', () => {
  const game=new SparseWorld(),fixture=new SparseWorld({...WORLD_GENERATION,samples:true});
- for(let x=-16;x<32;x++)for(let y=-16;y<0;y++)for(let z=-32;z<-16;z++)assert.ok((y===-1?[7]:[1,8,3,4,16]).includes(game.cell([x,y,z])));
+ for(let x=-16;x<32;x++)for(let y=-16;y<0;y++)for(let z=-32;z<-16;z++)assert.ok((y===-1?[7]:[8,3,4,16]).includes(game.cell([x,y,z])));
  assert.equal(fixture.cell([14,-1,-25]),6);assert.notEqual(game.cell([14,-1,-25]),6);
  assert.equal(game.generation.samples,false);assert.equal(game.stats().editBytes,0);
 });
@@ -57,6 +57,30 @@ test('worker render and collision use the exact same generation source across la
     const expected=greedyMesh((x,y,z)=>kind==='collision'?world.cell([coord[0]*size+x,coord[1]*size+y,coord[2]*size+z]):appearanceKey(world.cell([coord[0]*size+x,coord[1]*size+y,coord[2]*size+z]),coord[1]*size+y,generation.layers),size,kind==='collision');
     assert.deepEqual(actual,expected);
    }
+  }
+ }
+});
+
+test('theme blocks occur only in their owning layer, including every seam and moved depths', async () => {
+ const { resourceByKind } = await import('../../src/game/content/resources.ts');
+ const { validateLayers } = await import('../../src/game/content/layers.ts');
+ assert.deepEqual(STRATA.map(l=>l.base), [8,1,9,2,10,11,12,13,14,15]);
+ for(const layers of [STRATA, STRATA.map(l=>l.id==='fungal'?{...l,from:900}:l)]) {
+  validateLayers(layers);
+  const world = new SparseWorld({...WORLD_GENERATION,layers});
+  for(let i=0;i<layers.length;i++) {
+   const layer=layers[i], end=layers[i+1]?.from??4000, counts=new Map();
+   // Away from room footprints: inspect both boundary-adjacent block slices and the interior.
+   for(const depth of [layer.from, layer.from+80, end-2]) {
+    const y=-depth/2-1;
+    for(let x=20;x<40;x++)for(let z=20;z<40;z++) {
+     const kind=world.cell([x,y,z]);
+     if(kind===7)continue; // Protected hub floor is not a collectible theme block.
+     counts.set(kind,(counts.get(kind)||0)+1);
+     if(resourceByKind(kind).base) assert.equal(kind,layer.base,`${layer.id} contains foreign base ${kind}`);
+    }
+   }
+   assert.ok(counts.get(layer.base)>0);
   }
  }
 });
