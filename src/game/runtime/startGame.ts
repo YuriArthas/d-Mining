@@ -1,3 +1,4 @@
+import type { SparseWorld } from '../terrain/SparseWorld.ts';
 import { CameraGrade } from '../presentation/CameraGrade.ts';
 import type { CampContent } from "../content/campContent.ts";
 import type {
@@ -64,6 +65,7 @@ export type StartGameOptions = {
   avatar: Group;
   input: GameInput;
   session: GameSession;
+  restoredWorld?: SparseWorld;
   samples: boolean;
   previewLayer: string | null;
   signal: AbortSignal;
@@ -140,7 +142,7 @@ export async function startGame(options: StartGameOptions) {
     const worldTask = initPhysics().then(async () => {
       check();
       startup.physicsMs = performance.now() - startup.started;
-      const generation = {
+      const generation = options.restoredWorld?.generation ?? {
         ...WORLD_GENERATION,
         samples: options.samples,
         layers: content.layers,
@@ -152,6 +154,7 @@ export async function startGame(options: StartGameOptions) {
         undefined,
         session.collected,
         generation,
+        options.restoredWorld,
       );
       scope.defer(() => {
         terrain.group.removeFromParent();
@@ -301,6 +304,7 @@ export async function startGame(options: StartGameOptions) {
     check();
     onLoading({ stage: "shaders", done: 1, total: 1, complete: true });
     return {
+      session,
       content,
       physics,
       terrain,

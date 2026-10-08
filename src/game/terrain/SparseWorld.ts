@@ -1,3 +1,5 @@
+import { WorldSaveChanges, type WorldCaptureToken } from './WorldSaveChanges.ts';
+import { readRegion } from './WorldSaveCodec.ts';
 import { LAYERS, type Layer } from '../content/layers.ts';
 import { generatedMineral } from './strata.ts';
 import { sampleMineral } from './minerals.ts';
@@ -79,13 +81,29 @@ export class SparseWorld {
   readonly generation: WorldGeneration;
   constructor(generation: WorldGeneration = WORLD_GENERATION) { this.generation = Object.freeze({ ...generation }); }
   private readonly edits: Edits = new Map();
+  readonly saveChanges = new WorldSaveChanges();
+  hasUnsavedChanges() { return this.saveChanges.pending; }
+  acknowledgeChanges(token: WorldCaptureToken) { this.saveChanges.acknowledge(token); }
+  captureChanges() {
+    return { ...this.saveChanges.capture(c => this.edits.get(bucketKey(...c))!), totalRegionCount: this.edits.size };
+  }
+  // Used only during candidate-world construction, before any workers or gameplay.
+  restoreRegion(value: unknown) {
+    if (this.revision) throw Error('不能向运行中的世界恢复存档');
+    const data = readRegion(value, c => { const kind = baseXYZ(...c, this.generation); return kind > 0 && kind !== PROTECTED_FLOOR; });
+    const key = bucketKey(...data.region);
+    if (this.edits.has(key)) throw Error('存档包含重复矿坑区域');
+    this.edits.set(key, data.removed);
+    this.removed += data.removed === null ? 4096 : Array.from(data.removed).reduce((n, v, i, a) => i % 2 ? n + v - a[i - 1] + 1 : n, 0);
+  }
   revision = 0;
   removed = 0;
   cell(c: Coord) { return sampleXYZ(...c, this.edits, this.generation); }
   canMine(c: Coord) { const kind = this.cell(c); return kind > 0 && kind !== PROTECTED_FLOOR; }
   remove(cells: readonly Coord[]) {
     const accepted = [...new Map(cells.filter(c => inBounds(c) && c.every(Number.isInteger) && this.canMine(c)).map(c => [chunkKey(c), c])).values()];
-    if (accepted.length) { apply(this.edits, accepted); this.revision++; this.removed += accepted.length; }
+    if (accepted.length) { apply(this.edits, accepted); this.revision++; this.removed += accepted.length;
+      for (const c of accepted) this.saveChanges.mark(regionOf(c, INDEX_SIZE)); }
     return accepted;
   }
   snapshot(coord: Coord, size: number, pending: readonly Coord[] = []): EditSnapshot {

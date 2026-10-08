@@ -1,3 +1,6 @@
+import type { ProgressDataV1 } from './SessionProgress.ts';
+import { versionOne } from '../logic/data.ts';
+import { PetCommands } from './PetCommands.ts';
 import type { SessionContent, Destination, EggStation } from "./SessionContent.ts";
 import { PetService } from "./PetService.ts";
 import { PetUiAdapter } from "./PetUiAdapter.ts";
@@ -25,6 +28,22 @@ export type WorldCommands = {
 };
 export class GameSession {
   readonly pets: PetUiAdapter;
+  private readonly petService: PetService;
+  private progressListeners = new Set<(change: { urgent: boolean }) => void>();
+  suspended = false;
+  setSuspended(value: boolean) { this.suspended = value; if (value) this.world?.cancelMining(); }
+  onProgressCommitted = (listener: (change: { urgent: boolean }) => void) => {
+    this.progressListeners.add(listener);
+    return () => { this.progressListeners.delete(listener); };
+  };
+  private committed(urgent: boolean) { for (const listener of this.progressListeners) listener({ urgent }); }
+  exportProgress(): ProgressDataV1 {
+    return { version: 1 as const, wallet: this.wallet.exportData(), inventory: this.inventory.exportData(),
+      pickaxe: this.pickaxe.exportData(), pets: this.petService.exportData(), exploration: this.exploration.exportData() };
+  }
+  static createNew(content: SessionContent) { return new GameSession(content); }
+  static fromData(data: unknown, content: SessionContent) { return new GameSession(content, 50, undefined, {}, versionOne(data)); }
+
   private readonly miningAttributes: MiningAttributes;
   private readonly eggStations: { station: EggStation; detector: ZoneDetector }[];
   private eggStation: EggStation | null = null;
@@ -64,21 +83,28 @@ export class GameSession {
     capacity = 50,
     clock: () => number = () => performance.now() / 1000,
     petDependencies: { random?: () => number; createPetId?: () => string } = {},
+    saved?: unknown,
   ) {
     this.content = content;
-    this.wallet = new Wallet(content.initialCoins ?? 0);
+    const data = saved === undefined ? null : versionOne(saved);
+    this.wallet = data ? Wallet.fromData(data.wallet) : new Wallet(content.initialCoins ?? 0);
+    this.pickaxe = data ? Pickaxe.fromData(data.pickaxe) : new Pickaxe();
+    this.inventory = data ? Inventory.fromData(data.inventory, itemVolume) : new Inventory(capacity, itemVolume);
+    this.exploration = data ? Exploration.fromData(data.exploration, content.destinations, content.initiallyUnlocked) : new Exploration(content.destinations, content.initiallyUnlocked);
     const petService = new PetService({
       content: content.petContent ?? { pets: [], eggs: [], equipSlots: 3 },
       wallet: this.wallet,
       random: petDependencies.random ?? Math.random,
       createPetId: petDependencies.createPetId ?? (() => crypto.randomUUID()),
     });
+    this.petService = petService;
+    if (data) petService.restoreData(data.pets);
     this.miningAttributes = new MiningAttributes(this.pickaxe.getSnapshot, petService.getBonus);
     this.pets = new PetUiAdapter(petService, {
       balance: () => this.wallet.getBalance(),
       baseStats: this.pickaxe.getSnapshot,
       effectiveStats: this.miningAttributes.getSnapshot,
-      publish: () => this.publish(),
+      commands: new PetCommands(petService, () => { this.committed(true); this.publish(); }, () => !this.suspended),
       subscribe: this.subscribe,
     });
     this.eggStations = (content.eggStations ?? []).map(station => {
@@ -95,9 +121,7 @@ export class GameSession {
       id: p.id,
       detector: new ZoneDetector(p.zone),
     }));
-    this.exploration = new Exploration(content.destinations, content.initiallyUnlocked);
     this.clock = clock;
-    this.inventory = new Inventory(capacity, itemVolume);
     this.mining = new Mining(
       this.inventory,
       (targets) => this.world?.mine(targets) ?? false,
@@ -197,7 +221,7 @@ export class GameSession {
     if (this.refreshTarget()) this.publish();
   };
   hit = (cell: Coord) => {
-    if (this.inSellZone) return { status: "unavailable" } as const;
+    if (this.suspended || this.inSellZone) return { status: "unavailable" } as const;
     const result = this.combat.hit(cell, this.clock());
     if (result.status === "hit" || result.status === "breaking") {
       if (result.damage) this.lastHit++;
@@ -246,6 +270,7 @@ export class GameSession {
   // Called once, after terrain has actually removed these cells. Never checks isFull.
   collected = (resources: readonly { kind: number; cell?: Coord }[]) => {
     this.mining.collected(resources);
+    if (resources.length) this.committed(false);
     for (const resource of resources)
       if (resource.cell) this.combat.destroyed(resource.cell.join(","));
     this.refreshTarget();
@@ -253,22 +278,27 @@ export class GameSession {
     this.publish();
   };
   upgradePickaxe = (expectedLevel: number) => {
+    if (this.suspended) return { status: 'stale' } as const;
     const result = upgradePickaxe(expectedLevel, this.pickaxe, this.wallet);
     if (result.status === "upgraded") {
+      this.committed(true);
       this.notice = `镐子提升至 Lv.${result.level}`;
       this.publish();
     }
     return result;
   };
   upgradeBackpack = (tierId: string) => {
+    if (this.suspended) return { status: 'stale' } as const;
     const result = upgradeBackpack(tierId, this.inventory, this.wallet);
     if (result.status === "upgraded") {
+      this.committed(true);
       this.notice = `背包容量提升至 ${result.capacity}`;
       this.publish();
     }
     return result;
   };
   updatePosition(feet: readonly number[], grounded: boolean) {
+    if (this.suspended) return;
     let changed = false;
     const depth = Math.max(0, Math.floor(-feet[1]));
     if (depth !== this.depth) {
@@ -277,9 +307,11 @@ export class GameSession {
     }
     // Rapier leaves a small contact skin above a floor. Count standing on the
     // milestone floor as reaching it; airborne depth has no such tolerance.
+    const oldMaximum = this.exploration.maxDepth;
     const added = this.exploration.visit(
       Math.max(0, -feet[1] + (grounded ? 0.04 : 0)),
     );
+    if (this.exploration.maxDepth !== oldMaximum || added.length) this.committed(added.length > 0);
     if (added.length) {
       this.notice = `已解锁 ${this.content.destinations.find((r) => r.id === added.at(-1))!.name}，可回家传送`;
       changed = true;
@@ -315,6 +347,7 @@ export class GameSession {
     if (entered) {
       this.world?.cancelMining();
       const result = sellAll(this.inventory, this.wallet, itemPrice);
+      if (result.status === "sold") this.committed(true);
       this.notice =
         result.status === "sold"
           ? `出售 ${result.count} 件，获得 ${result.coins} 金币`
@@ -354,6 +387,7 @@ export class GameSession {
     this.publish();
   }
   travelTo = (id: string) => {
+    if (this.suspended) return "unavailable" as const;
     const room = this.content.destinations.find((r) => r.id === id);
     if (!room || !this.exploration.has(id)) return "locked" as const;
     if (!this.atHome) return "away" as const;
@@ -370,7 +404,7 @@ export class GameSession {
     return "travelling" as const;
   }
   returnToSurface = () => {
-    if (!this.world) return;
+    if (this.suspended || !this.world) return;
     this.world.cancelMining();
     this.world.returnToSurface();
     this.resetPosition();

@@ -7,7 +7,7 @@ import { buildRegion } from '../../src/game/terrain/meshing.ts';
 import { Inventory } from '../../src/game/logic/Inventory.ts';
 import { Mining } from '../../src/game/application/Mining.ts';
 import { oreDrops } from '../../src/game/application/items.ts';
-import { chunkKey, regionOf, WORLD_GENERATION } from '../../src/game/terrain/SparseWorld.ts';
+import { SparseWorld, chunkKey, regionOf, WORLD_GENERATION } from '../../src/game/terrain/SparseWorld.ts';
 await initPhysics();
 class WorkerProbe {
  requests=[];onmessage=null;onerror=null;onmessageerror=null;terminated=false;
@@ -78,7 +78,11 @@ test('12-cell collection spans worker jobs; admission checks once, committed rew
 test('cancelled and late terrain results do not reward; cancellation preserves committed edits',()=>{
  const receipts=[],f=setup(resources=>receipts.push(resources));
  try{drain(f.stream,f.workers);assert.ok(f.stream.mineMany([[0,-1,-25],[1,-1,-25]]));drain(f.stream,f.workers);
- assert.equal(receipts.length,1);assert.ok(f.stream.mineMany([[2,-1,-25],[3,-1,-25]]));f.stream.process();f.stream.cancelPending();
+ assert.equal(receipts.length,1);assert.ok(f.stream.mineMany([[2,-1,-25],[3,-1,-25]]));f.stream.process();
+ const saved = f.stream.world.captureChanges(), recovered = new SparseWorld(f.stream.world.generation);
+ for(const region of saved.regions)recovered.restoreRegion(region);
+ assert.equal(recovered.cell([0,-1,-25]),0);assert.ok(recovered.cell([2,-1,-25])>0);
+ f.stream.cancelPending();
  drain(f.stream,f.workers);assert.equal(receipts.length,1);assert.equal(f.stream.cell([0,-1,-25]),0);assert.ok(f.stream.cell([2,-1,-25])>0);
  assert.ok(f.stream.mineMany([[2,-1,-25],[3,-1,-25]]));drain(f.stream,f.workers);assert.equal(receipts.length,2);
  }finally{finish(f);}

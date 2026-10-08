@@ -1,0 +1,66 @@
+.save-boot,
+.save-exit {
+  position: absolute;
+  z-index: 120;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  background: #101e2fee;
+  color: #fff;
+  font: 600 15px system-ui;
+  text-align: center;
+  padding: 24px;
+}
+.save-boot h2,
+.save-exit h2 {
+  font-size: 22px;
+  margin: 8px;
+}
+.save-boot p,
+.save-exit p {
+  max-width: 520px;
+  overflow-wrap: anywhere;
+  color: #f5d8ae;
+}
+.save-boot button,
+.save-exit button,
+.save-warning button {
+  border: 2px solid #e5f6ff;
+  border-radius: 9px;
+  background: #237d99;
+  color: white;
+  font: 700 14px system-ui;
+  padding: 9px 18px;
+  cursor: pointer;
+}
+.save-warning {
+  position: absolute;
+  z-index: 110;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  padding: 8px 14px;
+  background: #352a22f5;
+  color: #ffe3ad;
+  border: 1px solid #d9ad66;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 85vw;
+  font-size: 13px;
+}
+.save-warning button {
+  font-size: 12px;
+  padding: 5px 9px;
+  white-space: nowrap;
+}
+.save-exit-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}

@@ -1,3 +1,4 @@
+import type { SavedGame } from '../persistence/SaveBootstrap.ts';
 import { WorldPromptProjector } from "../presentation/WorldPromptProjector.ts";
 import { CAMERA_LOOKS } from '../content/cameraLook.ts';
 import type { CampContent } from "../content/campContent.ts";
@@ -36,6 +37,7 @@ import { BOXES, RAMP } from "./physics.ts";
 
 export function ValidationScene({
   content,
+  savedGame,
   renderRate,
   shadowsEnabled: sceneShadowsEnabled,
   probeMode,
@@ -50,6 +52,7 @@ export function ValidationScene({
 }: {
   eggPrompt: RefObject<HTMLButtonElement | null>;
   content: CampContent;
+  savedGame: SavedGame;
   renderRate: RenderRate;
   shadowsEnabled: boolean;
   probeMode: ProbeMode;
@@ -102,6 +105,7 @@ export function ValidationScene({
       avatar: avatar.current!,
       input,
       session,
+      restoredWorld: savedGame.world,
       samples,
       previewLayer: params.get("debug") === "1" ? params.get("layer") : null,
       signal: controller.signal,
@@ -139,6 +143,7 @@ export function ValidationScene({
       })
       .catch((reason) => {
         if (controller.signal.aborted) return;
+        savedGame.saves.invalidate(reason);
         const error = `初始化失败：${String(reason)}`;
         onStatus(error);
         onLoading({ error });
@@ -149,7 +154,7 @@ export function ValidationScene({
       runtime.current?.dispose();
       runtime.current = null;
     };
-  }, [content, input, gl, scene, onStatus, onLoading, session]);
+  }, [content, input, gl, scene, onStatus, onLoading, session, savedGame]);
 
   useEffect(() => {
     const basic = new MeshBasicMaterial({ color: "#a0a0a0" });
@@ -265,7 +270,7 @@ export function ValidationScene({
   useFrame(({ camera }, elapsed) => {
     const game = runtime.current;
     if (!game || !avatar.current || !fixtures.current) return;
-    updateGame(
+    try { updateGame(
       game,
       elapsed,
       {
@@ -280,6 +285,8 @@ export function ValidationScene({
       onStatus,
       onLoading,
     );
+    } catch (error) { savedGame.saves.invalidate(error); throw error; }
+    if (game.terrain.error) savedGame.saves.invalidate(game.terrain.error);
     promptProjector.current.update(camera, session.getSnapshot().eggStation?.promptAnchor ?? null, eggPrompt.current);
   });
 

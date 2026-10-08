@@ -27,6 +27,7 @@ export function updateGame(
   onStatus: (text: string) => void,
   onLoading: (event: LoadingEvent) => void,
 ) {
+  if (current.session.suspended) return;
   const { camera, avatar, fixtures, contactShadow } = view;
   const { samples, timeOfDay, sceneShadowsEnabled, probeMode } = settings;
   const delta = Math.min(Math.max(elapsed, 0), 0.1);

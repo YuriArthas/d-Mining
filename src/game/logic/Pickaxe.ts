@@ -1,3 +1,4 @@
+import { versionOne } from './data.ts';
 import { integer } from './numbers.ts';
 export const PICKAXE_BALANCE = Object.freeze({ basePower: 10, powerPerLevel: 5, baseSpeed: 2, speedEvery: 5, speedMultiplier: 2, maxSpeed: 16 });
 export function pickaxeStats(level: number) {
@@ -10,6 +11,8 @@ export function pickaxeStats(level: number) {
 export class Pickaxe {
   private snapshot;
   constructor(level = 1) { this.snapshot = pickaxeStats(level); }
+  exportData() { return { version: 1 as const, level: this.snapshot.level }; }
+  static fromData(value: unknown) { return new Pickaxe(versionOne(value).level as number); }
   getSnapshot = () => this.snapshot;
   setLevel(level: number) { this.snapshot = pickaxeStats(level); }
 }

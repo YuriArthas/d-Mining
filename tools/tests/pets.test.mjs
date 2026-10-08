@@ -6,6 +6,7 @@ import { PetEquipment } from '../../src/game/logic/pets/PetEquipment.ts';
 import { calculateMiningStats, calculatePetBonus, drawEgg, selectBestPets } from '../../src/game/logic/pets/petRules.ts';
 import { PetService } from '../../src/game/application/PetService.ts';
 import { MiningAttributes } from '../../src/game/application/MiningAttributes.ts';
+import { PetCommands } from '../../src/game/application/PetCommands.ts';
 import { PetUiAdapter } from '../../src/game/application/PetUiAdapter.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
 import { Wallet } from '../../src/game/logic/Wallet.ts';
@@ -162,7 +163,7 @@ test('UI adapter publishes coherent snapshots, filters unrelated frames, release
   let emissions = 0;
   const publish = () => { for (const listener of listeners) listener(); };
   const attributes = new MiningAttributes(pickaxe.getSnapshot, service.getBonus);
-  const adapter = new PetUiAdapter(service, { effectiveStats: attributes.getSnapshot, balance: () => wallet.getBalance(), baseStats: pickaxe.getSnapshot, publish, subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener); } });
+  const adapter = new PetUiAdapter(service, { effectiveStats: attributes.getSnapshot, balance: () => wallet.getBalance(), baseStats: pickaxe.getSnapshot, commands: new PetCommands(service, publish), subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener); } });
   const unsubscribe = adapter.subscribe(() => { emissions++; assert.equal(adapter.getSnapshot().coins, wallet.getBalance()); });
   const first = adapter.getSnapshot(); publish(); assert.equal(emissions, 0); assert.equal(adapter.getSnapshot(), first);
   const result = adapter.hatch('meadow-egg'); assert.equal(emissions, 1);

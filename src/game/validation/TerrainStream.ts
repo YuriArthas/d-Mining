@@ -19,8 +19,8 @@ export class TerrainStream {
   error: string | null = null;
   private readonly physics: CharacterPhysics;
   private onExcavated: (resources: readonly ExcavatedCell[]) => void;
-  constructor(physics: CharacterPhysics, factory: WorkerFactory = () => new Worker(new URL('./terrain.worker.ts', import.meta.url), { type: 'module' }), onExcavated: (resources: readonly ExcavatedCell[]) => void = () => {}, generation: WorldGeneration = WORLD_GENERATION) {
-    this.world = new SparseWorld(generation);
+  constructor(physics: CharacterPhysics, factory: WorkerFactory = () => new Worker(new URL('./terrain.worker.ts', import.meta.url), { type: 'module' }), onExcavated: (resources: readonly ExcavatedCell[]) => void = () => {}, generation: WorldGeneration = WORLD_GENERATION, restoredWorld?: SparseWorld) {
+    this.world = restoredWorld ?? new SparseWorld(generation);
     this.onExcavated = onExcavated;
     this.physics = physics;
     this.render = new RenderTerrain(this.world, this.measurements, factory);

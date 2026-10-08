@@ -30,7 +30,7 @@ type PetUiPorts = {
   balance(): number;
   baseStats(): MiningStats;
   effectiveStats(): MiningStats;
-  publish(): void;
+  commands: Pick<PetUiApi, 'hatch' | 'equip' | 'unequip' | 'equipBest' | 'unequipAll'>;
   subscribe(listener: () => void): () => void;
 };
 
@@ -76,21 +76,9 @@ export class PetUiAdapter implements PetUiApi {
       if (next !== previous) { previous = next; listener(); }
     });
   };
-  hatch = (eggId: string) => {
-    const result = this.service.hatch(eggId);
-    if (result.status === 'hatched') this.ports.publish();
-    return result;
-  };
-  equip = (id: string) => {
-    const result = this.service.equip(id);
-    if (result.status === 'equipped') this.ports.publish();
-    return result;
-  };
-  unequip = (id: string) => this.publishChange(this.service.unequip(id));
-  equipBest = () => this.publishChange(this.service.equipBest());
-  unequipAll = () => this.publishChange(this.service.unequipAll());
-  private publishChange(changed: boolean) {
-    if (changed) this.ports.publish();
-    return changed;
-  }
+  hatch = (eggId: string) => this.ports.commands.hatch(eggId);
+  equip = (id: string) => this.ports.commands.equip(id);
+  unequip = (id: string) => this.ports.commands.unequip(id);
+  equipBest = () => this.ports.commands.equipBest();
+  unequipAll = () => this.ports.commands.unequipAll();
 }
