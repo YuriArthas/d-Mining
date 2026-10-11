@@ -1,3 +1,4 @@
+import {resourceByKind} from '../../src/game/content/resources.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {deriveFacility} from '../../src/game/world/deriveFacility.ts';
@@ -17,9 +18,9 @@ test('one translated and rotated facility descriptor aligns model, collider, lab
  assert.equal(moved.sign.at[0],moved.trigger.x);assert.equal(moved.ring.at[2],moved.trigger.z);
  const camp=createCampContent(),session=new GameSession({...camp.session,sales:[moved.trigger]});
  session.collected([{kind:5}]);session.updatePosition([26.7,0,30],true);
- assert.equal(session.getSnapshot().inventory.used,0);assert.equal(session.getSnapshot().coins,camp.session.initialCoins+40);
+ assert.equal(session.getSnapshot().inventory.used,0);assert.equal(session.getSnapshot().coins,camp.session.initialCoins+resourceByKind(5).price);
  session.collected([{kind:5}]);session.updatePosition([26.7,0,30],true);
- assert.equal(session.getSnapshot().coins,camp.session.initialCoins+40); // no second entry
+ assert.equal(session.getSnapshot().coins,camp.session.initialCoins+resourceByKind(5).price); // no second entry
  const swapped=deriveFacility({...SURFACE_FACILITIES.sale,model:{...SURFACE_FACILITIES.sale.model,asset:'simulator-upgrade'}});
  assert.deepEqual(swapped.trigger,deriveFacility(SURFACE_FACILITIES.sale).trigger);
 });
@@ -36,7 +37,7 @@ test('changed depth, theme and room dimensions agree across physics generation, 
  assert.equal(camp.hub.portals.find(p=>p.id==='fungal').depth,900);
  const session=new GameSession(camp.session),travel=[];
  session.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining(){},returnToSurface(){},travelTo:p=>travel.push(p)});
- session.updatePosition([80,-900,80],false);session.updatePosition([camp.session.home.x,0,camp.session.home.z],true);
+ session.updatePosition(room.spawn,false);session.updatePosition([camp.session.home.x,0,camp.session.home.z],true);
  assert.equal(session.travelTo('fungal'),'travelling');assert.deepEqual(travel,[room.spawn]);
 });
 test('adding a layer requires an explicit station, never a layer-name branch or index-based appearance',()=>{

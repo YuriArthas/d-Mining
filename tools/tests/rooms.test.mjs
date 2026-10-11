@@ -1,3 +1,4 @@
+import {resourceByKind} from '../../src/game/content/resources.ts';
 import {SESSION_CONTENT} from '../../src/game/world/sessionContent.ts';
 import { SURFACE_SHOP } from '../../src/game/world/surfaceLayout.ts';
 import assert from 'node:assert/strict';
@@ -38,17 +39,18 @@ function setup() {
  s.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{},travelTo:p=>calls.push(p)});
  return {s,calls};
 }
-test('outside room at milestone depth unlocks travel; only home may initiate it', () => {
+test('outside room does not unlock travel; room entry does, and only home may initiate it', () => {
  const {s,calls}=setup();s.updatePosition([90,-400,90],false);
+ assert.equal(s.getSnapshot().destinations[0].unlocked,false); s.updatePosition(ROOMS[0].spawn,true);
  assert.equal(s.getSnapshot().destinations[0].unlocked,true);assert.equal(s.getSnapshot().destinations[1].unlocked,false);
  assert.equal(s.travelTo('old_mine'),'away');s.updatePosition([HOME_ZONE.x,HOME_ZONE.y,HOME_ZONE.z],true);
  assert.equal(s.travelTo('fungal'),'locked');assert.equal(s.travelTo('unknown'),'locked');
  assert.equal(s.travelTo('old_mine'),'travelling');assert.deepEqual(calls,[ROOMS[0].spawn]);
  assert.equal(s.travelTo('old_mine'),'away');s.resetPosition();assert.equal(s.getSnapshot().destinations[0].unlocked,true);
 });
-test('standing at platform contact height reaches milestone without requiring room membership', () => {
+test('standing in room at contact height unlocks without reaching exact floor depth', () => {
  const {s}=setup();s.updatePosition([90,-399.973,90],false);assert.equal(s.getSnapshot().destinations[0].unlocked,false);
- s.updatePosition([90,-399.973,90],true);assert.equal(s.getSnapshot().destinations[0].unlocked,true);
+ s.updatePosition(ROOMS[0].spawn,true);assert.equal(s.getSnapshot().destinations[0].unlocked,true);
 });
 test('each underground sale zone sells once per entry; shops exit independently', () => {
  const {s}=setup();
@@ -60,7 +62,7 @@ test('each underground sale zone sells once per entry; shops exit independently'
  }
  const r=ROOMS[1];s.updatePosition([r.shop.x,r.shop.y,r.shop.z],true);assert.equal(s.getSnapshot().shopId,r.id);
  assert.equal(s.getSnapshot().inSellZone,false);s.updatePosition([r.x,-r.depth,r.z],true);assert.equal(s.getSnapshot().shopId,null);
- assert.equal(s.getSnapshot().coins,SESSION_CONTENT.initialCoins+40*ROOMS.length);
+ assert.equal(s.getSnapshot().coins,SESSION_CONTENT.initialCoins+resourceByKind(5).price*ROOMS.length);
 });
 
 test('surface upgrade kiosk reuses shop lifecycle and survives direct transfers between shops',()=>{

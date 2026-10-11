@@ -1,3 +1,4 @@
+import { PROGRESSION_VERSION } from '../content/progression.ts';
 import { GameSession } from "../application/GameSession.ts";
 import type { SessionContent } from "../application/SessionContent.ts";
 import { SparseWorld, type WorldGeneration } from "../terrain/SparseWorld.ts";
@@ -120,7 +121,7 @@ export function saveNamespace(
   return {
     name: testId
       ? `mining:acceptance:${testId}${samples ? ":samples" : ""}`
-      : `mining:${mode}${samples ? ":samples" : ""}`,
+      : `mining:${mode}:${PROGRESSION_VERSION}${samples ? ":samples" : ""}`,
     samples,
   };
 }

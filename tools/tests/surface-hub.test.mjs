@@ -21,7 +21,7 @@ test('locked pad gives one entry notice, never transports, and does not unlock i
  const before=events;for(let i=0;i<10;i++)s.updatePosition(feet(p),true);assert.equal(events,before);
 });
 test('unlocked pad travels without the home menu, only on grounded entry, once until leaving',()=>{
- const {s,calls}=setup(),p=SURFACE_PORTALS[0];s.updatePosition([90,-400,90],false);
+ const {s,calls}=setup(),p=SURFACE_PORTALS[0];s.updatePosition(ROOMS[0].spawn,true);
  s.updatePosition(feet(p),false);assert.equal(calls.length,0);
  s.updatePosition([p.zone.x,2,p.zone.z],true);assert.equal(calls.length,0);
  s.updatePosition(feet(p),true);assert.deepEqual(calls,[ROOMS[0].spawn]);
@@ -30,7 +30,7 @@ test('unlocked pad travels without the home menu, only on grounded entry, once u
  assert.equal(s.travelTo(SURFACE_PORTALS[1].id),'locked');
 });
 test('each pad uses its own destination rather than a shared fixed spawn',()=>{
- const {s,calls}=setup();s.updatePosition([90,-4000,90],false);
+ const {s,calls}=setup();ROOMS.forEach(r=>s.updatePosition(r.spawn,true));
  for(const [i,p] of SURFACE_PORTALS.entries()){
   s.updatePosition(feet(p),true);assert.deepEqual(calls[i],ROOMS[i].spawn);
   s.updatePosition(ROOMS[i].spawn,true);
@@ -45,11 +45,11 @@ test('landmark stands inside its own activation area with clearance for the play
  const corner=Math.hypot(PORTAL_MODEL.width/2,PORTAL_MODEL.depth/2);
  for(const p of SURFACE_PORTALS){assert.equal(p.x,p.zone.x);assert.equal(p.z,p.zone.z);assert.ok(p.zone.radius>corner);assert.ok(p.zone.radius>PORTAL_MODEL.depth/2+.4);}
 });
-test('eighteen eggs occupy three supported ascending tiers with separate browsing aisles',async()=>{
+test('sixteen progression eggs occupy three supported ascending tiers with separate browsing aisles',async()=>{
  const {PET_DISPLAYS,PET_AREA,HUB_PLACEMENTS}=await import('../../src/game/world/SurfaceHub.ts');
  const {PET_TIERS,PET_TERRACE_SOLIDS}=await import('../../src/game/world/PetTerraces.ts');
- assert.equal(PET_DISPLAYS.length,18);
- assert.deepEqual(PET_TIERS.map(t=>PET_DISPLAYS.filter(p=>p.tier===t.tier).length),[6,6,6]);
+ assert.equal(PET_DISPLAYS.length,16);
+ assert.deepEqual(PET_TIERS.map(t=>PET_DISPLAYS.filter(p=>p.tier===t.tier).length),[6,4,6]);
  const eggs=HUB_PLACEMENTS.filter(p=>p.asset.startsWith('egg-'));
  for(const [i,p] of eggs.entries()){
   assert.ok(p.x-p.width/2>PET_AREA.minX&&p.x+p.width/2<PET_AREA.maxX);
@@ -71,7 +71,7 @@ test('decorations do not occupy the pet court, portal court or central approach'
 });
 
 test('approved left portal lane stays clear, including hysteresis and player radius',()=>{
- const {s,calls}=setup();s.updatePosition([90,-4000,90],false);
+ const {s,calls}=setup();ROOMS.forEach(r=>s.updatePosition(r.spawn,true));
  for(let z=14;z<=50;z+=.5)for(const x of [-24,-22,-20]){
   for(const p of SURFACE_PORTALS)assert.ok(Math.hypot(x-p.x,z-p.z)>p.zone.radius+p.zone.hysteresis+.4);
   s.updatePosition([x,0,z],true);

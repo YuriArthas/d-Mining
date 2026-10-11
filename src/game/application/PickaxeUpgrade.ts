@@ -1,9 +1,9 @@
+import { upgradePrice } from '../content/progression.ts';
 import { pickaxeStats, type Pickaxe } from '../logic/Pickaxe.ts';
 import type { Wallet } from '../logic/Wallet.ts';
-export const PICKAXE_PRICES = Object.freeze({ first: 5, perLevel: 2 });
 export function pickaxeOffer(level: number, coins: number) {
   // No gameplay level cap; only refuse values outside JavaScript safe integers.
-  const price = PICKAXE_PRICES.first + (level - 1) * PICKAXE_PRICES.perLevel;
+  const price = upgradePrice(level);
   let next: ReturnType<typeof pickaxeStats> | null = null;
   if (Number.isSafeInteger(price)) {
     try { next = pickaxeStats(level + 1); } catch { /* Numeric representation limit. */ }

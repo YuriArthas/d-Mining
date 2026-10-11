@@ -74,6 +74,8 @@ export class GameSession {
     maximum: number;
     volume: number;
     price: number;
+    requiredLevel: number;
+    locked: boolean;
   }> | null = null;
   private lastHit = 0;
   private clock: () => number;
@@ -94,6 +96,7 @@ export class GameSession {
     const petService = new PetService({
       content: content.petContent ?? { pets: [], eggs: [], equipSlots: 3 },
       wallet: this.wallet,
+      hasDestination: (id) => this.exploration.has(id),
       random: petDependencies.random ?? Math.random,
       createPetId: petDependencies.createPetId ?? (() => crypto.randomUUID()),
     });
@@ -130,10 +133,11 @@ export class GameSession {
     this.combat = new MiningCombat({
       isFull: () => this.inventory.isFull(),
       stats: this.miningAttributes.getSnapshot,
+      level: () => this.pickaxe.getSnapshot().level,
       read: (cell) => {
         const kind = this.mineableKind(cell);
         return kind
-          ? { key: cell.join(","), maximum: oreDefinition(kind).maxHp }
+          ? { key: cell.join(","), maximum: oreDefinition(kind).maxHp, requiredLevel: oreDefinition(kind).requiredLevel }
           : null;
       },
       pending: (cell) => this.world?.pending(cell) ?? false,
@@ -205,7 +209,8 @@ export class GameSession {
       this.targetView = null;
       return true;
     }
-    if (this.targetView?.key === key && this.targetView.hp === hp) return false;
+    const requiredLevel = item.requiredLevel ?? 0, locked = this.pickaxe.getSnapshot().level < requiredLevel;
+    if (this.targetView?.key === key && this.targetView.hp === hp && this.targetView.locked === locked) return false;
     this.targetView = Object.freeze({
       key,
       name: item.name,
@@ -213,6 +218,7 @@ export class GameSession {
       maximum: item.maxHp,
       volume: item.volume,
       price: item.price,
+      requiredLevel, locked,
     });
     return true;
   }
@@ -228,6 +234,9 @@ export class GameSession {
       this.notice = "";
       this.refreshTarget();
       this.publish();
+    } else if (result.status === 'locked') {
+      const text = `需要 Lv.${result.requiredLevel} 镐子`;
+      if (this.notice !== text) { this.notice = text; this.publish(); }
     } else if (
       result.status === "full" &&
       this.notice !== "背包已满，前往售卖点出售"
@@ -283,6 +292,7 @@ export class GameSession {
     if (result.status === "upgraded") {
       this.committed(true);
       this.notice = `镐子提升至 Lv.${result.level}`;
+      this.refreshTarget();
       this.publish();
     }
     return result;
@@ -308,9 +318,13 @@ export class GameSession {
     // Rapier leaves a small contact skin above a floor. Count standing on the
     // milestone floor as reaching it; airborne depth has no such tolerance.
     const oldMaximum = this.exploration.maxDepth;
-    const added = this.exploration.visit(
-      Math.max(0, -feet[1] + (grounded ? 0.04 : 0)),
-    );
+    const bounded = this.content.destinations.some(d => d.roomBounds);
+    const enteredRooms = bounded ? this.content.destinations.filter(d => {
+      const b = d.roomBounds;
+      return b && feet[0] >= b.minX && feet[0] < b.maxX && feet[2] >= b.minZ && feet[2] < b.maxZ
+        && feet[1] >= b.floor - .04 && feet[1] < b.ceiling;
+    }).map(d => d.id) : undefined;
+    const added = this.exploration.visit(Math.max(0, -feet[1] + (grounded ? .04 : 0)), enteredRooms);
     if (this.exploration.maxDepth !== oldMaximum || added.length) this.committed(added.length > 0);
     if (added.length) {
       this.notice = `已解锁 ${this.content.destinations.find((r) => r.id === added.at(-1))!.name}，可回家传送`;

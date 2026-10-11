@@ -11,9 +11,10 @@ import { PetUiAdapter } from '../../src/game/application/PetUiAdapter.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
 import { Wallet } from '../../src/game/logic/Wallet.ts';
 import { Pickaxe } from '../../src/game/logic/Pickaxe.ts';
-import { PET_CONTENT } from '../../src/game/content/pets.ts';
-import { SESSION_CONTENT } from '../../src/game/world/sessionContent.ts';
+import { PET_CONTENT } from './fixtures/pets.ts';
+import { SESSION_CONTENT as LIVE_SESSION_CONTENT } from '../../src/game/world/sessionContent.ts';
 
+const SESSION_CONTENT = {...LIVE_SESSION_CONTENT, initialCoins:200, petContent:PET_CONTENT};
 const pet = (id, speciesId = 'moss-slime') => ({ id, speciesId, level: 1 });
 const setup = (coins = 100, overrides = {}) => {
   const wallet = new Wallet(coins); let serial = 0;
@@ -203,7 +204,7 @@ test('egg proximity derives from display configuration and clears on leaving or 
 });
 
 
-test('a new game starts with 200 coins once, independent from UI subscriptions and egg visits', () => {
+test('explicit fixture starting coins are granted once, independent from UI subscriptions and egg visits', () => {
   const session = new GameSession(SESSION_CONTENT);
   assert.equal(session.getSnapshot().coins, 200);
   const result = session.pets.hatch('meadow-egg');

@@ -1,3 +1,4 @@
+import { formatNumber as number } from '../../presentation/formatNumber.ts';
 import { useState, useSyncExternalStore } from 'react';
 import type { PetUiApi } from '../../application/PetUiAdapter.ts';
 import type { HatchResult } from '../../application/PetService.ts';
@@ -26,7 +27,7 @@ export function EggPanel({ api, eggId, onClose, onOpenPets }: { api: PetUiApi; e
         const settled = api.hatch(egg.id);
         if (settled.status === 'hatched') { setResult(settled); setMessage(''); }
         else setMessage(settled.status === 'insufficient-coins' ? '金币不足' : '这个蛋池暂不可用');
-      }}>{egg.canAfford ? `${egg.price} 金币 · 开一个` : `还差 ${egg.price - state.coins} 金币`}</GameButton>
+      }}>{!egg.unlocked ? `抵达${egg.unlockName}后解锁` : egg.canAfford ? `${number(egg.price)} 金币 · 开一个` : `还差 ${number(egg.price - state.coins)} 金币`}</GameButton>
       {message && <output role="status" className="egg-message">{message}</output>}
     </> : <p>这个蛋池暂不可用</p>}
   </PetDialog>;

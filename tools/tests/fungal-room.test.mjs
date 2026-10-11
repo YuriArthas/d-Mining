@@ -25,6 +25,7 @@ test('fungal room uses its own complete kit, functional zones, and clear vertica
  }finally{disposeScenery(view);}
  const session=new GameSession(withInitialAccess(camp.session)),moves=[];
  session.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining(){},returnToSurface(){},travelTo:p=>moves.push(p)});
+ session.updatePosition(room.spawn,true);
  const zone=camp.session.portals.find(p=>p.id==='fungal').zone;
  session.updatePosition([zone.x,zone.y,zone.z],true);
  assert.deepEqual(moves,[room.spawn]);

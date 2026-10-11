@@ -23,7 +23,7 @@ export function sessionContentFor(
   for (const portal of portals)
     if (!ids.has(portal.id)) throw Error("未知传送目的地: " + portal.id);
   return {
-    initialCoins: 200,
+    initialCoins: 0,
     petContent: PET_CONTENT,
     eggStations: PET_DISPLAYS.map(display => ({
       id: display.id,
@@ -31,7 +31,11 @@ export function sessionContentFor(
       promptAnchor: [display.x, display.y + 4.85, display.z] as const,
       zone: { x: display.x - 2, y: display.y, z: display.z, radius: 1.3, heightTolerance: .35, hysteresis: .3 },
     })),
-    destinations: rooms,
+    destinations: rooms.map(room => ({...room, roomBounds: {
+      minX: room.x - room.layout.widthCells, maxX: room.x + room.layout.widthCells,
+      minZ: room.z - room.layout.depthCells, maxZ: room.z + room.layout.depthCells,
+      floor: -room.depth, ceiling: -room.depth + room.layout.heightCells * 2,
+    }})),
     sales: [surface.sale, ...rooms.map((r) => r.sell)],
     shops: [
       { id: "surface-upgrade", zone: surface.shop },

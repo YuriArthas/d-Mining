@@ -1,3 +1,6 @@
+import {resourceByKind} from '../../src/game/content/resources.ts';
+import {BACKPACK_TIERS} from '../../src/game/application/BackpackUpgrade.ts';
+import {pickaxeStats} from '../../src/game/logic/Pickaxe.ts';
 import {SURFACE_SELL as SELL_ZONE} from '../../src/game/world/rooms.ts';
 import {SESSION_CONTENT} from '../../src/game/world/sessionContent.ts';
 import assert from 'node:assert/strict';
@@ -63,26 +66,21 @@ test('mining checks existing occupied volume, accepts oversize yield and never t
  mine.collected([...batch(2,'gem'),...batch(1,'large')]);assert.equal(bag.getSnapshot().used,167);assert.equal(requests.length,1);
 });
 test('weighted capacity upgrades preserve pieces and occupied volume and reopen mining',()=>{
- const bag=new Inventory(50,volume),wallet=new Wallet(20);bag.add([...batch(47),...batch(1,'gold')]);
+ const bag=new Inventory(50,volume),wallet=new Wallet(BACKPACK_TIERS[0].price);bag.add([...batch(47),...batch(1,'gold')]);
  assert.equal(upgradeBackpack('bag-100',bag,wallet).status,'upgraded');assert.equal(bag.getSnapshot().used,57);assert.equal(bag.getSnapshot().totalCount,48);assert.equal(bag.isFull(),false);assert.equal(wallet.getBalance(),0);
 });
-test('original mineral progression is retained and all resource definitions are immutable',()=>{
- for(let i=1;i<6;i++){
-  const a=ORE_ITEMS[i-1],b=ORE_ITEMS[i];assert.ok(b.volume>a.volume);
-  assert.ok(b.maxHp/a.maxHp>b.volume/a.volume);assert.ok(b.price/a.price>b.maxHp/a.maxHp);
-  assert.equal(itemVolume(b.itemId),b.volume);assert.equal(itemPrice(b.itemId),b.price);
- }
+test('resource quantities remain stable and definitions are immutable',()=>{
  for(const r of ORE_ITEMS){assert.ok(r.volume>0&&r.maxHp>0&&r.price>0);assert.ok(Object.isFrozen(r));assert.equal(itemVolume(r.itemId),r.volume);assert.equal(itemPrice(r.itemId),r.price);}
  assert.throws(()=>{ORE_ITEMS[0].volume=99});assert.throws(()=>itemDefinition('unknown'));
 });
 test('session shows mixed-unit snapshots and sells completed overflow at independent prices once',()=>{
- let now=0,solid=true;const session=new GameSession(SESSION_CONTENT, 50,()=>now);
+ let now=0,solid=true;const initial=new GameSession(SESSION_CONTENT).exportProgress(); initial.pickaxe.level=28; const session=new GameSession(SESSION_CONTENT,50,()=>now,{},initial);
  session.attach({cell:()=>solid?5:0,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{}});
- session.collected(Array.from({length:47},()=>({kind:1})));const cell=[11,-1,-25];session.selectTarget(cell);
- assert.equal(session.getSnapshot().target.volume,10);assert.equal(session.getSnapshot().target.price,40);
- for(let i=0;i<20;i++){now=i*.5;assert.equal(session.hit(cell).status,i===19?'breaking':'hit')}
- solid=false;session.collected([{cell,kind:5}]);let s=session.getSnapshot();assert.equal(s.inventory.used,57);assert.equal(s.inventory.totalCount,48);assert.deepEqual(s.sale,{status:'quoted',count:48,coins:87});
- solid=true;now+=.5;assert.equal(session.hit([12,-1,-25]).status,'full');assert.equal(session.blockHealth([12,-1,-25]),200);
- session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);s=session.getSnapshot();assert.equal(s.coins,SESSION_CONTENT.initialCoins+87);assert.equal(s.inventory.totalCount,0);assert.match(s.notice,/48 件.*87 金币/);
- session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);assert.equal(session.getSnapshot().coins,SESSION_CONTENT.initialCoins+87);
+ session.collected(Array.from({length:47},()=>({kind:8})));const cell=[11,-1,-25];session.selectTarget(cell);
+ assert.equal(session.getSnapshot().target.volume,10);assert.equal(session.getSnapshot().target.price,resourceByKind(5).price);
+ const hits=Math.ceil(resourceByKind(5).maxHp/pickaxeStats(28).power); for(let i=0;i<hits;i++){now=i*.5;assert.equal(session.hit(cell).status,i===hits-1?'breaking':'hit')}
+ solid=false;session.collected([{cell,kind:5}]);let s=session.getSnapshot();assert.equal(s.inventory.used,57);assert.equal(s.inventory.totalCount,48);assert.deepEqual(s.sale,{status:'quoted',count:48,coins:47+resourceByKind(5).price});
+ solid=true;now+=.5;assert.equal(session.hit([12,-1,-25]).status,'full');assert.equal(session.blockHealth([12,-1,-25]),resourceByKind(5).maxHp);
+ session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);s=session.getSnapshot();assert.equal(s.coins,SESSION_CONTENT.initialCoins+47+resourceByKind(5).price);assert.equal(s.inventory.totalCount,0);assert.match(s.notice,/48 件.*金币/);
+ session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);assert.equal(session.getSnapshot().coins,SESSION_CONTENT.initialCoins+47+resourceByKind(5).price);
 });

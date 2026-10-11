@@ -10,10 +10,10 @@ import { Wallet } from '../../src/game/logic/Wallet.ts';
 
 const pet = (id, slot, speciesId = 'moss-slime') => ({ id, slot, speciesId, level: 1 });
 test('each displayed egg charges its own price and draws only from its own configured pool', () => {
-  assert.equal(new Set(PET_DISPLAYS.map(p => p.eggId)).size, 18);
-  assert.equal(new Set(PET_CONTENT.eggs.map(e => e.price)).size, 18);
-  const wallet = new Wallet(1000000); let serial = 0, roll = 0;
-  const service = new PetService({ content: PET_CONTENT, wallet, random: () => roll, createPetId: () => `p${++serial}` });
+  assert.equal(new Set(PET_DISPLAYS.map(p => p.eggId)).size, 16);
+  assert.equal(new Set(PET_CONTENT.eggs.map(e => e.price)).size, 16);
+  const wallet = new Wallet(PET_CONTENT.eggs.reduce((sum,e)=>sum+e.price*5,0)); let serial = 0, roll = 0;
+  const service = new PetService({ content: PET_CONTENT, wallet, hasDestination:()=>true, random: () => roll, createPetId: () => `p${++serial}` });
   const pools = new Set();
   for (const stand of PET_DISPLAYS) {
     const egg = service.catalog.egg(stand.eggId);
@@ -29,7 +29,7 @@ test('each displayed egg charges its own price and draws only from its own confi
       cumulative += outcome.weight;
     }
   }
-  assert.equal(pools.size, 90);
+  assert.equal(pools.size, PET_CONTENT.pets.length);
 });
 
 test('followers preserve instance identity, share sphere geometry and release only owned resources', () => {

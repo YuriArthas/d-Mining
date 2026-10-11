@@ -1,3 +1,4 @@
+import { formatNumber } from './formatNumber.ts';
 import { Box3, Float32BufferAttribute, Group, Mesh, MeshBasicMaterial, Sphere, Vector3, type BufferGeometry } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { createWorldText } from './WorldText.ts';
@@ -25,7 +26,7 @@ export class EggStandLabels {
           const offer = offers.find(offer => offer.id === stand.eggId);
           if (!offer) throw Error(`蛋台缺少文字配置: ${stand.eggId}`);
           template = createWorldText({
-            at: [0, 0, 0], width: 2.1, title: offer.name, subtitle: `${offer.price} 金币`, color: '#fff4b8', background: '#20384d',
+            at: [0, 0, 0], width: 2.1, title: offer.name, subtitle: `${formatNumber(offer.price)} 金币`, color: '#fff4b8', background: '#20384d',
           }, { bevel: false });
           templates.set(offer.id, template);
         }

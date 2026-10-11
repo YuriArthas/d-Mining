@@ -1,0 +1,35 @@
+// Public desktop integration checks. Teleports and saved fixtures are controlled
+// probes; this does not establish natural travel times or long-play acceptance.
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE || '../../d-Block-Blast/node_modules/playwright');
+const fs=require('node:fs/promises'),assert=require('node:assert/strict');
+(async()=>{
+ const dir=require('node:path').resolve(__dirname,'../artifacts/progression');await fs.mkdir(dir,{recursive:true});
+ const base='https://w-sunjun-public.dev.clock-p.com/games/mining-test/index.html',id='progression-'+Date.now();
+ const browser=await chromium.launch({headless:true,args:['--no-sandbox','--disable-quic','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+ const page=await browser.newPage({viewport:{width:1280,height:800}});page.setDefaultTimeout(60000);
+ const report={url:base,checks:[],errors:[]};page.on('pageerror',e=>report.errors.push(e.message));
+ const snap=()=>page.evaluate(()=>window.__miningValidation.snapshot());
+ const ready=()=>page.waitForFunction(()=>window.__miningValidation?.snapshot().ready&&!document.querySelector('.loading-screen'),null,{timeout:180000});
+ const diagnostic=()=>page.evaluate(()=>{window.__miningValidation.performance({submission:'fenced',framesInFlight:1});const gl=document.querySelector('canvas').getContext('webgl2');setInterval(()=>gl.flush(),100);});
+ const go=async url=>{console.log('Opening',url);await page.goto(url,{waitUntil:'domcontentloaded'});try{await ready();}catch(e){console.log('LOAD FAILURE',await page.locator('body').innerText());throw e;}await diagnostic();console.log('Ready');};
+ const travel=async pos=>{await page.evaluate(p=>window.__miningValidation.teleport(p),pos);await ready();};
+ const check=t=>{report.checks.push(t);console.log(t);};
+ const openEgg=async eggId=>{const l=(await snap()).eggLabels.labels.find(l=>l.eggId===eggId);await travel([l.x-2,l.y,l.z]);await page.waitForFunction(id=>window.__miningValidation.snapshot().economy.eggId===id,eggId);await page.getByRole('button',{name:'查看宠物蛋'}).click();};
+ try{
+ await go(`${base}?debug=1&saveTest=${id}`);let s=await snap();assert.equal(s.economy.coins,0);assert(s.economy.destinations.every(d=>!d.unlocked));assert.equal(s.eggLabels.labelCount,16);const deepHit=await page.evaluate(()=>window.__miningValidation.hit([0,-145,0]));assert.equal(deepHit.status,'hit');assert.equal(deepHit.damage,10);check('Fresh game: zero coins, nine locked rooms, sixteen permanent egg labels');
+ await page.screenshot({path:dir+'/surface.png',timeout:60000});
+ const cells=await page.evaluate(()=>{const a=[];for(let y=-5;y>-15;y--)for(let x=-3;x<4;x++)for(let z=-3;z<4;z++)if(window.__miningValidation.cell([x,y,z])===8)a.push([x,y,z]);return a.slice(0,3);});assert.equal(cells.length,3);
+ for(const c of cells){await page.waitForTimeout(600);const hit=await page.evaluate(c=>window.__miningValidation.hit(c),c);assert.equal(hit.status,'breaking');await page.waitForFunction(c=>window.__miningValidation.cell(c)===0,c);}
+ assert.equal((await snap()).economy.inventory.totalCount,3);const sale=(await snap()).sellZone;await travel([sale.x,sale.y,sale.z]);await page.waitForFunction(()=>window.__miningValidation.snapshot().economy.coins===3);check('Real hit/terrain receipt/surface sale awards three coins (debug targeted cells)');
+ await openEgg('pebble-egg');assert.match(await page.locator('.egg-buy').innerText(),/老矿井/);assert(await page.locator('.egg-buy').isDisabled());assert.equal(await page.locator('.egg-probability').count(),5);await page.screenshot({path:dir+'/locked-egg.png',timeout:60000});await page.keyboard.press('Escape');check('Locked egg shows room requirement and five probabilities');
+ const room=(await snap()).content.rooms[0];await travel(room.spawn);await page.waitForFunction(()=>window.__miningValidation.snapshot().economy.destinations[0].unlocked);assert.equal((await snap()).economy.coins,3);assert((await snap()).pets.eggs.find(e=>e.id==='pebble-egg').unlocked);check('Entering actual room unlocks its egg without coin reward (controlled teleport)');
+ await page.evaluate(()=>window.__miningSave.flush());await page.reload({waitUntil:'domcontentloaded'});await ready();await diagnostic();s=await snap();assert.equal(s.economy.coins,3);assert(s.economy.destinations[0].unlocked);assert.equal(await page.evaluate(c=>window.__miningValidation.cell(c),cells[0]),0);check('Reload restores coins, room access and excavated terrain');
+ console.log('Preparing funded fixture');
+ // Separate funded fixture tests UI commands without claiming earned progression.
+ await page.evaluate(async id=>{const progress=structuredClone(window.__miningSave.progress());progress.wallet.coins=1e9;progress.pickaxe.level=7;const store=await window.__miningSave.openTestStore(id);await store.commit({expectedRevision:null,head:{formatVersion:1,revision:1,savedAt:Date.now(),regionCount:0,world:{generationVersion:9,seed:0,regionEncoding:1}},progress,regions:[]});store.close();},id);
+ console.log('Fixture saved');await go(`${base}?debug=1&saveTest=store-${id}`);assert.equal((await snap()).economy.pickaxe.level,7);const silver=await page.evaluate(()=>{for(let y=-202;y>-220;y--)for(let x=-3;x<4;x++)for(let z=-3;z<4;z++)if(window.__miningValidation.cell([x,y,z])===17)return [x,y,z];});assert(silver);assert.deepEqual(await page.evaluate(c=>window.__miningValidation.hit(c),silver),{status:'locked',requiredLevel:8});check('Public silver ore rejects level7 pickaxe');await openEgg('meadow-egg');await page.locator('.egg-buy').click();await page.getByRole('button',{name:'去装备',exact:true}).click();await page.getByRole('button',{name:'一键最佳',exact:true}).click();assert((await snap()).pets.effectiveStats.power>(await snap()).pets.baseStats.power);await page.keyboard.press('Escape');check('Funded fixture: real hatch and equip buttons increase mining power');
+ await page.getByRole('button',{name:'升级',exact:true}).click();await page.screenshot({path:dir+'/upgrade.png',timeout:60000});await page.getByRole('button',{name:/花费 .* 金币升级/}).first().click();assert.equal((await snap()).economy.pickaxe.level,8);await page.getByRole('button',{name:'关闭升级界面',exact:true}).click();check('Funded fixture: upgrade button consumes coins and raises pickaxe level');const oreHit=await page.evaluate(c=>window.__miningValidation.hit(c),silver);assert.equal(oreHit.status,'hit');check('Public silver ore accepts level8 pickaxe');await page.getByRole('button',{name:'升级',exact:true}).click();for(let l=8;l<21;l++)await page.locator('.upgrade-buy').click();const stats=(await snap()).economy.pickaxe;assert.equal(stats.level,21);assert.equal(stats.speed,16);assert.equal(stats.power,220);assert.equal(stats.overflowPower,110);await page.screenshot({path:dir+'/speed-cap.png',timeout:60000});check('Public upgrade UI reaches level21: speed16, power220, overflow110');
+ assert.deepEqual(report.errors,[]);
+ }catch(e){report.failure=String(e);report.snapshot=await snap().catch(()=>null);throw e;}
+ finally{await fs.writeFile(dir+'/public-report.json',JSON.stringify(report,null,2));await browser.close();}
+})().catch(e=>{console.error(e);process.exitCode=1});

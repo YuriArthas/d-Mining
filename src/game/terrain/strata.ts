@@ -1,3 +1,4 @@
+import { STAGES } from '../content/progression.ts';
 import { CELL } from './grid.ts';
 import { LAYERS, layerAtDepth, type Layer } from '../content/layers.ts';
 import {oreChanceAtDepth} from '../content/oreDistribution.ts';
@@ -12,6 +13,8 @@ export function mineralRoll(x:number,y:number,z:number,seed:number){
 }
 export function generatedMineral(x: number, y: number, z: number, seed: number, layers: readonly Layer[] = LAYERS) {
  const depth=-(y+1)*CELL,layer=layerAtDepth(depth,layers);
+ const stage = STAGES[layers.indexOf(layer)];
+ if (stage && depth - layer.from >= stage.deepAt) return stage.deepKind;
  const roll=mineralRoll(x,y,z,seed),chance=oreChanceAtDepth(depth);
  if(roll>=chance||!layer.ores.length)return layer.base;
  let total=weightTotals.get(layer);

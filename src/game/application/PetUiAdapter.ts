@@ -5,7 +5,7 @@ export type PetCardView = Readonly<{
   pet: PetInstance; name: string; rarity: PetRarity; powerBonusBps: number; equippedSlot: number | null;
 }>;
 export type EggOfferView = Readonly<{
-  id: string; name: string; price: number; canAfford: boolean;
+  id: string; name: string; price: number; canAfford: boolean; unlocked: boolean; unlockName?: string;
   outcomes: readonly Readonly<{ speciesId: string; name: string; rarity: PetRarity; probability: number; powerBonusBps: number }>[];
 }>;
 export type PetPanelSnapshot = Readonly<{
@@ -40,6 +40,7 @@ export class PetUiAdapter implements PetUiApi {
   private inventory;
   private equipment;
   private snapshot: PetPanelSnapshot | null = null;
+  private accessKey = "";
 
   constructor(service: PetService, ports: PetUiPorts) {
     this.service = service; this.ports = ports;
@@ -48,23 +49,25 @@ export class PetUiAdapter implements PetUiApi {
   getSnapshot = (): PetPanelSnapshot => {
     const inventory = this.service.getInventory(), equipment = this.service.getEquipment();
     const coins = this.ports.balance(), baseStats = this.ports.baseStats(), previous = this.snapshot;
-    if (previous && inventory === this.inventory && equipment === this.equipment && previous.coins === coins && previous.baseStats === baseStats) return previous;
+    const accessKey = this.service.catalog.content.eggs.map(egg => this.service.isUnlocked(egg.id) ? "1" : "0").join("");
+    if (previous && this.accessKey === accessKey && inventory === this.inventory && equipment === this.equipment && previous.coins === coins && previous.baseStats === baseStats) return previous;
     const catalog = this.service.catalog;
     const equippedSlots = new Map(equipment.slots.map((id, slot) => [id, slot]));
     const pets = previous && inventory === this.inventory && equipment === this.equipment ? previous.pets : Object.freeze(inventory.pets.map(pet => {
       const definition = catalog.pet(pet.speciesId);
       return Object.freeze({ pet, name: definition.name, rarity: definition.rarity, powerBonusBps: definition.powerBonusBps, equippedSlot: equippedSlots.get(pet.id) ?? null });
     }));
-    const eggs = previous?.coins === coins ? previous.eggs : Object.freeze(catalog.content.eggs.map(egg => {
+    const eggs = previous?.coins === coins && this.accessKey === accessKey ? previous.eggs : Object.freeze(catalog.content.eggs.map(egg => {
       const total = egg.outcomes.reduce((sum, outcome) => sum + outcome.weight, 0);
       return Object.freeze({
-        id: egg.id, name: egg.name, price: egg.price, canAfford: coins >= egg.price,
+        id: egg.id, name: egg.name, price: egg.price, canAfford: this.service.isUnlocked(egg.id) && coins >= egg.price, unlocked: this.service.isUnlocked(egg.id), unlockName: egg.unlockName,
         outcomes: Object.freeze(egg.outcomes.map(outcome => {
           const pet = catalog.pet(outcome.speciesId);
           return Object.freeze({ speciesId: pet.id, name: pet.name, rarity: pet.rarity, probability: outcome.weight / total, powerBonusBps: pet.powerBonusBps });
         })),
       });
     }));
+    this.accessKey = accessKey;
     this.inventory = inventory; this.equipment = equipment;
     return this.snapshot = Object.freeze({ coins, pets, slots: equipment.slots, bonus: this.service.getBonus(), baseStats, effectiveStats: this.ports.effectiveStats(), eggs });
   };

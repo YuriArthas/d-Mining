@@ -12,6 +12,8 @@ export type EggDefinition = Readonly<{
   id: EggId;
   name: string;
   price: number;
+  requiredDestination?: string;
+  unlockName?: string;
   outcomes: readonly Readonly<{ speciesId: PetSpeciesId; weight: number }>[];
 }>;
 export type PetContent = Readonly<{

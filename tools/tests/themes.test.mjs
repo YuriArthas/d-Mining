@@ -1,3 +1,4 @@
+import {STAGES} from '../../src/game/content/progression.ts';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { RESOURCES, resourceByKind } from '../../src/game/content/resources.ts';
@@ -14,10 +15,10 @@ import { Wallet } from '../../src/game/logic/Wallet.ts';
 import { oreDrops, itemVolume, itemPrice } from '../../src/game/application/items.ts';
 import { sellAll } from '../../src/game/application/Sale.ts';
 
-test('ten reusable themes and thirty unique resources are all used; fixed floor is not an item',()=>{
- assert.equal(THEMES.length,10);assert.equal(RESOURCES.length,30);assert.equal(RESOURCES.filter(r=>r.base).length,10);
- assert.equal(new Set(RESOURCES.map(r=>r.itemId)).size,30);assert.equal(new Set(RESOURCES.map(r=>r.kind)).size,30);
- const used=new Set(LAYERS.flatMap(l=>[l.base,...l.ores.map(o=>o.kind)]));assert.deepEqual(used,new Set(RESOURCES.map(r=>r.kind)));
+test('ten reusable themes and forty unique resources are all used; fixed floor is not an item',()=>{
+ assert.equal(THEMES.length,10);assert.equal(RESOURCES.length,40);assert.equal(RESOURCES.filter(r=>r.base).length,20);
+ assert.equal(new Set(RESOURCES.map(r=>r.itemId)).size,40);assert.equal(new Set(RESOURCES.map(r=>r.kind)).size,40);
+ const used=new Set(LAYERS.flatMap((l,i)=>[l.base,STAGES[i].deepKind,...l.ores.map(o=>o.kind)]));assert.deepEqual(used,new Set(RESOURCES.map(r=>r.kind)));
  assert.throws(()=>resourceByKind(7));assert.throws(()=>validateLayers([]));
  assert.throws(()=>validateLayers(LAYERS.map((l,i)=>i===2?{...l,from:401}:l)));
  assert.throws(()=>validateLayers(LAYERS.map((l,i)=>i===2?{...l,theme:'missing'}:l)));
@@ -45,7 +46,7 @@ test('visual floor themes split independently while collision remains identical'
 });
 test('every resource flows through the same unrestricted inventory and sale APIs',()=>{
  const bag=new Inventory(1,itemVolume),wallet=new Wallet();
- bag.add(oreDrops(RESOURCES));assert.equal(bag.getSnapshot().totalCount,30);assert.ok(bag.isFull());
+ bag.add(oreDrops(RESOURCES));assert.equal(bag.getSnapshot().totalCount,40);assert.ok(bag.isFull());
  const expected=RESOURCES.reduce((n,r)=>n+r.price,0);assert.equal(sellAll(bag,wallet,itemPrice).coins,expected);assert.equal(wallet.getBalance(),expected);assert.equal(bag.getSnapshot().used,0);
 });
 test('scene plans have finite geometry and keep landing and service centers out of ordinary solids',()=>{

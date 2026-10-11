@@ -94,12 +94,12 @@ test('combat damage survives streaming; actual removal alone awards and clears H
  const f=setup(resources=>{receipts.push(resources);session.collected(resources)}),s=f.stream;
  session.attach({cell:c=>s.cell(c),pending:c=>s.pending(c),mine:cs=>s.mineMany(cs),cancelMining:()=>s.cancelPending(),returnToSurface:()=>{}});
  try{
-  drain(s,f.workers);const c=[8,-1,-25];assert.equal(session.blockHealth(c),90);
+  drain(s,f.workers);const c=[8,-1,-25];assert.equal(session.blockHealth(c),30);
   const before=s.snapshot();assert.equal(session.hit(c).status,'hit');drain(s,f.workers);
-  assert.equal(session.blockHealth(c),80);assert.equal(s.snapshot().revision,before.revision);assert.equal(receipts.length,0);
-  s.relocate([0,-1999.9,0]);drain(s,f.workers);assert.equal(session.blockHealth(c),80);
-  s.relocate([17,.1,-47]);drain(s,f.workers);for(let i=1;i<8;i++){now=i*.5;assert.equal(session.hit(c).status,'hit')}
-  now=4;assert.equal(session.hit(c).status,'breaking');s.process();
+  assert.equal(session.blockHealth(c),20);assert.equal(s.snapshot().revision,before.revision);assert.equal(receipts.length,0);
+  s.relocate([0,-1999.9,0]);drain(s,f.workers);assert.equal(session.blockHealth(c),20);
+  s.relocate([17,.1,-47]);drain(s,f.workers);for(let i=1;i<2;i++){now=i*.5;assert.equal(session.hit(c).status,'hit')}
+  now=1;assert.equal(session.hit(c).status,'breaking');s.process();
   // An independent completed collection fills the bag while this destruction is prepared.
   session.collected([{kind:1}]);
   for(let i=0;i<10;i++){f.workers[1].flush();s.process();}
@@ -110,7 +110,7 @@ test('combat damage survives streaming; actual removal alone awards and clears H
 });
 test('cancelled lethal strike keeps sparse damage and retries without duplicate rewards',async()=>{
  const {GameSession}=await import('../../src/game/application/GameSession.ts');
- let now=0;const session=new GameSession(SESSION_CONTENT, 50,()=>now),receipts=[];
+ let now=0;const initial=new GameSession(SESSION_CONTENT).exportProgress();initial.pickaxe.level=31;const session=new GameSession(SESSION_CONTENT,50,()=>now,{},initial),receipts=[];
  const f=setup(resources=>{receipts.push(resources);session.collected(resources)}),s=f.stream;
  session.attach({cell:c=>s.cell(c),pending:c=>s.pending(c),mine:cs=>s.mineMany(cs),cancelMining:()=>s.cancelPending(),returnToSurface:()=>{}});
  try{

@@ -5,6 +5,7 @@ import test from 'node:test';
 import { Inventory } from '../../src/game/logic/Inventory.ts';
 import { Wallet } from '../../src/game/logic/Wallet.ts';
 import { BACKPACK_TIERS, backpackOffer, upgradeBackpack } from '../../src/game/application/BackpackUpgrade.ts';
+import { resourceByKind } from '../../src/game/content/resources.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
 
 const seed=(bag,count)=>bag.add([{itemId:'ore',count}]);
@@ -17,14 +18,14 @@ test('capacity API is independent of upgrades: increasing/decreasing preserves c
  bag.setCapacity(0);assert.equal(bag.getSnapshot(),state);
 });
 test('upgrade refuses insufficient funds without changing capacity or coins',()=>{
- const bag=new Inventory(50),wallet=new Wallet(19);seed(bag,57);
+ const bag=new Inventory(50),wallet=new Wallet(BACKPACK_TIERS[0].price-1);seed(bag,57);
  assert.equal(backpackOffer(50,19).canAfford,false);
  assert.deepEqual(upgradeBackpack('bag-100',bag,wallet),{status:'insufficient'});
- assert.equal(bag.capacity,50);assert.equal(bag.getSnapshot().used,57);assert.equal(wallet.getBalance(),19);
+ assert.equal(bag.capacity,50);assert.equal(bag.getSnapshot().used,57);assert.equal(wallet.getBalance(),BACKPACK_TIERS[0].price-1);
 });
 test('upgrade spends exact price, preserves over-capacity contents, and updates full query',()=>{
- const bag=new Inventory(50),wallet=new Wallet(20);seed(bag,57);
- assert.deepEqual(upgradeBackpack('bag-100',bag,wallet),{status:'upgraded',capacity:100,spent:20});
+ const bag=new Inventory(50),wallet=new Wallet(BACKPACK_TIERS[0].price);seed(bag,57);
+ assert.deepEqual(upgradeBackpack('bag-100',bag,wallet),{status:'upgraded',capacity:100,spent:BACKPACK_TIERS[0].price});
  assert.equal(wallet.getBalance(),0);assert.equal(bag.getSnapshot().used,57);assert.equal(bag.isFull(),false);
  seed(bag,100);assert.equal(bag.getSnapshot().used,157);
 });
@@ -32,12 +33,12 @@ test('stale, repeated and skipped-tier purchases cannot debit or silently buy th
  const bag=new Inventory(50),wallet=new Wallet(200);
  assert.equal(upgradeBackpack('bag-400',bag,wallet).status,'stale');assert.equal(wallet.getBalance(),200);
  assert.equal(upgradeBackpack('bag-100',bag,wallet).status,'upgraded');
- assert.equal(upgradeBackpack('bag-100',bag,wallet).status,'stale');assert.equal(wallet.getBalance(),180);assert.equal(bag.capacity,100);
+ assert.equal(upgradeBackpack('bag-100',bag,wallet).status,'stale');assert.equal(wallet.getBalance(),200-BACKPACK_TIERS[0].price);assert.equal(bag.capacity,100);
 });
 test('tier progression and maximum derive from capacity; configuration is immutable',()=>{
- const bag=new Inventory(50),wallet=new Wallet(170);
+ const bag=new Inventory(50),wallet=new Wallet(BACKPACK_TIERS.reduce((sum,t)=>sum+t.price,0));
  for(const tier of BACKPACK_TIERS){assert.equal(backpackOffer(bag.capacity,wallet.getBalance()).next.id,tier.id);assert.equal(upgradeBackpack(tier.id,bag,wallet).status,'upgraded')}
- assert.equal(bag.capacity,400);assert.equal(wallet.getBalance(),0);assert.deepEqual(backpackOffer(400,1000),{next:null,canAfford:false});
+ assert.equal(bag.capacity,BACKPACK_TIERS.at(-1).capacity);assert.equal(wallet.getBalance(),0);assert.deepEqual(backpackOffer(BACKPACK_TIERS.at(-1).capacity,1000),{next:null,canAfford:false});
  assert.equal(upgradeBackpack('bag-400',bag,wallet).status,'max');assert.throws(()=>{BACKPACK_TIERS[0].price=0});
  assert.equal(backpackOffer(150,100).next.id,'bag-200');
 });
@@ -47,7 +48,7 @@ test('session publishes one coherent purchase snapshot and mining immediately us
  session.collected(Array.from({length:57},()=>({kind:1})));assert.equal(session.requestMine([[0,-1,0]]),false);
  const unsub=session.subscribe(()=>observed.push(session.getSnapshot()));
  assert.equal(session.upgradeBackpack('bag-100').status,'upgraded');assert.equal(observed.length,1);
- assert.equal(observed[0].inventory.capacity,100);assert.equal(observed[0].inventory.used,57);assert.equal(observed[0].coins,SESSION_CONTENT.initialCoins);
+ assert.equal(observed[0].inventory.capacity,100);assert.equal(observed[0].inventory.used,57);assert.equal(observed[0].coins,SESSION_CONTENT.initialCoins+20*resourceByKind(1).price-BACKPACK_TIERS[0].price);
  assert.equal(session.upgradeBackpack('bag-100').status,'stale');assert.equal(observed.length,1);assert.equal(session.requestMine([[0,-1,0]]),true);
  unsub();
 });

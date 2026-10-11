@@ -1,10 +1,11 @@
 import { BlockHealth } from '../logic/BlockHealth.ts';
 import { AttackCooldown } from '../logic/AttackCooldown.ts';
-export type HitResult = Readonly<{ status: 'hit' | 'breaking'; remaining: number; damage: number }> | Readonly<{ status: 'full' | 'cooldown' | 'pending' | 'unavailable' }>;
+export type HitResult = Readonly<{ status: 'locked'; requiredLevel: number }> | Readonly<{ status: 'hit' | 'breaking'; remaining: number; damage: number }> | Readonly<{ status: 'full' | 'cooldown' | 'pending' | 'unavailable' }>;
 export type CombatPorts<Target> = {
   isFull(): boolean;
   stats(): { power: number; speed: number };
-  read(target: Target): { key: string; maximum: number } | null;
+  level?(): number;
+  read(target: Target): { key: string; maximum: number; requiredLevel?: number } | null;
   pending(target: Target): boolean;
   destroy(target: Target): boolean;
 };
@@ -17,6 +18,7 @@ export class MiningCombat<Target> {
     if (this.ports.isFull()) return { status: 'full' };
     const block = this.ports.read(target);
     if (!block) return { status: 'unavailable' };
+    if ((block.requiredLevel ?? 0) > (this.ports.level?.() ?? 1)) return { status: 'locked', requiredLevel: block.requiredLevel! };
     if (this.ports.pending(target)) return { status: 'pending' };
     if (!this.cooldown.ready(now)) return { status: 'cooldown' };
     const { power, speed } = this.ports.stats();

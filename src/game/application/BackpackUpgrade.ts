@@ -1,12 +1,11 @@
+import { STAGES } from '../content/progression.ts';
 import type { Inventory } from '../logic/Inventory.ts';
 import type { Wallet } from '../logic/Wallet.ts';
 
 // Temporary progression values, kept outside Inventory/Wallet and presentation.
-export const BACKPACK_TIERS = Object.freeze([
-  Object.freeze({ id: 'bag-100', capacity: 100, price: 20 }),
-  Object.freeze({ id: 'bag-200', capacity: 200, price: 50 }),
-  Object.freeze({ id: 'bag-400', capacity: 400, price: 100 }),
-]);
+export const BACKPACK_TIERS = Object.freeze(STAGES.map(s => Object.freeze({
+  id: `bag-${s.capacity}`, capacity: s.capacity, price: Math.round(s.basePrice * 100),
+})));
 export function backpackOffer(capacity: number, coins: number) {
   const next = BACKPACK_TIERS.find(tier => tier.capacity > capacity) ?? null;
   return Object.freeze({ next, canAfford: next !== null && coins >= next.price });

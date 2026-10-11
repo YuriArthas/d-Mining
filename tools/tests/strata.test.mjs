@@ -1,3 +1,4 @@
+import {STAGES} from '../../src/game/content/progression.ts';
 import { appearanceKey } from '../../src/game/terrain/minerals.ts';
 import assert from 'node:assert/strict';
 import test from 'node:test';
@@ -9,7 +10,7 @@ import {oreChanceAtDepth} from '../../src/game/content/oreDistribution.ts';
 test('layer boundaries use metres and the top face of each block', () => {
  assert.equal(stratumAtDepth(399.999).id,'surface');assert.equal(stratumAtDepth(400).id,'old_mine');
  assert.equal(stratumAtDepth(799.999).id,'old_mine');assert.equal(stratumAtDepth(800).id,'fungal');
- const allowed = [[-200,[8,3,4,16]],[-201,[1,3,4,16,17,5]],[-400,[1,3,4,16,17,5]],[-401,[9,4,17,18,25]]];
+ const allowed = [[-200,[32]],[-201,[1,3,4,16,17]],[-400,[33]],[-401,[9,3,4,18,25]]];
  for(const [y,ids] of allowed) for(let x=-48;x<=51;x++)for(let z=-48;z<=51;z++)assert.ok(ids.includes(generatedMineral(x,y,z,0)));
 });
 test('production shallow terrain excludes advanced minerals even at old sample coordinates', () => {
@@ -30,7 +31,7 @@ test('per-cell frequencies follow layer weights and ore chance rises continuousl
   for(const o of layer.ores)assert.ok(Math.abs((counts.get(o.kind)||0)/total-chance*o.weight/sum)<.003,`${layer.id} mineral ${o.kind}`);
   const density=1-counts.get(layer.base)/total;assert.ok(Math.abs(density-chance)<.003);assert.ok(density>previous);previous=density;
  }
- assert.equal(oreChanceAtDepth(0),.025);assert.equal(oreChanceAtDepth(4000),.28);
+ assert.equal(oreChanceAtDepth(0),.18);assert.equal(oreChanceAtDepth(4000),.32);
  for(let d=1;d<=4000;d++)assert.ok(oreChanceAtDepth(d)>=oreChanceAtDepth(d-1));
 });
 test('individual cell rolls are deterministic and neighboring ores are not quantized into 3-cube deposits', () => {
@@ -77,7 +78,7 @@ test('theme blocks occur only in their owning layer, including every seam and mo
      const kind=world.cell([x,y,z]);
      if(kind===7)continue; // Protected hub floor is not a collectible theme block.
      counts.set(kind,(counts.get(kind)||0)+1);
-     if(resourceByKind(kind).base) assert.equal(kind,layer.base,`${layer.id} contains foreign base ${kind}`);
+     if(resourceByKind(kind).base) assert.equal(kind,depth-layer.from>=STAGES[i].deepAt?STAGES[i].deepKind:layer.base,`${layer.id} contains foreign base ${kind}`);
     }
    }
    assert.ok(counts.get(layer.base)>0);

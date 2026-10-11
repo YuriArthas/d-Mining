@@ -12,6 +12,7 @@ export type Destination = Readonly<{
   name: string;
   depth: number;
   spawn: Coord;
+  roomBounds?: Readonly<{ minX: number; maxX: number; minZ: number; maxZ: number; floor: number; ceiling: number }>;
 }>;
 export type SessionContent = Readonly<{
   initialCoins?: number;

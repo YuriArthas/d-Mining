@@ -137,7 +137,7 @@ test('mineral tiles remain distinct within an atlas that includes the protected 
   const {resourceByKind}=await import('../../src/game/content/resources.ts');
   if(resourceByKind(MINERALS[tile].id).base)assert.equal(colors.size,1,'host rock has no repeated cell texture');else assert.ok(colors.size>=5);fingerprints.add(hash);
  }
- assert.equal(fingerprints.size,30);
+ assert.equal(fingerprints.size,MINERALS.length);
 });
 
 test('mineral response atlas separates metal inclusions from matte host and keeps floors flat',async()=>{

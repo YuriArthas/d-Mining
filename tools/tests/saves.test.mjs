@@ -1,8 +1,9 @@
+import {PET_CONTENT} from './fixtures/pets.ts';
 import test from "node:test";
 import assert from "node:assert/strict";
 import { GameSession } from "../../src/game/application/GameSession.ts";
 import { PetCommands } from "../../src/game/application/PetCommands.ts";
-import { SESSION_CONTENT } from "../../src/game/world/sessionContent.ts";
+import { SESSION_CONTENT as LIVE_SESSION_CONTENT } from "../../src/game/world/sessionContent.ts";
 import { withInitialAccess } from "../../src/game/content/initialAccess.ts";
 import {
   SparseWorld,
@@ -16,11 +17,12 @@ import {
 } from "../../src/game/persistence/saveTypes.ts";
 import { compatibleHead } from "../../src/game/persistence/saveMigrations.ts";
 import { saveNamespace } from "../../src/game/persistence/SaveBootstrap.ts";
+const SESSION_CONTENT = {...LIVE_SESSION_CONTENT, initialCoins:200, petContent:PET_CONTENT};
 const head = () => ({
   formatVersion: 1,
   revision: 1,
   savedAt: 1,
-  world: { generationVersion: 8, seed: 0, regionEncoding: 1 },
+  world: { generationVersion: 9, seed: 0, regionEncoding: 1 },
   regionCount: 0,
 });
 const deferred = () => {
@@ -111,7 +113,7 @@ test("restore rejects missing/unknown/partial data, never creates a new player",
   assert.equal(GameSession.createNew(SESSION_CONTENT).getSnapshot().coins, 200);
 });
 test("preview access is not earned; actual depth changes notify without a new unlock", () => {
-  const s = GameSession.createNew(withInitialAccess(SESSION_CONTENT)),
+  const s = GameSession.createNew(withInitialAccess({...SESSION_CONTENT,initiallyUnlocked:SESSION_CONTENT.destinations.map(d=>d.id)})),
     notifications = [];
   s.onProgressCommitted((c) => notifications.push(c));
   assert.ok(s.getSnapshot().destinations.every((d) => d.unlocked));
@@ -312,12 +314,12 @@ test("idle flush performs no write, and unrelated pet save does not rewrite ackn
 test("database namespaces are stable and separate production, preview, acceptance, and sample worlds", () => {
   assert.equal(
     saveNamespace({ pathname: "/games/mining/index.html", search: "" }).name,
-    "mining:production",
+    "mining:production:progression-v1",
   );
   assert.equal(
     saveNamespace({ pathname: "/games/mining-test/index.html", search: "" })
       .name,
-    "mining:test",
+    "mining:test:progression-v1",
   );
   assert.equal(
     saveNamespace({
@@ -331,7 +333,7 @@ test("database namespaces are stable and separate production, preview, acceptanc
       pathname: "/games/mining/index.html",
       search: "?debug=1&samples=1",
     }).name,
-    "mining:production:samples",
+    "mining:production:progression-v1:samples",
   );
   assert.throws(() =>
     saveNamespace({ pathname: "/", search: "?debug=1&saveTest=../../bad" }),

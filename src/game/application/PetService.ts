@@ -7,13 +7,14 @@ import type { Wallet } from '../logic/Wallet.ts';
 
 export type HatchResult =
   | Readonly<{ status: 'hatched'; eggId: string; pet: PetInstance; spent: number }>
-  | Readonly<{ status: 'unknown-egg' | 'insufficient-coins' }>;
+  | Readonly<{ status: 'unknown-egg' | 'insufficient-coins' | 'locked' }>;
 export type EquipOwnedResult = EquipResult | Readonly<{ status: 'not-owned' }>;
 export type PetServiceDependencies = {
   content: PetContent;
   wallet: Pick<Wallet, 'getBalance' | 'debit'>;
   random: () => number;
   createPetId: () => string;
+  hasDestination?: (id: string) => boolean;
 };
 
 // Synchronous use cases only. Neither rendering nor event delivery runs inside settlement.
@@ -32,9 +33,14 @@ export class PetService {
   getInventory = () => this.inventory.getSnapshot();
   getEquipment = () => this.equipment.getSnapshot();
   getBonus = () => this.bonus;
+  isUnlocked = (eggId: string) => {
+    const egg = this.catalog.egg(eggId);
+    return !!egg && (!egg.requiredDestination || this.deps.hasDestination?.(egg.requiredDestination) === true);
+  };
   hatch(eggId: string): HatchResult {
     const egg = this.catalog.egg(eggId);
     if (!egg) return { status: 'unknown-egg' };
+    if (!this.isUnlocked(eggId)) return { status: 'locked' };
     if (this.deps.wallet.getBalance() < egg.price) return { status: 'insufficient-coins' };
     const speciesId = drawEgg(egg, this.deps.random());
     const id = petId(this.deps.createPetId());

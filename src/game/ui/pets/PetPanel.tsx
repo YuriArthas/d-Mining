@@ -1,3 +1,4 @@
+import { formatNumber } from '../../presentation/formatNumber.ts';
 import { useState, useSyncExternalStore } from 'react';
 import type { PetUiApi } from '../../application/PetUiAdapter.ts';
 import { GameButton } from '../GameButton.tsx';
@@ -16,7 +17,7 @@ export function PetPanel({ api, onClose }: { api: PetUiApi; onClose(): void }) {
   const visible = state.pets.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
   const equipped = state.slots.filter(id => id !== null).length;
   return <PetDialog title="我的宠物" onClose={onClose}>
-    <div className="pet-summary"><span>已装备 <b>{equipped}/{state.slots.length}</b></span><span>力量加成 <strong>{bonusLabel(state.bonus.powerBonusBps)}</strong></span><span>挖矿力量 <b>{state.baseStats.power} → {state.effectiveStats.power}</b></span></div>
+    <div className="pet-summary"><span>已装备 <b>{equipped}/{state.slots.length}</b></span><span>力量加成 <strong>{bonusLabel(state.bonus.powerBonusBps)}</strong></span><span>挖矿力量 <b>{formatNumber(state.baseStats.power)} → {formatNumber(state.effectiveStats.power)}</b></span></div>
     <div className="pet-slots" aria-label="宠物装备槽">
       {state.slots.map((id, slot) => {
         const card = id === null ? null : state.pets.find(pet => pet.pet.id === id)!;

@@ -1,3 +1,4 @@
+import {resourceByKind} from '../../src/game/content/resources.ts';
 import {SESSION_CONTENT} from '../../src/game/world/sessionContent.ts';
 import assert from 'node:assert/strict';
 import test from 'node:test';
@@ -54,11 +55,11 @@ test('distant damage allocates no meshes; negative/deep coordinates and cleanup 
 });
 test('session damage projection persists across selection and clears only on actual removal',()=>{
  let now=0,solid=true;const session=new GameSession(SESSION_CONTENT, 50,()=>now),view=new BlockCracks();
- const cell=[14,-1,-25];session.attach({cell:()=>solid?6:0,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{}});
+ const cell=[14,-1,-25];session.attach({cell:()=>solid?16:0,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{}});
  const off=session.observeBlockDamage(view.setDamage);
  session.hit(cell);view.sync(near);assert.equal(view.group.children[0].geometry.getAttribute('crackTile').getX(0),0);
  session.selectTarget(null);session.resetPosition();view.sync(near);assert.equal(view.diagnostics().instances,1);
- for(let i=1;i<35;i++){now=i*.5;session.hit(cell)}view.sync(near);assert.equal(view.group.children[0].geometry.getAttribute('crackTile').getX(0),9);
- assert.equal(session.getSnapshot().inventory.used,0);solid=false;session.collected([{cell,kind:6}]);view.sync(near);
- assert.equal(view.diagnostics().instances,0);assert.equal(session.getSnapshot().inventory.used,15);off();view.dispose();
+ for(let i=1;i<Math.ceil(resourceByKind(16).maxHp/10);i++){now=i*.5;session.hit(cell)}view.sync(near);assert.equal(view.group.children[0].geometry.getAttribute('crackTile').getX(0),9);
+ assert.equal(session.getSnapshot().inventory.used,0);solid=false;session.collected([{cell,kind:16}]);view.sync(near);
+ assert.equal(view.diagnostics().instances,0);assert.equal(session.getSnapshot().inventory.used,4);off();view.dispose();
 });

@@ -12,11 +12,11 @@ export class Exploration {
       this.access.add(id);
     }
   }
-  visit(depth: number) {
+  visit(depth: number, enteredRooms?: readonly string[]) {
     if (!Number.isFinite(depth) || depth < 0) return [];
     this.maximum = Math.max(this.maximum, depth);
     const added: string[] = [];
-    for (const point of this.milestones) if (this.maximum >= point.depth && !this.unlocked.has(point.id)) {
+    for (const point of this.milestones) if ((enteredRooms ? enteredRooms.includes(point.id) : this.maximum >= point.depth) && !this.unlocked.has(point.id)) {
       this.unlocked.add(point.id); added.push(point.id);
     }
     return added;

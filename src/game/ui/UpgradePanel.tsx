@@ -1,3 +1,4 @@
+import { formatNumber as number } from '../presentation/formatNumber.ts';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import type { GameSession } from '../application/GameSession.ts';
 import { GameButton } from './GameButton.tsx';
@@ -33,17 +34,17 @@ export function UpgradePanel({ session, onClose, contextual = false }: {
       {tab === 'pickaxe' ? <>
         <p className="upgrade-description" data-testid="pickaxe-level">镐子 Lv.{pickaxe.level}{axe.next ? ` → Lv.${axe.next.level}` : ''}</p>
         <div className="pickaxe-stats">
-          <div><span>力量</span><strong>{pickaxe.power} <i>→</i> {axe.next?.power ?? pickaxe.power}</strong></div>
+          <div><span>力量</span><strong>{number(pickaxe.power)} <i>→</i> {number(axe.next?.power ?? pickaxe.power)}</strong></div>
           <div><span>攻速 · 次/秒</span><strong>{pickaxe.speed} <i>→</i> {axe.next?.speed ?? pickaxe.speed}</strong></div>
         </div>
         <p className="speed-step">{pickaxe.levelsUntilSpeed === null
-          ? `攻速已达上限 ${PICKAXE_BALANCE.maxSpeed} 次/秒，超出部分折算为力量${pickaxe.overflowPower ? `（已计入 +${pickaxe.overflowPower}）` : ''}`
+          ? `攻速已达上限 ${PICKAXE_BALANCE.maxSpeed} 次/秒，超出部分折算为力量${pickaxe.overflowPower ? `（已计入 +${number(pickaxe.overflowPower)}）` : ''}`
           : `再升 ${pickaxe.levelsUntilSpeed} 级攻速翻倍，最高 ${PICKAXE_BALANCE.maxSpeed} 次/秒；超出部分折算为力量`}</p>
       </> : <>
         <p className="upgrade-description">扩充容量，一趟带回更多矿物。</p>
         <div className="upgrade-capacity"><div><span>当前容量</span><strong>{state.inventory.capacity}</strong></div><span aria-hidden="true">→</span><div><span>{bag.next ? '升级后容量' : '最高容量'}</span><strong>{bag.next?.capacity ?? state.inventory.capacity}</strong></div></div>
       </>}
-      <div className="upgrade-price"><span>持有金币 <b>{state.coins}</b></span>{next && <span>升级费用 <b>{price}</b></span>}</div>
+      <div className="upgrade-price"><span>持有金币 <b>{number(state.coins)}</b></span>{next && <span>升级费用 <b>{number(price)}</b></span>}</div>
       <GameButton blurAfterPress={false} className="upgrade-buy" disabled={!next || !canAfford} onPress={() => {
         if (!next) return;
         if (tab === 'pickaxe') {
@@ -54,7 +55,7 @@ export function UpgradePanel({ session, onClose, contextual = false }: {
           setMessage(result.status === 'upgraded' ? `升级成功！容量增加到 ${result.capacity}` : result.status === 'insufficient' ? '金币不足，先去出售矿物' : '档位已更新，请查看当前升级');
         }
         panel.current?.focus();
-      }}>{!next ? (tab === 'backpack' ? '已升至最高容量' : '已达数值范围上限') : canAfford ? `花费 ${price} 金币升级` : `还差 ${price - state.coins} 金币`}</GameButton>
+      }}>{!next ? (tab === 'backpack' ? '已升至最高容量' : '已达数值范围上限') : canAfford ? `花费 ${number(price)} 金币升级` : `还差 ${number(price - state.coins)} 金币`}</GameButton>
       <output role="status" className="upgrade-result">{message || '矿物可在金色圆圈出售'}</output>
     </section>
   </div>;
