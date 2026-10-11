@@ -20,19 +20,30 @@ test('health queries allocate nothing; only touched cells retain their own damag
  assert.equal(h.damage('a',100,1000),0);h.forget('a');assert.equal(h.size,1);assert.equal(h.get('b',20),13);
  assert.throws(()=>h.damage('bad',0,10));assert.throws(()=>h.damage('bad',10,-1));assert.equal(h.size,1);
 });
-test('power rises each level, speed increases every five levels and caps independently',()=>{
- for(const [level,power,speed] of [[1,10,2],[2,15,2],[5,30,2],[6,35,4],[10,55,4],[11,60,8],[15,80,8],[16,85,16],[61,310,16],[1000,5005,16]]){
+test('speed doubles every five levels; overflow becomes power above 16 attacks per second',()=>{
+ for(const [level,power,speed] of [[1,10,2],[2,15,2],[5,30,2],[6,35,4],[10,55,4],[11,60,8],[15,80,8],[16,85,16],[20,105,16],[21,220,16],[26,540,16],[61,158720,16],[100,33095680,16]]){
   const s=pickaxeStats(level);assert.equal(s.power,power);assert.equal(s.speed,speed);
  }
- assert.equal(pickaxeStats(5).levelsUntilSpeed,1);assert.equal(pickaxeStats(6).levelsUntilSpeed,5);assert.equal(pickaxeStats(16).levelsUntilSpeed,null);
+ assert.equal(pickaxeStats(15).levelsUntilSpeed,1);assert.equal(pickaxeStats(16).levelsUntilSpeed,null);
+ assert.equal(pickaxeStats(20).overflowPower,0);assert.equal(pickaxeStats(21).overflowPower,110);
+ // The cap preserves theoretical DPS to within one rounded damage point per hit.
+ for(let level=1;level<=230;level++){
+  const s=pickaxeStats(level),difference=s.basePower*s.uncappedSpeed-s.power*s.speed;
+  assert.ok(difference>=0&&difference<s.speed);
+ }
  assert.throws(()=>pickaxeStats(0));assert.throws(()=>pickaxeStats(Number.MAX_SAFE_INTEGER));
+ assert.equal(Pickaxe.fromData({version:1,level:26}).getSnapshot().power,540);
+ const maximum=new Pickaxe(230),funds=new Wallet(1000);
+ assert.equal(pickaxeOffer(230,1000).next,null);
+ assert.equal(upgradePickaxe(230,maximum,funds).status,'limit');
+ assert.equal(funds.getBalance(),1000);assert.equal(maximum.getSnapshot().level,230);
 });
 test('pickaxe upgrade validates funds and expected level, spends once, and continues after speed cap',()=>{
  const axe=new Pickaxe(),wallet=new Wallet(4);assert.equal(pickaxeOffer(1,4).canAfford,false);
  assert.equal(upgradePickaxe(1,axe,wallet).status,'insufficient');assert.equal(wallet.getBalance(),4);wallet.credit(1);
  assert.equal(upgradePickaxe(1,axe,wallet).status,'upgraded');assert.equal(axe.getSnapshot().level,2);assert.equal(wallet.getBalance(),0);
  assert.equal(upgradePickaxe(1,axe,wallet).status,'stale');axe.setLevel(61);wallet.credit(1000);
- assert.equal(upgradePickaxe(61,axe,wallet).status,'upgraded');assert.equal(axe.getSnapshot().power,315);assert.equal(axe.getSnapshot().speed,16);
+ assert.equal(upgradePickaxe(61,axe,wallet).status,'upgraded');assert.equal(axe.getSnapshot().power,161280);assert.equal(axe.getSnapshot().speed,16);
 });
 test('first strike immediate; switching targets, tapping again and waiting do not grant burst hits',()=>{
  const f=setup(),c=f.combat;assert.equal(c.hit('a',0).remaining,20);
@@ -48,6 +59,29 @@ test('upgrade keeps previous cooldown; next hit uses new power then new interval
  const f=setup(100),c=f.combat;f.axe.setLevel(5);assert.equal(c.hit('a',0).remaining,70);
  f.axe.setLevel(6);assert.equal(c.hit('a',.499).status,'cooldown');assert.equal(c.hit('a',.5).remaining,35);assert.equal(c.cooldown.nextAt,.5+1/4);
  assert.equal(c.hit('a',.749).status,'cooldown');
+});
+test('real damage follows configured attack rate at 30, 60 and 120 FPS without cumulative rounding loss',()=>{
+ for(const fps of [30,60,120])for(const level of [1,6,11,16,21,26]){
+  const f=setup(1000000);f.axe.setLevel(level);
+  const stats=f.axe.getSnapshot();let hits=0;
+  for(let frame=0;frame<fps*10;frame++){
+   const now=frame/fps,result=f.combat.hit('a',now);
+   if(result.status==='hit'){
+    hits++;
+    // Repeating a command in the same frame never produces another attack.
+    assert.equal(f.combat.hit('b',now).status,'cooldown');
+   }
+  }
+  assert.equal(hits,stats.speed*10,`level ${level} at ${fps} FPS`);
+  assert.equal(f.combat.health.get('a',1000000),1000000-hits*stats.power);
+ }
+});
+test('long stalls discard missed attacks and begin a fresh cooldown',()=>{
+ const f=setup(1000000);f.axe.setLevel(16);
+ assert.equal(f.combat.hit('a',.01).status,'hit');assert.equal(f.combat.cooldown.nextAt,.01+1/16);
+ assert.equal(f.combat.hit('a',30).status,'hit');assert.equal(f.combat.cooldown.nextAt,30+1/16);
+ for(let i=0;i<100;i++)assert.equal(f.combat.hit('b',30).status,'cooldown');
+ assert.equal(f.combat.health.get('a',1000000),1000000-170);
 });
 test('lethal hit queues destruction once; pending cells cannot take more damage',()=>{
  const f=setup(20),c=f.combat;assert.equal(c.hit('a',0).status,'hit');assert.equal(f.requests.length,0);
@@ -66,7 +100,7 @@ test('cancelled zero-HP block retains damage and can retry without generating an
  assert.equal(c.hit('a',2).status,'pending');assert.equal(c.health.size,1);
 });
 test('damage never spreads to another cell; huge power still queues a single target',()=>{
- const f=setup(30);f.axe.setLevel(1000);assert.equal(f.combat.hit('a',0).damage,30);
+ const f=setup(30);f.axe.setLevel(100);assert.equal(f.combat.hit('a',0).damage,30);
  assert.deepEqual(f.requests,['a']);assert.equal(f.combat.health.get('b',30),30);
 });
 test('all configured minerals take exactly ceil(HP / power) blows',()=>{

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import type { GameSession } from '../application/GameSession.ts';
 import { GameButton } from './GameButton.tsx';
+import { PICKAXE_BALANCE } from '../logic/Pickaxe.ts';
 export function UpgradePanel({ session, onClose, contextual = false }: {
   session: Pick<GameSession, 'subscribe' | 'getSnapshot' | 'upgradeBackpack' | 'upgradePickaxe'>;
   onClose: () => void;
@@ -35,7 +36,9 @@ export function UpgradePanel({ session, onClose, contextual = false }: {
           <div><span>力量</span><strong>{pickaxe.power} <i>→</i> {axe.next?.power ?? pickaxe.power}</strong></div>
           <div><span>攻速 · 次/秒</span><strong>{pickaxe.speed} <i>→</i> {axe.next?.speed ?? pickaxe.speed}</strong></div>
         </div>
-        <p className="speed-step">{pickaxe.levelsUntilSpeed === null ? '攻速已达上限，力量继续提升' : pickaxe.levelsUntilSpeed === 1 ? '本次升级提升攻速' : `再升 ${pickaxe.levelsUntilSpeed} 级提升攻速`}</p>
+        <p className="speed-step">{pickaxe.levelsUntilSpeed === null
+          ? `攻速已达上限 ${PICKAXE_BALANCE.maxSpeed} 次/秒，超出部分折算为力量${pickaxe.overflowPower ? `（已计入 +${pickaxe.overflowPower}）` : ''}`
+          : `再升 ${pickaxe.levelsUntilSpeed} 级攻速翻倍，最高 ${PICKAXE_BALANCE.maxSpeed} 次/秒；超出部分折算为力量`}</p>
       </> : <>
         <p className="upgrade-description">扩充容量，一趟带回更多矿物。</p>
         <div className="upgrade-capacity"><div><span>当前容量</span><strong>{state.inventory.capacity}</strong></div><span aria-hidden="true">→</span><div><span>{bag.next ? '升级后容量' : '最高容量'}</span><strong>{bag.next?.capacity ?? state.inventory.capacity}</strong></div></div>

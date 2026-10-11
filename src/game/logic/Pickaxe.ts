@@ -4,9 +4,14 @@ export const PICKAXE_BALANCE = Object.freeze({ basePower: 10, powerPerLevel: 5, 
 export function pickaxeStats(level: number) {
   if (!integer(level, '镐子等级')) throw new Error('镐子等级必须大于 0');
   const c = PICKAXE_BALANCE;
-  const power = integer(c.basePower + (level - 1) * c.powerPerLevel, '力量');
-  const speed = Math.min(c.maxSpeed, c.baseSpeed * c.speedMultiplier ** Math.min(Math.floor((level - 1) / c.speedEvery), Math.ceil(Math.log(c.maxSpeed / c.baseSpeed) / Math.log(c.speedMultiplier))));
-  return Object.freeze({ level, power, speed, levelsUntilSpeed: speed >= c.maxSpeed ? null : c.speedEvery - (level - 1) % c.speedEvery });
+  const basePower = integer(c.basePower + (level - 1) * c.powerPerLevel, '基础力量');
+  const uncappedSpeed = integer(c.baseSpeed * c.speedMultiplier ** Math.floor((level - 1) / c.speedEvery), '理论攻速');
+  const speed = Math.min(c.maxSpeed, uncappedSpeed);
+  // Preserve uncapped damage per second after the attack-rate cap. Round once,
+  // before pet bonuses; use integer arithmetic even for large saved levels.
+  const power = integer(Number(BigInt(basePower) * BigInt(uncappedSpeed) / BigInt(speed)), '力量');
+  return Object.freeze({ level, basePower, power, speed, uncappedSpeed,
+    overflowPower: power - basePower, levelsUntilSpeed: speed >= c.maxSpeed ? null : c.speedEvery - (level - 1) % c.speedEvery });
 }
 export class Pickaxe {
   private snapshot;
