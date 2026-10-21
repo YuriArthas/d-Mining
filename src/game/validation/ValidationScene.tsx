@@ -338,30 +338,6 @@ export function ValidationScene({
       </group>
       <group ref={avatar}>
         <ContactShadow shadowRef={contactShadow} />
-        <mesh receiveShadow position={[0, GAME_CONFIG.player.height / 2, 0]}>
-          <cylinderGeometry
-            args={[
-              GAME_CONFIG.player.radius,
-              GAME_CONFIG.player.radius,
-              GAME_CONFIG.player.height,
-              32,
-            ]}
-          />
-          <meshStandardMaterial
-            color="#f0b45b"
-            roughness={0.9}
-            onBeforeCompile={compileStableShadow}
-            customProgramCacheKey={() => `avatar-${SHADOW_FILTER_ID}`}
-            transparent
-          />
-        </mesh>
-        <mesh
-          position={[0, GAME_CONFIG.player.height + 0.005, 0]}
-          rotation={[-Math.PI / 2, 0, Math.PI / 2]}
-        >
-          <circleGeometry args={[0.23, 3]} />
-          <meshBasicMaterial color="#253d45" transparent />
-        </mesh>
       </group>
     </group>
   );

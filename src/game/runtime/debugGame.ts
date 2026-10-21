@@ -133,6 +133,7 @@ export function attachGameDebug(
       pets: session.pets.getSnapshot(),
       eggLabels: current.eggLabels.diagnostics(),
       petFollowers: current.petFollowers.diagnostics(),
+      avatar: current.minerAvatar.diagnostics(),
       combat: session.combatDebug(),
       sellZone: current.content.session.sales[0],
       samples: terrain.sampleStats(),

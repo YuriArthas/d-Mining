@@ -94,6 +94,7 @@ export function updateGame(
       startup.firstPlayableMs = performance.now() - startup.started;
     const feet = physics.feet(),
       drawnFeet = physics.interpolatedFeet(player.fixed.alpha);
+    current.minerAvatar.update(drawnFeet, delta, physics.grounded, !!player.travelling);
     fixtures.visible = feet[1] > -64;
     if (contactShadow)
       contactShadow.visible = surfaceLightingActive && physics.grounded;

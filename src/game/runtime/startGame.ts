@@ -26,6 +26,7 @@ import { EnvironmentController } from "../presentation/EnvironmentController.ts"
 import { SceneryView } from "../presentation/SceneryView.ts";
 import { SceneryCollision } from "../presentation/SceneryCollision.ts";
 import { PetFollowers } from "../presentation/PetFollowers.ts";
+import { MinerAvatar } from "../presentation/MinerAvatar.ts";
 import { EggStandLabels } from "../presentation/EggStandLabels.ts";
 import { disposeScenery } from "../presentation/disposeScenery.ts";
 import { SurfaceHubView } from "../presentation/SurfaceHubView.ts";
@@ -205,11 +206,18 @@ export async function startGame(options: StartGameOptions) {
       startup.assetsReadyMs = performance.now() - startup.started;
       return surface;
     });
-    const [{ physics, terrain }, surface] = await Promise.all([
+    const avatarTask = MinerAvatar.load(abort.signal).then(miner => {
+      scope.defer(() => miner.dispose());
+      check();
+      return miner;
+    });
+    const [{ physics, terrain }, surface, minerAvatar] = await Promise.all([
       worldTask,
       surfaceTask,
+      avatarTask,
     ]);
     check();
+    avatar.add(minerAvatar.group);
     onStatus("正在准备画面");
     const cameraView = new CameraView(),
       player = new PlayerController(physics, terrain, input, session);
@@ -317,6 +325,7 @@ export async function startGame(options: StartGameOptions) {
       cameraGrade,
       eggLabels,
       petFollowers,
+      minerAvatar,
       startup,
       timing: { status: 0, frames: 0 },
       dispose: () => {

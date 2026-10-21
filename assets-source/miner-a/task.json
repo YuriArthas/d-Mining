@@ -1,0 +1,18 @@
+{
+  "taskId": "b054bf79-1490-4bf9-8774-287dd54f35f2",
+  "createdAt": "2026-10-21T12:57:58.582Z",
+  "reference": "/root/threejs_space/d-Mining/output/imagegen/character-concepts-20261021/a-blocky-miner.png",
+  "referenceSha256": "efa8c6ce24408a9b21facdd03618152d95915ef279b3fdd66f8521ed9201f137",
+  "recipe": {
+    "type": "image_to_model",
+    "model_version": "v3.0-20250812",
+    "file": {
+      "type": "png",
+      "source": "/root/threejs_space/d-Mining/output/imagegen/character-concepts-20261021/a-blocky-miner.png"
+    },
+    "face_limit": 12000,
+    "texture": true,
+    "pbr": false,
+    "texture_quality": "standard"
+  }
+}
