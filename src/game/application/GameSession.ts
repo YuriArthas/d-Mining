@@ -38,7 +38,8 @@ export type WorldCommands = {
   mine(targets: readonly Coord[]): boolean;
   cancelMining(): void;
   returnToSurface(): void;
-  travelTo?(feet: Coord): void;
+  /** Teleport; `lookAt` turns the camera toward what the player came to use. */
+  travelTo?(feet: Coord, lookAt?: Coord): void;
 };
 export class GameSession {
   private readonly equipment: EquipmentCollection;
@@ -266,7 +267,7 @@ export class GameSession {
     if(this.requestedShop||guide?.id==='upgrade'||guide?.id==='backpack') {
       guide=this.guideLocation==='mine'||!shop
         ? {id:'return',title:'返回地表，前往装备商店',detail:'商店里可以挑选镐子和背包',highlight:'return'}
-        : {id:guide?.id==='backpack'?'backpack':'shop',title:'走进商店，挑选新装备',detail:'跟随箭头走进蓝色 Shop 圈',marker:'shop'};
+        : {id:guide?.id==='backpack'?'backpack':'shop',title:'去商店挑选新装备',detail:'点右边「商店」一键传送，或跟随箭头走过去',marker:'shop'};
     }
     const anchor:Coord|null=guide?.marker==='shop'&&shop?[shop.zone.x,shop.zone.y+1,shop.zone.z]:guide?.marker==='mine'?this.content.onboarding?.entrance??null:guide?.marker==='sell'&&sale?[sale.x,sale.y+1,sale.z]:guide?.marker==='egg'&&station?station.promptAnchor:null;
     const destination:Coord|null=guide?.marker==='egg'&&station?[station.zone.x,station.zone.y,station.zone.z]:anchor;
@@ -287,7 +288,7 @@ export class GameSession {
       rewards: this.rewards.getSnapshot(),
       capsuleCoins: this.capsuleCoinReward(),
       atMachine: this.atMachine,
-      canTravel: this.atHome || this.rewards.getSnapshot().permanent.travel,
+      canTravel: this.canTravelNow(),
       autoHatch: this.autoHatchEgg,
       lastAutoHatch: this.lastAutoHatch,
       requestedEgg: this.requestedEgg,
@@ -662,7 +663,7 @@ export class GameSession {
     const room = this.content.destinations.find((r) => r.id === id);
     if (!room || !this.exploration.has(id)) return "locked" as const;
     if(this.content.journey&&((room.worldId??1)!==this.currentWorld||!this.worldProgress.mineOpen(this.currentWorld)))return 'locked' as const;
-    if (!this.atHome && !this.rewards.getSnapshot().permanent.travel) return "away" as const;
+    if (!this.canTravelNow()) return "away" as const;
     if (!this.world?.travelTo) return "unavailable" as const;
     return this.beginTravel(room);
   };
@@ -684,9 +685,34 @@ export class GameSession {
     this.notice = "走进金色圆圈出售，或踩左侧圆盘前往已解锁层";
     this.publish();
   };
+  /** The surface hub doubles as the teleport station; portable travel works anywhere. */
+  private canTravelNow() { return this.atHome || this.guideLocation === 'surface' || this.rewards.getSnapshot().permanent.travel; }
+  private surfaceSpot(target: 'shop' | 'sale' | 'capsule' | { egg: string }): { feet: Coord; look: Coord } | null {
+    const worldZ = this.content.journey ? worldRequirement(this.currentWorld).z : 0;
+    const near = (zone: { y: number; z: number }) => zone.y >= -.1 && Math.abs(zone.z - worldZ) < 100;
+    // Service rings sit on the street side of buildings that face +Z: arrive facing the counter.
+    const facingBuilding = (zone: { x: number; y: number; z: number }) => ({ feet: [zone.x, zone.y + .1, zone.z] as Coord, look: [zone.x, zone.y + 1, zone.z - 6] as Coord });
+    if (target === 'shop') { const zone = this.content.shops.find(s => near(s.zone))?.zone; return zone ? facingBuilding(zone) : null; }
+    if (target === 'sale') { const zone = this.content.sales.find(near); return zone ? facingBuilding(zone) : null; }
+    if (target === 'capsule') return this.currentWorld === 1 ? facingBuilding(CAPSULE_MACHINE_ZONE) : null;
+    if (!this.petService.isUnlocked(target.egg)) return null;
+    const station = this.content.eggStations?.find(s => s.eggId === target.egg);
+    return station ? { feet: [station.zone.x, station.zone.y + .1, station.zone.z], look: station.promptAnchor as Coord } : null;
+  }
+  /** Instant trip to a surface service, the way Roblox simulators offer Sell / Shop buttons. */
+  goTo = (target: 'shop' | 'sale' | 'capsule' | { egg: string }) => {
+    if (this.suspended || !this.world?.travelTo) return 'unavailable' as const;
+    const spot = this.surfaceSpot(target);
+    if (!spot) return 'unavailable' as const;
+    this.requestedEgg = null; this.requestedShop = false;
+    this.world.cancelMining();
+    this.world.travelTo(spot.feet, spot.look);
+    this.resetPosition();
+    return 'travelling' as const;
+  };
   travelWorld = (id: WorldId) => {
     if(this.suspended||!this.content.journey||!this.world?.travelTo)return 'unavailable' as const;
-    if(!this.atHome)return 'away' as const;
+    if(!this.canTravelNow())return 'away' as const;
     if(!this.worldProgress.areaOpen(id))return 'locked' as const;
     this.world.cancelMining();this.world.travelTo(worldSpawn(id));
     return 'travelling' as const;

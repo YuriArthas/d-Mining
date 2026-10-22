@@ -33,7 +33,6 @@ export class PetFollowers {
       const body = new Mesh(this.geometry, new MeshLambertMaterial({ color: look.color }));
       body.scale.setScalar(look.radius);
       const label = createWorldText({ at: [0, look.radius + .5, 0], width: .26 * look.label.length, title: look.label, subtitle: '', color: '#fff5cf', background: '#183343' }, { bevel: false });
-      label.add(createWorldText({ at: [0, -.24, 0], width: .42, title: `Lv.${pet.level}`, subtitle: '', color: '#dcebef', background: '#183343' }, { bevel: false }));
       group.add(body, label); group.name = `pet:${pet.id}`; group.visible = false;
       this.group.add(group);
       this.followers.set(pet.id, { pet, group, label, body, placed: false });

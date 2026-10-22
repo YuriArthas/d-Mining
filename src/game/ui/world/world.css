@@ -1,0 +1,27 @@
+/* World container (传送 / 进度). */
+.world-cards { --card: 138px; }
+.world-cards .ui-card-tile { min-height: 168px; }
+.world-cards .ui-card-tile > .ui-btn, .world-cards .ui-card-tile > .ui-stamp, .world-cards .ui-card-tile > .ui-bar { margin-top: auto; }
+.world-cards .ui-bar { width: 100%; }
+.world-lock { display: grid; place-items: center; }
+.world-lock .ui-icon { width: 46px; height: 46px; }
+.world-gate { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 10px; }
+.world-door { justify-content: center; }
+.world-door .ui-bar { width: 100%; }
+.world-mats { display: grid; gap: 4px 14px; padding: 6px 10px; align-content: start; }
+.world-mats > b { font-size: 14px; }
+.world-mat { display: grid; grid-template-columns: 22px 64px minmax(0, 1fr) auto; align-items: center; gap: 6px; min-height: 24px; font-size: 12px; }
+.world-mat-icon { width: 22px; height: 22px; color: var(--ui-ink); }
+.world-mat > b { font-size: 13px; text-align: right; white-space: nowrap; }
+@container game (max-width: 760px) {
+  .world-gate { grid-template-columns: 160px minmax(0, 1fr); }
+  .world-cards { --card: 124px; }
+}
+@container game (max-height: 440px) {
+  .world-mats { grid-template-columns: 1fr 1fr; }
+  .world-mats > b, .world-mats > .ui-stamp { grid-column: 1 / -1; }
+  .world-mat { grid-template-columns: 20px 52px minmax(0, 1fr) auto; }
+}
+@container game (max-height: 360px) {
+  .world-cards .ui-card-tile { min-height: 150px; }
+}

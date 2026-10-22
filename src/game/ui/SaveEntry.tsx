@@ -6,6 +6,7 @@ import {
   saveNamespace,
   type SavedGame,
 } from "../persistence/SaveBootstrap.ts";
+import { UiButton } from "./kit/controls.tsx";
 import "./save.css";
 export function SaveEntry({
   content,
@@ -80,21 +81,13 @@ export function SaveEntry({
   return (
     <main className="game-shell" onContextMenu={(e) => e.preventDefault()}>
       <section className="save-boot" role={error ? "alert" : "status"}>
-        <span className="wordmark">MINING</span>
-        <h2>{error ? "暂时无法读取进度" : message}</h2>
-        {error && (
-          <>
-            <p>{error}</p>
-            <button onClick={() => setAttempt((n) => n + 1)}>重试</button>
-          </>
-        )}
-        <button
-          onClick={() =>
-            location.replace(new URL("../../", location.href).href)
-          }
-        >
-          返回游戏列表
-        </button>
+        <span className="save-boot-mark ui-outline">MINING</span>
+        <h2 className="ui-outline">{error ? "暂时无法读取进度" : message}</h2>
+        {error && <p className="save-boot-error">{error}</p>}
+        <div className="save-boot-actions">
+          {error && <UiButton size="m" tone="orange" onPress={() => setAttempt((n) => n + 1)}>重试</UiButton>}
+          <UiButton size="m" tone="steel" onPress={() => location.replace(new URL("../../", location.href).href)}>返回游戏列表</UiButton>
+        </div>
       </section>
     </main>
   );

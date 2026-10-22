@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Mining UI mockups</title>
+<link rel="stylesheet" href="../../src/game/ui/kit/fonts.css">
+<link rel="stylesheet" href="../../src/game/ui/kit/tokens.css">
+<link rel="stylesheet" href="../../src/game/ui/kit/kit.css">
+<link rel="stylesheet" href="../../src/game/ui/hud/hud.css">
+<link rel="stylesheet" href="panel-kit.css">
+<style>
+  /* Minimal stand-ins for shell styles the HUD frame needs. */
+  .frame .joystick { position: absolute; border-radius: 50%; }
+  .frame .joystick-knob { position: absolute; border-radius: 50%; }
+  .frame .action-buttons { position: absolute; }
+  .frame .jump-button { border-radius: 50%; }
+  button { font: inherit; color: inherit; }
+</style>
+<script src="icons.js"></script>
+<script src="mockups.js"></script>
+</head>
+<body>
+<main id="frames"></main>
+<script>
+const $ = s => s;
+const tile = (icon, label, tone = 'blue', badge = '') => `<button class="ui-tile" data-tone="${tone}">${ICON[icon] ?? icon}<span class="ui-tile-label ui-outline">${label}</span>${badge ? `<b class="ui-badge ui-outline">${badge}</b>` : ''}</button>`;
+const btn = (label, tone = 'blue', size = 's', icon = '') => `<button class="ui-btn" data-tone="${tone}" data-size="${size}">${icon ? (ICON[icon] ?? icon) : ''}<span class="ui-outline">${label}</span></button>`;
+const close = `<button class="ui-close">${ICON.close}</button>`;
+const tabs = (items, active) => `<nav class="tabs">${items.map(([icon, label, badge]) => `<div class="tab"${label === active ? ' aria-selected="true"' : ''}>${ICON[icon] ?? icon}<span class="ui-outline">${label}</span>${badge ? `<b class="ui-badge ui-outline">${badge}</b>` : ''}</div>`).join('')}</nav>`;
+const frame = (name, bg, body, cls = '') => `<section class="frame game-shell ${cls}" data-name="${name}" style="--bg:url(assets/${bg}.jpg)">${body}</section>`;
+const PETS = [
+  ['slime', '#7ecf69', '苔团', 'common', '+50%'], ['mole', '#bc986a', '矿洞鼹鼠', 'common', '+60%'], ['fox', '#eca341', '琥珀狐', 'rare', '+80%', 1],
+  ['owl', '#8bcbdc', '晶羽猫头鹰', 'epic', '+115%', 1, 1], ['dragon', '#b2a0ee', '月光幼龙', 'legendary', '+175%'], ['slime', '#ad9b83', '石团', 'common', '+150%'],
+  ['mole', '#9f946e', '砂鼠', 'common', '+180%'], ['rabbit', '#b3988c', '斑岩兔', 'rare', '+240%'], ['turtle', '#c1c1a2', '青石龟', 'epic', '+345%'], ['bear', '#a57e77', '磐岩熊', 'legendary', '+525%'],
+];
+const petCell = ([kind, color, name, rarity, stat, equipped, selected]) => `<div class="cell" data-rarity="${rarity}"${equipped ? ' data-equipped' : ''}${selected ? ' aria-selected="true"' : ''}>
+  ${pet(kind, color)}<span class="name ui-outline">${name}</span><span class="stat ui-outline">${stat}</span>${equipped ? '<i class="check">✓</i>' : ''}</div>`;
+const BAG_TABS = [['paw', '宠物'], [ore('#76e0e7'), '矿物'], ['pickaxe', '装备']];
+const frames = [];
+
+// 1. HUD with the simplified rail: 宠物 / 商店 / 奖励 / 世界 (no fold).
+frames.push(frame('01-hud', 'bg-surface', `<div class="ui-hud">
+  <section class="hud-left"><div class="ui-pill" style="--meter:24%"><span class="ui-pill-meter"></span>${ICON.backpack.replace('ui-icon', 'ui-icon ui-pill-icon')}<span class="ui-pill-value ui-outline ui-num">12 / 50</span><span class="ui-pill-plus"><span class="ui-pill-plus-face">${ICON.plus}</span></span></div>
+    <div class="ui-pill" data-tone="gold">${ICON.coin.replace('ui-icon', 'ui-icon ui-pill-icon')}<span class="ui-pill-value ui-outline ui-num">1,234</span></div>
+    <div class="hud-objective"><aside class="guide-card"><span class="guide-kicker">当前目标</span><strong>挖满背包，回地表出售</strong><p>背包 12 / 50 · 售卖圈在出售屋门口</p></aside></div></section>
+  <header class="hud-depth"><span class="hud-depth-kicker ui-outline">第一世界 · 深度</span><strong class="hud-depth-value ui-outline ui-num">地表</strong></header>
+  <div class="hud-system">${tile('question', '帮助')}${tile('gear', '设置')}</div>
+  <nav class="hud-rail">${tile('paw', '宠物')}${tile('chest', '商店', 'orange')}${tile('gift', '奖励', 'pink', '3')}${tile('globe', '世界')}</nav>
+</div>
+<div class="joystick" style="left:16px;bottom:14px;width:124px;height:124px;border:3px solid #ffffffb3;background:radial-gradient(circle,#0b1d3326,#0b1d3355 70%)"><span class="joystick-knob" style="left:34px;top:34px;width:50px;height:50px;background:#ffffffe6;border:3px solid var(--ui-ink)"></span></div>
+<div class="action-buttons" style="right:18px;bottom:18px"><button class="jump-button" style="display:grid;place-items:center;width:72px;height:72px;padding:14px;border:3px solid #ffffffb3;background:radial-gradient(circle,#0b1d3333,#0b1d3366 70%)">${ICON.jump}</button></div>`));
+
+// 2. Bag · pets
+frames.push(frame('02-bag-pets', 'bg-surface', `<div class="scrim"></div><div class="sheet ui-panel">
+  <h2 class="sheet-title ui-outline">背包</h2>${close}${tabs(BAG_TABS, '宠物')}
+  <div class="content" style="flex-direction:row;gap:10px">
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+      <div class="content-head"><span class="chip">${ICON.paw}已装备 <b>2 / 3</b></span><span class="chip">总加成 <b>+195%</b></span><span class="grow"></span><span class="chip">10 / 50 只</span></div>
+      <div class="grid" style="--cell:82px">${PETS.map(petCell).join('')}${'<div class="cell empty"></div>'.repeat(5)}</div>
+    </div>
+    <aside class="detail" data-rarity="epic" style="width:168px"><span class="rarity">史诗</span>${pet('owl', '#8bcbdc')}<h3 class="ui-outline">晶羽猫头鹰</h3>
+      <div class="stat-row"><span>挖矿力量</span><b>+115%</b></div><div class="stat-row"><span>来自</span><b>原野蛋</b></div>${btn('卸下', 'steel', 's')}</aside>
+  </div>
+  <footer class="footer">${btn('获取宠物', 'green', 's', 'paw')}<span class="hint">去蛋台开蛋，宠物会跟着你一起挖矿</span><span class="grow"></span>${btn('全部卸下', 'steel', 's')}${btn('一键最佳', 'orange', 's')}</footer>
+</div>`));
+
+// 3. Bag · minerals
+const ORES = [['泥土', '#ad8161', 8, 1], ['岩石', '#929b91', 6, 1], ['煤', '#3a4448', 4, 8], ['铜', '#d88651', 5, 16], ['铁', '#99a9ae', 3, 12], ['金', '#edbd4d', 2, 40], ['水晶', '#76e0e7', 1, 80], ['祖母绿', '#3fd17f', 2, 120, 1]];
+frames.push(frame('03-bag-ores', 'bg-camp', `<div class="scrim"></div><div class="sheet ui-panel">
+  <h2 class="sheet-title ui-outline">背包</h2>${close}${tabs(BAG_TABS, '矿物')}
+  <div class="content">
+    <div class="content-head"><div class="bar" data-tone="gold" style="--v:68%;flex:1"><i></i><span>容量 34 / 50</span></div><span class="chip">${ICON.coin}可售 30 件 · 约 <b>1,240</b></span></div>
+    <div class="grid" style="--cell:88px">${ORES.map(([name, color, count, price, kept]) => `<div class="cell" style="--r:#2f8be0;--r-lo:#1d6cc7">
+      <span class="name ui-outline">${name}</span><span style="position:absolute;left:24%;top:24%;width:52%;height:52%">${ore(color)}</span>
+      <span class="stat ui-outline">×${count}</span><span class="ui-outline" style="position:absolute;left:6px;bottom:4px;font-size:11px;color:#bdf3ff">${price}</span>
+      ${kept ? '<span class="stamp" style="background:#b672e6;top:auto;bottom:22px;right:auto;left:50%;transform:translateX(-50%)">保留</span>' : ''}</div>`).join('')}${'<div class="cell empty"></div>'.repeat(4)}</div>
+  </div>
+  <footer class="footer"><span class="hint">点矿物可设为“保留”：世界矿区要用的材料不会被卖掉。</span><span class="grow"></span>${btn('前往售卖圈', 'orange', 's', 'coin')}</footer>
+</div>`));
+
+// 4. Bag · gear
+frames.push(frame('04-bag-gear', 'bg-surface', `<div class="scrim"></div><div class="sheet ui-panel">
+  <h2 class="sheet-title ui-outline">背包</h2>${close}${tabs(BAG_TABS, '装备')}
+  <div class="content" style="flex-direction:row;gap:12px">
+    ${[['pickaxe', '矿工镐', 'Lv.3 / 30', [['力量', '+30'], ['攻速', '2 次/秒']], '铁镐 · 力量 +45', '1,200', '#ffb84a', '#d9761a'],
+       ['backpack', '帆布背包', 'Lv.2 / 30', [['容量', '50'], ['已装', '34']], '旅行背包 · 容量 120', '800', '#c58cf0', '#8b55cf']].map(([icon, name, level, stats, next, price, c, lo]) =>
+      `<div class="card" style="flex:1;--c:${c};--c-lo:${lo};flex-direction:row;align-items:stretch;gap:10px;padding:10px">
+        <div style="width:110px;display:grid;justify-items:center;align-content:center;gap:4px"><span style="width:92px;height:92px">${ICON[icon]}</span><span class="rarity" style="--r:#0b4f94;--r-lo:#083d73">${level}</span></div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:6px"><h4 class="ui-outline" style="font-size:20px">${name}</h4>
+          ${stats.map(([k, v]) => `<div class="stat-row"><span>${k}</span><b>${v}</b></div>`).join('')}
+          <div class="well" style="padding:6px 8px;margin-top:auto"><small style="display:block;text-align:left">下一件</small><b class="ui-outline" style="font-size:14px">${next}</b><div style="margin-top:2px" class="chip">${ICON.coin}<b>${price}</b></div></div></div></div>`).join('')}
+  </div>
+  <footer class="footer"><span class="hint">装备在地表商店购买和更换，买到的旧装备可以免费换回。</span><span class="grow"></span>${btn('前往商店', 'orange', 's', 'chest')}</footer>
+</div>`));
+
+// 5. Egg stand
+const EGG = [['slime', '#7ecf69', '苔团', 'common', '40%', '+50%'], ['mole', '#bc986a', '矿洞鼹鼠', 'common', '30%', '+60%'], ['fox', '#eca341', '琥珀狐', 'rare', '20%', '+80%'], ['owl', '#8bcbdc', '晶羽猫头鹰', 'epic', '8%', '+115%'], ['dragon', '#b2a0ee', '月光幼龙', 'legendary', '2%', '+175%']];
+frames.push(frame('05-egg', 'bg-eggs', `<div class="scrim"></div><div class="sheet m ui-panel" style="top:40px;bottom:16px;width:min(760px,calc(100% - 56px))">
+  <h2 class="sheet-title ui-outline">原野蛋</h2>${close}
+  <div class="content" style="padding-top:30px"><div class="sheet-sub">第一世界 · 地表蛋台 · 每只宠物的真实概率</div>
+    <div style="display:grid;grid-template-columns:132px 1fr;gap:12px;align-items:center;flex:1;min-height:0">
+    <div style="display:grid;justify-items:center;gap:4px"><div style="width:118px;height:132px">${eggArt('#fff3d6', '#8fd36e')}</div><span class="chip">${ICON.coin}<b>80</b></span></div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">${EGG.map(([kind, color, name, rarity, odds, stat]) => `<div style="display:grid;gap:4px;justify-items:center">
+      <div class="cell" data-rarity="${rarity}" style="width:100%;aspect-ratio:1">${pet(kind, color)}<span class="name ui-outline">${name}</span><span class="stat ui-outline">${stat}</span></div>
+      <span class="ui-outline" style="font-size:22px;line-height:1">${odds}</span><span class="rarity" data-rarity="${rarity}">${{ common: '普通', rare: '稀有', epic: '史诗', legendary: '传说' }[rarity]}</span></div>`).join('')}</div></div>
+  </div>
+  <footer class="footer"><span class="chip">${ICON.coin}<b>1,234</b></span><span class="toggle"><i></i><span class="ui-outline">自动孵蛋</span></span><span class="grow"></span>${btn('开一个 · 80', 'orange', 'm', 'coin')}</footer>
+</div>`));
+
+// 6. Hatch reveal
+frames.push(frame('06-hatch', 'bg-eggs', `<div class="reveal" data-rarity="epic"><div class="reveal-body">
+  <div class="ribbon ui-outline">史诗！</div>${pet('owl', '#8bcbdc')}
+  <h2 class="ui-outline" style="margin:0;font-size:30px;--ui-stroke:5px">晶羽猫头鹰</h2>
+  <div style="display:flex;gap:8px"><span class="chip">挖矿力量 <b>+115%</b></span><span class="stamp" style="position:static;background:#ff78b5">新宠物</span></div>
+  <div style="display:flex;gap:10px;margin-top:8px">${btn('完成', 'steel', 'm')}${btn('去装备', 'purple', 'm', 'paw')}${btn('再开一个 · 80', 'orange', 'm', 'coin')}</div>
+</div></div>`));
+
+// 7. World · travel
+const LAYERS = [['地表', 0, '#62c96b', '#2f9a3d', 'here'], ['老矿井', 400, '#d79a5a', '#9a6332', 'open'], ['蘑菇洞穴', 800, '#58c4a4', '#2c8b74', 'open'], ['水晶洞穴', 1200, '#9b8cf5', '#6551c7', 'locked', '812 / 1200'], ['地下遗迹', 1600, '#cdb58a', '#9a8458', 'locked', '812 / 1600']];
+frames.push(frame('07-world-travel', 'bg-surface', `<div class="scrim"></div><div class="sheet ui-panel">
+  <h2 class="sheet-title ui-outline">世界</h2>${close}${tabs([['portal', '传送'], ['globe', '进度']], '传送')}
+  <div class="content"><div class="content-head"><span class="chip">${ICON.gem}历史最深 <b>812 米</b></span><span class="hint">到达新深度就永久解锁那一层的传送和宠物蛋</span></div>
+    <div class="cards" style="--card:134px">${LAYERS.map(([name, depth, c, lo, state, progress]) => `<div class="card${state === 'locked' ? ' locked' : ''}" style="--c:${c};--c-lo:${lo}">
+      <span style="width:58px;height:58px">${state === 'locked' ? lock : ICON.portal}</span><h4 class="ui-outline">${name}</h4><small>${depth ? `地下 ${depth} 米` : '营地 · 商店 · 蛋台'}</small>
+      ${state === 'here' ? '<span class="stamp" style="position:static">当前位置</span>' : state === 'open' ? btn('传送', 'green', 's') : `<div class="bar" style="--v:${812 / depth * 100}%;width:100%"><i></i><span>${progress}</span></div>`}</div>`).join('')}</div>
+  </div>
+  <footer class="footer"><span class="hint">回到地表或营地即可传送；抽到“便携传送”后随时可用。</span></footer>
+</div>`));
+
+// 8. World · progress
+const MATS = [['祖母绿', '#3fd17f', 12, 50], ['紫水晶', '#b07cf0', 50, 50], ['红宝石', '#ef5a6b', 8, 40], ['钻石', '#bdefff', 0, 30], ['黑曜石', '#4b4560', 3, 30]];
+frames.push(frame('08-world-gate', 'bg-surface', `<div class="scrim"></div><div class="sheet ui-panel">
+  <h2 class="sheet-title ui-outline">世界</h2>${close}${tabs([['portal', '传送'], ['globe', '进度']], '进度')}
+  <div class="content"><div class="content-head"><div class="seg"><b aria-selected="true">第二世界</b><b>第三世界</b></div><span class="grow"></span><span class="chip">当前：第一世界</span></div>
+    <div style="display:grid;grid-template-columns:200px 1fr;gap:10px;min-height:0">
+      <div class="card" style="--c:#4fc3ff;--c-lo:#1a86d8;justify-content:center"><span style="width:56px;height:56px">${ICON.globe}</span><h4 class="ui-outline">① 打开外门</h4><div class="bar" style="--v:32%;width:100%"><i></i><span>32.4 万 / 100 万</span></div><small>累计挖掘量（出售不减少）</small></div>
+      <div class="well" style="padding:8px;display:grid;gap:5px"><b class="ui-outline" style="font-size:14px">② 在矿口缴纳，永久开放矿区</b>
+        ${MATS.map(([name, color, have, need]) => `<div style="display:grid;grid-template-columns:22px 70px 1fr 64px;align-items:center;gap:6px"><span style="width:22px;height:22px">${ore(color)}</span><span>${name}</span><div class="bar" style="--v:${have / need * 100}%;height:16px;border-width:2px"><i></i></div><b class="ui-outline" style="font-size:13px;text-align:right">${have}/${need}</b></div>`).join('')}
+        <div style="display:grid;grid-template-columns:22px 70px 1fr 64px;align-items:center;gap:6px"><span style="width:22px;height:22px">${ICON.coin}</span><span>金币</span><div class="bar" data-tone="gold" style="--v:1%;height:16px;border-width:2px"><i></i></div><b class="ui-outline" style="font-size:13px;text-align:right">1万/1千万</b></div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer"><span class="grow"></span>${btn('保留所需材料', 'purple', 's', 'gem')}${btn('前往矿口', 'orange', 's', 'portal')}</footer>
+</div>`));
+
+// 9. Rewards · online
+frames.push(frame('09-rewards', 'bg-surface', `<div class="scrim"></div><div class="sheet ui-panel">
+  <h2 class="sheet-title ui-outline">奖励</h2>${close}${tabs([['gift', '在线', '1'], ['coin', '签到'], ['paw', '邀请']], '在线')}
+  <div class="content"><div class="content-head"><span class="chip">${ICON.gift}幸运币 <b>3</b></span><span class="hint">今日在线 07:42 · 每档每天领取一次</span></div>
+    <div class="cards" style="--card:142px">${[[5, 'ready'], [10, 'run', 77], [20, 'run', 38], [30, 'run', 25]].map(([m, s, v]) => `<div class="card" style="--c:${s === 'ready' ? '#ffd447' : '#2f8be0'};--c-lo:${s === 'ready' ? '#f08a14' : '#1d6cc7'}${s === 'ready' ? ';box-shadow:0 0 0 3px #fff7b0,0 3px 0 var(--ui-ink)' : ''}">
+      <h4 class="ui-outline">${m} 分钟</h4><span style="width:56px;height:56px">${ICON.gift}</span><small>幸运币 ×1</small>
+      ${s === 'ready' ? btn('领取', 'green', 's') : `<div class="bar" style="--v:${v}%;width:100%"><i></i><span>${['', '', '07:42', '07:42', '07:42'][1 + (m > 5) + (m > 10)] ?? ''} / ${m}:00</span></div>`}</div>`).join('')}</div>
+  </div>
+  <footer class="footer"><span class="hint">幸运币在地表扭蛋机抽奖：金币、加速、永久挖矿加速、便携传送……</span><span class="grow"></span>${btn('前往扭蛋机', 'pink', 's', 'gift')}</footer>
+</div>`));
+
+// 10. Capsule machine
+const PRIZES = [['coin', '金币', '65%', '随最深层成长'], ['bolt', '移速 ×2', '10%', '5 分钟'], ['pickaxe', '挖矿 ×1.5', '5%', '永久'], ['portal', '便携传送', '5%', '永久'], ['paw', '自动孵蛋', '5%', '永久'], ['clover', '稀有概率 ×2', '10%', '5 分钟']];
+frames.push(frame('10-capsule', 'bg-surface', `<div class="scrim"></div><div class="sheet m ui-panel" style="top:40px;bottom:14px;width:min(700px,calc(100% - 56px))">
+  <h2 class="sheet-title ui-outline">幸运扭蛋机</h2>${close}
+  <div class="content" style="padding-top:30px"><div class="sheet-sub">每次抽一项；已拥有的永久权益会换成金币</div>
+    <div style="display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:center;flex:1;min-height:0">
+    <div style="width:140px;height:160px">${capsuleArt()}</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">${PRIZES.map(([icon, name, odds, note], i) => `<div class="card" style="--c:${i === 0 ? '#ffcf4a' : i > 1 && i < 5 ? '#b67cf2' : '#3db0ff'};--c-lo:${i === 0 ? '#f08a14' : i > 1 && i < 5 ? '#7d47c9' : '#1676d6'};flex-direction:row;gap:6px;padding:6px 8px;justify-content:flex-start">
+      <span style="width:40px;height:40px;flex:none">${ICON[icon]}</span><div style="display:grid;justify-items:start"><b class="ui-outline" style="font-size:14px;line-height:1.15">${name}</b><span class="ui-outline" style="font-size:18px;color:var(--ui-text-gold)">${odds}</span><small>${note}</small></div></div>`).join('')}</div></div>
+  </div>
+  <footer class="footer"><span class="chip">${ICON.gift}幸运币 <b>3</b></span><span class="grow"></span>${btn('抽一次 · 1 幸运币', 'pink', 'm', 'gift')}</footer>
+</div>`));
+
+// 11. Help
+const TIPS = [['jump', '移动', '左边摇杆走路，右下跳跃，右侧空白处拖动看四周'], ['pickaxe', '挖矿', '点一下敲击，按住持续挖。矿石自动进背包'], ['coin', '出售', '背包满了回地表，走进金色圆圈自动卖掉'], ['chest', '升级', '在商店换更好的镐子和更大的背包'], ['paw', '宠物', '去蛋台开蛋，装备后加挖矿力量'], ['portal', '深度', '越往下矿越值钱，新深度解锁传送和新蛋']];
+frames.push(frame('11-help', 'bg-surface', `<div class="scrim"></div><div class="sheet m ui-panel" style="top:38px;bottom:12px;width:min(700px,calc(100% - 64px))">
+  <h2 class="sheet-title ui-outline">怎么玩</h2>${close}
+  <div class="content" style="padding-top:26px"><div style="display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:1fr;gap:8px;flex:1">${TIPS.map(([icon, title, text]) => `<div class="card" style="flex-direction:row;align-items:center;gap:10px;padding:10px 12px;--c:#2f8be0;--c-lo:#1d6cc7">
+    <span style="width:58px;height:58px;flex:none">${ICON[icon]}</span><div style="display:grid;gap:2px"><h4 class="ui-outline">${title}</h4><small style="text-align:left">${text}</small></div></div>`).join('')}</div></div>
+  <footer class="footer"><span class="hint">引导进行中：第 3 步 / 共 8 步</span><span class="grow"></span>${btn('跳过引导', 'steel', 's')}${btn('继续引导', 'green', 's')}</footer>
+</div>`));
+
+// 12. System dialog
+frames.push(frame('12-system', 'bg-surface', `<div class="scrim"></div><div class="sheet s ui-panel">
+  <h2 class="sheet-title ui-outline" style="font-size:28px">进度尚未保存</h2>
+  <div class="content" style="padding-top:28px"><div class="well" style="padding:10px 12px"><span class="hint">网络或存储暂时不可用。重试一次通常就能保存；也可以先回到游戏。</span></div></div>
+  <footer class="footer" style="justify-content:center">${btn('不保存退出', 'red', 's')}${btn('返回游戏', 'steel', 's')}${btn('重试保存', 'orange', 's')}</footer>
+</div>`));
+
+// 13. Loading
+frames.push(frame('13-loading', 'bg-surface', `<div class="scrim" style="background:linear-gradient(180deg,#0b1d3399,#0b1d33e6)"></div>
+  <div style="position:absolute;inset:0;display:grid;place-items:center;text-align:center"><div style="display:grid;justify-items:center;gap:10px;width:420px">
+    <span style="width:84px;height:84px">${ICON.pickaxe}</span>
+    <h1 class="ui-outline" style="margin:0;font-size:52px;line-height:1;--ui-stroke:8px;text-shadow:0 5px 0 var(--ui-ink)">MINING 矿场</h1>
+    <span class="ui-outline" style="font-size:16px;color:var(--ui-text-gold)">向下探索 · 满载而归</span>
+    <div class="bar" data-tone="gold" style="--v:62%;width:100%;height:30px"><i></i><span>正在铺设脚下的土地 · 62%</span></div>
+    <div class="ui-card" style="padding:8px 14px;font-size:13px">小提示：背包满了就回地表出售，金币可以买更好的镐子。</div>
+  </div></div>
+  <div style="position:absolute;top:12px;right:12px">${btn('退出', 'steel', 's', 'exit')}</div>`));
+
+// 14. Bag · pets on the smallest phone
+frames.push(frame('14-bag-pets-640', 'bg-surface', `<div class="scrim"></div><div class="sheet ui-panel" style="top:30px;bottom:8px;width:calc(100% - 40px)">
+  <h2 class="sheet-title ui-outline" style="font-size:28px;top:-22px">背包</h2>${close}${tabs(BAG_TABS, '宠物').replace('<nav class="tabs">', '<nav class="tabs" style="padding-top:22px;gap:5px">').replaceAll('class="tab"', 'class="tab" style="width:60px;height:54px"')}
+  <div class="content" style="padding-top:22px">
+    <div class="content-head"><span class="chip">${ICON.paw}已装备 <b>2 / 3</b></span><span class="grow"></span><span class="chip">10 / 50 只</span></div>
+    <div class="grid" style="--cell:76px">${PETS.map(petCell).join('')}</div>
+  </div>
+  <footer class="footer"><span class="rarity" data-rarity="epic">史诗</span><b class="ui-outline">晶羽猫头鹰 +115%</b><span class="grow"></span>${btn('卸下', 'steel', 's')}${btn('一键最佳', 'orange', 's')}</footer>
+</div>`, 'small'));
+
+document.getElementById('frames').innerHTML = frames.join('');
+</script>
+</body>
+</html>

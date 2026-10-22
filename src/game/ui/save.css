@@ -1,66 +1,11 @@
-.save-boot,
-.save-exit {
-  position: absolute;
-  z-index: 120;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 12px;
-  background: #101e2fee;
-  color: #fff;
-  font: 600 15px system-ui;
-  text-align: center;
-  padding: 24px;
+/* Save boot screen and save notices, matched to the loading screen and kit. */
+.save-boot {
+  position: absolute; inset: 0; z-index: 120; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 24px; text-align: center; color: #fff;
+  background: var(--ui-pattern) center / 44px repeat, radial-gradient(ellipse at 50% 40%, #4fd0ff 0%, #13a2f4 45%, #0a6fc4 100%);
 }
-.save-boot h2,
-.save-exit h2 {
-  font-size: 22px;
-  margin: 8px;
-}
-.save-boot p,
-.save-exit p {
-  max-width: 520px;
-  overflow-wrap: anywhere;
-  color: #f5d8ae;
-}
-.save-boot button,
-.save-exit button,
-.save-warning button {
-  border: 2px solid #e5f6ff;
-  border-radius: 9px;
-  background: #237d99;
-  color: white;
-  font: 700 14px system-ui;
-  padding: 9px 18px;
-  cursor: pointer;
-}
-.save-warning {
-  position: absolute;
-  z-index: 110;
-  left: 50%;
-  bottom: 18px;
-  transform: translateX(-50%);
-  padding: 8px 14px;
-  background: #352a22f5;
-  color: #ffe3ad;
-  border: 1px solid #d9ad66;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  max-width: 85vw;
-  font-size: 13px;
-}
-.save-warning button {
-  font-size: 12px;
-  padding: 5px 9px;
-  white-space: nowrap;
-}
-.save-exit-actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
+.save-boot-mark { font-size: 56px; line-height: 1; letter-spacing: .06em; --ui-stroke: 8px; text-shadow: 0 5px 0 var(--ui-ink); }
+.save-boot h2 { margin: 4px; font-size: 20px; }
+.save-boot-error { max-width: 520px; margin: 0; overflow-wrap: anywhere; font: 700 13px/1.5 var(--ui-font-body); color: #fff1b0; text-shadow: 0 1px 0 var(--ui-ink); }
+.save-boot-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 6px; }
+.save-warning { position: absolute; z-index: 110; left: 50%; top: calc(64px + var(--safe-top)); transform: translateX(-50%); display: flex; align-items: center; gap: 12px; max-width: 85%; padding: 8px 10px 8px 14px; font: 700 13px/1.4 var(--ui-font-body); }
+.save-error { padding: 10px 12px; }

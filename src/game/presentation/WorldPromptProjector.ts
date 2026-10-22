@@ -12,7 +12,8 @@ export class WorldPromptProjector {
     element.style.visibility = visible ? 'visible' : 'hidden';
     if (visible) {
       element.style.left = `${(this.point.x + 1) * 50}%`;
-      element.style.top = `${(1 - this.point.y) * 50}%`;
+      // Keep the prompt below the top HUD band (depth banner); it stays aligned over the egg horizontally.
+      element.style.top = `max(${(1 - this.point.y) * 50}%, calc(var(--safe-top, 0px) + 112px))`;
     }
   }
 }

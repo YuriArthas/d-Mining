@@ -4,23 +4,25 @@ import { formatNumber as number } from '../../presentation/formatNumber.ts';
 import { Pill, Tile, UiButton } from '../kit/controls.tsx';
 import { Icon } from '../kit/icons.tsx';
 import { OrePickupFeed } from '../OrePickupFeed.tsx';
+import { teamCanImprove } from '../bag/BagSheet.tsx';
+import { claimableRewards } from '../rewards/RewardsSheet.tsx';
 import { SystemMenu, type SystemControls } from './SystemMenu.tsx';
 import './hud.css';
 
 export type HudActions = {
-  openPets(): void; openShop(): void; openRewards(): void; openWorlds(): void;
-  openTravel(): void; openMinerals(): void; openHelp(): void;
+  openPets(): void; openShop(): void; openRewards(): void; openWorlds(): void; openMinerals(): void; openHelp(): void;
 };
 
-/** Screen-space HUD. Zones mirror the original: resources left, depth top-centre,
- *  actions down the right edge, the return-to-surface button only underground. */
+/** Screen-space HUD. Zones mirror the original: resources left, depth top-centre, four
+ *  actions down the right edge, Sell / Surface trips at the bottom when they help. */
 export function Hud({ session, actions, system, objective, target, prompts }: {
   session: GameSession; actions: HudActions; system: SystemControls;
   objective?: ReactNode; target?: ReactNode; prompts?: ReactNode;
 }) {
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot);
-  const [moreOpen, setMoreOpen] = useState(false);
-  const run = (action: () => void) => () => { setMoreOpen(false); action(); };
+  const pets = useSyncExternalStore(session.pets.subscribe, session.pets.getSnapshot);
+  const run = (action: () => void) => () => action();
+  const claimable = claimableRewards(state.rewards);
   const bag = state.inventory;
   const world = state.worlds.find(w => w.id === state.currentWorld)?.name ?? `世界 ${state.currentWorld}`;
   // Location is null until the first physics step; the game always starts on the surface.
@@ -49,27 +51,20 @@ export function Hud({ session, actions, system, objective, target, prompts }: {
     <SystemMenu system={system} onHelp={run(actions.openHelp)} />
 
     <nav className="hud-rail" aria-label="游戏功能">
-      <Tile icon="paw" label="宠物" aria-label="打开我的宠物" data-guide-action="pets" onPress={run(actions.openPets)} />
+      <Tile icon="paw" label="宠物" aria-label="打开我的宠物" data-guide-action="pets" badge={teamCanImprove(pets) ? '!' : undefined} onPress={run(actions.openPets)} />
       <Tile icon="chest" label="商店" tone="orange" aria-label="商店" data-kind="upgrade" data-guide-action="upgrade" onPress={run(actions.openShop)} />
-      <Tile icon="gift" label="奖励" tone="pink" aria-label={`奖励，幸运币 ${state.rewards.balance}`}
-        badge={state.rewards.balance > 0 ? number(state.rewards.balance) : undefined} onPress={run(actions.openRewards)} />
-      <div className="hud-more">
-        <Tile className="hud-more-toggle" icon="grid" label={moreOpen ? '收起' : '更多'} aria-label={moreOpen ? '收起功能' : '更多功能'}
-          aria-expanded={moreOpen} aria-controls="hud-more-panel" onPress={() => setMoreOpen(value => !value)} />
-        <div id="hud-more-panel" className="hud-more-panel ui-panel" data-open={moreOpen}>
-          {state.journey && <Tile icon="globe" label="世界" aria-label="世界" onPress={run(actions.openWorlds)} />}
-          <Tile icon="portal" label="传送" tone="purple" aria-label="传送" disabled={!state.canTravel}
-            title={state.canTravel ? '前往已解锁的地下层' : '回到营地后可以传送'} onPress={run(actions.openTravel)} />
-          {state.journey && <Tile icon="gem" label="矿物" aria-label="矿物背包" onPress={run(actions.openMinerals)} />}
-        </div>
-      </div>
+      <Tile icon="gift" label="奖励" tone="pink" aria-label={claimable ? `奖励，${claimable} 个可领取` : '奖励'} badge={claimable || undefined} onPress={run(actions.openRewards)} />
+      <Tile icon="globe" label="世界" aria-label="世界" onPress={run(actions.openWorlds)} />
     </nav>
 
     <div className="hud-bottom">
       {target}
       {prompts}
       <HudNotice text={state.notice} />
-      {!surface && <UiButton className="hud-return" size="l" icon="home" data-guide-action="return" onPress={run(session.returnToSurface)}>返回地表</UiButton>}
+      {(bag.used > 0 && !state.inSellZone || !surface) && <div className="hud-trips">
+        {bag.used > 0 && !state.inSellZone && <UiButton className="hud-sell" size="l" tone="green" icon="coin" data-state={bag.isFull ? 'full' : undefined} aria-label="传送到售卖圈出售" onPress={() => session.goTo('sale')}>出售</UiButton>}
+        {!surface && <UiButton className="hud-return" size="l" icon="home" data-guide-action="return" onPress={run(session.returnToSurface)}>返回地表</UiButton>}
+      </div>}
     </div>
     <OrePickupFeed session={session} />
   </div>;

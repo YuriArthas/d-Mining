@@ -8,27 +8,19 @@
 .guide-marker b { position:absolute; left:48px; top:10px; white-space:nowrap; padding:4px 10px; border:1px solid #ffcf59; border-radius:9px; background:#3e3526ed; font-size:13px; }
 .guide-offscreen { display:none; position:absolute; left:48px; top:40px; white-space:nowrap; padding:2px 8px; font-size:11px; background:#193a36ed; border-radius:6px; }
 .guide-marker[data-offscreen=true] .guide-offscreen { display:block; }
-.guide-help { max-width:560px; }
-.guide-help p,.guide-help li { line-height:1.7; font-size:14px; }
-.guide-help li { margin-bottom:10px; }
 .session-ui[data-panel=none][data-guide=return] [data-guide-action=return],
 .session-ui[data-panel=none][data-guide=upgrade] [data-guide-action=upgrade],
 .session-ui[data-panel=none][data-guide=backpack] [data-guide-action=upgrade],
 .session-ui[data-panel=none][data-guide=equip] [data-guide-action=pets],
+.session-ui[data-panel=none][data-guide=sell] .hud-sell,
 .session-ui[data-panel=none][data-guide=egg][data-guide-egg=true] .egg-world-prompt,
-.session-ui[data-panel=upgrade][data-guide=upgrade] .upgrade-panel[data-tab=backpack] .upgrade-tabs button:first-child,
-.session-ui[data-panel=upgrade][data-guide=upgrade] .upgrade-panel[data-tab=pickaxe] .upgrade-buy,
-.session-ui[data-panel=upgrade][data-guide=backpack] .upgrade-panel[data-tab=pickaxe] .upgrade-tabs button:last-child,
-.session-ui[data-panel=upgrade][data-guide=backpack] .upgrade-panel[data-tab=backpack] .upgrade-buy,
-.session-ui[data-panel=pets][data-needs-equip=true] .pet-footer .pet-primary,
-.session-ui[data-panel=egg][data-needs-equip=true] .egg-result-actions .pet-primary,
+.session-ui[data-panel=bag][data-needs-equip=true] .bag-equip-best,
+.session-ui[data-panel=egg][data-needs-equip=true] .hatch-actions [data-tone=purple],
 .session-ui[data-panel=egg][data-guide=egg][data-guide-egg=true] .egg-buy:not(:disabled) { outline:3px solid #ffe386; outline-offset:3px; box-shadow:0 0 12px #ffd35b80; animation:guide-pulse .8s ease-out 2; }
 @keyframes guide-pulse { 50% { outline-offset:5px; box-shadow:0 0 20px #ffd35bcc; } }
 @media (prefers-reduced-motion:reduce) { .session-ui button { animation:none!important; } }
 @media (max-height:650px) { .guide-card { top:100px; padding:10px 12px; } }
 
-.inventory-hud .inventory-help { position:absolute; bottom:8px; right:8px; width:24px; min-height:24px; background:#284747; color:#ffe2a0; }
-.inventory-hud .sale-hint,.inventory-hud .sale-notice { padding-right:28px; }
 
 .guide-card[data-step=dig] { border:2px solid #ffdc60; box-shadow:0 0 22px #ffd35b55; }
 .guide-mouse-instruction { display:flex; align-items:center; gap:16px; padding:8px 12px; margin:8px 0; border-radius:10px; background:#ffd35b1c; }

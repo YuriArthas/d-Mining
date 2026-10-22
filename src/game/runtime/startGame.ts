@@ -238,7 +238,12 @@ export async function startGame(options: StartGameOptions) {
         pending: (cell) => terrain.pending(cell),
         mine: (targets) => terrain.mineMany(targets),
         cancelMining: () => terrain.cancelPending(),
-        travelTo: player.travelTo,
+        travelTo: (feet, lookAt) => {
+          player.travelTo(feet);
+          // Camera yaw 0 looks toward -Z; face the destination's point of interest.
+          // Tall targets (egg stands with their prompt) get a steeper view so the prompt clears the top HUD.
+          if (lookAt) cameraView.look(Math.atan2(feet[0] - lookAt[0], feet[2] - lookAt[2]), lookAt[1] - feet[1] > 1.5 ? .5 : .32);
+        },
         returnToSurface: () => player.travelTo(content.returnPoint),
       }),
     );

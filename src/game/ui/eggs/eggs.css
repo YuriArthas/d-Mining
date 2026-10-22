@@ -1,0 +1,50 @@
+/* Egg stand sheet and the full-screen hatch reveal. */
+.egg-layout { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 12px; align-items: center; flex: 1; }
+.egg-hero { display: grid; justify-items: center; gap: 4px; }
+.egg-hero-art { width: 116px; height: 132px; }
+.egg-outcomes { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.egg-outcome { display: grid; justify-items: center; gap: 3px; min-width: 0; }
+.egg-outcome .ui-cell { aspect-ratio: 1; height: auto; cursor: default; }
+.egg-odds { font-size: 22px; line-height: 1; }
+.egg-owned { font: 700 11px/1.2 var(--ui-font-body); color: #e3f6ff; text-shadow: 0 1px 0 #0b3d6e; }
+.egg-status { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.hatch {
+  position: absolute; inset: 0; z-index: 70; display: grid; place-items: center; overflow: hidden;
+  background: radial-gradient(circle at 50% 46%, color-mix(in srgb, var(--r) 70%, white) 0, var(--r-lo) 38%, #0b1d33 80%);
+  touch-action: none;
+}
+.hatch-rays { position: absolute; inset: -40%; background: repeating-conic-gradient(from 0deg, #ffffff30 0 9deg, transparent 9deg 22deg); opacity: 0; animation: hatch-fade .3s 1s forwards, hatch-spin 24s linear infinite; }
+.hatch-stage { position: relative; display: grid; place-items: center; }
+.hatch-egg { grid-area: 1 / 1; width: 150px; height: 175px; animation: hatch-shake .8s ease-in-out, hatch-out .2s .8s forwards; }
+.hatch-flash { grid-area: 1 / 1; width: 520px; height: 520px; border-radius: 50%; background: radial-gradient(circle, #fff 0, #ffffffcc 30%, transparent 70%); opacity: 0; pointer-events: none; animation: hatch-flash .45s .8s; }
+.hatch-result { grid-area: 1 / 1; display: grid; justify-items: center; gap: 4px; opacity: 0; transform: scale(.6); animation: hatch-pop .45s 1s cubic-bezier(.3, 1.6, .5, 1) forwards; }
+.hatch-pet { width: 150px; height: 150px; filter: drop-shadow(0 6px 0 #0b1d3355); }
+.hatch-result h2 { margin: 0; font-size: 30px; --ui-stroke: 5px; }
+.hatch-ribbon { padding: 4px 28px 6px; border: var(--ui-edge) solid var(--ui-ink); background: linear-gradient(180deg, var(--r), var(--r-lo)); clip-path: polygon(0 0, 100% 0, 94% 50%, 100% 100%, 0 100%, 6% 50%); font-size: 24px; line-height: 1; }
+.hatch-new { background: var(--ui-pink); }
+.hatch-actions { justify-content: center; margin-top: 6px; }
+.hatch-skip { position: absolute; inset: 0; z-index: 2; padding: 0; border: 0; background: none; cursor: pointer; }
+.hatch[data-done=true] .hatch-egg { display: none; }
+.hatch[data-done=true] .hatch-flash { display: none; }
+.hatch[data-done=true] .hatch-result { opacity: 1; transform: none; animation: none; }
+.hatch[data-done=true] .hatch-rays { opacity: 1; animation: hatch-spin 24s linear infinite; }
+@keyframes hatch-shake { 0%, 100% { transform: rotate(0); } 15% { transform: rotate(-9deg); } 30% { transform: rotate(9deg); } 45% { transform: rotate(-12deg) scale(1.04); } 60% { transform: rotate(12deg) scale(1.06); } 75% { transform: rotate(-6deg) scale(1.1); } }
+@keyframes hatch-out { to { opacity: 0; transform: scale(1.35); } }
+@keyframes hatch-flash { 30% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes hatch-pop { to { opacity: 1; transform: none; } }
+@keyframes hatch-fade { to { opacity: 1; } }
+@keyframes hatch-spin { to { rotate: 360deg; } }
+
+@container game (max-height: 360px) {
+  .egg-layout { grid-template-columns: 96px minmax(0, 1fr); gap: 8px; }
+  .egg-hero-art { width: 84px; height: 96px; }
+  .egg-odds { font-size: 18px; }
+  .hatch-pet { width: 116px; height: 116px; }
+  .hatch-result h2 { font-size: 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hatch-egg, .hatch-flash { display: none; }
+  .hatch-result { opacity: 1; transform: none; animation: none; }
+  .hatch-rays { opacity: 1; animation: none; }
+}

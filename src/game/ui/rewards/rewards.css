@@ -1,0 +1,33 @@
+/* Rewards container and capsule machine. */
+.rewards-cards { --card: 150px; }
+.rewards-cards .ui-card-tile, .rewards-days .ui-card-tile { min-height: 150px; }
+.rewards-cards .ui-card-tile > :last-child, .rewards-days .ui-card-tile > :last-child { margin-top: auto; }
+.rewards-cards .ui-bar { width: 100%; }
+.rewards-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.rewards-days .ui-card-tile { padding: 6px 4px 8px; min-height: 140px; }
+.rewards-days h4 { font-size: 14px; }
+.rewards-days .ui-card-art { width: 40px; height: 40px; }
+.rewards-days b { font-size: 16px; color: var(--ui-text-gold); }
+.rewards-invite { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.rewards-share { display: grid; gap: 8px; padding: 10px; align-content: start; }
+.rewards-share > b { font-size: 16px; }
+
+.capsule-layout { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 12px; align-items: center; flex: 1; }
+.capsule-art { width: 132px; height: 154px; }
+.capsule-prizes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.capsule-prize { flex-direction: row; justify-content: flex-start; gap: 6px; padding: 6px 8px; --c: #3db0ff; --c-lo: #1676d6; }
+.capsule-prize[data-kind=coins] { --c: #ffcf4a; --c-lo: #f08a14; }
+.capsule-prize[data-kind=permanent] { --c: #b67cf2; --c-lo: #7d47c9; }
+.capsule-prize > div { display: grid; justify-items: start; min-width: 0; }
+.capsule-prize b { font-size: 14px; line-height: 1.15; }
+.capsule-prize strong { font-size: 18px; color: var(--ui-text-gold); }
+.capsule-prize small { text-align: left; }
+.capsule-prize-art { width: 40px; height: 40px; flex: none; }
+.capsule-reveal-art { width: 120px; height: 120px; }
+
+@container game (max-width: 760px) {
+  .rewards-days { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .capsule-layout { grid-template-columns: 96px minmax(0, 1fr); }
+  .capsule-art { width: 92px; height: 108px; }
+  .capsule-prizes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

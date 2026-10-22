@@ -1,0 +1,10 @@
+/* How-to-play cards. */
+.help-tips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 8px; flex: 1; }
+.help-tip { flex-direction: row; align-items: center; gap: 10px; padding: 10px 12px; }
+.help-tip-art { width: 54px; height: 54px; flex: none; }
+.help-tip h4 { text-align: left; }
+.help-tip p { margin: 2px 0 0; font: 700 12px/1.35 var(--ui-font-body); color: #eaf7ff; text-shadow: 0 1px 0 #0b2a4a; }
+@container game (max-width: 760px) {
+  .help-tips { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .help-tip-art { width: 40px; height: 40px; }
+}

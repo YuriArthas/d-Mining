@@ -1,0 +1,48 @@
+/* Bag container (宠物 / 矿物 / 装备). */
+.bag-pets { display: grid; grid-template-columns: minmax(0, 1fr) 168px; gap: 10px; align-items: start; min-height: 0; }
+.bag-pets-main { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.bag-detail { position: sticky; top: 0; gap: 5px; }
+.bag-detail-art { width: 76px; height: 76px; }
+.bag-detail h3 { font-size: 18px; }
+.bag-detail .ui-btn { width: 100%; }
+.bag-compact-equip { display: none; }
+.bag-message { max-width: 280px; }
+.bag-empty { display: grid; justify-items: center; gap: 6px; padding: 18px; text-align: center; }
+.bag-empty-art { width: 86px; height: 86px; }
+.bag-empty b { font-size: 20px; }
+
+.bag-eggs { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 8px; }
+.bag-egg { --c: #2f8be0; --c-lo: #1d6cc7; }
+.bag-egg-art { width: 62px; height: 72px; }
+.bag-egg h4 { font-size: 16px; }
+
+.bag-capacity { flex: 1; min-width: 160px; }
+.bag-ores .bag-ore-art { position: absolute; left: 25%; top: 24%; width: 50%; height: 50%; color: var(--ui-ink); }
+.bag-kept { position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--ui-purple); }
+.bag-reserve { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.bag-reserve > b { font-size: 15px; white-space: nowrap; }
+
+.bag-gears { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; flex: 1; }
+.bag-gear { flex-direction: row; align-items: stretch; gap: 10px; padding: 10px; --c: #ffb84a; --c-lo: #d9761a; }
+.bag-gear[data-kind=backpacks] { --c: #c58cf0; --c-lo: #8b55cf; }
+.bag-gear-art { width: 104px; display: grid; justify-items: center; align-content: center; gap: 6px; flex: none; }
+.bag-gear-art > .ui-icon { width: 88px; height: 88px; }
+.bag-gear-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.bag-gear-info h4 { font-size: 20px; text-align: left; }
+.bag-gear-next { display: grid; justify-items: start; gap: 3px; margin-top: auto; padding: 6px 8px; }
+.bag-gear-next small { text-align: left; }
+.bag-gear-next b { font-size: 14px; }
+
+@container game (max-width: 760px) {
+  .bag-pets { grid-template-columns: minmax(0, 1fr); }
+  .bag-detail { display: none; }
+  .bag-compact-equip { display: inline-flex; }
+  .bag-message { display: none; }
+  .bag-gear-art { width: 78px; }
+  .bag-gear-art > .ui-icon { width: 64px; height: 64px; }
+}
+@container game (max-height: 360px) {
+  .bag-gears { gap: 8px; }
+  .bag-gear { padding: 8px; }
+  .bag-gear-info h4 { font-size: 17px; }
+}

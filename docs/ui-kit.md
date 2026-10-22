@@ -10,6 +10,7 @@ One visual language for the HUD, dialogs and world prompts, matched to the origi
 | `src/game/ui/kit/kit.css` | Component styles: tile, button, close, pill, card, toast, panel |
 | `src/game/ui/kit/controls.tsx` | `Tile`, `UiButton`, `CloseButton`, `Pill` (all built on `GameButton`) |
 | `src/game/ui/kit/icons.tsx` | `Icon` vector set (48 × 48 grid, navy outline, two-tone fills) |
+| `src/game/ui/kit/panel.tsx`, `panel.css` | `Sheet` (the one dialog container), tabs, cells, chips, bars, toggles, rarity tags, card rows |
 | `src/game/ui/kit/fonts.css` | Generated `@font-face` rules — do not edit |
 | `tools/build-ui-fonts.py` | Font subsetter; writes `src/game/assets/fonts/` and `fonts.css` |
 
@@ -35,13 +36,38 @@ Kit components import `tokens.css` and `kit.css` themselves, so layout sheets th
 
 Touch targets are at least 44 × 44px. Every press goes through `GameButton`, which de-duplicates the compatibility click so closing a dialog never presses what is behind it.
 
+## Dialogs: one container
+
+Every window is a `Sheet`: cyan body, title on the top edge, red close on the corner, optional tab rail on the left (thumb side), a scrolling body and a pinned footer for actions (right thumb). Sizes: `l` (tabbed containers), `m` (single-purpose windows: egg, capsule, help), `s` (confirmations, shop counters, save dialogs). Content is shown as cells and cards, not forms; explanations shrink to one footer hint.
+
+- Rarity colours are shared everywhere: 普通 steel-blue, 稀有 blue, 史诗 purple, 传说 gold (`data-rarity`).
+- Cell states: normal, selected (white outline), equipped (green ring + check), locked (desaturated + lock), ready to claim (gold glow), claimed (stamp).
+- Colour meanings: orange buy / main action, green claim / positive, purple equip / keep, red close / destructive, steel secondary, gold currency and numbers.
+
+## Information architecture
+
+| Entry | Opens |
+| --- | --- |
+| HUD 宠物 tile | 背包 · 宠物 (badge “!” when 一键最佳 would improve the team) |
+| Backpack pill | 背包 · 矿物; its “+” teleports to the shop |
+| HUD 商店 tile | Teleports into the shop ring; the shop opens (工具 / 背包 counters) |
+| HUD 奖励 tile | 奖励 · 在线 / 签到 / 邀请 (badge = rewards ready to claim) |
+| HUD 世界 tile | 世界 · 传送 / 进度 |
+| HUD 出售 (when carrying ores) | Teleports to the sale ring; ores sell automatically |
+| HUD 返回地表 (underground) | Return to the surface spawn |
+| Egg stand prompt | Egg sheet with every pet's real odds → full-screen hatch reveal |
+| Capsule machine prompt | Capsule sheet (prize table) → result reveal |
+| Help / settings tiles | How-to-play cards / frame cap, shadows, exit |
+
+“前往” buttons inside sheets are instant trips (shop, sale ring, capsule machine, any unlocked egg stand) and turn the camera toward the destination. Travel to layers works anywhere on the surface; portable travel works anywhere. Features that do not exist are not shown (no rebirth counter, no pet levels).
+
 ## HUD layout (phone landscape first)
 
 - Top-left: backpack pill (tap → mineral bag, “+” → route to the shop), coin pill, active buffs, then the objective card.
 - Top-centre: world name and depth (“地表” on the surface, metres underground).
 - Top-right: help and settings tiles; settings holds frame-rate cap, shadows and **exit** (exit is no longer a red corner button).
-- Right edge: 宠物, 商店, 奖励, 更多. On phones 更多 opens 世界 / 传送 / 矿物; at ≥ 1000 × 620 every action is shown and there is no fold.
-- Bottom-centre: mining target card, context prompts (扭蛋 / 矿区要求), notices, and 返回地表 only when underground.
+- Right edge: 宠物, 商店, 奖励, 世界 — four actions, no fold, at every size.
+- Bottom-centre: mining target card, context prompts (扭蛋 / 矿区要求), notices, then 出售 (when carrying ores) and 返回地表 (underground).
 - Bottom corners: thumbstick and jump (touch screens only).
 
 Sizes are set per shell size with container queries in `src/game/ui/hud/hud.css` (`--hud-tile`, `--hud-pill`, …); the shell may be rotated in portrait, so the HUD never uses viewport units. The whole HUD hides while any dialog is open.

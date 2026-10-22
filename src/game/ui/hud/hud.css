@@ -52,13 +52,6 @@
 .hud-settings-panel .ui-btn { width: 100%; justify-content: flex-start; }
 .hud-settings-panel .ui-btn[data-tone=red] { justify-content: center; margin-top: 4px; }
 
-.hud-more { position: relative; }
-.ui-hud .hud-more-panel {
-  position: absolute; z-index: 5; right: calc(100% + 12px); top: 50%; transform: translateY(-50%);
-  display: none; grid-auto-flow: column; gap: var(--hud-gap); padding: 10px 12px 12px; pointer-events: auto;
-}
-.ui-hud .hud-more-panel[data-open=true] { display: grid; }
-
 /* Bottom centre: mining target, context prompts, notices, return button. */
 .hud-bottom {
   position: absolute; left: 50%; bottom: calc(12px + var(--safe-bottom)); transform: translateX(-50%);
@@ -66,7 +59,10 @@
 }
 .hud-bottom > * { pointer-events: auto; }
 .hud-bottom > .hud-notice, .hud-bottom > .target-health { pointer-events: none; }
-.hud-return { min-width: 168px; }
+.hud-trips { display: flex; gap: 10px; justify-content: center; }
+.hud-return, .hud-sell { min-width: 150px; }
+.hud-sell[data-state=full] { animation: hud-sell-full 1s ease-in-out infinite; }
+@keyframes hud-sell-full { 50% { transform: scale(1.06); box-shadow: 0 0 0 4px #fff7b0, 0 3px 0 var(--ui-ink); } }
 .hud-notice { display: block; max-width: 100%; }
 .hud-notice:empty { display: none; }
 .hud-notice .ui-toast { white-space: normal; text-align: center; justify-content: center; }
@@ -147,6 +143,10 @@
 .game-shell .jump-button .ui-icon { width: 100%; height: 100%; }
 .game-shell .control-hint { display: none; }
 
+/* Projected world prompt over an egg stand (positioned by WorldPromptProjector). */
+.egg-world-prompt { position: absolute; z-index: 4; transform: translate(-50%, -100%); }
+.egg-world-prompt::after { content: ""; position: absolute; left: calc(50% - 7px); bottom: -9px; width: 12px; height: 12px; background: var(--ui-orange-lo); border-right: 3px solid var(--ui-ink); border-bottom: 3px solid var(--ui-ink); transform: rotate(45deg); }
+
 /* World guidance labels stay below the depth banner. */
 .game-shell .guide-marker[data-offscreen=true] b,
 .game-shell .guide-offscreen { left: 50%; transform: translateX(-50%); top: calc(70px + var(--safe-top)); }
@@ -158,8 +158,6 @@
   .hud-depth { top: calc(8px + var(--safe-top)); }
   .hud-depth-kicker { font-size: 18px; --ui-stroke: 4px; }
   .hud-depth-value { font-size: 46px; --ui-stroke: 6px; }
-  .hud-more-toggle { display: none; }
-  .ui-hud .hud-more-panel, .ui-hud .hud-more-panel[data-open] { position: static; transform: none; display: grid; grid-auto-flow: row; gap: var(--hud-gap); padding: 0; border: 0; background: none; box-shadow: none; }
   .hud-objective :is(.guide-card, .journey-goals) strong { font-size: 20px; }
   .hud-objective :is(.guide-card, .journey-goals) p { font-size: 14px; }
 }
@@ -176,13 +174,14 @@
   .game-shell .joystick { width: 112px; height: 112px; }
   .game-shell .joystick-knob { left: 28px; top: 28px; }
   .game-shell .jump-button { width: 64px; height: 64px; padding: 12px; }
-  .hud-return { min-width: 150px; }
+  .hud-return, .hud-sell { min-width: 120px; }
   .hud-bottom .target-health { padding: 5px 10px 6px; }
 }
 .hud-objective:empty { display: none; }
 /* Skip stays available in Help on touch screens; keep the active objective compact. */
 @media (any-pointer: coarse) { .hud-objective .guide-skip { display: none; } }
 @media (prefers-reduced-motion: reduce) {
+  .hud-sell[data-state=full] { animation: none; }
   .ui-hud .ore-pickup { animation: hud-ore-still var(--pickup-lifetime) linear forwards; }
   @keyframes hud-ore-still { 0%, 70% { opacity: 1; } 100% { opacity: 0; } }
 }

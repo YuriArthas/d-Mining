@@ -3,7 +3,6 @@ import type { GameSession } from '../application/GameSession.ts';
 import type { DepthGoal } from '../application/OnboardingGuide.ts';
 import { LONG_MINING_GOAL } from '../logic/Onboarding.ts';
 import { GameButton } from './GameButton.tsx';
-import { PetDialog } from './pets/PetDialog.tsx';
 import './onboarding.css';
 import arrowUrl from '../assets/guide-arrow/roblox-arrow-v1.webp';
 const touchControls = window.matchMedia('(any-pointer: coarse)');
@@ -49,14 +48,4 @@ export function DepthGoalCard({goal,minedCount,showMiningTask}:{goal:DepthGoal|n
   {goal&&<div className="journey-depth"><span className="guide-kicker">下一矿层</span><strong>向 {goal.name} 进发</strong><p>历史最深 {Math.floor(goal.currentDepth)} / {goal.depth} 米</p><progress aria-label={`解锁${goal.name}的深度进度`} value={goal.currentDepth} max={goal.depth}/><p>到达后同时开放该层传送和宠物蛋。</p></div>}
   {showMiningTask&&<div className="journey-mining"><strong>{minedCount>=LONG_MINING_GOAL?'百块采矿目标已完成':'长期目标：采矿 100 块'}</strong><span>累计 {minedCount} 块{minedCount<LONG_MINING_GOAL?` / ${LONG_MINING_GOAL}`:''}</span></div>}
  </aside>;
-}
-export function OnboardingHelp({session,onClose}:{session:GameSession;onClose():void}) {
- const touch=useTouchControls();
- const status=session.getSnapshot().onboarding.status;
- return <PetDialog title="操作帮助" onClose={onClose} className="guide-help">
-  <p>{touch?'左侧摇杆移动 · 右下按钮跳跃 · 右侧空白处拖动观察':'WASD 移动 · 空格跳跃 · 按住右键拖动观察'}</p>
-  <p>{touch?'点一下方块敲击，长按持续挖矿。可以一边移动，一边拖动观察。':'鼠标指向方块，按住左键挖掘。'}矿物会自动装进背包。</p>
-  <ol><li>带上矿石，点击“返回地表”，再走进金色圆圈自动出售。地下休整房间也能卖矿。</li><li>走进蓝色 Shop 圈，选择工具或背包商店。左右切换查看装备，用金币购买。升级镐子会提高力量，部分等级还会提高攻速；购买后自动生效。</li><li>继续向下挖到 20 米，尝试一次带回更多矿石。累计采矿 100 块是长期目标，不影响继续认识宠物。</li><li>{touch?'靠近蛋台，点“查看宠物蛋”查看真实概率。':'靠近蛋台按 E 查看真实概率。'}开蛋后进入“宠物”，装备后才会增加挖矿力量。</li><li>历史最深深度达到下一层门槛，就永久解锁该层、对应传送和宠物蛋；返回地表也会保留。进度自动保存。</li></ol>
-  {status==='active'?<GameButton className="pet-secondary" onPress={()=>{session.skipOnboarding();onClose();}}>跳过引导</GameButton>:(status==='skipped'||status==='legacy')?<GameButton className="pet-primary" onPress={()=>{session.resumeOnboarding();onClose();}}>{status==='legacy'?'开启引导':'继续引导'}</GameButton>:<p>基础引导已完成，可以自由探索。</p>}
- </PetDialog>;
 }

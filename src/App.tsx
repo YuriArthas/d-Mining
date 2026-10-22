@@ -22,6 +22,8 @@ import type {ProbeMode} from './game/presentation/PerformanceProbe.ts';
 import type {PerformanceSnapshot} from './game/presentation/PerformanceMeter.ts';
 import {beginGameTouch, blockGameCompatibilityClick} from './game/ui/GameButton.tsx';
 import type {SystemControls} from './game/ui/hud/SystemMenu.tsx';
+import {UiButton} from './game/ui/kit/controls.tsx';
+import {Sheet} from './game/ui/kit/panel.tsx';
 import './game/ui/kit/fonts.css';
 import './game/ui/kit/tokens.css';
 import './game/ui/legacy.css';
@@ -184,18 +186,17 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
         </div></details>}
       </header>
       {!showLoading&&<div inert={!!exitState || saveStatus.state === 'conflicted'}><SessionUi shopView={shopView} system={system} guideMarker={guideMarker} blocked={saveStatus.state === 'failed' || saveStatus.state === 'conflicted'} eggPrompt={eggPrompt} session={session} input={input} surface={surface} /></div>}
-      {!exitState && (saveStatus.state === 'failed' || saveStatus.state === 'conflicted') && <aside className="save-warning" role="alert">
+      {!exitState && (saveStatus.state === 'failed' || saveStatus.state === 'conflicted') && <aside className="save-warning ui-card" role="alert">
         <span>{saveStatus.state === 'conflicted' ? saveStatus.error : '进度暂未保存，请重试'}</span>
-        {saveStatus.state === 'failed' ? <button onClick={() => void savedGame.saves.flush().catch(() => {})}>重试保存</button> : <button onClick={() => location.reload()}>重新进入</button>}
+        {saveStatus.state === 'failed' ? <UiButton size="s" tone="orange" onPress={() => void savedGame.saves.flush().catch(() => {})}>重试保存</UiButton> : <UiButton size="s" tone="orange" onPress={() => location.reload()}>重新进入</UiButton>}
       </aside>}
-      {exitState && <section className="save-exit" role="dialog" aria-label="保存进度">
-        <h2>{exitState === 'saving' ? '正在保存进度' : '进度尚未保存'}</h2>
-        {exitState === 'failed' && <><p>{exitError}</p><div className="save-exit-actions">
-          <button onClick={() => void exit()}>重试保存</button>
-          {saveStatus.state !== 'conflicted' && <button onClick={() => { input.reset(); setExitState(null); session.setSuspended(false); surface.current?.focus(); }}>返回游戏</button>}
-          <button onClick={() => void exit(true)}>不保存退出</button>
-        </div></>}
-      </section>}
+      {exitState && <Sheet title={exitState === 'saving' ? '正在保存进度' : '进度尚未保存'} size="s" label="保存进度" footer={exitState === 'failed' ? <>
+        <UiButton size="s" tone="red" onPress={() => void exit(true)}>不保存退出</UiButton>
+        {saveStatus.state !== 'conflicted' && <UiButton size="s" tone="steel" onPress={() => { input.reset(); setExitState(null); session.setSuspended(false); surface.current?.focus(); }}>返回游戏</UiButton>}
+        <span className="ui-grow" /><UiButton size="s" tone="orange" onPress={() => void exit()}>重试保存</UiButton>
+      </> : undefined}>
+        {exitState === 'saving' ? <p className="ui-hint">请稍候，马上就好…</p> : <div className="ui-well save-error"><span className="ui-hint">{exitError || '网络或存储暂时不可用，重试一次通常就能保存。'}</span></div>}
+      </Sheet>}
       {showLoading&&<LoadingScreen state={loading} onExit={() => void exit()} />}
     </main>
   );

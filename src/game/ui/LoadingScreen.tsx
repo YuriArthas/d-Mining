@@ -24,7 +24,7 @@ export function LoadingScreen({state,onExit}:{state:LoadingState;onExit:()=>void
     <ol className="loading-steps">{LOADING_STAGES.map((stage,i)=><li key={stage} data-complete={state.steps[stage].complete} data-active={stage===active}><span>{state.steps[stage].complete?'✓':String(i+1).padStart(2,'0')}</span>{labels[stage]}</li>)}</ol>
    </>:<button className="loading-retry" onClick={()=>location.reload()}>重新加载</button>}
   </div>
-  <div className="loading-bottom"><span className="loading-tip">挖满背包后，前往收购处换取金币。</span><span>探索 · 采集 · 成长</span></div>
+  <div className="loading-bottom"><span className="loading-tip">小提示：背包满了点「出售」，一键传送去卖矿。</span><span>探索 · 采集 · 成长</span></div>
  </section>;
 }
 export class LoadingBoundary extends Component<{onFailure:(message:string)=>void;children:ReactNode},{failed:boolean}>{

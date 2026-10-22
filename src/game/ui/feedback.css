@@ -1,9 +1,0 @@
-.reward-hud { position:absolute; left:20px; bottom:100px; display:flex; flex-direction:column; align-items:flex-start; gap:6px; pointer-events:auto; max-width:250px; }
-.reward-hud button,.capsule-world-prompt { min-height:44px; padding:10px 16px; border:2px solid #d6bc78; border-radius:12px; background:#2e344b; color:#fff3cb; font-family:inherit; font-size:15px; font-weight:700; line-height:1.4; cursor:pointer; }
-.reward-hud span { font-size:14px; color:#fff4d2; background:#24373de8; padding:5px 10px; border-radius:8px; }
-.capsule-world-prompt { position:absolute; left:50%; bottom:110px; transform:translateX(-50%); pointer-events:auto; }
-.capsule-world-prompt kbd { margin-right:8px; padding:3px 7px; background:#f9df8d; color:#3d2d36; border-radius:4px; }
-.session-ui:not([data-panel=none]) .reward-hud { visibility:hidden; }
-.auto-hatch-controls { display:flex; align-items:center; flex-wrap:wrap; gap:10px; padding:10px; margin-bottom:12px; background:#eee2d1; border-radius:10px; }
-.auto-hatch-controls p,.auto-hatch-controls output { margin:0; font-size:14px; line-height:1.5; }
-@media(max-height:700px) { .reward-hud { bottom:72px; } }

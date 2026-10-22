@@ -83,13 +83,8 @@ const SIZES = [[844, 390], [667, 375], [640, 320], [932, 430]];
     assert.equal(await page.getByTestId('depth').innerText(), '地表');
     await check('Four landscape phone sizes and 44px/21px safe areas: HUD zones stay inside, never overlap each other or the thumb controls, every HUD touch target is at least 44px, the centre stays a camera drag area. Surface shows depth "地表" and no return button.');
 
-    // 3. More fold, settings, help and click-through protection.
-    await tap(page.getByRole('button', { name: '更多功能' }));
-    assert.equal(await page.locator('.hud-more-panel[data-open=true] button').count(), 3);
-    for (const b of await page.locator('.hud-more-panel button').all()) inside(await b.boundingBox(), 'more item');
-    await shot('03-more-open');
-    await tap(page.getByRole('button', { name: '收起功能' }));
-    assert.equal(await page.locator('.hud-more-panel[data-open=true]').count(), 0);
+    // 3. Settings, help and click-through protection.
+    assert.equal(await page.locator('.hud-rail .ui-tile').count(), 4, 'four rail actions, no fold');
     await tap(page.getByRole('button', { name: '设置' }));
     await page.getByRole('button', { name: '退出游戏，返回游戏列表' }).waitFor();
     inside(await box('.hud-settings-panel'), 'settings panel');
@@ -105,18 +100,18 @@ const SIZES = [[844, 390], [667, 375], [640, 320], [932, 430]];
     await tap(page.getByRole('button', { name: '关闭操作帮助' }));
     assert.equal(await panel(), 'none');
     assert.equal(await page.locator('.hud-settings-panel').count(), 0, 'closing help does not click through to settings');
-    await check('Touch: More fold opens 世界/传送/矿物 and folds back; settings panel holds frame-rate, shadow and exit (moved out of the corner), closes on an outside tap without opening anything; help opens and closes with no click-through.');
+    await check('Touch: four rail actions without a fold; settings panel holds frame-rate, shadow and exit (moved out of the corner), closes on an outside tap without opening anything; help opens and closes with no click-through.');
 
     // 4. Resource pill actions.
     await tap(page.getByRole('button', { name: '查看背包里的矿物' }));
-    assert.equal(await panel(), 'minerals'); await page.keyboard.press('Escape').catch(() => {});
-    if (await panel() !== 'none') await tap(page.getByRole('dialog').getByRole('button', { name: /关闭/ }).first());
+    assert.equal(await panel(), 'bag');
+    await tap(page.getByRole('dialog').getByRole('button', { name: /关闭/ }).first());
     assert.equal(await panel(), 'none');
     await tap(page.getByRole('button', { name: '升级背包' }));
-    await page.waitForFunction(() => document.querySelector('[data-testid=guide-card]')?.textContent.includes('商店'));
-    await shot('05-backpack-plus-guides-to-shop');
-    await tap(page.getByRole('button', { name: '取消指引' }));
-    await check('Backpack pill opens the mineral bag; its plus button starts the existing route guidance to the shop (cancellable).');
+    await page.getByRole('dialog', { name: '商店分类' }).waitFor({ timeout: 30000 });
+    await shot('05-backpack-plus-opens-shop');
+    await tap(page.getByRole('button', { name: '关闭商店' }));
+    await check('Backpack pill opens the bag on its minerals tab; its plus button teleports into the shop ring and the shop opens.');
 
     // 5. Underground: depth and the return button appear, and return works by touch.
     await page.evaluate(() => { window.__miningValidation.teleport([0, -6, 0]); window.__miningValidation.look(0, .5); });
