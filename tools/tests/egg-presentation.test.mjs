@@ -84,12 +84,15 @@ test('empty label sets draw nothing and batch resources release once', () => {
   assert.throws(() => new EggStandLabels([{...PET_DISPLAYS[0], eggId:'missing'}], PET_CONTENT.eggs), /缺少文字配置/);
 });
 
-test('world prompt follows projection and hides outside view without edge clamping', () => {
+test('world prompt follows projection, stays below the top HUD band and hides outside view', () => {
   const projector = new WorldPromptProjector(), element = { style: {} };
   const camera = new PerspectiveCamera(60, 16 / 9, .1, 100); camera.updateMatrixWorld();
+  // top = max(projected %, top HUD band): the prompt never covers the depth banner.
+  const projectedTop = () => parseFloat(/max\(([\d.]+)%/.exec(element.style.top)[1]);
   projector.update(camera, [0, 0, -10], element);
-  assert.equal(element.style.visibility, 'visible'); assert.equal(element.style.left, '50%'); assert.equal(element.style.top, '50%');
-  projector.update(camera, [2, 1, -10], element); assert.ok(parseFloat(element.style.left) > 50); assert.ok(parseFloat(element.style.top) < 50);
+  assert.equal(element.style.visibility, 'visible'); assert.equal(element.style.left, '50%'); assert.equal(projectedTop(), 50);
+  assert.match(element.style.top, /calc\(var\(--safe-top, 0px\) \+ 112px\)/);
+  projector.update(camera, [2, 1, -10], element); assert.ok(parseFloat(element.style.left) > 50); assert.ok(projectedTop() < 50);
   for (const anchor of [[0, 0, 10], [100, 0, -10], null]) {
     projector.update(camera, anchor, element); assert.equal(element.style.visibility, 'hidden');
   }

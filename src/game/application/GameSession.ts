@@ -690,8 +690,9 @@ export class GameSession {
   private surfaceSpot(target: 'shop' | 'sale' | 'capsule' | { egg: string }): { feet: Coord; look: Coord } | null {
     const worldZ = this.content.journey ? worldRequirement(this.currentWorld).z : 0;
     const near = (zone: { y: number; z: number }) => zone.y >= -.1 && Math.abs(zone.z - worldZ) < 100;
-    // Service rings sit on the street side of buildings that face +Z: arrive facing the counter.
-    const facingBuilding = (zone: { x: number; y: number; z: number }) => ({ feet: [zone.x, zone.y + .1, zone.z] as Coord, look: [zone.x, zone.y + 1, zone.z - 6] as Coord });
+    // Arrive facing the counter: zones may name their building; older content faces +Z buildings.
+    const facingBuilding = (zone: { x: number; y: number; z: number; lookAt?: readonly [number, number, number] }) =>
+      ({ feet: [zone.x, zone.y + .1, zone.z] as Coord, look: (zone.lookAt ?? [zone.x, zone.y + 1, zone.z - 6]) as Coord });
     if (target === 'shop') { const zone = this.content.shops.find(s => near(s.zone))?.zone; return zone ? facingBuilding(zone) : null; }
     if (target === 'sale') { const zone = this.content.sales.find(near); return zone ? facingBuilding(zone) : null; }
     if (target === 'capsule') return this.currentWorld === 1 ? facingBuilding(CAPSULE_MACHINE_ZONE) : null;

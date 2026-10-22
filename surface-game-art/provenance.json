@@ -3,7 +3,7 @@
   "files": [
     {
       "file": "tools/blender/build_architecture.py",
-      "sha256": "7d5133135f628d922279023dfdb364a39593d1eda356430e794016ce07524ae2"
+      "sha256": "a24e61f268f3db7b001c45e47f14b14029c3cc6d7a8b87c0a4d4596e281b31bf"
     },
     {
       "file": "tools/blender/build_nature.py",
@@ -15,7 +15,7 @@
     },
     {
       "file": "tools/terrain/landscape.ts",
-      "sha256": "ba9a0dfbdb5352e79d64417fc8ddd449994b81e8531c53d5d4df19df7ab9e240"
+      "sha256": "d57135ab56247fa8c0b59c6dad190aeca29bcd962b0fefc984bfd4295adb58d3"
     },
     {
       "file": "tools/terrain/terrainTexture.ts",
@@ -27,7 +27,7 @@
     },
     {
       "file": "source-art/architecture.blend",
-      "sha256": "f6e2879e19d9378eaaa441b0d39bf6ebc846160b6686823e78dfa74fb07ca6ae"
+      "sha256": "a35995d32904f6d691c902bb9fdeaa9e622778df871439ca5c715a175d7c5a43"
     },
     {
       "file": "source-art/nature.blend",
@@ -35,7 +35,7 @@
     },
     {
       "file": "layout.json",
-      "sha256": "5346b9b53d9cffae9b99bb87c940256d19bc5d0d47c9ae62f15b57ab2445a2b6"
+      "sha256": "83884ce85a8eda627fae14855ec665f305d2c54c9f6c7e0e09590c85b74bba3b"
     },
     {
       "file": "package.json",
@@ -47,7 +47,7 @@
     },
     {
       "file": "../tools/export-pinewind-layout.mjs",
-      "sha256": "ff79e362fa75399790465cbf1a95ae9129a173eaf261bef2b1e14d218f11c3b4"
+      "sha256": "4f4209ec4c916c0f47c919eaca62848194f662c0a0ed50c53a41ad1c12fedcce"
     },
     {
       "file": "../tools/export-pinewind-scene.mjs",
@@ -59,11 +59,11 @@
     },
     {
       "file": "../src/game/content/pinewind/authored.json",
-      "sha256": "8d27ce5e6878d5a368f552f96c1e40ae93f728a77775a51988c5b1b07b7d7511"
+      "sha256": "10cc224224ef580022f933b1d9f3d72e766990de27d3bdc428b32d751e966f7d"
     },
     {
       "file": "public/assets/pinewind/architecture-atlas.png",
-      "sha256": "86848bb720d8a4e80c299da6ec7ae039a37e07e1a6387811e106f366b325bfaf"
+      "sha256": "9fb7aac07e6c6e8cd12103c2fc52f07b826029198bf97cfc1baa239f2341ef0e"
     },
     {
       "file": "public/assets/pinewind/nature-atlas.png",
@@ -71,7 +71,7 @@
     },
     {
       "file": "artifacts/architecture-asset.json",
-      "sha256": "a86263235407c45efe28f29591c5e3e4f753f3336f9450f82ba616fb560f6d36"
+      "sha256": "242eb7626d47016afd443ef7a1d654c016639a6b863725862e05d6eadb0e98e7"
     },
     {
       "file": "artifacts/nature-asset.json",
@@ -79,7 +79,7 @@
     },
     {
       "file": "artifacts/landscape-asset.json",
-      "sha256": "66d2c1483c496e45d76b1d86e072f2ce94bf98b80215507a4c134e1e95135ede"
+      "sha256": "15ede5a4eeeb7a758c636dc51aea19ccc44d5b88c9cc27364abe5b64bcce1fa3"
     }
   ],
   "runtimeAssets": [
@@ -87,11 +87,11 @@
       "parts": [
         "pinewind-architecture.000.part"
       ],
-      "bytes": 84184,
-      "decodedBytes": 248328,
-      "sha256": "28e5c397a7309258a67fe9c8d1a829cbdee382e424206db8c9735a88485b88ec",
-      "sourceSha256": "17bc164b7528a2c7c08ccb8a2dbcbb019c35392253baefca26a004fe83e80590",
-      "triangles": 13920,
+      "bytes": 95369,
+      "decodedBytes": 285628,
+      "sha256": "2b070a63a32789cba3bbff301b5f3c73800f04d529cbc147cbf623c313e11e3e",
+      "sourceSha256": "5941a0472f10dbbc6360df3cb728eb222b958164a973f1a2f1067ccf2458999d",
+      "triangles": 14052,
       "source": "Authored Pinewind; Blender architecture and offline procedural landscape",
       "materialProfile": "authored-color",
       "coordinateSpace": "authored",
@@ -103,11 +103,11 @@
       "parts": [
         "pinewind-landscape.000.part"
       ],
-      "bytes": 669084,
-      "decodedBytes": 1992600,
-      "sha256": "d28090f45db1d7bb999c66b48a55e43362abcb0f569d6e4eb97e3e085981081f",
-      "sourceSha256": "efa87d5a0b89c7c3d3f747cc149a6d223d3ebf8f423760ca5ef11ec5fa442183",
-      "triangles": 101682,
+      "bytes": 667129,
+      "decodedBytes": 1969756,
+      "sha256": "c00bc25c19c32293c1325c03c369a9f594957b959e1e11186a4bc4f2f1faec01",
+      "sourceSha256": "ddf8df9a9ec685a1ce880a780ddea3f718a9a29e9667059461b7d48bfc3820ce",
+      "triangles": 100492,
       "source": "Authored Pinewind; Blender architecture and offline procedural landscape",
       "materialProfile": "authored-color",
       "coordinateSpace": "authored",

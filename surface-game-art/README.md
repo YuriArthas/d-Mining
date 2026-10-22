@@ -18,7 +18,7 @@ node tools/export-pinewind-scene.mjs
 KTX_BIN=/root/threejs_space/d-Mining/.tools/ktx/bin node tools/pack-pinewind.mjs
 ```
 
-`layout.json` 来自主线服务点、蛋、传送站和台阶配置。Blender 保留可编辑 `.blend`、原始 GLB、两张 256² 图集及逐模型三角形数。离线 Three 工具生成连续地形、自然物实例、道路、1024² 接触阴影和对应三角网格碰撞；不把离线几何生成器引入游戏。
+`layout.json` 由 `src/game/content/pinewind/hubLayout.ts`（第一世界地表布局的唯一数据源）导出，包含服务点、蛋台与台阶、传送门、宠物屋、道具，以及地形用的广场、道路、铺地和植被避让区（`grounds`）。建筑脚本按每种蛋的颜色生成蛋贴图。Blender 保留可编辑 `.blend`、原始 GLB、两张 256² 图集及逐模型三角形数。离线 Three 工具生成连续地形、自然物实例、道路、1024² 接触阴影和对应三角网格碰撞；不把离线几何生成器引入游戏。
 
 打包只做 KTX2 UASTC、Meshopt 和 gzip，检查前后面数相同；产物写入主线既有 `src/game/assets/camp/` 的 `.part` 与 manifest 格式。`provenance.json` 记录源文件、生成工具、依赖锁文件、贴图与产物 SHA-256。逐模型面数与贴图尺寸在 `artifacts/*-asset.json`；没有 Tripo 任务 ID。
 

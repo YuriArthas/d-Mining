@@ -14,6 +14,8 @@ OUT.mkdir(parents=True, exist_ok=True)
 bpy.ops.object.select_all(action='SELECT'); bpy.ops.object.delete(use_global=False)
 for block in list(bpy.data.materials): bpy.data.materials.remove(block)
 
+layout=json.loads((ROOT/'layout.json').read_text())
+
 # 32-pixel motifs separated by two-pixel gutters. All marks are deliberately
 # grouped, hand-placed rectangles; no photographic overlay or random noise.
 SIZE=256; TILE=32
@@ -58,6 +60,18 @@ recipes=[
  ('65d5cc',[]), #25 solid egg teal
  ('c99cdd',[]), #26 solid egg lavender
 ]
+def shade(h,f):
+    c=rgb(h); return ''.join('%02x'%int(round(v*(1+f) if f<0 else v+(255-v)*f)) for v in c)
+GRASS_TILE=len(recipes)
+recipes.append(('6cc24a',[(3,4,9,3,'7fd15a'),(17,9,8,3,'7fd15a'),(6,21,10,3,'5fb43f'),(20,24,7,3,'5fb43f')])) # terrace grass
+# Each egg gets its own body colour; ivory and deep spots keep the established egg motif.
+EGG_TILES={}
+for e in layout['eggs']:
+    base=shade(e['color'],.16); deep=shade(e['color'],-.32)
+    spotted=len(recipes); recipes.append((base,[(5,9,5,5,'fff0cc'),(10,12,4,5,'fff0cc'),(19,22,6,4,deep),(22,18,5,5,deep)]))
+    plain=len(recipes); recipes.append((base,[]))
+    EGG_TILES[e['id']]=(spotted,plain)
+assert len(recipes)<=64, 'atlas full'
 for i,(base,marks) in enumerate(recipes): tile(i,base,marks)
 # Duplicate boundary pixels into the 2px gutters for mip-safe atlas islands.
 for i in range(len(recipes)):
@@ -320,7 +334,7 @@ lamp('Pet_Lantern',(1.25,3.26,3.72),.80)
 prism('Pet_BadgeBacking',[(x,y+5.10) for x,y in stepped_outline(1.40,1.65,.28)],3.74,3.95,0)
 prism('Pet_BadgeEgg',[(-.26,4.52),(.26,4.52),(.47,4.76),(.46,5.14),(.27,5.47),(.10,5.64),(-.10,5.64),(-.27,5.47),(-.46,5.14),(-.47,4.76)],3.98,4.13,16)
 
-def egg(name,at,h,t):
+def egg(name,at,h,t,plain=None):
     # A connected, solid eight-sided egg with four broad faceted bands. Atlas
     # V follows the WHOLE egg, so spots do not repeat as stripes on every band.
     x,y,z=at
@@ -331,7 +345,7 @@ def egg(name,at,h,t):
             a=2*math.pi*i/n+math.pi/8
             vs.append((x+math.cos(a)*r*h,y+yy*h,z+math.sin(a)*r*h))
     faces=[tuple(range(n)),tuple(reversed(range((len(profile)-1)*n,len(profile)*n)))]
-    plain={16:24,17:25,18:26}[t]; tiles=[plain,plain]
+    plain=plain if plain is not None else {16:24,17:25,18:26}[t]; tiles=[plain,plain]
     for k in range(len(profile)-1):
         for i in range(n):
             j=(i+1)%n
@@ -522,38 +536,41 @@ for i,(x,z,yaw) in enumerate(((-9.8,7.4,.1),(8.5,10.3,-.4))):
 
 # Adapt the approved Pinewind authoring method to the real playable mine.
 # No imported legacy meshes, Decimate, or decorative shaft floor.
-layout=json.loads((ROOT/'layout.json').read_text())
 for name,service in [('Merchant_Store','sale'),('Copper_Forge','shop')]:
     anchor=layout['services'][service]['anchor']
     MODELS[name].location=P((anchor['x'],0,anchor['z']))
     MODELS[name].rotation_euler[2]=anchor['yaw']
-MODELS['Pet_Conservatory'].location=P((34,0,8))
-MODELS['Pet_Conservatory'].rotation_euler[2]=0
+MODELS['Pet_Conservatory'].location=P((layout['conservatory']['x'],0,layout['conservatory']['z']))
+MODELS['Pet_Conservatory'].rotation_euler[2]=layout['conservatory']['yaw']
 MODELS['Mine_Headframe'].location=P((0,0,0))
 MODELS['Mine_Headframe'].scale=(1.5,1.8,1)
 MODELS['Creek_Bridge'].location=P((layout['bridge']['x'],0,layout['bridge']['z']))
 MODELS['Ore_Cart'].location=P((12,0,-5))
 MODELS['Ore_Crates'].location=P((-13,0,1))
-MODELS['Plaza_Signpost'].location=P((-4.5,0,25))
-for i,at in enumerate([(-7,0,23),(16,0,16)]):MODELS['Plaza_Lamp_%d'%i].location=P(at)
+MODELS['Plaza_Signpost'].location=P((layout['props']['signpost']['x'],0,layout['props']['signpost']['z']))
+for i,lamp_at in enumerate(layout['props']['lamps']):
+    MODELS['Plaza_Lamp_%d'%i].location=P((lamp_at['x'],0,lamp_at['z'])); MODELS['Plaza_Lamp_%d'%i].rotation_euler[2]=lamp_at['yaw']
 for ob in list(bpy.data.objects):
     if ob.name.startswith(('Mine_Lift','Mine_Access','Mine_DeckLantern','Mine_RearLoading','Pet_Nest','Pet_MainEgg','Pet_TealEgg','Pet_LavenderEgg')):
         bpy.data.objects.remove(ob,do_unlink=True)
-# Each actual pet SKU receives its own solid egg, sized for the existing labels.
+# Each actual pet SKU receives its own solid egg in its own colour, sized for the labels.
 for i,p in enumerate(layout['eggs']):
     model('Egg_'+p['id'],(p['x'],p['y'],p['z']),p['yaw'])
     slab('Egg_Plinth',stepped_outline(2.45,2.45,.30),0,.35,11)
     slab('Egg_GoldLip',stepped_outline(2.18,2.18,.26),.35,.49,8)
     slab('Egg_Nest',stepped_outline(1.95,1.95,.26),.49,.66,23)
-    egg('Egg_Display',(0,.66,0),2.25,16+i%3)
-# Broad stone terraces with small stair risers: preserve reachable egg heights.
+    spotted,plain=EGG_TILES[p['id']]
+    egg('Egg_Display',(0,.66,0),2.25,spotted,plain)
+# Timber planters with grass tops and a honey-timber front lip. Small risers keep every tier walkable.
+terrace=layout['terrace']; tz=(terrace['minZ']+terrace['maxZ'])/2; tl=terrace['maxZ']-terrace['minZ']; tw=terrace['width']
 for tier in layout['tiers']:
-    model('Terrace_'+str(tier['tier']),(tier['x'],0,30))
-    box('Terrace_Stone',(0,tier['y']/2,0),(6,tier['y'],26),19)
-    box('Terrace_Trim',(0,tier['y']-.07,0),(6,.14,26),11)
+    model('Terrace_'+str(tier['tier']),(tier['x'],0,tz))
+    box('Terrace_Timber',(0,(tier['y']-.16)/2,0),(tw,tier['y']-.16,tl),1)
+    box('Terrace_Grass',(0,tier['y']-.08,0),(tw,.16,tl),GRASS_TILE)
+    box('Terrace_Lip',(-tw/2+.12,tier['y']-.095,0),(.24,.21,tl),2)
 for i,p in enumerate(layout['steps']):
     model('TerraceStep_'+str(i),(p['x'],0,p['z']))
-    box('Terrace_Step',(0,p['y']/2,0),(p['width'],p['y'],p['depth']),11)
+    box('Terrace_Step',(0,p['y']/2,0),(p['width'],p['y'],p['depth']),2)
 for i,p in enumerate(layout['portals']):
     model('Portal_'+p['id'],(p['x'],0,p['z']),p['yaw'])
     slab('Portal_Base',stepped_outline(2.6,2.0,.23),0,.16,11)

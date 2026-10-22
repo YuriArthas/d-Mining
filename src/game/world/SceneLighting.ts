@@ -1,4 +1,5 @@
-import {SURFACE_BUILDINGS,SURFACE_SHOP,SURFACE_SALE} from './surfaceLayout.ts';
+import {PINEWIND_SERVICES,PINEWIND_SPAWN,PINEWIND_PLAZA} from '../content/pinewind/hubLayout.ts';
+const {sale:SALE,shop:SHOP}=PINEWIND_SERVICES;
 // Night uses broad neutral fill to retain material hues; local warm spots only add accents.
 // Area lighting is authored independently of lamp meshes and their transforms.
 // Decorative lamps can be added, removed or moved without changing this rig.
@@ -18,10 +19,11 @@ export const SURFACE_AREA_LIGHT={id:'pit-area-key',position:[0,9.5,1],target:[0,
 // All lights only illuminate; selected ground contact occlusion is baked offline.
 export const SURFACE_FILL_LIGHTS=[
  // Broad road fill bridges the two distant lamp pools, with a fully feathered edge.
- {id:'plaza-area',castShadow:false,position:[0,18,34],target:[0,0,34],color:'#ffeccc',intensity:1400,distance:60,angle:1.05,penumbra:1},
+ {id:'plaza-area',castShadow:false,position:[PINEWIND_PLAZA.x,18,PINEWIND_PLAZA.z+6],target:[PINEWIND_PLAZA.x,0,PINEWIND_PLAZA.z+6],color:'#ffeccc',intensity:1400,distance:60,angle:1.05,penumbra:1},
  ...[37,25].map(x=>({id:'pet-display-'+x,castShadow:false,position:[x,17,30] as const,target:[x,2,30] as const,color:'#ffead4',intensity:450,distance:40,angle:1.1,penumbra:1})),
- ...[[-25,20],[-25,32],[-25,44]].map(([x,z],i)=>({id:'portal-court-'+i,castShadow:false,position:[x,12,z] as const,target:[x,0,z] as const,color:'#fff0d9',intensity:220,distance:35,angle:1.05,penumbra:1})),
+ // The portal ring around the spawn.
+ ...[[-9,50],[0,57],[9,50]].map(([x,z],i)=>({id:'portal-court-'+i,castShadow:false,position:[PINEWIND_SPAWN.x+x,12,z] as const,target:[PINEWIND_SPAWN.x+x,0,z] as const,color:'#fff0d9',intensity:220,distance:35,angle:1.05,penumbra:1})),
  {id:'mine-facade-area',castShadow:false,position:[0,20,22],target:[0,8,10],color:'#ffe8c9',intensity:320,distance:45,angle:1.05,penumbra:1},
- {id:'shop-area',castShadow:false,position:[SURFACE_SHOP.x,13,SURFACE_SHOP.z],target:[SURFACE_BUILDINGS.shop.x,1,SURFACE_BUILDINGS.shop.z],color:'#ffe4be',intensity:170,distance:34,angle:1.15,penumbra:1},
- {id:'sell-area',castShadow:false,position:[SURFACE_SALE.x,13,SURFACE_SALE.z],target:[SURFACE_BUILDINGS.sale.x,1,SURFACE_BUILDINGS.sale.z],color:'#ffe4be',intensity:170,distance:34,angle:1.15,penumbra:1},
+ {id:'shop-area',castShadow:false,position:[SHOP.trigger.x,13,SHOP.trigger.z],target:[SHOP.center[0],1,SHOP.center[2]],color:'#ffe4be',intensity:170,distance:34,angle:1.15,penumbra:1},
+ {id:'sell-area',castShadow:false,position:[SALE.trigger.x,13,SALE.trigger.z],target:[SALE.center[0],1,SALE.center[2]],color:'#ffe4be',intensity:170,distance:34,angle:1.15,penumbra:1},
 ] as const;

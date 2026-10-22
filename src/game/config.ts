@@ -8,7 +8,7 @@ export const GAME_CONFIG = {
     distance: 8.5, // Metres from the player's observation target.
     targetHeight: 2.05, // Keep the initial crosshair above the cylinder rather than on its back.
     initialYaw: 0,
-    initialPitch: 0.22,
+    initialPitch: 0.34, // Look down on the plaza at spawn; players drag to change.
     minPitch: -0.55, // Radians; look upward from a shaft without crossing the floor.
     maxPitch: 1.45, // Almost straight down, with a stable horizontal heading.
     near: 0.08, // Metres; reduced only for extreme landscape aspect ratios.

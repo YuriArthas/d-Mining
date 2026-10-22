@@ -40,6 +40,8 @@ export type SurfaceContent = Readonly<{
   materials: MaterialPresets;
   shaft: Readonly<{ minX: number; maxX: number; minZ: number; maxZ: number }>;
 }>;
+/** An egg stand on the surface hub; eggs face the walkway along `yaw`. */
+export type HubEgg = Readonly<{ id: string; eggId: string; tier: number; x: number; y: number; z: number; yaw: number; asset: string; color: string }>;
 // Composition of authored data and deterministic plans. No engine objects or callbacks.
 export function createCampContent(
   layers: readonly Layer[] = LAYERS,
@@ -118,7 +120,7 @@ export function createCampContent(
     surface,
     environment: ENVIRONMENT_CONFIG as import("../presentation/EnvironmentController.ts").EnvironmentConfig,
     returnPoint: SURFACE_SPAWN,
-    hub: { portals, eggs: PET_DISPLAYS, baseHeight: PORTAL_BASE_HEIGHT },
+    hub: { portals, eggs: PET_DISPLAYS as readonly HubEgg[], baseHeight: PORTAL_BASE_HEIGHT },
   };
 }
 export type CampContent = ReturnType<typeof createCampContent> & {

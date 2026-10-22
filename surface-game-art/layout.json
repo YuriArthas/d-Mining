@@ -1,4 +1,5 @@
 {
+  "version": "pinewind-plaza-v3",
   "feedback": {
     "board": [
       10.8,
@@ -6,458 +7,227 @@
       12
     ],
     "capsule": [
-      12,
+      17,
       0,
-      30
+      12
     ]
   },
   "services": {
     "sale": {
-      "id": "surface-sale",
-      "type": "sell",
       "anchor": {
-        "x": -17,
-        "z": 12,
-        "yaw": 0
+        "x": -20.5,
+        "z": 14,
+        "yaw": 1.2217304763960306
       },
-      "model": {
-        "asset": "simulator-exchange",
-        "width": 10,
-        "depth": 8,
-        "height": 9,
-        "y": -0.08
-      },
-      "trigger": {
-        "x": 0,
-        "z": 6.7,
-        "radius": 1.7,
-        "heightTolerance": 0.25,
-        "hysteresis": 0.25
-      },
-      "collider": {
-        "x": 0,
-        "y": 3,
-        "z": 0,
-        "half": [
-          4.3,
-          3,
-          3.4
-        ],
-        "yaw": 0
-      },
-      "sign": {
-        "title": "SELL",
-        "color": "#ffe35c",
-        "background": "#18283d",
-        "width": 3.6,
-        "y": 4.5
-      },
-      "ringColor": "#ffe77d"
+      "center": [
+        -19.47,
+        1,
+        14.38
+      ]
     },
     "shop": {
-      "id": "surface-upgrade",
-      "type": "shop",
       "anchor": {
         "x": -20,
-        "z": -13,
-        "yaw": 0
+        "z": 28,
+        "yaw": 1.9198621771937625
       },
-      "model": {
-        "asset": "simulator-upgrade",
-        "width": 10,
-        "depth": 8,
-        "height": 9,
-        "y": -0.08
-      },
-      "trigger": {
-        "x": 0,
-        "z": 6.7,
-        "radius": 1.7,
-        "heightTolerance": 0.25,
-        "hysteresis": 0.25
-      },
-      "collider": {
-        "x": 0,
-        "y": 3,
-        "z": 0,
-        "half": [
-          4.3,
-          3,
-          3.4
-        ],
-        "yaw": 0
-      },
-      "sign": {
-        "title": "SHOP",
-        "color": "#40deff",
-        "background": "#18283d",
-        "width": 3.6,
-        "y": 4.5
-      },
-      "ringColor": "#44cfff"
+      "center": [
+        -20,
+        1,
+        28
+      ]
     }
   },
   "eggs": [
     {
-      "x": 28,
-      "y": 0.4,
-      "tier": 0,
-      "z": 20,
-      "id": "egg-stand-0-0",
+      "id": "stand-meadow-egg",
       "eggId": "meadow-egg",
-      "asset": "egg-meadow-blender",
-      "color": "#7ecf69",
-      "yaw": -1.5707963267948966
-    },
-    {
+      "tier": 0,
       "x": 28,
       "y": 0.4,
-      "tier": 0,
-      "z": 24,
-      "id": "egg-stand-0-1",
+      "z": 18.5,
+      "yaw": -1.5707963267948966,
+      "color": "#7ecf69"
+    },
+    {
+      "id": "stand-pebble-egg",
       "eggId": "pebble-egg",
-      "asset": "egg-core-blender",
-      "color": "#ad9b83",
-      "yaw": -1.5707963267948966
-    },
-    {
+      "tier": 0,
       "x": 28,
       "y": 0.4,
-      "tier": 0,
-      "z": 28,
-      "id": "egg-stand-0-2",
-      "eggId": "copper-egg",
-      "asset": "egg-ember-blender",
-      "color": "#dd9658",
-      "yaw": -1.5707963267948966
+      "z": 22.5,
+      "yaw": -1.5707963267948966,
+      "color": "#ad9b83"
     },
     {
-      "x": 28,
-      "y": 0.4,
-      "tier": 0,
-      "z": 32,
-      "id": "egg-stand-0-3",
-      "eggId": "amber-egg",
-      "asset": "egg-moon-blender",
-      "color": "#eeb74c",
-      "yaw": -1.5707963267948966
-    },
-    {
-      "x": 28,
-      "y": 0.4,
-      "tier": 0,
-      "z": 36,
-      "id": "egg-stand-0-4",
-      "eggId": "tide-egg",
-      "asset": "egg-tide-blender",
-      "color": "#54c5de",
-      "yaw": -1.5707963267948966
-    },
-    {
-      "x": 28,
-      "y": 0.4,
-      "tier": 0,
-      "z": 40,
-      "id": "egg-stand-0-5",
-      "eggId": "fire-egg",
-      "asset": "egg-ember-blender",
-      "color": "#fa874b",
-      "yaw": -1.5707963267948966
-    },
-    {
-      "x": 34,
-      "y": 2.2,
-      "tier": 1,
-      "z": 20,
-      "id": "egg-stand-1-0",
+      "id": "stand-mushroom-egg",
       "eggId": "mushroom-egg",
-      "asset": "egg-meadow-blender",
-      "color": "#cf7fbd",
-      "yaw": -1.5707963267948966
+      "tier": 0,
+      "x": 28,
+      "y": 0.4,
+      "z": 26.5,
+      "yaw": -1.5707963267948966,
+      "color": "#cf7fbd"
     },
     {
-      "x": 34,
-      "y": 2.2,
-      "tier": 1,
-      "z": 24,
-      "id": "egg-stand-1-1",
-      "eggId": "silver-egg",
-      "asset": "egg-moon-blender",
-      "color": "#b5c9dd",
-      "yaw": -1.5707963267948966
-    },
-    {
-      "x": 34,
-      "y": 2.2,
-      "tier": 1,
-      "z": 28,
-      "id": "egg-stand-1-2",
+      "id": "stand-crystal-egg",
       "eggId": "crystal-egg",
-      "asset": "egg-crystal-blender",
-      "color": "#a38af2",
-      "yaw": -1.5707963267948966
+      "tier": 0,
+      "x": 28,
+      "y": 0.4,
+      "z": 30.5,
+      "yaw": -1.5707963267948966,
+      "color": "#a38af2"
     },
     {
-      "x": 34,
-      "y": 2.2,
-      "tier": 1,
-      "z": 32,
-      "id": "egg-stand-1-3",
-      "eggId": "frost-egg",
-      "asset": "egg-tide-blender",
-      "color": "#93e0ef",
-      "yaw": -1.5707963267948966
+      "id": "stand-copper-egg",
+      "eggId": "copper-egg",
+      "tier": 0,
+      "x": 28,
+      "y": 0.4,
+      "z": 34.5,
+      "yaw": -1.5707963267948966,
+      "color": "#dd9658"
     },
     {
-      "x": 40,
-      "y": 4,
-      "tier": 2,
-      "z": 20,
-      "id": "egg-stand-2-0",
+      "id": "stand-ruin-egg",
       "eggId": "ruin-egg",
-      "asset": "egg-core-blender",
-      "color": "#c9b879",
-      "yaw": -1.5707963267948966
+      "tier": 0,
+      "x": 28,
+      "y": 0.4,
+      "z": 38.5,
+      "yaw": -1.5707963267948966,
+      "color": "#c9b879"
     },
     {
-      "x": 40,
-      "y": 4,
-      "tier": 2,
-      "z": 24,
-      "id": "egg-stand-2-1",
+      "id": "stand-tide-egg",
+      "eggId": "tide-egg",
+      "tier": 1,
+      "x": 34,
+      "y": 2.6,
+      "z": 24.5,
+      "yaw": -1.5707963267948966,
+      "color": "#54c5de"
+    },
+    {
+      "id": "stand-frost-egg",
+      "eggId": "frost-egg",
+      "tier": 1,
+      "x": 34,
+      "y": 2.6,
+      "z": 28.5,
+      "yaw": -1.5707963267948966,
+      "color": "#93e0ef"
+    },
+    {
+      "id": "stand-fire-egg",
+      "eggId": "fire-egg",
+      "tier": 1,
+      "x": 34,
+      "y": 2.6,
+      "z": 32.5,
+      "yaw": -1.5707963267948966,
+      "color": "#fa874b"
+    },
+    {
+      "id": "stand-lava-egg",
       "eggId": "lava-egg",
-      "asset": "egg-ember-blender",
-      "color": "#ef6c52",
-      "yaw": -1.5707963267948966
+      "tier": 1,
+      "x": 34,
+      "y": 2.6,
+      "z": 36.5,
+      "yaw": -1.5707963267948966,
+      "color": "#ef6c52"
     },
     {
-      "x": 40,
-      "y": 4,
+      "id": "stand-amber-egg",
+      "eggId": "amber-egg",
       "tier": 2,
-      "z": 28,
-      "id": "egg-stand-2-2",
+      "x": 40,
+      "y": 4.8,
+      "z": 18.5,
+      "yaw": -1.5707963267948966,
+      "color": "#eeb74c"
+    },
+    {
+      "id": "stand-fossil-egg",
       "eggId": "fossil-egg",
-      "asset": "egg-core-blender",
-      "color": "#d1b59a",
-      "yaw": -1.5707963267948966
+      "tier": 2,
+      "x": 40,
+      "y": 4.8,
+      "z": 22.5,
+      "yaw": -1.5707963267948966,
+      "color": "#d1b59a"
     },
     {
-      "x": 40,
-      "y": 4,
+      "id": "stand-silver-egg",
+      "eggId": "silver-egg",
       "tier": 2,
-      "z": 32,
-      "id": "egg-stand-2-3",
+      "x": 40,
+      "y": 4.8,
+      "z": 26.5,
+      "yaw": -1.5707963267948966,
+      "color": "#b5c9dd"
+    },
+    {
+      "id": "stand-gear-egg",
       "eggId": "gear-egg",
-      "asset": "egg-crystal-blender",
-      "color": "#7fb9c5",
-      "yaw": -1.5707963267948966
+      "tier": 2,
+      "x": 40,
+      "y": 4.8,
+      "z": 30.5,
+      "yaw": -1.5707963267948966,
+      "color": "#7fb9c5"
     },
     {
-      "x": 40,
-      "y": 4,
-      "tier": 2,
-      "z": 36,
-      "id": "egg-stand-2-4",
+      "id": "stand-star-egg",
       "eggId": "star-egg",
-      "asset": "egg-moon-blender",
-      "color": "#9697ee",
-      "yaw": -1.5707963267948966
-    },
-    {
-      "x": 40,
-      "y": 4,
       "tier": 2,
-      "z": 40,
-      "id": "egg-stand-2-5",
+      "x": 40,
+      "y": 4.8,
+      "z": 34.5,
+      "yaw": -1.5707963267948966,
+      "color": "#9697ee"
+    },
+    {
+      "id": "stand-core-egg",
       "eggId": "core-egg",
-      "asset": "egg-core-blender",
-      "color": "#f1c957",
-      "yaw": -1.5707963267948966
-    }
-  ],
-  "portals": [
-    {
-      "id": "old_mine",
-      "name": "老矿井",
-      "depth": 400,
-      "color": "#ffc778",
-      "x": -27,
-      "z": 48,
-      "yaw": 1.5707963267948966,
-      "model": "portal-timber",
-      "zone": {
-        "x": -27,
-        "y": 0,
-        "z": 48,
-        "radius": 1.6,
-        "heightTolerance": 0.25,
-        "hysteresis": 0.3
-      }
-    },
-    {
-      "id": "fungal",
-      "name": "蘑菇洞穴",
-      "depth": 800,
-      "color": "#97e2c5",
-      "x": -27,
-      "z": 44,
-      "yaw": 1.5707963267948966,
-      "model": "portal-fungal",
-      "zone": {
-        "x": -27,
-        "y": 0,
-        "z": 44,
-        "radius": 1.6,
-        "heightTolerance": 0.25,
-        "hysteresis": 0.3
-      }
-    },
-    {
-      "id": "crystal",
-      "name": "水晶洞穴",
-      "depth": 1200,
-      "color": "#b9b2fb",
-      "x": -27,
-      "z": 40,
-      "yaw": 1.5707963267948966,
-      "model": "portal-crystal",
-      "zone": {
-        "x": -27,
-        "y": 0,
-        "z": 40,
-        "radius": 1.6,
-        "heightTolerance": 0.25,
-        "hysteresis": 0.3
-      }
-    },
-    {
-      "id": "ruins",
-      "name": "地下遗迹",
-      "depth": 1600,
-      "color": "#9ed8c6",
-      "x": -27,
-      "z": 36,
-      "yaw": 1.5707963267948966,
-      "model": "portal-timber",
-      "tint": "#ffe4ad",
-      "zone": {
-        "x": -27,
-        "y": 0,
-        "z": 36,
-        "radius": 1.6,
-        "heightTolerance": 0.25,
-        "hysteresis": 0.3
-      }
-    },
-    {
-      "id": "frozen",
-      "name": "冰封矿洞",
-      "depth": 2000,
-      "color": "#dcf5f4",
-      "x": -27,
-      "z": 32,
-      "yaw": 1.5707963267948966,
-      "model": "portal-frozen",
-      "zone": {
-        "x": -27,
-        "y": 0,
-        "z": 32,
-        "radius": 1.6,
-        "heightTolerance": 0.25,
-        "hysteresis": 0.3
-      }
-    },
-    {
-      "id": "volcanic",
-      "name": "熔岩矿洞",
-      "depth": 2400,
-      "color": "#f2a267",
-      "x": -27,
-      "z": 28,
-      "yaw": 1.5707963267948966,
-      "model": "portal-volcanic",
-      "zone": {
-        "x": -27,
-        "y": 0,
-        "z": 28,
-        "radius": 1.6,
-        "heightTolerance": 0.25,
-        "hysteresis": 0.3
-      }
-    },
-    {
-      "id": "fossil",
-      "name": "巨型化石",
-      "depth": 2800,
-      "color": "#ecd9ae",
-      "x": -27,
-      "z": 24,
-      "yaw": 1.5707963267948966,
-      "model": "portal-fossil",
-      "zone": {
-        "x": -27,
-        "y": 0,
-        "z": 24,
-        "radius": 1.6,
-        "heightTolerance": 0.25,
-        "hysteresis": 0.3
-      }
-    },
-    {
-      "id": "machinery",
-      "name": "古代机械",
-      "depth": 3200,
-      "color": "#7ae1d0",
-      "x": -27,
-      "z": 20,
-      "yaw": 1.5707963267948966,
-      "model": "portal-timber",
-      "tint": "#8db5bd",
-      "zone": {
-        "x": -27,
-        "y": 0,
-        "z": 20,
-        "radius": 1.6,
-        "heightTolerance": 0.25,
-        "hysteresis": 0.3
-      }
-    },
-    {
-      "id": "core",
-      "name": "地心秘境",
-      "depth": 3600,
-      "color": "#f5da9b",
-      "x": -27,
-      "z": 16,
-      "yaw": 1.5707963267948966,
-      "model": "portal-core",
-      "zone": {
-        "x": -27,
-        "y": 0,
-        "z": 16,
-        "radius": 1.6,
-        "heightTolerance": 0.25,
-        "hysteresis": 0.3
-      }
+      "tier": 2,
+      "x": 40,
+      "y": 4.8,
+      "z": 38.5,
+      "yaw": -1.5707963267948966,
+      "color": "#f1c957"
     }
   ],
   "tiers": [
     {
+      "tier": 0,
       "x": 28,
-      "y": 0.4,
-      "tier": 0
+      "y": 0.4
     },
     {
+      "tier": 1,
       "x": 34,
-      "y": 2.2,
-      "tier": 1
+      "y": 2.6
     },
     {
+      "tier": 2,
       "x": 40,
-      "y": 4,
-      "tier": 2
+      "y": 4.8
     }
   ],
+  "terrace": {
+    "minZ": 17,
+    "maxZ": 43,
+    "width": 6,
+    "stairs": [
+      15.5,
+      44.5
+    ],
+    "stairDepth": 3,
+    "maxRiser": 0.3
+  },
   "steps": [
     {
       "x": 26.5,
@@ -488,174 +258,556 @@
       "depth": 3
     },
     {
-      "x": 31.5,
-      "y": 0.7000000000000001,
+      "x": 31.38,
+      "y": 0.68,
       "z": 15.5,
-      "width": 1,
+      "width": 0.75,
       "depth": 3
     },
     {
-      "x": 32.5,
-      "y": 1,
+      "x": 32.13,
+      "y": 0.95,
       "z": 15.5,
-      "width": 1,
+      "width": 0.75,
       "depth": 3
     },
     {
-      "x": 33.5,
-      "y": 1.3,
+      "x": 32.88,
+      "y": 1.23,
       "z": 15.5,
-      "width": 1,
+      "width": 0.75,
       "depth": 3
     },
     {
-      "x": 34.5,
-      "y": 1.6,
+      "x": 33.63,
+      "y": 1.5,
       "z": 15.5,
-      "width": 1,
+      "width": 0.75,
       "depth": 3
     },
     {
-      "x": 35.5,
-      "y": 1.9000000000000004,
+      "x": 34.38,
+      "y": 1.78,
       "z": 15.5,
-      "width": 1,
+      "width": 0.75,
       "depth": 3
     },
     {
-      "x": 36.5,
-      "y": 2.2,
+      "x": 35.13,
+      "y": 2.05,
       "z": 15.5,
-      "width": 1,
+      "width": 0.75,
       "depth": 3
     },
     {
-      "x": 31.5,
-      "y": 0.7000000000000001,
+      "x": 35.88,
+      "y": 2.33,
+      "z": 15.5,
+      "width": 0.75,
+      "depth": 3
+    },
+    {
+      "x": 36.63,
+      "y": 2.6,
+      "z": 15.5,
+      "width": 0.75,
+      "depth": 3
+    },
+    {
+      "x": 31.38,
+      "y": 0.68,
       "z": 44.5,
-      "width": 1,
+      "width": 0.75,
       "depth": 3
     },
     {
-      "x": 32.5,
-      "y": 1,
+      "x": 32.13,
+      "y": 0.95,
       "z": 44.5,
-      "width": 1,
+      "width": 0.75,
       "depth": 3
     },
     {
-      "x": 33.5,
-      "y": 1.3,
+      "x": 32.88,
+      "y": 1.23,
       "z": 44.5,
-      "width": 1,
+      "width": 0.75,
       "depth": 3
     },
     {
-      "x": 34.5,
-      "y": 1.6,
+      "x": 33.63,
+      "y": 1.5,
       "z": 44.5,
-      "width": 1,
+      "width": 0.75,
       "depth": 3
     },
     {
-      "x": 35.5,
-      "y": 1.9000000000000004,
+      "x": 34.38,
+      "y": 1.78,
       "z": 44.5,
-      "width": 1,
+      "width": 0.75,
       "depth": 3
     },
     {
-      "x": 36.5,
-      "y": 2.2,
+      "x": 35.13,
+      "y": 2.05,
       "z": 44.5,
-      "width": 1,
+      "width": 0.75,
       "depth": 3
     },
     {
-      "x": 37.5,
-      "y": 2.5,
+      "x": 35.88,
+      "y": 2.33,
+      "z": 44.5,
+      "width": 0.75,
+      "depth": 3
+    },
+    {
+      "x": 36.63,
+      "y": 2.6,
+      "z": 44.5,
+      "width": 0.75,
+      "depth": 3
+    },
+    {
+      "x": 37.38,
+      "y": 2.88,
       "z": 15.5,
-      "width": 1,
+      "width": 0.75,
       "depth": 3
     },
     {
-      "x": 38.5,
-      "y": 2.8000000000000003,
+      "x": 38.13,
+      "y": 3.15,
       "z": 15.5,
-      "width": 1,
+      "width": 0.75,
       "depth": 3
     },
     {
-      "x": 39.5,
-      "y": 3.1,
+      "x": 38.88,
+      "y": 3.43,
       "z": 15.5,
-      "width": 1,
+      "width": 0.75,
       "depth": 3
     },
     {
-      "x": 40.5,
-      "y": 3.4000000000000004,
-      "z": 15.5,
-      "width": 1,
-      "depth": 3
-    },
-    {
-      "x": 41.5,
+      "x": 39.63,
       "y": 3.7,
       "z": 15.5,
-      "width": 1,
+      "width": 0.75,
       "depth": 3
     },
     {
-      "x": 42.5,
-      "y": 4,
+      "x": 40.38,
+      "y": 3.97,
       "z": 15.5,
-      "width": 1,
+      "width": 0.75,
       "depth": 3
     },
     {
-      "x": 37.5,
-      "y": 2.5,
+      "x": 41.13,
+      "y": 4.25,
+      "z": 15.5,
+      "width": 0.75,
+      "depth": 3
+    },
+    {
+      "x": 41.88,
+      "y": 4.53,
+      "z": 15.5,
+      "width": 0.75,
+      "depth": 3
+    },
+    {
+      "x": 42.63,
+      "y": 4.8,
+      "z": 15.5,
+      "width": 0.75,
+      "depth": 3
+    },
+    {
+      "x": 37.38,
+      "y": 2.88,
       "z": 44.5,
-      "width": 1,
+      "width": 0.75,
       "depth": 3
     },
     {
-      "x": 38.5,
-      "y": 2.8000000000000003,
+      "x": 38.13,
+      "y": 3.15,
       "z": 44.5,
-      "width": 1,
+      "width": 0.75,
       "depth": 3
     },
     {
-      "x": 39.5,
-      "y": 3.1,
+      "x": 38.88,
+      "y": 3.43,
       "z": 44.5,
-      "width": 1,
+      "width": 0.75,
       "depth": 3
     },
     {
-      "x": 40.5,
-      "y": 3.4000000000000004,
-      "z": 44.5,
-      "width": 1,
-      "depth": 3
-    },
-    {
-      "x": 41.5,
+      "x": 39.63,
       "y": 3.7,
       "z": 44.5,
-      "width": 1,
+      "width": 0.75,
       "depth": 3
     },
     {
-      "x": 42.5,
-      "y": 4,
+      "x": 40.38,
+      "y": 3.97,
       "z": 44.5,
-      "width": 1,
+      "width": 0.75,
+      "depth": 3
+    },
+    {
+      "x": 41.13,
+      "y": 4.25,
+      "z": 44.5,
+      "width": 0.75,
+      "depth": 3
+    },
+    {
+      "x": 41.88,
+      "y": 4.53,
+      "z": 44.5,
+      "width": 0.75,
+      "depth": 3
+    },
+    {
+      "x": 42.63,
+      "y": 4.8,
+      "z": 44.5,
+      "width": 0.75,
       "depth": 3
     }
   ],
+  "portals": [
+    {
+      "id": "old_mine",
+      "x": -12,
+      "z": 46,
+      "yaw": 1.57
+    },
+    {
+      "id": "fungal",
+      "x": -10.39,
+      "z": 52,
+      "yaw": 2.09
+    },
+    {
+      "id": "crystal",
+      "x": -6,
+      "z": 56.39,
+      "yaw": 2.62
+    },
+    {
+      "id": "ruins",
+      "x": 6,
+      "z": 56.39,
+      "yaw": 3.67
+    },
+    {
+      "id": "frozen",
+      "x": 10.39,
+      "z": 52,
+      "yaw": 4.19
+    },
+    {
+      "id": "volcanic",
+      "x": 12,
+      "z": 46,
+      "yaw": 4.71
+    },
+    {
+      "id": "fossil",
+      "x": -12.73,
+      "z": 58.73,
+      "yaw": 2.36
+    },
+    {
+      "id": "machinery",
+      "x": 12.73,
+      "z": 58.73,
+      "yaw": 3.93
+    },
+    {
+      "id": "core",
+      "x": 17.39,
+      "z": 50.66,
+      "yaw": 4.45
+    }
+  ],
+  "conservatory": {
+    "x": 34,
+    "z": 8,
+    "yaw": 0,
+    "half": [
+      4.5,
+      3,
+      3.5
+    ]
+  },
+  "spawn": {
+    "x": 0,
+    "z": 46
+  },
+  "grounds": {
+    "plazas": [
+      {
+        "x": 0,
+        "z": 20,
+        "radius": 15
+      },
+      {
+        "x": 0,
+        "z": 46,
+        "radius": 4.6
+      },
+      {
+        "x": 17,
+        "z": 13.2,
+        "radius": 3.2
+      }
+    ],
+    "paths": [
+      {
+        "width": 2.7,
+        "points": [
+          [
+            0,
+            80
+          ],
+          [
+            0,
+            54
+          ],
+          [
+            0,
+            46
+          ],
+          [
+            0,
+            36.5
+          ],
+          [
+            0,
+            26
+          ],
+          [
+            0,
+            16
+          ],
+          [
+            0,
+            8
+          ]
+        ]
+      },
+      {
+        "width": 1.9,
+        "points": [
+          [
+            13.5,
+            21
+          ],
+          [
+            22,
+            21
+          ],
+          [
+            22,
+            15.5
+          ],
+          [
+            27,
+            15.5
+          ]
+        ]
+      },
+      {
+        "width": 1.9,
+        "points": [
+          [
+            22,
+            21
+          ],
+          [
+            22,
+            44.5
+          ],
+          [
+            27,
+            44.5
+          ]
+        ]
+      },
+      {
+        "width": 1.5,
+        "points": [
+          [
+            -11.82,
+            43.92
+          ],
+          [
+            -11.82,
+            48.08
+          ],
+          [
+            -10.39,
+            52
+          ],
+          [
+            -7.71,
+            55.19
+          ],
+          [
+            -4.1,
+            57.28
+          ],
+          [
+            0,
+            58
+          ],
+          [
+            4.1,
+            57.28
+          ],
+          [
+            7.71,
+            55.19
+          ],
+          [
+            10.39,
+            52
+          ],
+          [
+            11.82,
+            48.08
+          ],
+          [
+            11.82,
+            43.92
+          ]
+        ]
+      }
+    ],
+    "pads": [
+      [
+        0,
+        16
+      ],
+      [
+        -14.204059440734415,
+        16.291534960281982
+      ],
+      [
+        -13.704059440734413,
+        25.70846503971802
+      ],
+      [
+        22,
+        29
+      ],
+      [
+        0,
+        47
+      ]
+    ],
+    "keepClear": [
+      {
+        "kind": "rect",
+        "minX": -10,
+        "maxX": 10,
+        "minZ": -10,
+        "maxZ": 10
+      },
+      {
+        "kind": "rect",
+        "minX": 20,
+        "maxX": 46,
+        "minZ": 12,
+        "maxZ": 48
+      },
+      {
+        "kind": "rect",
+        "minX": -7,
+        "maxX": 7,
+        "minZ": 30,
+        "maxZ": 90
+      },
+      {
+        "kind": "circle",
+        "x": 0,
+        "z": 20,
+        "radius": 15.5
+      },
+      {
+        "kind": "circle",
+        "x": 0,
+        "z": 46,
+        "radius": 15.5
+      },
+      {
+        "kind": "circle",
+        "x": -19.47,
+        "z": 14.38,
+        "radius": 7.5
+      },
+      {
+        "kind": "circle",
+        "x": -20,
+        "z": 28,
+        "radius": 6.5
+      },
+      {
+        "kind": "circle",
+        "x": 34,
+        "z": 8,
+        "radius": 7
+      },
+      {
+        "kind": "circle",
+        "x": 17,
+        "z": 12,
+        "radius": 4
+      },
+      {
+        "kind": "circle",
+        "x": 10.8,
+        "z": 12,
+        "radius": 4
+      }
+    ]
+  },
+  "props": {
+    "lamps": [
+      {
+        "x": -5,
+        "z": 29.5,
+        "yaw": 0
+      },
+      {
+        "x": 5,
+        "z": 29.5,
+        "yaw": 3.141592653589793
+      }
+    ],
+    "signpost": {
+      "x": -4.5,
+      "z": 25
+    },
+    "capsule": [
+      17,
+      0,
+      12
+    ],
+    "board": [
+      10.8,
+      0,
+      12
+    ]
+  },
   "mine": {
     "minX": -8,
     "maxX": 8,

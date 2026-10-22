@@ -1,6 +1,12 @@
 import * as THREE from 'three';
 import { Kit, materials, rng, type V3 } from './kit.ts';
 import { createGroundTexture, createStoneTexture, createWaterTexture, createPathTexture, groundTextureBounds } from './terrainTexture.ts';
+import { readFileSync } from 'node:fs';
+
+// The hub plan (tools/export-pinewind-layout.mjs) owns plazas, paths, paving pads and clearances.
+type KeepClear = { kind: 'rect'; minX: number; maxX: number; minZ: number; maxZ: number } | { kind: 'circle'; x: number; z: number; radius: number };
+type Grounds = { plazas: { x: number; z: number; radius: number }[]; paths: { width: number; points: [number, number][] }[]; pads: [number, number][]; keepClear: KeepClear[] };
+const grounds: Grounds = JSON.parse(readFileSync(new URL('../../layout.json', import.meta.url), 'utf8')).grounds;
 
 // A single, authored valley. Geometry stays resident; the caller batches the
 // static authoring graph. No transparent foliage cards or runtime scattering.
@@ -122,14 +128,8 @@ export function landscapeHeight(x: number, z: number) {
   return meadowHeight(x, z);
 }
 
-const paths = [
- {width:2.7,points:[[0,80],[0,54],[0,46],[0,36.5],[0,26],[0,16],[0,8]]},
- {width:2.0,points:[[0,25],[-7,23],[-17,18.7],[-13,8],[-13,-4],[-20,-6.3]]},
- {width:2.2,points:[[0,25],[12,25],[20,29],[22,39],[22,45]]},
- {width:2.0,points:[[-17,18.7],[-23,24],[-23,38],[-23,48],[-12,47],[0,46]]},
- {width:1.7,points:[[20,29],[22,20],[22,15.5],[27,15.5]]},
- {width:1.7,points:[[22,39],[22,44.5],[27,44.5]]},
-].map(path=>({width:path.width,curve:new THREE.CatmullRomCurve3(path.points.map(([x,z])=>new THREE.Vector3(x,0,z)))}));
+const paths = grounds.paths.map(path => ({ width: path.width, points: path.points }))
+.map(path=>({width:path.width,curve:new THREE.CatmullRomCurve3(path.points.map(([x,z])=>new THREE.Vector3(x,0,z)))}));
 const pathPoints = paths.map(path => ({ width: path.width, points: path.curve.getPoints(90) }));
 function pathDistance(x: number, z: number) {
   let nearest = Infinity;
@@ -138,6 +138,7 @@ function pathDistance(x: number, z: number) {
     const t = clamp(((x - a.x) * dx + (z - a.z) * dz) / Math.max(.0001, dx * dx + dz * dz), 0, 1);
     nearest = Math.min(nearest, Math.hypot(x - a.x - dx * t, z - a.z - dz * t) - path.width);
   }
+  for (const plaza of grounds.plazas) nearest = Math.min(nearest, Math.hypot(x - plaza.x, z - plaza.z) - plaza.radius);
   return nearest;
 }
 
@@ -201,6 +202,14 @@ function buildGround(kit: Kit) {
     });
     for (let i = 0; i < sides.length - 1; i++) roadRegions.push(polygon([sides[i][0], sides[i][1], sides[i + 1][1], sides[i + 1][0]]));
   }
+  // Sandy plazas: convex polygons share the path material and partition the same ground cells.
+  for (const plaza of grounds.plazas) {
+    const sides = Math.max(24, Math.ceil(plaza.radius * 2.4));
+    roadRegions.push(polygon(Array.from({ length: sides }, (_, i) => {
+      const a = (i / sides) * Math.PI * 2;
+      return { x: plaza.x + Math.cos(a) * plaza.radius, y: 0, z: plaza.z + Math.sin(a) * plaza.radius };
+    })));
+  }
   const holes = [...riverCorridor, minePolygon];
   // The meadow is physically cut to the shared river contour. No toothed bank
   // remains underneath, and paths partition the same surface without overlays.
@@ -254,12 +263,9 @@ function buildGround(kit: Kit) {
 
 function placeNature(kit: Kit, getNature: NatureFactory, name: string, position: V3, scale: V3, yaw = 0) {
   const [x,,z]=position;
-  if(Math.abs(x)<10&&Math.abs(z)<10)return;
-  if(x>20&&x<46&&z>12&&z<48)return;
-  if(x>-31&&x<-22&&z>12&&z<51)return;
-  if(Math.hypot(x+17,z-12)<7||Math.hypot(x+20,z+13)<6||Math.hypot(x-34,z-8)<7)return;
-  if(Math.abs(x)<7&&z>30)return;
-  if(Math.hypot(x-12,z-30)<4||Math.hypot(x-10.8,z-12)<4)return;
+  for (const area of grounds.keepClear) {
+    if (area.kind === 'rect' ? x > area.minX && x < area.maxX && z > area.minZ && z < area.maxZ : Math.hypot(x - area.x, z - area.z) < area.radius) return;
+  }
 
   const object = getNature(name); object.name = `Blockcraft ${name}`;
   object.scale.set(...scale); kit.add(object, position, yaw); return object;
@@ -273,7 +279,7 @@ function buildQuarry(kit: Kit, getNature: NatureFactory) {
 }
 function buildPaths(kit: Kit) {
   // Deliberate square paving clusters, not a smooth overlay hiding painted edges.
-  for (const [cx, cz] of [[0,16],[-17,18.7],[-20,-6.3],[22,29],[0,47]]) {
+  for (const [cx, cz] of grounds.pads) {
     for (let row = 0; row < 3; row++) for (let col = 0; col < 3; col++) {
       if (row === 2 && col === 2) continue;
       const x = cx + (col - 1) * .84, z = cz + (row - 1) * .85;

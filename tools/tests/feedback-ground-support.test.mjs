@@ -11,13 +11,17 @@ import { COLLISION_SIZE, CELL } from '../../src/game/terrain/SparseWorld.ts';
 import { MOVEMENT } from '../../src/game/movement.ts';
 
 await initPhysics();
+// Every check runs at the live capsule machine zone, wherever the hub places it.
+const Z = CAPSULE_MACHINE_ZONE, AT = [Z.x, 0, Z.z];
+// A fixed point beside a legacy roadside curb that masks the voxel floor.
+const CURB = [12, 0, 31.8];
 const floorMeshes = [];
 for (let x = -1; x <= 1; x++) for (let z = 0; z <= 3; z++) {
   const coord = [x, -1, z], mesh = buildRegion('collision', coord, COLLISION_SIZE, []).mesh;
   if (mesh.indices.length) floorMeshes.push({ coord, mesh });
 }
 
-function setup({ floor = true, feedback = true, floorFirst = false, scenery = true } = {}) {
+function setup({ floor = true, feedback = true, floorFirst = false, scenery = true, at = AT } = {}) {
   const physics = new CharacterPhysics(false), floorHandles = [];
   function installFloor() {
     if (!floor) return;
@@ -30,7 +34,7 @@ function setup({ floor = true, feedback = true, floorFirst = false, scenery = tr
   const sites = scenery ? createScenerySites(CAMP_CONTENT.rooms, CAMP_CONTENT.surface.plan) : [];
   if (feedback) sites.push(FEEDBACK_COLLISION_SITE);
   const collisions = new SceneryCollision(physics, sites);
-  collisions.sync([12, 0, 31.8]);
+  collisions.sync(at);
   if (!floorFirst) installFloor();
   return {
     physics, collisions, floorHandles,
@@ -43,9 +47,9 @@ function ticks(physics, count, x = 0, forward = 0) {
 
 test('real surface curb cannot mask the voxel floor at the capsule machine, including the failed public float position', () => {
   const arrivals = [
-    [12, 0, 31.8],
-    [12.000136375427246, 0.019701611995696977, 31.800216674804688],
-    [12, 0.05, 31.8],
+    AT,
+    [Z.x + 0.000136375427246, 0.019701611995696977, Z.z + 0.000216674804688],
+    [Z.x, 0.05, Z.z],
   ];
   for (const floorFirst of [false, true]) for (const arrival of arrivals) {
     const scene = setup({ floorFirst });
@@ -65,7 +69,7 @@ test('the existing roadside curb also finds real ground without any new feedback
   const scene = setup({ feedback: false });
   try {
     const p = scene.physics;
-    p.teleport([12, 0, 31.8]); ticks(p, 300);
+    p.teleport(AT); ticks(p, 300);
     assert.equal(p.grounded, true); assert.equal(p.verticalSpeed, 0);
     assert.ok(p.feet()[1] < 0.2);
   } finally { scene.dispose(); }
@@ -77,12 +81,12 @@ test('walking over the curb, falling onto it and returning from the spawn all re
     try {
       const p = scene.physics;
       if (route === 'walk') {
-        p.teleport([12, 0.3, 34]); ticks(p, 30); ticks(p, 24, 0, 1);
+        p.teleport([Z.x, 0.3, Z.z + 2.2]); ticks(p, 30); ticks(p, 24, 0, 1);
       } else if (route === 'fall') {
-        p.teleport([12, 4, 31.8]);
+        p.teleport([Z.x, 4, Z.z]);
       } else {
         scene.collisions.sync([0, 0.05, 46]); p.teleport([0, 0.05, 46]); ticks(p, 60);
-        scene.collisions.sync([12, 0, 31.8]); p.teleport([12, 0, 31.8]);
+        scene.collisions.sync(AT); p.teleport(AT);
       }
       ticks(p, 300);
       assert.equal(p.grounded, true, route); assert.equal(p.verticalSpeed, 0, route);
@@ -98,7 +102,7 @@ test('a rejected curb with no real floor never grants support or an airborne jum
   const scene = setup({ floor: false });
   try {
     const p = scene.physics;
-    p.teleport([12, 0, 31.8]); ticks(p, 150);
+    p.teleport(AT); ticks(p, 150);
     assert.equal(p.grounded, false); assert.ok(p.verticalSpeed < 0);
     const jumps = p.jumps; p.tick(0, 0, 0, true, true);
     assert.equal(p.jumps, jumps); assert.equal(p.grounded, false);
@@ -109,7 +113,7 @@ test('removing the real floor beside a curb immediately removes jump eligibility
   const scene = setup();
   try {
     const p = scene.physics;
-    p.teleport([12, 0, 31.8]); ticks(p, 30); assert.equal(p.grounded, true);
+    p.teleport(AT); ticks(p, 30); assert.equal(p.grounded, true);
     for (const floor of scene.floorHandles) p.world.removeCollider(floor, false);
     const jumps = p.jumps; p.tick(0, 0, 0, true, true);
     assert.equal(p.jumps, jumps); assert.equal(p.grounded, false); assert.ok(p.verticalSpeed < 0);
@@ -132,7 +136,7 @@ test('grounded jump from the curb edge rises once and lands normally on actual s
   const scene = setup();
   try {
     const p = scene.physics;
-    p.teleport([12, 0, 31.8]); ticks(p, 30);
+    p.teleport(AT); ticks(p, 30);
     assert.equal(p.grounded, true);
     const base = p.feet()[1]; p.tick(0, 0, 0, true, true);
     assert.equal(p.jumps, 1); assert.equal(p.grounded, false);
@@ -146,10 +150,10 @@ test('grounded jump from the curb edge rises once and lands normally on actual s
 
 test('support retries only rejected colliders: one query on a clear floor and two beside the masking curb', () => {
   for (const scenery of [false, true]) {
-    const scene = setup({ scenery, feedback: false });
+    const scene = setup({ scenery, feedback: false, at: CURB });
     try {
       const p = scene.physics;
-      p.teleport([12, 0.02, 31.8]);
+      p.teleport([CURB[0], 0.02, CURB[2]]);
       const original = p.world.castShape.bind(p.world);
       let casts = 0;
       p.world.castShape = (...args) => { casts++; return original(...args); };

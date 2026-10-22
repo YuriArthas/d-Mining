@@ -1,6 +1,8 @@
 import type { PetContent } from "../logic/pets/types.ts";
 import type { ZoneConfig } from "../logic/ZoneDetector.ts";
 import type { Coord } from "../terrain/SparseWorld.ts";
+/** A service zone; `lookAt` is the point a player faces when teleported there. */
+export type ServiceZone = ZoneConfig & Readonly<{ lookAt?: readonly [number, number, number] }>;
 export type EggStation = Readonly<{
   id: string;
   eggId: string;
@@ -24,8 +26,8 @@ export type SessionContent = Readonly<{
   eggStations?: readonly EggStation[];
   initiallyUnlocked?: readonly string[];
   destinations: readonly Destination[];
-  sales: readonly ZoneConfig[];
-  shops: readonly Readonly<{ id: string; zone: ZoneConfig }>[];
+  sales: readonly ServiceZone[];
+  shops: readonly Readonly<{ id: string; zone: ServiceZone }>[];
   portals: readonly Readonly<{ id: string; zone: ZoneConfig }>[];
   home: ZoneConfig;
 }>;
