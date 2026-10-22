@@ -89,8 +89,10 @@ function buildMineralAtlas(response:boolean) {
     pixels[i+1]=Math.round((inclusion&&metal?.38:inclusion&&glass?.32:.96)*255);
     pixels[i+2]=Math.round((inclusion&&metal?.65:0)*255);
    }else{
-    const c=mark?color:host;
-    for(let k=0;k<3;k++)pixels[i+k]=Math.max(0,Math.min(255,Math.round(c[k]+shade)));
+    // Ore tiles store colour premultiplied by the inclusion mask: host pixels are black and the
+    // shader adds the layer's host rock by (1 - mask), so mip levels blend coverage correctly.
+    const c=mark?color:host,premultipliedHost=!mark&&!!r&&!r.base;
+    for(let k=0;k<3;k++)pixels[i+k]=premultipliedHost?0:Math.max(0,Math.min(255,Math.round(c[k]+shade)));
    }
    pixels[i+3]=255;
   }

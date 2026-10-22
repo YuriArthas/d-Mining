@@ -43,12 +43,13 @@ const SIZES = [[844, 390], [667, 375], [640, 320], [932, 430]];
   const box = selector => page.locator(selector).first().boundingBox();
   const overlap = (a, b) => a && b && Math.min(a.x + a.width, b.x + b.width) > Math.max(a.x, b.x) + 1 && Math.min(a.y + a.height, b.y + b.height) > Math.max(a.y, b.y) + 1;
   const inside = (r, label) => { const v = page.viewportSize(); assert.ok(r && r.x >= -1 && r.y >= -1 && r.x + r.width <= v.width + 1 && r.y + r.height <= v.height + 1, `${label} inside viewport ${JSON.stringify(r)}`); };
-  const layout = async name => {
+  const layout = async (name, withTarget = false) => {
     const zones = {};
-    for (const [key, selector] of Object.entries({ left: '.hud-left', depth: '.hud-depth', system: '.hud-system', rail: '.hud-rail', bottom: '.hud-bottom', joystick: '.joystick', jump: '.jump-button' })) {
+    for (const [key, selector] of Object.entries({ left: '.hud-left', depth: '.hud-depth', system: '.hud-system', rail: '.hud-rail', bottom: '.hud-bottom', joystick: '.joystick', jump: '.jump-button', ...(withTarget ? { target: '.target-health' } : {}) })) {
       zones[key] = await box(selector); inside(zones[key], key);
     }
-    for (const [a, b] of [['left', 'depth'], ['depth', 'system'], ['depth', 'rail'], ['system', 'rail'], ['rail', 'jump'], ['left', 'joystick'], ['bottom', 'joystick'], ['bottom', 'jump'], ['left', 'rail']]) {
+    const targetPairs = withTarget ? ['left', 'system', 'rail', 'bottom', 'joystick', 'jump', 'depth'].map(k => ['target', k]) : [];
+    for (const [a, b] of [['left', 'depth'], ['depth', 'system'], ['depth', 'rail'], ['system', 'rail'], ['rail', 'jump'], ['left', 'joystick'], ['bottom', 'joystick'], ['bottom', 'jump'], ['left', 'rail'], ...targetPairs]) {
       assert.ok(!overlap(zones[a], zones[b]), `${name}: ${a} clear of ${b} ${JSON.stringify([zones[a], zones[b]])}`);
     }
     for (const button of await page.locator('.ui-hud button:visible, .jump-button').all()) {
@@ -118,6 +119,34 @@ const SIZES = [[844, 390], [667, 375], [640, 320], [932, 430]];
     await page.getByRole('button', { name: '返回地表' }).waitFor();
     assert.match(await page.getByTestId('depth').innerText(), /米$/);
     await layout('844x390 underground'); await shot('06-underground-return');
+
+    // 5b. The mining target card (shown only while a finger aims at a block) sits in the top-centre
+    // stack: it must clear every other zone at each size and with safe areas, and leave the miner visible.
+    const aimAtBlock = async () => {
+      const v = page.viewportSize(), ring = await page.locator('.guide-dig-ring:visible').count() ? await box('.guide-dig-ring') : null;
+      // A new save is still in the first-dig lesson, which only allows the glowing block under its ring.
+      const points = [...(ring ? [[(ring.x + ring.width / 2) / v.width, (ring.y + ring.height / 2) / v.height]] : []), [.5, .42], [.56, .5], [.44, .36], [.6, .38], [.5, .3]];
+      for (const [fx, fy] of points) {
+        await touch('touchStart', [{ x: v.width * fx, y: v.height * fy, id: 4 }]);
+        try { await page.locator('.target-health').waitFor({ timeout: 1500 }); return; } catch { await touch('touchEnd'); }
+      }
+      throw new Error('no block under the probe points');
+    };
+    for (const [width, height, safe] of [...SIZES.map(([w, h]) => [w, h, false]), [844, 390, true]]) {
+      await page.setViewportSize({ width, height });
+      if (safe) await page.locator('.game-shell').evaluate(e => { e.style.setProperty('--safe-left', '44px'); e.style.setProperty('--safe-right', '44px'); e.style.setProperty('--safe-bottom', '21px'); });
+      await page.waitForTimeout(400);
+      await aimAtBlock();
+      const name = `${width}x${height}${safe ? ' safe areas' : ''} mining target`;
+      await layout(name, true);
+      const avatar = await page.evaluate(() => window.__miningValidation.snapshot().renderedPosition);
+      await shot(`07-target-${width}x${height}${safe ? '-safe' : ''}`);
+      await touch('touchEnd'); await page.waitForTimeout(200);
+      report.layouts.at(-1).avatar = avatar;
+      if (safe) await page.locator('.game-shell').evaluate(e => { for (const p of ['--safe-left', '--safe-right', '--safe-bottom']) e.style.removeProperty(p); });
+    }
+    await page.setViewportSize({ width: 844, height: 390 });
+    await check('While aiming at a block, the target card sits under the depth and clears the resource column, system buttons, rail, bottom buttons and thumb controls at four phone sizes and with 44px/21px safe areas.');
     await tap(page.getByRole('button', { name: '返回地表' }));
     await page.waitForFunction(() => document.querySelector('[data-testid=depth]')?.textContent === '地表', null, { timeout: 30000 });
     assert.equal(await page.getByRole('button', { name: '返回地表' }).count(), 0);

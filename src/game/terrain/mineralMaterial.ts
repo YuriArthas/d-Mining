@@ -1,19 +1,20 @@
 import { stabilizeShadows } from '../presentation/stableShadow.ts';
-import { Color, DataTexture, MeshPhysicalMaterial, LinearFilter, NearestFilter, RGBAFormat, ShaderChunk, SRGBColorSpace } from 'three';
+import { Color, DataTexture, MeshPhysicalMaterial, LinearFilter, LinearMipmapLinearFilter, NearestFilter, RGBAFormat, ShaderChunk, SRGBColorSpace } from 'three';
 import {LAYERS,type Layer} from '../content/layers.ts';
 import {resourceByKind} from '../content/resources.ts';
-import { ATLAS_COLUMNS, ATLAS_ROWS, ATLAS_WIDTH, ATLAS_HEIGHT, mineralAtlas, mineralResponseAtlas, TERRAIN_MATERIALS } from './minerals.ts';
+import { ATLAS_COLUMNS, ATLAS_ROWS, ATLAS_WIDTH, ATLAS_HEIGHT, TILE_SIZE, mineralAtlas, mineralResponseAtlas, TERRAIN_MATERIALS } from './minerals.ts';
 
 export function createMineralMaterial(layers:readonly Layer[]=LAYERS, worlds?:readonly Readonly<{layers:readonly Layer[]}>[]) {
   const hosts=worlds?worlds.flatMap((w,id)=>w.layers.map(layer=>({layer,world:id}))):layers.map(layer=>({layer,world:0}));
   const pixels = mineralAtlas(),responsePixels=mineralResponseAtlas();
   const atlas = new DataTexture(pixels, ATLAS_WIDTH, ATLAS_HEIGHT, RGBAFormat);
   atlas.colorSpace = SRGBColorSpace;
-  atlas.magFilter = NearestFilter; atlas.minFilter = LinearFilter;
-  atlas.generateMipmaps = false; atlas.needsUpdate = true;
+  // Crisp pixels up close, filtered mip levels at distance and grazing angles (no speckle).
+  atlas.magFilter = NearestFilter; atlas.minFilter = LinearMipmapLinearFilter;
+  atlas.generateMipmaps = true; atlas.needsUpdate = true;
   const responseAtlas=new DataTexture(responsePixels,ATLAS_WIDTH,ATLAS_HEIGHT,RGBAFormat);
-  responseAtlas.magFilter=responseAtlas.minFilter=LinearFilter;
-  responseAtlas.generateMipmaps=false;responseAtlas.needsUpdate=true;
+  responseAtlas.magFilter=LinearFilter;responseAtlas.minFilter=LinearMipmapLinearFilter;
+  responseAtlas.generateMipmaps=true;responseAtlas.needsUpdate=true;
   const material = new MeshPhysicalMaterial({ map: atlas, roughness: 1, metalness:0, specularIntensity:.08, envMapIntensity:0 });
   material.onBeforeCompile = shader => {
     shader.vertexShader = 'attribute float oreTile;\nvarying float vOreTile;\nvarying float vTerrainNormalY;\nvarying vec3 vTerrainWorld;\n' + shader.vertexShader;
@@ -34,15 +35,19 @@ export function createMineralMaterial(layers:readonly Layer[]=LAYERS, worlds?:re
       localOreUv=mix(localOreUv,vec2(localOreUv.y,1.0-localOreUv.x),turnOre);
       float oreTileIndex=floor(vOreTile+.5);
       vec2 oreTileCell=vec2(mod(oreTileIndex,${ATLAS_COLUMNS.toFixed(1)}),floor(oreTileIndex/${ATLAS_COLUMNS.toFixed(1)}));
-      vec2 oreAtlasUv=(oreTileCell+(vec2(0.5)+localOreUv*63.0)/64.0)/vec2(${ATLAS_COLUMNS.toFixed(1)},${ATLAS_ROWS.toFixed(1)});
-      vec3 oreResponse=texture2D(uOreResponse,oreAtlasUv).rgb;
-    ` + ShaderChunk.map_fragment.replace('texture2D( map, vMapUv )','texture2D(map,oreAtlasUv)')+`
+      // Mip level from the continuous cell UVs; fract() above would break hardware derivatives.
+      float oreLod=clamp(log2(max(max(length(dFdx(vMapUv)),length(dFdy(vMapUv)))*${TILE_SIZE.toFixed(1)},1e-6)),0.0,5.0);
+      // Keep both blended levels' samples inside this atlas tile.
+      float oreInset=.5*exp2(ceil(oreLod))/${TILE_SIZE.toFixed(1)};
+      vec2 oreAtlasUv=(oreTileCell+clamp(localOreUv,oreInset,1.0-oreInset))/vec2(${ATLAS_COLUMNS.toFixed(1)},${ATLAS_ROWS.toFixed(1)});
+      vec3 oreResponse=textureLod(uOreResponse,oreAtlasUv,oreLod).rgb;
+    ` + ShaderChunk.map_fragment.replace('texture2D( map, vMapUv )','textureLod(map,oreAtlasUv,oreLod)')+`
       vec3 hostColor=uHostColors[0];
       float hostWorld=${worlds?'(vTerrainWorld.z > 336. ? 2. : vTerrainWorld.z > 112. ? 1. : 0.)':'0.'};
       // Sample just inside the voxel so top/bottom faces at layer boundaries
       // use the rock they belong to, not the neighboring layer's rock.
       for(int i=0;i<${hosts.length};i++){if(abs(uHostWorlds[i]-hostWorld)<.1 && -vTerrainWorld.y+vTerrainNormalY*.01>=uHostDepths[i])hostColor=uHostColors[i];}
-      if(${TERRAIN_MATERIALS.flatMap((m,i)=>m.id!==7&&!resourceByKind(m.id).base?[`abs(vOreTile-${i}.0)<.1`]:[]).join('||')})diffuseColor.rgb=mix(hostColor,diffuseColor.rgb,step(.5,oreResponse.r));
+      if(${TERRAIN_MATERIALS.flatMap((m,i)=>m.id!==7&&!resourceByKind(m.id).base?[`abs(vOreTile-${i}.0)<.1`]:[]).join('||')})diffuseColor.rgb=hostColor*(1.0-oreResponse.r)+diffuseColor.rgb;
       // Broad, world-continuous variation has no per-cell border or tile phase.
       float rockTone=sin(vTerrainWorld.x*.39+vTerrainWorld.y*.27)*sin(vTerrainWorld.z*.43-vTerrainWorld.y*.19);
       diffuseColor.rgb*=.995+rockTone*.005;
@@ -52,7 +57,7 @@ export function createMineralMaterial(layers:readonly Layer[]=LAYERS, worlds?:re
       .replace('#include <metalnessmap_fragment>','#include <metalnessmap_fragment>\nmetalnessFactor=0.0;')
       ;
   };
-  material.customProgramCacheKey = () => `mineral-atlas-v11-grid-world-host-${hosts.length}`;
+  material.customProgramCacheKey = () => `mineral-atlas-v12-mip-premultiplied-host-${hosts.length}`;
   stabilizeShadows(material);
   return { material, atlasBytes: pixels.byteLength+responsePixels.byteLength, responseAtlasBytes:responsePixels.byteLength, dispose: () => { material.dispose(); atlas.dispose(); responseAtlas.dispose(); } };
 }

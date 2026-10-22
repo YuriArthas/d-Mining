@@ -1,23 +1,33 @@
 import { EQUIPMENT_URL, requiredModel } from './EquipmentModels.ts';
 import { equipmentModel } from '../content/shopCatalog.ts';
 import {
-  AnimationMixer, Group, MathUtils, Mesh, MeshStandardMaterial, Quaternion, SkinnedMesh, Vector3,
+  AnimationClip, AnimationMixer, Group, MathUtils, Mesh, MeshStandardMaterial, Quaternion, SkinnedMesh, Vector3,
   type AnimationAction, type Bone, type Texture,
 } from 'three';
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { disposeScenery } from './disposeScenery.ts';
 import { MinerMiningLayer } from './MinerMiningLayer.ts';
+import { UPPER_BODY, createMinerMotions } from './minerMotions.ts';
 
 const MODEL_URL = new URL('../assets/character/miner-a.glb', import.meta.url).href;
+const LANDING_SECONDS = .32;
+
+type Layer = { lower: AnimationAction; upper: AnimationAction };
+/** Lower and upper body play separately so the swing can own the arms while the legs keep moving. */
+function layer(mixer: AnimationMixer, clip: AnimationClip): Layer {
+  const part = (upper: boolean) => mixer.clipAction(new AnimationClip(`${clip.name}:${upper ? 'upper' : 'lower'}`, clip.duration,
+    clip.tracks.filter(t => UPPER_BODY.has(t.name.split('.')[0]) === upper))).play();
+  return { lower: part(false), upper: part(true) };
+}
 
 /** 角色外观借用游戏的脚底位置；骨骼动画不写入物理或存档。 */
 export class MinerAvatar {
   readonly group: Group;
   private readonly mixer: AnimationMixer;
-  private readonly idle: AnimationAction;
-  private readonly walk: AnimationAction;
-  private readonly run: AnimationAction;
-  private readonly mining: MinerMiningLayer;
+  private readonly locomotion: Layer[];
+  private readonly air: Layer[];
+  private readonly swing: AnimationAction;
+  private readonly mining = new MinerMiningLayer();
   private readonly pickaxe = new Group();
   private readonly backpack = new Group();
   private readonly equipment: Group;
@@ -34,6 +44,13 @@ export class MinerAvatar {
   private moving = 0;
   private running = 0;
   private grounded = true;
+  private verticalSpeed = 0;
+  private airTime = 0;
+  private airborne = 0;
+  private jumped = false;
+  private fallSpeed = 0;
+  private landAge = Infinity;
+  private landStrength = 0;
   private disposed = false;
 
   static async load(signal: AbortSignal) {
@@ -101,14 +118,13 @@ export class MinerAvatar {
     });
     if (this.meshes.length !== 1) throw new Error('矿工模型应包含一个蒙皮网格');
     this.mixer = new AnimationMixer(this.group);
-    const mining=gltf.animations.find(c=>c.name==='Mine');
-    if(!mining)throw Error('矿工模型缺少 Mine 动作');
-    this.mining=new MinerMiningLayer(this.mixer,clips,mining);
-    [this.idle, this.walk, this.run] = this.mining.lower;
-    this.idle.setEffectiveWeight(1);
-    this.walk.setEffectiveWeight(0);
-    this.run.setEffectiveWeight(0);
-    this.mining.update(0);
+    // The model's RAB 'Mine' clip is a slow axe chop; the swing and air poses are authored in code.
+    const motions=createMinerMotions(this.group);
+    this.locomotion=clips.map(clip=>layer(this.mixer,clip));
+    this.air=[motions.rise,motions.fall,motions.land].map(clip=>layer(this.mixer,clip));
+    this.swing=this.mixer.clipAction(motions.swing).play();
+    this.swing.paused=true;
+    this.blend(0,0,0,0);
     this.mixer.update(0);
   }
 
@@ -132,9 +148,10 @@ export class MinerAvatar {
 
   update(feet: readonly number[], delta: number, grounded: boolean, travelling: boolean) {
     const distance = Math.hypot(feet[0] - this.previous.x, feet[2] - this.previous.z);
-    const discontinuity = !this.initialized || travelling || distance > 2;
+    const discontinuity = !this.initialized || travelling || distance > 2 || Math.abs(feet[1] - this.previous.y) > 2;
     if(discontinuity)this.mining.cancel();
     const measured = discontinuity || delta <= 0 ? 0 : distance / delta;
+    const rising = discontinuity || delta <= 0 ? 0 : (feet[1] - this.previous.y) / delta;
     this.previous.set(feet[0], feet[1], feet[2]);
     this.initialized = true;
     this.grounded = grounded;
@@ -143,25 +160,58 @@ export class MinerAvatar {
     const running = MathUtils.smoothstep(this.speed, 2, 4.2);
     this.moving = discontinuity ? 0 : MathUtils.damp(this.moving, movement, 14, delta);
     this.running = discontinuity ? 0 : MathUtils.damp(this.running, running, 12, delta);
-    this.idle.setEffectiveWeight(1 - this.moving);
-    this.walk.setEffectiveWeight(this.moving * (1 - this.running));
-    this.run.setEffectiveWeight(this.moving * this.running);
-    this.walk.setEffectiveTimeScale(MathUtils.clamp(this.speed / 1.8, .45, 2));
-    this.run.setEffectiveTimeScale(MathUtils.clamp(this.speed / 3.6, .6, 2.2));
-    // 离地时保持腿部动作，避免空中继续踏步；挥镐仍独立控制上身。
-    this.walk.paused = !grounded;
-    this.run.paused = !grounded;
+    this.locomotion[1].lower.setEffectiveTimeScale(MathUtils.clamp(this.speed / 1.8, .45, 2));
+    this.locomotion[2].lower.setEffectiveTimeScale(MathUtils.clamp(this.speed / 3.6, .6, 2.2));
+    this.updateAir(rising, delta, grounded, discontinuity);
+    const rise = this.jumped ? MathUtils.smoothstep(this.verticalSpeed, -2.5, 1.5) : 0;
+    const land = this.landAge < LANDING_SECONDS ? this.landStrength * landingEnvelope(this.landAge) : 0;
     this.mining.update(delta);
+    this.blend(this.airborne * rise, this.airborne * (1 - rise), land, this.mining.weight);
     this.mixer.update(delta);
     const dx=this.miningTarget.x-feet[0],dz=this.miningTarget.z-feet[2];
     const elevation=Math.atan2(this.miningTarget.y-feet[1]-1.05,Math.max(.15,Math.hypot(dx,dz)));
-    const pitch=MathUtils.clamp(elevation+.25,-.5,.6)*this.mining.weight;
+    const pitch=MathUtils.clamp(elevation,-.6,.5)*this.mining.weight;
     this.upperTorso.quaternion.premultiply(this.aimRotation.setFromAxisAngle(this.pitchAxis,pitch));
     const desired=this.mining.weight>0&&Math.hypot(dx,dz)>.08
       ? Math.atan2(-dx,-dz)-(this.group.parent?.rotation.y??0) : 0;
     const turn=Math.atan2(Math.sin(desired-this.group.rotation.y),Math.cos(desired-this.group.rotation.y));
     this.group.rotation.y+=turn*(1-Math.exp(-22*delta));
     this.group.updateMatrixWorld(true);
+  }
+
+  /** Jump, fall and landing state from the drawn feet: the knee tuck needs a real take-off, a short
+   *  step down never counts as a fall, and only a landing after real air time crouches. */
+  private updateAir(rising: number, delta: number, grounded: boolean, discontinuity: boolean) {
+    if(discontinuity){this.airTime=0;this.airborne=0;this.jumped=false;this.fallSpeed=0;this.landAge=Infinity;this.verticalSpeed=0;return;}
+    this.verticalSpeed=MathUtils.damp(this.verticalSpeed,rising,24,delta);
+    if(grounded){
+      if(this.airTime>.18){this.landAge=0;this.landStrength=MathUtils.clamp((this.fallSpeed-1.5)/7,.3,1);}
+      else this.landAge+=delta;
+      this.airTime=0;this.jumped=false;this.fallSpeed=0;
+    }else{
+      this.airTime+=delta;this.landAge=Infinity;
+      this.jumped||=rising>2;
+      this.fallSpeed=Math.max(this.fallSpeed,-rising);
+    }
+    const target=!grounded&&(this.jumped||this.airTime>.09)?1:0;
+    this.airborne=MathUtils.damp(this.airborne,target,target?20:32,delta);
+    if(this.airborne<1e-3)this.airborne=0;
+  }
+
+  /** Lower body: locomotion under the air poses. Upper body: the same mix under the swing. */
+  private blend(rise: number, fall: number, land: number, swing: number) {
+    const total=rise+fall+land, scale=total>1?1/total:1, ground=1-Math.min(1,total);
+    const loco=[1-this.moving,this.moving*(1-this.running),this.moving*this.running];
+    const air=[rise*scale,fall*scale,land*scale];
+    this.locomotion.forEach((l,i)=>{
+      l.lower.setEffectiveWeight(loco[i]*ground);
+      l.upper.setEffectiveWeight(loco[i]*ground*(1-swing));
+      l.upper.time=l.lower.time;
+      l.upper.setEffectiveTimeScale(l.lower.getEffectiveTimeScale());
+    });
+    this.air.forEach((l,i)=>{l.lower.setEffectiveWeight(air[i]);l.upper.setEffectiveWeight(air[i]*(1-swing));});
+    this.swing.time=this.mining.phase*this.swing.getClip().duration;
+    this.swing.setEffectiveWeight(swing);
   }
 
   diagnostics() {
@@ -178,10 +228,11 @@ export class MinerAvatar {
       model: 'Miner A', bones: bones.length, skinnedMeshes: this.meshes.length,
       triangles: mesh.geometry.index!.count / 3, textures: textures.size,
       speed: this.speed, grounded: this.grounded,
+      air:{airborne:this.airborne,jumped:this.jumped,verticalSpeed:this.verticalSpeed,landing:this.landAge<LANDING_SECONDS},
       mining:this.mining.diagnostics(),
       pickaxe:{attachedTo:this.pickaxe.parent?.name,visible:this.pickaxe.visible,level:this.equippedTool,model:equipmentModel('tools',this.equippedTool),tip:this.pickaxe.getObjectsByProperty('type','Object3D').find(o=>o.name.startsWith('PickaxeTip'))?.getWorldPosition(new Vector3()).toArray()},
       backpack:{attachedTo:this.backpack.parent?.name,level:this.equippedBag,model:equipmentModel('backpacks',this.equippedBag)},
-      clips: [this.idle, this.walk, this.run].map(a => ({name:a.getClip().name,time:a.time,weight:a.getEffectiveWeight(),speed:a.getEffectiveTimeScale()})),
+      clips: this.locomotion.map(({lower:a}) => ({name:a.getClip().name.split(':')[0],time:a.time,weight:a.getEffectiveWeight(),speed:a.getEffectiveTimeScale()})),
       joints: Object.fromEntries(bones.filter(b => important.includes(b.name)).map((b: Bone) => [b.name,b.quaternion.toArray()])),
     };
   }
@@ -196,4 +247,10 @@ export class MinerAvatar {
     disposeScenery(this.equipment);
     disposeScenery(this.group);
   }
+}
+
+/** Crouch quickly on contact, then rise back over the rest of the landing. */
+function landingEnvelope(age: number) {
+  const attack=.045;
+  return age<attack ? MathUtils.smoothstep(age,0,attack) : (1-(age-attack)/(LANDING_SECONDS-attack))**2;
 }

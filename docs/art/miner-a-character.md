@@ -22,9 +22,12 @@
 | 待机 | [RoMixamo · 徒手站立待机](https://rab-sunjun-public.dev.clock-p.com/animations/4748) | 4748 / 4748 |
 | 行走 | [RoMixamo · 徒手向前走](https://rab-sunjun-public.dev.clock-p.com/animations/4768) | 4768 / 4768 |
 | 跑步 | [RoMixamo · 中速跑步](https://rab-sunjun-public.dev.clock-p.com/animations/4472) | 4472 / 4472 |
-| 挥镐 | [RoMixamo · 持斧下劈](https://rab-sunjun-public.dev.clock-p.com/animations/4698) | 4698 / 4698 |
+| 挥镐 | 代码手调（`src/game/presentation/minerMotions.ts`） | — |
+| 起跳 / 下落 / 落地 | 代码手调（同上） | — |
 
-四组动作均来自 RAB 的 R15 动作库，原始 Motion JSON 保存在 `assets-source/miner-a/rab-*.json`。按角色的静止姿势校正四肢旋转，行走与跑步另作下述膝部重定向；水平根位移由游戏控制，烘焙时校正脚底高度和循环接缝。没有使用 Tripo 自动绑定或自动生成的动作。挥镐采用持斧下劈的 0.10–1.95 秒片段，将骨盆转动并入上身；运行时只混合躯干、头和双臂，腿部继续播放当前移动动作。
+待机、行走、跑步来自 RAB 的 R15 动作库，原始 Motion JSON 保存在 `assets-source/miner-a/rab-*.json`。按角色的静止姿势校正四肢旋转，行走与跑步另作下述膝部重定向；水平根位移由游戏控制，烘焙时校正脚底高度和循环接缝。没有使用 Tripo 自动绑定或自动生成的动作。
+
+2026-10-22 起挥镐与跳跃改为代码手调：RAB 库里没有镐子挥击，只有约 2 秒的持斧下劈和带落地的长跳跃，压进 0.5 秒攻击周期或 0.75 秒滞空都显得拖沓。Miner A 的骨骼静止旋转全部为单位四元数、轴向与模型一致，所以姿势直接写成骨骼局部欧拉角，运行时生成四元数关键帧；落地下蹲按角色腿长做两节腿解算，双脚留在原地。GLB 里仍带着原来的 RAB `Mine` 片段（约 20 KB），运行时不再使用。
 
 ### 脚部绑定修正
 
@@ -42,27 +45,34 @@ R15 源动作的膝弯折方向在该角色的短腿比例上仍有侧偏，因�
 
 ## 游戏表现
 
-人物替换原有圆柱占位外观，身高保持 1.85 米。现有移动、碰撞、跳跃、相机和传送逻辑继续控制角色。动画根据实际水平位移平滑切换，遇墙停下也会回到待机；步频随实际速度变化。离地时保持腿部姿势，尚未增加专用跳跃动作。
+人物替换原有圆柱占位外观，身高保持 1.85 米。现有移动、碰撞、跳跃、相机和传送逻辑继续控制角色。动画根据实际水平位移平滑切换，遇墙停下也会回到待机；步频随实际速度变化。
+
+跳跃按脚底的实际竖直速度切换三个姿势：起跳上升时右膝上收、左臂上扬、镐子举在胸前；过了最高点换成双臂张开、双腿微分的下落姿势；落地后骨盆下沉约 13 厘米、膝盖弯曲，0.32 秒内回到移动或待机，下落越快蹲得越深。只有真正起跳才收膝；走下矮台阶、短暂离地不算下落，也不触发下蹲。空中仍可挥镐，此时腿保持空中姿势。
 
 ### 挥镐与基础工具
 
 基础镐由 Blender 自制，木柄、握把和金属镐头合成一个网格，456 个三角面，使用一张 64×64 自制贴图。脚本为 `tools/build-basic-pickaxe.py`，运行资产与来源记录位于 `src/game/assets/tools/basic-pickaxe.*`。没有 Tripo 生成任务。可编辑源文件：[basic-pickaxe.blend](https://w-sunjun-public.dev.clock-p.com/art/miner-a-mining-20261021/basic-pickaxe.blend)，SHA-256：`ebca2e1e0f99477885482df977530ee33f43052d6509e22c91d7c592cbf33f5b`。重建命令：`blender --background --factory-startup --python-exit-code 1 --python tools/build-basic-pickaxe.py`。
 
-镐子挂在右手骨骼上，角色朝选中的矿块转身，并按目标高度调整上身。有效挖矿命中触发挥击，周期随当前攻速变化；停止挖掘后回到移动或待机，传送取消动作。满包、冷却、不可挖目标、空点和零伤害重试不会新增挥击。
+镐子挂在右手骨骼上，角色朝选中的矿块转身，并按目标高度俯身或后仰（挖脚下的矿块时上身前倾，挖头顶的矿块时后仰）。一次挥击分五段：镐子竖在胸前 → 举到头后上方 → 加速砸下（全程 30% 处接触）→ 短暂停顿 → 回到胸前。接触时镐柄从拳头斜向上伸出、镐尖朝前下方，正对胸口高度的方块面。
 
-伤害、冷却和矿产结算仍由原有挖矿逻辑决定。动画响应已接受的命中，包含短暂抬手过程；未将伤害延迟至镐尖接触帧。保留原有八米选取范围，远处矿块采用朝向挥击，不拉伸手臂或镐子。目前所有装备等级共用这把基础镐外观，尚未制作整套进阶装备。
+有效挖矿命中才触发挥击，满包、冷却、不可挖目标、空点和零伤害重试都不挥。挥击时长等于攻击间隔，但限制在 0.22–0.6 秒：攻速超过每秒约 4.5 次时，每次命中照常结算，手臂按 0.22 秒一次连贯挥动，最多只排一次，停手后不补播。停止挖掘后回到移动或待机，传送取消动作。
+
+伤害、冷却和矿产结算仍由原有挖矿逻辑决定，命中在挥击开始时生效；接触帧放在较早的 30% 处，攻速 2 时约 0.15 秒后镐尖落下。保留原有八米选取范围，远处矿块采用朝向挥击，不拉伸手臂或镐子。目前所有装备等级共用这把基础镐外观，尚未制作整套进阶装备。
 
 角色在启动阶段异步加载，失败会显示加载错误。退出时释放动画、骨架、网格和贴图。专门的角色诊断随现有调试快照提供，普通玩家界面不展示这些信息。
 
 ## 验证与入口
 
-- 试玩入口：<https://w-sunjun-public.dev.clock-p.com/games/mining-test/index.html>。
+- 试玩入口：<https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html>（2026-10-22 起的主线公开入口）。
 - 构建：`npm run build`。
 - 定向验证：`node --test tools/tests/miner-avatar.test.mjs tools/tests/miner-mining.test.mjs tools/tests/mining-combat.test.mjs tools/tests/runtime-lifecycle.test.mjs`。
 - 公网浏览器验证：`node tools/check-miner-avatar.cjs`，结果保存在 `artifacts/miner-a/report.json`。
 - 脚部修正的定向公网验证：`node tools/check-miner-feet.cjs`；结果、截图和录像保存在 `artifacts/miner-a-feet-fix/`。验证实际加载的模型哈希、键盘跑动的多个动作阶段及停步回到 Idle。
 - 膝部修正的背面公网验证：`node tools/check-miner-rear.cjs`；结果保存在 `artifacts/miner-a-knees-fix/after/`。
 - 挥镐与工具公网验证：`node tools/check-miner-mining.cjs`；检查实际鼠标挖矿、命中次数、松手恢复、边走边挖与空点不挥击，结果保存在 `artifacts/miner-a-mining/public/`。
+- 手调动作测试：`node --test tools/tests/miner-motion.test.mjs`（举镐高度与接触位置、低处/高处目标、高攻速连贯挥动不补播、起跳→下落→落地顺序、矮台阶不触发、落地下蹲双脚不动）。
+- 手调动作与贴图的公网手机检查：`node tools/check-miner-motion-mobile.cjs`（横屏、触控、DPR 2）；触控跳跃、摇杆进老矿井、按住挖矿，并在页面内逐帧截取跳跃与挥镐，结果保存在 `artifacts/miner-motion-mobile/`。
+- 调动作用的离线预览：`tools/motion-preview/`（Vite 开发服务器 + `render-sheets.cjs` 输出侧面、背后、游戏视角的逐帧拼图），只用于制作，验收以公开入口为准。
 - 发布结果与公网文件哈希：`artifacts/preview-release.json`。仅更新测试入口，正式 Mining 不变。
 
 资产测试覆盖权重归一化、骨架、动作变化与循环、脚底高度，以及跑动时的相邻顶点拉伸。浏览器使用桌面 Chromium / SwiftShader，属于软件渲染的功能验证，不代表用户设备性能。截图和录像保存为外部文件，不作为会话的图片输入；外观最终以用户在测试入口的观察为准。

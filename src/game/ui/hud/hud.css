@@ -3,6 +3,7 @@
 .game-shell { container: game / size; }
 .ui-hud {
   --hud-edge: 10px; --hud-tile: 52px; --hud-sys: 44px; --hud-pill: 34px; --hud-gap: 8px;
+  --hud-left-w: clamp(200px, 30cqw, 270px);
   position: absolute; inset: 0; z-index: 2; pointer-events: none;
   font-family: var(--ui-font); color: #fff;
 }
@@ -13,7 +14,7 @@
 .hud-left {
   position: absolute; top: calc(var(--hud-edge) + var(--safe-top)); left: calc(var(--hud-edge) + var(--safe-left));
   display: grid; justify-items: start; gap: calc(var(--hud-gap) + 2px);
-  width: clamp(200px, 30cqw, 270px);
+  width: var(--hud-left-w);
 }
 .ui-hud .ui-pill { --pill-h: var(--hud-pill); }
 .hud-buffs { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -21,11 +22,15 @@
 .hud-buffs .ui-icon { width: 18px; height: 18px; }
 .hud-objective { width: 100%; }
 
-/* Top centre: where you are, like the original "Depth / Surface". */
-.hud-depth {
+/* Top centre: where you are (like the original "Depth / Surface"), then the block being mined
+   and fresh pickups. The third-person miner stands in the lower middle, so nothing stacks there. */
+.hud-center {
   position: absolute; top: calc(2px + var(--safe-top)); left: 50%; transform: translateX(-50%);
-  display: grid; justify-items: center; text-align: center; pointer-events: none; white-space: nowrap;
+  display: grid; justify-items: center; gap: 6px; pointer-events: none;
+  /* Centred in whatever the left column (and the matching inset on the right) leaves free. */
+  width: clamp(112px, calc(100cqw - 2 * (var(--hud-edge) + max(var(--safe-left), var(--safe-right)) + var(--hud-left-w) + 8px)), 280px);
 }
+.hud-depth { display: grid; justify-items: center; text-align: center; white-space: nowrap; }
 .hud-depth-kicker { font-size: 13px; --ui-stroke: 3px; }
 .hud-depth-value { font-size: 30px; line-height: 1.05; --ui-stroke: 5px; text-shadow: 0 3px 0 var(--ui-ink); }
 
@@ -58,7 +63,7 @@
   width: min(380px, 44cqw); display: grid; justify-items: center; gap: 8px; pointer-events: none;
 }
 .hud-bottom > * { pointer-events: auto; }
-.hud-bottom > .hud-notice, .hud-bottom > .target-health { pointer-events: none; }
+.hud-bottom > .hud-notice { pointer-events: none; }
 .hud-trips { display: flex; gap: 10px; justify-content: center; }
 .hud-return, .hud-sell { min-width: 150px; }
 .hud-sell[data-state=full] { animation: hud-sell-full 1s ease-in-out infinite; }
@@ -69,18 +74,19 @@
 .hud-bottom .journey-mine-prompt, .hud-bottom .capsule-world-prompt { position: static; transform: none; }
 
 /* Mining target card (TargetHealth markup). */
-.hud-bottom .target-health {
+.hud-center .target-health {
   position: static; width: min(250px, 100%); padding: 7px 12px 8px;
   border: var(--ui-edge) solid var(--ui-ink); border-radius: 12px;
   background: linear-gradient(180deg, var(--ui-card), var(--ui-card-lo)); box-shadow: inset 0 2px 0 #ffffff26, 0 3px 0 var(--ui-ink);
   font: 700 13px/1.35 var(--ui-font-body); color: var(--ui-text-soft);
 }
-.hud-bottom .target-health > div:first-child { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
-.hud-bottom .target-health strong { font-family: var(--ui-font); font-size: 16px; color: #fff; -webkit-text-stroke: 3px var(--ui-ink); paint-order: stroke fill; }
-.hud-bottom .target-health-track { height: 10px; margin: 6px 0 4px; border: 2px solid var(--ui-ink); border-radius: 6px; background: #0a2a4d; }
-.hud-bottom .target-health-track span { border-radius: 4px; background: linear-gradient(180deg, #a6f58e, #43c12f); }
-.hud-bottom .target-health small { display: block; font-size: 12px; color: #bfe6ff; }
-.hud-bottom .target-health .hit-flash { animation: hud-hit .2s ease-out; }
+.hud-center .target-health > div:first-child { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; min-width: 0; }
+.hud-center .target-health > div:first-child > span { flex: none; }
+.hud-center .target-health strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--ui-font); font-size: 16px; color: #fff; -webkit-text-stroke: 3px var(--ui-ink); paint-order: stroke fill; }
+.hud-center .target-health-track { height: 10px; margin: 6px 0 4px; border: 2px solid var(--ui-ink); border-radius: 6px; background: #0a2a4d; }
+.hud-center .target-health-track span { border-radius: 4px; background: linear-gradient(180deg, #a6f58e, #43c12f); }
+.hud-center .target-health small { display: block; font-size: 12px; color: #bfe6ff; }
+.hud-center .target-health .hit-flash { animation: hud-hit .2s ease-out; }
 @keyframes hud-hit { from { background: #fff; } }
 
 /* Objective card (GuideCard / DepthGoalCard markup) inside the left column. */
@@ -117,7 +123,7 @@
 .hud-objective .guide-complete button { display: block; width: 100%; }
 
 /* New-ore feed: short toasts under the depth banner, clear of the character. */
-.ui-hud .ore-pickup-feed { position: absolute; z-index: 3; left: 50%; top: calc(64px + var(--safe-top)); transform: translateX(-50%); display: grid; justify-items: center; gap: 5px; pointer-events: none; }
+.ui-hud .ore-pickup-feed { display: grid; justify-items: center; gap: 5px; pointer-events: none; }
 .ui-hud .ore-pickup {
   display: flex; align-items: center; gap: 8px; padding: 3px 14px 3px 6px;
   border: 2px solid var(--ui-ink); border-radius: 999px; background: #0f305ad9; box-shadow: 0 2px 0 var(--ui-ink);
@@ -155,7 +161,7 @@
 @container game (min-width: 1000px) and (min-height: 620px) {
   .ui-hud { --hud-edge: 18px; --hud-tile: 68px; --hud-sys: 52px; --hud-pill: 46px; --hud-gap: 12px; }
   .hud-left { width: 300px; }
-  .hud-depth { top: calc(8px + var(--safe-top)); }
+  .hud-center { top: calc(8px + var(--safe-top)); }
   .hud-depth-kicker { font-size: 18px; --ui-stroke: 4px; }
   .hud-depth-value { font-size: 46px; --ui-stroke: 6px; }
   .hud-objective :is(.guide-card, .journey-goals) strong { font-size: 20px; }
@@ -175,7 +181,7 @@
   .game-shell .joystick-knob { left: 28px; top: 28px; }
   .game-shell .jump-button { width: 64px; height: 64px; padding: 12px; }
   .hud-return, .hud-sell { min-width: 120px; }
-  .hud-bottom .target-health { padding: 5px 10px 6px; }
+  .hud-center .target-health { padding: 5px 10px 6px; }
 }
 .hud-objective:empty { display: none; }
 /* Skip stays available in Help on touch screens; keep the active objective compact. */

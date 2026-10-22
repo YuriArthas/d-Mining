@@ -14,7 +14,8 @@ export type HudActions = {
 };
 
 /** Screen-space HUD. Zones mirror the original: resources left, depth top-centre, four
- *  actions down the right edge, Sell / Surface trips at the bottom when they help. */
+ *  actions down the right edge, Sell / Surface trips at the bottom when they help. The block
+ *  being mined and fresh pickups stack under the depth, clear of the miner in the lower middle. */
 export function Hud({ session, actions, system, objective, target, prompts }: {
   session: GameSession; actions: HudActions; system: SystemControls;
   objective?: ReactNode; target?: ReactNode; prompts?: ReactNode;
@@ -43,10 +44,14 @@ export function Hud({ session, actions, system, objective, target, prompts }: {
       {objective && <div className="hud-objective">{objective}</div>}
     </section>
 
-    <header className="hud-depth" aria-label={`${world}，${surface ? '地表' : `深度 ${Math.floor(state.depth)} 米`}`}>
-      <span className="hud-depth-kicker ui-outline">{world} · 深度</span>
-      <strong className="hud-depth-value ui-outline ui-num" data-testid="depth">{depth}</strong>
-    </header>
+    <div className="hud-center">
+      <header className="hud-depth" aria-label={`${world}，${surface ? '地表' : `深度 ${Math.floor(state.depth)} 米`}`}>
+        <span className="hud-depth-kicker ui-outline">{world} · 深度</span>
+        <strong className="hud-depth-value ui-outline ui-num" data-testid="depth">{depth}</strong>
+      </header>
+      {target}
+      <OrePickupFeed session={session} />
+    </div>
 
     <SystemMenu system={system} onHelp={run(actions.openHelp)} />
 
@@ -58,7 +63,6 @@ export function Hud({ session, actions, system, objective, target, prompts }: {
     </nav>
 
     <div className="hud-bottom">
-      {target}
       {prompts}
       <HudNotice text={state.notice} />
       {(bag.used > 0 && !state.inSellZone || !surface) && <div className="hud-trips">
@@ -66,7 +70,6 @@ export function Hud({ session, actions, system, objective, target, prompts }: {
         {!surface && <UiButton className="hud-return" size="l" icon="home" data-guide-action="return" onPress={run(session.returnToSurface)}>返回地表</UiButton>}
       </div>}
     </div>
-    <OrePickupFeed session={session} />
   </div>;
 }
 

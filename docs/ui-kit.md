@@ -64,10 +64,10 @@ Every window is a `Sheet`: cyan body, title on the top edge, red close on the co
 ## HUD layout (phone landscape first)
 
 - Top-left: backpack pill (tap → mineral bag, “+” → route to the shop), coin pill, active buffs, then the objective card.
-- Top-centre: world name and depth (“地表” on the surface, metres underground).
+- Top-centre: world name and depth (“地表” on the surface, metres underground), then the mining target card and fresh ore pickups. The third-person miner stands in the lower middle, so nothing that appears while mining stacks there.
 - Top-right: help and settings tiles; settings holds frame-rate cap, shadows and **exit** (exit is no longer a red corner button).
 - Right edge: 宠物, 商店, 奖励, 世界 — four actions, no fold, at every size.
-- Bottom-centre: mining target card, context prompts (扭蛋 / 矿区要求), notices, then 出售 (when carrying ores) and 返回地表 (underground).
+- Bottom-centre: context prompts (扭蛋 / 矿区要求), notices, then 出售 (when carrying ores) and 返回地表 (underground).
 - Bottom corners: thumbstick and jump (touch screens only).
 
 Sizes are set per shell size with container queries in `src/game/ui/hud/hud.css` (`--hud-tile`, `--hud-pill`, …); the shell may be rotated in portrait, so the HUD never uses viewport units. The whole HUD hides while any dialog is open.

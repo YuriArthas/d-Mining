@@ -1,4 +1,4 @@
-import { BoxGeometry, DataTexture, DynamicDrawUsage, Group, InstancedBufferAttribute, InstancedMesh, Matrix4, MeshBasicMaterial, NearestFilter, RGBAFormat, ShaderChunk, SRGBColorSpace } from 'three';
+import { BoxGeometry, DataTexture, DynamicDrawUsage, Group, InstancedBufferAttribute, InstancedMesh, LinearMipmapLinearFilter, Matrix4, MeshBasicMaterial, NearestFilter, RGBAFormat, ShaderChunk, SRGBColorSpace } from 'three';
 import { CELL, RENDER_SIZE, chunkKey, regionOf, type Coord } from '../terrain/SparseWorld.ts';
 import { crackAtlas, crackStage, CRACK_STAGES, CRACK_TILE } from './cracks.ts';
 export type BlockDamage = Readonly<{ cell: Coord; hp: number; maximum: number }>;
@@ -17,18 +17,25 @@ export class BlockCracks {
   private updates = 0;
   constructor() {
     this.texture = new DataTexture(crackAtlas(), CRACK_TILE * CRACK_STAGES, CRACK_TILE, RGBAFormat);
-    this.texture.colorSpace = SRGBColorSpace; this.texture.magFilter = this.texture.minFilter = NearestFilter;
-    this.texture.generateMipmaps = false; this.texture.needsUpdate = true;
+    // Crisp pixels up close; filtered mip levels at distance and grazing angles, where one-pixel
+    // crack lines and highlights otherwise break up into flickering dots.
+    this.texture.colorSpace = SRGBColorSpace; this.texture.magFilter = NearestFilter; this.texture.minFilter = LinearMipmapLinearFilter;
+    this.texture.generateMipmaps = true; this.texture.needsUpdate = true;
     this.material = new MeshBasicMaterial({ map: this.texture, transparent: true, depthWrite: false,
       polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, toneMapped: false });
     this.material.onBeforeCompile = shader => {
       shader.vertexShader = 'attribute float crackTile;\nvarying float vCrackTile;\n' + shader.vertexShader;
       shader.vertexShader = shader.vertexShader.replace('#include <uv_vertex>', '#include <uv_vertex>\nvCrackTile = crackTile;');
       shader.fragmentShader = 'varying float vCrackTile;\n' + shader.fragmentShader;
-      shader.fragmentShader = shader.fragmentShader.replace('#include <map_fragment>', ShaderChunk.map_fragment.replace('texture2D( map, vMapUv )',
-        `texture2D( map, vec2((vCrackTile + clamp(vMapUv.x, 0.015625, 0.984375)) / ${CRACK_STAGES.toFixed(1)}, clamp(vMapUv.y, 0.015625, 0.984375)))`) + '\nif (diffuseColor.a < 0.01) discard;');
+      // Mip level from the face UVs, and an inset per level so samples never reach the next stage tile.
+      shader.fragmentShader = shader.fragmentShader.replace('#include <map_fragment>', `
+        float crackLod = clamp(log2(max(max(length(dFdx(vMapUv)), length(dFdy(vMapUv))) * ${CRACK_TILE.toFixed(1)}, 1e-6)), 0.0, 4.0);
+        float crackInset = .5 * exp2(ceil(crackLod)) / ${CRACK_TILE.toFixed(1)};
+        vec2 crackUv = clamp(vMapUv, vec2(crackInset), vec2(1.0 - crackInset));
+      ` + ShaderChunk.map_fragment.replace('texture2D( map, vMapUv )',
+        `textureLod( map, vec2((vCrackTile + crackUv.x) / ${CRACK_STAGES.toFixed(1)}, crackUv.y), crackLod )`) + '\nif (diffuseColor.a < 0.01) discard;');
     };
-    this.material.customProgramCacheKey = () => 'block-cracks-v1';
+    this.material.customProgramCacheKey = () => 'block-cracks-v2-mip';
   }
   setDamage = ({ cell, hp, maximum }: BlockDamage) => {
     const region = chunkKey(regionOf(cell, RENDER_SIZE)), key = chunkKey(cell), stage = maximum > 0 ? crackStage(hp, maximum) : 0;

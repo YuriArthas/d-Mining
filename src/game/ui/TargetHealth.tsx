@@ -10,6 +10,7 @@ export function TargetHealth({ session }: { session: Pick<GameSession, 'subscrib
       <span key={`${target.key}:${state.hitSerial}`} className={target.hp < target.maximum ? 'hit-flash' : ''} style={{ width: `${target.hp / target.maximum * 100}%` }} />
     </div>
     <small className="target-value" data-testid="target-value">体积 {target.volume} · 售价 {number(target.price)} 金币</small>
-    <small>{target.locked ? `需要 Lv.${target.requiredLevel} 镐子` : target.hp === 0 ? '已击碎，正在挖除' : `力量 ${number(state.miningStats.power)} · ${state.pickaxe.speed} 次/秒`}</small>
+    {/* Pickaxe stats live in the shop; while mining only a blocked or finished block needs a word. */}
+    {(target.locked || target.hp === 0) && <small>{target.locked ? `需要 Lv.${target.requiredLevel} 镐子` : '已击碎，正在挖除'}</small>}
   </aside>;
 }
