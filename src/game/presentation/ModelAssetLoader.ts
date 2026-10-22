@@ -32,6 +32,7 @@ export type ModelManifest = {
   source: string;
 };
 export type ModelRequest = {
+  coordinateSpace?: "authored" | "normalized";
   name: string;
   manifest: ModelManifest;
   parts: string[];
@@ -93,13 +94,13 @@ export async function loadModelAssets(
           gltf = await loader.parseAsync(buffer, ""),
           root = new Group();
         templates.set(name, root);
-        gltf.scene.rotation.y = -Math.PI / 2;
+        if (lease.item.coordinateSpace !== "authored") gltf.scene.rotation.y = -Math.PI / 2;
         root.add(gltf.scene);
         root.updateMatrixWorld(true);
         const bounds = new Box3().setFromObject(root),
           size = bounds.getSize(new Vector3()),
           center = bounds.getCenter(new Vector3());
-        gltf.scene.position.set(-center.x, -bounds.min.y, -center.z);
+        if (lease.item.coordinateSpace !== "authored") gltf.scene.position.set(-center.x, -bounds.min.y, -center.z);
         root.userData.width = size.x;
         root.userData.height = size.y;
         root.userData.depth = size.z;
@@ -158,7 +159,8 @@ export async function loadModelAssets(
           triangles,
           downloadMs,
           decodeMs: performance.now() - decodeStart,
-          normalizedFront: "+Z",
+          normalizedFront: lease.item.coordinateSpace === "authored" ? null : "+Z",
+          coordinateSpace: lease.item.coordinateSpace ?? "normalized",
           originalSize: size.toArray(),
           instances: lease.item.instances,
         });

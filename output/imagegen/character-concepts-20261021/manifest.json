@@ -1,0 +1,51 @@
+{
+  "model": "gpt-image-2.5-sunburst",
+  "execution": "imagegen skill CLI / generate-batch",
+  "size_requested": "1024x1536",
+  "quality_requested": "high",
+  "prompt_set": "prompts.jsonl",
+  "gallery": "https://w-sunjun-public.dev.clock-p.com/art/mining-characters-20261021/",
+  "validation": "Image files decoded and dimensions checked; gallery checked in browser; images intentionally not loaded into conversation context.",
+  "candidates": [
+    {
+      "id": "A",
+      "title": "方块感矿工",
+      "file": "a-blocky-miner.png",
+      "description": "方正轮廓、宽肩厚靴，突出积木式的游戏人物感。",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 1752029,
+      "sha256": "efa8c6ce24408a9b21facdd03618152d95915ef279b3fdd66f8521ed9201f137"
+    },
+    {
+      "id": "B",
+      "title": "圆润卡通矿工",
+      "file": "b-rounded-miner.png",
+      "description": "圆润头身与短粗四肢，亲切、活泼，偏卡通玩具感。",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 1935749,
+      "sha256": "c5ed71122c48bff767d3a0130649e70e091ff0d5c1283366f8bd2ee6d7a326a7"
+    },
+    {
+      "id": "C",
+      "title": "轻装探险者",
+      "file": "c-light-explorer.png",
+      "description": "较修长的卡通比例，轻便服装，突出探索与行动感。",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 1711861,
+      "sha256": "cdd3c6652232f8db81ab71b78be8fd4fbbd94945a74290ccb0ba08ec9c7610df"
+    },
+    {
+      "id": "D",
+      "title": "科幻采矿员",
+      "file": "d-future-miner.png",
+      "description": "厚实的科幻工作服与简洁护具，适合逐步进入更奇异的世界。",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 1848980,
+      "sha256": "c71ea6ec1d1c9ce33bce2e4343353cc09cc8859bcb37ce0b1867a024558c1f9e"
+    }
+  ]
+}

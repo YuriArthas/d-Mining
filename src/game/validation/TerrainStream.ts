@@ -65,16 +65,16 @@ export class TerrainStream {
   cell(c: Coord): number | null {
     if (!c.every(Number.isInteger)) return null;
     if (c[1] >= 0 && c[0] >= -48 && c[0] <= 51 && c[2] >= -48 && c[2] <= 51) return 0;
-    return inBounds(c) ? this.world.cell(c) : null;
+    return inBounds(c,this.world.generation) ? this.world.cell(c) : null;
   }
-  canMine(c: Coord) { return c.every(Number.isInteger) && inBounds(c) && this.world.canMine(c); }
+  canMine(c: Coord) { return c.every(Number.isInteger) && inBounds(c,this.world.generation) && this.world.canMine(c); }
   ready(feet: readonly number[]) {
     // Covers the 10.5 m camera boom, capsule sweep and downward lookahead.
     const side = COLLISION_SIZE * CELL;
     const min = feet.map((v, i) => Math.floor((v - 12) / side));
     const max = feet.map(v => Math.floor((v + 12) / side));
     for (let z = min[2]; z <= max[2]; z++) for (let y = min[1]; y <= max[1]; y++) for (let x = min[0]; x <= max[0]; x++) {
-      const c: Coord = [x, y, z]; if (validRegion(c, COLLISION_SIZE) && !this.collision.pipeline.has(c)) return false;
+      const c: Coord = [x, y, z]; if (validRegion(c, COLLISION_SIZE,this.world.generation) && !this.collision.pipeline.has(c)) return false;
     }
     return !this.error;
   }

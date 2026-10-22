@@ -5,19 +5,32 @@ import { GameButton } from '../GameButton.tsx';
 import { PetPortrait } from './PetPortrait.tsx';
 import { PetDialog } from './PetDialog.tsx';
 import { RARITY_NAMES, bonusLabel } from './petDisplay.ts';
+import { EquipmentIcon } from '../InventoryIcons.tsx';
 
 const PAGE_SIZE = 24;
-export function PetPanel({ api, onClose }: { api: PetUiApi; onClose(): void }) {
+export function PetPanel({ api, onClose, onFindEgg }: { api: PetUiApi; onClose(): void; onFindEgg(eggId: string): void }) {
   const state = useSyncExternalStore(api.subscribe, api.getSnapshot);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const [message, setMessage] = useState('');
+  const [findingEgg, setFindingEgg] = useState(false);
   const selected = state.pets.find(card => card.pet.id === selectedId) ?? state.pets[0] ?? null;
   const lastPage = Math.max(0, Math.ceil(state.pets.length / PAGE_SIZE) - 1), currentPage = Math.min(page, lastPage);
   const visible = state.pets.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
   const equipped = state.slots.filter(id => id !== null).length;
+  if (findingEgg) return <PetDialog title="获取宠物" onClose={onClose} className="pet-find-egg-panel">
+    <p className="pet-find-egg-description">选择已解锁的蛋台，跟随指引前往。到达后可查看每只宠物的概率并购买。</p>
+    <div className="pet-egg-destinations" aria-label="已解锁的宠物蛋台">{state.eggs.filter(egg => egg.unlocked).map(egg => <div key={egg.id}>
+      <EquipmentIcon kind="egg" /><span><strong>{egg.name}</strong><small>{formatNumber(egg.price)} 金币</small></span>
+      <GameButton className="pet-primary" blurAfterPress={false} onPress={() => onFindEgg(egg.id)} aria-label={`前往${egg.name}蛋台`}>前往蛋台</GameButton>
+    </div>)}</div>
+    {!state.eggs.some(egg => egg.unlocked) && <p>还没有解锁的蛋台，继续向下探索吧。</p>}
+    {state.eggs.some(egg => !egg.unlocked) && <p className="pet-find-egg-description">继续向深处挖掘，可以解锁更多宠物蛋。</p>}
+    <footer className="pet-footer"><GameButton className="pet-secondary" blurAfterPress={false} onPress={() => setFindingEgg(false)}>返回我的宠物</GameButton></footer>
+  </PetDialog>;
   return <PetDialog title="我的宠物" onClose={onClose}>
     <div className="pet-summary"><span>已装备 <b>{equipped}/{state.slots.length}</b></span><span>力量加成 <strong>{bonusLabel(state.bonus.powerBonusBps)}</strong></span><span>挖矿力量 <b>{formatNumber(state.baseStats.power)} → {formatNumber(state.effectiveStats.power)}</b></span></div>
+    <GameButton className="pet-primary pet-find-egg" blurAfterPress={false} data-guide-action="find-egg" onPress={() => setFindingEgg(true)}><EquipmentIcon kind="egg" />获取宠物 · 寻找蛋台</GameButton>
     <div className="pet-slots" aria-label="宠物装备槽">
       {state.slots.map((id, slot) => {
         const card = id === null ? null : state.pets.find(pet => pet.pet.id === id)!;

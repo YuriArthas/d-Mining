@@ -1,0 +1,287 @@
+{
+  "maker": "Blender",
+  "script": "tools/build-shop-showroom.py",
+  "source": [
+    "assets-source/shop-showroom/shop-equipment.blend",
+    "assets-source/shop-showroom/shop-showroom.blend"
+  ],
+  "texture": [
+    128,
+    128
+  ],
+  "models": [
+    {
+      "node": "Tool01",
+      "triangles": 248
+    },
+    {
+      "node": "Tool02",
+      "triangles": 248
+    },
+    {
+      "node": "Tool03",
+      "triangles": 248
+    },
+    {
+      "node": "Tool04",
+      "triangles": 292
+    },
+    {
+      "node": "Tool05",
+      "triangles": 332
+    },
+    {
+      "node": "Tool06",
+      "triangles": 304
+    },
+    {
+      "node": "Tool07",
+      "triangles": 332
+    },
+    {
+      "node": "Tool08",
+      "triangles": 304
+    },
+    {
+      "node": "Tool09",
+      "triangles": 332
+    },
+    {
+      "node": "Tool10",
+      "triangles": 344
+    },
+    {
+      "node": "Tool11",
+      "triangles": 356
+    },
+    {
+      "node": "Tool12",
+      "triangles": 356
+    },
+    {
+      "node": "Tool13",
+      "triangles": 356
+    },
+    {
+      "node": "Tool14",
+      "triangles": 400
+    },
+    {
+      "node": "Tool15",
+      "triangles": 440
+    },
+    {
+      "node": "Tool16",
+      "triangles": 412
+    },
+    {
+      "node": "Tool17",
+      "triangles": 440
+    },
+    {
+      "node": "Tool18",
+      "triangles": 412
+    },
+    {
+      "node": "Tool19",
+      "triangles": 440
+    },
+    {
+      "node": "Tool20",
+      "triangles": 452
+    },
+    {
+      "node": "Tool21",
+      "triangles": 356
+    },
+    {
+      "node": "Tool22",
+      "triangles": 356
+    },
+    {
+      "node": "Tool23",
+      "triangles": 356
+    },
+    {
+      "node": "Tool24",
+      "triangles": 400
+    },
+    {
+      "node": "Tool25",
+      "triangles": 440
+    },
+    {
+      "node": "Tool26",
+      "triangles": 412
+    },
+    {
+      "node": "Tool27",
+      "triangles": 440
+    },
+    {
+      "node": "Tool28",
+      "triangles": 412
+    },
+    {
+      "node": "Tool29",
+      "triangles": 440
+    },
+    {
+      "node": "Tool30",
+      "triangles": 452
+    },
+    {
+      "node": "Bag01",
+      "triangles": 352
+    },
+    {
+      "node": "Bag02",
+      "triangles": 352
+    },
+    {
+      "node": "Bag03",
+      "triangles": 352
+    },
+    {
+      "node": "Bag04",
+      "triangles": 352
+    },
+    {
+      "node": "Bag05",
+      "triangles": 308
+    },
+    {
+      "node": "Bag06",
+      "triangles": 308
+    },
+    {
+      "node": "Bag07",
+      "triangles": 336
+    },
+    {
+      "node": "Bag08",
+      "triangles": 284
+    },
+    {
+      "node": "Bag09",
+      "triangles": 284
+    },
+    {
+      "node": "Bag10",
+      "triangles": 336
+    },
+    {
+      "node": "Bag11",
+      "triangles": 392
+    },
+    {
+      "node": "Bag12",
+      "triangles": 392
+    },
+    {
+      "node": "Bag13",
+      "triangles": 392
+    },
+    {
+      "node": "Bag14",
+      "triangles": 392
+    },
+    {
+      "node": "Bag15",
+      "triangles": 348
+    },
+    {
+      "node": "Bag16",
+      "triangles": 348
+    },
+    {
+      "node": "Bag17",
+      "triangles": 376
+    },
+    {
+      "node": "Bag18",
+      "triangles": 324
+    },
+    {
+      "node": "Bag19",
+      "triangles": 324
+    },
+    {
+      "node": "Bag20",
+      "triangles": 376
+    },
+    {
+      "node": "Bag21",
+      "triangles": 392
+    },
+    {
+      "node": "Bag22",
+      "triangles": 392
+    },
+    {
+      "node": "Bag23",
+      "triangles": 392
+    },
+    {
+      "node": "Bag24",
+      "triangles": 392
+    },
+    {
+      "node": "Bag25",
+      "triangles": 348
+    },
+    {
+      "node": "Bag26",
+      "triangles": 348
+    },
+    {
+      "node": "Bag27",
+      "triangles": 376
+    },
+    {
+      "node": "Bag28",
+      "triangles": 324
+    },
+    {
+      "node": "Bag29",
+      "triangles": 324
+    },
+    {
+      "node": "Bag30",
+      "triangles": 376
+    }
+  ],
+  "showroomTriangles": 6700,
+  "files": [
+    {
+      "file": "src/game/assets/shop/equipment.glb",
+      "bytes": 1809836,
+      "sha256": "be3df1211b0c4660e40e02a3e1b3a6346d0e237695f3113a1f3a42b7723abc83"
+    },
+    {
+      "file": "src/game/assets/shop/showroom.glb",
+      "bytes": 638944,
+      "sha256": "6698166345b840e8a31bd0050aa2c06a5879d33d9596253a343da617a87dcdda"
+    },
+    {
+      "file": "assets-source/shop-showroom/shop-palette.png",
+      "bytes": 1083,
+      "sha256": "d0e7bc76038e26fde195c1ec6f96967d7a5c16be41707ff6a1b9472498859a10"
+    },
+    {
+      "file": "assets-source/shop-showroom/shop-equipment.blend",
+      "bytes": 336381,
+      "sha256": "faed11d4edf96bc52eb7400eb8a58509c2a5bd245568af6036e57ac4194d87fe"
+    },
+    {
+      "file": "assets-source/shop-showroom/shop-showroom.blend",
+      "bytes": 167873,
+      "sha256": "a94fae662765e4ea1b449a3d44fa710acc816317758363dce367754943ead21e"
+    },
+    {
+      "file": "tools/build-shop-showroom.py",
+      "bytes": 9214,
+      "sha256": "a8fb76df82ac7a1c16b6fc76cca2abc304654bc4c1f2454cd9d8111ac81e5b7c"
+    }
+  ]
+}

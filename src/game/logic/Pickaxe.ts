@@ -1,11 +1,12 @@
 import { versionOne } from './data.ts';
 import { integer } from './numbers.ts';
 export const PICKAXE_BALANCE = Object.freeze({ basePower: 10, powerPerLevel: 5, baseSpeed: 2, speedEvery: 5, speedMultiplier: 2, maxSpeed: 16 });
-export function pickaxeStats(level: number) {
+export function pickaxeStats(level: number, speedMultiplier = 1) {
   if (!integer(level, '镐子等级')) throw new Error('镐子等级必须大于 0');
   const c = PICKAXE_BALANCE;
   const basePower = integer(c.basePower + (level - 1) * c.powerPerLevel, '基础力量');
-  const uncappedSpeed = integer(c.baseSpeed * c.speedMultiplier ** Math.floor((level - 1) / c.speedEvery), '理论攻速');
+  if (speedMultiplier !== 1 && speedMultiplier !== 1.5) throw Error('无效挖矿速度倍率');
+  const uncappedSpeed = integer(c.baseSpeed * c.speedMultiplier ** Math.floor((level - 1) / c.speedEvery) * speedMultiplier, '理论攻速');
   const speed = Math.min(c.maxSpeed, uncappedSpeed);
   // Preserve uncapped damage per second after the attack-rate cap. Round once,
   // before pet bonuses; use integer arithmetic even for large saved levels.

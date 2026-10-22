@@ -1,0 +1,58 @@
+.guide-card { position:absolute; z-index:3; left:50%; transform:translateX(-50%); top:70px; width:min(320px,calc(100vw - 32px)); padding:15px 16px 11px; border:1px solid #ffe28c; border-left:4px solid #ffd568; border-radius:12px; background:rgba(20,48,52,.95); color:#fff7dc; box-shadow:0 5px 18px #0004; pointer-events:none; }
+.guide-card strong { display:block; font-size:16px; line-height:1.5; }
+.guide-card p { margin:6px 0 8px; font-size:14px; line-height:1.6; color:#d1e4df; }
+.guide-kicker { display:block; color:#f8d273; font-size:12px; letter-spacing:2px; margin-bottom:5px; }
+.guide-card button { pointer-events:auto; border:0; border-bottom:1px solid #8ca39b; background:transparent; color:#d4e2dc; cursor:pointer; padding:5px 0; font-size:11px; }
+.guide-marker { position:absolute; z-index:2; width:40px; height:48px; transform:translate(-50%,-100%); pointer-events:none; color:#fff4cb; text-shadow:0 2px 3px #3b2918,1px 0 2px #3b2918; text-align:center; filter:drop-shadow(0 2px 2px #0008); }
+.guide-marker-arrow { display:block; width:40px; height:48px; transform:rotate(var(--guide-rotation,0deg)); }
+.guide-marker b { position:absolute; left:48px; top:10px; white-space:nowrap; padding:4px 10px; border:1px solid #ffcf59; border-radius:9px; background:#3e3526ed; font-size:13px; }
+.guide-offscreen { display:none; position:absolute; left:48px; top:40px; white-space:nowrap; padding:2px 8px; font-size:11px; background:#193a36ed; border-radius:6px; }
+.guide-marker[data-offscreen=true] .guide-offscreen { display:block; }
+.guide-help { max-width:560px; }
+.guide-help p,.guide-help li { line-height:1.7; font-size:14px; }
+.guide-help li { margin-bottom:10px; }
+.session-ui[data-panel=none][data-guide=return] [data-guide-action=return],
+.session-ui[data-panel=none][data-guide=upgrade] [data-guide-action=upgrade],
+.session-ui[data-panel=none][data-guide=backpack] [data-guide-action=upgrade],
+.session-ui[data-panel=none][data-guide=equip] [data-guide-action=pets],
+.session-ui[data-panel=none][data-guide=egg][data-guide-egg=true] .egg-world-prompt,
+.session-ui[data-panel=upgrade][data-guide=upgrade] .upgrade-panel[data-tab=backpack] .upgrade-tabs button:first-child,
+.session-ui[data-panel=upgrade][data-guide=upgrade] .upgrade-panel[data-tab=pickaxe] .upgrade-buy,
+.session-ui[data-panel=upgrade][data-guide=backpack] .upgrade-panel[data-tab=pickaxe] .upgrade-tabs button:last-child,
+.session-ui[data-panel=upgrade][data-guide=backpack] .upgrade-panel[data-tab=backpack] .upgrade-buy,
+.session-ui[data-panel=pets][data-needs-equip=true] .pet-footer .pet-primary,
+.session-ui[data-panel=egg][data-needs-equip=true] .egg-result-actions .pet-primary,
+.session-ui[data-panel=egg][data-guide=egg][data-guide-egg=true] .egg-buy:not(:disabled) { outline:3px solid #ffe386; outline-offset:3px; box-shadow:0 0 12px #ffd35b80; animation:guide-pulse .8s ease-out 2; }
+@keyframes guide-pulse { 50% { outline-offset:5px; box-shadow:0 0 20px #ffd35bcc; } }
+@media (prefers-reduced-motion:reduce) { .session-ui button { animation:none!important; } }
+@media (max-height:650px) { .guide-card { top:100px; padding:10px 12px; } }
+
+.inventory-hud .inventory-help { position:absolute; bottom:8px; right:8px; width:24px; min-height:24px; background:#284747; color:#ffe2a0; }
+.inventory-hud .sale-hint,.inventory-hud .sale-notice { padding-right:28px; }
+
+.guide-card[data-step=dig] { border:2px solid #ffdc60; box-shadow:0 0 22px #ffd35b55; }
+.guide-mouse-instruction { display:flex; align-items:center; gap:16px; padding:8px 12px; margin:8px 0; border-radius:10px; background:#ffd35b1c; }
+.guide-left-mouse { width:42px; height:58px; flex-shrink:0; }
+.guide-left-button { animation:guide-mouse-press 1s ease-in-out infinite; }
+.guide-mouse-instruction b { display:block; color:#ffe076; font-size:21px; }
+.guide-mouse-instruction span { display:block; margin-top:4px; font-size:12px; }
+.guide-dig-marker { position:absolute; z-index:2; pointer-events:none; transform:translate(-50%,-50%); }
+.guide-dig-ring { display:block; width:34px; height:34px; border:3px solid #fff4a3; border-radius:50%; box-shadow:0 0 0 5px #ffc84260,0 0 20px #ffe455; animation:guide-mouse-press 1s ease-in-out infinite; }
+.guide-dig-caption { position:absolute; bottom:52px; left:50%; transform:translateX(-50%); padding:8px 12px; border:2px solid #ffdf6f; border-radius:10px; color:#fff8d4; background:#193a36f2; font-size:14px; white-space:nowrap; }
+.guide-dig-marker[data-has-target=false] .guide-dig-ring { display:none; }
+@keyframes guide-mouse-press { 50% { opacity:.45; } }
+@media (prefers-reduced-motion:reduce) { .guide-left-button,.guide-dig-ring { animation:none; } }
+
+/* The continuous world arrow already supplies the destination arrowhead. */
+.guide-marker:not([data-offscreen=true]) .guide-marker-arrow { visibility:hidden; }
+.guide-marker:not([data-offscreen=true]) b { left:50%; top:auto; bottom:6px; transform:translateX(-50%); }
+
+.guide-arrow-image { width:40px; height:48px; object-fit:contain; transform:rotate(180deg); }
+
+.guide-card .guide-continue { display:block; min-height:44px; margin:10px 0 4px; padding:8px 12px; border:1px solid #ffe28c; border-radius:8px; background:#efd078; color:#203b38; font-size:14px; font-weight:700; }
+.journey-goals { position:absolute; top:70px; left:50%; transform:translateX(-50%); width:min(310px,calc(100vw - 32px)); padding:12px 15px; border:1px solid #739b8f; border-radius:12px; background:rgba(20,48,52,.93); color:#fff7dc; pointer-events:none; }
+.journey-goals strong { display:block; font-size:15px; }
+.journey-goals p,.journey-goals span:not(.guide-kicker) { margin:5px 0; font-size:14px; line-height:1.5; color:#d1e4df; }
+.journey-goals progress { width:100%; height:10px; accent-color:#e5c263; }
+.journey-mining:not(:first-child) { border-top:1px solid #5b7e73; padding-top:8px; margin-top:8px; }
+@media (max-height:650px) { .journey-goals { top:100px; } }

@@ -1,0 +1,321 @@
+/* Layout reference: output/imagegen/pinewind-hud-20261021/roblox-hud-reference.png.
+   Screen-space groups are transparent; only icons, meters and active controls paint. */
+.game-shell--roblox-hud {
+  --hud-ink: #15334f;
+  --hud-icon: clamp(48px, 7.5vh, 70px);
+  --hud-edge: 24px;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.game-shell--roblox-hud :is(input, textarea, [contenteditable="true"]) {
+  user-select: text;
+  -webkit-user-select: text;
+  -webkit-touch-callout: default;
+}
+.game-shell--roblox-hud .roblox-hud {
+  inset: 0;
+  width: 100%; max-width: none; height: 100%; padding: 0;
+  background: none; border: 0; border-radius: 0; box-shadow: none;
+  pointer-events: none;
+  color: #fff;
+  font-weight: 900;
+  font-family: "Arial Rounded MT Bold", "Microsoft YaHei", system-ui, sans-serif;
+  -webkit-text-stroke: 4px var(--hud-ink);
+  paint-order: stroke fill;
+  text-shadow: 0 3px 0 var(--hud-ink);
+}
+.roblox-hud .hud-icon, .roblox-hud .equipment-icon, .roblox-hud .ore-icon,
+.game-header .hud-icon {
+  display: block; width: var(--hud-icon); height: var(--hud-icon); flex: none;
+  color: var(--hud-ink);
+  filter: drop-shadow(0 3px 0 #112d49) drop-shadow(0 1px 2px #10223880);
+}
+.roblox-hud .hud-status {
+  position: absolute; top: calc(22px + var(--safe-top)); left: calc(var(--hud-edge) + var(--safe-left));
+  display: grid; gap: 8px; max-width: 290px;
+}
+.hud-world, .hud-currency, .hud-capacity { display: flex; align-items: center; gap: 14px; }
+.hud-world > div, .hud-capacity > div { display: grid; gap: 5px; }
+.hud-world strong { font-size: 28px; line-height: 1.1; }
+.hud-world span { font-size: 19px; color: #c1f0ff; }
+.hud-currency strong { font-size: 39px; line-height: 1; font-variant-numeric: tabular-nums; }
+.hud-capacity strong { font-size: 28px; white-space: nowrap; }
+.hud-capacity progress {
+  display: block; width: 146px; height: 13px; border: 2px solid var(--hud-ink); border-radius: 8px;
+  background: #16334c; accent-color: #47c8ff; overflow: hidden;
+}
+.hud-capacity progress::-webkit-progress-bar { background: #16334c; border-radius: 5px; }
+.hud-capacity progress::-webkit-progress-value { background: linear-gradient(#b7f6ff, #22a8f2); border-radius: 5px; }
+.hud-capacity progress::-moz-progress-bar { background: #47c8ff; }
+.hud-capacity[data-full=true] strong { color: #ffe076; }
+.hud-capacity[data-full=true] progress { accent-color: #ffd55e; }
+.hud-capacity[data-full=true] progress::-webkit-progress-value { background: #ffd55e; }
+.hud-mined { font-size: 14px; color: #daefff; padding-left: 8px; -webkit-text-stroke-width: 3px; }
+.roblox-hud .hud-navigation {
+  position: absolute; top: max(280px, 32vh); left: calc(22px + var(--safe-left));
+  display: grid; grid-template-columns: repeat(2, 86px); gap: 15px 23px;
+  background: none; pointer-events: none;
+}
+.roblox-hud .hud-action {
+  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 5px;
+  min-height: 92px; width: auto; padding: 0 4px 4px;
+  background: none; border: 0; border-radius: 12px; box-shadow: none;
+  color: #fff; font-size: 22px; font-weight: 900; line-height: 1.2;
+  -webkit-text-stroke: 4px var(--hud-ink); paint-order: stroke fill; text-shadow: 0 3px 0 var(--hud-ink);
+  cursor: pointer; transition: transform 120ms ease; pointer-events: auto;
+}
+.roblox-hud .hud-action:disabled { filter: grayscale(.65); opacity: .55; cursor: default; }
+.roblox-hud .hud-action[data-kind=pets] .equipment-icon { color: #ffd24d; }
+.roblox-hud .hud-action .hud-badge {
+  position: absolute; top: 0; right: -3px; min-width: 25px; padding: 2px 5px;
+  border-radius: 50%; background: #ffd85d; border: 2px solid var(--hud-ink); font-size: 16px;
+  -webkit-text-stroke-width: 3px;
+}
+.roblox-hud .hud-equipment {
+  position: absolute; bottom: calc(45px + var(--safe-bottom)); left: 50%; transform: translateX(-50%);
+  display: flex; align-items: flex-end; gap: 26px; white-space: nowrap; background: none;
+}
+.hud-equipped { display: flex; flex-direction: column; align-items: center; gap: 9px; font-size: 19px; }
+.roblox-hud .hud-return { font-size: 21px; padding-bottom: 0; gap: 9px; }
+.hud-home-icon {
+  display: grid; place-items: center; width: 94px; height: 65px; border-radius: 23px;
+  border: 3px solid var(--hud-ink); background: linear-gradient(155deg, #fff6aa 3%, #ffd741 45%, #ec9b1f);
+  box-shadow: inset 0 3px 0 #fffbd9, 0 4px 0 #815528;
+}
+.roblox-hud .hud-home-icon .hud-icon { width: 47px; height: 47px; filter: drop-shadow(0 2px 0 #a26924); }
+.roblox-hud .hud-help, .game-shell--roblox-hud .game-header .hud-exit {
+  position: absolute; top: calc(19px + var(--safe-top)); width: 48px; height: 48px; min-height: 48px;
+  padding: 0; border: 0; background: none; box-shadow: none; cursor: pointer; pointer-events: auto;
+}
+.roblox-hud .hud-help { right: calc(85px + var(--safe-right)); }
+.roblox-hud .hud-help .hud-icon, .game-header .hud-exit .hud-icon { width: 48px; height: 48px; }
+.game-shell--roblox-hud .game-header .hud-exit {
+  right: calc(22px + var(--safe-right)); border: 3px solid var(--hud-ink); border-radius: 14px;
+  background: linear-gradient(#ff8495, #dd2d60); box-shadow: inset 0 2px 0 #ffbecc, 0 3px 0 #6e1b44;
+}
+.game-header .hud-exit .hud-icon { width: 38px; height: 38px; padding: 4px; }
+.roblox-hud .hud-loot {
+  position: absolute; right: calc(var(--hud-edge) + var(--safe-right)); bottom: calc(52px + var(--safe-bottom));
+  width: 290px; text-align: right;
+}
+.roblox-hud .inventory-ore-slots { gap: 9px; margin: 0 0 12px; }
+.roblox-hud .inventory-ore-slots:empty { margin: 0; }
+.roblox-hud .inventory-ore-slots > li { padding: 0; background: none; border: 0; overflow: visible; }
+.roblox-hud .inventory-ore-slots > li .ore-icon { width: 34px; height: 34px; }
+.roblox-hud .inventory-ore-slots > li > span, .roblox-hud .inventory-ore-slots > li > b { font-size: 14px; -webkit-text-stroke-width: 3px; }
+.roblox-hud .sale-hint, .roblox-hud .sale-notice { font-size: 14px; color: #fff4cf; padding: 0; -webkit-text-stroke-width: 3px; line-height: 1.6; }
+.roblox-hud .sale-notice:empty { display: none; }
+.roblox-hud .hud-buffs { position: absolute; bottom: 35px; left: var(--hud-edge); display: grid; gap: 6px; font-size: 15px; color: #ffe777; }
+.game-shell--roblox-hud .control-hint { font-size: 14px; bottom: calc(12px + var(--safe-bottom)); font-weight: 800; -webkit-text-stroke: 3px var(--hud-ink); paint-order: stroke fill; }
+
+.game-shell--roblox-hud .guide-card, .game-shell--roblox-hud .journey-goals {
+  top: calc(104px + var(--safe-top)); left: auto; right: calc(26px + var(--safe-right)); transform: none;
+  width: 305px; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none;
+  color: white; font-weight: 800; -webkit-text-stroke: 3px var(--hud-ink); paint-order: stroke fill; text-shadow: 0 2px 0 var(--hud-ink);
+}
+.game-shell--roblox-hud .guide-card strong, .game-shell--roblox-hud .journey-goals strong { font-size: 24px; line-height: 1.4; -webkit-text-stroke-width: 4px; }
+.game-shell--roblox-hud .guide-kicker { font-size: 18px; letter-spacing: 0; color: #ffda50; margin-bottom: 8px; }
+.game-shell--roblox-hud .guide-card p, .game-shell--roblox-hud .journey-goals p,
+.game-shell--roblox-hud .journey-goals span:not(.guide-kicker) { font-size: 15px; line-height: 1.6; color: #fff; margin: 6px 0; }
+.game-shell--roblox-hud .guide-card button { min-height: 44px; font-size: 15px; font-weight: 800; color: #7be6ff; text-decoration: underline; text-underline-offset: 5px; border: 0; -webkit-text-stroke: 3px var(--hud-ink); paint-order: stroke fill; }
+.game-shell--roblox-hud .guide-card .guide-continue { color: #fff; background: #3987ad; border: 2px solid #b9edff; text-decoration: none; }
+.game-shell--roblox-hud .guide-mouse-instruction { background: none; padding: 5px 0; gap: 12px; }
+.game-shell--roblox-hud .guide-mouse-instruction b { font-size: 20px; }
+.game-shell--roblox-hud .guide-mouse-instruction span { font-size: 14px; }
+.game-shell--roblox-hud .journey-mining:not(:first-child) { border: 0; padding-top: 12px; }
+.game-shell--roblox-hud .journey-goals progress { width: 190px; }
+.game-shell--roblox-hud .guide-marker b, .game-shell--roblox-hud .guide-offscreen,
+.game-shell--roblox-hud .guide-dig-caption {
+  background: none; border: 0; box-shadow: none; color: #fff2a3;
+  font-size: 16px; font-weight: 900; -webkit-text-stroke: 3px var(--hud-ink); paint-order: stroke fill;
+}
+.game-shell--roblox-hud .target-health {
+  top: auto; bottom: 185px; left: 50%; transform: translateX(-50%); width: 225px;
+  background: none; padding: 0; font-size: 16px; font-weight: 800;
+  -webkit-text-stroke: 3px var(--hud-ink); paint-order: stroke fill;
+}
+.game-shell--roblox-hud .target-health small { font-size: 14px; color: #f2f9ff; }
+.game-shell--roblox-hud .ore-pickup { background: none; border: 0; box-shadow: none; padding: 0; color: white; font-size: 20px; font-weight: 900; -webkit-text-stroke: 3px var(--hud-ink); paint-order: stroke fill; }
+
+.game-shell--roblox-hud .game-header { padding: 0; }
+.hud-settings { position: absolute; top: calc(19px + var(--safe-top)); right: calc(148px + var(--safe-right)); }
+.hud-settings > summary { list-style: none; cursor: pointer; width: 48px; height: 48px; pointer-events: auto; }
+.hud-settings > summary::-webkit-details-marker { display: none; }
+.hud-settings > summary .hud-icon { width: 48px; height: 48px; }
+.hud-settings .scene-actions { position: absolute; right: 0; top: 63px; width: 185px; display: grid; gap: 8px; }
+.game-shell--roblox-hud .scene-actions button { font-size: 14px; min-height: 44px; border: 2px solid #b8e6fa; background: #245273; color: white; box-shadow: 0 3px 0 #142f49; }
+.game-shell--roblox-hud:has(.hud-settings[open]) .guide-card,
+.game-shell--roblox-hud:has(.hud-settings[open]) .journey-goals { visibility: hidden; }
+.hud-debug-tools { position: absolute; right: 218px; top: 22px; pointer-events: auto; font-size: 12px; }
+.hud-debug-tools > summary { padding: 10px; cursor: pointer; text-shadow: 0 1px 2px #000; }
+.hud-debug-content { position: absolute; right: 0; top: 45px; width: 315px; padding: 12px; background: #f3f4df; color: #173d42; border-radius: 10px; }
+.hud-debug-content .input-monitor, .hud-debug-content .validation-panel { position: static; padding: 8px; margin-top: 8px; color: white; }
+.hud-debug-content .performance-expanded { position: static; padding: 10px 0; width: 100%; }
+.hud-debug-content .performance-hud { flex-wrap: wrap; }
+.game-shell--roblox-hud button:focus-visible, .hud-settings > summary:focus-visible { outline: 3px solid #fff294; outline-offset: 5px; }
+@media (hover: hover) {
+  .roblox-hud .hud-action:not(:disabled):hover { transform: translateY(-3px) scale(1.04); background: none; }
+  .roblox-hud .hud-help:hover, .hud-settings > summary:hover { transform: scale(1.07); }
+}
+@media (max-height: 760px) {
+  .game-shell--roblox-hud { --hud-icon: 49px; --hud-edge: 18px; }
+  .roblox-hud .hud-status { top: 16px; gap: 5px; }
+  .hud-world strong { font-size: 23px; }
+  .hud-world span { font-size: 16px; }
+  .hud-currency strong { font-size: 32px; }
+  .hud-capacity strong { font-size: 24px; }
+  .roblox-hud .hud-navigation { top: 236px; gap: 10px 16px; grid-template-columns: repeat(2, 70px); }
+  .roblox-hud .hud-action { min-height: 74px; font-size: 19px; }
+  .roblox-hud .hud-equipment { bottom: 39px; gap: 22px; }
+  .hud-equipped { font-size: 16px; }
+  .hud-home-icon { width: 82px; height: 50px; }
+  .game-shell--roblox-hud .guide-card, .game-shell--roblox-hud .journey-goals { top: 95px; width: 280px; }
+  .game-shell--roblox-hud .guide-card strong, .game-shell--roblox-hud .journey-goals strong { font-size: 22px; }
+}
+@media (max-width: 1150px) {
+  .roblox-hud .hud-loot { width: 225px; }
+  .roblox-hud .inventory-ore-slots { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) { .roblox-hud .hud-action { transition: none; } }
+
+.hud-secondary { display: contents; }
+.roblox-hud .hud-more { display: none; }
+
+/* Phone landscape is the primary composition. The shell may already be rotated
+   by styles.css, so height breakpoints below use its actual dimensions. */
+.game-shell--roblox-hud { container: mining-game / size; }
+@media (any-pointer: coarse) {
+  .game-shell--roblox-hud { --hud-icon: 36px; --hud-edge: 12px; }
+  .game-shell--roblox-hud .roblox-hud { -webkit-text-stroke-width: 3px; text-shadow: 0 2px 0 var(--hud-ink); }
+  .roblox-hud .hud-status {
+    top: calc(8px + var(--safe-top)); left: calc(12px + var(--safe-left));
+    max-width: 300px; display: grid; grid-template-columns: auto auto; gap: 6px 18px;
+  }
+  .hud-world { grid-column: 1 / -1; gap: 8px; min-height: 32px; }
+  .hud-world > .hud-icon { width: 28px; height: 28px; }
+  .hud-world > div { display: flex; align-items: baseline; gap: 10px; }
+  .hud-world strong { font-size: 18px; }
+  .hud-world span { font-size: 14px; }
+  .hud-currency, .hud-capacity { gap: 6px; }
+  .hud-currency .hud-icon, .hud-capacity .equipment-icon { width: 30px; height: 30px; }
+  .hud-currency strong { font-size: 24px; }
+  .hud-capacity strong { font-size: 19px; }
+  .hud-capacity > div { gap: 2px; }
+  .hud-capacity progress { width: 94px; height: 8px; }
+  .hud-mined { display: none; }
+  .roblox-hud .hud-navigation {
+    top: calc(98px + var(--safe-top)); left: calc(10px + var(--safe-left));
+    grid-template-columns: repeat(3, 56px); gap: 8px;
+  }
+  .roblox-hud .hud-action { width: 56px; min-height: 60px; font-size: 14px; padding: 0 2px 2px; gap: 4px; -webkit-text-stroke-width: 3px; }
+  .roblox-hud .hud-more { display: flex; }
+  .roblox-hud .hud-secondary { display: none; }
+  .roblox-hud .hud-secondary[data-open=true] {
+    position: absolute; top: 0; left: 198px; display: grid;
+    grid-template-columns: repeat(2, 56px); gap: 10px 8px;
+  }
+  .roblox-hud .hud-action .hud-badge { min-width: 20px; right: 1px; top: -6px; padding: 1px 3px; font-size: 14px; }
+  .roblox-hud .hud-equipment { bottom: calc(14px + var(--safe-bottom)); gap: 0; }
+  .hud-equipped { display: none; }
+  .roblox-hud .hud-return { width: 88px; min-height: 64px; font-size: 14px; gap: 5px; }
+  .hud-home-icon { width: 66px; height: 42px; border-radius: 16px; }
+  .roblox-hud .hud-home-icon .hud-icon { width: 34px; height: 34px; }
+  .roblox-hud .hud-help, .game-shell--roblox-hud .game-header .hud-exit {
+    top: calc(8px + var(--safe-top)); width: 44px; height: 44px; min-height: 44px;
+  }
+  .roblox-hud .hud-help { right: calc(62px + var(--safe-right)); }
+  .roblox-hud .hud-help .hud-icon { width: 40px; height: 40px; margin: auto; }
+  .game-shell--roblox-hud .game-header .hud-exit { right: calc(10px + var(--safe-right)); border-radius: 12px; }
+  .game-header .hud-exit .hud-icon { width: 36px; height: 36px; padding: 4px; }
+  .hud-settings { top: calc(8px + var(--safe-top)); right: calc(114px + var(--safe-right)); }
+  .hud-settings > summary { width: 44px; height: 44px; display: grid; place-items: center; }
+  .hud-settings > summary .hud-icon { width: 38px; height: 38px; }
+  .hud-settings .scene-actions { top: 50px; right: -104px; width: 210px; max-height: calc(100cqh - 80px - var(--safe-top) - var(--safe-bottom)); overflow-y: auto; padding: 4px; }
+  .hud-debug-tools { right: calc(174px + var(--safe-right)); top: calc(8px + var(--safe-top)); }
+  .hud-debug-tools > summary { min-height: 44px; display: grid; place-items: center; }
+  .hud-debug-content { max-height: calc(100cqh - 70px); overflow: auto; }
+
+  .game-shell--roblox-hud .guide-card, .game-shell--roblox-hud .journey-goals {
+    top: calc(66px + var(--safe-top)); right: calc(12px + var(--safe-right)); width: 224px;
+  }
+  .game-shell--roblox-hud .guide-kicker { font-size: 14px; margin-bottom: 3px; }
+  .game-shell--roblox-hud .guide-card strong, .game-shell--roblox-hud .journey-goals strong { font-size: 17px; line-height: 1.35; -webkit-text-stroke-width: 3px; }
+  .game-shell--roblox-hud .guide-card p, .game-shell--roblox-hud .journey-goals p,
+  .game-shell--roblox-hud .journey-goals span:not(.guide-kicker) { font-size: 14px; line-height: 1.45; margin: 4px 0; }
+  /* Skip remains available in Help. Keep the active objective clear of thumbs. */
+  .game-shell--roblox-hud .guide-skip { display: none; }
+  .game-shell--roblox-hud .guide-continue { margin: 6px 0 0; }
+  .game-shell--roblox-hud .journey-depth > p:last-child { display: none; }
+  .game-shell--roblox-hud .journey-mining:not(:first-child) { margin-top: 6px; padding-top: 0; }
+  .game-shell--roblox-hud .guide-marker b, .game-shell--roblox-hud .guide-offscreen,
+  .game-shell--roblox-hud .guide-dig-caption { font-size: 14px; }
+  .game-shell--roblox-hud .guide-marker[data-offscreen=true] b,
+  .game-shell--roblox-hud .guide-offscreen { left: 50%; transform: translateX(-50%); top: 48px; }
+  .game-shell--roblox-hud .guide-offscreen { top: 72px; }
+  .roblox-hud .hud-loot { width: auto; max-width: 320px; left: 50%; right: auto; bottom: calc(86px + var(--safe-bottom)); transform: translateX(-50%); text-align: center; }
+  .roblox-hud .inventory-ore-slots, .roblox-hud .sale-hint { display: none; }
+  .roblox-hud .sale-notice { font-size: 14px; line-height: 1.4; padding: 0; }
+  .roblox-hud .hud-buffs { left: calc(12px + var(--safe-left)); bottom: calc(152px + var(--safe-bottom)); font-size: 14px; gap: 3px; }
+  .game-shell--roblox-hud .control-hint { display: none; }
+  .game-shell--roblox-hud .joystick { left: calc(18px + var(--safe-left)); bottom: calc(16px + var(--safe-bottom)); }
+  .game-shell--roblox-hud .joystick-label { font-size: 14px; }
+  .game-shell--roblox-hud .action-buttons { right: calc(22px + var(--safe-right)); bottom: calc(22px + var(--safe-bottom)); }
+  .game-shell--roblox-hud .jump-button { width: 72px; height: 72px; font-size: 16px; }
+  .game-shell--roblox-hud .target-health { bottom: calc(116px + var(--safe-bottom)); width: 180px; font-size: 14px; }
+  .game-shell--roblox-hud .target-health small { font-size: 14px; }
+  .game-shell--roblox-hud .ore-pickup-feed { top: 52%; }
+  .game-shell--roblox-hud .ore-pickup { font-size: 14px; }
+  .game-shell--roblox-hud .egg-world-prompt { min-width: 112px; min-height: 44px; font-size: 14px; }
+  .capsule-world-prompt kbd, .journey-mine-prompt .desktop-hint { display: none; }
+  .game-shell--roblox-hud .capsule-world-prompt, .game-shell--roblox-hud .journey-mine-prompt { bottom: calc(102px + var(--safe-bottom)); min-height: 44px; font-size: 14px; }
+
+  /* Dialogs stay inside the landscape safe area and scroll with a finger. */
+  .game-shell--roblox-hud .pet-backdrop, .game-shell--roblox-hud .upgrade-backdrop {
+    padding: calc(8px + var(--safe-top)) calc(10px + var(--safe-right)) calc(8px + var(--safe-bottom)) calc(10px + var(--safe-left));
+    touch-action: pan-y;
+  }
+  .game-shell--roblox-hud .pet-panel, .game-shell--roblox-hud .upgrade-panel {
+    max-height: 100%; font-size: 14px; overscroll-behavior: contain; touch-action: pan-y;
+  }
+  .game-shell--roblox-hud .pet-panel { width: min(760px, 100%); padding: 12px 16px; }
+  .game-shell--roblox-hud .pet-egg-panel { width: min(580px, 100%); }
+  .game-shell--roblox-hud .upgrade-panel { width: min(400px, 100%); }
+  .game-shell--roblox-hud .shop-backdrop .upgrade-panel { width: min(360px, calc(100% - 280px)); }
+  .game-shell--roblox-hud .journey-panel { width: min(700px, 100%); }
+  .game-shell--roblox-hud .pet-panel button, .game-shell--roblox-hud .upgrade-panel button,
+  .game-shell--roblox-hud .journey-panel select { min-width: 44px; min-height: 44px; font-size: 14px; }
+  .game-shell--roblox-hud .pet-heading, .game-shell--roblox-hud .upgrade-panel > header {
+    position: sticky; top: -12px; z-index: 2; min-height: 52px; padding-block: 4px; background: #f0f7f7;
+  }
+  .game-shell--roblox-hud .upgrade-panel > header { background: #142c31; }
+  .game-shell--roblox-hud .pet-close { top: 4px; width: 44px; height: 44px; }
+  .game-shell--roblox-hud .pet-heading h1 { font-size: 22px; }
+  .game-shell--roblox-hud .pet-panel small, .game-shell--roblox-hud .pet-detail p,
+  .game-shell--roblox-hud .pet-empty p, .game-shell--roblox-hud .pet-empty span,
+  .game-shell--roblox-hud .pet-slot b, .game-shell--roblox-hud .pet-slot span,
+  .game-shell--roblox-hud .pet-card .pet-name-art, .game-shell--roblox-hud .pet-footer output,
+  .game-shell--roblox-hud .upgrade-panel p, .game-shell--roblox-hud .upgrade-panel output,
+  .game-shell--roblox-hud .upgrade-panel .pickaxe-stats span, .game-shell--roblox-hud .upgrade-panel small { font-size: 14px; }
+  .game-shell--roblox-hud .pet-panel.rewards-panel { padding: 0; }
+  .game-shell--roblox-hud .reward-balance { padding: 8px 16px; }
+  .game-shell--roblox-hud .rewards-panel .pet-heading { margin: 6px 16px; }
+  .game-shell--roblox-hud .reward-notice:empty { display: none; }
+  .game-shell--roblox-hud .rewards-content { padding: 12px 16px; }
+  .game-shell--roblox-hud .reward-signin-days { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .game-shell--roblox-hud .egg-preview-grid { margin-top: 10px; }
+  .game-shell--roblox-hud .egg-preview-pet { gap: 5px; padding: 8px 3px; }
+  .game-shell--roblox-hud .pet-footer { flex-wrap: wrap; }
+  .game-shell--roblox-hud .pet-footer output { max-width: 100%; }
+  .game-shell--roblox-hud .session-ui:not([data-panel=none]) .roblox-hud,
+  .game-shell--roblox-hud:has(.session-ui:not([data-panel=none])) .game-header { visibility: hidden; }
+}
+@container mining-game (max-height: 350px) {
+  @media (any-pointer: coarse) {
+    .roblox-hud .hud-navigation { top: calc(84px + var(--safe-top)); }
+    .roblox-hud .hud-status { gap: 2px 18px; }
+    .game-shell--roblox-hud .guide-card, .game-shell--roblox-hud .journey-goals { width: 204px; top: calc(60px + var(--safe-top)); }
+    .game-shell--roblox-hud .guide-card strong, .game-shell--roblox-hud .journey-goals strong { font-size: 16px; }
+    .roblox-hud .hud-buffs { left: 170px; bottom: calc(8px + var(--safe-bottom)); }
+  }
+}

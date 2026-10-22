@@ -10,6 +10,9 @@ export class SceneLightingRig {
  readonly streetLights:PointLight[]=[];
  readonly wallLights:PointLight[]=[];
  private time:SurfaceTime='night';
+ private daylight=0;
+ private strength=1;
+ private readonly lightLevels:{light:SpotLight|PointLight;intensity:number}[]=[];
  constructor(){
   const p=SURFACE_AREA_LIGHT;this.group.name='independent-area-lighting';
   this.key=new SpotLight(p.color,p.intensity,p.distance,p.angle,p.penumbra,2);
@@ -29,22 +32,35 @@ export class SceneLightingRig {
    const light=new PointLight(p.color,p.intensity,p.distance,p.decay);light.name=id;light.position.set(p.position[0],p.position[1],p.position[2]);light.castShadow=false;
    this.wallLights.push(light);
   }
+  for(const light of [this.key,...this.fills,...this.streetLights,...this.wallLights])
+   this.lightLevels.push({light,intensity:light.intensity});
   this.setTime('day');
  }
  setTime(time:SurfaceTime){
-  if(this.time===time)return false;
-  this.time=time;const night=time==='night';
-  this.key.intensity=night?SURFACE_AREA_LIGHT.intensity:0;
-  this.fills.forEach((light,i)=>light.intensity=night?SURFACE_FILL_LIGHTS[i].intensity:0);
-  this.streetLights.forEach((light,i)=>light.intensity=night?STREET_LIGHTS[i].light.intensity:0);
-  this.wallLights.forEach((light,i)=>light.intensity=night?WALL_TORCHES[i].light.intensity:0);
-  // Intensity zero alone leaves lights/shadow uniforms in Three's render list.
-  // Hiding light nodes removes that work; decoration and scenery stay resident.
-  for(const light of [this.key,...this.fills,...this.streetLights,...this.wallLights])light.visible=night;
-  localPointLighting.enabled.value=night&&this.group.visible?1:0;
-  return true;
+  return this.setDaylight(time==='day'?1:0);
  }
- setSurfaceActive(active:boolean){const changed=this.group.visible!==active;this.group.visible=active;localPointLighting.enabled.value=active&&this.time==='night'?1:0;return changed;}
- diagnostics(){return {localPointGrid:localPointLighting.diagnostics(),wallLights:this.wallLights.map(p=>({id:p.name,type:p.type,position:p.position.toArray(),intensity:p.intensity,distance:p.distance,visible:p.visible,castsShadow:p.castShadow})),streetLights:this.streetLights.map(p=>({id:p.name,type:p.type,position:p.position.toArray(),intensity:p.intensity,distance:p.distance,castsShadow:p.castShadow})),independentOfDecorations:true,time:this.time,fillLights:this.fills.length,shadowLights:[this.key,...this.fills].filter(light=>light.castShadow).length,activeShadowLights:this.group.visible?[this.key,...this.fills].filter(light=>light.visible&&light.castShadow).length:0,activeLights:this.group.visible?this.group.children.filter(light=>light instanceof PointLight||light instanceof SpotLight).filter(light=>light.visible).length:0,shadowPolicy:'baked-ground-only',active:this.group.visible,position:this.key.position.toArray(),target:this.key.target.position.toArray(),intensity:this.key.intensity,castsShadow:this.key.castShadow,shadowMapSize:this.key.shadow.mapSize.x};}
+ setDaylight(value:number){
+  const daylight=Math.max(0,Math.min(1,value));
+  if(this.daylight===daylight)return false;
+  this.daylight=daylight;this.time=daylight>=.5?'day':'night';this.applyStrength();return true;
+ }
+ setSurfaceStrength(strength:number){
+  const next=Math.max(0,Math.min(1,strength));
+  if(next===this.strength)return false;
+  this.strength=next;this.applyStrength();return true;
+ }
+ setSurfaceActive(active:boolean){return this.setSurfaceStrength(active?1:0);}
+ private applyStrength(){
+  const strength=(1-this.daylight)*this.strength;
+  this.group.visible=this.strength>0;
+  // Only uniforms change during descent. Remove the light nodes from Three's
+  // render list at zero; no per-frame allocations or extra shadow passes.
+  for(const {light,intensity} of this.lightLevels){
+   light.intensity=intensity*strength;
+   light.visible=strength>0;
+  }
+  localPointLighting.enabled.value=strength;
+ }
+ diagnostics(){return {strength:this.strength,daylightBlend:this.daylight,localPointGrid:localPointLighting.diagnostics(),wallLights:this.wallLights.map(p=>({id:p.name,type:p.type,position:p.position.toArray(),intensity:p.intensity,distance:p.distance,visible:p.visible,castsShadow:p.castShadow})),streetLights:this.streetLights.map(p=>({id:p.name,type:p.type,position:p.position.toArray(),intensity:p.intensity,distance:p.distance,castsShadow:p.castShadow})),independentOfDecorations:true,time:this.time,fillLights:this.fills.length,shadowLights:[this.key,...this.fills].filter(light=>light.castShadow).length,activeShadowLights:this.group.visible?[this.key,...this.fills].filter(light=>light.visible&&light.castShadow).length:0,activeLights:this.group.visible?this.group.children.filter(light=>light instanceof PointLight||light instanceof SpotLight).filter(light=>light.visible).length:0,shadowPolicy:'baked-ground-only',active:this.group.visible,position:this.key.position.toArray(),target:this.key.target.position.toArray(),intensity:this.key.intensity,castsShadow:this.key.castShadow,shadowMapSize:this.key.shadow.mapSize.x};}
  dispose(){for(const light of [...this.fills,...this.streetLights,...this.wallLights])light.dispose();this.key.dispose();localPointLighting.enabled.value=0;localPointLighting.dispose();this.group.removeFromParent();this.group.clear();}
 }

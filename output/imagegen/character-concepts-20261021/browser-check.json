@@ -1,0 +1,62 @@
+{
+  "status": 200,
+  "gallery": {
+    "title": "Mining · 人物候选",
+    "cards": 4,
+    "images": [
+      {
+        "loaded": true,
+        "width": 640,
+        "height": 960
+      },
+      {
+        "loaded": true,
+        "width": 640,
+        "height": 960
+      },
+      {
+        "loaded": true,
+        "width": 640,
+        "height": 960
+      },
+      {
+        "loaded": true,
+        "width": 640,
+        "height": 960
+      }
+    ],
+    "overflow": false
+  },
+  "opened": true,
+  "nextTitle": "B · 圆润卡通矿工",
+  "previousTitle": "A · 方块感矿工",
+  "closed": true,
+  "originals": [
+    {
+      "file": "a-blocky-miner.png",
+      "status": 200,
+      "type": "image/png"
+    },
+    {
+      "file": "b-rounded-miner.png",
+      "status": 200,
+      "type": "image/png"
+    },
+    {
+      "file": "c-light-explorer.png",
+      "status": 200,
+      "type": "image/png"
+    },
+    {
+      "file": "d-future-miner.png",
+      "status": 200,
+      "type": "image/png"
+    }
+  ],
+  "inline": {
+    "contentHeight": 1373,
+    "images": 4,
+    "overflow": false
+  },
+  "errors": []
+}

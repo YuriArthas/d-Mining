@@ -1,7 +1,7 @@
 import {ROOM_LAYOUT,type RoomLayout} from './roomLayout.ts';
 import { resourceByKind } from './resources.ts';
 import { themeById } from './themes.ts';
-export type Layer = Readonly<{ id: string; name: string; from: number; theme: string; scene?:string; base: number; ores: readonly Readonly<{kind:number;weight:number}>[]; shop: boolean; room?:RoomLayout }>;
+export type Layer = Readonly<{ id: string; name: string; from: number; theme: string; scene?:string; base: number; deepKind?: number; ores: readonly Readonly<{kind:number;weight:number}>[]; shop: boolean; room?:RoomLayout }>;
 export const WORLD_DEPTH = 4000;
 // The sole depth schedule. IDs remain stable when a layer moves.
 export const LAYERS: readonly Layer[] = Object.freeze([

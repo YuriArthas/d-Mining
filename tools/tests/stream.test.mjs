@@ -110,7 +110,7 @@ test('combat damage survives streaming; actual removal alone awards and clears H
 });
 test('cancelled lethal strike keeps sparse damage and retries without duplicate rewards',async()=>{
  const {GameSession}=await import('../../src/game/application/GameSession.ts');
- let now=0;const initial=new GameSession(SESSION_CONTENT).exportProgress();initial.pickaxe.level=31;const session=new GameSession(SESSION_CONTENT,50,()=>now,{},initial),receipts=[];
+ let now=0;const initial=new GameSession(SESSION_CONTENT).exportProgress();initial.pickaxe.level=31;delete initial.equipment; /* Legacy active-gear fixture. */const session=new GameSession(SESSION_CONTENT,50,()=>now,{},initial),receipts=[];
  const f=setup(resources=>{receipts.push(resources);session.collected(resources)}),s=f.stream;
  session.attach({cell:c=>s.cell(c),pending:c=>s.pending(c),mine:cs=>s.mineMany(cs),cancelMining:()=>s.cancelPending(),returnToSurface:()=>{}});
  try{

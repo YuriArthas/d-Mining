@@ -28,7 +28,7 @@ export function SaveEntry({
     setGame(null);
     const task = cleanup.current.then(async () => {
       abort.signal.throwIfAborted();
-      const target = saveNamespace(location);
+      const target = saveNamespace(location,generation.worlds?'journey-v1':undefined);
       return openSavedGame(
         target.name,
         content,

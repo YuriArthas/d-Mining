@@ -1,0 +1,16 @@
+{ maximumStretch: 2.776818137860405, maximumEdge: 0.1464209160706165 }
+✔ 矿工保留完整网格、16 骨架以及每个顶点的归一化权重 (7.120024ms)
+✔ 三组 RAB 动作包含实际关节变化，循环首尾一致且没有水平根位移 (4.588871ms)
+✔ 待机、行走和跑步全周期的蒙皮顶点保持人体尺度，脚底不穿地 (376.582808ms)
+✔ 跑步时相邻顶点不会因绑定到不同肢体而拉出长刺 (76.040741ms)
+✔ startup resources release in reverse order, including late arrivals after cancellation (1.425042ms)
+✔ a broken release cannot prevent the remaining resources from being freed (1.993198ms)
+✔ travel waits for terrain; installation precedes physics and input is not consumed while waiting (0.620874ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 597.798315

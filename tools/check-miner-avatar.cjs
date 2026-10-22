@@ -30,7 +30,7 @@ const path=require('node:path');
     await frames();
     report.videoStartSeconds=(Date.now()-start)/1000;
     let s=await snap();
-    assert.equal(s.avatar.bones,16);assert.equal(s.avatar.skinnedMeshes,1);assert.equal(s.avatar.textures,1);
+    assert.equal(s.avatar.bones,16);assert.equal(s.avatar.skinnedMeshes,1);assert.equal(s.avatar.textures,2);
     assert.equal(s.avatar.triangles,11678);assert.equal(s.avatar.clips[0].weight,1);
     report.initial=s.avatar;
     check('Public game loads the textured Miner A, 16 bones and RAB clips');

@@ -21,7 +21,7 @@ export const POINT_GRID=buildPointGrid(LOCAL_POINT_SOURCES);
 const texture=new DataTexture(POINT_GRID.data,POINT_GRID.width,POINT_GRID.height,RGBAFormat);texture.magFilter=texture.minFilter=NearestFilter;texture.generateMipmaps=false;texture.needsUpdate=true;
 export const localPointLighting={
  enabled:{value:0},texture,
- diagnostics:()=>({sources:LOCAL_POINT_SOURCES.length,maxLightsPerCell:POINT_GRID.maxLights,gridBytes:POINT_GRID.data.byteLength,grid:[POINT_GRID.width,POINT_GRID.height],globalPointLightsAdded:0,enabled:localPointLighting.enabled.value>0}),
+ diagnostics:()=>({strength:localPointLighting.enabled.value,sources:LOCAL_POINT_SOURCES.length,maxLightsPerCell:POINT_GRID.maxLights,gridBytes:POINT_GRID.data.byteLength,grid:[POINT_GRID.width,POINT_GRID.height],globalPointLightsAdded:0,enabled:localPointLighting.enabled.value>0}),
  dispose(){texture.dispose();},
 };
 const positions=LOCAL_POINT_SOURCES.map(p=>new Vector4(...p.position,p.distance));
@@ -49,7 +49,7 @@ export function compileLocalPointLights(shader:Parameters<MeshStandardMaterial['
  `+shader.fragmentShader;
  shader.fragmentShader=shader.fragmentShader.replace('#include <lights_fragment_begin>',`#include <lights_fragment_begin>
  // One index lookup; no global loop over all distant torches.
- if(localPointEnabled>.5){
+ if(localPointEnabled>0.){
   ivec2 tile=ivec2(floor((localPointWorld.xz-localPointOrigin)/${POINT_GRID.cellSize.toFixed(1)}));
   if(all(greaterThanEqual(tile,ivec2(0)))&&all(lessThan(tile,ivec2(${POINT_GRID.width},${POINT_GRID.height})))){
    vec4 ids=texelFetch(localPointIndex,tile,0)*255.;
@@ -59,7 +59,7 @@ export function compileLocalPointLights(shader:Parameters<MeshStandardMaterial['
      vec4 p=localPointPositions[id];vec3 delta=p.xyz-localPointWorld;float d=length(delta);
      if(d<p.w){
       IncidentLight nearby;nearby.direction=normalize(mat3(viewMatrix)*delta);
-      nearby.color=localPointColors[id]*getDistanceAttenuation(d,p.w,2.);nearby.visible=true;
+      nearby.color=localPointColors[id]*(localPointEnabled*getDistanceAttenuation(d,p.w,2.));nearby.visible=true;
       RE_Direct(nearby,geometryPosition,geometryNormal,geometryViewDir,geometryClearcoatNormal,material,reflectedLight);
      }
     }

@@ -1,0 +1,25 @@
+{
+  "generator": "imagegen skill CLI / Images API",
+  "model": "gpt-image-2",
+  "prompt": "docs/art/guide-arrow/prompt.txt",
+  "source": "output/imagegen/guide-arrow/roblox-arrow-source.png",
+  "runtime": "src/game/assets/guide-arrow/roblox-arrow-v1.webp",
+  "alpha": "preserved from API response; no procedural replacement",
+  "crop": [
+    193,
+    53,
+    825,
+    1475
+  ],
+  "size": [
+    512,
+    1148
+  ],
+  "bytes": 43218,
+  "sha256": "ef8581d266c37965c98c5f10e8f96bee691a484b50813721295de876a7f0d63f",
+  "sourceSha256": "711658e821acfff177d9cde1da04b0404a147bbfaff88c28d1632cf2db426e9e",
+  "headV": 0.6781206171107994,
+  "tailV": 0.061009817671809255,
+  "headAspect": 0.7216981132075472,
+  "tailAspect": 0.13679245283018868
+}

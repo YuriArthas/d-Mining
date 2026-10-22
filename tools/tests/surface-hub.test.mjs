@@ -21,7 +21,7 @@ test('locked pad gives one entry notice, never transports, and does not unlock i
  const before=events;for(let i=0;i<10;i++)s.updatePosition(feet(p),true);assert.equal(events,before);
 });
 test('unlocked pad travels without the home menu, only on grounded entry, once until leaving',()=>{
- const {s,calls}=setup(),p=SURFACE_PORTALS[0];s.updatePosition(ROOMS[0].spawn,true);
+ const {s,calls}=setup(),p=SURFACE_PORTALS[0];s.updatePosition([ROOMS[0].x,-ROOMS[0].depth+.027,ROOMS[0].z],true);
  s.updatePosition(feet(p),false);assert.equal(calls.length,0);
  s.updatePosition([p.zone.x,2,p.zone.z],true);assert.equal(calls.length,0);
  s.updatePosition(feet(p),true);assert.deepEqual(calls,[ROOMS[0].spawn]);
@@ -30,7 +30,7 @@ test('unlocked pad travels without the home menu, only on grounded entry, once u
  assert.equal(s.travelTo(SURFACE_PORTALS[1].id),'locked');
 });
 test('each pad uses its own destination rather than a shared fixed spawn',()=>{
- const {s,calls}=setup();ROOMS.forEach(r=>s.updatePosition(r.spawn,true));
+ const {s,calls}=setup();ROOMS.forEach(r=>s.updatePosition([r.x,-r.depth+.027,r.z],true));
  for(const [i,p] of SURFACE_PORTALS.entries()){
   s.updatePosition(feet(p),true);assert.deepEqual(calls[i],ROOMS[i].spawn);
   s.updatePosition(ROOMS[i].spawn,true);
@@ -71,7 +71,7 @@ test('decorations do not occupy the pet court, portal court or central approach'
 });
 
 test('approved left portal lane stays clear, including hysteresis and player radius',()=>{
- const {s,calls}=setup();ROOMS.forEach(r=>s.updatePosition(r.spawn,true));
+ const {s,calls}=setup();ROOMS.forEach(r=>s.updatePosition([r.x,-r.depth+.027,r.z],true));
  for(let z=14;z<=50;z+=.5)for(const x of [-24,-22,-20]){
   for(const p of SURFACE_PORTALS)assert.ok(Math.hypot(x-p.x,z-p.z)>p.zone.radius+p.zone.hysteresis+.4);
   s.updatePosition([x,0,z],true);
@@ -89,6 +89,9 @@ test('approved functional orientation and red line include actual rendered geome
  for(const p of HUB_PLACEMENTS.filter(p=>p.portalId)){
   const r=footprint(p);assert.ok(r.maxX<0&&r.minZ>=14&&r.maxZ<=50);
  }
- for(const b of Object.values(SURFACE_BUILDINGS)){assert.equal(b.z,56);assert.equal(b.yaw,Math.PI);}
- for(const z of [SURFACE_SALE,SURFACE_SHOP])assert.ok(Math.abs(z.z-49.3)<.0001);
+ for(const [id,zone] of [['sale',SURFACE_SALE],['shop',SURFACE_SHOP]]){
+  const b=SURFACE_BUILDINGS[id];assert.ok(b.x< -8);
+  assert.ok(Math.hypot(zone.x-b.x,zone.z-b.z)>5.7,'interaction must remain clear of the building');
+  assert.ok(Math.abs(zone.x)>8||Math.abs(zone.z)>8,'service must not cover mine');
+ }
 });

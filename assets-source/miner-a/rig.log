@@ -1,0 +1,15 @@
+06:29:10 | INFO: Data are loaded, start creating Blender stuff
+06:29:10 | INFO: Blender create Mesh node tripo_mesh_b054bf79-1490-4bf9-8774-287dd54f35f2
+06:29:10 | INFO: glTF import finished in 0.03s
+HEAT_TOTALS 0.9052776917815208 0
+Info: Saved as "miner-a-rigged.blend"
+INFO Draco mesh compression is available, use library at /opt/blender/blender-5.1.2-linux-x64/5.1/scripts/addons_core/io_scene_gltf2/libextern_draco.so
+06:29:12 | INFO: Starting glTF 2.0 export
+06:29:12 | INFO: Extracting primitive: tripo_mesh_b054bf79-1490-4bf9-8774-287dd54f35f2
+06:29:12 | INFO: Primitives created: 1
+06:29:12 | INFO: Finished glTF 2.0 export in 0.23992013931274414 s
+
+MINER_RIG {"taskId": "b054bf79-1490-4bf9-8774-287dd54f35f2", "vertices": 5841, "triangles": 11678, "bones": 16, "weights": "Blender bone-heat weights from authored anatomical skeleton; rigid head/helmet; normalized max 4 influences", "dominantVertexCounts": {"LowerTorso": 201, "UpperTorso": 881, "Head": 1365, "LeftUpperArm": 243, "LeftLowerArm": 43, "LeftHand": 354, "LeftUpperLeg": 428, "LeftLowerLeg": 163, "LeftFoot": 461, "RightUpperArm": 291, "RightLowerArm": 57, "RightHand": 476, "RightUpperLeg": 309, "RightLowerLeg": 118, "RightFoot": 451}, "loopQuaternionError": {"Idle": 8.940696716308594e-07, "Walk": 8.940696716308594e-07, "Run": 7.152557373046875e-07}, "height": 1.85, "textures": [["Color_b054bf79-1490-4bf9-8774-287dd54f35f2", 2048, 2048]], "sources": [{"clip": "Idle", "animationId": "4748", "animationVersionId": "4748", "name": "RoMixamo · 徒手站立待机 · c9ceea07", "source": {"source": {"name": "Unarmed Idle", "provider": "ROMIXAMO", "conversion": "ROMIXAMO_R15_SOURCE_V1", "externalId": "c9ceea07-b96c-11e4-a802-0aaa78deedf9"}}, "duration": 1.9, "url": "https://rab-sunjun-public.dev.clock-p.com/animations/4748"}, {"clip": "Walk", "animationId": "4768", "animationVersionId": "4768", "name": "RoMixamo · 徒手向前走", "source": {"source": {"name": "Unarmed Walk Forward", "provider": "ROMIXAMO", "conversion": "ROMIXAMO_R15_SOURCE_V1", "externalId": "c9cef1a4-b96c-11e4-a802-0aaa78deedf9"}}, "duration": 1.3666666666666667, "url": "https://rab-sunjun-public.dev.clock-p.com/animations/4768"}, {"clip": "Run", "animationId": "4472", "animationVersionId": "4472", "name": "RoMixamo · 中速跑步", "source": {"source": {"name": "Medium Run", "provider": "ROMIXAMO", "conversion": "ROMIXAMO_R15_SOURCE_V1", "externalId": "c9ce78f7-b96c-11e4-a802-0aaa78deedf9"}}, "duration": 0.5666666666666667, "url": "https://rab-sunjun-public.dev.clock-p.com/animations/4472"}], "blend": "assets-source/miner-a/miner-a-rigged.blend", "glb": "src/game/assets/character/miner-a.glb", "sha256": "0420b86979c27208dbeb609aa3b6a6821983de8285f2308125d4ef56c8eb3249", "bytes": 1227876, "footBinding": {"Left": {"restForward": [-0.4161924896455928, 0, -0.9092765319541702], "restYawDegrees": 24.594435708578054, "yawRadians": 0.42925388078475163}, "Right": {"restForward": [0.440825719127113, 0, -0.8975927168577426], "restYawDegrees": -26.156577136771524, "yawRadians": -0.45651839208853423}}}
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 02:18:37)
+
+Blender quit

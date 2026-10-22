@@ -1,4 +1,6 @@
-import type { Group, Mesh, PerspectiveCamera, WebGLRenderer } from "three";
+import type { Group, Material, Mesh, PerspectiveCamera, WebGLRenderer } from "three";
+import { surfaceLightStrengthAtFeet } from "../world/SurfaceLightFade.ts";
+import { environmentDepthAtFeet, playerDepthAtFeet } from "../logic/PlayerDepth.ts";
 import type { PreparedGame } from "./startGame.ts";
 import type { GameInput } from "../GameInput.ts";
 import type { LoadingEvent } from "../ui/loadingState.ts";
@@ -7,6 +9,7 @@ import type { ProbeMode } from "../presentation/PerformanceProbe.ts";
 import { stratumAtDepth } from "../terrain/strata.ts";
 import { themeById } from "../content/themes.ts";
 import { mineralName } from "../terrain/minerals.ts";
+import { generationAtZ } from '../terrain/SparseWorld.ts';
 export function updateGame(
   current: PreparedGame,
   elapsed: number,
@@ -20,17 +23,20 @@ export function updateGame(
   gl: WebGLRenderer,
   settings: {
     samples: boolean;
-    timeOfDay: SurfaceTime;
+    timeOfDay: SurfaceTime | 'auto';
     sceneShadowsEnabled: boolean;
     probeMode: ProbeMode;
   },
   onStatus: (text: string) => void,
   onLoading: (event: LoadingEvent) => void,
 ) {
-  if (current.session.suspended) return;
+  if (current.session.suspended) { current.minerAvatar.cancelMining(); return; }
   const { camera, avatar, fixtures, contactShadow } = view;
   const { samples, timeOfDay, sceneShadowsEnabled, probeMode } = settings;
   const delta = Math.min(Math.max(elapsed, 0), 0.1);
+  const onlineElapsed = document.hidden || current.timing.skipElapsed ? 0 : Math.min(Math.max(elapsed,0),1);
+  current.timing.skipElapsed=false;
+  if(current.startup.firstPlayableMs && onlineElapsed) current.session.advanceOnline(onlineElapsed);
   const start = performance.now(),
     {
       physics,
@@ -54,23 +60,16 @@ export function updateGame(
       performance.now() - sceneryStart,
     );
     const layer = stratumAtDepth(
-        Math.max(0, -currentFeet[1] + 0.04),
-        current.content.layers,
+        environmentDepthAtFeet(currentFeet, !player.travelling && physics.grounded, current.content.session.destinations),
+        generationAtZ(terrain.world.generation,currentFeet[2]/2).layers,
       ),
       theme = themeById(layer.theme);
-    const surfaceLightingActive = currentFeet[1] > -4;
-    current.facilities.updateSurface(
-      timeOfDay,
-      performance.now() / 1000,
-      sceneShadowsEnabled &&
-        surfaceLightingActive &&
-        probeMode !== "no-shadows",
-    );
+    const lightStrength = surfaceLightStrengthAtFeet(currentFeet[1]);
     gl.shadowMap.enabled = false;
     environment.update(
       {
         surface: theme.motif === "meadow",
-        surfaceLightingActive,
+        surfaceLightStrength: lightStrength,
         time: timeOfDay,
         depth: layer.from,
         sky: theme.sky,
@@ -78,6 +77,14 @@ export function updateGame(
         sceneryRevision: current.facilities.revision,
       },
       delta,
+      onlineElapsed,
+    );
+    current.facilities.updateSurface(
+      environment.surfaceTime,
+      performance.now() / 1000,
+      sceneShadowsEnabled && probeMode !== "no-shadows",
+      lightStrength,
+      environment.daylightBlend,
     );
     physics.setSurfaceActive(
       currentFeet[1] > -48 &&
@@ -94,10 +101,9 @@ export function updateGame(
       startup.firstPlayableMs = performance.now() - startup.started;
     const feet = physics.feet(),
       drawnFeet = physics.interpolatedFeet(player.fixed.alpha);
-    current.minerAvatar.update(drawnFeet, delta, physics.grounded, !!player.travelling);
     fixtures.visible = feet[1] > -64;
     if (contactShadow)
-      contactShadow.visible = surfaceLightingActive && physics.grounded;
+      contactShadow.visible = lightStrength > 0 && physics.grounded;
     cameraView.update(
       physics,
       drawnFeet,
@@ -107,6 +113,8 @@ export function updateGame(
       camera as PerspectiveCamera,
       delta,
     );
+    if (contactShadow)
+      (contactShadow.material as Material).opacity = cameraView.rig.avatarOpacity * lightStrength;
     current.petFollowers.update(drawnFeet, player.facing, camera, delta, !!player.travelling);
     interaction.update(
       camera as PerspectiveCamera,
@@ -115,14 +123,18 @@ export function updateGame(
       input,
       terrain,
     );
+    if(interaction.strike)current.minerAvatar.strike(interaction.strike.target,interaction.strike.speed);
+    current.minerAvatar.update(drawnFeet, delta, physics.grounded, !!player.travelling);
     const selected = interaction.selected;
     if (clock.status <= 0) {
       const info = terrain.snapshot();
+      const depth = Math.floor(playerDepthAtFeet(feet, physics.grounded, current.content.session.destinations));
+      const currentLayer = stratumAtDepth(environmentDepthAtFeet(feet, physics.grounded, current.content.session.destinations), generationAtZ(terrain.world.generation,feet[2]/2).layers);
       onStatus(
         terrain.error ??
           (player.travelling || !terrain.ready(feet)
             ? "正在准备附近地形"
-            : `深度 ${Math.max(0, Math.round(-feet[1]))} 米 · ${stratumAtDepth(Math.max(0, Math.round(-feet[1])), current.content.layers).name} · 已挖 ${info.committedEdits}${selected ? " · " + mineralName(terrain.cell(selected) ?? 0) : ""}`),
+            : `${current.content.worlds?`世界 ${current.session.getSnapshot().currentWorld} · `:''}深度 ${depth} 米 · ${currentLayer.name}${selected ? " · " + mineralName(terrain.cell(selected) ?? 0) : ""}`),
       );
       clock.status = 0.25;
     }

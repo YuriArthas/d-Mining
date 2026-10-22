@@ -14,13 +14,16 @@ test('a broken release cannot prevent the remaining resources from being freed',
  assert.throws(()=>scope.dispose(),AggregateError);assert.deepEqual(log,['colliders','world']);scope.dispose();
 });
 test('travel waits for terrain; installation precedes physics and input is not consumed while waiting',()=>{
- const log=[];let ready=false,jumps=0;
- const physics={feet:()=>[0,0,0],grounded:true,teleport:()=>log.push('teleport'),tick:()=>log.push('physics')};
+ const log=[],ticks=[];let ready=false,jumps=0,movementMultiplier=1;
+ const physics={feet:()=>[0,0,0],grounded:true,teleport:()=>log.push('teleport'),tick:(...args)=>{ticks.push(args);log.push('physics');}};
  const terrain={relocate:()=>log.push('relocate'),recenter:()=>{},process:()=>log.push('install'),ready:()=>ready};
  const input={reset:()=>{},getSnapshot:()=>({moveX:0,moveY:0}),consumeJump:()=>{jumps++;return false;}};
- const session={resetPosition:()=>{},updatePosition:()=>log.push('position')};
+ const session={resetPosition:()=>{},updatePosition:()=>log.push('position'),getMovementMultiplier:()=>movementMultiplier};
  const player=new PlayerController(physics,terrain,input,session);player.travelTo([0,-400,0]);
- player.step(1/60,0,()=>log.push('camera reset'));assert.equal(jumps,0);assert.ok(player.travelling);
+ player.step(1/60,0,()=>log.push('camera reset'));assert.equal(jumps,0);assert.ok(player.travelling);assert.equal(ticks.length,0);
  ready=true;log.length=0;player.step(1/60,0,()=>log.push('camera reset'));
  assert.deepEqual(log,['install','teleport','camera reset','physics','position']);assert.equal(player.travelling,null);assert.equal(jumps,1);
+ assert.deepEqual(ticks[0],[0,0,0,false,true,1]);
+ movementMultiplier=2;player.step(1/60,0,()=>{});
+ assert.equal(ticks.at(-1)[5],2,'physics receives the current session multiplier on each simulation step');
 });

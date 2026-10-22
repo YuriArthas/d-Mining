@@ -16,7 +16,7 @@ export class WallTorchView {
   for(const [part,d] of Object.entries(data)){
    const g=new BufferGeometry();g.setAttribute('position',new Float32BufferAttribute(d.positions,3));g.setAttribute('normal',new Float32BufferAttribute(d.normals,3));g.setAttribute('color',new Float32BufferAttribute(d.colors,3));
    const flame=part!=='body';
-   const material=flame?new MeshBasicMaterial({vertexColors:true,toneMapped:false}):stabilizeShadows(new MeshStandardMaterial({vertexColors:true,roughness:1,metalness:0,envMapIntensity:.3}));
+   const material=flame?new MeshBasicMaterial({vertexColors:true,toneMapped:false,transparent:true,depthWrite:false}):stabilizeShadows(new MeshStandardMaterial({vertexColors:true,roughness:1,metalness:0,envMapIntensity:.3}));
    if(flame){
     material.onBeforeCompile=shader=>{
      shader.uniforms.torchTime=this.clock;
@@ -36,6 +36,10 @@ export class WallTorchView {
    this.group.add(mesh);
   }
  }
- update(time:SurfaceTime,elapsed:number){this.clock.value=elapsed;for(const mesh of this.flames)mesh.visible=time==='night';}
+ update(time:SurfaceTime,elapsed:number,daylightBlend=time==='day'?1:0){
+  this.clock.value=elapsed;
+  const strength=1-Math.max(0,Math.min(1,daylightBlend));
+  for(const mesh of this.flames){mesh.visible=strength>0;(mesh.material as MeshBasicMaterial).opacity=strength;}
+ }
  diagnostics(){const {fixtures:WALL_TORCHES,level:WALL_TORCH_LEVEL}=this.content;return {count:WALL_TORCHES.length,level:WALL_TORCH_LEVEL+1,perWall:Object.fromEntries(['front','back','left','right'].map(side=>[side,WALL_TORCHES.filter(t=>t.side===side).length])),trianglesPerTorch:Object.values(data).reduce((sum,d)=>sum+d.triangles,0),batches:this.group.children.length,textureBytes:0,flamesVisible:this.flames.every(m=>m.visible),castsShadow:false};}
 }

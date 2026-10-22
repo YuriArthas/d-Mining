@@ -74,7 +74,7 @@ test('resource quantities remain stable and definitions are immutable',()=>{
  assert.throws(()=>{ORE_ITEMS[0].volume=99});assert.throws(()=>itemDefinition('unknown'));
 });
 test('session shows mixed-unit snapshots and sells completed overflow at independent prices once',()=>{
- let now=0,solid=true;const initial=new GameSession(SESSION_CONTENT).exportProgress(); initial.pickaxe.level=28; const session=new GameSession(SESSION_CONTENT,50,()=>now,{},initial);
+ let now=0,solid=true;const initial=new GameSession(SESSION_CONTENT).exportProgress(); initial.pickaxe.level=28;delete initial.equipment; /* Legacy active-gear fixture. */ const session=new GameSession(SESSION_CONTENT,50,()=>now,{},initial);
  session.attach({cell:()=>solid?5:0,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{}});
  session.collected(Array.from({length:47},()=>({kind:8})));const cell=[11,-1,-25];session.selectTarget(cell);
  assert.equal(session.getSnapshot().target.volume,10);assert.equal(session.getSnapshot().target.price,resourceByKind(5).price);

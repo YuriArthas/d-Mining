@@ -34,7 +34,7 @@ export class CharacterPhysics {
   private previousFeet: [number, number, number] = [...PLAYER.spawn];
   private surfaceColliders: RAPIER.Collider[] = [];
   private readonly includeCourse: boolean;
-  constructor(includeCourse = true) {
+  constructor(includeCourse = true, journey = false) {
     this.includeCourse = includeCourse;
     this.world.timestep = STEP;
     const { radius, height } = GAME_CONFIG.player;
@@ -49,9 +49,9 @@ export class CharacterPhysics {
     this.controller.setMinSlopeSlideAngle(MOVEMENT.slideSlope);
     this.setSurfaceActive(true);
     // Finite mine boundary. These five simple static walls replace missing-world fall-through.
-    this.world.createCollider(RAPIER.ColliderDesc.cuboid(100, 1, 100).setTranslation(4, -4001, 4));
-    for (const x of [-97, 105]) this.world.createCollider(RAPIER.ColliderDesc.cuboid(1, 2020, 100).setTranslation(x, -1980, 4));
-    for (const z of [-97, 105]) this.world.createCollider(RAPIER.ColliderDesc.cuboid(100, 2020, 1).setTranslation(4, -1980, z));
+    this.world.createCollider(RAPIER.ColliderDesc.cuboid(100, 1, journey?324:100).setTranslation(4, journey?-2801:-4001, journey?228:4));
+    for (const x of [-97, 105]) this.world.createCollider(RAPIER.ColliderDesc.cuboid(1, 2020, journey?324:100).setTranslation(x, -1980, journey?228:4));
+    for (const z of [-97, journey?553:105]) this.world.createCollider(RAPIER.ColliderDesc.cuboid(100, 2020, 1).setTranslation(4, -1980, z));
     this.teleport(PLAYER.spawn);
   }
   setSurfaceActive(active: boolean) {
@@ -82,16 +82,27 @@ export class CharacterPhysics {
     // Cast to real contact from slightly above the skin. Casting directly to the
     // skin threshold produces unstable zero-distance normals in Rapier 0.19.3.
     const lift = MOVEMENT.probeLift;
-    const hit = this.world.castShape({ ...position, y: position.y + lift }, { x: 0, y: 0, z: 0, w: 1 }, { x: 0, y: -1, z: 0 }, this.collider.shape, 0, distance + lift + MOVEMENT.skin, true, undefined, undefined, this.collider);
-    if (!hit || hit.normal1.y < Math.cos(MOVEMENT.maxSlope)) return null;
-    // The contact plane is more stable than GJK's estimated time of impact on
-    // large flat faces. Project the capsule's support point onto that plane.
-    const { radius, height } = GAME_CONFIG.player, n = hit.normal1, point = hit.witness1;
-    const separation = (position.x - point.x) * n.x + (position.y - point.y) * n.y + (position.z - point.z) * n.z - radius - (height / 2 - radius) * n.y;
-    const drop = (separation - MOVEMENT.skin - MOVEMENT.contactSlack) / n.y;
-    return drop <= distance && drop >= -MOVEMENT.supportProbe ? drop : null;
+    let rejected: Set<number> | undefined;
+    // A nearby curb can overlap the lifted capsule and be the first hit even
+    // though its contact plane cannot support these feet. Continue the same
+    // short sweep for real ground; never turn a rejected contact into support.
+    // Each retry excludes one collider, so queries are bounded by the live set.
+    for (let remaining = this.world.colliders.len(); remaining > 0; remaining--) {
+      const hit = this.world.castShape({ ...position, y: position.y + lift }, { x: 0, y: 0, z: 0, w: 1 }, { x: 0, y: -1, z: 0 }, this.collider.shape, 0, distance + lift + MOVEMENT.skin, true, undefined, undefined, this.collider, undefined, rejected ? collider => !rejected!.has(collider.handle) : undefined);
+      if (!hit) return null;
+      if (hit.normal1.y >= Math.cos(MOVEMENT.maxSlope)) {
+        // The contact plane is more stable than GJK's estimated time of impact
+        // on large flat faces. Project the capsule's support point onto it.
+        const { radius, height } = GAME_CONFIG.player, n = hit.normal1, point = hit.witness1;
+        const separation = (position.x - point.x) * n.x + (position.y - point.y) * n.y + (position.z - point.z) * n.z - radius - (height / 2 - radius) * n.y;
+        const drop = (separation - MOVEMENT.skin - MOVEMENT.contactSlack) / n.y;
+        if (drop <= distance && drop >= -MOVEMENT.supportProbe) return drop;
+      }
+      (rejected ??= new Set()).add(hit.collider.handle);
+    }
+    return null;
   }
-  tick(x: number, forward: number, yaw: number, jump: boolean, ready: boolean) {
+  tick(x: number, forward: number, yaw: number, jump: boolean, ready: boolean, speedMultiplier = 1) {
     // Apply no deferred displacement: this also refreshes broad phase after chunk collider swaps.
     this.body.setNextKinematicTranslation(this.body.translation());
     this.world.step();
@@ -106,9 +117,9 @@ export class CharacterPhysics {
     if (!supported || jumping) this.verticalSpeed = Math.max(-PLAYER.terminalSpeed, this.verticalSpeed - PLAYER.gravity * STEP);
     const scale = Math.max(1, Math.hypot(x, forward)); x /= scale; forward /= scale;
     const motion = {
-      x: (Math.cos(yaw) * x - Math.sin(yaw) * forward) * PLAYER.speed * STEP,
+      x: (Math.cos(yaw) * x - Math.sin(yaw) * forward) * PLAYER.speed * speedMultiplier * STEP,
       y: this.verticalSpeed * STEP,
-      z: (-Math.sin(yaw) * x - Math.cos(yaw) * forward) * PLAYER.speed * STEP,
+      z: (-Math.sin(yaw) * x - Math.cos(yaw) * forward) * PLAYER.speed * speedMultiplier * STEP,
     };
     this.controller.computeColliderMovement(this.collider, motion, undefined, undefined, c => c.handle !== this.collider.handle);
     const result = this.controller.computedMovement();

@@ -31,7 +31,7 @@ test('实际鞋底的前后轴跟随 RAB 动作，不能叠加模型静止姿势
   });
   const mixer=new AnimationMixer(gltf.scene),errors={};
   try{
-    for(const clip of gltf.animations){
+    for(const clip of gltf.animations.filter(c=>c.name!=='Mine')){
       const file={Idle:'idle',Walk:'walk',Run:'move'}[clip.name];
       const motion=JSON.parse(readFileSync(new URL(`../../assets-source/miner-a/rab-${file}.json`,import.meta.url))).currentVersion.motion;
       const byPart=new Map(motion.joints.map(j=>[j.childPartName,j]));
@@ -109,8 +109,8 @@ test('膝轴位于腿部截面中央，膝部只由同侧大腿和小腿控制',
   }
 });
 
-test('三组 RAB 动作包含实际关节变化，循环首尾一致且没有水平根位移', () => {
-  assert.deepEqual(gltf.animations.map(c=>c.name).sort(),['Idle','Run','Walk']);
+test('四组 RAB 动作包含实际关节变化，循环首尾一致且没有水平根位移', () => {
+  assert.deepEqual(gltf.animations.map(c=>c.name).sort(),['Idle','Mine','Run','Walk']);
   for(const clip of gltf.animations) {
     assert.ok(clip.validate());
     const animated=clip.tracks.filter(t=>t.name.endsWith('.quaternion')&&Array.from(t.values).some((v,i)=>Math.abs(v-t.values[i%4])>.01));
@@ -127,7 +127,7 @@ test('行走和跑步时膝盖在朝前的弯折平面内运动，不向侧面�
   const mixer=new AnimationMixer(gltf.scene),metrics={};
   const bone=name=>mesh.skeleton.bones.find(b=>b.name===name);
   try{
-    for(const clip of gltf.animations.filter(c=>c.name!=='Idle')){
+    for(const clip of gltf.animations.filter(c=>c.name==='Walk'||c.name==='Run')){
       mixer.stopAllAction();mixer.clipAction(clip).reset().play();
       let maximumLateral=0;
       for(let frame=0;frame<Math.round(clip.duration*60);frame++){
@@ -152,7 +152,7 @@ test('行走和跑步时膝盖在朝前的弯折平面内运动，不向侧面�
 
 test('待机、行走和跑步全周期的蒙皮顶点保持人体尺度，脚底不穿地', () => {
   const mixer=new AnimationMixer(gltf.scene),v=new Vector3();
-  for(const clip of gltf.animations){
+  for(const clip of gltf.animations.filter(c=>c.name!=='Mine')){
     mixer.stopAllAction();mixer.clipAction(clip).reset().play();
     for(let frame=0;frame<32;frame++){
       mixer.setTime(clip.duration*frame/32);gltf.scene.updateMatrixWorld(true);mesh.skeleton.update();

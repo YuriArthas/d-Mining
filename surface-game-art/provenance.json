@@ -1,0 +1,119 @@
+{
+  "method": "Blender and offline Three authoring; no Tripo",
+  "files": [
+    {
+      "file": "tools/blender/build_architecture.py",
+      "sha256": "7d5133135f628d922279023dfdb364a39593d1eda356430e794016ce07524ae2"
+    },
+    {
+      "file": "tools/blender/build_nature.py",
+      "sha256": "8dc8aff23e983f815802b3ca5124235a6d4d3bdf9c85319a296fc17492e8e6f7"
+    },
+    {
+      "file": "tools/terrain/kit.ts",
+      "sha256": "91c42fbbcfcf167999e85ad0f6f51790e18d9c909f14dd908efc1e609292dcfd"
+    },
+    {
+      "file": "tools/terrain/landscape.ts",
+      "sha256": "ba9a0dfbdb5352e79d64417fc8ddd449994b81e8531c53d5d4df19df7ab9e240"
+    },
+    {
+      "file": "tools/terrain/terrainTexture.ts",
+      "sha256": "a90b3e2be776c860d54d696d8670f7e138edbfcff1620dd5e72848228d94edc2"
+    },
+    {
+      "file": "tools/terrain/bakeShadows.mjs",
+      "sha256": "6d0a7ff78da6b363f7ce41a8daf1d8395fac97f043688ddafe013a09f05a3183"
+    },
+    {
+      "file": "source-art/architecture.blend",
+      "sha256": "f6e2879e19d9378eaaa441b0d39bf6ebc846160b6686823e78dfa74fb07ca6ae"
+    },
+    {
+      "file": "source-art/nature.blend",
+      "sha256": "8b7e180f929448356aa7b14c4fa4785383ba560588cad2293f9365fcf1d0e90f"
+    },
+    {
+      "file": "layout.json",
+      "sha256": "5346b9b53d9cffae9b99bb87c940256d19bc5d0d47c9ae62f15b57ab2445a2b6"
+    },
+    {
+      "file": "package.json",
+      "sha256": "55552e82a9e7e54348a11bb0d9988ff9138acbeee7475e3d89194b1abe4e0ce7"
+    },
+    {
+      "file": "package-lock.json",
+      "sha256": "6a925fa8444ade735cd022d6dac8bd4aec84ef4831513bf97c6c190d8b32bfdf"
+    },
+    {
+      "file": "../tools/export-pinewind-layout.mjs",
+      "sha256": "ff79e362fa75399790465cbf1a95ae9129a173eaf261bef2b1e14d218f11c3b4"
+    },
+    {
+      "file": "../tools/export-pinewind-scene.mjs",
+      "sha256": "1a303a4a8550a1645d53f2bf6e10aabd5a0cbb0dd81719d6f8767280cf5a5feb"
+    },
+    {
+      "file": "../tools/pack-pinewind.mjs",
+      "sha256": "689278a56724d0729967c197d29e7dc2c58c492ee3eda2918e0220f282810e5e"
+    },
+    {
+      "file": "../src/game/content/pinewind/authored.json",
+      "sha256": "8d27ce5e6878d5a368f552f96c1e40ae93f728a77775a51988c5b1b07b7d7511"
+    },
+    {
+      "file": "public/assets/pinewind/architecture-atlas.png",
+      "sha256": "86848bb720d8a4e80c299da6ec7ae039a37e07e1a6387811e106f366b325bfaf"
+    },
+    {
+      "file": "public/assets/pinewind/nature-atlas.png",
+      "sha256": "8569e32c73984ac83e20aa5de8c722df59df5c834fd71d00becff20d77229e7e"
+    },
+    {
+      "file": "artifacts/architecture-asset.json",
+      "sha256": "a86263235407c45efe28f29591c5e3e4f753f3336f9450f82ba616fb560f6d36"
+    },
+    {
+      "file": "artifacts/nature-asset.json",
+      "sha256": "087f423f26dbc15e565781019e72dc4fdb4da812ae32c9d95823c3252bcc43b9"
+    },
+    {
+      "file": "artifacts/landscape-asset.json",
+      "sha256": "66d2c1483c496e45d76b1d86e072f2ce94bf98b80215507a4c134e1e95135ede"
+    }
+  ],
+  "runtimeAssets": [
+    {
+      "parts": [
+        "pinewind-architecture.000.part"
+      ],
+      "bytes": 84184,
+      "decodedBytes": 248328,
+      "sha256": "28e5c397a7309258a67fe9c8d1a829cbdee382e424206db8c9735a88485b88ec",
+      "sourceSha256": "17bc164b7528a2c7c08ccb8a2dbcbb019c35392253baefca26a004fe83e80590",
+      "triangles": 13920,
+      "source": "Authored Pinewind; Blender architecture and offline procedural landscape",
+      "materialProfile": "authored-color",
+      "coordinateSpace": "authored",
+      "geometryEdits": false,
+      "textureEncoding": "KTX2 UASTC",
+      "reference": "surface-study final 2026-10-19T16:13:15.123Z"
+    },
+    {
+      "parts": [
+        "pinewind-landscape.000.part"
+      ],
+      "bytes": 669084,
+      "decodedBytes": 1992600,
+      "sha256": "d28090f45db1d7bb999c66b48a55e43362abcb0f569d6e4eb97e3e085981081f",
+      "sourceSha256": "efa87d5a0b89c7c3d3f747cc149a6d223d3ebf8f423760ca5ef11ec5fa442183",
+      "triangles": 101682,
+      "source": "Authored Pinewind; Blender architecture and offline procedural landscape",
+      "materialProfile": "authored-color",
+      "coordinateSpace": "authored",
+      "geometryEdits": false,
+      "textureEncoding": "KTX2 UASTC",
+      "reference": "surface-study final 2026-10-19T16:13:15.123Z"
+    }
+  ]
+}

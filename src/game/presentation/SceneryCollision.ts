@@ -4,6 +4,7 @@ import type { SceneryPlan } from "../world/sceneryKit.ts";
 export type ScenerySite = Readonly<{
   id: string;
   depth: number;
+  z?: number;
   plan: SceneryPlan;
 }>;
 
@@ -18,7 +19,7 @@ export class SceneryCollision {
       site.plan.solids.map((solid, i) => ({
         key: `${site.id}:${i}`,
         depth: site.depth,
-        solid,
+        solid: site.z ? {...solid, at:[solid.at[0],solid.at[1],solid.at[2]+site.z] as [number,number,number]} : solid,
       })),
     );
   }

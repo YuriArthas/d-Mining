@@ -108,6 +108,7 @@ export async function openSavedGame(
 }
 export function saveNamespace(
   location: Pick<Location, "pathname" | "search">,
+  progression = PROGRESSION_VERSION,
 ): { name: string; samples: boolean } {
   const params = new URLSearchParams(location.search),
     debug = params.get("debug") === "1";
@@ -121,7 +122,7 @@ export function saveNamespace(
   return {
     name: testId
       ? `mining:acceptance:${testId}${samples ? ":samples" : ""}`
-      : `mining:${mode}:${PROGRESSION_VERSION}${samples ? ":samples" : ""}`,
+      : `mining:${mode}:${progression}${samples ? ":samples" : ""}`,
     samples,
   };
 }

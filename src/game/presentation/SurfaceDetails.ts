@@ -82,12 +82,14 @@ export class SurfaceDetails {
   return root;
  }
  beginDraw(){this.stats.grassDrawCalls=0;this.stats.grassDrawnTriangles=0;this.stats.grassDrawnInstances=0;}
- update(time:SurfaceTime,elapsed:number,bakedShadowsEnabled=true){
-  this.bakedContact.strength.value=bakedShadowsEnabled ? .65 : 0;
-  this.wind.value=elapsed;this.wallTorches.update(time,elapsed);
-  if(time!==this.time){this.time=time;this.night.value=time==='night'?1:0;for(const m of this.lampMaterials)m.emissiveIntensity=time==='night'?2.5:0;}
+ update(time:SurfaceTime,elapsed:number,bakedShadowsEnabled=true,lightStrength=1,daylightBlend=time==='day'?1:0){
+  this.bakedContact.strength.value=bakedShadowsEnabled ? .65 * lightStrength : 0;
+  this.wind.value=elapsed;this.wallTorches.update(time,elapsed,daylightBlend);
+  const night=1-Math.max(0,Math.min(1,daylightBlend));
+  this.time=time;
+  if(night!==this.night.value){this.night.value=night;for(const m of this.lampMaterials)m.emissiveIntensity=2.5*night;}
  }
- diagnostics(){return {...this.stats,wallTorches:this.wallTorches.diagnostics(),bakedShadows:{enabled:this.bakedContact.strength.value>0,strength:this.bakedContact.strength.value,version:'selected-ground-contact-v1',sites:6,size:contactData.size,gpuBytesWithMipmaps:349525,drawCalls:0,receiver:'ground-only',realtimeShadowMaps:0},roads:{version:'pixel-stone-v2',stoneAtlasSize:256,stoneAtlasGpuBytes:349525,curbInstances:this.content.curbs.blocks.length,curbHeight:this.content.curbs.style.height,curbTriangles:curbData.triangles*this.content.curbs.blocks.length,curbBatches:1,collisionEdges:this.content.curbs.collisionEdges},time:this.time,lampMaterialCount:this.lampMaterials.length,windowEmissiveIntensity:this.time==='night'?2.5:0,pendantEmissiveMultiplier:this.night.value};}
+ diagnostics(){return {...this.stats,wallTorches:this.wallTorches.diagnostics(),bakedShadows:{enabled:this.bakedContact.strength.value>0,strength:this.bakedContact.strength.value,version:'selected-ground-contact-v1',sites:6,size:contactData.size,gpuBytesWithMipmaps:349525,drawCalls:0,receiver:'ground-only',realtimeShadowMaps:0},roads:{version:'pixel-stone-v2',stoneAtlasSize:256,stoneAtlasGpuBytes:349525,curbInstances:this.content.curbs.blocks.length,curbHeight:this.content.curbs.style.height,curbTriangles:curbData.triangles*this.content.curbs.blocks.length,curbBatches:1,collisionEdges:this.content.curbs.collisionEdges},time:this.time,lampMaterialCount:this.lampMaterials.length,windowEmissiveIntensity:2.5*this.night.value,pendantEmissiveMultiplier:this.night.value};}
  get ownedTextures(){return new Set([this.bakedContact.texture,this.atlas,this.roadStone,this.masks.post,this.masks.box]);}
  dispose(){if(this.disposed)return;this.disposed=true;this.bakedContact.texture.dispose();this.atlas.dispose();this.roadStone.dispose();this.masks.post.dispose();this.masks.box.dispose();}
 }

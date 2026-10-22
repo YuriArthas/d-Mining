@@ -62,3 +62,28 @@ test('surface detail views consume injected placements rather than default map t
   curbs.dispose();curbs.geometry.dispose();curbs.material.dispose();details.dispose();
  }
 });
+
+test('existing baked ground contact fades by a uniform with no real-time shadow maps',()=>{
+ const details=new SurfaceDetails(createSurfaceDetailContent());
+ try{
+  for(const strength of [1,.75,.25,0]){
+   details.update('night',1,true,strength);
+   assert.equal(details.bakedContact.strength.value,.65*strength);
+   assert.equal(details.diagnostics().bakedShadows.realtimeShadowMaps,0);
+   assert.equal(details.diagnostics().bakedShadows.drawCalls,0);
+  }
+  details.update('night',2,false,1);assert.equal(details.bakedContact.strength.value,0);
+ }finally{details.dispose();}
+});
+
+test('daylight blend dims lamp materials, flames and actual light radiance together',()=>{
+ const details=new SurfaceDetails(createSurfaceDetailContent()),lamp=new MeshStandardMaterial(),rig=new SceneLightingRig();details.installLamp(lamp,'post');
+ try{
+  details.update('day',100,true,1,.5);rig.setDaylight(.5);
+  assert.equal(lamp.emissiveIntensity,1.25);assert.equal(details.night.value,.5);
+  assert.equal(rig.key.intensity,425);assert.ok(rig.wallLights.every(light=>light.intensity===7));
+  const flame=details.wallTorches.group.children.find(mesh=>mesh.name!=='wall-torch-body');
+  assert.equal(flame.material.opacity,.5);assert.equal(flame.visible,true);
+  details.update('day',101,true,1,1);assert.equal(flame.visible,false);
+ }finally{disposeScenery(details.wallTorches.group);details.dispose();lamp.dispose();rig.dispose();}
+});

@@ -1,0 +1,669 @@
+{
+  "feedback": {
+    "board": [
+      10.8,
+      0,
+      12
+    ],
+    "capsule": [
+      12,
+      0,
+      30
+    ]
+  },
+  "services": {
+    "sale": {
+      "id": "surface-sale",
+      "type": "sell",
+      "anchor": {
+        "x": -17,
+        "z": 12,
+        "yaw": 0
+      },
+      "model": {
+        "asset": "simulator-exchange",
+        "width": 10,
+        "depth": 8,
+        "height": 9,
+        "y": -0.08
+      },
+      "trigger": {
+        "x": 0,
+        "z": 6.7,
+        "radius": 1.7,
+        "heightTolerance": 0.25,
+        "hysteresis": 0.25
+      },
+      "collider": {
+        "x": 0,
+        "y": 3,
+        "z": 0,
+        "half": [
+          4.3,
+          3,
+          3.4
+        ],
+        "yaw": 0
+      },
+      "sign": {
+        "title": "SELL",
+        "color": "#ffe35c",
+        "background": "#18283d",
+        "width": 3.6,
+        "y": 4.5
+      },
+      "ringColor": "#ffe77d"
+    },
+    "shop": {
+      "id": "surface-upgrade",
+      "type": "shop",
+      "anchor": {
+        "x": -20,
+        "z": -13,
+        "yaw": 0
+      },
+      "model": {
+        "asset": "simulator-upgrade",
+        "width": 10,
+        "depth": 8,
+        "height": 9,
+        "y": -0.08
+      },
+      "trigger": {
+        "x": 0,
+        "z": 6.7,
+        "radius": 1.7,
+        "heightTolerance": 0.25,
+        "hysteresis": 0.25
+      },
+      "collider": {
+        "x": 0,
+        "y": 3,
+        "z": 0,
+        "half": [
+          4.3,
+          3,
+          3.4
+        ],
+        "yaw": 0
+      },
+      "sign": {
+        "title": "SHOP",
+        "color": "#40deff",
+        "background": "#18283d",
+        "width": 3.6,
+        "y": 4.5
+      },
+      "ringColor": "#44cfff"
+    }
+  },
+  "eggs": [
+    {
+      "x": 28,
+      "y": 0.4,
+      "tier": 0,
+      "z": 20,
+      "id": "egg-stand-0-0",
+      "eggId": "meadow-egg",
+      "asset": "egg-meadow-blender",
+      "color": "#7ecf69",
+      "yaw": -1.5707963267948966
+    },
+    {
+      "x": 28,
+      "y": 0.4,
+      "tier": 0,
+      "z": 24,
+      "id": "egg-stand-0-1",
+      "eggId": "pebble-egg",
+      "asset": "egg-core-blender",
+      "color": "#ad9b83",
+      "yaw": -1.5707963267948966
+    },
+    {
+      "x": 28,
+      "y": 0.4,
+      "tier": 0,
+      "z": 28,
+      "id": "egg-stand-0-2",
+      "eggId": "copper-egg",
+      "asset": "egg-ember-blender",
+      "color": "#dd9658",
+      "yaw": -1.5707963267948966
+    },
+    {
+      "x": 28,
+      "y": 0.4,
+      "tier": 0,
+      "z": 32,
+      "id": "egg-stand-0-3",
+      "eggId": "amber-egg",
+      "asset": "egg-moon-blender",
+      "color": "#eeb74c",
+      "yaw": -1.5707963267948966
+    },
+    {
+      "x": 28,
+      "y": 0.4,
+      "tier": 0,
+      "z": 36,
+      "id": "egg-stand-0-4",
+      "eggId": "tide-egg",
+      "asset": "egg-tide-blender",
+      "color": "#54c5de",
+      "yaw": -1.5707963267948966
+    },
+    {
+      "x": 28,
+      "y": 0.4,
+      "tier": 0,
+      "z": 40,
+      "id": "egg-stand-0-5",
+      "eggId": "fire-egg",
+      "asset": "egg-ember-blender",
+      "color": "#fa874b",
+      "yaw": -1.5707963267948966
+    },
+    {
+      "x": 34,
+      "y": 2.2,
+      "tier": 1,
+      "z": 20,
+      "id": "egg-stand-1-0",
+      "eggId": "mushroom-egg",
+      "asset": "egg-meadow-blender",
+      "color": "#cf7fbd",
+      "yaw": -1.5707963267948966
+    },
+    {
+      "x": 34,
+      "y": 2.2,
+      "tier": 1,
+      "z": 24,
+      "id": "egg-stand-1-1",
+      "eggId": "silver-egg",
+      "asset": "egg-moon-blender",
+      "color": "#b5c9dd",
+      "yaw": -1.5707963267948966
+    },
+    {
+      "x": 34,
+      "y": 2.2,
+      "tier": 1,
+      "z": 28,
+      "id": "egg-stand-1-2",
+      "eggId": "crystal-egg",
+      "asset": "egg-crystal-blender",
+      "color": "#a38af2",
+      "yaw": -1.5707963267948966
+    },
+    {
+      "x": 34,
+      "y": 2.2,
+      "tier": 1,
+      "z": 32,
+      "id": "egg-stand-1-3",
+      "eggId": "frost-egg",
+      "asset": "egg-tide-blender",
+      "color": "#93e0ef",
+      "yaw": -1.5707963267948966
+    },
+    {
+      "x": 40,
+      "y": 4,
+      "tier": 2,
+      "z": 20,
+      "id": "egg-stand-2-0",
+      "eggId": "ruin-egg",
+      "asset": "egg-core-blender",
+      "color": "#c9b879",
+      "yaw": -1.5707963267948966
+    },
+    {
+      "x": 40,
+      "y": 4,
+      "tier": 2,
+      "z": 24,
+      "id": "egg-stand-2-1",
+      "eggId": "lava-egg",
+      "asset": "egg-ember-blender",
+      "color": "#ef6c52",
+      "yaw": -1.5707963267948966
+    },
+    {
+      "x": 40,
+      "y": 4,
+      "tier": 2,
+      "z": 28,
+      "id": "egg-stand-2-2",
+      "eggId": "fossil-egg",
+      "asset": "egg-core-blender",
+      "color": "#d1b59a",
+      "yaw": -1.5707963267948966
+    },
+    {
+      "x": 40,
+      "y": 4,
+      "tier": 2,
+      "z": 32,
+      "id": "egg-stand-2-3",
+      "eggId": "gear-egg",
+      "asset": "egg-crystal-blender",
+      "color": "#7fb9c5",
+      "yaw": -1.5707963267948966
+    },
+    {
+      "x": 40,
+      "y": 4,
+      "tier": 2,
+      "z": 36,
+      "id": "egg-stand-2-4",
+      "eggId": "star-egg",
+      "asset": "egg-moon-blender",
+      "color": "#9697ee",
+      "yaw": -1.5707963267948966
+    },
+    {
+      "x": 40,
+      "y": 4,
+      "tier": 2,
+      "z": 40,
+      "id": "egg-stand-2-5",
+      "eggId": "core-egg",
+      "asset": "egg-core-blender",
+      "color": "#f1c957",
+      "yaw": -1.5707963267948966
+    }
+  ],
+  "portals": [
+    {
+      "id": "old_mine",
+      "name": "老矿井",
+      "depth": 400,
+      "color": "#ffc778",
+      "x": -27,
+      "z": 48,
+      "yaw": 1.5707963267948966,
+      "model": "portal-timber",
+      "zone": {
+        "x": -27,
+        "y": 0,
+        "z": 48,
+        "radius": 1.6,
+        "heightTolerance": 0.25,
+        "hysteresis": 0.3
+      }
+    },
+    {
+      "id": "fungal",
+      "name": "蘑菇洞穴",
+      "depth": 800,
+      "color": "#97e2c5",
+      "x": -27,
+      "z": 44,
+      "yaw": 1.5707963267948966,
+      "model": "portal-fungal",
+      "zone": {
+        "x": -27,
+        "y": 0,
+        "z": 44,
+        "radius": 1.6,
+        "heightTolerance": 0.25,
+        "hysteresis": 0.3
+      }
+    },
+    {
+      "id": "crystal",
+      "name": "水晶洞穴",
+      "depth": 1200,
+      "color": "#b9b2fb",
+      "x": -27,
+      "z": 40,
+      "yaw": 1.5707963267948966,
+      "model": "portal-crystal",
+      "zone": {
+        "x": -27,
+        "y": 0,
+        "z": 40,
+        "radius": 1.6,
+        "heightTolerance": 0.25,
+        "hysteresis": 0.3
+      }
+    },
+    {
+      "id": "ruins",
+      "name": "地下遗迹",
+      "depth": 1600,
+      "color": "#9ed8c6",
+      "x": -27,
+      "z": 36,
+      "yaw": 1.5707963267948966,
+      "model": "portal-timber",
+      "tint": "#ffe4ad",
+      "zone": {
+        "x": -27,
+        "y": 0,
+        "z": 36,
+        "radius": 1.6,
+        "heightTolerance": 0.25,
+        "hysteresis": 0.3
+      }
+    },
+    {
+      "id": "frozen",
+      "name": "冰封矿洞",
+      "depth": 2000,
+      "color": "#dcf5f4",
+      "x": -27,
+      "z": 32,
+      "yaw": 1.5707963267948966,
+      "model": "portal-frozen",
+      "zone": {
+        "x": -27,
+        "y": 0,
+        "z": 32,
+        "radius": 1.6,
+        "heightTolerance": 0.25,
+        "hysteresis": 0.3
+      }
+    },
+    {
+      "id": "volcanic",
+      "name": "熔岩矿洞",
+      "depth": 2400,
+      "color": "#f2a267",
+      "x": -27,
+      "z": 28,
+      "yaw": 1.5707963267948966,
+      "model": "portal-volcanic",
+      "zone": {
+        "x": -27,
+        "y": 0,
+        "z": 28,
+        "radius": 1.6,
+        "heightTolerance": 0.25,
+        "hysteresis": 0.3
+      }
+    },
+    {
+      "id": "fossil",
+      "name": "巨型化石",
+      "depth": 2800,
+      "color": "#ecd9ae",
+      "x": -27,
+      "z": 24,
+      "yaw": 1.5707963267948966,
+      "model": "portal-fossil",
+      "zone": {
+        "x": -27,
+        "y": 0,
+        "z": 24,
+        "radius": 1.6,
+        "heightTolerance": 0.25,
+        "hysteresis": 0.3
+      }
+    },
+    {
+      "id": "machinery",
+      "name": "古代机械",
+      "depth": 3200,
+      "color": "#7ae1d0",
+      "x": -27,
+      "z": 20,
+      "yaw": 1.5707963267948966,
+      "model": "portal-timber",
+      "tint": "#8db5bd",
+      "zone": {
+        "x": -27,
+        "y": 0,
+        "z": 20,
+        "radius": 1.6,
+        "heightTolerance": 0.25,
+        "hysteresis": 0.3
+      }
+    },
+    {
+      "id": "core",
+      "name": "地心秘境",
+      "depth": 3600,
+      "color": "#f5da9b",
+      "x": -27,
+      "z": 16,
+      "yaw": 1.5707963267948966,
+      "model": "portal-core",
+      "zone": {
+        "x": -27,
+        "y": 0,
+        "z": 16,
+        "radius": 1.6,
+        "heightTolerance": 0.25,
+        "hysteresis": 0.3
+      }
+    }
+  ],
+  "tiers": [
+    {
+      "x": 28,
+      "y": 0.4,
+      "tier": 0
+    },
+    {
+      "x": 34,
+      "y": 2.2,
+      "tier": 1
+    },
+    {
+      "x": 40,
+      "y": 4,
+      "tier": 2
+    }
+  ],
+  "steps": [
+    {
+      "x": 26.5,
+      "y": 0.2,
+      "z": 15.5,
+      "width": 3,
+      "depth": 3
+    },
+    {
+      "x": 29.5,
+      "y": 0.4,
+      "z": 15.5,
+      "width": 3,
+      "depth": 3
+    },
+    {
+      "x": 26.5,
+      "y": 0.2,
+      "z": 44.5,
+      "width": 3,
+      "depth": 3
+    },
+    {
+      "x": 29.5,
+      "y": 0.4,
+      "z": 44.5,
+      "width": 3,
+      "depth": 3
+    },
+    {
+      "x": 31.5,
+      "y": 0.7000000000000001,
+      "z": 15.5,
+      "width": 1,
+      "depth": 3
+    },
+    {
+      "x": 32.5,
+      "y": 1,
+      "z": 15.5,
+      "width": 1,
+      "depth": 3
+    },
+    {
+      "x": 33.5,
+      "y": 1.3,
+      "z": 15.5,
+      "width": 1,
+      "depth": 3
+    },
+    {
+      "x": 34.5,
+      "y": 1.6,
+      "z": 15.5,
+      "width": 1,
+      "depth": 3
+    },
+    {
+      "x": 35.5,
+      "y": 1.9000000000000004,
+      "z": 15.5,
+      "width": 1,
+      "depth": 3
+    },
+    {
+      "x": 36.5,
+      "y": 2.2,
+      "z": 15.5,
+      "width": 1,
+      "depth": 3
+    },
+    {
+      "x": 31.5,
+      "y": 0.7000000000000001,
+      "z": 44.5,
+      "width": 1,
+      "depth": 3
+    },
+    {
+      "x": 32.5,
+      "y": 1,
+      "z": 44.5,
+      "width": 1,
+      "depth": 3
+    },
+    {
+      "x": 33.5,
+      "y": 1.3,
+      "z": 44.5,
+      "width": 1,
+      "depth": 3
+    },
+    {
+      "x": 34.5,
+      "y": 1.6,
+      "z": 44.5,
+      "width": 1,
+      "depth": 3
+    },
+    {
+      "x": 35.5,
+      "y": 1.9000000000000004,
+      "z": 44.5,
+      "width": 1,
+      "depth": 3
+    },
+    {
+      "x": 36.5,
+      "y": 2.2,
+      "z": 44.5,
+      "width": 1,
+      "depth": 3
+    },
+    {
+      "x": 37.5,
+      "y": 2.5,
+      "z": 15.5,
+      "width": 1,
+      "depth": 3
+    },
+    {
+      "x": 38.5,
+      "y": 2.8000000000000003,
+      "z": 15.5,
+      "width": 1,
+      "depth": 3
+    },
+    {
+      "x": 39.5,
+      "y": 3.1,
+      "z": 15.5,
+      "width": 1,
+      "depth": 3
+    },
+    {
+      "x": 40.5,
+      "y": 3.4000000000000004,
+      "z": 15.5,
+      "width": 1,
+      "depth": 3
+    },
+    {
+      "x": 41.5,
+      "y": 3.7,
+      "z": 15.5,
+      "width": 1,
+      "depth": 3
+    },
+    {
+      "x": 42.5,
+      "y": 4,
+      "z": 15.5,
+      "width": 1,
+      "depth": 3
+    },
+    {
+      "x": 37.5,
+      "y": 2.5,
+      "z": 44.5,
+      "width": 1,
+      "depth": 3
+    },
+    {
+      "x": 38.5,
+      "y": 2.8000000000000003,
+      "z": 44.5,
+      "width": 1,
+      "depth": 3
+    },
+    {
+      "x": 39.5,
+      "y": 3.1,
+      "z": 44.5,
+      "width": 1,
+      "depth": 3
+    },
+    {
+      "x": 40.5,
+      "y": 3.4000000000000004,
+      "z": 44.5,
+      "width": 1,
+      "depth": 3
+    },
+    {
+      "x": 41.5,
+      "y": 3.7,
+      "z": 44.5,
+      "width": 1,
+      "depth": 3
+    },
+    {
+      "x": 42.5,
+      "y": 4,
+      "z": 44.5,
+      "width": 1,
+      "depth": 3
+    }
+  ],
+  "mine": {
+    "minX": -8,
+    "maxX": 8,
+    "minZ": -8,
+    "maxZ": 8
+  },
+  "bridge": {
+    "x": 0,
+    "z": 36.5
+  }
+}

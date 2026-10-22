@@ -1,0 +1,102 @@
+
+> d-mining@0.1.0 build
+> tsc --noEmit && vite build
+
+vite v8.3.2 building client environment for production...
+transforming...
+✓ 467 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/assets/mine-fence.000-Crfx__uM.part                    4.60 kB
+dist/assets/grid-mine-timber-blender.000-OM-ZJI-D.part      5.10 kB
+dist/assets/egg-tide-blender.000-CysS4vVr.part              8.91 kB
+dist/assets/egg-moon-blender.000-rIg6ItzS.part             10.08 kB
+dist/assets/egg-ember-blender.000-B6bl06wR.part            10.22 kB
+dist/assets/egg-core-blender.000-BzoSBR3H.part             10.22 kB
+dist/assets/egg-crystal-blender.000-CsOB1JSU.part          10.42 kB
+dist/assets/egg-meadow-blender.000-oYgQYN0s.part           10.43 kB
+dist/index.html                                            15.27 kB │ gzip:     6.36 kB
+dist/assets/portal-plinth-blender.000-DSEcmzel.part        16.70 kB
+dist/assets/terrain.worker-CY-wOmb1.js                     34.64 kB
+dist/assets/roblox-arrow-v1-BJqG6lN4.webp                  43.21 kB
+dist/assets/bank-turf.000-C7T7Z97M.part                    43.65 kB
+dist/assets/portal-fossil.000-BtuiUTlY.part                44.89 kB
+dist/assets/portal-core.000-D6VEqdRB.part                  45.24 kB
+dist/assets/bank-fence.000-CIy2ScF5.part                   46.05 kB
+dist/assets/portal-crystal.000-kWkyYDtG.part               46.83 kB
+dist/assets/portal-fungal.000-Bbt1cXLT.part                47.57 kB
+dist/assets/bank-timber.000-0lHw-Fau.part                  47.87 kB
+dist/assets/portal-volcanic.000-CPLEz6cQ.part              48.60 kB
+dist/assets/portal-timber.000-lpVC9M8I.part                48.82 kB
+dist/assets/bank-braced.000-Dgkm0DW_.part                  48.88 kB
+dist/assets/mine-pendant.000-M3IwOFK5.part                 50.45 kB
+dist/assets/portal-frozen.000-BvAPxqKY.part                51.50 kB
+dist/assets/basis_transcoder-o4Hde_L7.js                   57.52 kB
+dist/assets/shrub-round.000-2MwHv683.part                  86.23 kB
+dist/assets/waystone-crystal.000-_h1kw8E0.part             95.93 kB
+dist/assets/oak-tall.000-hzAx8xZX.part                     96.47 kB
+dist/assets/soft-shrub.000-oYAX0Yws.part                  101.30 kB
+dist/assets/grass-tussock.000-DFJpV8sP.part               104.23 kB
+dist/assets/sapling-pair.000-F47RVyeK.part                104.24 kB
+dist/assets/cedar-pillow.000-DOPPjSgv.part                105.29 kB
+dist/assets/bank-steps.000-DmM0bVRR.part                  108.07 kB
+dist/assets/birch-round.000-Dki6FocL.part                 108.13 kB
+dist/assets/bench-timber.000-wKkYt6OZ.part                108.44 kB
+dist/assets/maple-coral.000-DG4Q6bf4.part                 111.19 kB
+dist/assets/maple-gold.000--PKrW0KM.part                  112.47 kB
+dist/assets/meadow-base.000-CABp5uNT.part                 112.71 kB
+dist/assets/sack-stack.000-Df39vQJM.part                  114.09 kB
+dist/assets/shrub-berry.000-CGpYyIyy.part                 114.21 kB
+dist/assets/shrub-flower.000-B4-pDGTZ.part                114.84 kB
+dist/assets/willow-dome.000-DVv_4KYS.part                 115.68 kB
+dist/assets/anvil-stump.000-BPe0f-6p.part                 117.01 kB
+dist/assets/crown-tree.000-86xvA_OA.part                  118.61 kB
+dist/assets/boulder-ore.000-COVxe5N_.part                 120.87 kB
+dist/assets/wheelbarrow.000-DXn1RSUP.part                 124.24 kB
+dist/assets/boulder-moss.000-NlYfjNsE.part                125.54 kB
+dist/assets/mushroom-cluster.000-BQRWyVV6.part            126.97 kB
+dist/assets/ore-bin-jade.000-Cl7OsAdk.part                134.18 kB
+dist/assets/mine-badge.000-CNUNN4kW.part                  134.33 kB
+dist/assets/flower-daisies.000-6bEAqio9.part              134.80 kB
+dist/assets/ore-bin-copper.000-Csoxz0sS.part              134.88 kB
+dist/assets/pit-track.000-C_b_o4eo.part                   138.59 kB
+dist/assets/oak-wide.000-XcYVsFIg.part                    138.77 kB
+dist/assets/fence-corner.000-DMb_LWJd.part                143.73 kB
+dist/assets/crate-stack.000-DFVvk4kr.part                 144.65 kB
+dist/assets/tool-rack.000-DvqCKTBI.part                   145.84 kB
+dist/assets/cart-empty.000-uBVVH0ZM.part                  147.18 kB
+dist/assets/pit-supply-pallet.000-DE1f-RhD.part           152.46 kB
+dist/assets/pit-lumber-stack.000-B1QIF31J.part            153.45 kB
+dist/assets/notice-board.000-DZde69bc.part                153.77 kB
+dist/assets/well-stone.000-C6t8hqwa.part                  154.10 kB
+dist/assets/pit-plank-deck.000-DmHuI3-d.part              156.03 kB
+dist/assets/workbench.000-DwQe_gTt.part                   161.46 kB
+dist/assets/pit-crates.000-D5rXTML8.part                  162.04 kB
+dist/assets/pit-sorting-table.000-AZWyhjou.part           162.67 kB
+dist/assets/assayer-stall.000-D9PKt1Wq.part               162.88 kB
+dist/assets/pit-tool-wall.000-DwDQaIbf.part               162.89 kB
+dist/assets/pit-spoil.000-zVq95Kh6.part                   165.14 kB
+dist/assets/rail-buffer.000-8mtuOqEL.part                 165.17 kB
+dist/assets/barrel-pair.000-CRQjJxcS.part                 165.33 kB
+dist/assets/pit-box-lantern.000-DYpKTi8L.part             165.88 kB
+dist/assets/lantern-post.000-Bv3qea_D.part                166.78 kB
+dist/assets/ore-cart.000-iI2MrRpY.part                    168.96 kB
+dist/assets/pit-winch.000-CfhXhRsu.part                   170.01 kB
+dist/assets/warehouse-shed.000-D5KPdT42.part              170.64 kB
+dist/assets/pit-headframe.000-CrX73Bu1.part               173.55 kB
+dist/assets/simulator-exchange.000-BBKEU1Py.part          181.09 kB
+dist/assets/simulator-upgrade.000-Cjm9qwtA.part           189.15 kB
+dist/assets/workshop-hut.000-7rYcDb75.part                193.10 kB
+dist/assets/basis_transcoder-VXdx5NbI.wasm                527.33 kB │ gzip:   248.94 kB
+dist/assets/miner-a-CwUn1e4Z.glb                        1,227.59 kB
+dist/assets/main-BSOEuFgR.css                              41.10 kB │ gzip:     9.36 kB
+dist/assets/saveDebug-BarHIYSP.js                           0.42 kB │ gzip:     0.31 kB
+dist/assets/index-Df-eyJsS.js                               2.46 kB │ gzip:     1.26 kB
+dist/assets/main-Bhh-lL6l.js                            6,481.81 kB │ gzip: 1,675.69 kB
+
+✓ built in 1.04s
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.

@@ -63,7 +63,7 @@ export class RegionPipeline<T> {
     const min = feet.map((v, i) => Math.floor((v - r - (i === 1 ? this.downAhead : 0)) / side));
     const max = feet.map(v => Math.floor((v + r) / side));
     for (let z = min[2]; z <= max[2]; z++) for (let y = min[1]; y <= max[1]; y++) for (let x = min[0]; x <= max[0]; x++) {
-      const c: Coord = [x, y, z]; if (validRegion(c, this.size)) this.desired.set(chunkKey(c), c);
+      const c: Coord = [x, y, z]; if (validRegion(c, this.size, this.world.generation)) this.desired.set(chunkKey(c), c);
     }
     for (const [key, item] of this.residents) if (this.distance(item.coord) > this.unloadRadius) {
       this.adapter.dispose(item.resource); this.residents.delete(key); this.unloaded++;
@@ -71,7 +71,7 @@ export class RegionPipeline<T> {
     if (this.transaction) this.addStageTargets();
   }
   private affected(cells: readonly Coord[]) {
-    return new Map(cells.flatMap(c => affectedRegions(c, this.size)).map(c => [chunkKey(c), c]));
+    return new Map(cells.flatMap(c => affectedRegions(c, this.size, this.world.generation)).map(c => [chunkKey(c), c]));
   }
   private addStageTargets() {
     for (const [key, coord] of this.affected(this.edits)) if ((this.residents.has(key) || this.desired.has(key)) && !this.staged.has(key)) this.staged.set(key, { coord, version: this.version(key) });

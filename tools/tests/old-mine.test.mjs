@@ -21,7 +21,7 @@ test('second layer uses only the new kit, stays portable across depths, and rele
  let released=0;texture.addEventListener('dispose',()=>released++);
  disposeScenery(view);assert.equal(released,1);
 });
-test('release access starts locked and entry unlocks the second-layer portal',()=>{
+test('release access starts locked and reaching layer depth unlocks the second-layer portal',()=>{
  const raw=CAMP_CONTENT.session;
  const session=new GameSession(withInitialAccess(raw));
  assert.deepEqual(session.getSnapshot().destinations.filter(d=>d.unlocked).map(d=>d.id),[]);
@@ -31,7 +31,8 @@ test('release access starts locked and entry unlocks the second-layer portal',()
  assert.throws(()=>new Exploration(raw.destinations,['missing']),/未知/);
  const portal=raw.portals.find(p=>p.id==='old_mine'),moves=[];
  session.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining(){},returnToSurface(){},travelTo:p=>moves.push(p)});
- session.updatePosition(CAMP_CONTENT.rooms[0].spawn,true);
+ const room=CAMP_CONTENT.rooms[0];
+ session.updatePosition([room.x,-room.depth+.027,room.z],true);
  session.updatePosition([portal.zone.x,portal.zone.y,portal.zone.z],true);
  assert.deepEqual(moves,[CAMP_CONTENT.rooms[0].spawn]);
  session.updatePosition([portal.zone.x,portal.zone.y,portal.zone.z],true);

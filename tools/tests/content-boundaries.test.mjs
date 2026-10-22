@@ -37,7 +37,7 @@ test('changed depth, theme and room dimensions agree across physics generation, 
  assert.equal(camp.hub.portals.find(p=>p.id==='fungal').depth,900);
  const session=new GameSession(camp.session),travel=[];
  session.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining(){},returnToSurface(){},travelTo:p=>travel.push(p)});
- session.updatePosition(room.spawn,false);session.updatePosition([camp.session.home.x,0,camp.session.home.z],true);
+ session.updatePosition([room.x,-room.depth+.027,room.z],true);session.updatePosition([camp.session.home.x,0,camp.session.home.z],true);
  assert.equal(session.travelTo('fungal'),'travelling');assert.deepEqual(travel,[room.spawn]);
 });
 test('adding a layer requires an explicit station, never a layer-name branch or index-based appearance',()=>{

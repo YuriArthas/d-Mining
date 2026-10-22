@@ -54,6 +54,7 @@ export class PlayerController {
         yaw,
         this.input.consumeJump(),
         this.terrain.ready(this.physics.feet()),
+        this.session.getMovementMultiplier(),
       );
       this.session.updatePosition(this.physics.feet(), this.physics.grounded);
       if (state.moveX || state.moveY)

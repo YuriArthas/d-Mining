@@ -1,0 +1,13 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>
+body{margin:0;font-family:var(--font-sans,system-ui);color:var(--foreground,#e8eef5)}
+nav{display:flex;align-items:center;gap:8px;margin:0 0 12px;flex-wrap:wrap}
+button,a{font:inherit;font-size:14px;padding:9px 13px;border-radius:var(--radius,8px)}
+button{cursor:pointer;border:1px solid var(--border,#455264);color:inherit;background:transparent}
+button[aria-pressed=true]{background:var(--accent-surface,#203b4b);color:var(--accent-surface-foreground,#b8e9ff);border-color:var(--accent,#56b9df)}
+a{margin-left:auto;color:var(--accent-foreground,#8cd6f3);text-decoration:none}
+img{display:block;width:100%;height:auto;aspect-ratio:8/5;object-fit:contain;border-radius:var(--radius,8px)}
+[hidden]{display:none}
+</style></head><body><nav aria-label="画面对照"><button data-image="live" aria-pressed="true">实际游戏</button><button data-image="reference" aria-pressed="false">Image 2.5 参考</button><a href="https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html" target="_blank" rel="noreferrer">打开试玩 ↗</a></nav>
+<img id="live" src="/root/.t3/worktrees/d-Mining/surface-roblox/artifacts/pinewind-hud-public/06-normal-player.png" alt="公开游戏中的无底板 Roblox HUD">
+<img id="reference" hidden src="/root/.t3/worktrees/d-Mining/surface-roblox/output/imagegen/pinewind-hud-20261021/roblox-hud-reference.png" alt="gpt-image-2.5 生成的布局参考图">
+<script>document.querySelectorAll('button[data-image]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('button[data-image]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));document.querySelectorAll('img').forEach(img=>img.hidden=img.id!==button.dataset.image)}));</script></body></html>

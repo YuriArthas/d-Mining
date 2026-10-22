@@ -8,6 +8,7 @@ export type EggStation = Readonly<{
   promptAnchor: readonly [number, number, number];
 }>;
 export type Destination = Readonly<{
+  worldId?: import('../content/worldJourney.ts').WorldId;
   id: string;
   name: string;
   depth: number;
@@ -15,6 +16,9 @@ export type Destination = Readonly<{
   roomBounds?: Readonly<{ minX: number; maxX: number; minZ: number; maxZ: number; floor: number; ceiling: number }>;
 }>;
 export type SessionContent = Readonly<{
+  journey?: boolean;
+  homes?: readonly Readonly<{worldId: import('../content/worldJourney.ts').WorldId; zone: ZoneConfig}>[];
+  onboarding?: Readonly<{ entrance: Coord; eggId: string; mineArea?: Readonly<{ minX:number; maxX:number; minZ:number; maxZ:number }> }>;
   initialCoins?: number;
   petContent?: PetContent;
   eggStations?: readonly EggStation[];

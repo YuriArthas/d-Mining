@@ -42,6 +42,13 @@
 .pet-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 16px; }
 .pet-footer output { font-size: 11px; color: #4e7479; max-width: 48%; line-height: 1.6; }
 .pet-footer > div { display: flex; gap: 8px; }
+.pet-panel .pet-find-egg { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; width: 100%; margin-bottom: 12px; font-size: 14px; }
+.pet-find-egg-panel .pet-find-egg-description { font-size: 14px; line-height: 1.6; color: #466877; }
+.pet-egg-destinations { display: flex; flex-direction: column; gap: 10px; max-height: 45vh; overflow: auto; padding: 3px; }
+.pet-egg-destinations > div { display: flex; align-items: center; gap: 12px; border: 1px solid #a6c3cd; border-radius: 10px; background: white; padding: 10px; }
+.pet-egg-destinations > div > span { flex: 1; font-size: 16px; }
+.pet-egg-destinations small { display: block; margin-top: 4px; font-size: 14px; color: #466877; }
+.pet-egg-destinations .pet-primary, .pet-find-egg-panel .pet-secondary { min-height: 44px; font-size: 14px; }
 .pet-empty { min-height: 210px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 18px; border: 2px dashed #bad3d6; border-radius: 12px; text-align: center; }
 .pet-empty b { font-size: 18px; color: #416a76; }
 .pet-empty p, .pet-empty span { font-size: 12px; color: #67808a; }

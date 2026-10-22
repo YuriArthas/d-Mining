@@ -32,6 +32,7 @@ import type { SceneryPlan } from "../world/sceneryKit.ts";
 import type { AssetProfile } from "./assetProfiles.ts";
 
 export type SurfaceContent = Readonly<{
+  authored?: import("./authoredSurface.ts").AuthoredSurface;
   details: SurfaceDetailContent;
   placements: readonly QuarryPlacement[];
   plan: SceneryPlan;
@@ -115,10 +116,13 @@ export function createCampContent(
     rooms,
     session,
     surface,
-    environment: ENVIRONMENT_CONFIG,
+    environment: ENVIRONMENT_CONFIG as import("../presentation/EnvironmentController.ts").EnvironmentConfig,
     returnPoint: SURFACE_SPAWN,
     hub: { portals, eggs: PET_DISPLAYS, baseHeight: PORTAL_BASE_HEIGHT },
   };
 }
-export type CampContent = ReturnType<typeof createCampContent>;
+export type CampContent = ReturnType<typeof createCampContent> & {
+  worlds?: readonly Readonly<{id: import('./worldJourney.ts').WorldId; z:number; layers:readonly Layer[]}>[];
+  extraSites?: readonly import('../presentation/SceneryCollision.ts').ScenerySite[];
+};
 export const CAMP_CONTENT = createCampContent();

@@ -31,7 +31,7 @@ export class RenderTerrain {
     for (const resident of this.pipeline.residents.values()) this.showWire(resident.resource);
   }
   constructor(world: SparseWorld, metrics: Measurements, factory: WorkerFactory) {
-    this.surface=createMineralMaterial(world.generation.layers);
+    this.surface=createMineralMaterial(world.generation.layers,world.generation.worlds);
     this.pipeline = new RegionPipeline('render', RENDER_SIZE, 54, 78, 0, world, {
       prepare: ({ coord, mesh: m }) => {
         const resource: RenderResource = { bytes: m.positions.byteLength + m.normals.byteLength + m.uvs.byteLength + m.tiles.byteLength + m.indices.byteLength, triangles: m.indices.length / 3 };

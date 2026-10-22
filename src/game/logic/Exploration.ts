@@ -12,11 +12,11 @@ export class Exploration {
       this.access.add(id);
     }
   }
-  visit(depth: number, enteredRooms?: readonly string[]) {
+  visit(depth: number) {
     if (!Number.isFinite(depth) || depth < 0) return [];
     this.maximum = Math.max(this.maximum, depth);
     const added: string[] = [];
-    for (const point of this.milestones) if ((enteredRooms ? enteredRooms.includes(point.id) : this.maximum >= point.depth) && !this.unlocked.has(point.id)) {
+    for (const point of this.milestones) if (this.maximum >= point.depth && !this.unlocked.has(point.id)) {
       this.unlocked.add(point.id); added.push(point.id);
     }
     return added;
@@ -32,6 +32,9 @@ export class Exploration {
       result.unlocked.add(id);
     }
     result.maximum = maximum;
+    // Explicit progression upgrade: recorded depth now grants admission even
+    // when an older save never entered the room. Previously granted access stays.
+    result.visit(maximum);
     return result;
   }
   get maxDepth() { return this.maximum; }

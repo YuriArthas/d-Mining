@@ -1,0 +1,35 @@
+.inventory-hud.feedback-inventory-hud { width: 290px; max-width: calc(100% - 20px); padding: 10px; font-size: 14px; }
+.feedback-inventory-hud .inventory-totals { align-items: flex-start; flex-wrap: wrap; font-size: 14px; }
+.feedback-inventory-hud .inventory-totals > span { margin-left: auto; }
+.equipment-icon { width: 28px; height: 28px; flex: none; }
+.ore-icon { width: 32px; height: 32px; flex: none; color: #dceae7; }
+.inventory-equipment { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; margin-top: 8px; }
+.inventory-equipment > span { display: flex; align-items: center; gap: 4px; font-size: 14px; color: #f4e4c5; }
+.inventory-equipment .equipment-icon { width: 24px; height: 24px; }
+.inventory-ore-slots { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; margin: 10px 0 8px; padding: 0; list-style: none; }
+.inventory-ore-slots:empty { margin: 8px 0 0; }
+.inventory-ore-slots > li { min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 5px 2px; border: 1px solid #8ba99c77; border-radius: 6px; background: #0a2025; }
+.inventory-ore-slots > li > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; font-size: 14px; }
+.inventory-ore-slots > li > b { max-width: 100%; overflow: hidden; text-overflow: ellipsis; font-size: 14px; color: #ffe2a0; }
+.feedback-inventory-hud button { min-height: 44px; font-size: 14px; }
+.feedback-inventory-hud button:focus-visible { outline: 3px solid #95dbff; outline-offset: 2px; }
+.feedback-inventory-hud .inventory-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.feedback-inventory-hud .inventory-actions button:disabled { cursor: default; background: #32474b; color: #adbdbc; border-color: #52686b; }
+.feedback-inventory-hud .inventory-pets-button { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.feedback-inventory-hud .inventory-pets-button .equipment-icon { width: 22px; height: 22px; }
+.feedback-inventory-hud .sale-hint, .feedback-inventory-hud .sale-notice { padding-right: 46px; font-size: 14px; line-height: 1.4; }
+.inventory-hud.feedback-inventory-hud .inventory-help { right: 8px; bottom: 8px; width: 44px; min-height: 44px; font-size: 18px; }
+.ore-pickup-feed { position: absolute; z-index: 3; left: 50%; top: 60%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 5px; pointer-events: none; }
+.ore-pickup { display: flex; align-items: center; gap: 8px; padding: 5px 12px; background: #152e35e8; border: 1px solid #8ba99c99; border-radius: 10px; color: #fff4d7; font-size: 16px; white-space: nowrap; animation: ore-collected var(--pickup-lifetime) ease-out forwards; }
+.ore-pickup strong { margin-left: auto; color: #a9e8b7; }
+@keyframes ore-collected { 0% { opacity: 0; transform: translateY(7px); } 10%, 65% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-10px); } }
+@media (max-height: 700px) {
+  .inventory-hud.feedback-inventory-hud { top: calc(42px + var(--safe-top)); }
+  .inventory-ore-slots > li { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 2px; padding: 3px 2px; }
+  .inventory-ore-slots > li > span { width: 100%; order: 2; }
+  .inventory-ore-slots .ore-icon { width: 23px; height: 23px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ore-pickup { animation: ore-collected-still var(--pickup-lifetime) linear forwards; }
+  @keyframes ore-collected-still { 0%, 65% { opacity: 1; } 100% { opacity: 0; } }
+}

@@ -7,6 +7,7 @@ export type RegionDataV1 = {
 export function readRegion(
   value: unknown,
   canDelete: (cell: Coord) => boolean,
+  minimumZ = -3,
 ): RegionDataV1 {
   const data = record(value),
     region = data.region,
@@ -17,7 +18,7 @@ export function readRegion(
     !region.every(Number.isSafeInteger) ||
     region[0] < -3 ||
     region[0] > 3 ||
-    region[2] < -3 ||
+    region[2] < minimumZ ||
     region[2] > 3 ||
     region[1] < -125 ||
     region[1] > -1

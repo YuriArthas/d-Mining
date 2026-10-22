@@ -4,22 +4,36 @@ import { LAYERS, type Layer } from '../content/layers.ts';
 import { generatedMineral } from './strata.ts';
 import { sampleMineral } from './minerals.ts';
 export { CELL } from './grid.ts';
+import { CELL } from './grid.ts';
 import { inEntrance, PROTECTED_FLOOR } from '../world/entrance.ts';
 import {surfaceExcavated} from '../world/SurfaceExcavation.ts';
 import { roomAir, onRoomFloor } from '../world/rooms.ts';
 import { SHAFT } from '../validation/course.ts';
 export type Coord = readonly [number, number, number];
-export type WorldGeneration = Readonly<{ version: number; seed: number; samples: boolean; layers: readonly Layer[] }>;
+export type WorldGeneration = Readonly<{ version: number; seed: number; samples: boolean; layers: readonly Layer[]; worlds?: readonly Readonly<{z:number;layers:readonly Layer[]}>[] }>;
 export const WORLD_GENERATION: WorldGeneration = Object.freeze({ version: 9, seed: 0, samples: false, layers: LAYERS });
+const localGenerations = new WeakMap<WorldGeneration, readonly WorldGeneration[]>();
+export function generationAtZ(generation:WorldGeneration,z:number) {
+  if(!generation.worlds)return generation;
+  let local=localGenerations.get(generation);
+  if(!local){local=generation.worlds.map(w=>({...generation,worlds:undefined,layers:w.layers}));localGenerations.set(generation,local);}
+  return local[z > 168 ? 2 : z > 56 ? 1 : 0];
+}
 export const INDEX_SIZE = 16; // Sparse spatial index only; never a dense voxel allocation.
 export const RENDER_SIZE = 16;
 export const COLLISION_SIZE = 8;
 export const LIMITS = { minX: -48, maxX: 51, minY: -2000, maxY: -1, minZ: -48, maxZ: 51 };
 export const chunkKey = (c: Coord) => c.join(',');
 export const regionOf = (c: Coord, size: number): Coord => [Math.floor(c[0] / size), Math.floor(c[1] / size), Math.floor(c[2] / size)];
-export const inBounds = ([x, y, z]: Coord) => x >= LIMITS.minX && x <= LIMITS.maxX && y >= LIMITS.minY && y <= LIMITS.maxY && z >= LIMITS.minZ && z <= LIMITS.maxZ;
-export const validRegion = (c: Coord, size: number) => c[0] * size <= LIMITS.maxX && (c[0] + 1) * size > LIMITS.minX && c[1] * size <= LIMITS.maxY && (c[1] + 1) * size > LIMITS.minY && c[2] * size <= LIMITS.maxZ && (c[2] + 1) * size > LIMITS.minZ;
-const bucketKey = (x: number, y: number, z: number) => x + 3 + 7 * (z + 3 + 7 * (y + 125));
+export const inBounds = ([x, y, z]: Coord, generation?: WorldGeneration) => x >= LIMITS.minX && x <= LIMITS.maxX && y >= LIMITS.minY && y <= LIMITS.maxY && z >= LIMITS.minZ && z <= (generation?.worlds ? 275 : LIMITS.maxZ);
+export const validRegion = (c: Coord, size: number, generation?: WorldGeneration) => c[0] * size <= LIMITS.maxX && (c[0] + 1) * size > LIMITS.minX && c[1] * size <= LIMITS.maxY && (c[1] + 1) * size > LIMITS.minY && c[2] * size <= (generation?.worlds ? 275 : LIMITS.maxZ) && (c[2] + 1) * size > LIMITS.minZ;
+// The layout now extends behind spawn (+Z). Keep v11's persistent coordinates:
+// world 2/3 remain centered at saved regions -7/-14, while their scene regions
+// are +7/+14. Offsets are whole 16-cell regions, so all deleted-cell runs and
+// existing mineral identities stay byte-for-byte compatible with old saves.
+const savedRegionZ = (z: number) => z > 3 ? z - 14 * Math.floor((z + 3) / 7) : z;
+const savedCellToScene = (c: Coord): Coord => [c[0], c[1], c[2] + (c[2] < -168 ? 448 : c[2] < -56 ? 224 : 0)];
+const bucketKey = (x: number, y: number, z: number) => x + 3 + 7 * (savedRegionZ(z) + 17 + 21 * (y + 125));
 const indexXYZ = (x: number, y: number, z: number) => (x & 15) + 16 * ((y & 15) + 16 * (z & 15));
 // Sorted inclusive runs [start,end,...]. null denotes an entirely removed index region.
 export type Runs = Uint16Array | null;
@@ -54,6 +68,15 @@ function apply(edits: Edits, cells: readonly Coord[]) {
   for (const [key, indices] of groups) edits.set(key, mergeRemoved(edits.get(key), indices));
 }
 export function baseXYZ(x: number, y: number, z: number, generation: WorldGeneration = WORLD_GENERATION): number {
+  if (generation.worlds) {
+    if (!inBounds([x,y,z],generation)) return 0;
+    const area = generation.worlds[z > 168 ? 2 : z > 56 ? 1 : 0];
+    const localZ = z - area.z / CELL;
+    // The corridor is solid ground; each mine ends after its sixth underground layer.
+    if (localZ < -48 || localZ > 51) return y >= -2 ? PROTECTED_FLOOR : 0;
+    if (y < -1400) return y === -1401 ? PROTECTED_FLOOR : 0;
+    return baseXYZ(x,y,localZ,generationAtZ(generation,z));
+  }
   if (x < -48 || x > 51 || y < -2000 || y > -1 || z < -48 || z > 51) return 0;
   if (!generation.samples && surfaceExcavated(x,y,z)) return 0;
   if (roomAir(x, y, z, generation.layers)) return 0;
@@ -66,13 +89,13 @@ export function sampleXYZ(x: number, y: number, z: number, edits: Edits, generat
   const base = baseXYZ(x, y, z, generation); // Check bounds before looking up the bounded numeric key.
   return base && contains(edits.get(bucketKey(Math.floor(x / 16), Math.floor(y / 16), Math.floor(z / 16))), indexXYZ(x, y, z)) ? 0 : base;
 }
-export function affectedRegions(cell: Coord, size: number): Coord[] {
+export function affectedRegions(cell: Coord, size: number, generation?: WorldGeneration): Coord[] {
   const home = regionOf(cell, size), result: Coord[] = [home];
   for (let axis = 0; axis < 3; axis++) {
     const local = ((cell[axis] % size) + size) % size;
     if (local === 0 || local === size - 1) {
       const neighbor = [...home] as [number, number, number]; neighbor[axis] += local === 0 ? -1 : 1;
-      if (validRegion(neighbor, size)) result.push(neighbor);
+      if (validRegion(neighbor, size, generation)) result.push(neighbor);
     }
   }
   return result;
@@ -90,7 +113,7 @@ export class SparseWorld {
   // Used only during candidate-world construction, before any workers or gameplay.
   restoreRegion(value: unknown) {
     if (this.revision) throw Error('不能向运行中的世界恢复存档');
-    const data = readRegion(value, c => { const kind = baseXYZ(...c, this.generation); return kind > 0 && kind !== PROTECTED_FLOOR; });
+    const data = readRegion(value, c => { const kind = baseXYZ(...(this.generation.worlds ? savedCellToScene(c) : c), this.generation); return kind > 0 && kind !== PROTECTED_FLOOR; }, this.generation.worlds ? -17 : -3);
     const key = bucketKey(...data.region);
     if (this.edits.has(key)) throw Error('存档包含重复矿坑区域');
     this.edits.set(key, data.removed);
@@ -101,16 +124,16 @@ export class SparseWorld {
   cell(c: Coord) { return sampleXYZ(...c, this.edits, this.generation); }
   canMine(c: Coord) { const kind = this.cell(c); return kind > 0 && kind !== PROTECTED_FLOOR; }
   remove(cells: readonly Coord[]) {
-    const accepted = [...new Map(cells.filter(c => inBounds(c) && c.every(Number.isInteger) && this.canMine(c)).map(c => [chunkKey(c), c])).values()];
+    const accepted = [...new Map(cells.filter(c => inBounds(c,this.generation) && c.every(Number.isInteger) && this.canMine(c)).map(c => [chunkKey(c), c])).values()];
     if (accepted.length) { apply(this.edits, accepted); this.revision++; this.removed += accepted.length;
-      for (const c of accepted) this.saveChanges.mark(regionOf(c, INDEX_SIZE)); }
+      for (const c of accepted) { const region=regionOf(c, INDEX_SIZE); this.saveChanges.mark([region[0],region[1],savedRegionZ(region[2])]); } }
     return accepted;
   }
   snapshot(coord: Coord, size: number, pending: readonly Coord[] = []): EditSnapshot {
     const min = coord.map(v => Math.floor((v * size - 1) / 16)), max = coord.map(v => Math.floor(((v + 1) * size) / 16));
     const nearby: Edits = new Map();
     for (let z = min[2]; z <= max[2]; z++) for (let y = min[1]; y <= max[1]; y++) for (let x = min[0]; x <= max[0]; x++) {
-      if (!validRegion([x, y, z], 16)) continue;
+      if (!validRegion([x, y, z], 16, this.generation)) continue;
       const key = bucketKey(x, y, z), runs = this.edits.get(key);
       if (runs !== undefined) nearby.set(key, runs === null ? null : runs.slice());
     }

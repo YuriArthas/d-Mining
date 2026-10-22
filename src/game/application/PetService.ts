@@ -7,7 +7,7 @@ import type { Wallet } from '../logic/Wallet.ts';
 
 export type HatchResult =
   | Readonly<{ status: 'hatched'; eggId: string; pet: PetInstance; spent: number }>
-  | Readonly<{ status: 'unknown-egg' | 'insufficient-coins' | 'locked' }>;
+  | Readonly<{ status: 'unknown-egg' | 'insufficient-coins' | 'locked' | 'unavailable' }>;
 export type EquipOwnedResult = EquipResult | Readonly<{ status: 'not-owned' }>;
 export type PetServiceDependencies = {
   content: PetContent;
@@ -15,6 +15,7 @@ export type PetServiceDependencies = {
   random: () => number;
   createPetId: () => string;
   hasDestination?: (id: string) => boolean;
+  lucky?: () => boolean;
 };
 
 // Synchronous use cases only. Neither rendering nor event delivery runs inside settlement.
@@ -37,8 +38,18 @@ export class PetService {
     const egg = this.catalog.egg(eggId);
     return !!egg && (!egg.requiredDestination || this.deps.hasDestination?.(egg.requiredDestination) === true);
   };
-  hatch(eggId: string): HatchResult {
+  effectiveEgg = (eggId: string) => {
     const egg = this.catalog.egg(eggId);
+    if (!egg || !this.deps.lucky?.()) return egg;
+    const rare = egg.outcomes.reduce((sum,o) => sum+(this.catalog.pet(o.speciesId).rarity==='common'?0:o.weight),0);
+    const common = egg.outcomes.reduce((sum,o) => sum+(this.catalog.pet(o.speciesId).rarity==='common'?o.weight:0),0);
+    // Double the rare-or-better TOTAL probability, taking the difference from
+    // common outcomes while preserving relative weights inside each group.
+    return {...egg,outcomes:egg.outcomes.map(o => ({...o,weight:this.catalog.pet(o.speciesId).rarity==='common'?o.weight*Math.max(0,common-rare):o.weight*(common>rare?2*common:1)}))};
+  };
+  get lucky() { return this.deps.lucky?.() ?? false; }
+  hatch(eggId: string): HatchResult {
+    const egg = this.effectiveEgg(eggId);
     if (!egg) return { status: 'unknown-egg' };
     if (!this.isUnlocked(eggId)) return { status: 'locked' };
     if (this.deps.wallet.getBalance() < egg.price) return { status: 'insufficient-coins' };

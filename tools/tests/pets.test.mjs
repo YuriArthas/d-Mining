@@ -15,6 +15,10 @@ import { PET_CONTENT } from './fixtures/pets.ts';
 import { SESSION_CONTENT as LIVE_SESSION_CONTENT } from '../../src/game/world/sessionContent.ts';
 
 const SESSION_CONTENT = {...LIVE_SESSION_CONTENT, initialCoins:200, petContent:PET_CONTENT};
+function goToEgg(session,eggId='meadow-egg') {
+  const station=SESSION_CONTENT.eggStations.find(station=>station.eggId===eggId);
+  session.updatePosition([station.zone.x,station.zone.y,station.zone.z],true);
+}
 const pet = (id, speciesId = 'moss-slime') => ({ id, speciesId, level: 1 });
 const setup = (coins = 100, overrides = {}) => {
   const wallet = new Wallet(coins); let serial = 0;
@@ -187,6 +191,7 @@ test('session uses pet power for real combat without resetting damage or cooldow
   const sale = SESSION_CONTENT.sales[0]; session.updatePosition([sale.x, sale.y, sale.z], true); session.resetPosition();
   const target = [0, -1, 0]; assert.equal(session.hit(target).damage, 10);
   const cooldown = session.combatDebug().nextAttackAt;
+  goToEgg(session);
   const acquired = session.pets.hatch('meadow-egg'); assert.equal(acquired.status, 'hatched');
   session.pets.equip(acquired.pet.id);
   assert.equal(session.combatDebug().nextAttackAt, cooldown); assert.equal(session.hit(target).status, 'cooldown');
@@ -207,6 +212,7 @@ test('egg proximity derives from display configuration and clears on leaving or 
 test('explicit fixture starting coins are granted once, independent from UI subscriptions and egg visits', () => {
   const session = new GameSession(SESSION_CONTENT);
   assert.equal(session.getSnapshot().coins, 200);
+  goToEgg(session);
   const result = session.pets.hatch('meadow-egg');
   assert.equal(result.status, 'hatched'); assert.equal(session.getSnapshot().coins, 190);
   for (let i=0; i<3; i++) {
@@ -218,5 +224,6 @@ test('explicit fixture starting coins are granted once, independent from UI subs
   }
   const custom = new GameSession({...SESSION_CONTENT,initialCoins:0});
   assert.equal(custom.getSnapshot().coins,0);
+  goToEgg(custom);
   assert.equal(custom.pets.hatch('meadow-egg').status,'insufficient-coins');
 });

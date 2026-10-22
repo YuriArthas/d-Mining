@@ -1,0 +1,16 @@
+{
+  "parts": [
+    "pinewind-architecture.000.part"
+  ],
+  "bytes": 84184,
+  "decodedBytes": 248328,
+  "sha256": "28e5c397a7309258a67fe9c8d1a829cbdee382e424206db8c9735a88485b88ec",
+  "sourceSha256": "17bc164b7528a2c7c08ccb8a2dbcbb019c35392253baefca26a004fe83e80590",
+  "triangles": 13920,
+  "source": "Authored Pinewind; Blender architecture and offline procedural landscape",
+  "materialProfile": "authored-color",
+  "coordinateSpace": "authored",
+  "geometryEdits": false,
+  "textureEncoding": "KTX2 UASTC",
+  "reference": "surface-study final 2026-10-19T16:13:15.123Z"
+}

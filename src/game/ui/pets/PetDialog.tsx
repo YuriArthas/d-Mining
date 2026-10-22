@@ -6,7 +6,7 @@ export function PetDialog({ title, onClose, children, className = '' }: {
   title: string; onClose(): void; children: ReactNode; className?: string;
 }) {
   const panel = useRef<HTMLElement>(null);
-  useEffect(() => { panel.current?.focus(); }, []);
+  useEffect(() => { panel.current?.focus(); }, [title]);
   return <div className="pet-backdrop">
     <section ref={panel} role="dialog" aria-modal="true" aria-label={title} tabIndex={-1} className={`pet-panel ${className}`}
       onKeyDown={event => {
@@ -14,8 +14,8 @@ export function PetDialog({ title, onClose, children, className = '' }: {
         event.stopPropagation();
         if (event.key === 'Escape') { event.preventDefault(); onClose(); }
         if (event.key !== 'Tab') return;
-        const buttons = [...event.currentTarget.querySelectorAll<HTMLButtonElement>('button:not(:disabled)')];
-        const index = buttons.indexOf(document.activeElement as HTMLButtonElement);
+        const buttons = [...event.currentTarget.querySelectorAll<HTMLElement>('button:not(:disabled),input:not(:disabled),textarea:not(:disabled),select:not(:disabled),a[href],[tabindex]:not([tabindex="-1"])')].filter(element=>!element.hidden&&element.getAttribute('aria-hidden')!=='true'&&element.getClientRects().length>0);
+        const index = buttons.indexOf(document.activeElement as HTMLElement);
         event.preventDefault();
         buttons[event.shiftKey ? (index <= 0 ? buttons.length - 1 : index - 1) : (index + 1) % buttons.length]?.focus();
       }}>

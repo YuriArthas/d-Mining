@@ -14,7 +14,7 @@ export function mineralRoll(x:number,y:number,z:number,seed:number){
 export function generatedMineral(x: number, y: number, z: number, seed: number, layers: readonly Layer[] = LAYERS) {
  const depth=-(y+1)*CELL,layer=layerAtDepth(depth,layers);
  const stage = STAGES[layers.indexOf(layer)];
- if (stage && depth - layer.from >= stage.deepAt) return stage.deepKind;
+ if (depth - layer.from >= (stage?.deepAt ?? 280) && (layer.deepKind ?? stage?.deepKind)) return (layer.deepKind ?? stage!.deepKind);
  const roll=mineralRoll(x,y,z,seed),chance=oreChanceAtDepth(depth);
  if(roll>=chance||!layer.ores.length)return layer.base;
  let total=weightTotals.get(layer);

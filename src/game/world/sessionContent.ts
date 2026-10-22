@@ -1,3 +1,4 @@
+import { ENTRANCE_WORLD } from './entrance.ts';
 import type {
   SessionContent,
   Destination,
@@ -24,6 +25,7 @@ export function sessionContentFor(
     if (!ids.has(portal.id)) throw Error("未知传送目的地: " + portal.id);
   return {
     initialCoins: 0,
+    onboarding: { entrance: [(ENTRANCE_WORLD.minX + ENTRANCE_WORLD.maxX) / 2, .4, ENTRANCE_WORLD.maxZ + 2], eggId: 'meadow-egg', mineArea: ENTRANCE_WORLD },
     petContent: PET_CONTENT,
     eggStations: PET_DISPLAYS.map(display => ({
       id: display.id,

@@ -213,10 +213,13 @@ sources = []
 foot_vertices = [v.index for v in mesh.data.vertices if v.co.z < .18]
 loop_metrics = {}
 knee_retarget_metrics = {}
-for clip_name, source_name in [('Idle','idle'), ('Walk','walk'), ('Run','move')]:
+idle_motion=json.loads((SOURCE/'rab-idle.json').read_text())['currentVersion']['motion']
+idle_transforms=idle_motion['keyframes'][0]['transforms']
+for clip_name, source_name in [('Idle','idle'), ('Walk','walk'), ('Run','move'), ('Mine','mine')]:
     source = json.loads((SOURCE/f'rab-{source_name}.json').read_text())
     motion = source['currentVersion']['motion']
-    duration = motion['durationSeconds']
+    source_start,source_end=(.10,1.95) if clip_name=='Mine' else (0,motion['durationSeconds'])
+    duration = source_end-source_start
     action = bpy.data.actions.new(clip_name)
     rig.animation_data.action = action
     count = round(duration*fps)
@@ -238,12 +241,12 @@ for clip_name, source_name in [('Idle','idle'), ('Walk','walk'), ('Run','move')]
             qb = Quaternion((b['quaternion'][3],*b['quaternion'][:3]))
             result[key] = (qa.slerp(qb,alpha), Vector(a['position']).lerp(Vector(b['position']),alpha))
         return result
-    start_sample = sample(0)
+    start_sample = sample(source_start)
     knee_metrics={'maxLateralBefore':0,'maxLateralAfter':0,'maxAnkleDrift':0}
     for frame in range(count+1):
         bpy.context.scene.frame_set(frame)
         t = duration*frame/count
-        transforms = sample(t)
+        transforms = sample(t+source_start)
         # 将最后 10% 的采样平滑接回首帧，消除导入动作本身的循环接缝。
         closing = max(0,(frame/count-.9)/.1)
         closing = closing*closing*(3-2*closing)
@@ -254,6 +257,14 @@ for clip_name, source_name in [('Idle','idle'), ('Walk','walk'), ('Run','move')]
         # 保留髋与踝端点、脚掌朝向；膝的弯折平面朝骨盆前方，避免
         # R15 转换动作中的侧向膝旋转在短粗腿上表现为向外拧。
         local_rotations={j['childPartName']:transforms[j['jointKey']][0].slerp(start_sample[j['jointKey']][0],closing) for j in motion['joints']}
+        if clip_name=='Mine':
+            # 下劈的躯干转动归到上身；游戏中的下肢仍由 Idle/Walk/Run 控制。
+            local_rotations['UpperTorso']=local_rotations['LowerTorso'] @ local_rotations['UpperTorso']
+            for j in motion['joints']:
+                name=j['childPartName']
+                if name=='LowerTorso' or 'Leg' in name or 'Foot' in name:
+                    q=idle_transforms[j['jointKey']]['quaternion']
+                    local_rotations[name]=Quaternion((q[3],*q[:3]))
         world_rotations={'Root':Quaternion()}
         def world_rotation(name):
             if name not in world_rotations:
@@ -319,7 +330,7 @@ for clip_name, source_name in [('Idle','idle'), ('Walk','walk'), ('Run','move')]
     strip.action_frame_start = 0
     strip.action_frame_end = count
     track.mute = True
-    sources.append({'clip':clip_name,'animationId':source['animationId'],'animationVersionId':source['currentVersion']['animationVersionId'],'name':source['name'],'source':source['meta'],'duration':count/fps,'url':'https://rab-sunjun-public.dev.clock-p.com/animations/'+source['animationId']})
+    sources.append({'clip':clip_name,'animationId':source['animationId'],'animationVersionId':source['currentVersion']['animationVersionId'],'name':source['name'],'source':source['meta'],'duration':count/fps,'sourceRange':[source_start,source_end],'url':'https://rab-sunjun-public.dev.clock-p.com/animations/'+source['animationId']})
 rig.animation_data.action = None
 for bone in rig.pose.bones:
     bone.location=(0,0,0)

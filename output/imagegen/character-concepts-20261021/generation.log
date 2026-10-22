@@ -1,0 +1,13 @@
+OPENAI_API_KEY is set.
+[job 1/4] starting
+[job 2/4] starting
+[job 3/4] starting
+[job 4/4] starting
+[job 3/4] completed in 16.4s
+[job 1/4] completed in 17.1s
+[job 4/4] completed in 20.7s
+[job 2/4] completed in 21.0s
+Wrote output/imagegen/character-concepts-20261021/c-light-explorer.png
+Wrote output/imagegen/character-concepts-20261021/a-blocky-miner.png
+Wrote output/imagegen/character-concepts-20261021/d-future-miner.png
+Wrote output/imagegen/character-concepts-20261021/b-rounded-miner.png

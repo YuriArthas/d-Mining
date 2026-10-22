@@ -39,18 +39,18 @@ function setup() {
  s.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{},travelTo:p=>calls.push(p)});
  return {s,calls};
 }
-test('outside room does not unlock travel; room entry does, and only home may initiate it', () => {
- const {s,calls}=setup();s.updatePosition([90,-400,90],false);
- assert.equal(s.getSnapshot().destinations[0].unlocked,false); s.updatePosition(ROOMS[0].spawn,true);
+test('reaching depth outside a room unlocks travel, and only home may initiate it without the portable perk', () => {
+ const {s,calls}=setup();s.updatePosition([90,-399.999,90],false);
+ assert.equal(s.getSnapshot().destinations[0].unlocked,false); s.updatePosition([90,-400,90],false);
  assert.equal(s.getSnapshot().destinations[0].unlocked,true);assert.equal(s.getSnapshot().destinations[1].unlocked,false);
  assert.equal(s.travelTo('old_mine'),'away');s.updatePosition([HOME_ZONE.x,HOME_ZONE.y,HOME_ZONE.z],true);
  assert.equal(s.travelTo('fungal'),'locked');assert.equal(s.travelTo('unknown'),'locked');
  assert.equal(s.travelTo('old_mine'),'travelling');assert.deepEqual(calls,[ROOMS[0].spawn]);
  assert.equal(s.travelTo('old_mine'),'away');s.resetPosition();assert.equal(s.getSnapshot().destinations[0].unlocked,true);
 });
-test('standing in room at contact height unlocks without reaching exact floor depth', () => {
+test('standing at milestone contact height unlocks without requiring room entry or exact floor depth', () => {
  const {s}=setup();s.updatePosition([90,-399.973,90],false);assert.equal(s.getSnapshot().destinations[0].unlocked,false);
- s.updatePosition(ROOMS[0].spawn,true);assert.equal(s.getSnapshot().destinations[0].unlocked,true);
+ s.updatePosition([90,-399.973,90],true);assert.equal(s.getSnapshot().destinations[0].unlocked,true);
 });
 test('each underground sale zone sells once per entry; shops exit independently', () => {
  const {s}=setup();

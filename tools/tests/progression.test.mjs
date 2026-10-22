@@ -11,34 +11,46 @@ import { saveNamespace } from '../../src/game/persistence/SaveBootstrap.ts';
 import { LAYERS } from '../../src/game/content/layers.ts';
 import { formatNumber } from '../../src/game/presentation/formatNumber.ts';
 import { simulate } from '../balance/simulate.mjs';
+function goToEgg(session,eggId) {
+ const station=SESSION_CONTENT.eggStations.find(station=>station.eggId===eggId);
+ session.updatePosition([station.zone.x,station.zone.y,station.zone.z],true);
+}
 
 test('new progression saves start empty and never share the legacy preview slot',()=>{
  const s=new GameSession(SESSION_CONTENT);
  assert.equal(s.getSnapshot().coins,0);
  assert.ok(s.getSnapshot().destinations.every(d=>!d.unlocked));
+ goToEgg(s,'meadow-egg');
  assert.equal(s.pets.hatch('meadow-egg').status,'insufficient-coins');
  assert.notEqual(saveNamespace({pathname:'/games/mining-test/index.html',search:''}).name,'mining:test');
  assert.equal(WORLD_GENERATION.version,9);
 });
-test('room entry, not depth alone, grants only that room access and no coins',()=>{
+test('historical depth grants every reached layer and its eggs without coins or room discovery',()=>{
  const s=new GameSession(SESSION_CONTENT),room=SESSION_CONTENT.destinations[1];
+ // Arrival is airborne until physics confirms contact with the room floor.
+ s.updatePosition(room.spawn,false);
+ assert.equal(s.getSnapshot().destinations.find(d=>d.id===room.id).unlocked,false);
  s.updatePosition([90,-900,90],false);
- assert.ok(s.getSnapshot().destinations.every(d=>!d.unlocked));
- s.updatePosition(room.spawn,true);
- assert.deepEqual(s.getSnapshot().destinations.filter(d=>d.unlocked).map(d=>d.id),[room.id]);
+ const reached=SESSION_CONTENT.destinations.filter(d=>d.depth<=900).map(d=>d.id);
+ assert.deepEqual(s.getSnapshot().destinations.filter(d=>d.unlocked).map(d=>d.id),reached);
  assert.equal(s.getSnapshot().coins,0);
+ s.updatePosition([90,0,90],true);
+ assert.deepEqual(s.getSnapshot().destinations.filter(d=>d.unlocked).map(d=>d.id),reached);
  const restored=GameSession.fromData(s.exportProgress(),SESSION_CONTENT);
  assert.equal(restored.pets.getSnapshot().eggs.find(e=>e.id==='mushroom-egg').unlocked,true);
- assert.equal(restored.pets.getSnapshot().eggs.find(e=>e.id==='pebble-egg').unlocked,false);
+ assert.equal(restored.pets.getSnapshot().eggs.find(e=>e.id==='pebble-egg').unlocked,true);
+ assert.equal(restored.pets.getSnapshot().eggs.find(e=>e.id==='crystal-egg').unlocked,false);
 });
 test('locked eggs consume neither currency nor RNG; access changes refresh the same UI adapter',()=>{
  let rolls=0;
  const s=new GameSession({...SESSION_CONTENT,initialCoins:1e8},50,()=>0,{random:()=>{rolls++;return 0;},createPetId:()=>String(rolls)});
+ goToEgg(s,'pebble-egg');
  const before=s.pets.getSnapshot(),coins=s.getSnapshot().coins;
  assert.equal(s.pets.hatch('pebble-egg').status,'locked');assert.equal(rolls,0);assert.equal(s.getSnapshot().coins,coins);
- s.updatePosition(SESSION_CONTENT.destinations[0].spawn,true);
+ s.updatePosition([90,-SESSION_CONTENT.destinations[0].depth,90],false);
  assert.notEqual(s.pets.getSnapshot(),before);
  assert.equal(s.pets.getSnapshot().eggs.find(e=>e.id==='pebble-egg').canAfford,true);
+ goToEgg(s,'pebble-egg');
  assert.equal(s.pets.hatch('pebble-egg').status,'hatched');assert.equal(rolls,1);
  assert.equal(s.getSnapshot().coins,coins-PET_CONTENT.eggs.find(e=>e.id==='pebble-egg').price);
 });
@@ -55,7 +67,7 @@ test('pet power cannot bypass advanced ore level; common and deep rock have no h
  for(kind of [3,4,...STAGES.map(stage=>stage.deepKind)]){
   now++;assert.notEqual(s.hit([kind,-250,0]).status,'locked');
  }
- const earned=s.exportProgress();earned.pickaxe.level=8;
+ const earned=s.exportProgress();earned.pickaxe.level=8;delete earned.equipment; /* Legacy active-gear fixture. */
  const ready=GameSession.fromData(earned,SESSION_CONTENT);kind=17;
  ready.attach({cell:()=>17,pending:()=>false,mine:()=>true,cancelMining(){},returnToSurface(){}});
  assert.equal(ready.hit(cell).status,'breaking');

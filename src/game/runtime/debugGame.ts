@@ -18,6 +18,8 @@ import { GAME_CONFIG } from "../config.ts";
 import { COURSE_SPAWN } from "../validation/course.ts";
 import { ORE_SAMPLES, mineralName } from "../terrain/minerals.ts";
 export type ValidationDebug = {
+  advanceDayNight: (seconds: number) => void;
+  advanceOnline: (seconds: number) => void;
   snapshot: () => unknown;
   performance: (options: {
     framesInFlight?: 1 | 2;
@@ -81,6 +83,8 @@ export function attachGameDebug(
   } = current;
   const teleport = player.travelTo;
   const debug: ValidationDebug = {
+    advanceDayNight: seconds => environment.advanceDayNight(seconds),
+    advanceOnline: seconds => session.advanceOnline(seconds),
     snapshot: () => ({
       ...terrain.snapshot(),
       content: {
@@ -105,6 +109,7 @@ export function attachGameDebug(
         cameraDistance: GAME_CONFIG.camera.distance,
       },
       startup: { ...startup, sky: environment?.sky.diagnostics() },
+      dayNight: environment.dayNightSnapshot,
       travelling: !!player.travelling,
       facilities: {
         ...facilities.diagnostics(),
@@ -118,6 +123,8 @@ export function attachGameDebug(
           color: sun.color.getHexString(),
           intensity: sun.intensity,
         },
+        ambient: environment.ambientSnapshot,
+        cameraDaylightBlend: environment.cameraDaylightBlend,
         shadowPolicy: "baked-ground-only",
         surfaceArea: environment?.lights.diagnostics(),
         cameraFar: (activeCamera as PerspectiveCamera).far,
@@ -126,7 +133,7 @@ export function attachGameDebug(
         shadowAutoUpdate: gl.shadowMap.autoUpdate,
         shadowMapSize: 0,
         shadowFilter: "none",
-        surfaceReflections: environment?.sky.active ?? false,
+        surfaceReflections: scene.environment !== null,
       },
       cracks: interaction.cracks.diagnostics(),
       economy: session.getSnapshot(),
@@ -139,6 +146,11 @@ export function attachGameDebug(
       samples: terrain.sampleStats(),
       terrainVisuals: terrain.render.diagnostics(),
       position: physics.feet(),
+      guideMining: {visible:interaction.lesson.group.visible,cell:interaction.lesson.cell},
+      guideDirection: (() => {
+        const arrow=scene.getObjectByName('onboarding-direction');
+        return arrow?{style:arrow.userData.style,texture:arrow.userData.texture,visible:arrow.visible,position:arrow.position.toArray(),yaw:arrow.rotation.y,length:arrow.userData.length,destination:arrow.userData.destination}:null;
+      })(),
       grounded: physics.grounded,
       ready: !player.travelling && terrain.ready(physics.feet()),
       physicsSteps: physics.steps,
@@ -212,8 +224,8 @@ export function attachGameDebug(
         feet[0] < -95 ||
         feet[0] > 103 ||
         feet[2] < -95 ||
-        feet[2] > 103 ||
-        feet[1] < -3999 ||
+        feet[2] > (current.content.worlds ? 551 : 103) ||
+        feet[1] < (current.content.worlds ? -2799 : -3999) ||
         feet[1] > 20
       )
         throw new Error("验证位置超出矿区");

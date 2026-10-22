@@ -36,7 +36,7 @@ export const SURFACE_FACILITIES = {
   sale: {
     id: "surface-sale",
     type: "sell",
-    anchor: { x: -12, z: 56, yaw: Math.PI },
+    anchor: { x: -17, z: 12, yaw: 0 },
     model: {
       asset: "simulator-exchange",
       width: 10,
@@ -64,7 +64,7 @@ export const SURFACE_FACILITIES = {
   shop: {
     id: "surface-upgrade",
     type: "shop",
-    anchor: { x: 12, z: 56, yaw: Math.PI },
+    anchor: { x: -20, z: -13, yaw: 0 },
     model: {
       asset: "simulator-upgrade",
       width: 10,

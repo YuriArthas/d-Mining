@@ -1,0 +1,19 @@
+{
+  "name": "mining-surface-study",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit && vite build && node tools/asset-manifest.mjs",
+    "dev": "vite --host 0.0.0.0",
+    "publish": "npm run build && node tools/publish.mjs"
+  },
+  "dependencies": {
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "@types/three": "0.186.0",
+    "typescript": "7.0.2",
+    "vite": "8.3.2"
+  }
+}

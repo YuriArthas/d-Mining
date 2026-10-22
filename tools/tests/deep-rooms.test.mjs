@@ -18,7 +18,7 @@ for(const layer of LAYERS.filter(l=>l.from>=1600&&l.scene))test(`${layer.id} ind
  assert.ok(triangles<60000);assert.equal(plan.authored.kit.texture.size,64);
  const session=new GameSession(withInitialAccess(camp.session)),moves=[];
  session.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining(){},returnToSurface(){},travelTo:p=>moves.push(p)});
- session.updatePosition(room.spawn,true);
+ session.updatePosition([room.x,-room.depth+.027,room.z],true);
  const zone=camp.session.portals.find(p=>p.id===layer.id).zone;
  session.updatePosition([zone.x,zone.y,zone.z],true);assert.deepEqual(moves,[room.spawn]);
  session.collected([{kind:5}]);session.updatePosition([room.sell.x,room.sell.y,room.sell.z],true);

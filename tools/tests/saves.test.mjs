@@ -18,6 +18,10 @@ import {
 import { compatibleHead } from "../../src/game/persistence/saveMigrations.ts";
 import { saveNamespace } from "../../src/game/persistence/SaveBootstrap.ts";
 const SESSION_CONTENT = {...LIVE_SESSION_CONTENT, initialCoins:200, petContent:PET_CONTENT};
+function goToEgg(session) {
+  const station=SESSION_CONTENT.eggStations.find(station=>station.eggId==='meadow-egg');
+  session.updatePosition([station.zone.x,station.zone.y,station.zone.z],true);
+}
 const head = () => ({
   formatVersion: 1,
   revision: 1,
@@ -38,9 +42,13 @@ const cells = [
   [-9, -30, -10],
   [-8, -30, -10],
 ];
-function fixture(commit = async () => {}) {
-  const session = GameSession.createNew(SESSION_CONTENT),
+function fixture(commit = async () => {}, minedBefore = false) {
+  const data = GameSession.createNew(SESSION_CONTENT).exportProgress();
+  if (minedBefore) data.onboarding = { ...data.onboarding, minedOnce: true };
+  const session = GameSession.fromData(data, SESSION_CONTENT),
     world = new SparseWorld();
+  // Establish valid gameplay proximity before tracking save notifications.
+  goToEgg(session);
   const batches = [];
   const store = {
     commit: async (batch) => {
@@ -72,6 +80,7 @@ function fixture(commit = async () => {}) {
 }
 test("session round-trip restores resources and equipment without granting starting coins again", () => {
   const s = GameSession.createNew(SESSION_CONTENT);
+  goToEgg(s);
   const pet = s.pets.hatch("meadow-egg").pet;
   s.pets.equip(pet.id);
   s.collected(Array.from({ length: 60 }, () => ({ kind: 8 })));
@@ -144,6 +153,7 @@ test("preview access is not earned; actual depth changes notify without a new un
 test("pet commands settle first, notify once, and rejected commands do not dirty progress", () => {
   const s = GameSession.createNew(SESSION_CONTENT),
     states = [];
+  goToEgg(s);
   s.onProgressCommitted(() => states.push(s.exportProgress()));
   s.pets.hatch("unknown");
   assert.equal(states.length, 0);
@@ -353,7 +363,7 @@ test("unknown formats and changed terrain generations are rejected without silen
 
 test("continuous normal changes keep the original two-second deadline", async (t) => {
   t.mock.timers.enable({ apis: ["setTimeout"] });
-  const f = fixture();
+  const f = fixture(undefined, true);
   try {
     f.session.collected([{ kind: 8 }]);
     for (let i = 0; i < 3; i++) {
@@ -373,7 +383,7 @@ test("continuous normal changes keep the original two-second deadline", async (t
 });
 test("urgent request shortens a normal save deadline", async (t) => {
   t.mock.timers.enable({ apis: ["setTimeout"] });
-  const f = fixture();
+  const f = fixture(undefined, true);
   try {
     f.session.collected([{ kind: 8 }]);
     t.mock.timers.tick(100);

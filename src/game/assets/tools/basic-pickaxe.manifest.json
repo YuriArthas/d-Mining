@@ -1,0 +1,23 @@
+{
+  "maker": "Blender",
+  "script": "tools/build-basic-pickaxe.py",
+  "blend": "assets-source/basic-pickaxe/basic-pickaxe.blend",
+  "glb": "src/game/assets/tools/basic-pickaxe.glb",
+  "triangles": 456,
+  "texture": [
+    64,
+    64
+  ],
+  "sha256": "40ecf93f01064548139dc538f5be8c3f36d6cf8a260be869cdcd5c913ce81d8e",
+  "bytes": 35372,
+  "grip": [
+    0,
+    0,
+    0
+  ],
+  "tip": [
+    0,
+    0.46,
+    -0.43
+  ]
+}

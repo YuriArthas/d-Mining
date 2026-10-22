@@ -1,0 +1,109 @@
+{
+  "repository": "https://github.com/CloudAI-X/threejs-skills",
+  "commit": "0e181866f095b5f06d005133876e926515390d95",
+  "installedAt": "2026-10-20T08:47:23.112673+00:00",
+  "targetThreeVersion": "0.186.1",
+  "installer": "/root/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py",
+  "primaryDirectory": "/root/.agents/skills",
+  "claudeDirectoryLinks": "/root/.claude/skills",
+  "license": {
+    "path": "/root/.agents/skill-sources/cloudai-x-threejs-skills/LICENSE",
+    "sha256": "d26f12fa1a0e03fd5aa4d3cbf05262a9f1c684672d0864abac78b3bbb12b268c"
+  },
+  "upstreamSkillFilesUnmodified": true,
+  "verification": {
+    "provider": "codex",
+    "probe": "skills/list (the same API used by T3 CodexProvider)",
+    "cwd": "/root/threejs_space/d-Mining",
+    "count": 13,
+    "errors": [],
+    "skills": [
+      {
+        "name": "threejs-animation",
+        "path": "/root/.agents/skills/threejs-animation/SKILL.md",
+        "enabled": true,
+        "sha256": "0ab1b79cb977a1b5b03b247f9ef677acc76c3ee80d42904afb1b66838a19c481"
+      },
+      {
+        "name": "threejs-asset-pipeline",
+        "path": "/root/.agents/skills/threejs-asset-pipeline/SKILL.md",
+        "enabled": true,
+        "sha256": "25ca0a26ce01a1151c6757757569ef7bea56bc1af77b216c386c136060e5952d"
+      },
+      {
+        "name": "threejs-fundamentals",
+        "path": "/root/.agents/skills/threejs-fundamentals/SKILL.md",
+        "enabled": true,
+        "sha256": "cb6a0db8f05bb7d8196cad0ca6ae245e2baec53da4675e1b94be4fa735ed8a09"
+      },
+      {
+        "name": "threejs-geometry",
+        "path": "/root/.agents/skills/threejs-geometry/SKILL.md",
+        "enabled": true,
+        "sha256": "c29c1568cb56e902999b6a50316cd5079c53ee620138148897d269e9716e8da7"
+      },
+      {
+        "name": "threejs-interaction",
+        "path": "/root/.agents/skills/threejs-interaction/SKILL.md",
+        "enabled": true,
+        "sha256": "46f60f3235aa11f2b89320cc2fb5b0adc167f3e8f0c717ba60ad1b006b41621f"
+      },
+      {
+        "name": "threejs-lighting",
+        "path": "/root/.agents/skills/threejs-lighting/SKILL.md",
+        "enabled": true,
+        "sha256": "f12faf79625a7f42952124a5456d338e8399a65e16326c1a6a3239aa8e5ce489"
+      },
+      {
+        "name": "threejs-loaders",
+        "path": "/root/.agents/skills/threejs-loaders/SKILL.md",
+        "enabled": true,
+        "sha256": "ddf6ed2d7dfc809ce722482541fe88af7d349cd8066a4617fabaea865a2a831d"
+      },
+      {
+        "name": "threejs-materials",
+        "path": "/root/.agents/skills/threejs-materials/SKILL.md",
+        "enabled": true,
+        "sha256": "7d17cefac80196f3dd5068e2042e66244073925d24a55b7ca77534d594c5bc81"
+      },
+      {
+        "name": "threejs-performance",
+        "path": "/root/.agents/skills/threejs-performance/SKILL.md",
+        "enabled": true,
+        "sha256": "dacbf6a43ed280bdfcda2ce9fcf7a3f0ae54c25ed264e62f6e9a0117d6534285"
+      },
+      {
+        "name": "threejs-postprocessing",
+        "path": "/root/.agents/skills/threejs-postprocessing/SKILL.md",
+        "enabled": true,
+        "sha256": "0063f5f544215748ed666d878f1d69112094e662792228445a3ab9a56d209fb1"
+      },
+      {
+        "name": "threejs-react-three-fiber",
+        "path": "/root/.agents/skills/threejs-react-three-fiber/SKILL.md",
+        "enabled": true,
+        "sha256": "07c0f09516dce50c91c3d23c5baca83c35d161e1abe3d8460782aba56e9476fa"
+      },
+      {
+        "name": "threejs-shaders",
+        "path": "/root/.agents/skills/threejs-shaders/SKILL.md",
+        "enabled": true,
+        "sha256": "8dc55ed6cc348abaad60851ae9f3f5ebcc6e3027dd7f7a55acc1832c73f11bca"
+      },
+      {
+        "name": "threejs-textures",
+        "path": "/root/.agents/skills/threejs-textures/SKILL.md",
+        "enabled": true,
+        "sha256": "43b4fde95cf9fe42b05f38fe6a6c6d5f36eb062cb15b3fd21a0eed376a5d1d9b"
+      }
+    ]
+  },
+  "claudeVerification": {
+    "scanner": "/root/t3code/apps/server/src/provider/Drivers/ClaudeSkills.ts:discoverClaudeSkills",
+    "configRoot": "/root/.claude",
+    "cwd": "/root/threejs_space/d-Mining",
+    "recognized": 13,
+    "enabled": 13,
+    "method": "Executed the T3 scanner through Node with NodeServices.layer; no Claude model turn was started."
+  }
+}

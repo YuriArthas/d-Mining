@@ -1,5 +1,9 @@
 import type { SparseWorld } from '../terrain/SparseWorld.ts';
+import { JourneyGates, journeySurfacePlan, spawnPassageSolids, openSpawnPassage } from '../presentation/JourneyGates.ts';
 import { CameraGrade } from '../presentation/CameraGrade.ts';
+import { FeedbackFixtures } from '../presentation/FeedbackFixtures.ts';
+import { FEEDBACK_COLLISION_SITE } from '../content/feedbackFacilities.ts';
+import { surfaceLightStrengthAtFeet } from '../world/SurfaceLightFade.ts';
 import type { CampContent } from "../content/campContent.ts";
 import type {
   Group,
@@ -70,7 +74,7 @@ export type StartGameOptions = {
   samples: boolean;
   previewLayer: string | null;
   signal: AbortSignal;
-  settings: () => { time: SurfaceTime; bakedShadows: boolean };
+  settings: () => { time: SurfaceTime | 'auto'; bakedShadows: boolean };
   onStatus: (text: string) => void;
   onLoading: (event: LoadingEvent) => void;
 };
@@ -109,6 +113,12 @@ export async function startGame(options: StartGameOptions) {
     if (!abort.signal.aborted) options.onLoading(event);
   };
   const startup = createStartupStats();
+  const timing = {status:0,frames:0,skipElapsed:true};
+  // Visibility can change while RAF is stopped. Remember the event rather than
+  // trusting document.hidden on the first resumed frame.
+  const visibilityChanged = () => { timing.skipElapsed=true; };
+  document.addEventListener('visibilitychange',visibilityChanged);
+  scope.defer(()=>document.removeEventListener('visibilitychange',visibilityChanged));
   try {
     check();
     renderer.shadowMap.autoUpdate = false;
@@ -148,7 +158,7 @@ export async function startGame(options: StartGameOptions) {
         samples: options.samples,
         layers: content.layers,
       };
-      const physics = new CharacterPhysics(generation.samples);
+      const physics = new CharacterPhysics(generation.samples,!!generation.worlds);
       scope.defer(() => physics.dispose());
       const terrain = new TerrainStream(
         physics,
@@ -236,6 +246,7 @@ export async function startGame(options: StartGameOptions) {
     scope.defer(() => interaction.dispose());
     root.add(interaction.group);
     surface.retain();
+    if(content.worlds&&!content.surface.authored?.opensSpawnPassage)openSpawnPassage(surface.group);
     const eggLabels = new EggStandLabels(content.hub.eggs, session.pets.getSnapshot().eggs);
     root.add(eggLabels.group);
     scope.defer(() => disposeScenery(eggLabels.group));
@@ -252,12 +263,21 @@ export async function startGame(options: StartGameOptions) {
       };
     updateHub();
     scope.defer(session.subscribe(updateHub));
-    const sites = createScenerySites(content.rooms, content.surface.plan),
+    const mainPlan=content.worlds&&!content.surface.authored?.opensSpawnPassage?{...content.surface.plan,solids:spawnPassageSolids(content.surface.plan.solids)}:content.surface.plan;
+    const sites = [...createScenerySites(content.rooms, mainPlan),FEEDBACK_COLLISION_SITE,...content.extraSites??[],
+      ...content.worlds?.slice(1).map(w=>({id:`world${w.id}.surface`,depth:0,plan:journeySurfacePlan(w.z)}))??[]],
       sceneryCollision = new SceneryCollision(physics, sites);
     scope.defer(() => sceneryCollision.dispose());
     const facilities = new SceneryView(surface, sites);
     scope.defer(() => facilities.dispose());
     root.add(facilities.group, terrain.group);
+    if(content.worlds){const gates=new JourneyGates(physics,session);root.add(gates.group);scope.defer(()=>gates.dispose());}
+    const feedbackFixtures = new FeedbackFixtures();
+    root.add(feedbackFixtures.group);
+    const updateFeedback = () => { const s=session.getSnapshot(); feedbackFixtures.update(s.challengeBoard,s.maxDepth); };
+    updateFeedback();
+    scope.defer(session.subscribe(updateFeedback));
+    scope.defer(() => feedbackFixtures.dispose());
     startup.sceneAttachMs = performance.now() - startup.started;
     startup.terrainPendingAtAttach = terrain.snapshot().queue;
     const roomStart = performance.now();
@@ -274,18 +294,19 @@ export async function startGame(options: StartGameOptions) {
       theme = themeById(layer.theme);
     cameraView.prepare(physics, camera);
     avatar.position.set(...feet);
-    let warmTime: SurfaceTime;
+    let warmTime: SurfaceTime | 'auto';
     do {
       const settings = options.settings();
       warmTime = settings.time;
       facilities.updateSurface(
-        warmTime,
+        warmTime==='auto'?'night':warmTime,
         performance.now() / 1000,
-        settings.bakedShadows && feet[1] > -4,
+        settings.bakedShadows,
+        surfaceLightStrengthAtFeet(feet[1]),
       );
       environment.prepare({
         surface: theme.motif === "meadow",
-        surfaceLightingActive: feet[1] > -4,
+        surfaceLightStrength: surfaceLightStrengthAtFeet(feet[1]),
         time: warmTime,
         depth: layer.from,
         sky: theme.sky,
@@ -327,7 +348,7 @@ export async function startGame(options: StartGameOptions) {
       petFollowers,
       minerAvatar,
       startup,
-      timing: { status: 0, frames: 0 },
+      timing,
       dispose: () => {
         abort.abort();
         scope.dispose();

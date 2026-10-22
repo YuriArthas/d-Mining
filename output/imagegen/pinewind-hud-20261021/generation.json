@@ -1,0 +1,14 @@
+{
+  "model": "gpt-image-2.5",
+  "method": "imagegen skill CLI / Images API edit",
+  "input": "artifacts/pinewind-public-submitted/01-spawn.png",
+  "promptFile": "prompt.txt",
+  "promptSha256": "9f3f8c538325cd7cdbc5f327ea32924a8294ab9c551d38fe88dd0ce87328c5bb",
+  "output": "roblox-hud-reference.png",
+  "outputSha256": "dac1a7249ef61e51e5a168ba1a227e2e6414c35366531ec7c7f16f68bf13d916",
+  "size": [
+    1586,
+    992
+  ],
+  "use": "HUD composition reference; live scene geometry is unchanged"
+}

@@ -1,3 +1,5 @@
+import { assembleAuthoredSurface } from "./assembleAuthoredSurface.ts";
+import { NearestFilter, NearestMipmapNearestFilter } from "three";
 import type { SurfaceContent } from "../content/campContent.ts";
 import type { AssetProfile } from "../content/assetProfiles.ts";
 import { Mesh, MeshStandardMaterial, type WebGLRenderer } from "three";
@@ -60,6 +62,20 @@ export async function loadStaticSurface(
   signal: AbortSignal,
   onProgress?: (done: number, total: number) => void,
 ) {
+  if (content.authored) {
+    const requests:ModelRequest[]=[...new Set(content.authored.instances.map(p=>p.asset))].map(name=>{
+      const manifest=manifests[`../assets/camp/${name}.manifest.json`];
+      if(!manifest)throw Error(`缺少模型清单 ${name}`);
+      return {name,manifest,coordinateSpace:'authored',parts:manifest.parts.map(part=>{
+        const url=urls[`../assets/camp/${part}`];if(!url)throw Error(`缺少模型资源 ${part}`);return url;
+      }),bytes:manifest.bytes,decodedBytes:manifest.decodedBytes,instances:content.authored!.instances.filter(p=>p.asset===name).length};
+    });
+    const assets=await loadModelAssets(renderer,requests,signal,m=>{
+      m.roughness=1;m.metalness=0;m.envMapIntensity=0;
+      if(m.map){m.map.magFilter=NearestFilter;m.map.minFilter=NearestMipmapNearestFilter;}
+    },onProgress);
+    return assembleAuthoredSurface(assets,content);
+  }
   const start = performance.now(),
     details = new SurfaceDetails(content.details);
   const names = [...new Set(content.placements.map((p) => p.asset))];

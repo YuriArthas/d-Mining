@@ -10,12 +10,8 @@ import { instanceMineBlocks } from "./instanceMineBlocks.ts";
 import { instanceStaticProps } from "./instanceStaticProps.ts";
 import { createBoundaryCore } from "./BoundaryCore.ts";
 import { surfaceTextureMemory } from "./surfaceTextureMemory.ts";
-export type SurfaceScene = {
-  group: Group;
-  details: SurfaceDetails;
-  retain: () => void;
-  dispose: () => void;
-};
+import type { SurfaceScene } from "./SurfaceScene.ts";
+export type { SurfaceScene } from "./SurfaceScene.ts";
 export function assembleSurface(
   assets: Awaited<ReturnType<typeof loadModelAssets>>,
   details: SurfaceDetails,

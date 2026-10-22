@@ -1,0 +1,51 @@
+// Public desktop checks with isolated save slots. Seeded inventories and debug
+// teleports/hits validate UI and persistence, not natural new-player play times.
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE || '../../d-Block-Blast/node_modules/playwright');
+const fs=require('node:fs/promises'),assert=require('node:assert/strict');
+(async()=>{
+ const dir=require('node:path').resolve(__dirname,'../artifacts/onboarding-arrows');await fs.mkdir(dir,{recursive:true});
+ const base='https://w-sunjun-public.dev.clock-p.com/games/mining-test/index.html',id='onboarding-'+Date.now();
+ const browser=await chromium.launch({headless:true,args:['--no-sandbox','--disable-quic','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+ const page=await browser.newPage({viewport:{width:1280,height:800}});page.setDefaultTimeout(60000);
+ const report={url:base,checks:[],errors:[],networkFailures:[]};page.on('pageerror',e=>report.errors.push(e.message));page.on('requestfailed',r=>report.networkFailures.push({url:r.url(),error:r.failure()?.errorText}));
+ await page.addInitScript(()=>{let logger;window.__testLoadingErrors=[];Object.defineProperty(window,'__MINING_LOG__',{configurable:true,get:()=>logger,set:value=>{logger=value;const fail=value.fail;value.fail=(error,type)=>{window.__testLoadingErrors.push(String(error));return fail(error,type);};const write=value.write;value.write=(type,data)=>{if(type==='loading.error')window.__testLoadingErrors.push(data);return write(type,data);};}});});
+ const snap=()=>page.evaluate(()=>window.__miningValidation.snapshot());
+ const ready=async()=>{await page.waitForFunction(()=>document.querySelector('.loading-error:not([hidden])')||window.__miningValidation?.snapshot().ready&&!document.querySelector('.loading-screen'),null,{timeout:180000,polling:500});if(await page.locator('.loading-error:visible').count())throw Error('Public loading failed: '+JSON.stringify(await page.evaluate(()=>window.__testLoadingErrors)));};
+ const diagnostic=()=>page.evaluate(()=>{window.__miningValidation.performance({submission:'fenced',framesInFlight:1});const gl=document.querySelector('canvas').getContext('webgl2');setInterval(()=>gl.flush(),100);});
+ const go=async url=>{console.log('Opening',url);await page.goto(url,{waitUntil:'domcontentloaded'});await page.bringToFront();await ready();await diagnostic();console.log('Ready');};
+ const reload=async()=>{console.log('Reloading');await page.evaluate(()=>window.__miningSave.flush());await page.reload({waitUntil:'domcontentloaded'});await ready();await diagnostic();console.log('Reloaded');};
+ const rendered=async()=>{const before=(await snap()).renderer.submission.submitted;await page.waitForFunction(n=>window.__miningValidation.snapshot().renderer.submission.submitted>=n+2,before,{polling:500,timeout:60000});};
+ const travel=async pos=>{await page.evaluate(p=>window.__miningValidation.teleport(p),pos);await ready();await rendered();};
+ const step=async id=>{await page.waitForFunction(id=>document.querySelector('.guide-card')?.dataset.step===id,id,{polling:500});};
+ const check=t=>{report.checks.push(t);console.log(t);};
+ const screenshot=async name=>{await rendered();return page.screenshot({path:dir+'/'+name+'.png',timeout:60000});};
+ const saveFixture=async(name,edit)=>{
+   const data=await page.evaluate(()=>structuredClone(window.__miningSave.progress()));edit(data);
+   await page.evaluate(async({name,data})=>{const store=await window.__miningSave.openTestStore(name);await store.commit({expectedRevision:null,head:{formatVersion:1,revision:1,savedAt:Date.now(),regionCount:0,world:{generationVersion:9,seed:0,regionEncoding:1}},progress:data,regions:[]});store.close();},{name,data});
+ };
+ try{
+ await go(`${base}?debug=1&submission=fenced&saveTest=${id}`);await step('mine');assert.equal((await snap()).economy.coins,0);const fresh=await page.evaluate(()=>structuredClone(window.__miningSave.progress()));
+ await page.waitForFunction(()=>document.querySelector('.guide-marker')?.dataset.directionVisible==='true');await screenshot('fresh-1280');check('Fresh zero-coin save: active tutorial and mine entrance marker');
+ await page.setViewportSize({width:1120,height:700});await rendered();await screenshot('fresh-1120');await page.setViewportSize({width:1280,height:800});await page.waitForTimeout(2500);
+ const view=(await snap()).view;await page.evaluate(v=>window.__miningValidation.look(v.yaw+Math.PI,v.pitch),view);await rendered();await page.waitForFunction(()=>document.querySelector('.guide-marker')?.dataset.offscreen==='true');await screenshot('target-behind');await page.evaluate(v=>window.__miningValidation.look(v.yaw,v.pitch),view);await rendered();check('Direction arrow visible at spawn; camera turn keeps an offscreen destination indicator');
+ await page.getByRole('button',{name:'操作帮助',exact:true}).click();assert.equal(await page.locator('.guide-card').count(),0);assert.equal(await page.locator('.guide-marker').count(),0);await screenshot('help');await page.keyboard.press('Escape');await step('mine');
+ await page.getByRole('button',{name:'跳过引导',exact:true}).click();assert.equal((await snap()).economy.onboarding.status,'skipped');await reload();assert.equal(await page.locator('.guide-card').count(),0);assert.equal((await snap()).economy.onboarding.status,'skipped');
+ await page.getByRole('button',{name:'操作帮助',exact:true}).click();await page.getByRole('button',{name:'继续引导',exact:true}).click();await step('mine');check('Help hides guide; skip persists across reload; resume restores current goal');
+ const cells=await page.evaluate(()=>{const a=[];for(let y=-5;y>-15;y--)for(let x=-3;x<4;x++)for(let z=-3;z<4;z++)if(window.__miningValidation.cell([x,y,z])===8)a.push([x,y,z]);return a.slice(0,3);});assert.equal(cells.length,3);
+ for(const c of cells){await page.waitForTimeout(600);assert.equal((await page.evaluate(c=>window.__miningValidation.hit(c),c)).status,'breaking');await page.waitForFunction(c=>window.__miningValidation.cell(c)===0,c,{polling:500});}
+ await step('sell');assert.equal((await snap()).economy.onboarding.minedOnce,true);const sale=(await snap()).sellZone;await travel([sale.x,sale.y,sale.z]);await step('earn');assert.equal((await snap()).economy.coins,3);assert.equal((await snap()).economy.onboarding.soldOnce,true);check('Real terrain receipts record mining; partial-bag sale records selling; insufficient funds returns to earning');
+ await saveFixture(id+'-egg',p=>{p.wallet.coins=80;p.onboarding={version:1,status:'active',minedOnce:true,soldOnce:true,equippedOnce:false};p.inventory.items={'ore.gold':1};});
+ await go(`${base}?debug=1&submission=fenced&saveTest=store-${id}-egg`);await step('egg');await page.waitForFunction(()=>document.querySelector('.guide-marker')?.dataset.directionVisible==='true');await screenshot('egg-goal');
+ const l=(await snap()).eggLabels.labels.find(l=>l.eggId==='meadow-egg');await travel([l.x-2,l.y,l.z]);await page.waitForFunction(()=>window.__miningValidation.snapshot().economy.eggId==='meadow-egg',null,{polling:500});await page.waitForFunction(()=>document.querySelector('.egg-world-prompt')?.style.visibility==='visible',null,{polling:500});assert.equal(await page.locator('.guide-marker').evaluate(e=>e.style.visibility),'hidden');assert.equal(await page.locator('.guide-marker').getAttribute('data-direction-visible'),'false');await screenshot('egg-prompt');await page.keyboard.press('e');await page.locator('.egg-buy').waitFor();assert.equal(await page.locator('.guide-card').count(),0);assert.equal(await page.locator('.egg-probability').count(),5);await screenshot('egg-panel');
+ await page.locator('.egg-buy').click();assert.equal((await snap()).economy.onboarding.equippedOnce,false);await screenshot('hatch-result');await page.getByRole('button',{name:'去装备',exact:true}).click();await page.getByRole('button',{name:'一键最佳',exact:true}).click();assert.equal((await snap()).economy.onboarding.equippedOnce,true);await page.keyboard.press('Escape');await step('earn');check('Seeded 80 coins: egg before axe; five visible probabilities; hatch alone does not count; equip learns once');
+ await travel([sale.x,sale.y,sale.z]);await step('upgrade');await page.getByRole('button',{name:'升级',exact:true}).click();await screenshot('upgrade');await page.locator('.upgrade-buy').click();assert.equal((await snap()).economy.onboarding.status,'completed');assert.equal(await page.locator('.guide-complete').count(),0);await page.getByRole('button',{name:'关闭升级界面',exact:true}).click();await page.locator('.guide-complete').waitFor();await screenshot('complete');await reload();assert.equal((await snap()).economy.onboarding.status,'completed');assert.equal(await page.locator('.guide-card').count(),0);await page.getByRole('button',{name:'操作帮助',exact:true}).click();assert.equal(await page.getByRole('button',{name:'继续引导',exact:true}).count(),0);await page.keyboard.press('Escape');check('Selling seeded stock funds real upgrade; completion waits for panel close, persists, and never replays');
+ await saveFixture(id+'-legacy',p=>{Object.assign(p,structuredClone(fresh));delete p.onboarding;p.inventory.items={'ore.soil':50};});
+ await go(`${base}?debug=1&submission=fenced&saveTest=store-${id}-legacy`);assert.equal((await snap()).economy.onboarding.status,'legacy');assert.equal(await page.locator('.guide-card').count(),0);
+ await page.getByRole('button',{name:'操作帮助',exact:true}).click();await page.getByRole('button',{name:'开启引导',exact:true}).click();await step('sell');
+ await travel([0,-20,0]);await step('return');assert.equal(await page.locator('.guide-marker').count(),0);await screenshot('underground-full');
+ const room=(await snap()).content.rooms[0];await travel(room.spawn);assert.equal((await snap()).economy.guide.id,'sell');assert.ok((await snap()).economy.guideAnchor[1]<-20);await screenshot('room-sale');
+ check('Legacy save stays quiet until opt-in; full bag underground highlights return; room points at its own sale circle without a surface marker');
+ assert.deepEqual(report.errors,[]);
+ }catch(e){report.failure=String(e);report.snapshot=await snap().catch(()=>null);await screenshot('failure').catch(()=>{});throw e;}
+ finally{await fs.writeFile(dir+'/public-report.json',JSON.stringify(report,null,2));await browser.close();}
+})().catch(e=>{console.error(e);process.exitCode=1});

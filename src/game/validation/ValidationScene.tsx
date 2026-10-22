@@ -1,6 +1,9 @@
+import type { ShopView } from '../presentation/ShopView.ts';
+import { GuideMarkerProjector } from '../presentation/GuideMarkerProjector.ts';
+import { GuideDirectionArrow, updateGuideRoute } from '../presentation/GuideDirectionArrow.tsx';
 import type { SavedGame } from '../persistence/SaveBootstrap.ts';
 import { WorldPromptProjector } from "../presentation/WorldPromptProjector.ts";
-import { CAMERA_LOOKS } from '../content/cameraLook.ts';
+import { blendedCameraLook } from '../content/cameraLook.ts';
 import type { CampContent } from "../content/campContent.ts";
 import { useEffect, useRef, type RefObject } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
@@ -37,6 +40,7 @@ import { BOXES, RAMP } from "./physics.ts";
 
 export function ValidationScene({
   content,
+  shopView,
   savedGame,
   renderRate,
   shadowsEnabled: sceneShadowsEnabled,
@@ -48,15 +52,17 @@ export function ValidationScene({
   session,
   timeOfDay,
   stylized,
-  eggPrompt,
+  eggPrompt, guideMarker,
 }: {
+  shopView: ShopView;
+  guideMarker: RefObject<HTMLDivElement | null>;
   eggPrompt: RefObject<HTMLButtonElement | null>;
   content: CampContent;
   savedGame: SavedGame;
   renderRate: RenderRate;
   shadowsEnabled: boolean;
   probeMode: ProbeMode;
-  timeOfDay: SurfaceTime;
+  timeOfDay: SurfaceTime | 'auto';
   stylized: boolean;
   input: GameInput;
   onStatus: (text: string) => void;
@@ -74,6 +80,8 @@ export function ValidationScene({
   const runtime = useRef<PreparedGame | null>(null);
   const contactShadow = useRef<Mesh>(null);
   const loadingReleased = useRef(false);
+  const guideProjector = useRef(new GuideMarkerProjector());
+  const guideArrow = useRef<Group>(null);
   const promptProjector = useRef(new WorldPromptProjector());
   const settings = useRef({ timeOfDay, sceneShadowsEnabled });
   settings.current = { timeOfDay, sceneShadowsEnabled };
@@ -195,10 +203,12 @@ export function ValidationScene({
 
   // Priority 1 owns drawing; ordinary useFrame callbacks still simulate every
   // scheduled tick, including when the GPU has not completed its previous draw.
-  useFrame(({ gl, scene, camera }) => {
+  useFrame(({ gl, scene, camera }, delta) => {
     if (!runtime.current || probeMode === "idle") return;
     try {
-      submission.current?.draw(() => {
+      const current = runtime.current;
+      let drewWorld = false;
+      const submitted = submission.current?.draw(() => {
         runtime.current?.facilities.beginSurfaceDraw();
         const autoReset = gl.info.autoReset;
         gl.info.autoReset = false;
@@ -207,13 +217,19 @@ export function ValidationScene({
         const override = scene.overrideMaterial;
         if (probeMode === "unlit") scene.overrideMaterial = unlit.current;
         try {
-          runtime.current!.cameraGrade.draw(gl, scene, camera, stylized && probeMode !== "unlit", CAMERA_LOOKS[timeOfDay]);
+          // Environment cubemap/PMREM draws share the same admission and fence
+          // as the world frame and finish before any material samples them.
+          if (shopView.render(gl, delta)) return;
+          current.environment.prepareDraw();
+          drewWorld = true;
+          current.cameraGrade.draw(gl, scene, camera, stylized && probeMode !== "unlit", blendedCameraLook(current.environment.cameraDaylightBlend));
         } finally {
           scene.overrideMaterial = override;
           profiler.current?.endFrame();
           gl.info.autoReset = autoReset;
         }
       });
+      if (submitted && drewWorld) current.environment.markSubmitted();
     } catch (reason) {
       const error = `渲染失败：${String(reason)}`;
       onStatus(error);
@@ -270,6 +286,16 @@ export function ValidationScene({
   useFrame(({ camera }, elapsed) => {
     const game = runtime.current;
     if (!game || !avatar.current || !fixtures.current) return;
+    const gear = session.getSnapshot();
+    game.minerAvatar.setEquipment(gear.pickaxe.level, gear.backpackLevel);
+    if (shopView.active) {
+      input.reset(); game.minerAvatar.cancelMining();
+      if (guideArrow.current) guideArrow.current.visible = false;
+      if (eggPrompt.current) eggPrompt.current.style.visibility = 'hidden';
+      if (guideMarker.current) guideMarker.current.style.visibility = 'hidden';
+      if (!document.hidden && !session.suspended) session.advanceOnline(Math.min(Math.max(elapsed, 0), 1));
+      return;
+    }
     try { updateGame(
       game,
       elapsed,
@@ -287,11 +313,33 @@ export function ValidationScene({
     );
     } catch (error) { savedGame.saves.invalidate(error); throw error; }
     if (game.terrain.error) savedGame.saves.invalidate(game.terrain.error);
-    promptProjector.current.update(camera, session.getSnapshot().eggStation?.promptAnchor ?? null, eggPrompt.current);
+    const guideState = session.getSnapshot();
+    promptProjector.current.update(camera, guideState.eggStation?.promptAnchor ?? null, eggPrompt.current);
+    if(guideState.guide?.id!=='dig') guideProjector.current.update(camera, guideState.guideAnchor, guideMarker.current);
+    game.interaction.lesson.update(camera as PerspectiveCamera, game.physics.feet(), game.interaction.selected, game.terrain, guideState.pickaxe.level, guideMarker.current, guideState.guide?.id==='dig'&&!game.player.travelling&&!session.suspended);
+    // At the recommended egg, its visible E button takes over the same anchor.
+    // If it moves offscreen, keep the guide's direction marker available.
+    if (guideState.guide?.marker === 'egg' && guideState.eggId === guideState.guideEggId
+      && eggPrompt.current?.style.visibility === 'visible' && guideMarker.current) {
+      guideMarker.current.style.visibility = 'hidden';
+    }
+    const arrow = guideArrow.current, target = guideState.guideDestination;
+    if (arrow) {
+      const feet = avatar.current.position;
+      const dx = target ? target[0] - feet.x : 0, dz = target ? target[2] - feet.z : 0;
+      const distance = Math.hypot(dx, dz);
+      const atEgg = guideState.guide?.marker === 'egg' && guideState.eggId === guideState.guideEggId;
+      arrow.visible = !!target && !!guideMarker.current && !game.player.travelling && distance > 2 && !atEgg;
+      if (arrow.visible) {
+        updateGuideRoute(arrow,feet.toArray(),target!);
+      }
+      if (guideMarker.current) guideMarker.current.dataset.directionVisible = String(arrow.visible);
+    }
   });
 
   return (
     <group ref={root}>
+      <GuideDirectionArrow arrowRef={guideArrow} />
       <hemisphereLight ref={ambient} args={["#eef4ef", "#718574", 1.15]} />
       <directionalLight
         ref={sun}

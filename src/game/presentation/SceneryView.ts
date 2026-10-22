@@ -30,6 +30,7 @@ export class SceneryView {
     if (this.visuals.has(site.id)) return;
     const view = createScenery(site.plan);
     view.position.y = -site.depth;
+    view.position.z = site.z ?? 0;
     this.visuals.set(site.id, view);
     this.group.add(view);
     this.revision++;
@@ -49,8 +50,10 @@ export class SceneryView {
     time: SurfaceTime,
     elapsed: number,
     bakedShadowsEnabled: boolean,
+    lightStrength = 1,
+    daylightBlend = time === 'day' ? 1 : 0,
   ) {
-    this.surface.details.update(time, elapsed, bakedShadowsEnabled);
+    this.surface.details.update(time, elapsed, bakedShadowsEnabled, lightStrength, daylightBlend);
   }
   beginSurfaceDraw() {
     this.surface.details.beginDraw();

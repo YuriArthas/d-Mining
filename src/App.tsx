@@ -1,5 +1,7 @@
+import { ShopView } from './game/presentation/ShopView.ts';
 import {withInitialAccess} from "./game/content/initialAccess.ts";
-import {CAMP_CONTENT} from './game/content/campContent.ts';
+import {JOURNEY_GENERATION} from './game/content/journeyCamp.ts';
+import {PINEWIND_CAMP as CAMP_CONTENT} from './game/content/pinewindSurface.ts';
 import {LoadingScreen,LoadingBoundary} from './game/ui/LoadingScreen.tsx';
 import {initialLoading,updateLoading,type LoadingEvent} from './game/ui/loadingState.ts';
 import type {RenderRate} from './game/movement.ts';
@@ -13,17 +15,20 @@ import { GameInput, type InputSnapshot } from './game/GameInput.ts';
 import { InputMonitor, ValidationPanel } from './game/Controls.tsx';
 import { ValidationScene } from './game/validation/ValidationScene.tsx';
 import { SaveEntry } from './game/ui/SaveEntry.tsx';
-import { WORLD_GENERATION } from './game/terrain/SparseWorld.ts';
 import type { SavedGame } from './game/persistence/SaveBootstrap.ts';
 import { SessionUi } from './game/ui/SessionUi.tsx';
 import {PerformanceProbeUi} from './game/ui/PerformanceProbeUi.tsx';
 import type {ProbeMode} from './game/presentation/PerformanceProbe.ts';
 import type {PerformanceSnapshot} from './game/presentation/PerformanceMeter.ts';
+import {HudIcon} from './game/ui/HudIcon.tsx';
+import {beginGameTouch, blockGameCompatibilityClick} from './game/ui/GameButton.tsx';
+import './game/ui/robloxHud.css';
 
 declare global {
   interface Window {
     __mining?: {
       getInput: () => InputSnapshot;
+      getShop: () => ReturnType<ShopView["diagnostics"]>;
       getCamera: () => number[] | null;
       getCellState: (x: number, y: number, z: number) => 'unavailable' | 'solid' | 'empty';
     };
@@ -31,20 +36,21 @@ declare global {
 }
 
 const SAVE_CONTENT = withInitialAccess(CAMP_CONTENT.session);
-const SAVE_GENERATION = { ...WORLD_GENERATION, layers: CAMP_CONTENT.layers };
+const SAVE_GENERATION = JOURNEY_GENERATION;
 export function App() {
   return <SaveEntry content={SAVE_CONTENT} generation={SAVE_GENERATION}>{game => <GameView savedGame={game} />}</SaveEntry>;
 }
 function GameView({ savedGame }: { savedGame: SavedGame }) {
-  const hosted = /\/games\/mining(?:-test)?\/(?:index\.html)?$/.test(window.location.pathname);
+  const hosted = /\/games\/mining(?:-test|-surface-play)?\/(?:index\.html)?$/.test(window.location.pathname);
   const canvas = useRef<HTMLCanvasElement>(null);
+  const guideMarker = useRef<HTMLDivElement>(null);
   const eggPrompt = useRef<HTMLButtonElement>(null);
   const scene = useRef<RootState | null>(null);
   const exiting = useRef(false);
   const [exited, setExited] = useState(false);
-  const [timeOfDay,setTimeOfDay]=useState<SurfaceTime>('night');
+  const [timeOfDay,setTimeOfDay]=useState<SurfaceTime | 'auto'>('auto');
   const [shadowsEnabled,setShadowsEnabled]=useState(true);
-  const [stylized,setStylized]=useState(()=>new URLSearchParams(location.search).get('look')!=='original');
+  const [stylized,setStylized]=useState(()=>new URLSearchParams(location.search).get('look')==='graded');
   const [renderRate,setRenderRate]=useState<RenderRate>('display');
   const [loading,dispatchLoading]=useReducer(updateLoading,undefined,initialLoading);
   const onLoading=useCallback((event:LoadingEvent)=>{
@@ -67,6 +73,8 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
   const [status, setStatus] = useState('正在准备地形');
   const [performanceStats,setPerformanceStats]=useState<PerformanceSnapshot|null>(null);
   const [input] = useState(() => new GameInput());
+  const [shopView] = useState(() => new ShopView());
+  useEffect(() => () => shopView.dispose(), [shopView]);
   const session = savedGame.session;
   const saveStatus = useSyncExternalStore(savedGame.saves.subscribe, savedGame.saves.getStatus);
   const [exitState, setExitState] = useState<'saving' | 'failed' | null>(null);
@@ -82,6 +90,7 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
     void import('./game/persistence/saveDebug.ts').then(({ attachSaveDebug }) => { if (live) attachSaveDebug(savedGame); });
     window.__mining = {
       getInput: input.getSnapshot,
+      getShop: () => shopView.diagnostics(),
       getCamera: () => scene.current?.camera.position.toArray() ?? null,
       getCellState: (x, y, z) => {
         const value = window.__miningValidation?.cell([x, y, z]);
@@ -132,7 +141,7 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
   }
 
   return (
-    <main onContextMenuCapture={event => event.preventDefault()} className="game-shell game-shell--active" aria-label="Mining 游戏" style={{ '--scene-background': GAME_CONFIG.background } as CSSProperties}>
+    <main onPointerDownCapture={beginGameTouch} onClickCapture={blockGameCompatibilityClick} onContextMenuCapture={event => event.preventDefault()} className="game-shell game-shell--active game-shell--roblox-hud" aria-label="Mining 游戏" style={{ '--scene-background': GAME_CONFIG.background } as CSSProperties}>
       <div inert={showLoading || !!exitState || saveStatus.state === 'conflicted'} ref={surface} className="scene" tabIndex={0} aria-label="游戏视角，拖动观察，点按敲击，长按方块挖掘">
         <LoadingBoundary onFailure={failLoading}><Canvas
           ref={canvas}
@@ -145,11 +154,11 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
           gl={{ antialias: true }}
           fallback={<p>当前浏览器无法启动 3D 画面，请使用支持 WebGL2 的浏览器。</p>}
         >
-          <ValidationScene savedGame={savedGame} eggPrompt={eggPrompt} stylized={stylized} content={CAMP_CONTENT} renderRate={renderRate} shadowsEnabled={shadowsEnabled} probeMode={probeMode} input={input} onStatus={setStatus} onLoading={onLoading} onPerformance={setPerformanceStats} session={session} timeOfDay={timeOfDay} />
+          <ValidationScene shopView={shopView} guideMarker={guideMarker} savedGame={savedGame} eggPrompt={eggPrompt} stylized={stylized} content={CAMP_CONTENT} renderRate={renderRate} shadowsEnabled={shadowsEnabled} probeMode={probeMode} input={input} onStatus={setStatus} onLoading={onLoading} onPerformance={setPerformanceStats} session={session} timeOfDay={timeOfDay} />
         </Canvas></LoadingBoundary>
       </div>
       <header inert={!!exitState} className="game-header" style={{display:showLoading?'none':undefined}}>
-        <div><span className="wordmark">MINING</span><span className="stage-label">{status}</span>
+        {debug && <details className="hud-debug-tools"><summary>调试</summary><div className="hud-debug-content"><span className="wordmark">MINING</span><span className="stage-label">{status}</span>
           <div className="performance-hud" aria-label="实时性能" title="帧率模式可切换60帧上限或跟随屏幕回调；FPS 按实际提交的主画面计数；CPU 是每次逻辑更新均值，提交是实际绘制的主线程均值（含反射）。RAF 是浏览器回调频率，调度是游戏限帧的跳过比例；GPU 计时需显式开启；绘制次数拆为主画面 / 反射，三角面含两个通道。">
             <div>{performanceStats?`${performanceStats.fps.toFixed(1)} FPS · ${performanceStats.frameMs?.toFixed(1)??'—'} ms`:'FPS — · — ms'}</div>
             <details className="performance-details"><summary>详情</summary><div className="performance-expanded">
@@ -160,23 +169,30 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
             <PerformanceProbeUi stylized={stylized} renderRate={renderRate} shadowsEnabled={shadowsEnabled} stats={performanceStats} onMode={changeProbeMode} />
             </div></details>
           </div>
-        </div>
+          <InputMonitor input={input} /><ValidationPanel />
+        </div></details>}
+        <details className="hud-settings" onToggle={() => input.reset()} onKeyDown={event => {
+          if (event.key === 'Escape') { event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus(); }
+        }}>
+        <summary aria-label="画面设置" title="画面设置"><HudIcon kind="settings" /></summary>
         <nav className="scene-actions" aria-label="场景设置">
         <button type="button" aria-label={renderRate==='display'?'切换为60帧上限':'跟随屏幕刷新率'} onClick={()=>{input.reset();setRenderRate(r=>r==='display'?'60':'display');surface.current?.focus();}}>帧率：{renderRate==='display'?'屏幕':'60'}</button>
         <button type="button" aria-label={stylized?'切换为原始画面':'切换为风格化画面'} aria-pressed={stylized} onClick={()=>{input.reset();setStylized(v=>!v);surface.current?.focus();}}>画面：{stylized?'风格化':'原始'}</button>
         <button type="button" aria-label={shadowsEnabled?'关闭烘焙阴影':'开启烘焙阴影'} aria-pressed={shadowsEnabled} onClick={()=>{input.reset();setShadowsEnabled(v=>!v);surface.current?.focus();}}>阴影：{shadowsEnabled?'烘焙':'关'}</button>
-        <button type="button" aria-label={timeOfDay==='day'?'切换到夜晚':'切换到白天'} onClick={()=>{input.reset();setTimeOfDay(t=>t==='day'?'night':'day');surface.current?.focus();}}>{timeOfDay==='day'?'☀ 白天':'☾ 夜晚'}</button>
-        <button type="button" onClick={() => void exit()}
+        {debug && <><button type="button" aria-label={timeOfDay==='day'?'切换到夜晚':'切换到白天'} onClick={()=>{input.reset();setTimeOfDay(t=>t==='day'?'night':'day');surface.current?.focus();}}>{timeOfDay==='auto'?'昼夜：自动':timeOfDay==='day'?'☀ 白天':'☾ 夜晚'}</button>
+        {timeOfDay!=='auto'&&<button type="button" onClick={()=>{input.reset();setTimeOfDay('auto');surface.current?.focus();}}>恢复自动昼夜</button>}</>}
+        </nav>
+        </details>
+        <button className="hud-exit" type="button" title="退出游戏" onClick={() => void exit()}
           onPointerDown={event => { if (event.pointerType !== 'mouse') event.preventDefault(); }}
           onPointerUp={event => {
             // A second touch does not synthesize click on every mobile browser.
             if (event.pointerType !== 'mouse' && event.currentTarget.contains(document.elementFromPoint(event.clientX, event.clientY))) exit();
           }} aria-label={hosted ? '退出游戏，返回游戏列表' : '退出游戏'}>
-          退出游戏
+          <HudIcon kind="exit" />
         </button>
-        </nav>
       </header>
-      {!showLoading&&<div inert={!!exitState || saveStatus.state === 'conflicted'}><SessionUi eggPrompt={eggPrompt} session={session} input={input} surface={surface} /></div>}
+      {!showLoading&&<div inert={!!exitState || saveStatus.state === 'conflicted'}><SessionUi shopView={shopView} guideMarker={guideMarker} blocked={saveStatus.state === 'failed' || saveStatus.state === 'conflicted'} eggPrompt={eggPrompt} session={session} input={input} surface={surface} /></div>}
       {!exitState && (saveStatus.state === 'failed' || saveStatus.state === 'conflicted') && <aside className="save-warning" role="alert">
         <span>{saveStatus.state === 'conflicted' ? saveStatus.error : '进度暂未保存，请重试'}</span>
         {saveStatus.state === 'failed' ? <button onClick={() => void savedGame.saves.flush().catch(() => {})}>重试保存</button> : <button onClick={() => location.reload()}>重新进入</button>}
@@ -190,7 +206,6 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
         </div></>}
       </section>}
       {showLoading&&<LoadingScreen state={loading} onExit={() => void exit()} />}
-      {debug && !showLoading && <><InputMonitor input={input} /><ValidationPanel /></>}
     </main>
   );
 }

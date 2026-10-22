@@ -1,4 +1,5 @@
 import { Group, Raycaster, Vector2, type PerspectiveCamera } from "three";
+import { MiningLessonHighlight } from '../presentation/MiningLessonHighlight.ts';
 import { createSelectionOutline } from "../presentation/SelectionOutline.ts";
 import { BlockCracks } from "../presentation/BlockCracks.ts";
 import { selectCell } from "../terrain/selection.ts";
@@ -9,9 +10,11 @@ import type { TerrainStream } from "../validation/TerrainStream.ts";
 
 export class MiningInteraction {
   readonly group = new Group();
+  readonly lesson = new MiningLessonHighlight();
   readonly cracks = new BlockCracks();
   readonly marker = createSelectionOutline();
   selected: Coord | null = null;
+  strike: { target: Coord; speed: number } | null = null;
   private readonly point = new Vector2();
   private readonly ray = new Raycaster();
   private readonly session: GameSession;
@@ -20,7 +23,7 @@ export class MiningInteraction {
   constructor(session: GameSession) {
     this.session = session;
     this.marker.visible = false;
-    this.group.add(this.cracks.group, this.marker);
+    this.group.add(this.cracks.group, this.marker, this.lesson.group);
     this.detach = session.observeBlockDamage(this.cracks.setDamage);
   }
   update(
@@ -30,6 +33,7 @@ export class MiningInteraction {
     input: GameInput,
     terrain: TerrainStream,
   ) {
+    this.strike=null;
     const start = performance.now(),
       press = input.consumeMinePress(),
       aim = press ?? input.getAim();
@@ -54,8 +58,11 @@ export class MiningInteraction {
       this.marker.position.set(
         ...(selected.map((v) => (v + 0.5) * CELL) as [number, number, number]),
       );
-    if (selected && (press || input.getSnapshot().mining))
-      this.session.hit(selected);
+    if (selected && (press || input.getSnapshot().mining)) {
+      const result=this.session.hit(selected);
+      if((result.status==='hit'||result.status==='breaking')&&result.damage>0)
+        this.strike={target:selected.map(v=>(v+.5)*CELL) as unknown as Coord,speed:this.session.getSnapshot().miningStats.speed};
+    }
     this.cracks.sync(terrain.render.pipeline.residents);
   }
   dispose() {
@@ -63,6 +70,7 @@ export class MiningInteraction {
     this.disposed = true;
     this.detach();
     this.cracks.dispose();
+    this.lesson.dispose();
     this.marker.geometry.dispose();
     this.marker.material.dispose();
     this.group.removeFromParent();

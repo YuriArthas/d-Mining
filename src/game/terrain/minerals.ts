@@ -6,6 +6,10 @@ export const MINERALS = RESOURCES.map(r=>({id:r.kind,name:r.name,color:r.color})
 export const TERRAIN_MATERIALS = [...MINERALS, {id:7,name:'固定地面',color:THEMES[0].floor}].sort((a,b)=>a.id-b.id);
 export const TILE_SIZE = 64;
 export const ATLAS_TILES = TERRAIN_MATERIALS.length + THEMES.length - 1;
+export const ATLAS_COLUMNS = 16;
+export const ATLAS_ROWS = Math.ceil(ATLAS_TILES / ATLAS_COLUMNS);
+export const ATLAS_WIDTH = ATLAS_COLUMNS * TILE_SIZE;
+export const ATLAS_HEIGHT = ATLAS_ROWS * TILE_SIZE;
 const slots = new Map(TERRAIN_MATERIALS.map((r,i)=>[r.id,i]));
 const floorSlots = new Map(THEMES.map((t,i)=>[t.id,i===0?slots.get(7)!:TERRAIN_MATERIALS.length+i-1]));
 export function appearanceKey(kind: number, y: number, layers: readonly Layer[] = LAYERS) {
@@ -35,7 +39,7 @@ function grain(x:number,y:number,seed:number){
  n=Math.imul(n^(n>>>13),1274126177);return ((n^(n>>>16))>>>0)/4294967295;
 }
 function buildMineralAtlas(response:boolean) {
- const pixels=new Uint8Array(TILE_SIZE*TILE_SIZE*ATLAS_TILES*4);
+ const pixels=new Uint8Array(ATLAS_WIDTH*ATLAS_HEIGHT*4);
  for(let tile=0;tile<ATLAS_TILES;tile++){
   const entry=TERRAIN_MATERIALS[tile],floor=!entry||entry.id===7;
   const r=floor?null:resourceByKind(entry.id),color=rgb(entry?.color??THEMES[tile-TERRAIN_MATERIALS.length+1].floor);
@@ -75,7 +79,7 @@ function buildMineralAtlas(response:boolean) {
     if((px===0||py===0||px===31||py===31)&&medium<.6)shade-=8;
    }
    if(mark)shade+=(edge?-22:facet)+(fine-.5)*12;
-   const i=(y*ATLAS_TILES*TILE_SIZE+tile*TILE_SIZE+x)*4;
+   const i=((Math.floor(tile/ATLAS_COLUMNS)*TILE_SIZE+y)*ATLAS_WIDTH+(tile%ATLAS_COLUMNS)*TILE_SIZE+x)*4;
    if(response){
     const metal=r&&(r.pattern==='metal'||[4,5,16,17,27,28].includes(r.kind));
     const glass=r&&['ice','crystal','gem','star','amber'].includes(r.pattern);

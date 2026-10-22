@@ -24,7 +24,8 @@
   "loopQuaternionError": {
     "Idle": 8.940696716308594e-07,
     "Walk": 8.940696716308594e-07,
-    "Run": 7.152557373046875e-07
+    "Run": 7.152557373046875e-07,
+    "Mine": 8.940696716308594e-07
   },
   "height": 1.85,
   "textures": [
@@ -49,6 +50,10 @@
         }
       },
       "duration": 1.9,
+      "sourceRange": [
+        0,
+        1.9
+      ],
       "url": "https://rab-sunjun-public.dev.clock-p.com/animations/4748"
     },
     {
@@ -65,6 +70,10 @@
         }
       },
       "duration": 1.3666666666666667,
+      "sourceRange": [
+        0,
+        1.367
+      ],
       "url": "https://rab-sunjun-public.dev.clock-p.com/animations/4768"
     },
     {
@@ -81,13 +90,37 @@
         }
       },
       "duration": 0.5666666666666667,
+      "sourceRange": [
+        0,
+        0.567
+      ],
       "url": "https://rab-sunjun-public.dev.clock-p.com/animations/4472"
+    },
+    {
+      "clip": "Mine",
+      "animationId": "4698",
+      "animationVersionId": "4698",
+      "name": "RoMixamo · 持斧下劈",
+      "source": {
+        "source": {
+          "name": "Standing Melee Attack Downward",
+          "provider": "ROMIXAMO",
+          "conversion": "ROMIXAMO_R15_SOURCE_V1",
+          "externalId": "c9ced340-b96c-11e4-a802-0aaa78deedf9"
+        }
+      },
+      "duration": 1.85,
+      "sourceRange": [
+        0.1,
+        1.95
+      ],
+      "url": "https://rab-sunjun-public.dev.clock-p.com/animations/4698"
     }
   ],
   "blend": "assets-source/miner-a/miner-a-rigged.blend",
   "glb": "src/game/assets/character/miner-a.glb",
-  "sha256": "8a4ad82d2278a76ba672ddac33c6a5ae86cae4834fbeb69e807cbd703e77c456",
-  "bytes": 1227872,
+  "sha256": "4c48bf96764ab7b5b8ebb98b0b3726dc7e1103c9a508c097f6f9a13c92f3bed6",
+  "bytes": 1255392,
   "footBinding": {
     "Left": {
       "restForward": [
@@ -173,6 +206,11 @@
       "maxLateralBefore": 0.059501778800040483,
       "maxLateralAfter": 1.0710209608078003e-08,
       "maxAnkleDrift": 4.2146848510894035e-08
+    },
+    "Mine": {
+      "maxLateralBefore": 0,
+      "maxLateralAfter": 0,
+      "maxAnkleDrift": 0
     }
   }
 }

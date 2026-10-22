@@ -125,13 +125,15 @@ test('digging each sample rebuilds exactly the exposed area and does not create 
  }
 });
 test('mineral tiles remain distinct within an atlas that includes the protected floor',async()=>{
- const { mineralAtlas,MINERALS,TERRAIN_MATERIALS,TILE_SIZE,ATLAS_TILES }=await import('../../src/game/terrain/minerals.ts');
- const a=mineralAtlas();assert.equal(a.byteLength,ATLAS_TILES*TILE_SIZE*TILE_SIZE*4);assert.deepEqual(a,mineralAtlas());
+ const { mineralAtlas,MINERALS,TERRAIN_MATERIALS,TILE_SIZE,ATLAS_COLUMNS,ATLAS_WIDTH,ATLAS_HEIGHT }=await import('../../src/game/terrain/minerals.ts');
+ const a=mineralAtlas();assert.equal(a.byteLength,ATLAS_WIDTH*ATLAS_HEIGHT*4);assert.deepEqual(a,mineralAtlas());
+ assert.ok(ATLAS_WIDTH<=2048&&ATLAS_HEIGHT<=2048,'all mineral tiles fit a compact GPU texture without rescaling');
  const fingerprints=new Set();
  for(let tile=0;tile<MINERALS.length;tile++){
   const colors=new Set();let hash=0;
   for(let y=0;y<TILE_SIZE;y++)for(let x=0;x<TILE_SIZE;x++){
-   const p=(y*ATLAS_TILES*TILE_SIZE+TERRAIN_MATERIALS.findIndex(r=>r.id===MINERALS[tile].id)*TILE_SIZE+x)*4;assert.equal(a[p+3],255);
+   const slot=TERRAIN_MATERIALS.findIndex(r=>r.id===MINERALS[tile].id);
+   const p=((Math.floor(slot/ATLAS_COLUMNS)*TILE_SIZE+y)*ATLAS_WIDTH+(slot%ATLAS_COLUMNS)*TILE_SIZE+x)*4;assert.equal(a[p+3],255);
    colors.add(a.slice(p,p+3).join(','));hash=(Math.imul(hash,31)+a[p]*65536+a[p+1]*256+a[p+2])>>>0;
   }
   const {resourceByKind}=await import('../../src/game/content/resources.ts');
@@ -141,11 +143,11 @@ test('mineral tiles remain distinct within an atlas that includes the protected 
 });
 
 test('mineral response atlas separates metal inclusions from matte host and keeps floors flat',async()=>{
- const { mineralResponseAtlas,TERRAIN_MATERIALS,TILE_SIZE,ATLAS_TILES }=await import('../../src/game/terrain/minerals.ts');
- const data=mineralResponseAtlas();assert.equal(data.length,ATLAS_TILES*TILE_SIZE*TILE_SIZE*4);assert.deepEqual(data,mineralResponseAtlas());
+ const { mineralResponseAtlas,TERRAIN_MATERIALS,TILE_SIZE,ATLAS_COLUMNS,ATLAS_WIDTH,ATLAS_HEIGHT }=await import('../../src/game/terrain/minerals.ts');
+ const data=mineralResponseAtlas();assert.equal(data.length,ATLAS_WIDTH*ATLAS_HEIGHT*4);assert.deepEqual(data,mineralResponseAtlas());
  const tilePixels=id=>{
   const tile=TERRAIN_MATERIALS.findIndex(m=>m.id===id),pixels=[];
-  for(let y=0;y<TILE_SIZE;y++)for(let x=0;x<TILE_SIZE;x++){const i=(y*ATLAS_TILES*TILE_SIZE+tile*TILE_SIZE+x)*4;pixels.push([...data.slice(i,i+4)])}
+  for(let y=0;y<TILE_SIZE;y++)for(let x=0;x<TILE_SIZE;x++){const i=((Math.floor(tile/ATLAS_COLUMNS)*TILE_SIZE+y)*ATLAS_WIDTH+(tile%ATLAS_COLUMNS)*TILE_SIZE+x)*4;pixels.push([...data.slice(i,i+4)])}
   return pixels;
  };
  const gold=tilePixels(5),floor=tilePixels(7),soil=tilePixels(8);

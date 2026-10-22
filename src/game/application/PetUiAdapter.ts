@@ -49,7 +49,7 @@ export class PetUiAdapter implements PetUiApi {
   getSnapshot = (): PetPanelSnapshot => {
     const inventory = this.service.getInventory(), equipment = this.service.getEquipment();
     const coins = this.ports.balance(), baseStats = this.ports.baseStats(), previous = this.snapshot;
-    const accessKey = this.service.catalog.content.eggs.map(egg => this.service.isUnlocked(egg.id) ? "1" : "0").join("");
+    const accessKey = `${this.service.lucky}:` + this.service.catalog.content.eggs.map(egg => this.service.isUnlocked(egg.id) ? "1" : "0").join("");
     if (previous && this.accessKey === accessKey && inventory === this.inventory && equipment === this.equipment && previous.coins === coins && previous.baseStats === baseStats) return previous;
     const catalog = this.service.catalog;
     const equippedSlots = new Map(equipment.slots.map((id, slot) => [id, slot]));
@@ -57,7 +57,8 @@ export class PetUiAdapter implements PetUiApi {
       const definition = catalog.pet(pet.speciesId);
       return Object.freeze({ pet, name: definition.name, rarity: definition.rarity, powerBonusBps: definition.powerBonusBps, equippedSlot: equippedSlots.get(pet.id) ?? null });
     }));
-    const eggs = previous?.coins === coins && this.accessKey === accessKey ? previous.eggs : Object.freeze(catalog.content.eggs.map(egg => {
+    const eggs = previous?.coins === coins && this.accessKey === accessKey ? previous.eggs : Object.freeze(catalog.content.eggs.map(original => {
+      const egg = this.service.effectiveEgg(original.id)!;
       const total = egg.outcomes.reduce((sum, outcome) => sum + outcome.weight, 0);
       return Object.freeze({
         id: egg.id, name: egg.name, price: egg.price, canAfford: this.service.isUnlocked(egg.id) && coins >= egg.price, unlocked: this.service.isUnlocked(egg.id), unlockName: egg.unlockName,

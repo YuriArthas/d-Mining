@@ -1,4 +1,5 @@
 import { STAGES, shallowHealth, deepHealth } from './progression.ts';
+import { JOURNEY_RESOURCES } from './journeyResources.ts';
 // Stable logical identities. No renderer or layer dependency; kind 7 is reserved for protected terrain.
 export type Resource = Readonly<{ kind: number; itemId: string; name: string; color: string; volume: number; maxHp: number; price: number; pattern: string; base: boolean; requiredLevel?: number }>;
 const original: readonly Resource[] = Object.freeze([
@@ -41,6 +42,7 @@ const oreStages: Record<number, readonly [number, number]> = {
   23:[6,0],24:[6,61],26:[7,76],27:[8,0],28:[8,91],29:[8,96],30:[9,106],31:[9,111],
 };
 export const RESOURCES: readonly Resource[] = Object.freeze([
+  ...JOURNEY_RESOURCES,
   ...original.map(resource => {
     const i = resource.base ? baseKinds.indexOf(resource.kind) : oreStages[resource.kind][0];
     const stage = STAGES[i];

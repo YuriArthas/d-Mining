@@ -1,0 +1,64 @@
+.pet-panel.rewards-panel { display: flex; flex-direction: column; width: min(940px, calc(100vw - 40px)); max-height: 95%; overflow: hidden; padding: 0; font-size: 16px; }
+.rewards-panel button, .rewards-panel textarea { font: inherit; }
+.rewards-panel button { min-height: 44px; font-size: 15px; }
+.rewards-panel .pet-heading { flex-shrink: 0; min-height: 44px; margin: 16px 20px; }
+.rewards-panel .pet-close { width: 44px; height: 44px; }
+.reward-balance { display: flex; flex-shrink: 0; align-items: center; gap: 12px; padding: 14px 20px; background: #f0e9ff; border-bottom: 2px solid #d5c4ef; color: #382752; }
+.reward-token-icon { width: 30px; height: 30px; flex: 0 0 auto; vertical-align: middle; }
+.reward-balance > .reward-token-icon { width: 46px; height: 46px; }
+.reward-balance > div { display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px; }
+.reward-balance strong { font-size: 30px; }
+.reward-balance p { margin: 0 0 0 auto; font-size: 14px; line-height: 1.5; text-align: right; }
+.rewards-content { flex: 1 1 auto; overflow-y: auto; min-height: 0; padding: 16px 20px; overscroll-behavior: contain; }
+.reward-section + .reward-section { border-top: 2px solid #e3dccb; padding-top: 18px; margin-top: 18px; }
+.reward-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
+.reward-section h2 { font-size: 19px; margin: 0 0 5px; color: #433c2c; }
+.reward-section p, .capsule-intro, .capsule-footer p { font-size: 14px; line-height: 1.6; margin: 0; color: #5c5546; }
+.reward-section-heading > button { flex: 0 0 auto; }
+.reward-online-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.reward-online-card { display: flex; flex-direction: column; align-items: center; gap: 9px; padding: 14px 10px 10px; border: 2px solid #e4d5af; border-radius: 12px; background: #fffaf0; }
+.reward-online-card > strong { font-size: 18px; }
+.reward-online-card > span { display: flex; gap: 6px; align-items: center; }
+.reward-online-card button { width: 100%; white-space: nowrap; padding-inline: 8px; }
+.reward-online-card progress { width: 100%; height: 9px; accent-color: #55a263; }
+.reward-online-card[data-claimed="true"] { background: #ecf5e9; border-color: #a4c89a; }
+.reward-signin-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+.reward-signin-days > div { display: flex; flex-direction: column; gap: 7px; align-items: center; padding: 12px 4px; border: 2px solid #e0d6c1; border-radius: 10px; background: #f4efe4; font-size: 14px; }
+.reward-signin-days strong { font-size: 18px; }
+.reward-signin-days small { font-size: 14px; color: #625747; }
+.reward-signin-days [data-current="true"] { border-color: #9d70ca; background: #f3eaff; }
+.reward-signin-days [data-claimed="true"] { background: #edf4e8; border-color: #abc59d; }
+.reward-share-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+.reward-share-buttons > button { flex: 1 1 210px; }
+.reward-section .reward-helper { margin-top: 10px; }
+.reward-invite-entry { display: grid; grid-template-columns: 1fr auto; gap: 10px 14px; align-items: end; }
+.reward-invite-entry label { grid-column: 1 / -1; font-size: 14px; }
+.reward-invite-entry textarea { width: 100%; min-height: 90px; max-height: 180px; resize: vertical; box-sizing: border-box; border: 2px solid #c3b291; background: #fff; border-radius: 8px; padding: 10px; color: #352e23; }
+.reward-invite-entry textarea:focus-visible { outline: 3px solid #8160bb; outline-offset: 2px; }
+.reward-section .reward-redeemed { padding: 12px; color: #275c2c; background: #ebf3e6; border-radius: 8px; }
+.reward-notice { flex-shrink: 0; min-height: 24px; padding: 12px 20px; background: #ede4d1; border-top: 2px solid #d3c6aa; font-size: 15px; line-height: 1.5; }
+.reward-notice[data-kind="success"] { color: #275529; background: #e4f2df; }
+.reward-notice[data-kind="error"], .capsule-result[data-kind="error"] { color: #892f26; background: #ffebe3; }
+.capsule-intro { margin-bottom: 14px; }
+.capsule-reward-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.capsule-reward-card { display: flex; flex-direction: column; gap: 7px; padding: 13px; border: 2px solid #daccad; border-radius: 12px; background: #fffaf0; }
+.capsule-reward-card[data-owned="true"] { border-color: #9dbd90; background: #f0f7e9; }
+.capsule-reward-top { display: flex; align-items: center; justify-content: space-between; }
+.capsule-reward-symbol { font-size: 32px; line-height: 1; color: #79579b; }
+.capsule-reward-top strong { font-size: 18px; color: #72561d; }
+.capsule-reward-card h2 { font-size: 16px; line-height: 1.4; margin: 4px 0 0; color: #403626; }
+.capsule-reward-card p { margin: 0; font-size: 14px; line-height: 1.5; color: #5d5547; }
+.capsule-reward-card small { margin-top: auto; padding-top: 5px; font-size: 14px; color: #5f4b77; }
+.capsule-result { min-height: 62px; padding: 14px; margin-top: 16px; border-radius: 12px; background: #f0e8ff; color: #4c326c; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+.capsule-result strong { font-size: 21px; }
+.capsule-result p { margin: 4px 0 0; font-size: 15px; line-height: 1.5; }
+.capsule-footer { display: flex; flex-shrink: 0; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 20px; background: #ede4d1; border-top: 2px solid #d3c6aa; }
+.capsule-spin-button { display: flex; flex-shrink: 0; align-items: center; justify-content: center; gap: 9px; min-height: 52px !important; }
+@media (max-width: 760px) {
+  .reward-online-grid, .capsule-reward-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .reward-invite-entry { grid-template-columns: 1fr; }
+  .reward-signin-days { gap: 4px; }
+  .reward-signin-days small { display: none; }
+  .reward-balance p { max-width: 145px; }
+  .capsule-footer { flex-wrap: wrap; }
+}

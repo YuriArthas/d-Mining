@@ -1,8 +1,20 @@
-import { useRef, type ButtonHTMLAttributes } from 'react';
+import { useRef, type ButtonHTMLAttributes, type MouseEvent, type PointerEvent } from 'react';
 
 // Shared across buttons: a touch can replace its button with a new panel before
 // the browser sends the compatibility click at the same screen position.
 let lastTouch = -Infinity;
+
+// Capture on the game shell as well: a touch can remove a dialog before the
+// compatibility click arrives on a native <summary> or button behind it.
+// A fresh finger press must still be able to use those native controls at once.
+export function beginGameTouch(event: PointerEvent) {
+  if (event.pointerType !== 'mouse') lastTouch = -Infinity;
+}
+export function blockGameCompatibilityClick(event: MouseEvent) {
+  if (event.detail !== 0 && performance.now() - lastTouch < 700) {
+    event.preventDefault(); event.stopPropagation();
+  }
+}
 
 // Non-primary touch may not synthesize click. Handle its release once, and ignore
 // the following compatibility click so a purchase never advances two tiers.

@@ -5,19 +5,23 @@ export class PetCommands {
     privateService: PetService,
     completed: () => void,
     allowed: () => boolean = () => true,
+    canHatch: (id: string) => boolean = () => true,
   ) {
     this.service = privateService;
     this.completed = completed;
     this.allowed = allowed;
+    this.canHatch = canHatch;
   }
   private readonly service: PetService;
   private readonly completed: () => void;
   private readonly allowed: () => boolean;
+  private readonly canHatch: (id: string) => boolean;
   private check() {
     if (!this.allowed()) throw Error("当前会话不可操作");
   }
   hatch = (id: string) => {
     this.check();
+    if (!this.canHatch(id)) return { status: 'unavailable' } as const;
     const r = this.service.hatch(id);
     if (r.status === "hatched") this.completed();
     return r;

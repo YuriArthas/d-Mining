@@ -1,0 +1,26 @@
+[
+  {
+    "id": "A",
+    "title": "方块感矿工",
+    "file": "a-blocky-miner.png",
+    "description": "方正轮廓、宽肩厚靴，突出积木式的游戏人物感。"
+  },
+  {
+    "id": "B",
+    "title": "圆润卡通矿工",
+    "file": "b-rounded-miner.png",
+    "description": "圆润头身与短粗四肢，亲切、活泼，偏卡通玩具感。"
+  },
+  {
+    "id": "C",
+    "title": "轻装探险者",
+    "file": "c-light-explorer.png",
+    "description": "较修长的卡通比例，轻便服装，突出探索与行动感。"
+  },
+  {
+    "id": "D",
+    "title": "科幻采矿员",
+    "file": "d-future-miner.png",
+    "description": "厚实的科幻工作服与简洁护具，适合逐步进入更奇异的世界。"
+  }
+]
