@@ -27,6 +27,7 @@
 - 会话快照新增 `location`（surface / mine / room），HUD 据此判断是否显示返回地表。
 - `GuideCard` 与场景内指引箭头拆成 `GuideCard` / `GuideMarker`，卡片放进 HUD，箭头仍在场景层由投影器定位。
 - 引导高亮沿用 `data-guide-action`（return / upgrade / pets），点击防穿透沿用 `GameButton`。
+  （2026-10-22 后续调整：强制引导链改为四条一次性提示，高亮改用 `data-tip-target`，见 docs/phase-tips-20261022.md。）
 
 ## 验证
 

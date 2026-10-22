@@ -313,23 +313,17 @@ export function ValidationScene({
     );
     } catch (error) { savedGame.saves.invalidate(error); throw error; }
     if (game.terrain.error) savedGame.saves.invalidate(game.terrain.error);
-    const guideState = session.getSnapshot();
-    promptProjector.current.update(camera, guideState.eggStation?.promptAnchor ?? null, eggPrompt.current);
-    if(guideState.guide?.id!=='dig') guideProjector.current.update(camera, guideState.guideAnchor, guideMarker.current);
-    game.interaction.lesson.update(camera as PerspectiveCamera, game.physics.feet(), game.interaction.selected, game.terrain, guideState.pickaxe.level, guideMarker.current, guideState.guide?.id==='dig'&&!game.player.travelling&&!session.suspended);
-    // At the recommended egg, its visible E button takes over the same anchor.
-    // If it moves offscreen, keep the guide's direction marker available.
-    if (guideState.guide?.marker === 'egg' && guideState.eggId === guideState.guideEggId
-      && eggPrompt.current?.style.visibility === 'visible' && guideMarker.current) {
-      guideMarker.current.style.visibility = 'hidden';
-    }
-    const arrow = guideArrow.current, target = guideState.guideDestination;
+    const tipState = session.getSnapshot(), tip = tipState.tip;
+    promptProjector.current.update(camera, tipState.eggStation?.promptAnchor ?? null, eggPrompt.current);
+    // First-dig tip: an arrow to the mine on the surface, then a glowing block once there.
+    if (tip?.anchor === 'mine') guideProjector.current.update(camera, tipState.tipAnchor, guideMarker.current);
+    game.interaction.lesson.update(camera as PerspectiveCamera, game.physics.feet(), game.interaction.selected, game.terrain, tipState.pickaxe.level, guideMarker.current, tip?.anchor === 'dig' && !game.player.travelling && !session.suspended);
+    const arrow = guideArrow.current, target = tip?.anchor === 'mine' ? tipState.tipAnchor : null;
     if (arrow) {
       const feet = avatar.current.position;
       const dx = target ? target[0] - feet.x : 0, dz = target ? target[2] - feet.z : 0;
       const distance = Math.hypot(dx, dz);
-      const atEgg = guideState.guide?.marker === 'egg' && guideState.eggId === guideState.guideEggId;
-      arrow.visible = !!target && !!guideMarker.current && !game.player.travelling && distance > 2 && !atEgg;
+      arrow.visible = !!target && !!guideMarker.current && !game.player.travelling && distance > 2;
       if (arrow.visible) {
         updateGuideRoute(arrow,feet.toArray(),target!);
       }

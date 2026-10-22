@@ -7,6 +7,7 @@ import { OrePickupFeed } from '../OrePickupFeed.tsx';
 import { teamCanImprove } from '../bag/BagSheet.tsx';
 import { claimableRewards } from '../rewards/RewardsSheet.tsx';
 import { SystemMenu, type SystemControls } from './SystemMenu.tsx';
+import { TipToast } from '../TipsUi.tsx';
 import './hud.css';
 
 export type HudActions = {
@@ -16,9 +17,9 @@ export type HudActions = {
 /** Screen-space HUD. Zones mirror the original: resources left, depth top-centre, four
  *  actions down the right edge, Sell / Surface trips at the bottom when they help. The block
  *  being mined and fresh pickups stack under the depth, clear of the miner in the lower middle. */
-export function Hud({ session, actions, system, objective, target, prompts }: {
+export function Hud({ session, actions, system, objective, target, prompts, tipHidden = false }: {
   session: GameSession; actions: HudActions; system: SystemControls;
-  objective?: ReactNode; target?: ReactNode; prompts?: ReactNode;
+  objective?: ReactNode; target?: ReactNode; prompts?: ReactNode; tipHidden?: boolean;
 }) {
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot);
   const pets = useSyncExternalStore(session.pets.subscribe, session.pets.getSnapshot);
@@ -30,7 +31,9 @@ export function Hud({ session, actions, system, objective, target, prompts }: {
   const surface = state.location !== 'mine' && state.location !== 'room';
   const depth = surface ? '地表' : `${number(Math.floor(state.depth))} 米`;
   const { speed, luck } = state.rewards.timed;
-  return <div className="ui-hud" data-location={state.location ?? 'surface'}>
+  // HUD tips name a control on screen; the first-dig tip is drawn in the world instead.
+  const tip = !tipHidden && state.tip && state.tip.anchor !== 'mine' && state.tip.anchor !== 'dig' ? state.tip : null;
+  return <div className="ui-hud" data-location={state.location ?? 'surface'} data-tip={tip?.id}>
     <section className="hud-left" aria-label="资源与目标">
       <Pill icon="backpack" meter={bag.capacity > 0 ? bag.used / bag.capacity : 0} state={bag.isFull ? 'full' : undefined}
         onPress={run(actions.openMinerals)} pressLabel="查看背包里的矿物" plus={{ label: '升级背包', onPress: run(actions.openShop) }}>
@@ -49,6 +52,7 @@ export function Hud({ session, actions, system, objective, target, prompts }: {
         <span className="hud-depth-kicker ui-outline">{world} · 深度</span>
         <strong className="hud-depth-value ui-outline ui-num" data-testid="depth">{depth}</strong>
       </header>
+      <TipToast session={session} tip={tip} />
       {target}
       <OrePickupFeed session={session} />
     </div>
@@ -56,18 +60,19 @@ export function Hud({ session, actions, system, objective, target, prompts }: {
     <SystemMenu system={system} onHelp={run(actions.openHelp)} />
 
     <nav className="hud-rail" aria-label="游戏功能">
-      <Tile icon="paw" label="宠物" aria-label="打开我的宠物" data-guide-action="pets" badge={teamCanImprove(pets) ? '!' : undefined} onPress={run(actions.openPets)} />
-      <Tile icon="chest" label="商店" tone="orange" aria-label="商店" data-kind="upgrade" data-guide-action="upgrade" onPress={run(actions.openShop)} />
+      <Tile icon="paw" label="宠物" aria-label="打开我的宠物" data-tip-target="pets" badge={teamCanImprove(pets) ? '!' : undefined} onPress={run(actions.openPets)} />
+      <Tile icon="chest" label="商店" tone="orange" aria-label="商店" data-kind="upgrade" data-tip-target="shop" onPress={run(actions.openShop)} />
       <Tile icon="gift" label="奖励" tone="pink" aria-label={claimable ? `奖励，${claimable} 个可领取` : '奖励'} badge={claimable || undefined} onPress={run(actions.openRewards)} />
       <Tile icon="globe" label="世界" aria-label="世界" onPress={run(actions.openWorlds)} />
     </nav>
 
     <div className="hud-bottom">
       {prompts}
-      <HudNotice text={state.notice} />
+      {/* The one-time sell tip already says it; do not repeat the full-bag notice under it. */}
+      <HudNotice text={tip?.id === 'sell' && state.inventory.isFull ? '' : state.notice} />
       {(bag.used > 0 && !state.inSellZone || !surface) && <div className="hud-trips">
-        {bag.used > 0 && !state.inSellZone && <UiButton className="hud-sell" size="l" tone="green" icon="coin" data-state={bag.isFull ? 'full' : undefined} aria-label="传送到售卖圈出售" onPress={() => session.goTo('sale')}>出售</UiButton>}
-        {!surface && <UiButton className="hud-return" size="l" icon="home" data-guide-action="return" onPress={run(session.returnToSurface)}>返回地表</UiButton>}
+        {bag.used > 0 && !state.inSellZone && <UiButton className="hud-sell" size="l" tone="green" icon="coin" data-state={bag.isFull ? 'full' : undefined} aria-label="传送到售卖圈出售" onPress={() => { session.dismissTip('sell'); session.goTo('sale'); }}>出售</UiButton>}
+        {!surface && <UiButton className="hud-return" size="l" icon="home" onPress={run(session.returnToSurface)}>返回地表</UiButton>}
       </div>}
     </div>
   </div>;

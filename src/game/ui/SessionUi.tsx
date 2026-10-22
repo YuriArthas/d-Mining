@@ -1,6 +1,6 @@
 import { useEffect, useState, type RefObject, useSyncExternalStore } from 'react';
 import type { GameSession } from '../application/GameSession.ts';
-import { selectDepthGoal } from '../application/OnboardingGuide.ts';
+import { selectDepthGoal } from '../application/Tips.ts';
 import type { GameInput } from '../GameInput.ts';
 import { Controls } from '../Controls.tsx';
 import type { ShopView } from '../presentation/ShopView.ts';
@@ -11,7 +11,7 @@ import { HelpSheet } from './HelpSheet.tsx';
 import { Hud } from './hud/Hud.tsx';
 import type { SystemControls } from './hud/SystemMenu.tsx';
 import { Icon } from './kit/icons.tsx';
-import { GuideCard, GuideMarker, DepthGoalCard } from './OnboardingUi.tsx';
+import { DepthGoalCard, TipMarker } from './TipsUi.tsx';
 import { CapsuleSheet, RewardsSheet, type RewardsTab } from './rewards/RewardsSheet.tsx';
 import { ShopPanel } from './ShopPanel.tsx';
 import { TargetHealth } from './TargetHealth.tsx';
@@ -26,7 +26,6 @@ export function SessionUi({ shopView, session, input, surface, eggPrompt, guideM
   session: GameSession; input: GameInput; surface: RefObject<HTMLDivElement | null>; eggPrompt: RefObject<HTMLButtonElement | null>;
 }) {
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot);
-  const pets = useSyncExternalStore(session.pets.subscribe, session.pets.getSnapshot);
   const [focused, setFocused] = useState(() => document.hasFocus() && !document.hidden);
   useEffect(() => {
     const update = () => setFocused(document.hasFocus() && !document.hidden);
@@ -64,20 +63,18 @@ export function SessionUi({ shopView, session, input, surface, eggPrompt, guideM
   });
 
   const panel = modal?.kind ?? (shopOpen ? 'shop' : 'none');
-  const guideHidden = !!modal || shopOpen || blocked || !focused;
-  const objective = state.guide || state.guideCompletionPending
-    ? <GuideCard session={session} state={state} hidden={guideHidden} />
-    : !blocked && <DepthGoalCard goal={selectDepthGoal(state.maxDepth, state.destinations)} minedCount={state.onboarding.minedCount} showMiningTask={state.onboarding.longTaskIntroduced} />;
+  const tipHidden = !!modal || shopOpen || blocked || !focused;
+  const objective = !blocked && <DepthGoalCard goal={selectDepthGoal(state.maxDepth, state.destinations)} />;
   const prompts = <>
     {lockedMine && <GameButton className="ui-btn" data-tone="orange" data-size="m" onPress={() => open({ kind: 'world', tab: 'progress' })}><Icon kind="globe" /><span className="ui-outline"><span className="desktop-hint">E · </span>查看矿区要求</span></GameButton>}
     {state.atMachine && <GameButton className="ui-btn capsule-world-prompt" data-tone="pink" data-size="m" onPress={() => open({ kind: 'capsule' })}><Icon kind="gift" /><span className="ui-outline"><span className="desktop-hint">E · </span>幸运扭蛋</span></GameButton>}
   </>;
-  return <div className="session-ui" data-panel={panel} data-guide-egg={state.eggId === state.guideEggId} data-guide={!blocked && focused ? state.guide?.id : undefined}
-    data-needs-equip={!blocked && focused && state.guide?.id === 'equip' && pets.pets.length > 0}>
-    <GuideMarker session={session} state={state} marker={guideMarker} hidden={guideHidden} />
-    {!modal && !shopOpen && <Hud session={session} system={system} objective={objective} prompts={prompts} target={<TargetHealth session={session} />}
+  return <div className="session-ui" data-panel={panel}>
+    <TipMarker tip={state.tip} anchor={state.tipAnchor} marker={guideMarker} hidden={tipHidden} />
+    {!modal && !shopOpen && <Hud session={session} system={system} objective={objective} prompts={prompts} target={<TargetHealth session={session} />} tipHidden={blocked || !focused}
       actions={{
-        openPets: () => open({ kind: 'bag', tab: 'pets' }), openMinerals: () => open({ kind: 'bag', tab: 'ores' }), openShop,
+        openPets: () => { session.dismissTip('pets'); open({ kind: 'bag', tab: 'pets' }); }, openMinerals: () => open({ kind: 'bag', tab: 'ores' }),
+        openShop: () => { session.dismissTip('shop'); openShop(); },
         openRewards: () => open({ kind: 'rewards', tab: 'online' }), openWorlds: () => open({ kind: 'world', tab: 'travel' }), openHelp: () => open({ kind: 'help' }),
       }} />}
     {!modal && !shopOpen && <Controls input={input} surface={surface} />}

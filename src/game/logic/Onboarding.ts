@@ -1,91 +1,82 @@
 import { versionOne } from './data.ts';
 
-export const DEEPER_MINING_GOAL = 20;
-export const LONG_MINING_GOAL = 100;
+/** One-time tips, in the order a new player meets them. Each is shown at most once per save. */
+export const TIP_IDS = ['dig', 'sell', 'shop', 'pets'] as const;
+export type TipId = (typeof TIP_IDS)[number];
+type Status = 'active' | 'skipped' | 'completed' | 'legacy';
+
+/** Saved under `onboarding`. `seen` drives the tips; the other fields are facts that older test builds
+ *  sharing this save still read, so they stay valid and up to date. */
 export type OnboardingData = Readonly<{
   version: 1;
-  status: 'active' | 'skipped' | 'completed' | 'legacy';
+  seen: readonly TipId[];
+  status: Status;
   minedOnce: boolean;
   soldOnce: boolean;
   equippedOnce: boolean;
   longTaskIntroduced: boolean;
   minedCount: number;
 }>;
-export type LearningEvidence = {
-  coins: number; level: number; capacity: number; items: number;
-  pets: number; equipped: boolean; maxDepth: number;
-};
+/** What the player has already shown they know, for saves made before tips existed. */
+export type LearningEvidence = { level: number; pets: number; equipped: boolean };
 
 export class Onboarding {
   private data: OnboardingData;
+
   constructor(saved: unknown, restored: boolean, evidence: LearningEvidence) {
-    if (saved !== undefined) {
-      const d = versionOne(saved);
-      if (!['active', 'skipped', 'completed', 'legacy'].includes(d.status as string)
-        || ['minedOnce', 'soldOnce', 'equippedOnce'].some(k => typeof d[k] !== 'boolean')
-        || (d.longTaskIntroduced !== undefined && typeof d.longTaskIntroduced !== 'boolean')
-        || (d.minedCount !== undefined && (!Number.isSafeInteger(d.minedCount) || (d.minedCount as number) < 0))) {
-        throw Error('新手引导存档数据错误');
-      }
+    if (saved === undefined) {
+      // A restored save without onboarding data predates tutorials: it is played, stay quiet.
       this.data = Object.freeze({
-        version: 1, status: d.status as OnboardingData['status'],
-        minedOnce: d.minedOnce as boolean, soldOnce: d.soldOnce as boolean,
-        equippedOnce: d.equippedOnce as boolean,
-        longTaskIntroduced: (d.longTaskIntroduced as boolean | undefined) ?? false,
-        // Old saves never recorded lifetime collection. Do not reconstruct it
-        // from held ore, wallet balance, or excavated terrain.
-        minedCount: (d.minedCount as number | undefined) ?? 0,
+        version: 1, seen: restored ? [...TIP_IDS] : [], status: restored ? 'legacy' : 'active',
+        minedOnce: false, soldOnce: false, equippedOnce: false, longTaskIntroduced: false, minedCount: 0,
       });
-    } else {
-      this.data = Object.freeze({
-        version: 1, status: restored ? 'legacy' : 'active',
-        minedOnce: false, soldOnce: false, equippedOnce: false,
-        longTaskIntroduced: false, minedCount: 0,
-      });
+      return;
     }
-    if (restored) {
-      if (saved === undefined) this.inferObservableFacts(evidence);
-      // Previously completed tutorials remain complete after adding steps.
-      // Restoring or resuming never creates a completion celebration.
-      if (this.data.status === 'active' && this.complete(evidence)) this.patch({ status: 'completed' });
+    const d = versionOne(saved);
+    if (!['active', 'skipped', 'completed', 'legacy'].includes(d.status as string)
+      || ['minedOnce', 'soldOnce', 'equippedOnce'].some(k => typeof d[k] !== 'boolean')
+      || (d.longTaskIntroduced !== undefined && typeof d.longTaskIntroduced !== 'boolean')
+      || (d.minedCount !== undefined && (!Number.isSafeInteger(d.minedCount) || (d.minedCount as number) < 0))
+      || (d.seen !== undefined && (!Array.isArray(d.seen) || d.seen.some(id => typeof id !== 'string')))) {
+      throw Error('新手引导存档数据错误');
     }
+    const facts = {
+      status: d.status as Status, minedOnce: d.minedOnce as boolean, soldOnce: d.soldOnce as boolean,
+      equippedOnce: d.equippedOnce as boolean, longTaskIntroduced: (d.longTaskIntroduced as boolean | undefined) ?? false,
+      minedCount: (d.minedCount as number | undefined) ?? 0,
+    };
+    // Skipped or finished in any build (older test builds share this save) means no more tips.
+    // Unknown ids from a newer build are dropped; a save written before tips derives them from facts.
+    const seen = facts.status !== 'active' ? [...TIP_IDS]
+      : Array.isArray(d.seen) ? TIP_IDS.filter(id => (d.seen as string[]).includes(id))
+      : TIP_IDS.filter(id => ({ dig: facts.minedOnce, sell: facts.soldOnce, shop: evidence.level >= 2, pets: evidence.pets > 0 || evidence.equipped || facts.equippedOnce })[id]);
+    this.data = Object.freeze({ version: 1, seen, ...facts });
   }
+
   getSnapshot = () => this.data;
-  private patch(change: Partial<OnboardingData>) {
-    if (Object.entries(change).every(([key, value]) => this.data[key as keyof OnboardingData] === value)) return false;
-    this.data = Object.freeze({ ...this.data, ...change });
-    return true;
+  has(id: TipId) { return this.data.seen.includes(id); }
+
+  /** Mark a tip as shown for good. Returns true when this changed the save. */
+  markSeen(id: TipId) {
+    if (this.has(id)) return false;
+    const seen = TIP_IDS.filter(tip => tip === id || this.has(tip));
+    return this.patch({ seen, ...(seen.length === TIP_IDS.length && this.data.status === 'active' ? { status: 'completed' as const } : {}) });
   }
-  private inferObservableFacts(e: LearningEvidence) {
-    // Rewards can fund every purchase. Neither coins, upgrades nor owned pets
-    // prove that a sale happened; soldOnce only comes from a sale settlement.
-    this.patch({ minedOnce: this.data.minedOnce || e.items > 0, equippedOnce: this.data.equippedOnce || e.equipped });
-  }
-  private mainLoopComplete(e: LearningEvidence) {
-    return this.data.minedOnce && this.data.soldOnce && e.level >= 2
-      && e.maxDepth >= DEEPER_MINING_GOAL && e.capacity > 50;
-  }
-  private complete(e: LearningEvidence) {
-    return this.mainLoopComplete(e) && this.data.longTaskIntroduced && this.data.equippedOnce;
-  }
+
   record(fact: 'minedOnce' | 'soldOnce' | 'equippedOnce') { return this.patch({ [fact]: true }); }
+
   recordCollected(count: number) {
-    if (!Number.isSafeInteger(count) || count < 0 || !Number.isSafeInteger(this.data.minedCount + count)) {
-      throw Error('累计采矿数量错误');
-    }
+    if (!Number.isSafeInteger(count) || count < 0 || !Number.isSafeInteger(this.data.minedCount + count)) throw Error('累计采矿数量错误');
     if (count === 0) return false;
     return this.patch({ minedOnce: true, minedCount: this.data.minedCount + count });
   }
-  introduceLongTask(e: LearningEvidence) {
-    return this.data.status === 'active' && this.mainLoopComplete(e) && this.patch({ longTaskIntroduced: true });
-  }
-  settle(e: LearningEvidence) {
-    return this.data.status === 'active' && this.complete(e) ? this.patch({ status: 'completed' }) : false;
-  }
-  skip() { return this.data.status === 'active' && this.patch({ status: 'skipped' }); }
-  resume(e: LearningEvidence) {
-    if (this.data.status !== 'skipped' && this.data.status !== 'legacy') return false;
-    this.inferObservableFacts(e);
-    return this.patch({ status: this.complete(e) ? 'completed' : 'active' });
+
+  private patch(change: Partial<OnboardingData>) {
+    if (Object.entries(change).every(([key, value]) => {
+      const current = this.data[key as keyof OnboardingData];
+      return Array.isArray(value) ? Array.isArray(current) && current.length === value.length && value.every((v, i) => current[i] === v) : current === value;
+    })) return false;
+    this.data = Object.freeze({ ...this.data, ...change });
+    return true;
   }
 }

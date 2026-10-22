@@ -36,10 +36,6 @@ test('old saves derive owned tiers; corrupt new collections fail instead of hidi
  const s=GameSession.fromData(data,content);assert.deepEqual(s.getSnapshot().equipment,{version:1,toolLevel:3,backpackCapacity:600});enter(s);assert.equal(s.useShopItem('tools','tool-1').status,'equipped');assert.equal(s.getSnapshot().coins,1000);
  for(const bad of [null,{}, {version:2}, {version:1,toolLevel:2,backpackCapacity:600}, {version:1,toolLevel:3,backpackCapacity:50}])assert.throws(()=>new EquipmentCollection(3,600,bad));
 });
-test('manual shop navigation works after skipping tutorial and stays in current world',()=>{
- const s=funded();s.skipOnboarding();s.updatePosition([0,.1,46],true);s.guideToShop();assert.equal(s.getSnapshot().guide.marker,'shop');assert.ok(s.getSnapshot().guideAnchor);enter(s);assert.equal(s.getSnapshot().requestedShop,false);
- s.updatePosition([0,-20,0],true);s.guideToShop();assert.equal(s.getSnapshot().guide.id,'return');assert.equal(s.getSnapshot().guideAnchor,null);s.cancelEggGuide();assert.equal(s.getSnapshot().guide,null);
-});
 const loader=new GLTFLoader().register(()=>({name:'cpu-test-textures',loadTexture:()=>Promise.resolve(new Texture())}));
 async function asset(path) { const b=readFileSync(new URL('../../src/game/assets/'+path,import.meta.url));return loader.parseAsync(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength),''); }
 test('all 60 catalog models exist, real prices/capacities match game progression, and avatar equips the selected models',async()=>{

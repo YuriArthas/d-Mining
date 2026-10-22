@@ -1,4 +1,4 @@
-import { Onboarding } from '../logic/Onboarding.ts';
+import { TIP_IDS, type TipId, Onboarding } from '../logic/Onboarding.ts';
 import { EquipmentCollection } from '../logic/EquipmentCollection.ts';
 import { shopTools, shopBackpacks, type ShopCategory } from '../content/shopCatalog.ts';
 import { WorldProgress } from '../logic/WorldProgress.ts';
@@ -10,7 +10,7 @@ import { Rewards, type RewardOptions, type RewardClaimResult } from '../logic/Re
 import { stageCoinReward, type OnlineRewardMinutes } from '../content/rewards.ts';
 import { STAGES } from '../content/progression.ts';
 import { CAPSULE_MACHINE_ZONE } from '../content/feedbackFacilities.ts';
-import { selectGuide, type GuideTarget } from './OnboardingGuide.ts';
+import { TIP_GAP, TIP_SECONDS, nextTip, tipLearned, tipView, type TipState } from './Tips.ts';
 import type { ProgressDataV1 } from './SessionProgress.ts';
 import { versionOne } from '../logic/data.ts';
 import { PetCommands } from './PetCommands.ts';
@@ -53,7 +53,6 @@ export class GameSession {
   private readonly equipment: EquipmentCollection;
   private readonly bagCatalog;
   private toolCatalog;
-  private requestedShop = false;
   private readonly worldProgress: WorldProgress;
   private readonly reservations: MineralReservation;
   private currentWorld: WorldId = 1;
@@ -116,14 +115,16 @@ export class GameSession {
     this.feedback({ type: 'denied', reason });
   }
   private petTier(pet: { speciesId: string }) { return ['common', 'rare', 'epic', 'legendary'].indexOf(this.petService.catalog.pet(pet.speciesId).rarity); }
-  private requestedEgg: string | null = null;
+  /** The one tip on screen, when it appeared, and the quiet time before another may follow. */
+  private tip: TipId | null = null;
+  private tipSince = 0;
+  private tipQuietUntil = 0;
   readonly pets: PetUiAdapter;
   private readonly onboarding: Onboarding;
   private guideLocation: 'surface'|'mine'|'room'|null = null;
   private nearMine = false;
   private atMine = false;
   private guideRoomId: string | null = null;
-  private guideCompletionPending = false;
   private readonly petService: PetService;
   private progressListeners = new Set<(change: { urgent: boolean }) => void>();
   suspended = false;
@@ -134,7 +135,6 @@ export class GameSession {
   };
   private committed(urgent: boolean) {
     if (this.petService.getEquipment().slots.some(id=>id!==null)) this.onboarding.record('equippedOnce');
-    if (this.onboarding.settle(this.learningEvidence())) this.guideCompletionPending = true;
     for (const listener of this.progressListeners) listener({ urgent }); }
   exportProgress(): ProgressDataV1 {
     return { version: 1 as const, equipment:this.equipment.exportData(), rewards:this.rewards.exportData(), challengeBoard:this.challengeBoard.exportData(), wallet: this.wallet.exportData(), inventory: this.inventory.exportData(),
@@ -224,7 +224,7 @@ export class GameSession {
       balance: () => this.wallet.getBalance(),
       baseStats: this.baseMiningStats,
       effectiveStats: this.miningAttributes.getSnapshot,
-      commands: this.withHatchFeedback(new PetCommands(petService, () => { this.requestedEgg=null; this.committed(true); this.publish(); }, () => !this.suspended, id => !this.content.eggStations?.length || this.eggId===id)),
+      commands: this.withHatchFeedback(new PetCommands(petService, () => { this.committed(true); this.publish(); }, () => !this.suspended, id => !this.content.eggStations?.length || this.eggId===id)),
       subscribe: this.subscribe,
     });
     this.eggStations = (content.eggStations ?? []).map(station => {
@@ -263,48 +263,54 @@ export class GameSession {
     this.snapshot = this.makeSnapshot();
   }
   private learningEvidence() {
-    return {coins:this.wallet.getBalance(),level:this.equipment.toolLevel,capacity:this.equipment.backpackCapacity,maxDepth:this.exploration.maxDepth,items:this.inventory.getSnapshot().totalCount,pets:this.petService.getInventory().count,equipped:this.petService.getEquipment().slots.some(id=>id!==null)};
+    return {level:this.equipment.toolLevel,pets:this.petService.getInventory().count,equipped:this.petService.getEquipment().slots.some(id=>id!==null)};
   }
-  acknowledgeLongMiningTask = () => {
-    if (!this.suspended && this.snapshot.guide?.id === 'long-task' && this.onboarding.introduceLongTask(this.learningEvidence())) { this.committed(true); this.publish(); }
-  };
-  guideToEgg = (eggId: string) => {
-    if (this.suspended || !this.petService.isUnlocked(eggId) || !this.content.eggStations?.some(s => s.eggId === eggId)) return false;
-    this.requestedEgg = eggId;
-    this.requestedShop = false;
-    this.publish();
-    return true;
-  };
-  guideToShop = () => { if(!this.suspended){this.requestedShop=true;this.requestedEgg=null;this.publish();} };
-  cancelEggGuide = () => { this.requestedEgg = null; this.requestedShop=false; this.publish(); };
-  dismissGuideCompletion = () => { if(this.guideCompletionPending){this.guideCompletionPending=false;this.publish();} };
-  skipOnboarding = () => { if(!this.suspended&&this.onboarding.skip()){this.committed(true);this.publish();} };
-  resumeOnboarding = () => { if(!this.suspended&&this.onboarding.resume(this.learningEvidence())){this.committed(true);this.publish();} };
-  private makeSnapshot() {
-    const bag=this.inventory.getSnapshot(), egg=this.content.petContent?.eggs.find(e=>e.id===(this.requestedEgg??this.content.onboarding?.eggId));
-    let guide: GuideTarget|null=this.requestedEgg ? {id:'egg' as const,phase:'pets',title:`前往${egg!.name}蛋台`,detail:this.guideLocation==='surface'?'跟随箭头，靠近后按 E 购买':'先返回地表，再前往蛋台购买',...(this.guideLocation==='surface'?{marker:'egg' as const}:{highlight:'return' as const})} : selectGuide({learning:this.onboarding.getSnapshot(),location:this.guideLocation,nearMine:this.nearMine,atMine:this.atMine,hasTarget:!!this.targetView&&!this.targetView.locked,inSellZone:this.inSellZone,full:bag.isFull,items:bag.totalCount,coins:this.wallet.getBalance(),level:this.equipment.toolLevel,capacity:this.equipment.backpackCapacity,maxDepth:this.exploration.maxDepth,backpackPrice:this.bagOffer().next?.price??null,pets:this.petService.getInventory().count,upgradePrice:this.toolOffer().price,eggPrice:egg?.price??null});
-    const station=this.content.eggStations?.find(s=>s.eggId===egg?.id);
-    const room=this.content.destinations.find(d=>d.id===this.guideRoomId)?.roomBounds;
-    const sale=this.guideLocation==='room'&&room?this.content.sales.find(s=>s.x>=room.minX&&s.x<room.maxX&&s.z>=room.minZ&&s.z<room.maxZ&&s.y>=room.floor&&s.y<room.ceiling):this.content.sales[0];
-    const worldZ=this.content.journey?worldRequirement(this.currentWorld).z:0;
-    const shop=this.content.shops.find(s=>this.guideLocation==='room'&&room?s.zone.x>=room.minX&&s.zone.x<room.maxX&&s.zone.z>=room.minZ&&s.zone.z<room.maxZ&&Math.abs(s.zone.y-room.floor)<1:s.zone.y>=-.1&&Math.abs(s.zone.z-worldZ)<100);
-    if(this.requestedShop||guide?.id==='upgrade'||guide?.id==='backpack') {
-      guide=this.guideLocation==='mine'||!shop
-        ? {id:'return',title:'返回地表，前往装备商店',detail:'商店里可以挑选镐子和背包',highlight:'return'}
-        : {id:guide?.id==='backpack'?'backpack':'shop',title:'去商店挑选新装备',detail:'点右边「商店」一键传送，或跟随箭头走过去',marker:'shop'};
+  private tipState(): TipState {
+    const bag=this.inventory.getSnapshot(), facts=this.onboarding.getSnapshot();
+    const egg=this.content.petContent?.eggs.find(e=>e.id===this.content.onboarding?.eggId);
+    return {seen:id=>this.onboarding.has(id),location:this.guideLocation,atMine:this.atMine,minedOnce:facts.minedOnce,soldOnce:facts.soldOnce,
+      full:bag.isFull,items:bag.totalCount,coins:this.wallet.getBalance(),level:this.equipment.toolLevel,upgradePrice:this.toolOffer().price,
+      pets:this.petService.getInventory().count,eggPrice:egg?.price??null};
+  }
+  /** At most one tip on screen, each shown once per save. It ends when the player does the thing,
+   *  taps it away, or after a few seconds; something the player already did never gets a tip.
+   *  Tips ended by the player's own action follow from saved facts (first block, first sale, pickaxe
+   *  level, pets) and ride along with the next save; only a tip that merely timed out saves at once. */
+  private updateTips() {
+    if (this.suspended) return;
+    const state=this.tipState(), now=this.clock();
+    for (const id of TIP_IDS) if (id!==this.tip && tipLearned(id,state)) this.onboarding.markSeen(id);
+    if (this.tip && tipLearned(this.tip,state)) this.endTip(now);
+    else if (this.tip && now-this.tipSince>=TIP_SECONDS[this.tip] && this.endTip(now)) this.committed(false);
+    if (!this.tip && now>=this.tipQuietUntil) {
+      const next=nextTip(state);
+      if (next) { this.tip=next; this.tipSince=now; }
     }
-    const anchor:Coord|null=guide?.marker==='shop'&&shop?[shop.zone.x,shop.zone.y+1,shop.zone.z]:guide?.marker==='mine'?this.content.onboarding?.entrance??null:guide?.marker==='sell'&&sale?[sale.x,sale.y+1,sale.z]:guide?.marker==='egg'&&station?station.promptAnchor:null;
-    const destination:Coord|null=guide?.marker==='egg'&&station?[station.zone.x,station.zone.y,station.zone.z]:anchor;
-
+  }
+  private endTip(now: number) {
+    const changed=!!this.tip&&this.onboarding.markSeen(this.tip);
+    this.tip=null; this.tipQuietUntil=now+TIP_GAP;
+    return changed;
+  }
+  /** The player tapped the tip away, or used the control it points at. */
+  dismissTip = (id?: TipId) => {
+    if (!this.tip || (id && id !== this.tip)) return;
+    if (this.endTip(this.clock())) this.committed(false);
+    this.publish();
+  };
+  private makeSnapshot() {
+    const bag=this.inventory.getSnapshot(), tip=this.tip?tipView(this.tip,this.tipState()):null;
     return Object.freeze({
-      equipment: this.equipment.exportData(), shopCatalog:{tools:this.toolCatalog,backpacks:this.bagCatalog}, requestedShop:this.requestedShop,
+      equipment: this.equipment.exportData(), shopCatalog:{tools:this.toolCatalog,backpacks:this.bagCatalog},
       journey: !!this.content.journey, currentWorld: this.currentWorld, atMineEntrance:this.atMineEntrance,
       minedVolume:this.worldProgress.minedVolume,
       worlds:this.content.journey?WORLD_REQUIREMENTS.map(w=>({...w,areaOpen:this.worldProgress.areaOpen(w.id),mineOpen:this.worldProgress.mineOpen(w.id),
         remaining:Math.max(0,w.mined-this.worldProgress.minedVolume),
         materials:w.materials.map(m=>({...m,name:itemDefinition(m.itemId).name,owned:bag.items[m.itemId]??0,reserved:this.reservations.quantity(m.itemId,bag.items[m.itemId]??0)}))})):[],
       mineralReservations:Object.fromEntries(Object.entries(bag.items).map(([id,n])=>[id,{reserved:this.reservations.quantity(id,n),sellable:n-this.reservations.quantity(id,n),mode:this.reservations.mode(id)}])),
-      onboarding: this.onboarding.getSnapshot(), guide, guideAnchor: anchor, guideDestination: destination, guideEggId: egg?.id ?? null, guideCompletionPending: this.guideCompletionPending,
+      onboarding: this.onboarding.getSnapshot(), tip,
+      // The first-dig tip points across the map at the mine until the player gets there.
+      tipAnchor: tip?.anchor==='mine'?this.content.onboarding?.entrance??null:null,
       inventory: this.inventory.getSnapshot(),
       backpackLevel: 1 + (this.content.journey?JOURNEY_BACKPACKS:BACKPACK_TIERS).filter(tier => tier.capacity <= bag.capacity).length,
       maxDepth: this.exploration.maxDepth,
@@ -315,7 +321,6 @@ export class GameSession {
       canTravel: this.canTravelNow(),
       autoHatch: this.autoHatchEgg,
       lastAutoHatch: this.lastAutoHatch,
-      requestedEgg: this.requestedEgg,
       coins: this.wallet.getBalance(),
       sale: quoteSale(this.content.journey?this.reservations.sellable(bag.items):bag.items, itemPrice),
       inSellZone: this.inSellZone,
@@ -348,6 +353,7 @@ export class GameSession {
     };
   };
   private publish() {
+    this.updateTips();
     this.snapshot = this.makeSnapshot();
     for (const listener of this.listeners) listener();
   }
@@ -507,7 +513,7 @@ export class GameSession {
       else if(this.autoHatchElapsed>=2){
         this.autoHatchElapsed=0;
         const hatched=this.petService.hatch(this.autoHatchEgg);
-        if(hatched.status==='hatched'){this.lastAutoHatch=hatched;this.requestedEgg=null;this.committed(true);this.feedback({type:'hatched',tier:this.petTier(hatched.pet),auto:true});}
+        if(hatched.status==='hatched'){this.lastAutoHatch=hatched;this.committed(true);this.feedback({type:'hatched',tier:this.petTier(hatched.pet),auto:true});}
         else {this.stopAutoHatch();this.notice=hatched.status==='insufficient-coins'?'金币不足，自动孵蛋已停止':'蛋台不可用，自动孵蛋已停止';}
       }
     }
@@ -627,7 +633,6 @@ export class GameSession {
       this.shops.find((shop) => shop.detector.isInside)?.id ?? null;
     if (activeShop !== this.shopId) {
       this.shopId = activeShop;
-      if(activeShop)this.requestedShop=false;
       changed = true;
     }
     for (const station of this.eggStations) station.detector.update(feet, grounded);
@@ -741,7 +746,6 @@ export class GameSession {
     if (this.suspended || !this.world?.travelTo) return 'unavailable' as const;
     const spot = this.surfaceSpot(target);
     if (!spot) return 'unavailable' as const;
-    this.requestedEgg = null; this.requestedShop = false;
     this.world.cancelMining();
     this.world.travelTo(spot.feet, spot.look);
     this.resetPosition();
