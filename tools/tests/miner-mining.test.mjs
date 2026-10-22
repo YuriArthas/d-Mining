@@ -75,12 +75,12 @@ test('挥镐只响应实际伤害：冷却、满包、锁定、空点与零伤�
   const update=()=>interaction.update(camera,[1,0,1],false,input,terrain);
   try{
     input.point(0,0,true);input.mine('mouse',true);update();
-    assert.deepEqual(interaction.strike,{target:[1,1,-3],speed:2});
+    assert.deepEqual(interaction.strike,{target:[1,1,-3],speed:2,cell:[0,0,-2],kind:1,breaking:false});
     for(const status of ['cooldown','full','locked','pending','unavailable']){
       result={status};update();assert.equal(interaction.strike,null,status);
     }
     result={status:'breaking',damage:0};update();assert.equal(interaction.strike,null);
-    speed=16;result={status:'breaking',damage:4};update();assert.equal(interaction.strike.speed,16);
+    speed=16;result={status:'breaking',damage:4};update();assert.equal(interaction.strike.speed,16);assert.equal(interaction.strike.breaking,true,'the final blow is marked so it can burst at once');
     const previous=calls;
     allowed=false;update();assert.equal(interaction.strike,null);assert.equal(calls,previous);
     allowed=true;ready=false;update();assert.equal(interaction.strike,null);assert.equal(calls,previous);

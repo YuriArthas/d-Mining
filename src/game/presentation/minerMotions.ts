@@ -22,7 +22,7 @@ const easeOut = (t: number) => 1 - (1 - t) ** 3;
 const easeInOut = (t: number) => t * t * (3 - 2 * t);
 
 /** Phase of the pick's contact within one swing; the hit itself lands when the swing starts. */
-export const SWING_IMPACT = 0.3;
+export const SWING_IMPACT = 0.24;
 
 // One swing, normalised to a 1 s clip that the mining layer stretches over the attack period:
 // carry the pick at the ready, raise it high behind the head, snap it down into the target, hold, recover.
@@ -51,10 +51,10 @@ const FOLLOW: Pose = {
 const RECOIL: Pose = { ...FOLLOW, UpperTorso: [-13, 15, -3], RightUpperArm: [66, 0, 6], RightHand: [-18, 0, 0] };
 const SWING: readonly Key[] = [
   { at: 0, pose: READY },
-  { at: 0.19, pose: WINDUP, ease: easeOut },
+  { at: 0.15, pose: WINDUP, ease: easeOut },
   { at: SWING_IMPACT, pose: IMPACT, ease: easeIn },
-  { at: 0.38, pose: FOLLOW, ease: easeOut },
-  { at: 0.5, pose: RECOIL, ease: easeInOut },
+  { at: 0.32, pose: FOLLOW, ease: easeOut },
+  { at: 0.45, pose: RECOIL, ease: easeInOut },
   { at: 1, pose: READY, ease: easeInOut },
 ];
 

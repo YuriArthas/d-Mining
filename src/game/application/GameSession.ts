@@ -41,6 +41,14 @@ export type WorldCommands = {
   /** Teleport; `lookAt` turns the camera toward what the player came to use. */
   travelTo?(feet: Coord, lookAt?: Coord): void;
 };
+export type SessionFeedback =
+  | Readonly<{ type: 'sold'; coins: number; count: number }>
+  | Readonly<{ type: 'purchased' }>
+  | Readonly<{ type: 'reward' }>
+  | Readonly<{ type: 'hatched'; tier: number; auto: boolean }>
+  | Readonly<{ type: 'unlocked' }>
+  | Readonly<{ type: 'denied'; reason: 'locked' | 'full' | 'coins' }>;
+
 export class GameSession {
   private readonly equipment: EquipmentCollection;
   private readonly bagCatalog;
@@ -92,6 +100,22 @@ export class GameSession {
     this.pickupListeners.add(listener);
     return () => { this.pickupListeners.delete(listener); };
   };
+  private readonly feedbackListeners = new Set<(event: SessionFeedback) => void>();
+  /** Moments worth a sound or a flourish: sales, purchases, rewards, hatches, unlocks and refusals. */
+  onFeedback = (listener: (event: SessionFeedback) => void) => {
+    this.feedbackListeners.add(listener);
+    return () => { this.feedbackListeners.delete(listener); };
+  };
+  private feedback(event: SessionFeedback) { for (const listener of this.feedbackListeners) listener(event); }
+  private lastRefusal = -Infinity;
+  /** Refusals repeat at most every 1.2 s, so holding a finger on a block does not buzz. */
+  private refuse(reason: 'locked' | 'full') {
+    const now = this.clock();
+    if (now - this.lastRefusal < 1.2) return;
+    this.lastRefusal = now;
+    this.feedback({ type: 'denied', reason });
+  }
+  private petTier(pet: { speciesId: string }) { return ['common', 'rare', 'epic', 'legendary'].indexOf(this.petService.catalog.pet(pet.speciesId).rarity); }
   private requestedEgg: string | null = null;
   readonly pets: PetUiAdapter;
   private readonly onboarding: Onboarding;
@@ -200,7 +224,7 @@ export class GameSession {
       balance: () => this.wallet.getBalance(),
       baseStats: this.baseMiningStats,
       effectiveStats: this.miningAttributes.getSnapshot,
-      commands: new PetCommands(petService, () => { this.requestedEgg=null; this.committed(true); this.publish(); }, () => !this.suspended, id => !this.content.eggStations?.length || this.eggId===id),
+      commands: this.withHatchFeedback(new PetCommands(petService, () => { this.requestedEgg=null; this.committed(true); this.publish(); }, () => !this.suspended, id => !this.content.eggStations?.length || this.eggId===id)),
       subscribe: this.subscribe,
     });
     this.eggStations = (content.eggStations ?? []).map(station => {
@@ -380,12 +404,10 @@ export class GameSession {
     } else if (result.status === 'locked') {
       const text = `需要 Lv.${result.requiredLevel} 镐子`;
       if (this.notice !== text) { this.notice = text; this.publish(); }
-    } else if (
-      result.status === "full" &&
-      this.notice !== "背包已满，前往售卖点出售"
-    ) {
-      this.notice = "背包已满，前往售卖点出售";
-      this.publish();
+      this.refuse('locked');
+    } else if (result.status === "full") {
+      if (this.notice !== "背包已满，前往售卖点出售") { this.notice = "背包已满，前往售卖点出售"; this.publish(); }
+      this.refuse('full');
     }
     return result;
   };
@@ -419,12 +441,23 @@ export class GameSession {
     nextAttackAt: this.combat.cooldown.nextAt,
     now: this.clock(),
   });
+  private withHatchFeedback(commands: PetCommands) {
+    return {
+      equip: commands.equip, unequip: commands.unequip, equipBest: commands.equipBest, unequipAll: commands.unequipAll,
+      hatch: (id: string) => {
+        const result = commands.hatch(id);
+        if (result.status === 'hatched') this.feedback({ type: 'hatched', tier: this.petTier(result.pet), auto: false });
+        else if (result.status === 'insufficient-coins') this.feedback({ type: 'denied', reason: 'coins' });
+        return result;
+      },
+    };
+  }
   private capsuleCoinReward() {
     const stage=this.content.destinations.filter(d=>this.exploration.maxDepth>=d.depth).length;
     return stageCoinReward(STAGES[Math.min(stage,STAGES.length-1)].basePrice);
   }
   private finishReward(result: RewardClaimResult) {
-    if(result.status==='claimed'){this.committed(true);this.publish();}
+    if(result.status==='claimed'){this.committed(true);this.publish();this.feedback({type:'reward'});}
     return result;
   }
   claimOnlineReward = (minutes: OnlineRewardMinutes) => this.suspended ? {status:'unavailable' as const} : this.finishReward(this.rewards.claimOnline(minutes));
@@ -449,7 +482,7 @@ export class GameSession {
     const result=this.rewards.spin(amount);
     if(result.status==='spun'){
       if(result.coinReward)this.wallet.credit(result.coinReward);
-      this.syncRewardEffects();this.committed(true);this.publish();
+      this.syncRewardEffects();this.committed(true);this.publish();this.feedback({type:'reward'});
     }
     return result;
   };
@@ -474,7 +507,7 @@ export class GameSession {
       else if(this.autoHatchElapsed>=2){
         this.autoHatchElapsed=0;
         const hatched=this.petService.hatch(this.autoHatchEgg);
-        if(hatched.status==='hatched'){this.lastAutoHatch=hatched;this.requestedEgg=null;this.committed(true);}
+        if(hatched.status==='hatched'){this.lastAutoHatch=hatched;this.requestedEgg=null;this.committed(true);this.feedback({type:'hatched',tier:this.petTier(hatched.pet),auto:true});}
         else {this.stopAutoHatch();this.notice=hatched.status==='insufficient-coins'?'金币不足，自动孵蛋已停止':'蛋台不可用，自动孵蛋已停止';}
       }
     }
@@ -483,6 +516,7 @@ export class GameSession {
   };
   // Called once, after terrain has actually removed these cells. Never checks isFull.
   collected = (resources: readonly { kind: number; cell?: Coord }[]) => {
+    const wasFull=this.inventory.isFull();
     const volume=resources.reduce((n,r)=>n+oreDefinition(r.kind).volume,0);
     this.worldProgress.previewCollection(volume);
     this.mining.collected(resources);
@@ -494,15 +528,16 @@ export class GameSession {
     this.notice = this.inventory.isFull() ? "背包已满，前往售卖点出售" : "";
     this.publish();
     if (resources.length) for (const listener of this.pickupListeners) listener(oreDrops(resources));
+    if (!wasFull && this.inventory.isFull()) this.refuse('full');
   };
   upgradePickaxe = (expectedLevel: number) => {
     if(this.suspended||expectedLevel!==this.equipment.toolLevel)return {status:'stale'} as const;
     const offer=this.toolOffer();
     if(!offer.next)return {status:'limit'} as const;
-    if(!this.wallet.debit(offer.price))return {status:'insufficient'} as const;
+    if(!this.wallet.debit(offer.price)){this.feedback({type:'denied',reason:'coins'});return {status:'insufficient'} as const;}
     this.pickaxe.setLevel(offer.next.level);this.equipment.toolLevel=offer.next.level;
     if(!this.content.journey)this.toolCatalog=shopTools(false,this.equipment.toolLevel);
-    this.committed(true);this.refreshTarget();this.publish();
+    this.committed(true);this.refreshTarget();this.publish();this.feedback({type:'purchased'});
     return {status:'upgraded',level:offer.next.level,spent:offer.price} as const;
   };
   upgradeBackpack = (tierId: string) => {
@@ -510,9 +545,9 @@ export class GameSession {
     const {next}=this.bagOffer();
     if(!next)return {status:'max'} as const;
     if(next.id!==tierId)return {status:'stale'} as const;
-    if(!this.wallet.debit(next.price))return {status:'insufficient'} as const;
+    if(!this.wallet.debit(next.price)){this.feedback({type:'denied',reason:'coins'});return {status:'insufficient'} as const;}
     this.inventory.setCapacity(next.capacity);this.equipment.backpackCapacity=next.capacity;
-    this.committed(true);this.publish();
+    this.committed(true);this.publish();this.feedback({type:'purchased'});
     return {status:'upgraded',capacity:next.capacity,spent:next.price} as const;
   };
   useShopItem = (category:ShopCategory,id:string) => {
@@ -575,6 +610,7 @@ export class GameSession {
     if (added.length) {
       this.notice = `已解锁 ${this.content.destinations.find((r) => r.id === added.at(-1))!.name}，回到地表可传送；对应宠物蛋已解锁`;
       changed = true;
+      this.feedback({ type: 'unlocked' });
     }
     const homeEvent = this.home.update(feet, grounded);
     if (homeEvent) {
@@ -614,7 +650,7 @@ export class GameSession {
     if (entered) {
       this.world?.cancelMining();
       const result = this.executeSale();
-      if (result.status === 'sold') { this.onboarding.record('soldOnce'); this.committed(true); }
+      if (result.status === 'sold') { this.onboarding.record('soldOnce'); this.committed(true); this.feedback({ type: 'sold', coins: result.coins, count: result.count }); }
       this.notice =
         result.status === "sold"
           ? `出售 ${result.count} 件，获得 ${result.coins} 金币`

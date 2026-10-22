@@ -5,6 +5,7 @@ import type {
   Scene,
   WebGLRenderer,
 } from "three";
+import { gameAudio } from "../audio/GameAudio.ts";
 import type { PreparedGame } from "./startGame.ts";
 import type { GameSession } from "../application/GameSession.ts";
 import type { GameInput } from "../GameInput.ts";
@@ -141,6 +142,7 @@ export function attachGameDebug(
       eggLabels: current.eggLabels.diagnostics(),
       petFollowers: current.petFollowers.diagnostics(),
       avatar: current.minerAvatar.diagnostics(),
+      feedback: { audio: gameAudio.diagnostics(), effects: current.feedback.effects.diagnostics() },
       combat: session.combatDebug(),
       sellZone: current.content.session.sales[0],
       samples: terrain.sampleStats(),

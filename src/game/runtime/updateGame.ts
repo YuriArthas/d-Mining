@@ -125,6 +125,7 @@ export function updateGame(
     );
     if(interaction.strike)current.minerAvatar.strike(interaction.strike.target,interaction.strike.speed);
     current.minerAvatar.update(drawnFeet, delta, physics.grounded, !!player.travelling);
+    current.feedback.update(delta, interaction.strike, current.minerAvatar.consumeEvents(), drawnFeet);
     const selected = interaction.selected;
     if (clock.status <= 0) {
       const info = terrain.snapshot();

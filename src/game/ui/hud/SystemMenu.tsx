@@ -7,6 +7,7 @@ import { Tile, UiButton } from '../kit/controls.tsx';
 export type SystemControls = {
   renderRate: RenderRate; toggleRenderRate(): void;
   shadows: boolean; toggleShadows(): void;
+  sound: boolean; toggleSound(): void;
   stylized: boolean; toggleStylized(): void;
   timeOfDay: SurfaceTime | 'auto'; toggleTimeOfDay(): void; autoTimeOfDay(): void;
   debug: boolean; hosted: boolean;
@@ -31,6 +32,7 @@ export function SystemMenu({ system, onHelp }: { system: SystemControls; onHelp(
       {open && <section id="hud-settings-panel" className="hud-settings-panel ui-panel" aria-label="设置">
         <h2 className="ui-panel-title ui-outline">设置</h2>
         <UiButton size="s" tone="steel" aria-pressed={system.renderRate === '60'} onPress={system.toggleRenderRate}>帧率上限：{system.renderRate === '60' ? '60' : '跟随屏幕'}</UiButton>
+        <UiButton size="s" tone="steel" aria-pressed={system.sound} onPress={system.toggleSound}>音效：{system.sound ? '开' : '关'}</UiButton>
         <UiButton size="s" tone="steel" aria-pressed={system.shadows} onPress={system.toggleShadows}>阴影：{system.shadows ? '开' : '关'}</UiButton>
         {system.debug && <>
           <UiButton size="s" tone="steel" aria-pressed={system.stylized} onPress={system.toggleStylized}>画面：{system.stylized ? '风格化' : '原始'}</UiButton>

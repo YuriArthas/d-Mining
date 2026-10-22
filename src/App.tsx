@@ -21,6 +21,7 @@ import {PerformanceProbeUi} from './game/ui/PerformanceProbeUi.tsx';
 import type {ProbeMode} from './game/presentation/PerformanceProbe.ts';
 import type {PerformanceSnapshot} from './game/presentation/PerformanceMeter.ts';
 import {beginGameTouch, blockGameCompatibilityClick} from './game/ui/GameButton.tsx';
+import {gameAudio} from './game/audio/GameAudio.ts';
 import type {SystemControls} from './game/ui/hud/SystemMenu.tsx';
 import {UiButton} from './game/ui/kit/controls.tsx';
 import {Sheet} from './game/ui/kit/panel.tsx';
@@ -79,6 +80,9 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
   const [input] = useState(() => new GameInput());
   const [shopView] = useState(() => new ShopView());
   useEffect(() => () => shopView.dispose(), [shopView]);
+  // Sound starts on the first touch, click or key press (browser rule) and pauses while hidden.
+  useEffect(() => gameAudio.attach(), []);
+  const sound = useSyncExternalStore(gameAudio.subscribe, gameAudio.isEnabled);
   const session = savedGame.session;
   const saveStatus = useSyncExternalStore(savedGame.saves.subscribe, savedGame.saves.getStatus);
   const [exitState, setExitState] = useState<'saving' | 'failed' | null>(null);
@@ -120,6 +124,7 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
       // Finish removing the DOM Canvas outside the R3F commit callback. Pending Canvas
       // effects may reconnect events, so disconnect once more after its final removal.
       flushSync(() => setExited(true));
+      gameAudio.dispose();
       scene.current?.events.disconnect?.();
       scene.current = null;
       // Replace the disposed game entry so browser Back cannot restore an empty game.
@@ -138,6 +143,7 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
   const system: SystemControls = {
     renderRate, toggleRenderRate: () => { settle(); setRenderRate(r => r === 'display' ? '60' : 'display'); },
     shadows: shadowsEnabled, toggleShadows: () => { settle(); setShadowsEnabled(v => !v); },
+    sound, toggleSound: () => { settle(); gameAudio.toggle(); },
     stylized, toggleStylized: () => { settle(); setStylized(v => !v); },
     timeOfDay, toggleTimeOfDay: () => { settle(); setTimeOfDay(t => t === 'day' ? 'night' : 'day'); }, autoTimeOfDay: () => { settle(); setTimeOfDay('auto'); },
     debug, hosted, exit: () => void exit(),

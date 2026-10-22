@@ -17,7 +17,7 @@ import type { GameInput } from "../GameInput.ts";
 import type { GameSession } from "../application/GameSession.ts";
 import type { LoadingEvent } from "../ui/loadingState.ts";
 import type { SurfaceTime } from "../world/SceneLighting.ts";
-import { WORLD_GENERATION } from "../terrain/SparseWorld.ts";
+import { WORLD_GENERATION, generationAtZ } from "../terrain/SparseWorld.ts";
 import { stratumAtDepth } from "../terrain/strata.ts";
 import { themeById } from "../content/themes.ts";
 import { CharacterPhysics, initPhysics } from "../validation/physics.ts";
@@ -39,6 +39,7 @@ import { createScenerySites } from "../world/createScenerySites.ts";
 import { PlayerController } from "./PlayerController.ts";
 import { CameraView } from "./CameraView.ts";
 import { MiningInteraction } from "./MiningInteraction.ts";
+import { MiningFeedback } from "./MiningFeedback.ts";
 import { DisposalScope } from "./DisposalScope.ts";
 
 export type StartupStats = ReturnType<typeof createStartupStats>;
@@ -231,6 +232,12 @@ export async function startGame(options: StartGameOptions) {
     onStatus("正在准备画面");
     const cameraView = new CameraView(),
       player = new PlayerController(physics, terrain, input, session);
+    const feedback = new MiningFeedback(session, {
+      cell: (cell) => terrain.cell(cell),
+      layers: (cell) => generationAtZ(terrain.world.generation, cell[2]).layers,
+    });
+    scope.defer(() => feedback.dispose());
+    root.add(feedback.effects.group);
     scope.defer(
       session.attach({
         cell: (cell) => terrain.cell(cell),
@@ -239,12 +246,13 @@ export async function startGame(options: StartGameOptions) {
         mine: (targets) => terrain.mineMany(targets),
         cancelMining: () => terrain.cancelPending(),
         travelTo: (feet, lookAt) => {
+          feedback.travel();
           player.travelTo(feet);
           // Camera yaw 0 looks toward -Z; face the destination's point of interest.
           // Tall targets (egg stands with their prompt) get a steeper view so the prompt clears the top HUD.
           if (lookAt) cameraView.look(Math.atan2(feet[0] - lookAt[0], feet[2] - lookAt[2]), lookAt[1] - feet[1] > 1.5 ? .5 : .32);
         },
-        returnToSurface: () => player.travelTo(content.returnPoint),
+        returnToSurface: () => { feedback.travel(); player.travelTo(content.returnPoint); },
       }),
     );
     const interaction = new MiningInteraction(session);
@@ -352,6 +360,7 @@ export async function startGame(options: StartGameOptions) {
       eggLabels,
       petFollowers,
       minerAvatar,
+      feedback,
       startup,
       timing,
       dispose: () => {

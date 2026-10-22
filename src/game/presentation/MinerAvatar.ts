@@ -51,6 +51,9 @@ export class MinerAvatar {
   private fallSpeed = 0;
   private landAge = Infinity;
   private landStrength = 0;
+  private tookOff = false;
+  private landed: number | null = null;
+  private contact: [number, number, number] | null = null;
   private disposed = false;
 
   static async load(signal: AbortSignal) {
@@ -177,20 +180,32 @@ export class MinerAvatar {
     const turn=Math.atan2(Math.sin(desired-this.group.rotation.y),Math.cos(desired-this.group.rotation.y));
     this.group.rotation.y+=turn*(1-Math.exp(-22*delta));
     this.group.updateMatrixWorld(true);
+    // Where the pick actually lands this frame: effects start at the struck spot the camera can see.
+    if(this.mining.consumeContact())this.contact=this.pickTip()?.toArray() as [number,number,number]??[this.miningTarget.x,this.miningTarget.y,this.miningTarget.z];
+  }
+
+  private pickTip() { return this.pickaxe.getObjectsByProperty('type','Object3D').find(o=>o.name.startsWith('PickaxeTip'))?.getWorldPosition(new Vector3()); }
+
+  /** Moments for sound and effects since the last call: the pick reaching the block (with the pick
+   *  tip's world position), a take-off and a landing (with its strength). */
+  consumeEvents() {
+    const events={contact:this.contact,jump:this.tookOff,land:this.landed};
+    this.contact=null;this.tookOff=false;this.landed=null;
+    return events;
   }
 
   /** Jump, fall and landing state from the drawn feet: the knee tuck needs a real take-off, a short
    *  step down never counts as a fall, and only a landing after real air time crouches. */
   private updateAir(rising: number, delta: number, grounded: boolean, discontinuity: boolean) {
-    if(discontinuity){this.airTime=0;this.airborne=0;this.jumped=false;this.fallSpeed=0;this.landAge=Infinity;this.verticalSpeed=0;return;}
+    if(discontinuity){this.airTime=0;this.airborne=0;this.jumped=false;this.fallSpeed=0;this.landAge=Infinity;this.verticalSpeed=0;this.tookOff=false;this.landed=null;this.contact=null;return;}
     this.verticalSpeed=MathUtils.damp(this.verticalSpeed,rising,24,delta);
     if(grounded){
-      if(this.airTime>.18){this.landAge=0;this.landStrength=MathUtils.clamp((this.fallSpeed-1.5)/7,.3,1);}
+      if(this.airTime>.18){this.landAge=0;this.landStrength=MathUtils.clamp((this.fallSpeed-1.5)/7,.3,1);this.landed=this.landStrength;}
       else this.landAge+=delta;
       this.airTime=0;this.jumped=false;this.fallSpeed=0;
     }else{
       this.airTime+=delta;this.landAge=Infinity;
-      this.jumped||=rising>2;
+      if(!this.jumped&&rising>2){this.jumped=true;this.tookOff=true;}
       this.fallSpeed=Math.max(this.fallSpeed,-rising);
     }
     const target=!grounded&&(this.jumped||this.airTime>.09)?1:0;
@@ -230,7 +245,7 @@ export class MinerAvatar {
       speed: this.speed, grounded: this.grounded,
       air:{airborne:this.airborne,jumped:this.jumped,verticalSpeed:this.verticalSpeed,landing:this.landAge<LANDING_SECONDS},
       mining:this.mining.diagnostics(),
-      pickaxe:{attachedTo:this.pickaxe.parent?.name,visible:this.pickaxe.visible,level:this.equippedTool,model:equipmentModel('tools',this.equippedTool),tip:this.pickaxe.getObjectsByProperty('type','Object3D').find(o=>o.name.startsWith('PickaxeTip'))?.getWorldPosition(new Vector3()).toArray()},
+      pickaxe:{attachedTo:this.pickaxe.parent?.name,visible:this.pickaxe.visible,level:this.equippedTool,model:equipmentModel('tools',this.equippedTool),tip:this.pickTip()?.toArray()},
       backpack:{attachedTo:this.backpack.parent?.name,level:this.equippedBag,model:equipmentModel('backpacks',this.equippedBag)},
       clips: this.locomotion.map(({lower:a}) => ({name:a.getClip().name.split(':')[0],time:a.time,weight:a.getEffectiveWeight(),speed:a.getEffectiveTimeScale()})),
       joints: Object.fromEntries(bones.filter(b => important.includes(b.name)).map((b: Bone) => [b.name,b.quaternion.toArray()])),
