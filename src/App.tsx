@@ -20,9 +20,11 @@ import { SessionUi } from './game/ui/SessionUi.tsx';
 import {PerformanceProbeUi} from './game/ui/PerformanceProbeUi.tsx';
 import type {ProbeMode} from './game/presentation/PerformanceProbe.ts';
 import type {PerformanceSnapshot} from './game/presentation/PerformanceMeter.ts';
-import {HudIcon} from './game/ui/HudIcon.tsx';
 import {beginGameTouch, blockGameCompatibilityClick} from './game/ui/GameButton.tsx';
-import './game/ui/robloxHud.css';
+import type {SystemControls} from './game/ui/hud/SystemMenu.tsx';
+import './game/ui/kit/fonts.css';
+import './game/ui/kit/tokens.css';
+import './game/ui/legacy.css';
 
 declare global {
   interface Window {
@@ -130,6 +132,15 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
     }
   };
 
+  const settle = () => { input.reset(); surface.current?.focus(); };
+  const system: SystemControls = {
+    renderRate, toggleRenderRate: () => { settle(); setRenderRate(r => r === 'display' ? '60' : 'display'); },
+    shadows: shadowsEnabled, toggleShadows: () => { settle(); setShadowsEnabled(v => !v); },
+    stylized, toggleStylized: () => { settle(); setStylized(v => !v); },
+    timeOfDay, toggleTimeOfDay: () => { settle(); setTimeOfDay(t => t === 'day' ? 'night' : 'day'); }, autoTimeOfDay: () => { settle(); setTimeOfDay('auto'); },
+    debug, hosted, exit: () => void exit(),
+  };
+
   if (exited) {
     return (
       <main onContextMenuCapture={event => event.preventDefault()} className="game-shell" aria-label="Mining 游戏">
@@ -171,28 +182,8 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
           </div>
           <InputMonitor input={input} /><ValidationPanel />
         </div></details>}
-        <details className="hud-settings" onToggle={() => input.reset()} onKeyDown={event => {
-          if (event.key === 'Escape') { event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus(); }
-        }}>
-        <summary aria-label="画面设置" title="画面设置"><HudIcon kind="settings" /></summary>
-        <nav className="scene-actions" aria-label="场景设置">
-        <button type="button" aria-label={renderRate==='display'?'切换为60帧上限':'跟随屏幕刷新率'} onClick={()=>{input.reset();setRenderRate(r=>r==='display'?'60':'display');surface.current?.focus();}}>帧率：{renderRate==='display'?'屏幕':'60'}</button>
-        <button type="button" aria-label={stylized?'切换为原始画面':'切换为风格化画面'} aria-pressed={stylized} onClick={()=>{input.reset();setStylized(v=>!v);surface.current?.focus();}}>画面：{stylized?'风格化':'原始'}</button>
-        <button type="button" aria-label={shadowsEnabled?'关闭烘焙阴影':'开启烘焙阴影'} aria-pressed={shadowsEnabled} onClick={()=>{input.reset();setShadowsEnabled(v=>!v);surface.current?.focus();}}>阴影：{shadowsEnabled?'烘焙':'关'}</button>
-        {debug && <><button type="button" aria-label={timeOfDay==='day'?'切换到夜晚':'切换到白天'} onClick={()=>{input.reset();setTimeOfDay(t=>t==='day'?'night':'day');surface.current?.focus();}}>{timeOfDay==='auto'?'昼夜：自动':timeOfDay==='day'?'☀ 白天':'☾ 夜晚'}</button>
-        {timeOfDay!=='auto'&&<button type="button" onClick={()=>{input.reset();setTimeOfDay('auto');surface.current?.focus();}}>恢复自动昼夜</button>}</>}
-        </nav>
-        </details>
-        <button className="hud-exit" type="button" title="退出游戏" onClick={() => void exit()}
-          onPointerDown={event => { if (event.pointerType !== 'mouse') event.preventDefault(); }}
-          onPointerUp={event => {
-            // A second touch does not synthesize click on every mobile browser.
-            if (event.pointerType !== 'mouse' && event.currentTarget.contains(document.elementFromPoint(event.clientX, event.clientY))) exit();
-          }} aria-label={hosted ? '退出游戏，返回游戏列表' : '退出游戏'}>
-          <HudIcon kind="exit" />
-        </button>
       </header>
-      {!showLoading&&<div inert={!!exitState || saveStatus.state === 'conflicted'}><SessionUi shopView={shopView} guideMarker={guideMarker} blocked={saveStatus.state === 'failed' || saveStatus.state === 'conflicted'} eggPrompt={eggPrompt} session={session} input={input} surface={surface} /></div>}
+      {!showLoading&&<div inert={!!exitState || saveStatus.state === 'conflicted'}><SessionUi shopView={shopView} system={system} guideMarker={guideMarker} blocked={saveStatus.state === 'failed' || saveStatus.state === 'conflicted'} eggPrompt={eggPrompt} session={session} input={input} surface={surface} /></div>}
       {!exitState && (saveStatus.state === 'failed' || saveStatus.state === 'conflicted') && <aside className="save-warning" role="alert">
         <span>{saveStatus.state === 'conflicted' ? saveStatus.error : '进度暂未保存，请重试'}</span>
         {saveStatus.state === 'failed' ? <button onClick={() => void savedGame.saves.flush().catch(() => {})}>重试保存</button> : <button onClick={() => location.reload()}>重新进入</button>}

@@ -300,6 +300,7 @@ export class GameSession {
       eggStation: this.eggStation,
       miningStats: this.miningAttributes.getSnapshot(),
       depth: this.depth,
+      location: this.guideLocation,
       destinations: this.content.destinations.filter(r=>!this.content.journey||(r.worldId??1)===this.currentWorld).map((r) => ({
         id: r.id,
         name: r.name,

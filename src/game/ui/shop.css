@@ -41,4 +41,4 @@
  .shop-category { min-height:150px; padding:8px 4px; }.shop-category>svg { width:60px;height:60px; }.shop-rebirth-icon { height:60px;font-size:60px; }.shop-category strong { font-size:20px; }.shop-category-box h1 { margin-bottom:10px; }
 }
 
-.shop-category>svg,.shop-switch>svg,.shop-wallet svg { flex:none; color:#244268; }
+.shop-category>svg,.shop-switch>svg,.shop-wallet svg { flex:none; }

@@ -4,7 +4,7 @@ import type { ShopCategory } from '../content/shopCatalog.ts';
 import type { ShopView } from '../presentation/ShopView.ts';
 import { formatNumber as number } from '../presentation/formatNumber.ts';
 import { GameButton } from './GameButton.tsx';
-import { HudIcon } from './HudIcon.tsx';
+import { Icon } from './kit/icons.tsx';
 import './shop.css';
 
 export function ShopPanel({session,view,onClose}:{session:GameSession;view:ShopView;onClose():void}) {
@@ -22,8 +22,8 @@ export function ShopPanel({session,view,onClose}:{session:GameSession;view:ShopV
     <div className="shop-category-box">
       <h1>商店</h1><GameButton className="shop-close" aria-label="关闭商店" onPress={onClose}>×</GameButton>
       <div className="shop-categories">
-        <GameButton className="shop-category" data-category="tools" onPress={()=>open('tools')}><HudIcon kind="upgrade"/><strong>工具商店</strong><span>挑选你的矿镐</span></GameButton>
-        <GameButton className="shop-category" data-category="backpacks" onPress={()=>open('backpacks')}><HudIcon kind="backpack"/><strong>背包商店</strong><span>装下更多收获</span></GameButton>
+        <GameButton className="shop-category" data-category="tools" onPress={()=>open('tools')}><Icon kind="pickaxe"/><strong>工具商店</strong><span>挑选你的矿镐</span></GameButton>
+        <GameButton className="shop-category" data-category="backpacks" onPress={()=>open('backpacks')}><Icon kind="backpack"/><strong>背包商店</strong><span>装下更多收获</span></GameButton>
         <GameButton className="shop-category" data-category="rebirth" disabled onPress={()=>{}}><span className="shop-rebirth-icon" aria-hidden="true">↻</span><strong>重生商店</strong><span>未开放</span></GameButton>
       </div>
     </div>
@@ -43,12 +43,12 @@ export function ShopPanel({session,view,onClose}:{session:GameSession;view:ShopV
   };
   return <section className="shop-showroom" role="dialog" aria-modal="true" aria-label={category==='tools'?'工具商店':'背包商店'} data-category={category} data-item={item.id}>
     <header className="shop-item-heading"><h1>{item.name}</h1><p>{item.description}</p></header>
-    <nav className="shop-top-actions" aria-label="商店操作"><GameButton className="shop-category-back" onPress={view.categories}>分类</GameButton><GameButton className="shop-switch" aria-label={category==='tools'?'切换到背包商店':'切换到工具商店'} onPress={()=>open(category==='tools'?'backpacks':'tools')}><HudIcon kind={category==='tools'?'backpack':'upgrade'}/><span>{category==='tools'?'背包':'工具'}</span></GameButton><GameButton className="shop-close" aria-label="关闭商店" onPress={onClose}>×</GameButton></nav>
+    <nav className="shop-top-actions" aria-label="商店操作"><GameButton className="shop-category-back" onPress={view.categories}>分类</GameButton><GameButton className="shop-switch" aria-label={category==='tools'?'切换到背包商店':'切换到工具商店'} onPress={()=>open(category==='tools'?'backpacks':'tools')}><Icon kind={category==='tools'?'backpack':'pickaxe'}/><span>{category==='tools'?'背包':'工具'}</span></GameButton><GameButton className="shop-close" aria-label="关闭商店" onPress={onClose}>×</GameButton></nav>
     <GameButton className="shop-arrow shop-prev" aria-label="上一件商品" disabled={display.index===0} onPress={()=>view.select(display.index-1)}>◀</GameButton>
     <GameButton className="shop-arrow shop-next" aria-label="下一件商品" disabled={display.index===items.length-1} onPress={()=>view.select(display.index+1)}>▶</GameButton>
     {!display.ready&&!display.error&&<div className="shop-loading" role="status">正在布置展厅…</div>}
     {display.error&&<div className="shop-loading" role="alert"><p>展厅资源加载失败</p><GameButton onPress={view.retry}>重新加载</GameButton></div>}
-    <div className="shop-wallet" aria-label="随身资源"><div><HudIcon kind="backpack"/><strong>{number(state.inventory.used)} / {number(state.inventory.capacity)}</strong></div><div><HudIcon kind="coin"/><strong>{number(state.coins)}</strong></div></div>
+    <div className="shop-wallet" aria-label="随身资源"><div><Icon kind="backpack"/><strong>{number(state.inventory.used)} / {number(state.inventory.capacity)}</strong></div><div><Icon kind="coin"/><strong>{number(state.coins)}</strong></div></div>
     <footer className="shop-item-actions">
       <div className="shop-stats">{category==='tools'?<><span>力量 <b>+{number(item.power!)}</b></span><span>攻速 <b>{item.speed} / 秒</b></span></>:<span>容量 <b>{number(item.capacity!)}</b></span>}</div>
       <GameButton className="shop-buy" data-owned={owned} data-testid="shop-buy" disabled={blocked} onPress={purchase}>{!owned&&<span className="shop-price">◉ {number(item.price)}</span>}<strong>{label}</strong></GameButton>

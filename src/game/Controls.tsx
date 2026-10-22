@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, useSyncExternalStore, type RefObject } fro
 import type { GameInput } from './GameInput.ts';
 import { MINERALS } from './terrain/minerals.ts';
 import { bindInput } from './bindInput.ts';
+import { Icon } from './ui/kit/icons.tsx';
 
 export function Controls({ input, surface }: { input: GameInput; surface: RefObject<HTMLDivElement | null> }) {
   const touchTarget = useRef<HTMLDivElement>(null);
@@ -17,10 +18,9 @@ export function Controls({ input, surface }: { input: GameInput; surface: RefObj
     <div className="touch-controls">
       <div ref={stick} className="joystick" role="group" aria-label="移动摇杆">
         <span ref={knob} className="joystick-knob" />
-        <span className="joystick-label">移动</span>
       </div>
       <div className="action-buttons">
-        <button ref={jump} className="jump-button" type="button" aria-label="跳跃输入" aria-pressed="false">跳跃</button>
+        <button ref={jump} className="jump-button" type="button" aria-label="跳跃输入" title="跳跃" aria-pressed="false"><Icon kind="jump" /></button>
       </div>
     </div>
     <div className="control-hint">

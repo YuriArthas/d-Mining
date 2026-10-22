@@ -1,0 +1,53 @@
+/* Mining UI kit tokens. One visual language for the HUD, panels and world prompts,
+   matched to the original Roblox screens: bright cyan bodies, thick navy outlines,
+   chunky 3D drop edges and outlined white display text. See docs/ui-kit.md. */
+.game-shell {
+  --ui-ink: #13355d;
+  --ui-ink-soft: #24578c;
+  --ui-blue: #0aaefc;
+  --ui-blue-hi: #6ad6ff;
+  --ui-blue-lo: #0684d6;
+  --ui-well: #0a64b4;
+  --ui-cell: #2a84dc;
+  --ui-green: #52d23d;
+  --ui-green-lo: #2b8f22;
+  --ui-orange: #ffa53c;
+  --ui-orange-lo: #c96a17;
+  --ui-gold: #ffd447;
+  --ui-gold-lo: #c9930f;
+  --ui-purple: #b672e6;
+  --ui-purple-lo: #7442a6;
+  --ui-pink: #ff78b5;
+  --ui-pink-lo: #c3407f;
+  --ui-red: #f06363;
+  --ui-red-lo: #a3333a;
+  --ui-steel: #6f8aac;
+  --ui-steel-lo: #415a7c;
+  --ui-text-gold: #ffd84d;
+  --ui-text-soft: #dcf3ff;
+  --ui-scrim: #0b1d3399;
+  --ui-card: #123d6ae6;
+  --ui-card-lo: #0c2a4ce6;
+  --ui-stroke: 3px;
+  --ui-edge: 3px;
+  --ui-font-cjk: "Mining Display Noto";
+  --ui-font: var(--ui-font-cjk), "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Microsoft YaHei", system-ui, sans-serif;
+  --ui-font-body: "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Microsoft YaHei", system-ui, sans-serif;
+  --ui-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'%3E%3Cpath d='M22 13l6 9-6 9-6-9z' fill='%23fff' fill-opacity='.09'/%3E%3Cpath d='M0 0l4 6-4 6M44 32l-4 6 4 6' fill='none'/%3E%3C/svg%3E");
+}
+
+/* Outlined display text: white fill over a navy stroke, like Roblox UIStroke. */
+.ui-outline {
+  color: #fff;
+  font-family: var(--ui-font);
+  font-weight: 800;
+  -webkit-text-stroke: var(--ui-stroke) var(--ui-ink);
+  paint-order: stroke fill;
+  text-shadow: 0 2px 0 var(--ui-ink);
+  letter-spacing: .01em;
+}
+.ui-num { font-variant-numeric: tabular-nums; }
+
+/* Game surfaces never select text or raise the long-press callout; real inputs still edit. */
+.game-shell { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.game-shell :is(input, textarea, [contenteditable="true"]) { user-select: text; -webkit-user-select: text; -webkit-touch-callout: default; }

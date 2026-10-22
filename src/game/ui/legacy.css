@@ -1,0 +1,66 @@
+/* Retained rules for dialogs and world labels that predate the UI kit.
+   They are replaced panel by panel in the later UI steps (see docs/ui-kit.md). */
+.game-shell--roblox-hud button:focus-visible { outline: 3px solid #fff294; outline-offset: 5px; }
+
+/* World guidance labels */
+.game-shell--roblox-hud .guide-marker b, .game-shell--roblox-hud .guide-offscreen,
+.game-shell--roblox-hud .guide-dig-caption {
+  background: none; border: 0; box-shadow: none; color: #fff2a3;
+  font-family: var(--ui-font); font-size: 16px; font-weight: 900; -webkit-text-stroke: 3px var(--ui-ink); paint-order: stroke fill;
+}
+
+/* Debug tools (debug=1 only) */
+.game-shell--roblox-hud .game-header { padding: 0; }
+.hud-debug-tools { position: absolute; left: 50%; transform: translateX(-50%); top: calc(64px + var(--safe-top)); pointer-events: auto; font-size: 12px; }
+.hud-debug-tools > summary { min-height: 44px; display: grid; place-items: center; padding: 0 10px; cursor: pointer; text-shadow: 0 1px 2px #000; }
+.hud-debug-content { position: absolute; left: 50%; transform: translateX(-50%); top: 45px; width: 315px; max-height: calc(100cqh - 120px); overflow: auto; padding: 12px; background: #f3f4df; color: #173d42; border-radius: 10px; }
+.hud-debug-content .input-monitor, .hud-debug-content .validation-panel { position: static; padding: 8px; margin-top: 8px; color: white; }
+.hud-debug-content .performance-expanded { position: static; padding: 10px 0; width: 100%; }
+.hud-debug-content .performance-hud { flex-wrap: wrap; }
+
+@media (any-pointer: coarse) {
+  .game-shell--roblox-hud .guide-marker b, .game-shell--roblox-hud .guide-offscreen,
+  .game-shell--roblox-hud .guide-dig-caption { font-size: 14px; }
+  .game-shell--roblox-hud .egg-world-prompt { min-width: 112px; min-height: 44px; font-size: 14px; }
+
+  /* Dialogs stay inside the landscape safe area and scroll with a finger. */
+  .game-shell--roblox-hud .pet-backdrop, .game-shell--roblox-hud .upgrade-backdrop {
+    padding: calc(8px + var(--safe-top)) calc(10px + var(--safe-right)) calc(8px + var(--safe-bottom)) calc(10px + var(--safe-left));
+    touch-action: pan-y;
+  }
+  .game-shell--roblox-hud .pet-panel, .game-shell--roblox-hud .upgrade-panel {
+    max-height: 100%; font-size: 14px; overscroll-behavior: contain; touch-action: pan-y;
+  }
+  .game-shell--roblox-hud .pet-panel { width: min(760px, 100%); padding: 12px 16px; }
+  .game-shell--roblox-hud .pet-egg-panel { width: min(580px, 100%); }
+  .game-shell--roblox-hud .upgrade-panel { width: min(400px, 100%); }
+  .game-shell--roblox-hud .journey-panel { width: min(700px, 100%); }
+  .game-shell--roblox-hud .pet-panel button, .game-shell--roblox-hud .upgrade-panel button,
+  .game-shell--roblox-hud .journey-panel select { min-width: 44px; min-height: 44px; font-size: 14px; }
+  .game-shell--roblox-hud .pet-heading, .game-shell--roblox-hud .upgrade-panel > header {
+    position: sticky; top: -12px; z-index: 2; min-height: 52px; padding-block: 4px; background: #f0f7f7;
+  }
+  .game-shell--roblox-hud .upgrade-panel > header { background: #142c31; }
+  .game-shell--roblox-hud .pet-close { top: 4px; width: 44px; height: 44px; }
+  .game-shell--roblox-hud .pet-heading h1 { font-size: 22px; }
+  .game-shell--roblox-hud .pet-panel small, .game-shell--roblox-hud .pet-detail p,
+  .game-shell--roblox-hud .pet-empty p, .game-shell--roblox-hud .pet-empty span,
+  .game-shell--roblox-hud .pet-slot b, .game-shell--roblox-hud .pet-slot span,
+  .game-shell--roblox-hud .pet-card .pet-name-art, .game-shell--roblox-hud .pet-footer output,
+  .game-shell--roblox-hud .upgrade-panel p, .game-shell--roblox-hud .upgrade-panel output,
+  .game-shell--roblox-hud .upgrade-panel small { font-size: 14px; }
+  .game-shell--roblox-hud .pet-panel.rewards-panel { padding: 0; }
+  .game-shell--roblox-hud .reward-balance { padding: 8px 16px; }
+  .game-shell--roblox-hud .rewards-panel .pet-heading { margin: 6px 16px; }
+  .game-shell--roblox-hud .reward-notice:empty { display: none; }
+  .game-shell--roblox-hud .rewards-content { padding: 12px 16px; }
+  .game-shell--roblox-hud .reward-signin-days { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .game-shell--roblox-hud .egg-preview-grid { margin-top: 10px; }
+  .game-shell--roblox-hud .egg-preview-pet { gap: 5px; padding: 8px 3px; }
+  .game-shell--roblox-hud .pet-footer { flex-wrap: wrap; }
+  .game-shell--roblox-hud .pet-footer output { max-width: 100%; }
+}
+
+/* Inline vector icons inside the older panels. */
+.equipment-icon { width: 28px; height: 28px; flex: none; }
+.ore-icon { width: 32px; height: 32px; flex: none; color: #dceae7; }

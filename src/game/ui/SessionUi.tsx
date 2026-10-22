@@ -1,4 +1,4 @@
-import { GuideCard, OnboardingHelp, DepthGoalCard } from './OnboardingUi.tsx';
+import { GuideCard, GuideMarker, OnboardingHelp, DepthGoalCard } from './OnboardingUi.tsx';
 import { selectDepthGoal } from '../application/OnboardingGuide.ts';
 import { RewardsPanel, CapsulePanel } from './RewardsPanel.tsx';
 import { GameButton } from './GameButton.tsx';
@@ -7,7 +7,8 @@ import { useEffect, useState, type RefObject, useSyncExternalStore } from 'react
 import type { GameSession } from '../application/GameSession.ts';
 import type { GameInput } from '../GameInput.ts';
 import { Controls } from '../Controls.tsx';
-import { InventoryHud } from './InventoryHud.tsx';
+import { Hud } from './hud/Hud.tsx';
+import type { SystemControls } from './hud/SystemMenu.tsx';
 import { ShopPanel } from './ShopPanel.tsx';
 import type { ShopView } from '../presentation/ShopView.ts';
 import { TargetHealth } from './TargetHealth.tsx';
@@ -16,8 +17,9 @@ import { EggPanel } from './pets/EggPanel.tsx';
 import { TravelPanel } from './TravelPanel.tsx';
 import { WorldPanel, MineralPanel } from './JourneyPanel.tsx';
 
-export function SessionUi({ shopView, session, input, surface, eggPrompt, guideMarker, blocked = false }: {
+export function SessionUi({ shopView, session, input, surface, eggPrompt, guideMarker, system, blocked = false }: {
   shopView: ShopView;
+  system: SystemControls;
   guideMarker: RefObject<HTMLDivElement | null>;
   blocked?: boolean;
   session: GameSession;
@@ -63,16 +65,23 @@ export function SessionUi({ shopView, session, input, surface, eggPrompt, guideM
     return () => window.removeEventListener('keydown', press);
   }, [modal, shopOpen, state.eggStation, state.atMachine, state.atMineEntrance, state.worlds, input, eggPrompt, blocked, focused]);
   const panel=modal??(shopOpen?'shop':'none');
+  const open = (next: NonNullable<typeof modal>) => () => { input.reset(); setModal(next); };
+  const lockedMine=!!state.atMineEntrance&&state.worlds.some(w=>w.id===state.atMineEntrance&&!w.mineOpen);
+  const guideHidden=!!modal||shopOpen||blocked||!focused;
+  const objective=state.guide||state.guideCompletionPending
+    ? <GuideCard session={session} state={state} hidden={guideHidden} />
+    : !blocked&&<DepthGoalCard goal={selectDepthGoal(state.maxDepth,state.destinations)} minedCount={state.onboarding.minedCount} showMiningTask={state.onboarding.longTaskIntroduced}/>;
+  const prompts=<>
+    {lockedMine&&<GameButton className="journey-mine-prompt ui-btn" data-tone="orange" data-size="m" onPress={open('worlds')}><span className="ui-outline"><span className="desktop-hint">E · </span>查看矿区缴纳要求</span></GameButton>}
+    {state.atMachine&&<GameButton className="capsule-world-prompt ui-btn" data-tone="pink" data-size="m" onPress={open('capsule')}><span className="ui-outline"><span className="desktop-hint">E · </span>幸运扭蛋</span></GameButton>}
+  </>;
   return <div className="session-ui" data-panel={panel} data-guide-egg={state.eggId===state.guideEggId} data-guide={!blocked&&focused?state.guide?.id:undefined} data-needs-equip={!blocked&&focused&&state.guide?.id==='equip'&&pets.pets.length>0}>
-    <GuideCard session={session} state={state} marker={guideMarker} hidden={!!modal||shopOpen||blocked||!focused} />
-    {!modal&&!shopOpen&&!blocked&&!state.guide&&!state.guideCompletionPending&&<DepthGoalCard goal={selectDepthGoal(state.maxDepth,state.destinations)} minedCount={state.onboarding.minedCount} showMiningTask={state.onboarding.longTaskIntroduced}/>}
+    <GuideMarker session={session} state={state} marker={guideMarker} hidden={guideHidden} />
     {modal==='help'&&<OnboardingHelp session={session} onClose={close} />}
-    {!modal && !shopOpen && <TargetHealth session={session} />}
-    <InventoryHud onOpenHelp={() => { input.reset(); setModal('help'); }} onOpenPets={openPets} session={session} onOpenUpgrade={openShop} onOpenTravel={() => { input.reset(); setModal('travel'); }} onOpenWorlds={() => { input.reset(); setModal('worlds'); }} onOpenMinerals={() => { input.reset(); setModal('minerals'); }} onOpenRewards={() => { input.reset(); setModal('rewards'); }} />
-    {!modal&&!shopOpen&&state.atMineEntrance&&state.worlds.some(w=>w.id===state.atMineEntrance&&!w.mineOpen)&&<GameButton className="journey-mine-prompt" onPress={()=>{input.reset();setModal('worlds');}}><span className="desktop-hint">E · </span>查看矿区缴纳要求</GameButton>}
+    {!modal && !shopOpen && <Hud session={session} system={system} objective={objective} prompts={prompts} target={<TargetHealth session={session} />}
+      actions={{ openPets, openShop, openHelp: open('help'), openTravel: open('travel'), openWorlds: open('worlds'), openMinerals: open('minerals'), openRewards: open('rewards') }} />}
     {modal==='worlds'&&<WorldPanel session={session} onClose={close}/>}
     {modal==='minerals'&&<MineralPanel session={session} onClose={close}/>}
-    {!modal&&!shopOpen&&state.atMachine&&<GameButton className="capsule-world-prompt" onPress={()=>{input.reset();setModal('capsule');}}><kbd>E</kbd> 幸运扭蛋</GameButton>}
     {!modal && !shopOpen && <Controls input={input} surface={surface} />}
     {!modal && !shopOpen && state.eggStation && <button ref={eggPrompt} type="button" className="egg-world-prompt" style={{ visibility: 'hidden' }} aria-label="查看宠物蛋" onClick={openEgg}>
       <kbd>E</kbd><span>查看宠物蛋</span>
