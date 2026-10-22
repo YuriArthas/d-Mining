@@ -1,0 +1,21 @@
+{
+  "maker": "Blender",
+  "script": "tools/build-pet-cube.py",
+  "blend": "assets-source/pets/pet-cube.blend",
+  "glb": "src/game/assets/pets/pet-cube.glb",
+  "triangles": 300,
+  "vertices": 152,
+  "edge": 1.0,
+  "bevel": 0.17,
+  "segments": 4,
+  "origin": "bottom centre, +Z (glTF) is the face side",
+  "uvRange": [
+    0.0497918426990509,
+    0.0497918426990509,
+    0.9502081871032715,
+    0.9502081871032715
+  ],
+  "textures": "none; colour, pattern and face are drawn at runtime per species",
+  "sha256": "d421b3c2a281ce1161418f24298073c8162516fc2d1bbff19656c4a9061fd576",
+  "bytes": 9368
+}

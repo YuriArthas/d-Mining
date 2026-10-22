@@ -115,7 +115,7 @@ export function updateGame(
     );
     if (contactShadow)
       (contactShadow.material as Material).opacity = cameraView.rig.avatarOpacity * lightStrength;
-    current.petFollowers.update(drawnFeet, player.facing, camera, delta, !!player.travelling);
+    current.petFollowers.update(drawnFeet, player.facing, camera, delta, !!player.travelling, physics.grounded);
     interaction.update(
       camera as PerspectiveCamera,
       feet,

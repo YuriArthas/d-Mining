@@ -2,17 +2,20 @@ import { useRef, type ButtonHTMLAttributes, type MouseEvent, type PointerEvent }
 import { gameAudio } from '../audio/GameAudio.ts';
 
 // Shared across buttons: a touch can replace its button with a new panel before
-// the browser sends the compatibility click at the same screen position.
+// the browser sends the compatibility click at the same screen position. On a slow
+// frame that click can arrive well after the release, so the window is generous;
+// any new press clears it, so a fresh tap is never swallowed.
 let lastTouch = -Infinity;
+const COMPATIBILITY_CLICK_MS = 2000;
 
 // Capture on the game shell as well: a touch can remove a dialog before the
 // compatibility click arrives on a native <summary> or button behind it.
 // A fresh finger press must still be able to use those native controls at once.
-export function beginGameTouch(event: PointerEvent) {
-  if (event.pointerType !== 'mouse') lastTouch = -Infinity;
+export function beginGameTouch(_event: PointerEvent) {
+  lastTouch = -Infinity;
 }
 export function blockGameCompatibilityClick(event: MouseEvent) {
-  if (event.detail !== 0 && performance.now() - lastTouch < 700) {
+  if (event.detail !== 0 && performance.now() - lastTouch < COMPATIBILITY_CLICK_MS) {
     event.preventDefault(); event.stopPropagation();
   }
 }
@@ -34,7 +37,7 @@ export function GameButton({ onPress, blurAfterPress = true, ...props }: Omit<Bu
       if (!props.disabled && event.currentTarget.contains(document.elementFromPoint(event.clientX, event.clientY))) press();
     }}
     onClick={event => {
-      if (event.detail !== 0 && performance.now() - lastTouch < 700) return;
+      if (event.detail !== 0 && performance.now() - lastTouch < COMPATIBILITY_CLICK_MS) return;
       if (!props.disabled) press();
       if (blurAfterPress) event.currentTarget.blur();
     }} />;

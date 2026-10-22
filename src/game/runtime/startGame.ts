@@ -222,10 +222,11 @@ export async function startGame(options: StartGameOptions) {
       check();
       return miner;
     });
-    const [{ physics, terrain }, surface, minerAvatar] = await Promise.all([
+    const [{ physics, terrain }, surface, minerAvatar, petBody] = await Promise.all([
       worldTask,
       surfaceTask,
       avatarTask,
+      PetFollowers.loadBody(abort.signal),
     ]);
     check();
     avatar.add(minerAvatar.group);
@@ -263,7 +264,7 @@ export async function startGame(options: StartGameOptions) {
     const eggLabels = new EggStandLabels(content.hub.eggs, session.pets.getSnapshot().eggs);
     root.add(eggLabels.group);
     scope.defer(() => disposeScenery(eggLabels.group));
-    const petFollowers = new PetFollowers();
+    const petFollowers = new PetFollowers(petBody);
     root.add(petFollowers.group);
     scope.defer(() => petFollowers.dispose());
     const updatePets = () => petFollowers.sync(session.pets.getSnapshot().pets.flatMap(card =>
