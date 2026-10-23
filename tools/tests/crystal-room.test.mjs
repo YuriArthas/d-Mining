@@ -12,7 +12,7 @@ test('crystal station keeps its floor and ceiling aperture, independent sale, an
  const camp=createCampContent(LAYERS.map(l=>l.id==='crystal'?{...l,from:1300}:l));
  const room=camp.rooms.find(r=>r.id==='crystal'),plan=roomPlan(room);
  assert.equal(plan.authored.kit.id,'crystal-v1');assert.equal(room.shop,null);
- assert.equal(plan.signs[0].subtitle,'04 / 1300 M');
+ assert.equal(plan.signs[0].subtitle,'04 / 1300 米');
  const outside=p=>p.at[0]+p.half[0]<=-8||p.at[0]-p.half[0]>=8||p.at[2]+p.half[2]<=-8||p.at[2]-p.half[2]>=8;
  assert.ok(plan.solids.every(outside));
  const floorAndCeiling=plan.authored.instances.filter(p=>p.floor);

@@ -34,7 +34,7 @@ export class FeedbackFixtures {
     rows.forEach((r,i)=>{
       const y=174+i*78;c.fillStyle=r.id==='self'?'#365f65':i%2?'#20383e':'#243e43';c.fillRect(26,y,716,68);
       c.textAlign='left';c.fillStyle=r.id==='self'?'#ffeb9a':'#edf4ee';c.font=r.id==='self'?'bold 34px sans-serif':'32px sans-serif';c.fillText(`${i+1}  ${r.name}`,48,y+45);
-      c.textAlign='right';c.fillText(`${r.depth} m`,716,y+45);
+      c.textAlign='right';c.fillText(`${r.depth} 米`,716,y+45);
     });
     c.textAlign='center';c.fillStyle='#b2ccc5';c.font='25px sans-serif';c.fillText('继续向下，刷新你的纪录',384,856);this.texture.needsUpdate=true;
   }

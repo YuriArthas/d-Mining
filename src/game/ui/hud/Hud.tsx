@@ -1,6 +1,6 @@
 import { useEffect, useState, useSyncExternalStore, type ReactNode } from 'react';
 import type { GameSession } from '../../application/GameSession.ts';
-import { formatNumber as number } from '../../presentation/formatNumber.ts';
+import { formatDepth, formatNumber as number } from '../../presentation/formatNumber.ts';
 import { Pill, Tile, UiButton } from '../kit/controls.tsx';
 import { Icon } from '../kit/icons.tsx';
 import { OrePickupFeed } from '../OrePickupFeed.tsx';
@@ -29,7 +29,7 @@ export function Hud({ session, actions, system, objective, target, prompts, tipH
   const world = state.worlds.find(w => w.id === state.currentWorld)?.name ?? `世界 ${state.currentWorld}`;
   // Location is null until the first physics step; the game always starts on the surface.
   const surface = state.location !== 'mine' && state.location !== 'room';
-  const depth = surface ? '地表' : `${number(Math.floor(state.depth))} 米`;
+  const depth = surface ? '地表' : formatDepth(state.depth);
   const { speed, luck, sell } = state.rewards.timed;
   // HUD tips name a control on screen; the first-dig tip is drawn in the world instead.
   const tip = !tipHidden && state.tip && state.tip.anchor !== 'mine' && state.tip.anchor !== 'dig' ? state.tip : null;

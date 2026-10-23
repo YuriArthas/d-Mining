@@ -2,7 +2,7 @@ import { useState, useSyncExternalStore, type CSSProperties } from 'react';
 import type { GameSession } from '../../application/GameSession.ts';
 import type { WorldId } from '../../content/worldJourney.ts';
 import { itemDefinition } from '../../application/items.ts';
-import { formatNumber as number } from '../../presentation/formatNumber.ts';
+import { formatDepth, formatNumber as number } from '../../presentation/formatNumber.ts';
 import { GameButton } from '../GameButton.tsx';
 import { OreIcon } from '../InventoryIcons.tsx';
 import { UiButton } from '../kit/controls.tsx';
@@ -38,7 +38,7 @@ function TravelTab({ session, common, onClose }: { session: GameSession; common:
     else setMessage(result === 'locked' ? '还没有解锁这一层' : '现在无法传送，请稍后再试');
   };
   return <Sheet {...common} footer={<span className="ui-hint" role="status">{message || '在哪都能传送。到达新深度会永久解锁那一层的传送和宠物蛋。'}</span>}>
-    <div className="ui-row"><Chip icon="gem">历史最深 <b>{number(Math.floor(state.maxDepth))} 米</b></Chip><span className="ui-hint">{world}</span></div>
+    <div className="ui-row"><Chip icon="gem">历史最深 <b>{formatDepth(state.maxDepth)}</b></Chip><span className="ui-hint">{world}</span></div>
     <div className="ui-cards world-cards">
       <div className="ui-card-tile" style={{ '--c': '#62c96b', '--c-lo': '#2f9a3d' } as CSSProperties}>
         <Icon kind="home" className="ui-icon ui-card-art" /><h4 className="ui-outline">地表</h4><small>商店 · 蛋台</small>
@@ -48,7 +48,7 @@ function TravelTab({ session, common, onClose }: { session: GameSession; common:
         const [c, lo] = layerColor(room.name, index);
         return <div key={room.id} className="ui-card-tile" data-locked={room.unlocked ? undefined : ''} style={{ '--c': c, '--c-lo': lo } as CSSProperties}>
           {room.unlocked ? <Icon kind="portal" className="ui-icon ui-card-art" /> : <span className="ui-card-art world-lock" aria-hidden="true"><LockIcon /></span>}
-          <h4 className="ui-outline">{room.name}</h4><small>地下 {number(room.depth)} 米</small>
+          <h4 className="ui-outline">{room.name}</h4><small>地下 {formatDepth(room.depth)}</small>
           {room.unlocked ? <UiButton size="s" tone="green" aria-label={`传送到${room.name}`} onPress={() => go(room.id)}>传送</UiButton>
             : <Bar value={state.maxDepth} max={room.depth} size="s">{Math.floor(Math.min(state.maxDepth, room.depth))} / {room.depth} 米</Bar>}
         </div>;

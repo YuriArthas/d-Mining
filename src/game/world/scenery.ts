@@ -11,7 +11,7 @@ function buildRoomPlan(room:RestRoom):SceneryPlan {
   p.booth(room.sell.x,0,room.sell.z,t,false,room.sell.radius);
   if(room.shop)p.booth(room.shop.x,0,room.shop.z,t,true,room.shop.radius);
   const sideSign=t.motif==='fossil'||t.motif==='core';
-  p.sign([sideSign?-7.5:0,6.2,-18.8],sideSign?6:9,t.name,`${String(THEMES.indexOf(t)+1).padStart(2,'0')}  /  ${room.depth} M`,t);
+  p.sign([sideSign?-7.5:0,6.2,-18.8],sideSign?6:9,t.name,`${String(THEMES.indexOf(t)+1).padStart(2,'0')}  /  ${room.depth} 米`,t);
   // Wall footings and supports leave both circulation and the open mine ceiling clear.
   for(const x of [-18.7,18.7])for(const z of [-14,-4,6,16]){
     p.box([x,4,z],[.75,8,.75],t.wood,true);

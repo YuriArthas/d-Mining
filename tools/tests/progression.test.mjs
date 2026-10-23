@@ -92,7 +92,7 @@ test('prices and HP remain safe integers, front four have one egg and later stag
   assert.equal(eggs.length,stage.index<4?1:2);
   for(let level=stage.entryLevel;level<stage.exitLevel;level++)assert.ok(Number.isSafeInteger(upgradePrice(level))&&upgradePrice(level)>0);
  }
- assert.equal(formatNumber(1234567),'1.23M');assert.equal(formatNumber(999),'999');
+ assert.equal(formatNumber(1234567),'123万');assert.equal(formatNumber(999),'999');
 });
 test('calculator repeats decisions and RNG, accounts all elapsed time, and separates strategies',()=>{
  const a=simulate({seed:23,stages:2}),b=simulate({seed:23,stages:2});
@@ -102,4 +102,10 @@ test('calculator repeats decisions and RNG, accounts all elapsed time, and separ
  assert.ok(a.milestones.every(m=>m.coins>=0));
  const fast=simulate({seed:23,stages:2,policy:'efficient'});
  assert.notDeepEqual(a.purchases,fast.purchases);
+});
+test('large numbers read in 万 / 亿 and depths always in full metres', async () => {
+ const { formatDepth } = await import('../../src/game/presentation/formatNumber.ts');
+ for (const [value, text] of [[0,'0'],[9999,'9999'],[10000,'1万'],[12345,'1.23万'],[123456,'12.3万'],[3_000_000,'300万'],[12_345_678,'1235万'],[200_000_000_000,'2000亿'],[3e12,'3万亿'],[-25000,'-2.5万']])
+  assert.equal(formatNumber(value), text, String(value));
+ assert.equal(formatDepth(2400), '2400 米'); assert.equal(formatDepth(12.9), '12 米');
 });

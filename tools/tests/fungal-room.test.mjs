@@ -13,7 +13,7 @@ test('fungal room uses its own complete kit, functional zones, and clear vertica
  const room=camp.rooms.find(r=>r.id==='fungal'),plan=roomPlan(room);
  assert.equal(plan.authored.kit.id,'fungal-v1');
  assert.deepEqual(room.spawn,[0,-899.9,12]);
- assert.equal(plan.signs[0].subtitle,'03 / 900 M');
+ assert.equal(plan.signs[0].subtitle,'03 / 900 米');
  assert.equal(plan.shapes.length,2);
  for(const s of plan.solids)assert.ok(s.at[0]+s.half[0]<=-8||s.at[0]-s.half[0]>=8||s.at[2]+s.half[2]<=-8||s.at[2]-s.half[2]>=8);
  const view=createScenery({...plan,signs:[]});

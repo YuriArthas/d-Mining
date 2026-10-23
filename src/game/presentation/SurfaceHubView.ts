@@ -74,10 +74,10 @@ export class SurfaceHubView {
           background: "#18283d",
         }));
       group.add(
-        label(p.name, 2.7 + PORTAL_BASE_HEIGHT, p.color, 2.1, `${p.depth} m`),
+        label(p.name, 2.7 + PORTAL_BASE_HEIGHT, p.color, 2.1, `${p.depth} 米`),
       );
-      const locked = label("LOCKED", 0.38, "#e5d5b5", 0.95, "", 1.3),
-        enter = label("ENTER", 0.38, p.color, 0.95, "", 1.3);
+      const locked = label("未解锁", 0.38, "#e5d5b5", 0.95, "", 1.3),
+        enter = label("进入", 0.38, p.color, 0.95, "", 1.3);
       group.add(locked, enter);
       surface.add(group);
       const materials: MeshStandardMaterial[] = [],

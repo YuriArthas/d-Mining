@@ -36,7 +36,7 @@
       ],
       "width": 4.4,
       "title": "{name}",
-      "subtitle": "{number} / {depth} M",
+      "subtitle": "{number} / {depth} 米",
       "color": "#f5ce8a",
       "background": "#3c4653"
     },
