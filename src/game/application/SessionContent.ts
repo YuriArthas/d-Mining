@@ -21,6 +21,9 @@ export type SessionContent = Readonly<{
   journey?: boolean;
   homes?: readonly Readonly<{worldId: import('../content/worldJourney.ts').WorldId; zone: ZoneConfig}>[];
   onboarding?: Readonly<{ entrance: Coord; eggId: string; mineArea?: Readonly<{ minX:number; maxX:number; minZ:number; maxZ:number }> }>;
+  /** Surface cells (flattened x,z pairs, 2 m cells) where the authored ground sinks below the floor, down to
+   *  1.2 m (world 1's creek): standing there still counts as being on the surface, not in the mine. */
+  sunkenSurface?: readonly number[];
   initialCoins?: number;
   petContent?: PetContent;
   eggStations?: readonly EggStation[];

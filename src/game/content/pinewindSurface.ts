@@ -2,10 +2,12 @@ import authored from './pinewind/authored.json' with {type:'json'};
 import type {CampContent, SurfaceContent} from './campContent.ts';
 import type {SessionContent} from '../application/SessionContent.ts';
 import type {Solid, V3} from '../world/sceneryKit.ts';
-import {JOURNEY_CAMP} from './journeyCamp.ts';
+import {JOURNEY_CAMP,JOURNEY_GENERATION} from './journeyCamp.ts';
+import {CatmullRomCurve3,Vector3} from 'three';
+import {CELL} from '../terrain/grid.ts';
 import {
  PINEWIND_SERVICES, PINEWIND_PORTAL_SLOTS, PINEWIND_PORTAL_RADIUS, PINEWIND_EGG_DISPLAYS, PINEWIND_EGG_TIERS,
- PINEWIND_TERRACE, PINEWIND_STAIR_STEPS, PINEWIND_CONSERVATORY, PINEWIND_EGG_SIGN,
+ PINEWIND_TERRACE, PINEWIND_STAIR_STEPS, PINEWIND_CONSERVATORY, PINEWIND_EGG_SIGN, PINEWIND_CREEK,
 } from './pinewind/hubLayout.ts';
 import type {AuthoredInstance, AuthoredLight} from './authoredSurface.ts';
 
@@ -64,6 +66,7 @@ export function withPinewindSurface(base:CampContent):CampContent {
  const surfaceShop=base.session.shops.findIndex(s=>s.id==='surface-upgrade');
  if(surfaceShop<0)throw Error('Base content lacks the surface shop');
  const session:SessionContent={...base.session,
+  sunkenSurface:CREEK_CELLS,
   sales:[PINEWIND_SERVICES.sale.trigger,...base.session.sales.slice(1)],
   shops:base.session.shops.map((s,i)=>i===surfaceShop?{...s,zone:PINEWIND_SERVICES.shop.trigger}:s),
   portals,
@@ -77,4 +80,25 @@ export function withPinewindSurface(base:CampContent):CampContent {
    // The sky's sun disc and its image-based light follow the same sun.
    sky:{...base.environment.sky,lighting:{...base.environment.sky.lighting,day:{moonPosition:PINEWIND_DAY.moonPosition,environmentIntensity:PINEWIND_DAY.environmentIntensity}}}}};
 }
+/** The creek's floor cells: cut from the voxel meshes, and counted as surface when standing in the creek. */
+const CREEK_CELLS=creekFloorCells();
 export const PINEWIND_CAMP=withPinewindSurface(JOURNEY_CAMP);
+
+/** Surface floor cells under the sunken creek and its banks: every cell whose square reaches the corridor,
+ *  inside the authored ground (-96..104 m, which covers the cut from above). */
+export function creekFloorCells(): number[] {
+ const {points,width,bank}=PINEWIND_CREEK,line=new CatmullRomCurve3(points.map(([x,z])=>new Vector3(x,0,z))).getPoints(220);
+ const reach=width.base+width.wave+bank+Math.SQRT2*CELL/2,cells=new Map<string,[number,number]>();
+ for(let i=0;i<line.length-1;i++){
+  const a=line[i],b=line[i+1],dx=b.x-a.x,dz=b.z-a.z,length2=dx*dx+dz*dz||1;
+  for(let cx=Math.floor((Math.min(a.x,b.x)-reach)/CELL);cx<=Math.floor((Math.max(a.x,b.x)+reach)/CELL);cx++)
+   for(let cz=Math.floor((Math.min(a.z,b.z)-reach)/CELL);cz<=Math.floor((Math.max(a.z,b.z)+reach)/CELL);cz++){
+    if(cx<-48||cx>51||cz<-48||cz>51)continue;
+    const x=(cx+.5)*CELL,z=(cz+.5)*CELL,t=Math.max(0,Math.min(1,((x-a.x)*dx+(z-a.z)*dz)/length2));
+    if(Math.hypot(x-a.x-dx*t,z-a.z-dz*t)<reach)cells.set(cx+','+cz,[cx,cz]);
+   }
+ }
+ return [...cells.values()].flat();
+}
+/** World 1's terrain with the creek bed cut out of the voxel floor meshes (version unchanged: saves still fit). */
+export const PINEWIND_GENERATION=Object.freeze({...JOURNEY_GENERATION,surfaceCut:CREEK_CELLS});

@@ -25,6 +25,16 @@ export const PINEWIND_FACILITIES = {
  *  raised-cosine arch, `rise` metres high in the middle, meeting the path at ground level `halfSpan` metres
  *  either side of the centre; `width` is the boarded deck between its overhanging board ends. */
 export const PINEWIND_BRIDGE = { x: 0, z: 36.5, halfSpan: 5.6, rise: 1.15, width: 5.24 } as const;
+/** The creek across the valley: its centre line, flowing from the north-east round to the west, and its half
+ *  width along it (`base + wave * sin(t * waves)` at fraction t of the line, water and inner banks); the banks
+ *  reach `bank` metres further. Its bed lies below the surface floor, so the voxel floor under it is left out
+ *  of the terrain meshes (pinewindSurface.ts, PINEWIND_GENERATION). */
+export const PINEWIND_CREEK = {
+  points: [[64, -70], [57, -30], [54, 10], [52, 32], [44, 51], [28, 49], [15, 39], [0, 36.5], [-18, 40], [-38, 50], [-70, 55], [-110, 57]],
+  width: { base: 2.45, wave: .22, waves: 14 }, bank: 1.05,
+  /** Height of the water surface, sunk below the meadow (the bed is about 0.55 m lower). */
+  water: -.4,
+} as const;
 /** Where the bridge lands on the plaza. */
 const BRIDGE_EXIT = { x: 0, z: 30 } as const;
 /** Forward offset of each building's visual centre from its anchor (authored GLB bounds). */

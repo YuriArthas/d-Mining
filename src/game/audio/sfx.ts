@@ -21,7 +21,7 @@ export type SfxCue =
   | Readonly<{ type: 'step'; surface: FootSurface; strength: number }>;
 export type CueType = SfxCue['type'];
 
-export type FootSurface = 'grass' | 'sand' | 'dirt' | 'stone' | 'wood' | 'metal' | 'ice' | 'crystal';
+export type FootSurface = 'grass' | 'sand' | 'dirt' | 'stone' | 'wood' | 'metal' | 'ice' | 'crystal' | 'water';
 export { makeNoise, type Voice };
 
 const notes = (v: Voice, frequencies: readonly number[], gap: number, peak: number, decay: number, wave: OscillatorType = 'triangle', start = 0) =>
@@ -139,6 +139,12 @@ function step(v: Voice, surface: FootSurface, strength: number) {
       tone(v, { from: 660 * d, peak: g(0.04), attack: 0.001, decay: 0.14 });
       tone(v, { from: 660 * 2.63 * d, peak: g(0.024), attack: 0.001, decay: 0.1 });
       return tone(v, { from: 660 * 4.18 * d, peak: g(0.014), attack: 0.001, decay: 0.07 });
+    case 'water':
+      // Wading: a soft splash as the water closes round the boot, then a couple of drips.
+      hiss(v, { filter: 'bandpass', from: 1400 * d, to: 650, sweep: 0.09, q: 0.9, peak: g(0.2), attack: 0.004, decay: 0.12 });
+      hiss(v, { filter: 'highpass', from: 3200 * d, q: 0.6, peak: g(0.06), attack: 0.01, decay: 0.09 });
+      tone(v, { from: 700 * d, to: 1300, sweep: 0.03, peak: g(0.04), attack: 0.002, decay: 0.03, start: 0.05 });
+      return tone(v, { from: 900 * d, to: 1700, sweep: 0.025, peak: g(0.03), attack: 0.002, decay: 0.025, start: 0.09 });
     case 'ice':
       hiss(v, { filter: 'bandpass', from: 4200 * d, q: 1.4, peak: g(0.11), attack: 0.001, decay: 0.014 });
       tone(v, { wave: 'triangle', from: 480 * d, to: 340, sweep: 0.03, peak: g(0.12), attack: 0.001, decay: 0.03 });

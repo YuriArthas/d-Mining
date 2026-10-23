@@ -10,6 +10,7 @@ import { Rewards, type RewardOptions, type RewardClaimResult } from '../logic/Re
 import { stageCoinReward, type OnlineRewardMinutes } from '../content/rewards.ts';
 import { STAGES } from '../content/progression.ts';
 import { CAPSULE_MACHINE_ZONE } from '../content/feedbackFacilities.ts';
+import { CELL } from '../terrain/grid.ts';
 import { TIP_GAP, TIP_SECONDS, nextTip, tipLearned, tipView, type TipState } from './Tips.ts';
 import type { ProgressDataV1 } from './SessionProgress.ts';
 import { versionOne } from '../logic/data.ts';
@@ -602,7 +603,7 @@ export class GameSession {
       return b && feet[0] >= b.minX && feet[0] < b.maxX && feet[2] >= b.minZ && feet[2] < b.maxZ
         && feet[1] >= b.floor - .04 && feet[1] < b.ceiling;
     }).map(d => d.id) : undefined;
-    const location=feet[1]>=-.1?'surface':enteredRooms?.length?'room':'mine';
+    const location=feet[1]>=-.1||feet[1]>=-1.2&&this.onSunkenSurface(feet)?'surface':enteredRooms?.length?'room':'mine';
     const roomId=location==='room'?enteredRooms![0]:null;
     if(roomId!==this.guideRoomId){this.guideRoomId=roomId;changed=true;}
     const entrance=this.content.onboarding?.entrance;
@@ -727,6 +728,14 @@ export class GameSession {
     this.publish();
   };
   /** The surface hub doubles as the teleport station; portable travel works anywhere. */
+  private sunken: ReadonlySet<string> | null = null;
+  /** In a sunken stretch of the surface (the creek), where the voxel floor sits no higher than -2 m. */
+  private onSunkenSurface(feet: readonly number[]) {
+    const cells = this.content.sunkenSurface;
+    if (!cells?.length) return false;
+    if (!this.sunken) { const keys = new Set<string>(); for (let i = 0; i + 1 < cells.length; i += 2) keys.add(cells[i] + ',' + cells[i + 1]); this.sunken = keys; }
+    return this.sunken.has(Math.floor(feet[0] / CELL) + ',' + Math.floor(feet[2] / CELL));
+  }
   private canTravelNow() { return this.atHome || this.guideLocation === 'surface' || this.rewards.getSnapshot().permanent.travel; }
   private surfaceSpot(target: 'shop' | 'sale' | 'capsule' | { egg: string }): { feet: Coord; look: Coord } | null {
     const worldZ = this.content.journey ? worldRequirement(this.currentWorld).z : 0;

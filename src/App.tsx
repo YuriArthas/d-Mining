@@ -1,7 +1,6 @@
 import { ShopView } from './game/presentation/ShopView.ts';
 import {withInitialAccess} from "./game/content/initialAccess.ts";
-import {JOURNEY_GENERATION} from './game/content/journeyCamp.ts';
-import {PINEWIND_CAMP as CAMP_CONTENT} from './game/content/pinewindSurface.ts';
+import {PINEWIND_CAMP as CAMP_CONTENT,PINEWIND_GENERATION} from './game/content/pinewindSurface.ts';
 import {LoadingScreen,LoadingBoundary} from './game/ui/LoadingScreen.tsx';
 import {initialLoading,updateLoading,type LoadingEvent} from './game/ui/loadingState.ts';
 import type {RenderRate} from './game/movement.ts';
@@ -41,7 +40,7 @@ declare global {
 }
 
 const SAVE_CONTENT = withInitialAccess(CAMP_CONTENT.session);
-const SAVE_GENERATION = JOURNEY_GENERATION;
+const SAVE_GENERATION = PINEWIND_GENERATION;
 export function App() {
   return <SaveEntry content={SAVE_CONTENT} generation={SAVE_GENERATION}>{game => <GameView savedGame={game} />}</SaveEntry>;
 }

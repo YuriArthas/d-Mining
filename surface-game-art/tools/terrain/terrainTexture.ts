@@ -70,21 +70,6 @@ export function createStoneTexture() {
   return finish(data, size, 'Blockcraft stone: authored 64px strata', true);
 }
 
-/** Water is a matte pixel-painted surface, with no ripple normals or reflections. */
-export function createWaterTexture() {
-  const size = 64, data = new Uint8Array(size * size * 4), base = rgba('#32b8c7');
-  for (let i = 0; i < size * size; i++) data.set(base, i * 4);
-  const patch = (x: number, y: number, width: number, height: number, color: string) => {
-    const value = rgba(color);
-    for (let py = y; py < y + height; py++) for (let px = x; px < x + width; px++) data.set(value, (py * size + px) * 4);
-  };
-  patch(4, 10, 16, 5, '#3cc1ce'); patch(12, 15, 10, 3, '#3cc1ce');
-  patch(33, 35, 17, 5, '#2aabbf'); patch(39, 40, 11, 4, '#2aabbf');
-  patch(9, 11, 6, 2, '#a2e2dc'); patch(44, 51, 8, 2, '#a2e2dc');
-  patch(40, 49, 4, 2, '#72d3d5');
-  return finish(data, size, 'Blockcraft water: authored 64px broad glints', true);
-}
-
 /** Sparse pixel accents remain on an otherwise broad, clean cream-sand road: the ground is a light, calm
  *  stage so the buildings, portals and characters stand out (as in the original game). */
 export function createPathTexture() {

@@ -1,5 +1,5 @@
 import type { FootSurface } from '../audio/sfx.ts';
-import { PINEWIND_BRIDGE, PINEWIND_GROUNDS, PINEWIND_PORTAL_SLOTS, PINEWIND_STAIR_STEPS, PINEWIND_TERRACE } from '../content/pinewind/hubLayout.ts';
+import { PINEWIND_BRIDGE, PINEWIND_CREEK, PINEWIND_GROUNDS, PINEWIND_PORTAL_SLOTS, PINEWIND_STAIR_STEPS, PINEWIND_TERRACE } from '../content/pinewind/hubLayout.ts';
 import { resourceByKind } from '../content/resources.ts';
 import { CELL, type Coord } from '../terrain/SparseWorld.ts';
 import { PROTECTED_FLOOR } from '../world/entrance.ts';
@@ -62,6 +62,9 @@ export function footSurface(feet: readonly number[], ports: Ports): FootSurface 
   const [x, y, z] = feet, cy = Math.floor((y - 0.15) / CELL);
   const kind = ports.cell([Math.floor(x / CELL), cy, Math.floor(z / CELL)]) ?? 0;
   const raised = !kind || y - (cy + 1) * CELL > 0.3;
+  // On the hub only the creek dips below the floor: water once the feet are under its surface, mud on the
+  // banks above it.
+  if (ports.hub(feet) && kind === PROTECTED_FLOOR && y < -.1) return y < PINEWIND_CREEK.water + .05 ? 'water' : 'dirt';
   if (ports.hub(feet) && (raised || kind === PROTECTED_FLOOR)) return hubSurface(x, z, raised);
   if (raised || kind === PROTECTED_FLOOR) return FLOOR[ports.theme(feet)] ?? 'stone';
   return kindSurface(kind);

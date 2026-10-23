@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Kit, materials, rng, type V3 } from './kit.ts';
-import { createGroundTexture, createStoneTexture, createWaterTexture, createPathTexture, groundTextureBounds } from './terrainTexture.ts';
+import { createGroundTexture, createStoneTexture, createPathTexture, groundTextureBounds } from './terrainTexture.ts';
 import { readFileSync } from 'node:fs';
 import { ConvexGeometry } from 'three/addons/geometries/ConvexGeometry.js';
 
@@ -27,9 +27,9 @@ const smooth = (a: number, b: number, value: number) => {
 const mine = { x: 0, z: 0, rx: 8, rz: 8 };
 const ellipse = (x: number, z: number) => (x / mine.rx) ** 2 + ((z - mine.z) / mine.rz) ** 2;
 
-const stream = new THREE.CatmullRomCurve3([
-  [64,-70],[57,-30],[54,10],[52,32],[44,51],[28,49],[15,39],[0,36.5],[-18,40],[-38,50],[-70,55],[-110,57],
-].map(([x,z])=>new THREE.Vector3(x,0,z)));
+/** The creek (layout `creek`, from hubLayout.ts): the game cuts the voxel floor under the same corridor. */
+const creek: { points: [number, number][]; width: { base: number; wave: number; waves: number }; bank: number; water: number } = layout.creek;
+const stream = new THREE.CatmullRomCurve3(creek.points.map(([x,z])=>new THREE.Vector3(x,0,z)));
 const streamPoints = stream.getPoints(220);
 type RiverSample = { distance: number; halfWidth: number; t: number };
 function riverAt(x: number, z: number): RiverSample {
@@ -41,7 +41,7 @@ function riverAt(x: number, z: number): RiverSample {
     const d = (x - a.x - u * dx) ** 2 + (z - a.z - u * dz) ** 2;
     if (d < distanceSquared) { distanceSquared = d; t = (i + u) / (streamPoints.length - 1); }
   }
-  return { distance: Math.sqrt(distanceSquared), halfWidth: 2.45 + .22 * Math.sin(t * 14), t };
+  return { distance: Math.sqrt(distanceSquared), halfWidth: creek.width.base + creek.width.wave * Math.sin(t * creek.width.waves), t };
 }
 
 /** Behind the portal ring the ground rises into a ridge that closes the valley's south side, so the
@@ -102,22 +102,28 @@ const mineRadius=(x:number,z:number)=>Math.max(Math.abs(x),Math.abs(z))/8;
 const riverCenters = stream.getSpacedPoints(90);
 const upstream = riverCenters[0].clone().add(riverCenters[0].clone().sub(riverCenters[1]).normalize().multiplyScalar(45));
 riverCenters.unshift(upstream);
+// The creek is sunk into the valley (the game leaves the voxel floor under it out of the terrain meshes):
+// across each section, from the meadow edge a turf lip rolls over to a steep earth bank (walkable, about 40
+// degrees) that meets the water 0.4 m below the meadow, then the bank runs on under the water to a bed
+// almost a metre down. Rows: meadow, lip, waterline, three bed rows to the centre, and back up.
+export const CREEK_WATER_Y = creek.water;
+const SECTION = [[1.05, 0], [.55, -.07], [.16, CREEK_WATER_Y], [-.25, -.66], [-.85, -.86]] as const;
+const WATERLINE = 2, LAST_ROW = SECTION.length * 2;
 const riverSections = riverCenters.map((center, index) => {
   const previous = riverCenters[Math.max(0, index - 1)], next = riverCenters[Math.min(riverCenters.length - 1, index + 1)];
   const tangent = next.clone().sub(previous).normalize(), width = riverAt(center.x, center.z).halfWidth;
-  const offsets = [-(width + 1.05), -(width + .70), -(width - .05), -(width - .35), 0, width - .35, width - .05, width + .70, width + 1.05];
-  return offsets.map((offset, row) => {
+  const rows = [...SECTION.map(([out, y]) => [-(width + out), y] as const), [0, -.95] as const, ...[...SECTION].reverse().map(([out, y]) => [width + out, y] as const)];
+  return rows.map(([offset, depth], row) => {
     const x = center.x - tangent.z * offset, z = center.z + tangent.x * offset;
-    const y = row === 0 || row === 8 ? meadowHeight(x, z) : row === 1 || row === 7 ? .04 : row === 2 || row === 6 ? .02 : .01;
-    return { x, y, z };
+    return { x, y: row === 0 || row === LAST_ROW ? meadowHeight(x, z) : depth, z };
   });
 });
 const riverCorridor: Polygon[] = [], bankBoundary: Array<[Point, Point]> = [], bankFaces: Array<{ polygon: Polygon; row: number }> = [];
 for (let i = 0; i < riverSections.length - 1; i++) {
   const a = riverSections[i], b = riverSections[i + 1];
-  riverCorridor.push(polygon([a[0], a[8], b[8], b[0]]));
-  bankBoundary.push([a[0], b[0]], [a[8], b[8]]);
-  for (let row = 0; row < 8; row++) bankFaces.push({ polygon: polygon([a[row], a[row + 1], b[row + 1], b[row]]), row });
+  riverCorridor.push(polygon([a[0], a[LAST_ROW], b[LAST_ROW], b[0]]));
+  bankBoundary.push([a[0], b[0]], [a[LAST_ROW], b[LAST_ROW]]);
+  for (let row = 0; row < LAST_ROW; row++) bankFaces.push({ polygon: polygon([a[row], a[row + 1], b[row + 1], b[row]]), row });
 }
 function faceHeight(points: Point[], x: number, z: number): number | undefined {
   const p = { x, y: 0, z };
@@ -203,7 +209,8 @@ function buildGround(kit: Kit) {
   pathMaterial.name = 'Clean polygon path with sparse pixel-painted patches';
   const bankMaterial = new THREE.MeshLambertMaterial({ map: createStoneTexture(), vertexColors: true });
   bankMaterial.name = 'Broad bevelled earth banks and polygon quarry terraces';
-  const white = new THREE.Color('#ffffff'), earth = new THREE.Color('#c7a36e');
+  // Earth on the bank above the water; the bed under the water is darker.
+  const white = new THREE.Color('#ffffff'), earth = new THREE.Color('#b48a5a'), bed = new THREE.Color('#6f7a5e');
   const roadRegions: Polygon[] = [];
   for (const path of paths) {
     const points = path.curve.getSpacedPoints(Math.ceil(path.curve.getLength() / 2.5));
@@ -264,8 +271,8 @@ function buildGround(kit: Kit) {
     for (let i = 1; i < face.polygon.points.length - 1; i++) {
       const points = [face.polygon.points[0], face.polygon.points[i], face.polygon.points[i + 1]];
       const clipped = cutPolygon(points, worldPolygon).inside;
-      if (face.row === 0 || face.row === 7) emitSurface(lips, clipped, white, 'ground');
-      else emitSurface(banks, clipped, earth, 'bank');
+      if (face.row === 0 || face.row === LAST_ROW - 1) emitSurface(lips, clipped, white, 'ground');
+      else emitSurface(banks, clipped, face.row === 1 || face.row === LAST_ROW - 2 ? earth : bed, 'bank');
     }
   }
   kit.group.add(meshFromData(lips, grassMaterial, 'Shared bevelled turf lips'));
@@ -554,6 +561,44 @@ function buildCliffs(kit: Kit, getNature: NatureFactory) {
   });
   return columns;
 }
+/** Rounded stones half in the water along both banks, reed clumps on the lips and lily pads in the calm water
+ *  near the banks, so the creek reads as a stream rather than a painted band. A separate random sequence
+ *  keeps every other placement where it was. Nothing on the bridge's footprint. */
+function creekDressing(kit: Kit, getNature: NatureFactory) {
+  const r = rng(52114), bridge = (x: number, z: number) => Math.abs(x) < 4 && Math.abs(z - 36.5) < 7;
+  const inside = (x: number, z: number) => x > groundBounds.x0 + 2 && x < groundBounds.x1 - 2 && z > groundBounds.z0 + 2 && z < groundBounds.z1 - 2;
+  const place = (name: string, label: string, x: number, y: number, z: number, scale: V3) => {
+    if (!inside(x, z) || bridge(x, z)) return;
+    const object = getNature(name); object.name = label; object.scale.set(...scale); kit.add(object, [x, y, z], r() * Math.PI * 2);
+  };
+  for (let i = 4; i < 218; i += 2) {
+    const t = i / 220, p = stream.getPoint(t), tangent = stream.getTangent(t), w = riverAt(p.x, p.z).halfWidth;
+    for (const side of [-1, 1]) {
+      const at = (offset: number) => [p.x - tangent.z * offset * side, p.z + tangent.x * offset * side] as const;
+      if (r() < .45) {
+        const [x, z] = at(w + .02 + r() * .22), s = .45 + r() * .6;
+        place(r() < .5 ? 'rock_a' : 'rock_b', 'Blockcraft waterline stone', x, landscapeHeight(x, z) - .12, z, [s * 1.25, s * .75, s]);
+      }
+      if (r() < .2) {
+        const [x, z] = at(w + .75 + r() * .25), s = 1.3 + r() * .5;
+        place('grass', 'Blockcraft creek reeds', x, landscapeHeight(x, z), z, [s, s * 1.3, s]);
+      }
+    }
+  }
+  // Lily pads: small notched discs floating in clusters near the banks.
+  const leaf = new THREE.Color('#58b94a');
+  for (const [t, side] of [[.18, 1], [.27, -1], [.36, 1], [.6, -1], [.68, 1], [.77, -1], [.86, 1]] as const) {
+    const p = stream.getPoint(t), tangent = stream.getTangent(t), w = riverAt(p.x, p.z).halfWidth;
+    for (let k = 3 + Math.floor(r() * 3); k > 0; k--) {
+      const along = (r() - .5) * 2.4, off = w - .45 - r() * .7, x = p.x + tangent.x * along - tangent.z * off * side, z = p.z + tangent.z * along + tangent.x * off * side;
+      if (!inside(x, z) || bridge(x, z)) continue;
+      const radius = .28 + r() * .22, geometry = new THREE.CircleGeometry(radius, 9, 0, Math.PI * 2 - .55);
+      geometry.rotateX(-Math.PI / 2); geometry.rotateY(r() * Math.PI * 2);
+      const pad = kit.mesh(geometry, '#' + leaf.clone().multiplyScalar(.9 + r() * .2).getHexString(), [x, CREEK_WATER_Y + .012, z]);
+      pad.name = 'Creek lily pad'; pad.castShadow = false;
+    }
+  }
+}
 function buildBackdrop(kit: Kit) {
   // Two connected mountain ranges: long angular slopes, broad saddles and only
   // a few short plateau shoulders. Block-built detail belongs near the player;
@@ -617,23 +662,41 @@ function buildBackdrop(kit: Kit) {
     kit.group.add(mountain);
   }
 }
+/** The water between the two waterlines, 0.4 m below the meadow: strips across each section carry `creek`
+ *  (across: 0 at one bank, 1 at the other; along: metres downstream) for the game's water shader
+ *  (src/game/presentation/creekWater.ts: depth tint, flow, edge foam and glints). */
 function buildWater() {
-  const data = meshData(), white = new THREE.Color('#ffffff');
+  const columns = 6, positions: number[] = [], normals: number[] = [], creekUv: number[] = [];
+  let along = 0;
   for (let i = 0; i < riverSections.length - 1; i++) {
-    const a = riverSections[i], b = riverSections[i + 1];
-    const surface = polygon([a[2], a[6], b[6], b[2]].map(p => ({ x: p.x, y: .055, z: p.z })));
-    emitSurface(data, cutPolygon(surface.points, worldPolygon).inside, white, 'water');
+    const a = riverSections[i], b = riverSections[i + 1], ca = riverCenters[i], cb = riverCenters[i + 1], step = ca.distanceTo(cb);
+    const centre = { x: (ca.x + cb.x) / 2, z: (ca.z + cb.z) / 2 };
+    if (centre.x < groundBounds.x0 || centre.x > groundBounds.x1 || centre.z < groundBounds.z0 || centre.z > groundBounds.z1) { along += step; continue; }
+    const at = (section: Point[], u: number) => ({ x: mix(section[WATERLINE].x, section[LAST_ROW - WATERLINE].x, u), z: mix(section[WATERLINE].z, section[LAST_ROW - WATERLINE].z, u) });
+    for (let j = 0; j < columns; j++) {
+      const u0 = j / columns, u1 = (j + 1) / columns, p = [[at(a, u0), u0, along], [at(a, u1), u1, along], [at(b, u1), u1, along + step], [at(b, u0), u0, along + step]] as const;
+      // Two triangles per cell, wound upward.
+      for (const tri of [[0, 1, 2], [0, 2, 3]]) {
+        const [q0, q1, q2] = tri.map(k => p[k]), up = (q1[0].x - q0[0].x) * (q2[0].z - q0[0].z) - (q1[0].z - q0[0].z) * (q2[0].x - q0[0].x) < 0;
+        for (const q of up ? [q0, q1, q2] : [q0, q2, q1]) { positions.push(q[0].x, CREEK_WATER_Y, q[0].z); normals.push(0, 1, 0); creekUv.push(q[1], q[2]); }
+      }
+    }
+    along += step;
   }
-  const material = new THREE.MeshLambertMaterial({ map: createWaterTexture() });
-  const water = meshFromData(data, material, 'Bright polygon creek with broad pixel glints');
-  water.castShadow = false; water.userData.keepDynamic = true;
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+  geometry.setAttribute('creek', new THREE.Float32BufferAttribute(creekUv, 2));
+  const material = new THREE.MeshLambertMaterial({ color: '#36b9c9' }); material.name = 'Creek water';
+  const water = new THREE.Mesh(geometry, material); water.name = 'Creek water';
+  water.castShadow = false; water.receiveShadow = true; water.userData.keepDynamic = true;
   return [water];
 }
 
 export function buildLandscape(getNature: NatureFactory): { group: THREE.Group; water: THREE.Mesh[] } {
   random = rng(712044);
   const kit = new Kit(); kit.group.name = 'Pinewind playable valley';
-  buildGround(kit); buildEdging(kit); buildQuarry(kit, getNature); buildPaths(kit); buildBackdrop(kit); buildCliffs(kit, getNature); plantings(kit, getNature); meadowDetails(kit, getNature);
+  buildGround(kit); buildEdging(kit); buildQuarry(kit, getNature); buildPaths(kit); buildBackdrop(kit); buildCliffs(kit, getNature); plantings(kit, getNature); meadowDetails(kit, getNature); creekDressing(kit, getNature);
   kit.group.traverse(o=>{if(o instanceof THREE.Mesh && /Flowing meadow|Inset polygon|turf lips|creek banks/.test(o.name)){o.userData.surfaceGround=true;o.castShadow=false;}});
   return { group: kit.group, water: buildWater() };
 }

@@ -4,6 +4,7 @@ import type { SurfaceContent } from "../content/campContent.ts";
 import type { AssetProfile } from "../content/assetProfiles.ts";
 import { Mesh, MeshStandardMaterial, type WebGLRenderer } from "three";
 import { liftAlbedo, liftFoliage } from "./albedoLift.ts";
+import { applyCreekWater } from "./creekWater.ts";
 import { applyBakedLight, setBakedGround, setBakedSun } from "./bakedLight.ts";
 import { loadStandingLight, setStandingLight } from "./standingLight.ts";
 import standingLightUrl from "../assets/camp/pinewind-standing-light.png?url";
@@ -84,6 +85,7 @@ export async function loadStaticSurface(
       if(request.name==='pinewind-architecture')liftAlbedo(m);
       // Woods, rocks and the cliff walls: lit all round like the original's valley, not near black in shade.
       else if(m.name==='Nature_PixelAtlas_Opaque'||m.name.startsWith('Valley cliff'))liftFoliage(m);
+      if(m.name==='Creek water')applyCreekWater(m);
       applyBakedLight(m);
     },onProgress);
     setBakedSun(content.authored.light.sun);

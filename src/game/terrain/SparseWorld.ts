@@ -10,9 +10,25 @@ import {surfaceExcavated} from '../world/SurfaceExcavation.ts';
 import { roomAir, onRoomFloor } from '../world/rooms.ts';
 import { SHAFT } from '../validation/course.ts';
 export type Coord = readonly [number, number, number];
-export type WorldGeneration = Readonly<{ version: number; seed: number; samples: boolean; layers: readonly Layer[]; worlds?: readonly Readonly<{z:number;layers:readonly Layer[]}>[] }>;
+/** `surfaceCut`: surface floor cells (y = -1, flattened x,z pairs) left out of the terrain meshes, render and
+ *  collision alike, where the authored surface sinks below the floor (world 1's creek bed). They stay protected
+ *  floor for mining, saves and every cell query, so the generation version and saves are unaffected. */
+export type WorldGeneration = Readonly<{ version: number; seed: number; samples: boolean; layers: readonly Layer[]; worlds?: readonly Readonly<{z:number;layers:readonly Layer[]}>[]; surfaceCut?: readonly number[] }>;
 export const WORLD_GENERATION: WorldGeneration = Object.freeze({ version: 9, seed: 0, samples: false, layers: LAYERS });
 const localGenerations = new WeakMap<WorldGeneration, readonly WorldGeneration[]>();
+const surfaceCuts = new WeakMap<WorldGeneration, ReadonlySet<number>>();
+const cutKey = (x: number, z: number) => (x + 2048) * 4096 + z + 2048;
+/** Whether the terrain meshes leave out this cell (see `WorldGeneration.surfaceCut`). */
+export function surfaceCutAt(generation: WorldGeneration, x: number, y: number, z: number) {
+  if (y !== -1 || !generation.surfaceCut?.length) return false;
+  let cells = surfaceCuts.get(generation);
+  if (!cells) {
+    const keys = new Set<number>(), list = generation.surfaceCut;
+    for (let i = 0; i + 1 < list.length; i += 2) keys.add(cutKey(list[i], list[i + 1]));
+    surfaceCuts.set(generation, cells = keys);
+  }
+  return cells.has(cutKey(x, z));
+}
 export function generationAtZ(generation:WorldGeneration,z:number) {
   if(!generation.worlds)return generation;
   let local=localGenerations.get(generation);

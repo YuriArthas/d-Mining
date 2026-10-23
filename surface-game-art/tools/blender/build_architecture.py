@@ -503,7 +503,8 @@ for sx in (-1,1):
     # Stone footings flank the feet of the arch on the banks, outside the boards so none shows through.
     for sz in (-1,1):
         fx,fz=sx*3.0,sz*2.95
-        slab('Bridge_Footing',[(fx+a,fz+b) for a,b in stepped_outline(.70,1.30,.18)],-.3,.40,19)
+        # Down to the creek bed: the banks under the footings are sunk below the meadow.
+        slab('Bridge_Footing',[(fx+a,fz+b) for a,b in stepped_outline(.70,1.30,.18)],-1.1,.40,19)
         slab('Bridge_FootingCap',[(fx+a,fz+b) for a,b in stepped_outline(.80,1.40,.20)],.40,.50,11)
 model('Creek_Bridge_Rails',(bridge['x'],0,bridge['z']))
 RX=2.42; RAIL_END=BL-.06
