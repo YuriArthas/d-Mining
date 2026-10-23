@@ -48,7 +48,6 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
   const hosted = /\/games\/mining(?:-test|-surface-play)?\/(?:index\.html)?$/.test(window.location.pathname);
   const canvas = useRef<HTMLCanvasElement>(null);
   const guideMarker = useRef<HTMLDivElement>(null);
-  const eggPrompt = useRef<HTMLButtonElement>(null);
   const scene = useRef<RootState | null>(null);
   const exiting = useRef(false);
   const [exited, setExited] = useState(false);
@@ -174,7 +173,7 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
           gl={{ antialias: true }}
           fallback={<p>当前浏览器无法启动 3D 画面，请使用支持 WebGL2 的浏览器。</p>}
         >
-          <ValidationScene shopView={shopView} guideMarker={guideMarker} savedGame={savedGame} eggPrompt={eggPrompt} stylized={stylized} content={CAMP_CONTENT} renderRate={renderRate} shadowsEnabled={shadowsEnabled} probeMode={probeMode} input={input} onStatus={setStatus} onLoading={onLoading} onPerformance={setPerformanceStats} session={session} timeOfDay={timeOfDay} />
+          <ValidationScene shopView={shopView} guideMarker={guideMarker} savedGame={savedGame} stylized={stylized} content={CAMP_CONTENT} renderRate={renderRate} shadowsEnabled={shadowsEnabled} probeMode={probeMode} input={input} onStatus={setStatus} onLoading={onLoading} onPerformance={setPerformanceStats} session={session} timeOfDay={timeOfDay} />
         </Canvas></LoadingBoundary>
       </div>
       <header inert={!!exitState} className="game-header" style={{display:showLoading?'none':undefined}}>
@@ -192,7 +191,7 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
           <InputMonitor input={input} /><ValidationPanel />
         </div></details>}
       </header>
-      {!showLoading&&<div inert={!!exitState || saveStatus.state === 'conflicted'}><SessionUi shopView={shopView} system={system} guideMarker={guideMarker} blocked={saveStatus.state === 'failed' || saveStatus.state === 'conflicted'} eggPrompt={eggPrompt} session={session} input={input} surface={surface} /></div>}
+      {!showLoading&&<div inert={!!exitState || saveStatus.state === 'conflicted'}><SessionUi shopView={shopView} system={system} guideMarker={guideMarker} blocked={saveStatus.state === 'failed' || saveStatus.state === 'conflicted'} session={session} input={input} surface={surface} /></div>}
       {!exitState && (saveStatus.state === 'failed' || saveStatus.state === 'conflicted') && <aside className="save-warning ui-card" role="alert">
         <span>{saveStatus.state === 'conflicted' ? saveStatus.error : '进度暂未保存，请重试'}</span>
         {saveStatus.state === 'failed' ? <UiButton size="s" tone="orange" onPress={() => void savedGame.saves.flush().catch(() => {})}>重试保存</UiButton> : <UiButton size="s" tone="orange" onPress={() => location.reload()}>重新进入</UiButton>}

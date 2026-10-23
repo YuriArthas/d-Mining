@@ -266,6 +266,9 @@ export async function startGame(options: StartGameOptions) {
     const eggLabels = new EggStandLabels(content.hub.eggs, session.pets.getSnapshot().eggs);
     root.add(eggLabels.group);
     scope.defer(() => disposeScenery(eggLabels.group));
+    const updateEggLabels = () => { const eggs = session.pets.getSnapshot().eggs; eggLabels.setUnlocked(id => eggs.some(egg => egg.id === id && egg.unlocked)); };
+    updateEggLabels();
+    scope.defer(session.pets.subscribe(updateEggLabels));
     const petFollowers = new PetFollowers(petBody);
     root.add(petFollowers.group);
     scope.defer(() => petFollowers.dispose());

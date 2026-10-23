@@ -39,7 +39,7 @@ export function EggSheet({ session, eggId, onClose, onOpenPets }: { session: Gam
       <UiButton size="m" tone="orange" icon={egg.unlocked && egg.canAfford ? 'coin' : undefined} disabled={!egg.canAfford || !!state.autoHatch} className="egg-buy" onPress={hatch}>{buyLabel}</UiButton>
     </>}>
       <div className="egg-layout">
-        <div className="egg-hero"><EggArt className="egg-hero-art" spotSpecies={egg.outcomes.at(-1)?.speciesId} /><Chip icon="coin"><b>{number(egg.price)}</b></Chip></div>
+        <div className="egg-hero"><EggArt className="egg-hero-art" eggId={egg.id} /><Chip icon="coin"><b>{number(egg.price)}</b></Chip></div>
         <div className="egg-outcomes" aria-label="可能获得的宠物">{egg.outcomes.map(outcome => <div key={outcome.speciesId} className="egg-outcome" data-rarity={outcome.rarity}>
           <div className="ui-cell" data-rarity={outcome.rarity}><PetArt speciesId={outcome.speciesId} rarity={outcome.rarity} />
             <span className="ui-cell-name ui-outline">{outcome.name}</span><span className="ui-cell-stat ui-outline">{bonusLabel(outcome.powerBonusBps)}</span></div>
@@ -49,13 +49,13 @@ export function EggSheet({ session, eggId, onClose, onOpenPets }: { session: Gam
         </div>)}</div>
       </div>
     </Sheet>
-    {result && <HatchReveal key={result.pet.id} speciesId={result.pet.speciesId} pets={pets} price={egg.price} canAgain={egg.canAfford}
+    {result && <HatchReveal key={result.pet.id} eggId={egg.id} speciesId={result.pet.speciesId} pets={pets} price={egg.price} canAgain={egg.canAfford}
       onDone={() => setResult(null)} onEquip={() => { setResult(null); onOpenPets(); }} onAgain={() => { setResult(null); hatch(); }} />}
   </>;
 }
 
-function HatchReveal({ speciesId, pets, price, canAgain, onDone, onEquip, onAgain }: {
-  speciesId: string; pets: ReturnType<GameSession['pets']['getSnapshot']>; price: number; canAgain: boolean; onDone(): void; onEquip(): void; onAgain(): void;
+function HatchReveal({ eggId, speciesId, pets, price, canAgain, onDone, onEquip, onAgain }: {
+  eggId: string; speciesId: string; pets: ReturnType<GameSession['pets']['getSnapshot']>; price: number; canAgain: boolean; onDone(): void; onEquip(): void; onAgain(): void;
 }) {
   const outcome = pets.eggs.flatMap(egg => egg.outcomes).find(o => o.speciesId === speciesId);
   const [skipped, setSkipped] = useState(false);
@@ -66,7 +66,7 @@ function HatchReveal({ speciesId, pets, price, canAgain, onDone, onEquip, onAgai
     onPointerDown={() => setSkipped(true)}>
     <div className="hatch-rays" />
     <div className="hatch-stage">
-      <EggArt className="hatch-egg" spotSpecies={speciesId} />
+      <EggArt className="hatch-egg" eggId={eggId} />
       <div className="hatch-flash" />
       <div className="hatch-result">
         <div className="hatch-ribbon ui-outline">{{ common: '普通', rare: '稀有！', epic: '史诗！', legendary: '传说！！' }[rarity]}</div>

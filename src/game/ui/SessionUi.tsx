@@ -22,9 +22,9 @@ type Modal =
   | { kind: 'bag'; tab: BagTab } | { kind: 'world'; tab: WorldTab } | { kind: 'rewards'; tab: RewardsTab }
   | { kind: 'egg' } | { kind: 'capsule' } | { kind: 'help' };
 
-export function SessionUi({ shopView, session, input, surface, eggPrompt, guideMarker, system, blocked = false }: {
+export function SessionUi({ shopView, session, input, surface, guideMarker, system, blocked = false }: {
   shopView: ShopView; system: SystemControls; guideMarker: RefObject<HTMLDivElement | null>; blocked?: boolean;
-  session: GameSession; input: GameInput; surface: RefObject<HTMLDivElement | null>; eggPrompt: RefObject<HTMLButtonElement | null>;
+  session: GameSession; input: GameInput; surface: RefObject<HTMLDivElement | null>;
 }) {
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot);
   const [focused, setFocused] = useState(() => document.hasFocus() && !document.hidden);
@@ -53,12 +53,13 @@ export function SessionUi({ shopView, session, input, surface, eggPrompt, guideM
   const closeShop = () => { input.reset(); setShopRequest(null); setDismissedShop(state.shopId); shopView.close(); surface.current?.focus(); };
   const openShop = (category: ShopCategory) => { input.reset(); setModal(null); setShopRequest(category); if (shopView.active) showShopCategory(shopView, state, category); };
   const lockedMine = !!state.atMineEntrance && state.worlds.some(w => w.id === state.atMineEntrance && !w.mineOpen);
+  const pets = useSyncExternalStore(session.pets.subscribe, session.pets.getSnapshot);
+  const eggName = state.eggId ? pets.eggs.find(egg => egg.id === state.eggId)?.name ?? '宠物蛋' : null;
 
   useEffect(() => {
     if (modal || shopOpen || (!state.eggStation && !state.atMachine && !lockedMine) || blocked || !focused) return;
     const press = (event: KeyboardEvent) => {
       if (event.code !== 'KeyE' || event.repeat || event.ctrlKey || event.metaKey || event.altKey || event.defaultPrevented) return;
-      if (!lockedMine && !state.atMachine && eggPrompt.current?.style.visibility !== 'visible') return;
       event.preventDefault(); open(lockedMine ? { kind: 'world', tab: 'progress' } : state.atMachine ? { kind: 'capsule' } : { kind: 'egg' });
     };
     window.addEventListener('keydown', press);
@@ -71,6 +72,7 @@ export function SessionUi({ shopView, session, input, surface, eggPrompt, guideM
   const prompts = <>
     {lockedMine && <GameButton className="ui-btn" data-tone="orange" data-size="m" onPress={() => open({ kind: 'world', tab: 'progress' })}><Icon kind="globe" /><span className="ui-outline"><span className="desktop-hint">E · </span>查看矿区要求</span></GameButton>}
     {state.atMachine && <GameButton className="ui-btn capsule-world-prompt" data-tone="pink" data-size="m" onPress={() => open({ kind: 'capsule' })}><Icon kind="gift" /><span className="ui-outline"><span className="desktop-hint">E · </span>幸运扭蛋</span></GameButton>}
+    {state.eggStation && eggName && <GameButton className="ui-btn egg-world-prompt" data-tone="orange" data-size="m" aria-label={`查看${eggName}`} onPress={() => open({ kind: 'egg' })}><Icon kind="paw" /><span className="ui-outline"><span className="desktop-hint">E · </span>查看{eggName}</span></GameButton>}
   </>;
   return <div className="session-ui" data-panel={panel}>
     <TipMarker tip={state.tip} anchor={state.tipAnchor} marker={guideMarker} hidden={tipHidden} />
@@ -81,9 +83,6 @@ export function SessionUi({ shopView, session, input, surface, eggPrompt, guideM
         openRewards: () => open({ kind: 'rewards', tab: 'online' }), openWorlds: () => open({ kind: 'world', tab: 'travel' }), openHelp: () => open({ kind: 'help' }),
       }} />}
     {!modal && !shopOpen && <Controls input={input} surface={surface} />}
-    {!modal && !shopOpen && state.eggStation && <button ref={eggPrompt} type="button" className="egg-world-prompt ui-btn" data-tone="orange" data-size="m" style={{ visibility: 'hidden' }} aria-label="查看宠物蛋" onClick={() => open({ kind: 'egg' })}>
-      <Icon kind="paw" /><span className="ui-outline"><span className="desktop-hint">E · </span>查看宠物蛋</span>
-    </button>}
     {modal?.kind === 'bag' && <BagSheet session={session} tab={modal.tab} onTab={tab => setModal({ kind: 'bag', tab })} onClose={close} onShop={openShop} />}
     {modal?.kind === 'world' && <WorldSheet session={session} tab={modal.tab} onTab={tab => setModal({ kind: 'world', tab })} onClose={close} />}
     {modal?.kind === 'rewards' && <RewardsSheet session={session} tab={modal.tab} onTab={tab => setModal({ kind: 'rewards', tab })} onClose={close} />}

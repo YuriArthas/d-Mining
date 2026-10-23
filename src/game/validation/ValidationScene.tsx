@@ -2,7 +2,6 @@ import type { ShopView } from '../presentation/ShopView.ts';
 import { GuideMarkerProjector } from '../presentation/GuideMarkerProjector.ts';
 import { GuideDirectionArrow, updateGuideRoute } from '../presentation/GuideDirectionArrow.tsx';
 import type { SavedGame } from '../persistence/SaveBootstrap.ts';
-import { WorldPromptProjector } from "../presentation/WorldPromptProjector.ts";
 import { blendedCameraLook } from '../content/cameraLook.ts';
 import type { CampContent } from "../content/campContent.ts";
 import { useEffect, useRef, type RefObject } from "react";
@@ -52,11 +51,10 @@ export function ValidationScene({
   session,
   timeOfDay,
   stylized,
-  eggPrompt, guideMarker,
+  guideMarker,
 }: {
   shopView: ShopView;
   guideMarker: RefObject<HTMLDivElement | null>;
-  eggPrompt: RefObject<HTMLButtonElement | null>;
   content: CampContent;
   savedGame: SavedGame;
   renderRate: RenderRate;
@@ -83,7 +81,6 @@ export function ValidationScene({
   const loadingReleased = useRef(false);
   const guideProjector = useRef(new GuideMarkerProjector());
   const guideArrow = useRef<Group>(null);
-  const promptProjector = useRef(new WorldPromptProjector());
   const settings = useRef({ timeOfDay, sceneShadowsEnabled });
   settings.current = { timeOfDay, sceneShadowsEnabled };
   const { advance, gl, scene, camera: activeCamera } = useThree();
@@ -292,7 +289,6 @@ export function ValidationScene({
     if (shopView.active) {
       input.reset(); game.minerAvatar.cancelMining();
       if (guideArrow.current) guideArrow.current.visible = false;
-      if (eggPrompt.current) eggPrompt.current.style.visibility = 'hidden';
       if (guideMarker.current) guideMarker.current.style.visibility = 'hidden';
       if (!document.hidden && !session.suspended) session.advanceOnline(Math.min(Math.max(elapsed, 0), 1));
       return;
@@ -316,7 +312,6 @@ export function ValidationScene({
     } catch (error) { savedGame.saves.invalidate(error); throw error; }
     if (game.terrain.error) savedGame.saves.invalidate(game.terrain.error);
     const tipState = session.getSnapshot(), tip = tipState.tip;
-    promptProjector.current.update(camera, tipState.eggStation?.promptAnchor ?? null, eggPrompt.current);
     // First-dig tip: an arrow to the mine on the surface, then a glowing block once there.
     if (tip?.anchor === 'mine') guideProjector.current.update(camera, tipState.tipAnchor, guideMarker.current);
     game.interaction.lesson.update(camera as PerspectiveCamera, game.physics.feet(), game.interaction.selected, game.terrain, tipState.pickaxe.level, guideMarker.current, tip?.anchor === 'dig' && !game.player.travelling && !session.suspended);

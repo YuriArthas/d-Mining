@@ -71,7 +71,7 @@
 .hud-notice { display: block; max-width: 100%; }
 .hud-notice:empty { display: none; }
 .hud-notice .ui-toast { white-space: normal; text-align: center; justify-content: center; }
-.hud-bottom .journey-mine-prompt, .hud-bottom .capsule-world-prompt { position: static; transform: none; }
+.hud-bottom .journey-mine-prompt, .hud-bottom .capsule-world-prompt, .hud-bottom .egg-world-prompt { position: static; transform: none; }
 
 /* Mining target card (TargetHealth markup). */
 .hud-center .target-health {
@@ -150,8 +150,6 @@
 .game-shell .control-hint { display: none; }
 
 /* Projected world prompt over an egg stand (positioned by WorldPromptProjector). */
-.egg-world-prompt { position: absolute; z-index: 4; transform: translate(-50%, -100%); }
-.egg-world-prompt::after { content: ""; position: absolute; left: calc(50% - 7px); bottom: -9px; width: 12px; height: 12px; background: var(--ui-orange-lo); border-right: 3px solid var(--ui-ink); border-bottom: 3px solid var(--ui-ink); transform: rotate(45deg); }
 
 /* World guidance labels stay below the depth banner. */
 .game-shell .guide-marker[data-offscreen=true] b,

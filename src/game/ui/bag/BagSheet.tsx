@@ -47,7 +47,7 @@ function PetsTab({ session, pets, common, onClose }: Props & { pets: PetPanelSna
   const eggOf = (speciesId: string) => pets.eggs.find(egg => egg.outcomes.some(o => o.speciesId === speciesId))?.name;
   if (finding) return <Sheet {...common} footer={<><UiButton size="s" tone="steel" onPress={() => setFinding(false)}>返回宠物</UiButton><span className="ui-hint">点「前往」直接传送到蛋台，靠近后查看概率并开蛋。</span></>}>
     <div className="bag-eggs">{pets.eggs.map(egg => <div key={egg.id} className="ui-card-tile bag-egg" data-locked={egg.unlocked ? undefined : ''}>
-      <EggArt className="bag-egg-art" spotSpecies={egg.outcomes.at(-1)?.speciesId} />
+      <EggArt className="bag-egg-art" eggId={egg.id} />
       <h4 className="ui-outline">{egg.name}</h4>
       {egg.unlocked ? <><Chip icon="coin"><b>{number(egg.price)}</b></Chip>
         <UiButton size="s" tone="orange" aria-label={`前往${egg.name}蛋台`} onPress={() => { if (session.goTo({ egg: egg.id }) === 'travelling') onClose(); }}>前往</UiButton></>
