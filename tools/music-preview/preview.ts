@@ -61,18 +61,19 @@ export async function stepTour(surfaces: FootSurface[]) {
   });
 }
 
-/** Encodes part of a buffer as mono Opus in WebM by playing it into a MediaRecorder (real time). */
-export async function opus(buffer: AudioBuffer, from = 0, seconds = buffer.duration, bitrate = 20000) {
-  const ctx = new AudioContext({ sampleRate: buffer.sampleRate }), source = ctx.createBufferSource(), fade = ctx.createGain();
+/** Encodes part of a buffer as Opus in WebM by playing it into a MediaRecorder (real time). */
+export async function opus(buffer: AudioBuffer, from = 0, seconds = buffer.duration, bitrate = 20000, gain = 1, channels = 1) {
+  const ctx = new AudioContext({ sampleRate: buffer.sampleRate }), source = ctx.createBufferSource(), fade = ctx.createGain(), boost = ctx.createGain();
+  boost.gain.value = gain;
   const out = ctx.createMediaStreamDestination();
-  out.channelCount = 1;
+  out.channelCount = channels;
   source.buffer = buffer;
   // Short fades so an excerpt never starts or ends with a click.
   fade.gain.setValueAtTime(0, ctx.currentTime + 0.05);
   fade.gain.linearRampToValueAtTime(1, ctx.currentTime + 0.25);
   fade.gain.setValueAtTime(1, ctx.currentTime + 0.05 + seconds - 0.6);
   fade.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.05 + seconds);
-  source.connect(fade).connect(out);
+  source.connect(boost).connect(fade).connect(out);
   const recorder = new MediaRecorder(out.stream, { mimeType: 'audio/webm;codecs=opus', audioBitsPerSecond: bitrate }), chunks: Blob[] = [];
   recorder.ondataavailable = e => chunks.push(e.data);
   const done = new Promise<void>(resolve => { recorder.onstop = () => resolve(); });

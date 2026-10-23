@@ -44,26 +44,31 @@ const SURFACES = ['grass', 'sand', 'dirt', 'stone', 'wood', 'metal', 'ice', 'cry
   };
   if (what === 'levels') await run('levels', SONGS.map(id => ({ kind: 'song', args: [id, 0, 1, 1, 0, 45], label: id })), 0);
   if (what === 'clips') {
-    // Listening excerpts (mono Opus, low bitrate) for summaries; encoded in real time.
+    // Listening excerpts (mono Opus, low bitrate) for summaries; encoded in real time. Each kind is
+    // raised by a fixed gain so it is comfortable to hear on its own (relative levels within a kind kept).
     const jobs = [
-      ...SONGS.map(id => ({ name: `song-${id}`, kind: 'song', args: [id, 0], from: 'theme', seconds: Number(process.env.SONG_SECONDS || 6) })),
-      { name: 'ambience-meadow-day', kind: 'ambience', args: ['meadow', 1, 9], from: 1, seconds: 6 },
-      { name: 'ambience-meadow-night', kind: 'ambience', args: ['meadow', 0, 8], from: 1, seconds: 5 },
-      { name: 'ambience-timber', kind: 'ambience', args: ['timber', 1, 9], from: 1, seconds: 5 },
-      { name: 'ambience-lava', kind: 'ambience', args: ['lava', 1, 9], from: 1, seconds: 5 },
-      { name: 'ambience-machine', kind: 'ambience', args: ['machine', 1, 9], from: 1, seconds: 5 },
-      { name: 'steps', kind: 'stepTour', args: [['grass', 'sand', 'stone', 'wood', 'metal', 'ice']], from: 0, seconds: 10 },
+      ...SONGS.map(id => ({ name: `song-${id}`, kind: 'song', args: [id, 0], from: 'theme', seconds: Number(process.env.SONG_SECONDS || 6), gain: 4 })),
+      { name: 'ambience-meadow-day', kind: 'ambience', args: ['meadow', 1, 9], from: 1, seconds: 6, gain: 5.6 },
+      { name: 'ambience-meadow-night', kind: 'ambience', args: ['meadow', 0, 8], from: 1, seconds: 5, gain: 5.6 },
+      { name: 'ambience-timber', kind: 'ambience', args: ['timber', 1, 9], from: 1, seconds: 5, gain: 5.6 },
+      { name: 'ambience-lava', kind: 'ambience', args: ['lava', 1, 9], from: 1, seconds: 5, gain: 5.6 },
+      { name: 'ambience-machine', kind: 'ambience', args: ['machine', 1, 9], from: 1, seconds: 5, gain: 5.6 },
+      { name: 'steps', kind: 'stepTour', args: [['grass', 'sand', 'stone', 'wood', 'metal', 'ice']], from: 0, seconds: 10, gain: 3 },
     ];
-    const clips = {};
+    // CLIP_QUALITY=high: stereo at 64 kbps (songs) / 48 kbps, for hosting; default mono 20 kbps for embedding.
+    const high = process.env.CLIP_QUALITY === 'high', clips = {};
     for (const job of jobs) {
+      if (high && job.kind === 'song') job.seconds = Number(process.env.SONG_SECONDS || 10);
+      if (high && job.kind === 'ambience') { job.seconds = 8; job.args = [job.args[0], job.args[1], 10]; }
+      Object.assign(job, { bitrate: high ? (job.kind === 'song' ? 64000 : 48000) : 20000, channels: high ? 2 : 1 });
       clips[job.name] = await evaluate(async job => {
         const p = window.preview, args = job.kind === 'song' ? [...job.args, 1, 1, 0, p.firstTheme(job.args[0]) + job.seconds + 1] : job.args;
         const buffer = await p[job.kind](...args), from = job.from === 'theme' ? p.firstTheme(job.args[0]) : job.from;
-        return p.opus(buffer, from, job.seconds, 20000);
+        return p.opus(buffer, from, job.seconds, job.bitrate, job.gain, job.channels);
       }, job);
       console.log(job.name, Math.round(clips[job.name].length / 1024), 'KiB base64');
     }
-    await fs.writeFile(path.join(dir, 'clips.json'), JSON.stringify(clips));
+    await fs.writeFile(path.join(dir, high ? 'clips-high.json' : 'clips.json'), JSON.stringify(clips));
   }
   if (what === 'zoom') await run('zoom', (process.env.SONGS || 'meadow,timber').split(',').map(id => ({ kind: 'song', args: [id, 0, 1, 1, 0, 20], label: `${id} 0-20s` })), 0);
   if (what === 'songs' || what === 'all') {
