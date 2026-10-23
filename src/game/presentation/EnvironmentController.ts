@@ -4,6 +4,7 @@ import {
   type Scene,
   type HemisphereLight,
   type DirectionalLight,
+  type Vector3,
 } from "three";
 import type { SurfaceEnvironment, SkyConfig } from "./SurfaceEnvironment.ts";
 import type { SceneLightingRig } from "./SceneLightingRig.ts";
@@ -114,6 +115,10 @@ export class EnvironmentController {
     this.sky.markSubmitted();
   }
   get daylightBlend() { return this.daylight; }
+  /** Unit vector toward the key light (sun by day, moon by night). */
+  keyDirection(out: Vector3) {
+    return out.copy(this.key.position).sub(this.key.target.position).normalize();
+  }
   get dayNightSnapshot() { return this.cycle.getSnapshot(); }
   get cameraDaylightBlend() { return this.daylight * this.surfaceStrength; }
   get environmentLightingStrength() { return this.surfaceStrength; }

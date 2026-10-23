@@ -6,10 +6,12 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { createHash } from 'node:crypto';
 import { buildLandscape } from '../surface-game-art/tools/terrain/landscape.ts';
-import { bakeShadows } from '../surface-game-art/tools/terrain/bakeShadows.mjs';
+import { bakeLight, LIGHT_BAKE, OCCLUDER } from '../surface-game-art/tools/terrain/bakeLight.mjs';
 import { batchStatic } from '../surface-game-art/tools/terrain/kit.ts';
 const require=createRequire(new URL('../surface-game-art/package.json',import.meta.url));
 const {createCanvas,loadImage,ImageData,Image}=require('@napi-rs/canvas');
+const {NodeIO,TextureInfo}=require('@gltf-transform/core');
+const {ALL_EXTENSIONS}=require('@gltf-transform/extensions');
 globalThis.self=globalThis;globalThis.ImageData=ImageData;globalThis.HTMLImageElement=Image;
 globalThis.createImageBitmap=async blob=>loadImage(Buffer.from(await blob.arrayBuffer()));
 globalThis.document={createElement(name){if(name!=='canvas')throw Error(name);const c=createCanvas(1,1);c.toBlob=async(callback,type)=>callback(new Blob([await c.encode(type==='image/jpeg'?'jpeg':'png')],{type}));return c;}};
@@ -24,16 +26,84 @@ const solid=root=>{
 };
 const built=buildLandscape(name=>{const node=nature.getObjectByName(name);if(!node)throw Error(name);return node.clone(true);});
 const colliders=[];built.group.traverse(o=>{if(o.isMesh&&(o.userData.surfaceGround||/trunk/i.test(o.name)))colliders.push(solid(o));});
-const shadow=bakeShadows(built.group,architecture,createCanvas);
-const batched=batchStatic(built.group);batched.group.add(...built.water,shadow.group);
-// GLTF PBR is the existing game's material contract. A matte response preserves the palette.
-batched.group.traverse(o=>{if(!o.isMesh)return;const m=o.material;if(m.isMeshLambertMaterial)o.material=new THREE.MeshStandardMaterial({color:m.color,map:m.map,vertexColors:m.vertexColors,roughness:1,metalness:0,side:m.side});});
+
+// Light bake casters: every static model except the distant mountains (far beyond any shadow) and the two
+// gate doors (they swing open, so they must not leave a door-shaped shadow behind). The open meadow and
+// paths only occlude at contact; creek banks and turf lips occlude like any solid.
+const casters=[],groundMeshes=[];
+built.group.updateMatrixWorld(true);architecture.updateMatrixWorld(true);
+// The distant ridges get their own material so their batches stay apart from the baked props.
+let ridgeMaterial=null;
+built.group.traverse(o=>{if(o.isMesh&&o.name==='Angular distant mountain ridge'){ridgeMaterial??=Object.assign(o.material.clone(),{name:'Distant ridge (unbaked)'});o.material=ridgeMaterial;}});
+built.group.traverse(o=>{
+ if(!o.isMesh||o.material===ridgeMaterial)return;
+ if(o.userData.surfaceGround)groundMeshes.push(o);
+ casters.push({mesh:o,kind:/Flowing meadow|Inset polygon/.test(o.name)?OCCLUDER.floor:OCCLUDER.solid});
+});
+const architectureMeshes=[];
+architecture.traverse(o=>{if(!o.isMesh)return;architectureMeshes.push(o);for(let p=o;p;p=p.parent)if(p.name.startsWith('World_Gate_Door'))return;casters.push({mesh:o,kind:OCCLUDER.solid});});
+
+const batched=batchStatic(built.group);batched.group.add(...built.water);
+const vertexMeshes=batched.group.children.filter(o=>o.isMesh&&!o.userData.surfaceGround&&!o.userData.keepDynamic&&o.material!==ridgeMaterial);
+const baked=await bakeLight({casters,ground:groundMeshes,lightmap:architectureMeshes,vertex:vertexMeshes});
+
+// Ground and creek water read the top-down bake through a planar second UV set.
+const G=LIGHT_BAKE.ground;
+const groundLight=new THREE.DataTexture(baked.groundImage,G.resolution,G.resolution);
+groundLight.name='Pinewind baked ground light';groundLight.channel=1;groundLight.flipY=false;
+groundLight.magFilter=THREE.LinearFilter;groundLight.minFilter=THREE.LinearMipmapLinearFilter;groundLight.generateMipmaps=true;groundLight.needsUpdate=true;
+const planar=g=>{const p=g.attributes.position,uv=new Float32Array(p.count*2);for(let i=0;i<p.count;i++){uv[i*2]=(p.getX(i)-G.x0)/G.size;uv[i*2+1]=(p.getZ(i)-G.z0)/G.size;}g.setAttribute('uv1',new THREE.BufferAttribute(uv,2));};
+// GLTF PBR is the existing game's material contract. A matte response preserves the palette; one converted
+// material per source material.
+const converted=new Map();
+const convert=(m,bake)=>{
+ const key=m.uuid+':'+bake;if(converted.has(key))return converted.get(key);
+ const out=m.isMeshLambertMaterial?new THREE.MeshStandardMaterial({color:m.color,map:m.map,vertexColors:m.vertexColors,roughness:1,metalness:0,side:m.side}):m.clone();
+ out.name=m.name;
+ if(bake==='map'){out.aoMap=groundLight;out.aoMapIntensity=1;}
+ if(bake==='vertex')out.userData.bakedLight='vertex';
+ converted.set(key,out);return out;
+};
+let neutralVertices=0;
+batched.group.traverse(o=>{
+ if(!o.isMesh)return;
+ if(o.userData.surfaceGround||o.userData.keepDynamic){planar(o.geometry);o.material=convert(o.material,'map');return;}
+ const bake=baked.vertexBakes.get(o);
+ // The distant mountains share the props' material; they stay fully lit and open to the sky.
+ const values=bake??new Uint8Array(o.geometry.attributes.position.count*4).fill(255);
+ if(!bake)neutralVertices+=o.geometry.attributes.position.count;
+ o.geometry.setAttribute('bake',new THREE.BufferAttribute(values,4,true));
+ o.material=convert(o.material,'vertex');
+});
 const glb=await new GLTFExporter().parseAsync(batched.group,{binary:true,onlyVisible:true});
 writeFileSync(`${dir}/landscape.glb`,Buffer.from(glb));
-architecture.updateMatrixWorld(true);
+
+// Buildings: the lightmap goes into a copy of the Blender export as the occlusion texture on TEXCOORD_1.
+const encodePng=async(image,size)=>{const canvas=createCanvas(size,size);const data=canvas.getContext('2d').createImageData(size,size);data.data.set(image);canvas.getContext('2d').putImageData(data,0,0);return canvas.encode('png');};
+const io=new NodeIO().registerExtensions(ALL_EXTENSIONS);
+const doc=await io.read(`${dir}/architecture.glb`);
+const lightPng=await encodePng(baked.lightImage,LIGHT_BAKE.lightmapSize);
+const lightTexture=doc.createTexture('Pinewind baked building light').setImage(lightPng).setMimeType('image/png');
+for(const material of doc.getRoot().listMaterials()){
+ material.setOcclusionTexture(lightTexture);
+ material.getOcclusionTextureInfo().setTexCoord(1).setMagFilter(TextureInfo.MagFilter.LINEAR).setMinFilter(TextureInfo.MinFilter.LINEAR_MIPMAP_LINEAR).setWrapS(TextureInfo.WrapMode.CLAMP_TO_EDGE).setWrapT(TextureInfo.WrapMode.CLAMP_TO_EDGE);
+}
+await io.write(`${dir}/architecture-lit.glb`,doc);
+mkdirSync('surface-game-art/artifacts/light-bake',{recursive:true});
+writeFileSync('surface-game-art/artifacts/light-bake/ground-light.png',await encodePng(baked.groundImage,G.resolution));
+// Characters read this small map on the CPU (sun visibility above the floor, floor height).
+const standingPng=await encodePng(baked.standingImage,LIGHT_BAKE.standing.resolution);
+writeFileSync('src/game/assets/camp/pinewind-standing-light.png',standingPng);
+writeFileSync('surface-game-art/artifacts/light-bake/building-light.png',lightPng);
+
 const roots=architecture.children.map(node=>({node:node.name,at:node.position.toArray(),rotation:node.quaternion.toArray(),scale:node.scale.toArray()}));
 for(const name of ['Creek_Bridge','Mine_Headframe']){const node=architecture.getObjectByName(name);if(!node)throw Error(name);colliders.push(solid(node));}
+const light={version:LIGHT_BAKE.version,sun:LIGHT_BAKE.sun,sunRadiusDeg:LIGHT_BAKE.sunRadiusDeg,aoRadius:LIGHT_BAKE.aoRadius,ground:G,lightmapSize:LIGHT_BAKE.lightmapSize,standing:{...LIGHT_BAKE.standing,sha256:createHash('sha256').update(standingPng).digest('hex')}};
 mkdirSync('src/game/content/pinewind',{recursive:true});
-writeFileSync('src/game/content/pinewind/authored.json',JSON.stringify({version:1,roots,solids:colliders,landscape:batched.stats},null,0)+'\n');
-writeFileSync('surface-game-art/artifacts/landscape-asset.json',JSON.stringify({source:'surface-study procedural landscape adapted to the square gameplay shaft',triangles:batched.stats.triangles,textureSizes:[512,64,64,64,shadow.textureSize],sha256:createHash('sha256').update(Buffer.from(glb)).digest('hex'),collisionParts:colliders.length},null,2));
+writeFileSync('src/game/content/pinewind/authored.json',JSON.stringify({version:1,roots,solids:colliders,landscape:batched.stats,light},null,0)+'\n');
+const sha=b=>createHash('sha256').update(b).digest('hex');
+writeFileSync('surface-game-art/artifacts/landscape-asset.json',JSON.stringify({source:'surface-study procedural landscape adapted to the square gameplay shaft',triangles:batched.stats.triangles,textureSizes:[512,64,64,64,G.resolution],sha256:sha(Buffer.from(glb)),collisionParts:colliders.length},null,2));
+writeFileSync('surface-game-art/artifacts/light-bake.json',JSON.stringify({...light,generator:'surface-game-art/tools/terrain/bakeLight.mjs (BVH ray tracing, Node worker threads)',samples:{sun:LIGHT_BAKE.sunSamples,sky:LIGHT_BAKE.aoSamples},floorContact:LIGHT_BAKE.floorContact,stats:baked.stats,neutralVertices,
+ textures:{ground:{size:[G.resolution,G.resolution],channels:'R sky occlusion, G sun visibility',sha256:sha(baked.groundImage)},building:{size:[LIGHT_BAKE.lightmapSize,LIGHT_BAKE.lightmapSize],uv:'TEXCOORD_1 (Blender Lightmap layer)',channels:'R sky occlusion, G sun visibility',pngSha256:sha(lightPng)}},
+ outputs:{landscape:sha(Buffer.from(glb)),architectureLit:sha(readFileSync(`${dir}/architecture-lit.glb`))}},null,2)+'\n');
 console.log('Landscape:',batched.stats.triangles,'triangles;',colliders.length,'collision parts; architecture roots',roots.length);

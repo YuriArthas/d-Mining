@@ -6,6 +6,8 @@ const fs = require('node:fs/promises'), path = require('node:path'), assert = re
 const base = 'https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html';
 const dir = path.resolve(process.env.ARTIFACT_DIR || 'artifacts/lighting-tone');
 const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36';
+// Desktop by default (the current art checks are desktop only); DEVICE=mobile keeps the phone emulation.
+const MOBILE = process.env.DEVICE === 'mobile';
 const SUN = [-35, 60, 35];
 // null keeps the game's own values. Each variant may set day light values and exposure.
 const VARIANTS = JSON.parse(process.env.VARIANTS || 'null') ?? {
@@ -23,10 +25,10 @@ const VIEWS = JSON.parse(process.env.VIEWS || 'null') ?? [
 
 (async () => {
   await fs.mkdir(dir, { recursive: true });
-  const report = { url: base, startedAt: new Date().toISOString(), tier: 'Public mobile Chromium emulation (Android UA, touch, landscape 844×390, DPR 2, SwiftShader). Colour judgement needs a real screen.', variants: VARIANTS, views: VIEWS, shots: [], errors: [] };
+  const report = { url: base, startedAt: new Date().toISOString(), tier: MOBILE ? 'Public mobile Chromium emulation (Android UA, touch, landscape 844×390, DPR 2, SwiftShader). Colour judgement needs a real screen.' : 'Public desktop Chromium (1600×900, DPR 1, SwiftShader). Colour judgement needs a real screen.', variants: VARIANTS, views: VIEWS, shots: [], errors: [] };
   const save = () => fs.writeFile(path.join(dir, 'report.json'), JSON.stringify(report, null, 2));
   const browser = await chromium.launch({ args: ['--no-sandbox', '--disable-quic', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
-  const context = await browser.newContext({ viewport: { width: 844, height: 390 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2, userAgent: UA });
+  const context = await browser.newContext(MOBILE ? { viewport: { width: 844, height: 390 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2, userAgent: UA } : { viewport: { width: 1600, height: 900 }, deviceScaleFactor: 1 });
   const page = await context.newPage();
   page.setDefaultTimeout(60000);
   page.on('pageerror', e => report.errors.push(e.message));
@@ -36,18 +38,22 @@ const VIEWS = JSON.parse(process.env.VIEWS || 'null') ?? [
     const n = (await snap()).renderer.submission.submitted;
     await page.waitForFunction(([n, f]) => window.__miningValidation.snapshot().renderer.submission.submitted >= n + f, [n, frames], { timeout: 120000, polling: 250 });
   };
-  const tap = async locator => { await locator.scrollIntoViewIfNeeded(); const r = await locator.boundingBox(); assert.ok(r, 'tap target visible'); await page.touchscreen.tap(r.x + r.width / 2, r.y + r.height / 2); await page.waitForTimeout(400); };
+  const press = (x, y) => MOBILE ? page.touchscreen.tap(x, y) : page.mouse.click(x, y);
+  const tap = async locator => { await locator.scrollIntoViewIfNeeded(); const r = await locator.boundingBox(); assert.ok(r, 'tap target visible'); await press(r.x + r.width / 2, r.y + r.height / 2); await page.waitForTimeout(400); };
   try {
     await page.goto(`${base}?debug=1&submission=fenced&framesInFlight=1&saveTest=tone-${Date.now()}`, { waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => window.__miningValidation?.snapshot().ready && !document.querySelector('.loading-screen'), null, { timeout: 300000 });
-    await page.touchscreen.tap(600, 120); await page.waitForTimeout(500);
+    // A failed load shows the retry screen: stop at once with its message instead of waiting it out.
+    await page.waitForFunction(() => (window.__miningValidation?.snapshot().ready && !document.querySelector('.loading-screen')) || document.body.innerText.includes('暂时没能进入矿场'), null, { timeout: 300000 });
+    const failed = await page.evaluate(() => document.body.innerText.includes('暂时没能进入矿场') ? document.body.innerText.slice(0, 300) : null);
+    if (failed) throw new Error('load failed: ' + failed);
+    await press(MOBILE ? 600 : 1100, MOBILE ? 120 : 260); await page.waitForTimeout(500);
     // Fixed time of day through the debug setting (auto → day → night).
     const time = process.env.TIME === 'night' ? '夜晚' : '白天';
     await tap(page.getByRole('button', { name: '设置', exact: true }).first());
     await tap(page.getByRole('button', { name: /^昼夜：/ }).first());
     if (time === '夜晚') await tap(page.getByRole('button', { name: /^昼夜：/ }).first());
     await page.getByRole('button', { name: `昼夜：${time}` }).waitFor();
-    await page.touchscreen.tap(420, 200); await page.waitForTimeout(400);
+    await press(MOBILE ? 420 : 800, MOBILE ? 200 : 450); await page.waitForTimeout(400);
     await page.addStyleTag({ content: '.ui-hud,.hud-debug-tools,.joystick,.jump-button{display:none!important}' });
     for (const view of VIEWS) {
       await page.evaluate(v => { window.__miningValidation.teleport(v.at); window.__miningValidation.look(v.yaw, v.pitch); }, view);

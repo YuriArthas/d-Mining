@@ -578,9 +578,11 @@ for i,p in enumerate(layout['portals']):
         box('Portal_Pier',(x,.32,0),(.52,.64,.72),19)
         box('Portal_Post',(x,1.48,0),(.34,2.4,.38),1)
         box('Portal_Collar',(x,2.45,0),(.48,.32,.52),0)
-    box('Portal_Header',(0,2.72,0),(2.85,.40,.66),6 if i%2 else 5)
+    # Every slot looks like the first portal (as the game has always shown them); each keeps its own
+    # model so its baked light belongs to its own place.
+    box('Portal_Header',(0,2.72,0),(2.85,.40,.66),5)
     box('Portal_GoldLine',(0,2.94,0),(2.5,.10,.48),8)
-    prism('Portal_Crest',[(x,y+2.72) for x,y in stepped_outline(.58,.58,.15)],.36,.50,17+i%2)
+    prism('Portal_Crest',[(x,y+2.72) for x,y in stepped_outline(.58,.58,.15)],.36,.50,17)
 
 # Functional furniture: newly authored shells; live canvas data is attached in-game.
 model('Challenge_Board',tuple(layout['feedback']['board']))
@@ -705,9 +707,38 @@ for name,root in MODELS.items():
     bpy.context.view_layer.objects.active=meshes[0]
     bpy.ops.object.join()
     bpy.context.object.name=name+'_Mesh'
+# Lightmap UVs (TEXCOORD_1): a second unwrap of every runtime mesh into one shared atlas, islands at one
+# texel density in world units, for the offline light bake (tools/terrain/bakeLight.mjs). Faces resting
+# face-down on the ground are never seen and are left out of the atlas (parked on one corner texel).
+joined=[o for o in (bpy.data.objects.get(name+'_Mesh') for name in MODELS) if o]
+for ob in joined:
+    ob.data.uv_layers.active=ob.data.uv_layers.new(name='Lightmap')
+bpy.ops.object.select_all(action='DESELECT')
+for ob in joined: ob.select_set(True)
+bpy.context.view_layer.objects.active=joined[0]
+bpy.ops.object.mode_set(mode='EDIT')
+hidden_faces=0
+for ob in joined:
+    bm=bmesh.from_edit_mesh(ob.data); world=ob.matrix_world; rotation=world.to_3x3().normalized()
+    for f in bm.faces:
+        down=(rotation@f.normal).z<-.9 and (world@f.calc_center_median()).z<.06
+        f.select_set(not down); hidden_faces+=down
+    bmesh.update_edit_mesh(ob.data)
+bpy.ops.uv.smart_project(angle_limit=math.radians(45),island_margin=0.0,area_weight=0.0,correct_aspect=True,scale_to_bounds=False)
+bpy.ops.uv.average_islands_scale()
+bpy.ops.uv.pack_islands(rotate=True,margin_method='FRACTION',margin=.0016,shape_method='CONCAVE')
+for ob in joined:
+    bm=bmesh.from_edit_mesh(ob.data); layer=bm.loops.layers.uv['Lightmap']
+    for f in bm.faces:
+        if not f.select:
+            for loop in f.loops: loop[layer].uv=(.0002,.0002)
+    bmesh.update_edit_mesh(ob.data)
+bpy.ops.object.mode_set(mode='OBJECT')
+for ob in joined:
+    ob.data.uv_layers.active=ob.data.uv_layers['PixelAtlas']; ob.data.uv_layers['PixelAtlas'].active_render=True
 glb=OUT/'architecture.glb'
 bpy.ops.export_scene.gltf(filepath=str(glb),export_format='GLB',export_yup=True,export_texcoords=True,export_normals=True,export_materials='EXPORT',export_cameras=False,export_lights=False,export_extras=True)
 def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
-report={'schema':1,'authorship':'Pinewind playable adaptation, regenerated from approved authoring scripts; open 16m square mine, gameplay-aligned services and egg terraces; no legacy model import or decimation','blenderVersion':bpy.app.version_string,'coordinateConvention':'Source helpers Three Y-up -> Blender (x,-z,y), exported glTF Y-up','atlas':{'file':str(ATLAS.relative_to(ROOT)),'size':[256,256],'usedTiles':len(recipes),'tilePixels':32,'filter':'Closest / glTF NEAREST','pixelArt':'Low contrast sparse grouped marks; large calm toy-color areas, limited plank/glass/egg accents; no random noise','sha256':sha(ATLAS)},'geometryChecks':geometry_checks,'models':stats,'triangles':sum(s['triangles'] for s in stats),'vertices':sum(s['vertices'] for s in stats),'meshCount':sum(s['meshes'] for s in stats),'worldBounds':{'min':[round(min(v[a] for v in all_bounds),4) for a in range(3)],'max':[round(max(v[a] for v in all_bounds),4) for a in range(3)]},'files':{str(p.relative_to(ROOT)):{'bytes':p.stat().st_size,'sha256':sha(p)} for p in (pathlib.Path(__file__).resolve(),source,glb,ATLAS)}}
+report={'schema':1,'authorship':'Pinewind playable adaptation, regenerated from approved authoring scripts; open 16m square mine, gameplay-aligned services and egg terraces; no legacy model import or decimation','blenderVersion':bpy.app.version_string,'coordinateConvention':'Source helpers Three Y-up -> Blender (x,-z,y), exported glTF Y-up','atlas':{'file':str(ATLAS.relative_to(ROOT)),'size':[256,256],'usedTiles':len(recipes),'tilePixels':32,'filter':'Closest / glTF NEAREST','pixelArt':'Low contrast sparse grouped marks; large calm toy-color areas, limited plank/glass/egg accents; no random noise','sha256':sha(ATLAS)},'geometryChecks':geometry_checks,'lightmapUv':{'layer':'Lightmap','gltf':'TEXCOORD_1','method':'smart_project 45 deg, average island scale, pack (margin 0.0016, 2.5 texels at 1536)','hiddenGroundFaces':hidden_faces},'models':stats,'triangles':sum(s['triangles'] for s in stats),'vertices':sum(s['vertices'] for s in stats),'meshCount':sum(s['meshes'] for s in stats),'worldBounds':{'min':[round(min(v[a] for v in all_bounds),4) for a in range(3)],'max':[round(max(v[a] for v in all_bounds),4) for a in range(3)]},'files':{str(p.relative_to(ROOT)):{'bytes':p.stat().st_size,'sha256':sha(p)} for p in (pathlib.Path(__file__).resolve(),source,glb,ATLAS)}}
 (ROOT/'artifacts/architecture-asset.json').write_text(json.dumps(report,indent=2)+'\n')
 print('ARCHITECTURE_ASSET '+json.dumps({k:report[k] for k in ('triangles','vertices','meshCount','worldBounds')}))

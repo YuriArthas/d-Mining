@@ -11,6 +11,9 @@ import { themeById } from "../content/themes.ts";
 import { mineralName } from "../terrain/minerals.ts";
 import { generationAtZ } from '../terrain/SparseWorld.ts';
 import { setArchitectureDaylight } from '../presentation/albedoLift.ts';
+import { Vector3 } from "three";
+import { bakedLightState, bakedSunAlignment, bakedSunDirection, setStandingSun } from '../presentation/bakedLight.ts';
+import { standingSun } from '../presentation/standingLight.ts';
 export function updateGame(
   current: PreparedGame,
   elapsed: number,
@@ -19,6 +22,7 @@ export function updateGame(
     avatar: Group;
     fixtures: Group;
     contactShadow: Mesh | null;
+    sunShadow?: Group | null;
   },
   input: GameInput,
   gl: WebGLRenderer,
@@ -32,7 +36,7 @@ export function updateGame(
   onLoading: (event: LoadingEvent) => void,
 ) {
   if (current.session.suspended) { current.minerAvatar.cancelMining(); return; }
-  const { camera, avatar, fixtures, contactShadow } = view;
+  const { camera, avatar, fixtures, contactShadow, sunShadow } = view;
   const { samples, timeOfDay, sceneShadowsEnabled, probeMode } = settings;
   const delta = Math.min(Math.max(elapsed, 0), 0.1);
   const onlineElapsed = document.hidden || current.timing.skipElapsed ? 0 : Math.min(Math.max(elapsed,0),1);
@@ -118,6 +122,7 @@ export function updateGame(
     );
     if (contactShadow)
       (contactShadow.material as Material).opacity = cameraView.rig.avatarOpacity * lightStrength;
+    updateMinerSunlight(avatar, sunShadow ?? null, drawnFeet, environment, lightStrength * (physics.grounded ? 1 : 0), cameraView.rig.avatarOpacity);
     current.petFollowers.update(drawnFeet, player.facing, camera, delta, !!player.travelling, physics.grounded);
     interaction.update(
       camera as PerspectiveCamera,
@@ -150,4 +155,22 @@ export function updateGame(
     onLoading({ error });
     throw reason;
   }
+}
+
+const keyDirection = new Vector3();
+/** By day the miner takes the baked sun at its feet (darker in shade) and casts a decal shadow along the
+ *  baked sun's direction, faded in shade, at night, underground and with shadows switched off. */
+function updateMinerSunlight(avatar: Group, sunShadow: Group | null, feet: readonly number[], environment: PreparedGame['environment'], strength: number, opacity: number) {
+  const baked = bakedLightState().active, sun = baked ? standingSun(feet[0], feet[1], feet[2]) : 1;
+  setStandingSun(sun);
+  if (!sunShadow) return;
+  const shown = baked ? bakedSunAlignment(environment.keyDirection(keyDirection)) * sun * strength * opacity : 0;
+  sunShadow.visible = shown > .01;
+  if (!sunShadow.visible) return;
+  const toward = bakedSunDirection(), across = Math.hypot(toward.x, toward.z);
+  // Local -Z points along the shadow (away from the sun); the decal is as long as a 1.75 m body's shadow.
+  sunShadow.rotation.y = Math.atan2(toward.x, toward.z) - avatar.rotation.y;
+  const decal = sunShadow.children[0] as Mesh, length = 1.75 * across / Math.max(.2, toward.y);
+  decal.scale.y = length + .3; decal.position.z = -(length + .3) / 2 + .2;
+  (decal.material as Material).opacity = .56 * shown;
 }

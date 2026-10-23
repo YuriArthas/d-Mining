@@ -1,4 +1,5 @@
 import { stabilizeShadows } from '../presentation/stableShadow.ts';
+import { applyBakedGroundTop } from '../presentation/bakedLight.ts';
 import { Color, DataTexture, MeshPhysicalMaterial, LinearFilter, LinearMipmapLinearFilter, NearestFilter, RGBAFormat, ShaderChunk, SRGBColorSpace } from 'three';
 import {LAYERS,type Layer} from '../content/layers.ts';
 import {resourceByKind} from '../content/resources.ts';
@@ -58,6 +59,8 @@ export function createMineralMaterial(layers:readonly Layer[]=LAYERS, worlds?:re
       ;
   };
   material.customProgramCacheKey = () => `mineral-atlas-v12-mip-premultiplied-host-${hosts.length}`;
+  // The top of the mine shares the valley's baked shadows (e.g. the headframe's) with the ground around it.
+  applyBakedGroundTop(material, 'vTerrainWorld', 'vTerrainNormalY');
   stabilizeShadows(material);
   return { material, atlasBytes: pixels.byteLength+responsePixels.byteLength, responseAtlasBytes:responsePixels.byteLength, dispose: () => { material.dispose(); atlas.dispose(); responseAtlas.dispose(); } };
 }

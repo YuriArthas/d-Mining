@@ -5,6 +5,7 @@ import {
   type AnimationAction, type Bone, type Texture,
 } from 'three';
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import { applyStandingLight } from './bakedLight.ts';
 import { disposeScenery } from './disposeScenery.ts';
 import { MinerMiningLayer } from './MinerMiningLayer.ts';
 import { UPPER_BODY, createMinerMotions } from './minerMotions.ts';
@@ -101,7 +102,7 @@ export class MinerAvatar {
       object.receiveShadow=true;
       for(const material of Array.isArray(object.material)?object.material:[object.material]) {
         material.transparent=true;
-        if(material instanceof MeshStandardMaterial){material.roughness=.9;material.metalness=0;}
+        if(material instanceof MeshStandardMaterial){material.roughness=.9;material.metalness=0;applyStandingLight(material);}
       }
     });
     this.setEquipment(1,1);
@@ -122,6 +123,8 @@ export class MinerAvatar {
         if (material instanceof MeshStandardMaterial) {
           material.roughness = .9;
           material.metalness = 0;
+          // Walking into a baked shadow darkens the miner like the ground around it.
+          applyStandingLight(material);
         }
       }
     });

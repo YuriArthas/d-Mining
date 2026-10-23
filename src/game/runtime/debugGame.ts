@@ -9,6 +9,7 @@ import { gameAudio } from "../audio/GameAudio.ts";
 import { SURFACE_EXPOSURE, type SurfaceLookOverride } from "../world/SceneLighting.ts";
 import { applyToneGrade } from "../presentation/toneGrade.ts";
 import { ARCHITECTURE_ALBEDO, setArchitectureAlbedo } from "../presentation/albedoLift.ts";
+import { setBakedLightTuning } from "../presentation/bakedLight.ts";
 import type { PreparedGame } from "./startGame.ts";
 import type { GameSession } from "../application/GameSession.ts";
 import type { GameInput } from "../GameInput.ts";
@@ -32,7 +33,7 @@ export type ValidationDebug = {
   }) => void;
   surfaceHeight: (x: number, z: number) => number | null;
   /** Try other surface light values and exposure live; null restores the game's. */
-  lightingLook: (look: (SurfaceLookOverride & { exposure?: number; grade?: boolean; albedo?: { saturation: number; brightness: number; bounce?: number } }) | null) => void;
+  lightingLook: (look: (SurfaceLookOverride & { exposure?: number; grade?: boolean; albedo?: { saturation: number; brightness: number; bounce?: number }; baked?: false | { shadow?: number; ao?: number; aoBuildings?: number; aoDirect?: number } }) | null) => void;
   /** Final audio output level (dBFS) and a recordable stream of it, for checks. */
   audioLevel: () => number | null;
   audioStream: () => MediaStream | null;
@@ -134,7 +135,7 @@ export function attachGameDebug(
         },
         ambient: environment.ambientSnapshot,
         cameraDaylightBlend: environment.cameraDaylightBlend,
-        shadowPolicy: "baked-ground-only",
+        shadowPolicy: "baked-light",
         surfaceArea: environment?.lights.diagnostics(),
         cameraFar: (activeCamera as PerspectiveCamera).far,
         surfaceFog: !!scene.fog,
@@ -212,6 +213,8 @@ export function attachGameDebug(
       applyToneGrade(gl, look?.grade ?? true);
       const albedo = look?.albedo ?? ARCHITECTURE_ALBEDO;
       setArchitectureAlbedo(albedo.saturation, albedo.brightness, albedo.bounce ?? ARCHITECTURE_ALBEDO.bounce);
+      // false: no baked light at all (for side-by-side checks); an object retunes it.
+      setBakedLightTuning(look?.baked === false ? { shadow: 0, ao: 0, aoBuildings: 0 } : look?.baked ?? null);
     },
     audioLevel: () => gameAudio.outputLevel(),
     audioStream: () => gameAudio.outputStream(),

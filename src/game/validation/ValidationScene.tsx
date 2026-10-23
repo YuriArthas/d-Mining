@@ -79,6 +79,7 @@ export function ValidationScene({
     fixtures = useRef<Group>(null);
   const runtime = useRef<PreparedGame | null>(null);
   const contactShadow = useRef<Mesh>(null);
+  const sunShadow = useRef<Group>(null);
   const loadingReleased = useRef(false);
   const guideProjector = useRef(new GuideMarkerProjector());
   const guideArrow = useRef<Group>(null);
@@ -304,6 +305,7 @@ export function ValidationScene({
         avatar: avatar.current,
         fixtures: fixtures.current,
         contactShadow: contactShadow.current,
+        sunShadow: sunShadow.current,
       },
       input,
       gl,
@@ -379,7 +381,7 @@ export function ValidationScene({
         )}
       </group>
       <group ref={avatar}>
-        <ContactShadow shadowRef={contactShadow} />
+        <ContactShadow shadowRef={contactShadow} sunShadowRef={sunShadow} />
       </group>
     </group>
   );

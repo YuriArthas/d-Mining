@@ -39,7 +39,7 @@ const dir=path.resolve(process.env.ARTIFACT_DIR||'artifacts/pinewind-public');
   assert.equal(report.initial.facilities.version,'pinewind-master-v2');
   assert.equal(report.initial.facilities.oldSurfaceAssetsLoaded,0);
   check('New authored surface and preserved game initialize on the public route');
-  assert.ok(initial.facilities.surfaceDetails.bakedShadowMeshes>0);
+  assert.ok(initial.facilities.surfaceDetails.bakedLight.meshes.map>0&&initial.facilities.surfaceDetails.bakedLight.meshes.vertex>0);
   await page.getByRole('button',{name:'关闭烘焙阴影'}).click();
   await page.waitForFunction(()=>window.__miningValidation.snapshot().facilities.surfaceDetails.shadowEnabled===false);
   await page.getByRole('button',{name:'开启烘焙阴影'}).click();

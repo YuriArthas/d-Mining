@@ -73,7 +73,7 @@ export class CameraView {
       const material = object.material as Material;
       material.opacity = this.rig.avatarOpacity;
       material.depthWrite =
-        object !== contactShadow && this.rig.avatarOpacity >= 1;
+        object !== contactShadow && !object.userData.decal && this.rig.avatarOpacity >= 1;
     });
   }
 }

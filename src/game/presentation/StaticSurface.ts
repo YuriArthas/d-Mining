@@ -4,6 +4,9 @@ import type { SurfaceContent } from "../content/campContent.ts";
 import type { AssetProfile } from "../content/assetProfiles.ts";
 import { Mesh, MeshStandardMaterial, type WebGLRenderer } from "three";
 import { liftAlbedo } from "./albedoLift.ts";
+import { applyBakedLight, setBakedGround, setBakedSun } from "./bakedLight.ts";
+import { loadStandingLight, setStandingLight } from "./standingLight.ts";
+import standingLightUrl from "../assets/camp/pinewind-standing-light.png?url";
 import { SurfaceDetails } from "./SurfaceDetails.ts";
 import {
   styleMineBlock,
@@ -64,6 +67,10 @@ export async function loadStaticSurface(
   onProgress?: (done: number, total: number) => void,
 ) {
   if (content.authored) {
+    const light=content.authored.light;
+    // The characters' sun grid downloads alongside the models (a small PNG).
+    const standing=loadStandingLight(standingLightUrl,light.ground,light.standing.heightStep,signal);
+    standing.catch(()=>{});
     const requests:ModelRequest[]=[...new Set(content.authored.instances.map(p=>p.asset))].map(name=>{
       const manifest=manifests[`../assets/camp/${name}.manifest.json`];
       if(!manifest)throw Error(`缺少模型清单 ${name}`);
@@ -75,8 +82,17 @@ export async function loadStaticSurface(
       m.roughness=1;m.metalness=0;m.envMapIntensity=0;
       if(m.map){m.map.magFilter=NearestFilter;m.map.minFilter=NearestMipmapNearestFilter;}
       if(request.name==='pinewind-architecture')liftAlbedo(m);
+      applyBakedLight(m);
     },onProgress);
-    return assembleAuthoredSurface(assets,content);
+    setBakedSun(content.authored.light.sun);
+    let groundLight=null as MeshStandardMaterial['aoMap'];
+    assets.templates.get('pinewind-landscape')?.traverse(o=>{if(!groundLight&&o instanceof Mesh&&o.userData.surfaceGround!==false){const m=o.material as MeshStandardMaterial;if(m.aoMap)groundLight=m.aoMap;}});
+    setBakedGround(groundLight,content.authored.light.ground);
+    const scene=assembleAuthoredSurface(assets,content);
+    try{setStandingLight(await standing);}catch(error){scene.dispose();throw error;}
+    const dispose=scene.dispose;
+    scene.dispose=()=>{setStandingLight(null);setBakedGround(null,light.ground);dispose();};
+    return scene;
   }
   const start = performance.now(),
     details = new SurfaceDetails(content.details);
