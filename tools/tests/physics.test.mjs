@@ -128,3 +128,21 @@ test('outer corner can be walked around without getting stuck on a convex edge',
   assert.ok(p.feet()[0]>-15.1);assert.ok(p.feet()[2]>24);assert.ok(p.grounded);
  }finally{p.dispose();}
 });
+test('ground found past a rejected steep edge never pulls the feet into the collider holding that edge',()=>{
+ // The old bridge end, cut down to two triangles of one mesh collider: the slab top (0.43 m) and the tilted
+ // board beyond it, whose outer edge 0.16 m higher meets the capsule at 45.6° on these lanes, over a path.
+ const board=[-2.5,.5921,41.7267,2.5,.5921,41.7267,2.5,.9203,40.6559],slab=[-3.065,.43,43.045,3.065,.43,43.045,3.065,.43,41.355];
+ const vertices=new Float32Array([...board,...slab]),indices=new Uint32Array([0,1,2,3,4,5]),lanes=[1.7,1.75,1.8,1.85,1.9];
+ const lowest=(x,guard)=>{const p=new CharacterPhysics(false);try{
+  if(!guard)p.buries=()=>false;
+  p.world.createCollider(RAPIER.ColliderDesc.cuboid(20,1,20).setTranslation(0,-.965,40));
+  p.world.createCollider(RAPIER.ColliderDesc.trimesh(vertices,indices,RAPIER.TriMeshFlags.FIX_INTERNAL_EDGES));
+  p.teleport([x,.3,47]);let low=Infinity;
+  for(let i=0;i<140;i++){p.tick(0,1,0,false,true);const f=p.feet();if(f[2]>41.4&&f[2]<43)low=Math.min(low,f[1]);}
+  return low;
+ }finally{p.dispose();}};
+ // Without the overlap check some lane drops 0.4 m through the slab onto the path (the reported bug);
+ // if this stops reproducing, the fixture no longer exercises the check and needs replacing.
+ assert.ok(lanes.some(x=>lowest(x,false)<.2),'fixture reproduces the drop without the check');
+ for(const x of lanes)assert.ok(lowest(x,true)>.43,`lane ${x}: feet stay on the slab`);
+});

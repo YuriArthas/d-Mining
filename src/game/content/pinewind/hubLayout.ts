@@ -21,6 +21,10 @@ export const PINEWIND_FACILITIES = {
   sale: { ...SURFACE_FACILITIES.sale, anchor: { x: -20.5, z: 14, yaw: 70 * DEG } },
   shop: { ...SURFACE_FACILITIES.shop, anchor: { x: 18.5, z: 11, yaw: -62 * DEG } },
 } as const satisfies Record<'sale' | 'shop', SurfaceFacility>;
+/** The footbridge over the creek, along the main path (local Z runs along the deck). The deck is one smooth
+ *  raised-cosine arch, `rise` metres high in the middle, meeting the path at ground level `halfSpan` metres
+ *  either side of the centre; `width` is the boarded deck between its overhanging board ends. */
+export const PINEWIND_BRIDGE = { x: 0, z: 36.5, halfSpan: 5.6, rise: 1.15, width: 5.24 } as const;
 /** Where the bridge lands on the plaza. */
 const BRIDGE_EXIT = { x: 0, z: 30 } as const;
 /** Forward offset of each building's visual centre from its anchor (authored GLB bounds). */

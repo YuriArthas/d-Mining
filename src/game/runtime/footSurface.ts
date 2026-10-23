@@ -1,5 +1,5 @@
 import type { FootSurface } from '../audio/sfx.ts';
-import { PINEWIND_GROUNDS, PINEWIND_PORTAL_SLOTS, PINEWIND_STAIR_STEPS, PINEWIND_TERRACE } from '../content/pinewind/hubLayout.ts';
+import { PINEWIND_BRIDGE, PINEWIND_GROUNDS, PINEWIND_PORTAL_SLOTS, PINEWIND_STAIR_STEPS, PINEWIND_TERRACE } from '../content/pinewind/hubLayout.ts';
 import { resourceByKind } from '../content/resources.ts';
 import { CELL, type Coord } from '../terrain/SparseWorld.ts';
 import { PROTECTED_FLOOR } from '../world/entrance.ts';
@@ -19,7 +19,6 @@ export function kindSurface(kind: number): FootSurface {
   try { return PATTERN[resourceByKind(kind).pattern] ?? 'stone'; } catch { return 'stone'; }
 }
 
-const BRIDGE = { x: 0, z: 36.5, halfX: 2.4, halfZ: 4.5 } as const;
 const PAD_RADIUS = 2.1;
 function onPath(x: number, z: number) {
   for (const path of PINEWIND_GROUNDS.paths) {
@@ -36,7 +35,7 @@ function onPath(x: number, z: number) {
  *  plazas, packed paths, and grass everywhere else. `raised` means standing on scenery above the
  *  ground voxels. */
 export function hubSurface(x: number, z: number, raised: boolean): FootSurface {
-  if (Math.abs(x - BRIDGE.x) < BRIDGE.halfX && Math.abs(z - BRIDGE.z) < BRIDGE.halfZ) return 'wood';
+  if (Math.abs(x - PINEWIND_BRIDGE.x) < PINEWIND_BRIDGE.width / 2 && Math.abs(z - PINEWIND_BRIDGE.z) < PINEWIND_BRIDGE.halfSpan) return 'wood';
   if (PINEWIND_GROUNDS.pads.some(([px, pz]) => Math.hypot(x - px, z - pz) < PAD_RADIUS)) return 'stone';
   if (Object.values(PINEWIND_PORTAL_SLOTS).some(p => Math.hypot(x - p.x, z - p.z) < 1.4)) return 'stone';
   if (raised) {

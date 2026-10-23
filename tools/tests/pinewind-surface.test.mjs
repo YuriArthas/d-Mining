@@ -106,6 +106,41 @@ test('actual character collision: bridge, both services, every portal, the first
   assert.ok(physics.feet()[0]>42.6,`stairs blocked at ${physics.feet()}`);assert.ok(physics.feet()[1]>PINEWIND_EGG_TIERS[2].y-.1);
  }finally{collisions.dispose();physics.dispose();}
 });
+test('the bridge deck leaves the path at ground level and arches gently; the feet stay on the boards on every lane, both ways',async()=>{
+ await initPhysics();
+ const {PINEWIND_BRIDGE:B}=await import('../../src/game/content/pinewind/hubLayout.ts');
+ const plan=PINEWIND_CAMP.surface.plan,x0=B.x-4,x1=B.x+4,z0=B.z-B.halfSpan-4,z1=B.z+B.halfSpan+4;
+ // Visible surfaces around the bridge: the colliders are the authored meshes themselves (deck, rails, ground).
+ const tris=[];
+ for(const s of plan.solids.filter(s=>s.triangles)){const {vertices:v,indices:I}=s.triangles;
+  for(let t=0;t<I.length;t+=3){const tri=[0,1,2].flatMap(k=>[0,1,2].map(a=>v[I[t+k]*3+a]+s.at[a]));
+   if(Math.max(tri[0],tri[3],tri[6])>x0&&Math.min(tri[0],tri[3],tri[6])<x1&&Math.max(tri[2],tri[5],tri[8])>z0&&Math.min(tri[2],tri[5],tri[8])<z1)tris.push(tri);}}
+ const top=(x,z)=>{let best=0;for(const [ax,ay,az,bx,by,bz,cx,cy,cz] of tris){const d=(bz-az)*(cx-ax)-(bx-ax)*(cz-az);if(Math.abs(d)<1e-12)continue;
+  const u=((z-az)*(cx-ax)-(x-ax)*(cz-az))/d,w=((bz-az)*(x-ax)-(bx-ax)*(z-az))/d;if(u>=0&&w>=0&&u+w<=1)best=Math.max(best,ay+u*(by-ay)+w*(cy-ay));}return best;};
+ // Board seams are 3.5 cm wide: read the deck at the highest of three nearby points.
+ const deck=(x,z)=>Math.max(top(x,z-.02),top(x,z),top(x,z+.02));
+ for(const end of [-1,1]){
+  const step=deck(B.x,B.z+end*(B.halfSpan-.05))-top(B.x,B.z+end*(B.halfSpan+.3));
+  assert.ok(Math.abs(step)<.03,`no step where the deck meets the path (${step.toFixed(3)} m)`);
+ }
+ assert.ok(deck(B.x,B.z)>B.rise-.05&&deck(B.x,B.z)<B.rise+.1,'deck rises to its crown');
+ for(let z=-B.halfSpan;z<B.halfSpan;z+=.25){const slope=Math.abs(deck(B.x,B.z+z+.25)-deck(B.x,B.z+z))/.25;assert.ok(slope<Math.tan(20*Math.PI/180),`slope ${slope.toFixed(2)} at ${z}`);}
+ const physics=new CharacterPhysics(false,true),collisions=new SceneryCollision(physics,[{id:'surface',depth:0,plan}]);
+ physics.world.createCollider(RAPIER.ColliderDesc.cuboid(100,1,100).setTranslation(0,-1,0));
+ try{
+  for(const dir of [-1,1])for(const x of [-1.6,-.8,0,.8,1.6]){
+   const start=B.z-dir*(B.halfSpan+3),goal=B.z+dir*(B.halfSpan+2);
+   physics.teleport([x,.3,start]);let sink=-1,air=0,ticks=0;
+   for(let i=0;i<500&&(goal-physics.feet()[2])*dir>0;i++){
+    collisions.sync(physics.feet());physics.tick(0,1,dir<0?0:Math.PI,false,true);
+    const f=physics.feet();if(i<20)continue;ticks++;sink=Math.max(sink,top(f[0],f[2])-f[1]);if(!physics.grounded)air++;
+   }
+   assert.ok((goal-physics.feet()[2])*dir<=0,`lane ${x} heading ${dir}: stopped at ${physics.feet()}`);
+   assert.ok(sink<.005,`lane ${x} heading ${dir}: feet ${sink.toFixed(3)} m inside the visible surface`);
+   assert.ok(air<=ticks*.02,`lane ${x} heading ${dir}: airborne for ${air} of ${ticks} steps`);
+  }
+ }finally{collisions.dispose();physics.dispose();}
+});
 test('instant trips face the service building',()=>{
  const session=new GameSession(PINEWIND_CAMP.session);let trip=null;
  session.attach({cell:()=>0,pending:()=>false,mine:()=>false,cancelMining(){},returnToSurface(){},travelTo:(feet,look)=>{trip={feet,look};}});

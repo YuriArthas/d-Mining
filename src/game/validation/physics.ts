@@ -33,6 +33,8 @@ export class CharacterPhysics {
   private snapFrames = 0;
   private previousFeet: [number, number, number] = [...PLAYER.spawn];
   private surfaceColliders: RAPIER.Collider[] = [];
+  /** The player's capsule less its skin, for overlap checks. */
+  private core: RAPIER.Capsule | undefined;
   private readonly includeCourse: boolean;
   constructor(includeCourse = true, journey = false) {
     this.includeCourse = includeCourse;
@@ -96,11 +98,27 @@ export class CharacterPhysics {
         const { radius, height } = GAME_CONFIG.player, n = hit.normal1, point = hit.witness1;
         const separation = (position.x - point.x) * n.x + (position.y - point.y) * n.y + (position.z - point.z) * n.z - radius - (height / 2 - radius) * n.y;
         const drop = (separation - MOVEMENT.skin - MOVEMENT.contactSlack) / n.y;
-        if (drop <= distance && drop >= -MOVEMENT.supportProbe) return drop;
+        if (drop <= distance && drop >= -MOVEMENT.supportProbe) {
+          // Ground found past a rejected collider must not pull the capsule into it: one mesh collider
+          // can hold both a steep edge touching the capsule and the floor under its feet (the old bridge
+          // end let the feet drop 0.4 m through its slab onto the path below).
+          if (rejected && this.buries(position, drop, rejected)) return null;
+          return drop;
+        }
       }
       (rejected ??= new Set()).add(hit.collider.handle);
     }
     return null;
+  }
+  /** Whether lowering the capsule by `drop` would sink it deeper than its skin into one of the `skipped`
+   *  colliders it does not already overlap (a curb the capsule stands against keeps overlapping it). The
+   *  sweep reached the ground past only those, so no other collider lies in the way. */
+  private buries(position: RAPIER.Vector, drop: number, skipped: ReadonlySet<number>) {
+    const { radius, height } = GAME_CONFIG.player, still = { x: 0, y: 0, z: 0, w: 1 };
+    this.core ??= new RAPIER.Capsule(height / 2 - radius, radius - MOVEMENT.skin);
+    const overlapping = new Set<number>();
+    this.world.intersectionsWithShape(position, still, this.core, collider => { overlapping.add(collider.handle); return true; }, undefined, undefined, this.collider, undefined, collider => skipped.has(collider.handle));
+    return this.world.intersectionWithShape({ x: position.x, y: position.y - drop, z: position.z }, still, this.core, undefined, undefined, this.collider, undefined, collider => skipped.has(collider.handle) && !overlapping.has(collider.handle)) !== null;
   }
   tick(x: number, forward: number, yaw: number, jump: boolean, ready: boolean, speedMultiplier = 1) {
     // Apply no deferred displacement: this also refreshes broad phase after chunk collider swaps.

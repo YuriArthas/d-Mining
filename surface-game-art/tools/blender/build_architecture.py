@@ -64,6 +64,11 @@ def shade(h,f):
     c=rgb(h); return ''.join('%02x'%int(round(v*(1+f) if f<0 else v+(255-v)*f)) for v in c)
 GRASS_TILE=len(recipes)
 recipes.append(('6cc24a',[(3,4,9,3,'7fd15a'),(17,9,8,3,'7fd15a'),(6,21,10,3,'5fb43f'),(20,24,7,3,'5fb43f')])) # terrace grass
+# Bridge boards in three close honey tones. Grain sits mid-board: bands along a board's edges read as stair
+# nosings once boards line up along an arch.
+DECK_TILES=[]
+for base,marks in (('e2a85e',[(4,13,11,2,'d59a52'),(19,18,9,2,'eab570')]),('d99f57',[(6,11,9,2,'cc914c'),(17,19,11,2,'e3aa63')]),('e9b46b',[(3,16,12,2,'dca55f'),(20,10,8,2,'f0c07c')])):
+    DECK_TILES.append(len(recipes)); recipes.append((base,marks))
 # Each egg gets its own body colour; ivory and deep spots keep the established egg motif.
 EGG_TILES={}
 for e in layout['eggs']:
@@ -463,37 +468,59 @@ box('Mine_RearLoadingFoot',(0,.29,-7.45),(5.85,.58,1.70),19)
 for x in (-2,2): box('Mine_RearLoadingPost',(x,1.26,-7.45),(.30,1.94,.30),1)
 box('Mine_RearLoadingRail',(0,2.15,-7.45),(4.60,.26,.28),2)
 
-# BRIDGE: a shallow arch of nine wide boards, smooth thick rail segments.
-model('Creek_Bridge',(2,0,24))
-def deck(z): return .40+.90*(1-(z/5.22)**2)
-for i in range(9):
-    z=(i-4)*1.16; y=deck(z); slope=-1.8*z/(5.22*5.22)
-    tilted_box('Bridge_WidePlank_%02d'%i,(0,y,z),(5.0,.35,1.12),2 if i%3 else 1,-math.atan(slope))
-for x in (-2.33,2.33):
-    anchors=[-5.22,-2.61,0,2.61,5.22]
-    for z in anchors:
+# BRIDGE (layout `bridge`): a humpback timber footbridge. The deck is one smooth raised-cosine arch that
+# leaves the path at ground level on both banks, so there is no slab, ramp or step to climb: boards laid
+# across it with dark seams between them, navy side beams under the overhanging board ends tracing the
+# arch, stone footings where the arch meets the banks. Posts, rails and the four lantern pillars are a
+# separate model, so the game collides with them apart from the deck the character stands on.
+bridge=layout['bridge']; BL=bridge['halfSpan']; BH=bridge['rise']; BW=bridge['width']/2
+def deck(z):
+    u=max(-1.0,min(1.0,z/BL)); return .047+BH*(1+math.cos(math.pi*u))/2
+def arch_band(name,x0,x1,top,bottom,z0,z1,n,t):
+    # A band along z whose top and bottom follow two curves; sections wind like box().
+    zs=[z0+(z1-z0)*i/n for i in range(n+1)]
+    verts=[v for z in zs for v in ((x0,bottom(z),z),(x1,bottom(z),z),(x1,top(z),z),(x0,top(z),z))]
+    faces=[(3,2,1,0),(4*n,4*n+1,4*n+2,4*n+3)]
+    for i in range(n):
+        a,b=4*i,4*i+4
+        faces+=[(a,a+1,b+1,b),(b+3,b+2,a+2,a+3),(a,b,b+3,a+3),(a+2,b+2,b+1,a+1)]
+    return mesh(name,verts,faces,t)
+model('Creek_Bridge',(bridge['x'],0,bridge['z']))
+BOARDS=21; pitch=2*BL/BOARDS; seam=.035; board=.2
+for i in range(BOARDS):
+    za,zb=-BL+i*pitch,-BL+(i+1)*pitch; ya,yb=deck(za),deck(zb)
+    # Each board's top is the arch chord, trimmed by half a seam at either end; 0.2 m thick at right angles.
+    l=math.hypot(zb-za,yb-ya); dz,dy=(zb-za)/l,(yb-ya)/l
+    (az,ay),(bz,by)=(za+dz*seam/2,ya+dy*seam/2),(zb-dz*seam/2,yb-dy*seam/2)
+    (cz,cy),(ez,ey)=(az+dy*board,ay-dz*board),(bz+dy*board,by-dz*board)
+    hw=BW-(.06 if i%2 else 0)
+    verts=[(-hw,cy,cz),(hw,cy,cz),(hw,ay,az),(-hw,ay,az),(-hw,ey,ez),(hw,ey,ez),(hw,by,bz),(-hw,by,bz)]
+    mesh('Bridge_Board_%02d'%i,verts,[(3,2,1,0),(4,5,6,7),(0,1,5,4),(7,6,2,3),(0,4,7,3),(2,6,5,1)],DECK_TILES[(i*7+i//3)%3])
+arch_band('Bridge_SeamFill',-(BW-.3),BW-.3,lambda z:deck(z)-.03,lambda z:deck(z)-.24,-BL,BL,28,10)
+for sx in (-1,1):
+    # Below ground beyond |z| 4.5, so the beams stop there.
+    arch_band('Bridge_SideBeam',min(sx*2.22,sx*2.50),max(sx*2.22,sx*2.50),lambda z:deck(z)-.19,lambda z:deck(z)-.62,-4.5,4.5,24,0)
+    # Stone footings flank the feet of the arch on the banks, outside the boards so none shows through.
+    for sz in (-1,1):
+        fx,fz=sx*3.0,sz*2.95
+        slab('Bridge_Footing',[(fx+a,fz+b) for a,b in stepped_outline(.70,1.30,.18)],-.3,.40,19)
+        slab('Bridge_FootingCap',[(fx+a,fz+b) for a,b in stepped_outline(.80,1.40,.20)],.40,.50,11)
+model('Creek_Bridge_Rails',(bridge['x'],0,bridge['z']))
+RX=2.42; RAIL_END=BL-.06
+for sx in (-1,1):
+    x=sx*RX
+    for z in (-3.7,-1.85,0,1.85,3.7):
         y=deck(z)
-        box('Bridge_Post',(x,y+.61,z),(.48,1.69,.48),0)
-        box('Bridge_PostCap',(x,y+1.54,z),(.67,.20,.67),8)
-    for za,zb in zip(anchors,anchors[1:]):
-        beam('Bridge_Stringer',(x,deck(za)-.24,za),(x,deck(zb)-.24,zb),.56,.54,0)
-        beam('Bridge_Handrail',(x,deck(za)+1.29,za),(x,deck(zb)+1.29,zb),.44,.40,2)
-        beam('Bridge_LowerRail',(x,deck(za)+.60,za),(x,deck(zb)+.60,zb),.27,.25,1)
-for z in (-5.70,5.70):
-    box('Bridge_Masonry',(0,-.48,z),(5.90,1.38,1.60),19)
-    box('Bridge_MasonryCap',(0,.28,z),(6.24,.30,1.80),11)
-    for x in (-2.76,2.76):
-        box('Bridge_EndPier',(x,.79,z),(.80,1.03,.80),3)
-        box('Bridge_EndPierCap',(x,1.35,z),(1.02,.23,1.02),11)
-# Continuous visible approach ramps; the character need not autostep a trimesh lip.
-for sign in [-1,1]:
-    za,zb=(-8.10,-6.59) if sign<0 else (6.59,8.10)
-    ya,yb=(.035,.43) if sign<0 else (.43,.035)
-    verts=[(-3.12,.01,za),(3.12,.01,za),(3.12,ya,za),(-3.12,ya,za),
-           (-3.12,.01,zb),(3.12,.01,zb),(3.12,yb,zb),(-3.12,yb,zb)]
-    mesh('Bridge_ApproachRamp',verts,[(3,2,1,0),(4,5,6,7),(0,1,5,4),(7,6,2,3),(0,4,7,3),(2,6,5,1)],11)
-lamp('Bridge_NorthLantern',(-2.76,1.89,-5.70),.82)
-lamp('Bridge_SouthLantern',(2.76,1.89,5.70),.82)
+        box('Bridge_Post',(x,y+.33,z),(.42,1.56,.42),0)
+        box('Bridge_PostCap',(x,y+1.19,z),(.58,.16,.58),8)
+    arch_band('Bridge_Handrail',x-.19,x+.19,lambda z:deck(z)+1.02,lambda z:deck(z)+.77,-RAIL_END,RAIL_END,32,2)
+    arch_band('Bridge_MidRail',x-.11,x+.11,lambda z:deck(z)+.52,lambda z:deck(z)+.36,-RAIL_END,RAIL_END,32,1)
+    for sz in (-1,1):
+        px,pz=sx*2.6,sz*(BL-.05)
+        slab('Bridge_PillarPlinth',[(px+a,pz+b) for a,b in stepped_outline(.9,.9,.19)],0,.3,19)
+        slab('Bridge_Pillar',[(px+a,pz+b) for a,b in stepped_outline(.68,.68,.14)],.3,1.28,3)
+        slab('Bridge_PillarCap',[(px+a,pz+b) for a,b in stepped_outline(.88,.88,.17)],1.28,1.45,11)
+        lamp('Bridge_Lantern',(px,1.45+.445*.75,pz),.75)
 
 # PLAZA PROPS retain the previous placement anchors, but every mesh is new.
 model('Ore_Cart',(8.9,.08,-4.4),-.32)
@@ -544,7 +571,6 @@ MODELS['Pet_Conservatory'].location=P((layout['conservatory']['x'],0,layout['con
 MODELS['Pet_Conservatory'].rotation_euler[2]=layout['conservatory']['yaw']
 MODELS['Mine_Headframe'].location=P((0,0,0))
 MODELS['Mine_Headframe'].scale=(1.5,1.8,1)
-MODELS['Creek_Bridge'].location=P((layout['bridge']['x'],0,layout['bridge']['z']))
 MODELS['Ore_Cart'].location=P((12,0,-5))
 MODELS['Ore_Crates'].location=P((-13,0,1))
 MODELS['Plaza_Signpost'].location=P((layout['props']['signpost']['x'],0,layout['props']['signpost']['z']))
@@ -643,7 +669,7 @@ for side,sx in (('L',-1),('R',1)):
 # is applied to them. Preserve nearest sampling and the authored atlas UVs.
 bevel_count=0
 for ob in [o for o in bpy.data.objects if o.type=='MESH']:
-    prominent=any(key in ob.name for key in ('Shop_CornerTimber','Shop_PorchPost','Forge_FrontPost','Pet_CornerTimber','Pet_SideTimber','Bridge_PostCap','Shop_FoundationCap','Pet_FoundationCap','Bridge_MasonryCap'))
+    prominent=any(key in ob.name for key in ('Shop_CornerTimber','Shop_PorchPost','Forge_FrontPost','Pet_CornerTimber','Pet_SideTimber','Bridge_PostCap','Shop_FoundationCap','Pet_FoundationCap'))
     if not prominent: continue
     bpy.context.view_layer.objects.active=ob
     mod=ob.modifiers.new('BroadSingleChamfer','BEVEL'); mod.width=.055; mod.segments=1

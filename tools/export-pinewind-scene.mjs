@@ -97,7 +97,8 @@ writeFileSync('src/game/assets/camp/pinewind-standing-light.png',standingPng);
 writeFileSync('surface-game-art/artifacts/light-bake/building-light.png',lightPng);
 
 const roots=architecture.children.map(node=>({node:node.name,at:node.position.toArray(),rotation:node.quaternion.toArray(),scale:node.scale.toArray()}));
-for(const name of ['Creek_Bridge','Mine_Headframe']){const node=architecture.getObjectByName(name);if(!node)throw Error(name);colliders.push(solid(node));}
+// The bridge deck and its rails are separate colliders: a character brushing a post must still find the deck.
+for(const name of ['Creek_Bridge','Creek_Bridge_Rails','Mine_Headframe']){const node=architecture.getObjectByName(name);if(!node)throw Error(name);colliders.push(solid(node));}
 const light={version:LIGHT_BAKE.version,sun:LIGHT_BAKE.sun,sunRadiusDeg:LIGHT_BAKE.sunRadiusDeg,aoRadius:LIGHT_BAKE.aoRadius,ground:G,lightmapSize:LIGHT_BAKE.lightmapSize,standing:{...LIGHT_BAKE.standing,sha256:createHash('sha256').update(standingPng).digest('hex')}};
 mkdirSync('src/game/content/pinewind',{recursive:true});
 writeFileSync('src/game/content/pinewind/authored.json',JSON.stringify({version:1,roots,solids:colliders,landscape:batched.stats,light},null,0)+'\n');
