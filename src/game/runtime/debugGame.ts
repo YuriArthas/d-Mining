@@ -8,6 +8,7 @@ import type {
 import { gameAudio } from "../audio/GameAudio.ts";
 import { SURFACE_EXPOSURE, type SurfaceLookOverride } from "../world/SceneLighting.ts";
 import { applyToneGrade } from "../presentation/toneGrade.ts";
+import { ARCHITECTURE_ALBEDO, setArchitectureAlbedo } from "../presentation/albedoLift.ts";
 import type { PreparedGame } from "./startGame.ts";
 import type { GameSession } from "../application/GameSession.ts";
 import type { GameInput } from "../GameInput.ts";
@@ -31,7 +32,7 @@ export type ValidationDebug = {
   }) => void;
   surfaceHeight: (x: number, z: number) => number | null;
   /** Try other surface light values and exposure live; null restores the game's. */
-  lightingLook: (look: (SurfaceLookOverride & { exposure?: number; grade?: boolean }) | null) => void;
+  lightingLook: (look: (SurfaceLookOverride & { exposure?: number; grade?: boolean; albedo?: { saturation: number; brightness: number; bounce?: number } }) | null) => void;
   /** Final audio output level (dBFS) and a recordable stream of it, for checks. */
   audioLevel: () => number | null;
   audioStream: () => MediaStream | null;
@@ -209,6 +210,8 @@ export function attachGameDebug(
       environment.setLookOverride(look ? { day: look.day, night: look.night } : null);
       gl.toneMappingExposure = look?.exposure ?? SURFACE_EXPOSURE;
       applyToneGrade(gl, look?.grade ?? true);
+      const albedo = look?.albedo ?? ARCHITECTURE_ALBEDO;
+      setArchitectureAlbedo(albedo.saturation, albedo.brightness, albedo.bounce ?? ARCHITECTURE_ALBEDO.bounce);
     },
     audioLevel: () => gameAudio.outputLevel(),
     audioStream: () => gameAudio.outputStream(),

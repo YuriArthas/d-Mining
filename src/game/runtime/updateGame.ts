@@ -10,6 +10,7 @@ import { stratumAtDepth } from "../terrain/strata.ts";
 import { themeById } from "../content/themes.ts";
 import { mineralName } from "../terrain/minerals.ts";
 import { generationAtZ } from '../terrain/SparseWorld.ts';
+import { setArchitectureDaylight } from '../presentation/albedoLift.ts';
 export function updateGame(
   current: PreparedGame,
   elapsed: number,
@@ -80,6 +81,7 @@ export function updateGame(
       delta,
       onlineElapsed,
     );
+    setArchitectureDaylight(environment.daylightBlend);
     current.facilities.updateSurface(
       environment.surfaceTime,
       performance.now() / 1000,

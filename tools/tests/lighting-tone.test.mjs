@@ -35,3 +35,21 @@ test('游戏用带调色的色调映射：着色器里多一步绿色和反差�
   applyToneGrade(renderer, false);
   assert.equal(renderer.toneMapping, NeutralToneMapping);
 });
+
+test('房子材质：贴图颜色提亮提饱和；白天墙面多吃一份暖色反射光，夜里这份光收掉', async () => {
+  const { MeshStandardMaterial } = await import('three');
+  const { ARCHITECTURE_ALBEDO, liftAlbedo, setArchitectureDaylight } = await import('../../src/game/presentation/albedoLift.ts');
+  const material = new MeshStandardMaterial();
+  liftAlbedo(material); liftAlbedo(material);
+  const shader = { uniforms: {}, fragmentShader: 'void main(){\n#include <map_fragment>\n#include <lights_fragment_end>\n}' };
+  material.onBeforeCompile(shader, null);
+  assert.equal(shader.fragmentShader.match(/albedoSaturation \)/g)?.length, 1, 'patched once even if lifted twice');
+  assert.match(shader.fragmentShader, /reflectedLight\.indirectDiffuse \*= mix\( albedoBounce/);
+  assert.equal(material.customProgramCacheKey(), 'architecture-albedo-lift-v3');
+  assert.equal(shader.uniforms.albedoSaturation.value, ARCHITECTURE_ALBEDO.saturation);
+  setArchitectureDaylight(0);
+  assert.deepEqual(shader.uniforms.albedoBounce.value.toArray(), [1, 1, 1], 'no extra fill at night');
+  setArchitectureDaylight(1);
+  const [r, g, b] = shader.uniforms.albedoBounce.value.toArray();
+  assert.ok(g === ARCHITECTURE_ALBEDO.bounce && r > g && b < g, `warm daytime bounce: ${[r, g, b]}`);
+});

@@ -3,6 +3,7 @@ import { NearestFilter, NearestMipmapNearestFilter } from "three";
 import type { SurfaceContent } from "../content/campContent.ts";
 import type { AssetProfile } from "../content/assetProfiles.ts";
 import { Mesh, MeshStandardMaterial, type WebGLRenderer } from "three";
+import { liftAlbedo } from "./albedoLift.ts";
 import { SurfaceDetails } from "./SurfaceDetails.ts";
 import {
   styleMineBlock,
@@ -70,9 +71,10 @@ export async function loadStaticSurface(
         const url=urls[`../assets/camp/${part}`];if(!url)throw Error(`缺少模型资源 ${part}`);return url;
       }),bytes:manifest.bytes,decodedBytes:manifest.decodedBytes,instances:content.authored!.instances.filter(p=>p.asset===name).length};
     });
-    const assets=await loadModelAssets(renderer,requests,signal,m=>{
+    const assets=await loadModelAssets(renderer,requests,signal,(m,request)=>{
       m.roughness=1;m.metalness=0;m.envMapIntensity=0;
       if(m.map){m.map.magFilter=NearestFilter;m.map.minFilter=NearestMipmapNearestFilter;}
+      if(request.name==='pinewind-architecture')liftAlbedo(m);
     },onProgress);
     return assembleAuthoredSurface(assets,content);
   }
