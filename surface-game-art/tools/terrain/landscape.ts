@@ -6,7 +6,10 @@ import { readFileSync } from 'node:fs';
 // The hub plan (tools/export-pinewind-layout.mjs) owns plazas, paths, paving pads and clearances.
 type KeepClear = { kind: 'rect'; minX: number; maxX: number; minZ: number; maxZ: number } | { kind: 'circle'; x: number; z: number; radius: number };
 type Grounds = { plazas: { x: number; z: number; radius: number }[]; paths: { width: number; points: [number, number][] }[]; pads: [number, number][]; keepClear: KeepClear[] };
-const grounds: Grounds = JSON.parse(readFileSync(new URL('../../layout.json', import.meta.url), 'utf8')).grounds;
+const layout = JSON.parse(readFileSync(new URL('../../layout.json', import.meta.url), 'utf8'));
+const grounds: Grounds = layout.grounds;
+/** The next world's gate: it stands in the pass of the wooded ridge that closes the valley's south side. */
+const gate: { x: number; z: number; opening: number; height: number; wallTo: number } = layout.gate;
 
 // A single, authored valley. Geometry stays resident; the caller batches the
 // static authoring graph. No transparent foliage cards or runtime scattering.
@@ -40,11 +43,18 @@ function riverAt(x: number, z: number): RiverSample {
   return { distance: Math.sqrt(distanceSquared), halfWidth: 2.45 + .22 * Math.sin(t * 14), t };
 }
 
+/** Behind the portal ring the ground rises into a ridge that closes the valley's south side, so the
+ *  view back from the plaza ends in wooded hills instead of open land; the route to the next world
+ *  keeps a flat canyon floor through the pass where the gate stands. */
+function southRidge(x: number, z: number) {
+  const rise = smooth(gate.z - 9, gate.z + 17, z), pass = smooth(gate.opening / 2 + 2.5, gate.wallTo + 4, Math.abs(x));
+  return rise * pass * 13;
+}
 /** The broad valley supports a faceted creek, without a visible world voxel grid. */
 function meadowHeight(x: number, z: number) {
-  // The plaza and the route to the next world's gate remain on the gameplay floor.
-  if(Math.abs(x)<12 && z>50)return .035;
-  const upland=smooth(53,92,Math.abs(x))*7.5+smooth(33,77,-z)*8;
+  // The plaza, the portal ring and the route through the gate remain on the gameplay floor.
+  if(Math.abs(x)<gate.opening/2+2.5 && z>50)return .035;
+  const upland=smooth(53,92,Math.abs(x))*7.5+smooth(33,77,-z)*8+southRidge(x,z);
   return .035+upland*(1+.13*Math.sin(x*.115+z*.08)+.10*Math.cos(z*.17-x*.07));
 }
 type Point = { x: number; y: number; z: number };
@@ -318,6 +328,26 @@ function plantings(kit: Kit, getNature: NatureFactory) {
     const [x, z, s] = bushes[i];
     placeNature(kit, getNature, 'bush', [x, landscapeHeight(x, z), z], [s, s, s], i % 4 * Math.PI / 2);
   }
+  southernWoods(kit, getNature);
+}
+/** Woods on the south ridge: oaks along its foot behind the portal ring, pines higher up and on the
+ *  canyon rims, leaving the pass and the gate clear. */
+function southernWoods(kit: Kit, getNature: NatureFactory) {
+  const trees: Array<[number, number, number, boolean]> = [
+    [-16, 66, 10, false], [-22, 64, 11, true], [-28, 67, 12, true], [-35, 63, 10, false], [-42, 66, 13, true],
+    [-49, 62, 11, false], [-57, 66, 12, true], [-64, 63, 11, true], [-71, 67, 12, false],
+    [17, 66, 10, false], [23, 64, 12, true], [29, 67, 11, false], [36, 63, 13, true], [43, 66, 10, false],
+    [50, 63, 12, true], [58, 66, 11, true], [65, 63, 12, false], [72, 67, 12, true],
+    [-19, 76, 13, true], [-31, 79, 14, true], [-45, 75, 12, true], [-59, 80, 13, true], [-74, 77, 13, true],
+    [19, 77, 13, true], [32, 80, 14, true], [46, 76, 12, true], [60, 79, 13, true], [75, 78, 13, true],
+    [-13, 86, 12, true], [13, 88, 12, true], [-24, 92, 14, true], [26, 94, 14, true], [-40, 90, 13, true], [41, 91, 13, true],
+  ];
+  trees.forEach(([x, z, h, pine], i) => placeNature(kit, getNature, pine ? 'tree_pine' : 'tree_oak', [x, landscapeHeight(x, z), z], [h, h, h], Math.floor(rng(400 + i * 23)() * 4) * Math.PI / 2));
+  const bushes: Array<[number, number, number]> = [
+    [-15, 60, 1.3], [-17, 61.5, .9], [-22, 58, 1.2], [15, 60, 1.2], [17, 61.5, 1], [22, 58, 1.3],
+    [-13, 64, 1.1], [13, 64, 1.1], [-21, 27, 1.3], [-19, 29.5, 1], [-23, 30, .9],
+  ];
+  bushes.forEach(([x, z, s], i) => placeNature(kit, getNature, 'bush', [x, landscapeHeight(x, z), z], [s, s, s], i % 4 * Math.PI / 2));
 }
 function flowerPatch(kit: Kit, getNature: NatureFactory, cx: number, cz: number, radius: number, count: number, name: string, seed: number) {
   const r = rng(seed);
@@ -353,7 +383,10 @@ function meadowDetails(kit: Kit, getNature: NatureFactory) {
   flowerPatch(kit, getNature, 10, 31, 2.2, 15, 'flower_ivory', 78);
   flowerPatch(kit, getNature, -14, 21, 1.7, 11, 'flower_yellow', 98);
   flowerPatch(kit, getNature, 15, -22, 1.7, 9, 'flower_yellow', 118);
-  const grassCenters = [[-26, 12], [-26, 22], [-10, 24], [12, 29], [25, 8], [31, 15], [-13, -23], [14, -24]];
+  flowerPatch(kit, getNature, -19, 58, 2.2, 14, 'flower_purple', 138);
+  flowerPatch(kit, getNature, 19, 58, 2.2, 14, 'flower_yellow', 158);
+  flowerPatch(kit, getNature, -21, 28.5, 2, 12, 'flower_ivory', 178);
+  const grassCenters = [[-26, 12], [-26, 22], [-10, 24], [12, 29], [25, 8], [31, 15], [-13, -23], [14, -24], [-17, 60], [17, 60]];
   for (let clump = 0; clump < 64; clump++) {
     const center = grassCenters[clump % grassCenters.length], a = random() * Math.PI * 2, d = Math.sqrt(random()) * 3.4;
     const x = center[0] + Math.cos(a) * d, z = center[1] + Math.sin(a) * d;
@@ -367,6 +400,8 @@ function buildBackdrop(kit: Kit, getNature: NatureFactory) {
     [-31, -32, 7, 8, 6, 11], [-20, -39, 9, 10, 7, 23], [-6, -43, 11, 11, 7, 37],
     [10, -42, 10, 12, 7, 43], [24, -35, 8, 8, 6, 59],
     [-39, -21, 6, 6, 8, 67], [42, -23, 6, 8, 10, 79],
+    // Rocky shoulders where the ridge meets the gate's pass.
+    [-17.5, 74, 6, 7, 6, 83], [17.5, 75, 6, 8, 6, 91], [-25, 84, 8, 9, 7, 97], [26, 85, 8, 10, 7, 103],
   ]) {
     placeNature(kit, getNature, 'cliff', [x, landscapeHeight(x, z) - .2, z], [w, h, d], (seed % 4) * Math.PI / 2);
     for (let i = 0; i < 2; i++) {
@@ -377,9 +412,12 @@ function buildBackdrop(kit: Kit, getNature: NatureFactory) {
   // Two connected mountain ranges: long angular slopes, broad saddles and only
   // a few short plateau shoulders. Block-built detail belongs near the player;
   // the distant skyline must continue to read as a valley, not a curtain wall.
+  // `facing` turns a range's long slope toward the valley (1: the range lies north and faces south).
+  // Only the north has distant ranges: the later worlds lie along +Z, so the south is closed by the
+  // wooded ridge alone and the route to them stays clear.
   const ridges = [
-    { z: -112, tint: '#7cadd0', heights: [12, 23, 33, 38, 31, 35, 43, 42, 33, 28, 34, 41, 38, 28, 30, 21, 9], phase: 1.4, shoulders: [3, 6, 11] },
-    { z: -80, tint: '#608fae', heights: [8, 17, 24, 27, 24, 18, 23, 28, 25, 19, 16, 22, 29, 30, 24, 17, 7], phase: 3.1, shoulders: [3, 7, 13] },
+    { z: -112, tint: '#7cadd0', heights: [12, 23, 33, 38, 31, 35, 43, 42, 33, 28, 34, 41, 38, 28, 30, 21, 9], phase: 1.4, shoulders: [3, 6, 11], facing: 1 },
+    { z: -80, tint: '#608fae', heights: [8, 17, 24, 27, 24, 18, 23, 28, 25, 19, 16, 22, 29, 30, 24, 17, 7], phase: 3.1, shoulders: [3, 7, 13], facing: 1 },
   ];
   for (const ridge of ridges) {
     const spine: THREE.Vector3[] = [];
@@ -404,7 +442,7 @@ function buildBackdrop(kit: Kit, getNature: NatureFactory) {
       const end = i === 0 || i === spine.length - 1;
       const x = crest.x + (end ? 0 : Math.sin(i * 1.4 + ridge.phase) * 4 * row.drift);
       const y = -2.5 + (crest.y + 2.5) * row.fraction;
-      const z = crest.z + row.depth + (rowIndex === 3 ? 0 : Math.sin(i * .73 + rowIndex) * 3.5);
+      const z = crest.z + row.depth * ridge.facing + (rowIndex === 3 ? 0 : Math.sin(i * .73 + rowIndex) * 3.5);
       return new THREE.Vector3(x, y, z);
     }));
     const positions: number[] = [], normals: number[] = [], colors: number[] = [];
@@ -415,9 +453,9 @@ function buildBackdrop(kit: Kit, getNature: NatureFactory) {
       // in the lighting, while preserving the authored angular slope breaks.
       const across = b.clone().sub(a).add(d.clone().sub(c));
       const uphill = c.clone().sub(a).add(d.clone().sub(b));
-      const normal = across.cross(uphill).normalize();
+      const normal = across.cross(uphill).normalize().multiplyScalar(ridge.facing);
       const color = tint.clone().multiplyScalar(.98 + rows[row].fraction * .035);
-      for (const point of [a, b, c, b, d, c]) {
+      for (const point of ridge.facing > 0 ? [a, b, c, b, d, c] : [a, c, b, b, c, d]) {
         positions.push(point.x, point.y, point.z);
         normals.push(normal.x, normal.y, normal.z);
         colors.push(color.r, color.g, color.b);

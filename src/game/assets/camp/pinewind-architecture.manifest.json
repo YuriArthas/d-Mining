@@ -2,11 +2,11 @@
   "parts": [
     "pinewind-architecture.000.part"
   ],
-  "bytes": 95369,
-  "decodedBytes": 285628,
-  "sha256": "2b070a63a32789cba3bbff301b5f3c73800f04d529cbc147cbf623c313e11e3e",
-  "sourceSha256": "5941a0472f10dbbc6360df3cb728eb222b958164a973f1a2f1067ccf2458999d",
-  "triangles": 14052,
+  "bytes": 99259,
+  "decodedBytes": 302492,
+  "sha256": "64b06d02afa02aad923e1c62a49d7e0fae6ee5171395ff51410aa927df1a2b07",
+  "sourceSha256": "a126435b5123ad8793aa443ed203091d979b0391be7462d370146ee70f4a7c2a",
+  "triangles": 14888,
   "source": "Authored Pinewind; Blender architecture and offline procedural landscape",
   "materialProfile": "authored-color",
   "coordinateSpace": "authored",

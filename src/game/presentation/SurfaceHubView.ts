@@ -7,7 +7,7 @@ import {
   RingGeometry,
 } from "three";
 import type { CampContent } from "../content/campContent.ts";
-import { createWorldText } from "./WorldText.ts";
+import { createWorldText, readableFromBothSides } from "./WorldText.ts";
 // Presentation consumes progress snapshots only. It neither unlocks nor teleports.
 export class SurfaceHubView {
   private readonly entries = new Map<
@@ -59,7 +59,8 @@ export class SurfaceHubView {
         subtitle = "",
         offset = 0.85,
       ) =>
-        createWorldText({
+        // Portals face the spawn; from the plaza side the text turns around instead of reading mirrored.
+        readableFromBothSides(createWorldText({
           at: [
             p.x + Math.sin(p.yaw) * offset,
             y,
@@ -71,7 +72,7 @@ export class SurfaceHubView {
           subtitle,
           color,
           background: "#18283d",
-        });
+        }));
       group.add(
         label(p.name, 2.7 + PORTAL_BASE_HEIGHT, p.color, 2.1, `${p.depth} m`),
       );

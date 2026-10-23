@@ -591,7 +591,7 @@ box('Board_Back',(0,4,0),(4.7,5.5,.32),0)
 for x in [-2.29,2.29]:box('Board_FrameSide',(x,4,.19),(.18,5.5,.18),2)
 for y in [1.3,6.7]:box('Board_FrameRail',(0,y,.19),(4.7,.18,.18),8)
 # A faceted teal toy cabinet with a recessed capsule display and bold roof/collars.
-model('Capsule_Cabinet',tuple(layout['feedback']['capsule']))
+model('Capsule_Cabinet',tuple(layout['feedback']['capsule']),layout['feedback'].get('capsuleYaw',0))
 slab('Capsule_Base',stepped_outline(2.5,2.2,.22),0,.28,19)
 slab('Capsule_Body',stepped_outline(2.2,1.9,.18),.28,2.15,6)
 slab('Capsule_LowerCollar',stepped_outline(2.5,2.2,.22),2.15,2.38,8)
@@ -603,6 +603,38 @@ roof('Capsule_Roof',2.7,2.4,4.12,.45,6,1)
 box('Capsule_PrizeSlot',(0,.88,.96),(.92,.48,.13),0)
 box('Capsule_PrizeTray',(0,.60,1.00),(1.10,.12,.20),8)
 box('Capsule_Dial',(.66,1.55,1.00),(.38,.38,.18),8)
+
+# Gate to the next world, standing in the pass of the south ridge at house scale: chamfered stone
+# pillars, a timber lintel with a sign board under a small gable, lamps on the pillar fronts and
+# side walls that meet the hill slopes. The two doors are separate models hinged at the pillars so
+# the game can swing them open. The front (sign, lamps, studs) faces the spawn (-Z).
+gate=layout['gate']; half_open=gate['opening']/2; gh=gate['height']; wall_to=gate['wallTo']
+model('World_Gate',(gate['x'],0,gate['z']))
+for sx in (-1,1):
+    px=sx*(half_open+1.0)
+    slab('Gate_PillarPlinth',[(px+x,z) for x,z in stepped_outline(2.6,3.0,.30)],0,.8,19)
+    slab('Gate_Pillar',[(px+x,z) for x,z in stepped_outline(2.0,2.4,.26)],.8,gh-.75,3)
+    slab('Gate_PillarCap',[(px+x,z) for x,z in stepped_outline(2.5,2.9,.28)],gh-.75,gh-.2,11)
+    slab('Gate_PillarCrown',[(px+x,z) for x,z in stepped_outline(1.6,2.0,.22)],gh-.2,gh+.25,8)
+    lamp('Gate_Lamp',(px,gh-2.9,-1.55),1.1)
+    ww=wall_to-half_open-2.0; wx=sx*(half_open+2.0+ww/2)
+    box('Gate_SideWall',(wx,1.7,0),(ww,3.4,1.4),3)
+    box('Gate_SideWallCap',(wx,3.55,0),(ww+.2,.3,1.7),11)
+lw=2*half_open+2.2
+box('Gate_Lintel',(0,gh-1.6,0),(lw,1.3,1.6),10)
+box('Gate_LintelGold',(0,gh-2.3,-.82),(lw-.4,.18,.12),8)
+box('Gate_SignBoard',(0,gh-1.6,-.9),(6.6,1.05,.22),0)
+box('Gate_Frieze',(0,gh-.55,0),(lw,.8,1.2),1)
+for sz in (-1,1): tilted_box('Gate_RoofPlane',(0,gh+.15,sz*.72),(lw+.9,.32,1.75),5,sz*.52,'X')
+box('Gate_RoofRidge',(0,gh+.62,0),(lw+1.1,.3,.42),21)
+for side,sx in (('L',-1),('R',1)):
+    model('World_Gate_Door'+side,(gate['x']+sx*half_open,0,gate['z']))
+    w=half_open-.05; cx=-sx*w/2
+    box('GateDoor_Leaf',(cx,3.65,0),(w,7.2,.36),14)
+    for y in (1.0,3.65,6.3): box('GateDoor_Band',(cx,y,0),(w-.1,.34,.5),20)
+    for y in (1.0,6.3):
+        for k in range(3): box('GateDoor_Stud',(cx+(k-1)*(w-1.0)/2,y,-.31),(.24,.24,.12),8)
+    box('GateDoor_Ring',(-sx*(w-.5),3.65,-.31),(.38,.52,.12),8)
 
 # A bounded set of prominent block edges receive a single broad chamfer.
 # Main diagonal beams already have eight-sided sections, so no bevel modifier

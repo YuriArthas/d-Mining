@@ -56,7 +56,7 @@ export function withPinewindSurface(base:CampContent):CampContent {
  for(const p of portals)solids.push({at:[p.x,.08,p.z],half:[1.3,.08,1],yaw:p.yaw});
  for(const p of portals)for(const sign of [-1,1])solids.push({at:[p.x+Math.cos(p.yaw)*1.05*sign,1.5,p.z-Math.sin(p.yaw)*1.05*sign],half:[.25,1.5,.25],yaw:p.yaw});
  const surface:SurfaceContent={...base.surface,placements:[],profiles:{},
-  authored:{version:'pinewind-plaza-v3',instances:models,groundAssets:['pinewind-landscape'],opensSpawnPassage:true},
+  authored:{version:'pinewind-plaza-v4',instances:models,groundAssets:['pinewind-landscape'],opensSpawnPassage:true},
   plan:{shapes:services.map(s=>s.ring),signs:[...services.map(s=>s.sign),PINEWIND_EGG_SIGN],solids},
  };
  // The first entries of sales/shops are world 1's surface services (see sessionContentFor).

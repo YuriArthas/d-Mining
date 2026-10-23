@@ -287,7 +287,7 @@ export async function startGame(options: StartGameOptions) {
     const facilities = new SceneryView(surface, sites);
     scope.defer(() => facilities.dispose());
     root.add(facilities.group, terrain.group);
-    if(content.worlds){const gates=new JourneyGates(physics,session);root.add(gates.group);scope.defer(()=>gates.dispose());}
+    if(content.worlds){const gates=new JourneyGates(physics,session,surface.group);root.add(gates.group);scope.defer(()=>gates.dispose());}
     const feedbackFixtures = new FeedbackFixtures();
     root.add(feedbackFixtures.group);
     const updateFeedback = () => { const s=session.getSnapshot(); feedbackFixtures.update(s.challengeBoard,s.maxDepth); };

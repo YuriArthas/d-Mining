@@ -1,5 +1,5 @@
 import { CanvasTexture, Group, Mesh, MeshBasicMaterial, PlaneGeometry, SRGBColorSpace } from 'three';
-import { CHALLENGE_BOARD_AT, CAPSULE_MACHINE_AT } from '../content/feedbackFacilities.ts';
+import { CHALLENGE_BOARD_AT, CAPSULE_MACHINE_AT, CAPSULE_MACHINE_YAW } from '../content/feedbackFacilities.ts';
 import type { ChallengeMiner } from '../logic/ChallengeBoard.ts';
 import { disposeScenery } from './disposeScenery.ts';
 
@@ -18,7 +18,7 @@ export class FeedbackFixtures {
     const face = new Mesh(new PlaneGeometry(4.4,5.15),new MeshBasicMaterial({map:this.texture,toneMapped:false}));
     face.position.set(0,4,.18); board.add(face); this.group.add(board);
 
-    const machine = new Group(); machine.name = 'capsule-machine'; machine.position.set(...CAPSULE_MACHINE_AT);
+    const machine = new Group(); machine.name = 'capsule-machine'; machine.position.set(...CAPSULE_MACHINE_AT); machine.rotation.y = CAPSULE_MACHINE_YAW;
     const label=document.createElement('canvas');label.width=512;label.height=128;
     const ctx=label.getContext('2d');if(!ctx)throw Error('无法绘制扭蛋机标签');
     ctx.fillStyle='#37244f';ctx.fillRect(0,0,512,128);ctx.fillStyle='#fff2b3';ctx.font='bold 46px sans-serif';ctx.textAlign='center';ctx.fillText('幸运扭蛋',256,54);ctx.font='28px sans-serif';ctx.fillText('1 枚幸运币 · 靠近按 E',256,100);

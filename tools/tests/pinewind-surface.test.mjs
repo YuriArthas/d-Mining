@@ -113,3 +113,28 @@ test('instant trips face the service building',()=>{
  assert.deepEqual(trip.look,PINEWIND_SERVICES.shop.center);
  assert.equal(trip.feet[0],PINEWIND_SERVICES.shop.trigger.x);
 });
+
+test('布局 v4：出售和商店分在矿井两侧，从出生点看不会前后叠在一起；排行榜和扭蛋机避开矿架和房子', async () => {
+ const { PINEWIND_GATE } = await import('../../src/game/content/pinewind/hubLayout.ts');
+ const { worldGateZ } = await import('../../src/game/content/worldJourney.ts');
+ const { CHALLENGE_BOARD_AT, CAPSULE_MACHINE_AT, CAPSULE_MACHINE_ZONE } = await import('../../src/game/content/feedbackFacilities.ts');
+ // The default arrival view looks north from just behind the spawn.
+ const eye = [PINEWIND_SPAWN.x, PINEWIND_SPAWN.z + 6], bearing = ([x, z]) => Math.atan2(x - eye[0], eye[1] - z);
+ const sale = PINEWIND_SERVICES.sale.center, shop = PINEWIND_SERVICES.shop.center;
+ assert.ok(sale[0] < -8 && shop[0] > 8, `sell west, shop east of the mine: ${sale} / ${shop}`);
+ const apart = Math.abs(bearing([shop[0], shop[2]]) - bearing([sale[0], sale[2]])) * 180 / Math.PI;
+ assert.ok(apart > 35, `from the spawn the two buildings are ${apart.toFixed(0)}° apart`);
+ // Board and capsule clear the headframe footprint (11.7 x 10.2) and the service buildings.
+ const headframe = (x, z, r) => Math.abs(x) < 11.7 + r && Math.abs(z) < 10.2 + r;
+ assert.ok(!headframe(CHALLENGE_BOARD_AT[0], CHALLENGE_BOARD_AT[2], 2.35), 'board clear of the headframe');
+ assert.ok(!headframe(CAPSULE_MACHINE_AT[0], CAPSULE_MACHINE_AT[2], 1.3), 'capsule clear of the headframe');
+ for (const [name, at] of [['board', CHALLENGE_BOARD_AT], ['capsule', CAPSULE_MACHINE_AT]]) for (const service of [sale, shop])
+  assert.ok(Math.hypot(at[0] - service[0], at[2] - service[2]) > 6.5, `${name} clear of ${service}`);
+ assert.ok(Math.hypot(CAPSULE_MACHINE_ZONE.x - CAPSULE_MACHINE_AT[0], CAPSULE_MACHINE_ZONE.z - CAPSULE_MACHINE_AT[2]) < 2, 'capsule zone in front of it');
+ // The authored gate stands on the gameplay gate line, its doors hinged at the opening's edges.
+ assert.equal(PINEWIND_GATE.z, worldGateZ(2));
+ const roots = new Map(PINEWIND_CAMP.surface.authored.instances.map(i => [i.node, i]));
+ assert.deepEqual(roots.get('World_Gate').at, [PINEWIND_GATE.x, 0, PINEWIND_GATE.z]);
+ for (const [node, sx] of [['World_Gate_DoorL', -1], ['World_Gate_DoorR', 1]])
+  assert.deepEqual(roots.get(node).at, [PINEWIND_GATE.x + sx * PINEWIND_GATE.opening / 2, 0, PINEWIND_GATE.z], node);
+});

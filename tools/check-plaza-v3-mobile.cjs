@@ -39,7 +39,8 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
     // 1. Brand-new player, no debug.
     await page.goto(`${base}?saveTest=plaza-new-${Date.now()}`, { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => document.querySelector('.ui-hud') && !document.querySelector('.loading-screen'), null, { timeout: 300000 });
-    await page.waitForTimeout(5000); await page.screenshot({ path: path.join(dir, '00-new-player.png') }); report.screenshots.push('00-new-player');
+    // Normal pacing (no fenced debug mode) can starve software-rendered screenshots: allow longer.
+    await page.waitForTimeout(5000); await page.screenshot({ path: path.join(dir, '00-new-player.png'), timeout: 240000 }); report.screenshots.push('00-new-player');
     await check('Normal entry renders the plaza layout from the spawn.');
 
     // 2. Seed an isolated save with ores, coins, pets and the first two layers.
@@ -77,14 +78,14 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
     await shot('01-sell-trip');
     await check(`出售 teleports into the west sale ring (${s.position.map(v => v.toFixed(1)).join(', ')}), turns the camera to the building and auto-sells.`);
 
-    // 4. Shop trip: the shop beside it opens.
+    // 4. Shop trip: the shop across the plaza (north-east, right of the mine) opens.
     await tap(button('商店'));
     await page.getByRole('dialog', { name: '商店分类' }).waitFor({ timeout: 30000 });
     s = await snap();
-    assert.ok(s.position[0] < -10 && s.position[2] > 22 && s.position[2] < 30, `shop ring next to sale: ${s.position}`);
+    assert.ok(s.position[0] > 10 && s.position[2] > 8 && s.position[2] < 18, `shop ring north-east of the plaza, across from the sale: ${s.position}`);
     await tap(button(/^关闭商店/)); await page.waitForTimeout(800);
     await shot('02-shop-ring');
-    await check(`商店 teleports into the shop ring beside the sale (${s.position.map(v => v.toFixed(1)).join(', ')}) and the shop opens.`);
+    await check(`商店 teleports into the shop ring across the plaza from the sale (${s.position.map(v => v.toFixed(1)).join(', ')}) and the shop opens.`);
 
     // 5. Egg trip to the first stand on the front terrace.
     await tap(button('打开我的宠物')); await tap(button('获取宠物')); await tap(button('前往原野蛋蛋台'));

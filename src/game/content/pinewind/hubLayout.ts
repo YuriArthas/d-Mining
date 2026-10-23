@@ -2,7 +2,7 @@ import { SURFACE_FACILITIES, type SurfaceFacility } from '../surfaceFacilities.t
 import { deriveFacility } from '../../world/deriveFacility.ts';
 import { EGG_DISPLAY_ROWS } from '../petAppearance.ts';
 import type { Sign } from '../../world/sceneryKit.ts';
-import { CAPSULE_MACHINE_AT, CHALLENGE_BOARD_AT } from '../feedbackFacilities.ts';
+import { CAPSULE_MACHINE_AT, CAPSULE_MACHINE_YAW, CHALLENGE_BOARD_AT } from '../feedbackFacilities.ts';
 
 /** Pinewind hub plan for world 1. One source for the playable zones, collision, the
  *  runtime composition and the offline art pipeline (tools/export-pinewind-layout.mjs).
@@ -14,11 +14,12 @@ export const PINEWIND_SPAWN = { x: 0, z: 46 } as const;
 /** Sandy plaza between the mine and the creek. Services, the leaderboard and the bridge open onto it. */
 export const PINEWIND_PLAZA = { x: 0, z: 20, radius: 15 } as const;
 
-// Sell and shop stand side by side on the west edge, toed in toward the plaza and the bridge,
-// so both read from the spawn and from the plaza centre.
+// Sell and shop flank the mine on opposite sides of the plaza (sell west, shop north-east), each
+// turned toward the plaza centre, so from the spawn they read left and right of the headframe and
+// never line up one behind the other.
 export const PINEWIND_FACILITIES = {
   sale: { ...SURFACE_FACILITIES.sale, anchor: { x: -20.5, z: 14, yaw: 70 * DEG } },
-  shop: { ...SURFACE_FACILITIES.shop, anchor: { x: -20, z: 28, yaw: 110 * DEG } },
+  shop: { ...SURFACE_FACILITIES.shop, anchor: { x: 18.5, z: 11, yaw: -62 * DEG } },
 } as const satisfies Record<'sale' | 'shop', SurfaceFacility>;
 /** Where the bridge lands on the plaza. */
 const BRIDGE_EXIT = { x: 0, z: 30 } as const;
@@ -37,6 +38,9 @@ function service(kind: keyof typeof PINEWIND_FACILITIES) {
   return { ...derived, sign, center, trigger: { ...derived.trigger, lookAt: center } };
 }
 export const PINEWIND_SERVICES = { sale: service('sale'), shop: service('shop') } as const;
+
+/** The gate to the next world stands in the pass of the wooded ridge behind the portal ring. */
+export const PINEWIND_GATE = { x: 0, z: 69, opening: 8, height: 9.6, wallTo: 14 } as const;
 
 /** Portals ring the spawn: walk south from the spawn to travel, north over the bridge to work. */
 const aroundSpawn = (theta: number, radius = 12) => ({
@@ -93,7 +97,7 @@ export const PINEWIND_EGG_SIGN: Sign = { at: [33, 10, 9], yaw: round(Math.atan2(
 export const PINEWIND_PROPS = {
   lamps: [{ x: -5, z: 29.5, yaw: 0 }, { x: 5, z: 29.5, yaw: Math.PI }],
   signpost: { x: -4.5, z: 25 },
-  capsule: CAPSULE_MACHINE_AT, board: CHALLENGE_BOARD_AT,
+  capsule: CAPSULE_MACHINE_AT, capsuleYaw: CAPSULE_MACHINE_YAW, board: CHALLENGE_BOARD_AT,
 } as const;
 
 /** Ground plan for the offline landscape: sandy plazas, path ribbons, paving pads and
@@ -103,7 +107,7 @@ export const PINEWIND_GROUNDS = {
   plazas: [
     PINEWIND_PLAZA,
     { x: PINEWIND_SPAWN.x, z: PINEWIND_SPAWN.z, radius: 4.6 },
-    { x: CAPSULE_MACHINE_AT[0], z: CAPSULE_MACHINE_AT[2] + 1.2, radius: 3.2 }, // capsule machine pad
+    { x: round(CAPSULE_MACHINE_AT[0] + Math.sin(CAPSULE_MACHINE_YAW) * 1.2), z: round(CAPSULE_MACHINE_AT[2] + Math.cos(CAPSULE_MACHINE_YAW) * 1.2), radius: 3.2 }, // capsule machine pad
   ],
   paths: [
     { width: 2.7, points: [[0, 80], [0, 54], [0, 46], [0, 36.5], [0, 26], [0, 16], [0, 8]] },
@@ -119,7 +123,8 @@ export const PINEWIND_GROUNDS = {
     { kind: 'circle', x: PINEWIND_PLAZA.x, z: PINEWIND_PLAZA.z, radius: PINEWIND_PLAZA.radius + .5 },
     { kind: 'circle', x: PINEWIND_SPAWN.x, z: PINEWIND_SPAWN.z, radius: 15.5 },
     { kind: 'circle', x: PINEWIND_SERVICES.sale.center[0], z: PINEWIND_SERVICES.sale.center[2], radius: 7.5 },
-    { kind: 'circle', x: PINEWIND_SERVICES.shop.center[0], z: PINEWIND_SERVICES.shop.center[2], radius: 6.5 },
+    { kind: 'circle', x: PINEWIND_SERVICES.shop.center[0], z: PINEWIND_SERVICES.shop.center[2], radius: 7 },
+    { kind: 'rect', minX: -PINEWIND_GATE.wallTo - 1, maxX: PINEWIND_GATE.wallTo + 1, minZ: PINEWIND_GATE.z - 4, maxZ: PINEWIND_GATE.z + 4 },
     { kind: 'circle', x: PINEWIND_CONSERVATORY.x, z: PINEWIND_CONSERVATORY.z, radius: 7 },
     { kind: 'circle', x: CAPSULE_MACHINE_AT[0], z: CAPSULE_MACHINE_AT[2], radius: 4 },
     { kind: 'circle', x: CHALLENGE_BOARD_AT[0], z: CHALLENGE_BOARD_AT[2], radius: 4 },
