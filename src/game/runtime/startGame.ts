@@ -40,6 +40,7 @@ import { PlayerController } from "./PlayerController.ts";
 import { CameraView } from "./CameraView.ts";
 import { MiningInteraction } from "./MiningInteraction.ts";
 import { MiningFeedback } from "./MiningFeedback.ts";
+import { worldAtFeet } from "../content/worldJourney.ts";
 import { DisposalScope } from "./DisposalScope.ts";
 
 export type StartupStats = ReturnType<typeof createStartupStats>;
@@ -236,6 +237,7 @@ export async function startGame(options: StartGameOptions) {
     const feedback = new MiningFeedback(session, {
       cell: (cell) => terrain.cell(cell),
       layers: (cell) => generationAtZ(terrain.world.generation, cell[2]).layers,
+      hub: (feet) => !!content.surface.authored && feet[1] > -0.6 && worldAtFeet(feet) === 1,
     });
     scope.defer(() => feedback.dispose());
     root.add(feedback.effects.group);

@@ -15,10 +15,11 @@ function harness(solid = () => 1) {
     onFeedback: l => { listeners.feedback.add(l); return () => listeners.feedback.delete(l); },
     onOreCollected: l => { listeners.ore.add(l); return () => listeners.ore.delete(l); },
   };
-  const audio = { play: cue => { cues.push(cue); return true; } };
-  const feedback = new MiningFeedback(session, { cell: solid, layers: () => LAYERS }, audio);
+  const scenes = [];
+  const audio = { play: cue => { cues.push(cue); return true; }, setScene: scene => scenes.push(scene) };
+  const feedback = new MiningFeedback(session, { cell: solid, layers: () => LAYERS, hub: f => f[1] > -0.6 }, audio);
   const still = { contact: false, jump: false, land: null };
-  return { feedback, cues, listeners, still, emit: e => listeners.feedback.forEach(l => l(e)), collect: b => listeners.ore.forEach(l => l(b)) };
+  return { feedback, cues, scenes, listeners, still, emit: e => listeners.feedback.forEach(l => l(e)), collect: b => listeners.ore.forEach(l => l(b)) };
 }
 const feet = [0, 0, 6];
 
@@ -127,4 +128,32 @@ test('会话发出出售、购买、余额不足和满包拒绝事件', () => {
   assert.deepEqual(events, [], 'holding on a block does not buzz again right away');
   now = 2; assert.equal(session.requestMine([[0, -1, 0]]), false);
   assert.deepEqual(events.shift(), { type: 'denied', reason: 'full' }, 'a later try is refused audibly');
+});
+
+test('脚步声按脚下材质出声：地下岩石是石头，地表广场是沙地，传到声音里的是这一步的力度', () => {
+  const rock = harness(() => 1);
+  rock.feedback.update(1 / 60, null, { ...rock.still, step: 1 }, [0, -40, 6]);
+  assert.deepEqual(rock.cues, [{ type: 'step', surface: 'stone', strength: 1 }]);
+  rock.feedback.dispose();
+  // World 1's surface floor (protected kind 7) takes the hub's ground plan: the plaza is sand.
+  const hub = harness(c => (c[1] === -1 ? 7 : 0));
+  hub.feedback.update(1 / 60, null, { ...hub.still, step: 0.5 }, [3, 0.02, 20]);
+  hub.feedback.update(1 / 60, null, hub.still, [3, 0.02, 20]);
+  assert.deepEqual(hub.cues, [{ type: 'step', surface: 'sand', strength: 0.5 }], 'one cue per step');
+  hub.feedback.dispose();
+});
+
+test('每帧报告所在位置：地表是山谷的曲子和风声，下到矿井变成闷住的曲子和洞穴声；退出后静音', () => {
+  const h = harness();
+  h.feedback.place({ theme: 'meadow_mine', surfaceLight: 1, daylight: 1 });
+  assert.equal(h.scenes.at(-1).song, 'meadow');
+  assert.equal(h.scenes.at(-1).ambience, 'meadow');
+  h.feedback.place({ theme: 'meadow_mine', surfaceLight: 0, daylight: 1 });
+  assert.equal(h.scenes.at(-1).ambience, 'shallow');
+  assert.equal(h.scenes.at(-1).muffle, 1);
+  h.feedback.place({ theme: 'lava_cave', surfaceLight: 0, daylight: 1 });
+  assert.deepEqual([h.scenes.at(-1).song, h.scenes.at(-1).ambience], ['lava', 'lava']);
+  h.feedback.dispose();
+  assert.equal(h.scenes.at(-1).song, null);
+  assert.equal(h.scenes.at(-1).ambience, null);
 });

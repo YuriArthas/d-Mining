@@ -8,6 +8,7 @@ import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { disposeScenery } from './disposeScenery.ts';
 import { MinerMiningLayer } from './MinerMiningLayer.ts';
 import { UPPER_BODY, createMinerMotions } from './minerMotions.ts';
+import { crossed, footContacts } from './minerSteps.ts';
 
 const MODEL_URL = new URL('../assets/character/miner-a.glb', import.meta.url).href;
 const LANDING_SECONDS = .32;
@@ -54,6 +55,11 @@ export class MinerAvatar {
   private tookOff = false;
   private landed: number | null = null;
   private contact: [number, number, number] | null = null;
+  /** Foot-plant phases of the walk and run clips (index 1 and 2 of `locomotion`). */
+  private readonly steps: readonly (readonly number[])[];
+  private readonly stepPhase = [0, 0, 0];
+  private stepped: number | null = null;
+  private stepCount = 0;
   private disposed = false;
 
   static async load(signal: AbortSignal) {
@@ -120,6 +126,7 @@ export class MinerAvatar {
       }
     });
     if (this.meshes.length !== 1) throw new Error('矿工模型应包含一个蒙皮网格');
+    this.steps = clips.map((clip, i) => i === 0 ? [] : footContacts(this.group, clip));
     this.mixer = new AnimationMixer(this.group);
     // The model's RAB 'Mine' clip is a slow axe chop; the swing and air poses are authored in code.
     const motions=createMinerMotions(this.group);
@@ -171,6 +178,7 @@ export class MinerAvatar {
     this.mining.update(delta);
     this.blend(this.airborne * rise, this.airborne * (1 - rise), land, this.mining.weight);
     this.mixer.update(delta);
+    this.detectStep(discontinuity);
     const dx=this.miningTarget.x-feet[0],dz=this.miningTarget.z-feet[2];
     const elevation=Math.atan2(this.miningTarget.y-feet[1]-1.05,Math.max(.15,Math.hypot(dx,dz)));
     const pitch=MathUtils.clamp(elevation,-.6,.5)*this.mining.weight;
@@ -184,13 +192,25 @@ export class MinerAvatar {
     if(this.mining.consumeContact())this.contact=this.pickTip()?.toArray() as [number,number,number]??[this.miningTarget.x,this.miningTarget.y,this.miningTarget.z];
   }
 
+  /** A footstep when the leading locomotion clip passes a foot plant while walking on the ground. */
+  private detectStep(discontinuity: boolean) {
+    const lead = this.running > .5 ? 2 : 1, walking = !discontinuity && this.grounded && this.airborne === 0 && this.moving > .5;
+    this.locomotion.forEach(({ lower }, i) => {
+      const phase = lower.time / lower.getClip().duration;
+      if (i === lead && walking && this.steps[i].some(contact => crossed(this.stepPhase[i], phase, contact))) {
+        this.stepped = Math.max(this.stepped ?? 0, .5 + .5 * this.running); this.stepCount++;
+      }
+      this.stepPhase[i] = phase;
+    });
+  }
+
   private pickTip() { return this.pickaxe.getObjectsByProperty('type','Object3D').find(o=>o.name.startsWith('PickaxeTip'))?.getWorldPosition(new Vector3()); }
 
   /** Moments for sound and effects since the last call: the pick reaching the block (with the pick
-   *  tip's world position), a take-off and a landing (with its strength). */
+   *  tip's world position), a take-off, a landing and a footstep (with their strength). */
   consumeEvents() {
-    const events={contact:this.contact,jump:this.tookOff,land:this.landed};
-    this.contact=null;this.tookOff=false;this.landed=null;
+    const events={contact:this.contact,jump:this.tookOff,land:this.landed,step:this.stepped};
+    this.contact=null;this.tookOff=false;this.landed=null;this.stepped=null;
     return events;
   }
 
@@ -242,7 +262,7 @@ export class MinerAvatar {
     return {
       model: 'Miner A', bones: bones.length, skinnedMeshes: this.meshes.length,
       triangles: mesh.geometry.index!.count / 3, textures: textures.size,
-      speed: this.speed, grounded: this.grounded,
+      speed: this.speed, grounded: this.grounded, steps: { count: this.stepCount, contacts: this.steps.slice(1) },
       air:{airborne:this.airborne,jumped:this.jumped,verticalSpeed:this.verticalSpeed,landing:this.landAge<LANDING_SECONDS},
       mining:this.mining.diagnostics(),
       pickaxe:{attachedTo:this.pickaxe.parent?.name,visible:this.pickaxe.visible,level:this.equippedTool,model:equipmentModel('tools',this.equippedTool),tip:this.pickTip()?.toArray()},

@@ -3,39 +3,7 @@ import assert from 'node:assert/strict';
 import { GameAudio } from '../../src/game/audio/GameAudio.ts';
 import { CUE_LENGTH, makeNoise, playCue } from '../../src/game/audio/sfx.ts';
 
-// Minimal Web Audio stand-in that records every scheduled node and parameter ramp.
-class Param {
-  constructor(value = 0) { this.value = value; this.events = []; }
-  setValueAtTime(v, t) { this.events.push(['set', v, t]); return this; }
-  linearRampToValueAtTime(v, t) { this.events.push(['linear', v, t]); return this; }
-  exponentialRampToValueAtTime(v, t) {
-    if (!(v > 0)) throw new RangeError(`exponential ramp to ${v}`);
-    this.events.push(['exp', v, t]); return this;
-  }
-}
-class Node {
-  constructor(ctx, kind) { this.ctx = ctx; this.kind = kind; this.outputs = []; ctx.nodes.push(this); }
-  connect(node) { this.outputs.push(node); return node; }
-}
-class FakeContext {
-  constructor() { this.nodes = []; this.state = 'suspended'; this.currentTime = 10; this.sampleRate = 8000; this.destination = new Node(this, 'destination'); FakeContext.created++; }
-  createGain() { const n = new Node(this, 'gain'); n.gain = new Param(1); return n; }
-  createOscillator() { const n = new Node(this, 'osc'); n.frequency = new Param(440); n.start = t => { n.startTime = t; }; n.stop = t => { n.stopTime = t; }; return n; }
-  createBiquadFilter() { const n = new Node(this, 'filter'); n.frequency = new Param(350); n.Q = new Param(1); return n; }
-  createBufferSource() { const n = new Node(this, 'source'); n.start = (t, offset, duration) => { Object.assign(n, { startTime: t, offset, duration }); }; return n; }
-  createBuffer(channels, length, rate) { const data = new Float32Array(length); return { duration: length / rate, length, sampleRate: rate, getChannelData: () => data }; }
-  createDynamicsCompressor() { const n = new Node(this, 'compressor'); for (const k of ['threshold', 'knee', 'ratio', 'attack', 'release']) n[k] = new Param(); return n; }
-  resume() { this.state = 'running'; return Promise.resolve(); }
-  suspend() { this.state = 'suspended'; return Promise.resolve(); }
-  close() { this.state = 'closed'; return Promise.resolve(); }
-}
-FakeContext.created = 0;
-const store = () => { const data = new Map(); return { data, getItem: k => data.get(k) ?? null, setItem: (k, v) => data.set(k, String(v)) }; };
-function withAudioContext(run) {
-  const previous = globalThis.AudioContext;
-  globalThis.AudioContext = FakeContext;
-  try { return run(); } finally { if (previous) globalThis.AudioContext = previous; else delete globalThis.AudioContext; }
-}
+import { FakeContext, seeded, settings as store, withAudioContext } from './fixtures/fakeAudio.mjs';
 
 test('声音只在首次手势后开始：之前不建上下文、不出声；关掉后记住选择', () => withAudioContext(() => {
   const settings = store(), audio = new GameAudio(settings);
@@ -75,6 +43,7 @@ test('每个音效都在声明的时长内结束，单个声部不过载，指�
     { type: 'sell' }, { type: 'jump' }, { type: 'land', strength: 1 }, { type: 'ui' }, { type: 'purchase' }, { type: 'reward' },
     ...[0, 3].flatMap(tier => [{ type: 'hatch', tier }, { type: 'hatch', tier, auto: true }]),
     { type: 'unlock' }, { type: 'travel' }, { type: 'denied' },
+    ...['grass', 'sand', 'dirt', 'stone', 'wood', 'metal', 'ice', 'crystal'].map(surface => ({ type: 'step', surface, strength: 1 })),
   ];
   let seed = 1;
   const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
@@ -97,3 +66,39 @@ test('噪声缓冲固定：每次进游戏的音色一致', () => {
   assert.deepEqual(Array.from(a.slice(0, 64)), Array.from(b.slice(0, 64)));
   assert.ok(Math.max(...a) <= 1 && Math.min(...a) >= -1);
 });
+
+test('音乐和音效分开开关，各自记住；两个都关掉才暂停声音', () => withAudioContext(() => {
+  const saved = store(), audio = new GameAudio(saved);
+  audio.unlock();
+  audio.setMusicEnabled(false);
+  assert.equal(saved.data.get('mining:music'), 'off');
+  assert.equal(audio.play({ type: 'ui' }), true, 'effects still play with music off');
+  assert.equal(audio.diagnostics().state, 'running');
+  audio.setEnabled(false);
+  assert.equal(audio.diagnostics().state, 'suspended', 'everything off: the context sleeps');
+  const reloaded = new GameAudio(saved);
+  assert.deepEqual([reloaded.isEnabled(), reloaded.isMusicEnabled()], [false, false], 'both choices survive a reload');
+  audio.setMusicEnabled(true);
+  assert.equal(audio.diagnostics().state, 'running', 'music alone wakes the sound');
+  assert.equal(audio.play({ type: 'ui' }), false, 'effects stay off');
+  audio.dispose();
+}));
+
+test('场景决定曲目和环境声；开蛋、解锁这些大时刻会把音乐压低一下', () => withAudioContext(() => {
+  const audio = new GameAudio(store());
+  audio.random = seeded(4);
+  audio.setScene({ song: 'meadow', rhythm: 1, lead: 1, muffle: 0, ambience: 'meadow', daylight: 1, cave: 0 });
+  audio.unlock();
+  const context = audio['context'];
+  for (let i = 0; i < 20; i++) { context.currentTime += 0.1; audio.tick(); }
+  const d = audio.diagnostics();
+  assert.equal(d.player.playing, 'meadow');
+  assert.ok(d.player.scheduled > 0, 'notes scheduled');
+  assert.equal(d.ambience.id, 'meadow');
+  const duck = audio['mixer'].duck.gain;
+  audio.play({ type: 'unlock' });
+  assert.ok(duck.events.some(e => e[0] === 'target' && e[1] < 0.6), 'music ducks under the fanfare');
+  audio.setEnabled(false);
+  assert.equal(audio.diagnostics().ambience.id, null, 'ambience belongs to the effects switch');
+  audio.dispose();
+}));

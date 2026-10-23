@@ -1,21 +1,26 @@
 import { Color } from 'three';
 import type { GameSession, SessionFeedback } from '../application/GameSession.ts';
 import { itemDefinition } from '../application/items.ts';
-import { gameAudio, type GameAudio } from '../audio/GameAudio.ts';
+import { QUIET_SCENE, gameAudio, type GameAudio } from '../audio/GameAudio.ts';
 import type { HitMaterial } from '../audio/sfx.ts';
+import { Soundscape, type PlaceSound } from '../audio/soundscape.ts';
 import { layerAtDepth, type Layer } from '../content/layers.ts';
 import { resourceByKind } from '../content/resources.ts';
 import { HitEffects, type BlockColors } from '../presentation/HitEffects.ts';
 import { CELL, type Coord } from '../terrain/SparseWorld.ts';
+import { footSurface } from './footSurface.ts';
 
 export type FeedbackStrike = Readonly<{ cell: Coord; kind: number; breaking: boolean }>;
-/** `contact` is the pick tip's world position on the frame the swing reaches the block. */
-export type AvatarMoments = Readonly<{ contact: readonly number[] | null; jump: boolean; land: number | null }>;
+/** `contact` is the pick tip's world position on the frame the swing reaches the block; `step` is a
+ *  foot planting (with its strength). */
+export type AvatarMoments = Readonly<{ contact: readonly number[] | null; jump: boolean; land: number | null; step?: number | null }>;
 type Ports = Readonly<{
   /** Current block kind, or 0/null once mined. */
   cell(cell: Coord): number | null;
   /** Strata of the world containing this cell. */
   layers(cell: Coord): readonly Layer[];
+  /** Whether these feet are on world 1's surface hub (its ground plan sets the footstep surface). */
+  hub?(feet: readonly number[]): boolean;
 }>;
 
 const SAND = new Color('#d6bf92');
@@ -38,9 +43,12 @@ export function pickupTier(itemId: string) {
 }
 
 /** Turns game moments into sound and short effects. The final blow bursts at once (the block is
- *  queued for removal at that moment); other hits sound when the swing actually reaches the block. */
+ *  queued for removal at that moment); other hits sound when the swing actually reaches the block.
+ *  It also tells the audio where the player is (music and ambience) and what they walk on. */
 export class MiningFeedback {
   readonly effects = new HitEffects();
+  private readonly soundscape = new Soundscape();
+  private theme = 'meadow_mine';
   private pending: FeedbackStrike | null = null;
   private readonly ports: Ports;
   private readonly audio: GameAudio;
@@ -69,6 +77,7 @@ export class MiningFeedback {
         this.audio.play({ type: 'break', material: hitMaterial(strike.kind) });
       } else this.pending = strike;
     }
+    if (moments.step != null) this.audio.play({ type: 'step', surface: this.surface(feet), strength: moments.step });
     if (moments.jump) this.audio.play({ type: 'jump' });
     if (moments.land !== null) {
       this.audio.play({ type: 'land', strength: moments.land });
@@ -79,7 +88,17 @@ export class MiningFeedback {
 
   travel() { this.pending = null; this.audio.play({ type: 'travel' }); }
 
-  dispose() { for (const detach of this.detach) detach(); this.effects.dispose(); }
+  /** Call every frame with the place around the feet. */
+  place(place: PlaceSound) {
+    this.theme = place.theme;
+    this.audio.setScene(this.soundscape.scene(place));
+  }
+
+  surface(feet: readonly number[]) {
+    return footSurface(feet, { cell: c => this.ports.cell(c), theme: () => this.theme, hub: f => this.ports.hub?.(f) ?? false });
+  }
+
+  dispose() { for (const detach of this.detach) detach(); this.effects.dispose(); this.audio.setScene(QUIET_SCENE); }
 
   private readonly onSession = (event: SessionFeedback) => {
     switch (event.type) {

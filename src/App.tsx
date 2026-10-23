@@ -80,9 +80,10 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
   const [input] = useState(() => new GameInput());
   const [shopView] = useState(() => new ShopView());
   useEffect(() => () => shopView.dispose(), [shopView]);
-  // Sound starts on the first touch, click or key press (browser rule) and pauses while hidden.
+  // Sound and music start on the first touch, click or key press (browser rule) and pause while hidden.
   useEffect(() => gameAudio.attach(), []);
   const sound = useSyncExternalStore(gameAudio.subscribe, gameAudio.isEnabled);
+  const music = useSyncExternalStore(gameAudio.subscribe, gameAudio.isMusicEnabled);
   const session = savedGame.session;
   const saveStatus = useSyncExternalStore(savedGame.saves.subscribe, savedGame.saves.getStatus);
   const [exitState, setExitState] = useState<'saving' | 'failed' | null>(null);
@@ -143,6 +144,7 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
   const system: SystemControls = {
     renderRate, toggleRenderRate: () => { settle(); setRenderRate(r => r === 'display' ? '60' : 'display'); },
     shadows: shadowsEnabled, toggleShadows: () => { settle(); setShadowsEnabled(v => !v); },
+    music, toggleMusic: () => { settle(); gameAudio.toggleMusic(); },
     sound, toggleSound: () => { settle(); gameAudio.toggle(); },
     stylized, toggleStylized: () => { settle(); setStylized(v => !v); },
     timeOfDay, toggleTimeOfDay: () => { settle(); setTimeOfDay(t => t === 'day' ? 'night' : 'day'); }, autoTimeOfDay: () => { settle(); setTimeOfDay('auto'); },

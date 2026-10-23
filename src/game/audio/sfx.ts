@@ -1,6 +1,8 @@
 /** Procedural sound effects: every cue is synthesised from oscillators and one shared noise buffer,
  *  so the game ships no audio files. Recipes only schedule nodes on a BaseAudioContext, which lets
  *  tests and offline renders reuse them. Levels are per cue; the bus adds a gentle compressor. */
+import { hiss, makeNoise, tone, vary, type Voice } from './synth.ts';
+
 export type HitMaterial = 'soil' | 'rock' | 'ore' | 'gem';
 export type SfxCue =
   | Readonly<{ type: 'hit'; material: HitMaterial }>
@@ -15,53 +17,13 @@ export type SfxCue =
   | Readonly<{ type: 'hatch'; tier: number; auto?: boolean }>
   | Readonly<{ type: 'unlock' }>
   | Readonly<{ type: 'travel' }>
-  | Readonly<{ type: 'denied' }>;
+  | Readonly<{ type: 'denied' }>
+  | Readonly<{ type: 'step'; surface: FootSurface; strength: number }>;
 export type CueType = SfxCue['type'];
 
-export type Voice = Readonly<{ ctx: BaseAudioContext; out: AudioNode; t: number; noise: AudioBuffer; random: () => number }>;
-const SILENT = 0.0001;
+export type FootSurface = 'grass' | 'sand' | 'dirt' | 'stone' | 'wood' | 'metal' | 'ice' | 'crystal';
+export { makeNoise, type Voice };
 
-export function makeNoise(ctx: BaseAudioContext, seconds = 2) {
-  const buffer = ctx.createBuffer(1, Math.round(ctx.sampleRate * seconds), ctx.sampleRate), data = buffer.getChannelData(0);
-  // Deterministic white noise: identical cues every session, no Math.random at load.
-  let seed = 0x9e3779b9;
-  for (let i = 0; i < data.length; i++) { seed ^= seed << 13; seed ^= seed >>> 17; seed ^= seed << 5; data[i] = ((seed >>> 0) / 4294967295) * 2 - 1; }
-  return buffer;
-}
-
-/** Exponential attack/decay envelope feeding the voice output. */
-function envelope(v: Voice, peak: number, attack: number, decay: number, start: number) {
-  const gain = v.ctx.createGain(), t = v.t + start;
-  gain.gain.setValueAtTime(SILENT, t);
-  gain.gain.exponentialRampToValueAtTime(Math.max(peak, SILENT * 2), t + attack);
-  gain.gain.exponentialRampToValueAtTime(SILENT, t + attack + decay);
-  gain.connect(v.out);
-  return gain;
-}
-
-type Tone = { wave?: OscillatorType; from: number; to?: number; sweep?: number; peak: number; attack?: number; decay: number; start?: number };
-function tone(v: Voice, { wave = 'sine', from, to = from, sweep = 0.05, peak, attack = 0.003, decay, start = 0 }: Tone) {
-  const osc = v.ctx.createOscillator(), t = v.t + start;
-  osc.type = wave;
-  osc.frequency.setValueAtTime(from, t);
-  if (to !== from) osc.frequency.exponentialRampToValueAtTime(to, t + sweep);
-  osc.connect(envelope(v, peak, attack, decay, start));
-  osc.start(t); osc.stop(t + attack + decay + 0.02);
-}
-
-type Hiss = { filter: BiquadFilterType; from: number; to?: number; sweep?: number; q?: number; peak: number; attack?: number; decay: number; start?: number };
-function hiss(v: Voice, { filter, from, to = from, sweep = 0.05, q = 1, peak, attack = 0.002, decay, start = 0 }: Hiss) {
-  const source = v.ctx.createBufferSource(), biquad = v.ctx.createBiquadFilter(), t = v.t + start;
-  source.buffer = v.noise;
-  biquad.type = filter; biquad.Q.value = q;
-  biquad.frequency.setValueAtTime(from, t);
-  if (to !== from) biquad.frequency.exponentialRampToValueAtTime(to, t + sweep);
-  source.connect(biquad).connect(envelope(v, peak, attack, decay, start));
-  const length = attack + decay + 0.02;
-  source.start(t, v.random() * Math.max(0, v.noise.duration - length - 0.01), length);
-}
-
-const vary = (v: Voice, amount = 0.06) => 1 + (v.random() * 2 - 1) * amount;
 const notes = (v: Voice, frequencies: readonly number[], gap: number, peak: number, decay: number, wave: OscillatorType = 'triangle', start = 0) =>
   frequencies.forEach((f, i) => tone(v, { wave, from: f, peak, decay, start: start + i * gap }));
 const sparkle = (v: Voice, start: number, count = 3, peak = 0.05) =>
@@ -138,6 +100,58 @@ function hatch(v: Voice, tier: number, auto?: boolean) {
   if (tier >= 1) sparkle(v, 1.12, 2 + tier, 0.045);
 }
 
+/** Footsteps come several times a second, so they sit well under the mining sounds and every step
+ *  varies a little. Each surface has its own midrange signature (phones drop the heel thump). */
+function step(v: Voice, surface: FootSurface, strength: number) {
+  const s = Math.max(0.3, Math.min(1, strength)), d = vary(v, 0.08), g = (peak: number) => peak * s * vary(v, 0.12);
+  const grains = (count: number, low: number, span: number, peak: number, spread: number) => {
+    for (let i = 0; i < count; i++) hiss(v, { filter: 'bandpass', from: low + v.random() * span, q: 2.5, peak: g(peak * (0.6 + v.random() * 0.6)), attack: 0.001, decay: 0.01 + v.random() * 0.02, start: v.random() * spread });
+  };
+  switch (surface) {
+    case 'grass':
+      // Blades brushing the boot over a soft, muffled heel.
+      hiss(v, { filter: 'highpass', from: 2600 * d, q: 0.6, peak: g(0.055), attack: 0.012, decay: 0.07 });
+      hiss(v, { filter: 'lowpass', from: 700 * d, q: 0.7, peak: g(0.17), attack: 0.004, decay: 0.05 });
+      return tone(v, { from: 120 * d, to: 70, sweep: 0.05, peak: g(0.12), attack: 0.003, decay: 0.06 });
+    case 'sand':
+      hiss(v, { filter: 'lowpass', from: 1100 * d, q: 0.7, peak: g(0.24), attack: 0.006, decay: 0.07 });
+      return grains(5, 1800, 3200, 0.12, 0.07);
+    case 'dirt':
+      hiss(v, { filter: 'lowpass', from: 1300 * d, to: 600, sweep: 0.05, q: 0.8, peak: g(0.22), attack: 0.003, decay: 0.055 });
+      tone(v, { wave: 'triangle', from: 260 * d, to: 170, sweep: 0.04, peak: g(0.12), attack: 0.002, decay: 0.04 });
+      return grains(3, 1200, 1800, 0.06, 0.05);
+    case 'stone':
+      // A heel click, a short stony knock and a toe scuff.
+      hiss(v, { filter: 'bandpass', from: 3000 * d, q: 1.2, peak: g(0.13), attack: 0.001, decay: 0.016 });
+      tone(v, { wave: 'triangle', from: 430 * d, to: 300, sweep: 0.03, peak: g(0.15), attack: 0.001, decay: 0.035 });
+      tone(v, { from: 150 * d, to: 85, sweep: 0.04, peak: g(0.12), attack: 0.002, decay: 0.05 });
+      return hiss(v, { filter: 'highpass', from: 3800, q: 0.7, peak: g(0.04), attack: 0.004, decay: 0.035, start: 0.025 });
+    case 'wood':
+      // Hollow planks: a low board resonance with a dry click.
+      tone(v, { wave: 'triangle', from: 220 * d, to: 190, sweep: 0.05, peak: g(0.17), attack: 0.002, decay: 0.075 });
+      tone(v, { from: 540 * d, peak: g(0.07), attack: 0.001, decay: 0.05 });
+      hiss(v, { filter: 'bandpass', from: 900 * d, q: 3, peak: g(0.1), attack: 0.001, decay: 0.045 });
+      return hiss(v, { filter: 'bandpass', from: 3200, q: 1.5, peak: g(0.06), attack: 0.001, decay: 0.01 });
+    case 'metal':
+      // Plate underfoot rings with three inharmonic partials.
+      hiss(v, { filter: 'bandpass', from: 3400 * d, q: 1, peak: g(0.08), attack: 0.001, decay: 0.014 });
+      tone(v, { wave: 'triangle', from: 380 * d, to: 300, sweep: 0.03, peak: g(0.12), attack: 0.001, decay: 0.04 });
+      tone(v, { from: 660 * d, peak: g(0.04), attack: 0.001, decay: 0.14 });
+      tone(v, { from: 660 * 2.63 * d, peak: g(0.024), attack: 0.001, decay: 0.1 });
+      return tone(v, { from: 660 * 4.18 * d, peak: g(0.014), attack: 0.001, decay: 0.07 });
+    case 'ice':
+      hiss(v, { filter: 'bandpass', from: 4200 * d, q: 1.4, peak: g(0.11), attack: 0.001, decay: 0.014 });
+      tone(v, { wave: 'triangle', from: 480 * d, to: 340, sweep: 0.03, peak: g(0.12), attack: 0.001, decay: 0.03 });
+      tone(v, { from: 2500 * d, peak: g(0.035), attack: 0.001, decay: 0.07 });
+      return grains(3, 3000, 3000, 0.05, 0.04);
+    case 'crystal':
+      hiss(v, { filter: 'bandpass', from: 3600 * d, q: 1.3, peak: g(0.11), attack: 0.001, decay: 0.014 });
+      tone(v, { wave: 'triangle', from: 450 * d, to: 320, sweep: 0.03, peak: g(0.13), attack: 0.001, decay: 0.035 });
+      tone(v, { from: 2093 * d, peak: g(0.032), attack: 0.001, decay: 0.12 });
+      return tone(v, { from: 3136 * d, peak: g(0.02), attack: 0.001, decay: 0.09 });
+  }
+}
+
 function travel(v: Voice) {
   hiss(v, { filter: 'bandpass', from: 1800, to: 300, sweep: 0.45, q: 0.9, peak: 0.2, attack: 0.05, decay: 0.5 });
   tone(v, { from: 220, to: 110, sweep: 0.4, peak: 0.12, attack: 0.04, decay: 0.45 });
@@ -176,10 +190,11 @@ export function playCue(v: Voice, cue: SfxCue) {
     case 'denied':
       tone(v, { wave: 'square', from: 233, peak: 0.16, attack: 0.004, decay: 0.08 });
       return tone(v, { wave: 'square', from: 196, peak: 0.16, attack: 0.004, decay: 0.1, start: 0.11 });
+    case 'step': return step(v, cue.surface, cue.strength);
   }
 }
 
 /** Seconds a cue keeps sounding after it starts (for tests and offline renders). */
 export const CUE_LENGTH: Readonly<Record<CueType, number>> = {
-  hit: 0.4, break: 0.5, pickup: 0.5, sell: 0.65, jump: 0.25, land: 0.2, ui: 0.08, purchase: 0.45, reward: 0.7, hatch: 1.7, unlock: 1.05, travel: 0.6, denied: 0.25,
+  hit: 0.4, break: 0.5, pickup: 0.5, sell: 0.65, jump: 0.25, land: 0.2, ui: 0.08, purchase: 0.45, reward: 0.7, hatch: 1.7, unlock: 1.05, travel: 0.6, denied: 0.25, step: 0.2,
 };

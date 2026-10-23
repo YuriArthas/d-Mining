@@ -65,6 +65,7 @@ export function updateGame(
       ),
       theme = themeById(layer.theme);
     const lightStrength = surfaceLightStrengthAtFeet(currentFeet[1]);
+    current.feedback.place({ theme: layer.theme, surfaceLight: lightStrength, daylight: environment.daylightBlend });
     gl.shadowMap.enabled = false;
     environment.update(
       {

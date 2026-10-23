@@ -28,6 +28,9 @@ export type ValidationDebug = {
     reflection?: "live" | "frozen" | "off";
   }) => void;
   surfaceHeight: (x: number, z: number) => number | null;
+  /** Final audio output level (dBFS) and a recordable stream of it, for checks. */
+  audioLevel: () => number | null;
+  audioStream: () => MediaStream | null;
   look: (yaw: number, pitch: number) => void;
   canMine: (coord: Coord) => boolean;
   cell: (coord: Coord) => number | null;
@@ -198,6 +201,8 @@ export function attachGameDebug(
         profiler.reflectionMode = options.reflection;
     },
     surfaceHeight: (x, z) => facilities.surfaceHeight(x, z),
+    audioLevel: () => gameAudio.outputLevel(),
+    audioStream: () => gameAudio.outputStream(),
     look: (yaw, pitch) => cameraView.look(yaw, pitch),
     cell: (coord) => terrain.cell(coord),
     canMine: (coord) => terrain.canMine(coord),
