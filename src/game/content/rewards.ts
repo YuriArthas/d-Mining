@@ -2,9 +2,10 @@
 export const ONLINE_REWARD_MINUTES = [5, 10, 20, 30] as const;
 export type OnlineRewardMinutes = typeof ONLINE_REWARD_MINUTES[number];
 export const SIGNIN_REWARDS = [1, 1, 1, 2, 2, 2, 3] as const;
+/** Lucky coins for each online tier: longer play is worth more. */
+export const ONLINE_REWARDS: Readonly<Record<OnlineRewardMinutes, number>> = { 5: 1, 10: 1, 20: 2, 30: 3 };
 export const REWARD_CONFIG = Object.freeze({
   spinCost: 1,
-  onlineReward: 1,
   shareReward: 1,
   inviteReward: 2,
   timedDurationSeconds: 300,

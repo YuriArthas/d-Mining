@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 /** Chunky two-tone vector icons with navy outlines, drawn on a 48 × 48 grid. */
 export type IconKind =
   | 'backpack' | 'coin' | 'paw' | 'chest' | 'gift' | 'grid' | 'globe' | 'portal' | 'gem'
-  | 'question' | 'gear' | 'home' | 'jump' | 'plus' | 'bolt' | 'clover' | 'exit' | 'close' | 'pickaxe';
+  | 'question' | 'gear' | 'home' | 'jump' | 'plus' | 'bolt' | 'clover' | 'exit' | 'close' | 'pickaxe' | 'luck';
 
 const INK = '#13355d';
 const line = { stroke: INK, strokeWidth: 3, strokeLinejoin: 'round' as const, strokeLinecap: 'round' as const };
@@ -22,6 +22,15 @@ const ICONS: Record<IconKind, ReactNode> = {
     <circle cx="22.5" cy="23" r="11.5" fill="#ffdd66" stroke="#e39a12" strokeWidth="2.5" />
     <path d="m22.5 15 2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8Z" fill="#fff6c4" stroke="#e39a12" strokeWidth="1.6" strokeLinejoin="round" />
     <path d="M12 16a12 12 0 0 1 6-6" stroke="#fff8d8" strokeWidth="3" strokeLinecap="round" fill="none" />
+  </>,
+  // Lucky coin (rewards and the capsule machine): pink with a four-leaf clover, never mistaken for gold.
+  luck: <>
+    <circle cx="25.5" cy="26" r="17" fill="#c2367a" {...line} />
+    <circle cx="22.5" cy="23" r="17" fill="#ff6fb1" {...line} />
+    <circle cx="22.5" cy="23" r="11.5" fill="#ff9ccb" stroke="#e0458f" strokeWidth="2.5" />
+    <g fill="#5fd36a" stroke="#227a3c" strokeWidth="1.6"><circle cx="18.6" cy="19.3" r="4.2" /><circle cx="26.4" cy="19.3" r="4.2" /><circle cx="18.6" cy="27" r="4.2" /><circle cx="26.4" cy="27" r="4.2" /></g>
+    <path d="M22.5 23.2c1.5 3 2.6 5.6 3.3 8.6" stroke="#227a3c" strokeWidth="2" strokeLinecap="round" fill="none" />
+    <path d="M12 16a12 12 0 0 1 6-6" stroke="#ffd9ec" strokeWidth="3" strokeLinecap="round" fill="none" />
   </>,
   paw: <>
     <ellipse cx="11.5" cy="20" rx="4.6" ry="5.6" fill="#ffd24d" {...line} />

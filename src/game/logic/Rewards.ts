@@ -1,5 +1,5 @@
 import {
-  CAPSULE_REWARDS, ONLINE_REWARD_MINUTES, REWARD_CONFIG, SIGNIN_REWARDS,
+  CAPSULE_REWARDS, ONLINE_REWARD_MINUTES, ONLINE_REWARDS, REWARD_CONFIG, SIGNIN_REWARDS,
   type CapsuleRewardId, type OnlineRewardMinutes,
 } from '../content/rewards.ts';
 import { createInviteCode, parseInviteCode, validateInviteId } from './InviteCode.ts';
@@ -142,10 +142,11 @@ export class Rewards {
     if (!data) return { status: 'clock-reversed' };
     if (data.onlineClaimed.includes(minutes)) return { status: 'already-claimed' };
     if (data.onlineSeconds < minutes * 60) return { status: 'not-ready' };
-    data.balance = integer(data.balance + REWARD_CONFIG.onlineReward, '特殊货币');
+    const amount = ONLINE_REWARDS[minutes];
+    data.balance = integer(data.balance + amount, '特殊货币');
     data.onlineClaimed.push(minutes);
     this.data = data;
-    return { status: 'claimed', amount: REWARD_CONFIG.onlineReward };
+    return { status: 'claimed', amount };
   }
 
   claimDaily(day = this.today()): RewardClaimResult {

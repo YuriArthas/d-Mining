@@ -30,7 +30,8 @@ export function BagSheet(props: Props) {
     { id: 'ores', label: '矿物', icon: <OreIcon color="#76e0e7" className="ui-icon" /> },
     { id: 'gear', label: '装备', icon: 'pickaxe' },
   ];
-  const common = { title: '背包', tabs, tab: props.tab, onTab: props.onTab, onClose: props.onClose };
+  // The title names the open tab: “背包” is already the bag capacity, a shop counter and an item.
+  const common = { title: { pets: '宠物', ores: '矿物', gear: '装备' }[props.tab], tabs, tab: props.tab, onTab: props.onTab, onClose: props.onClose };
   if (props.tab === 'ores') return <OresTab {...props} common={common} />;
   if (props.tab === 'gear') return <GearTab {...props} common={common} />;
   return <PetsTab {...props} pets={pets} common={common} />;
@@ -59,13 +60,16 @@ function PetsTab({ session, pets, common, onClose }: Props & { pets: PetPanelSna
     const result = session.pets.equip(card.pet.id);
     setMessage(result.status === 'equipped' ? `已装备 ${card.name}` : result.status === 'full' ? '装备位已满：先卸下一只，或点一键最佳' : '这只宠物已不在背包里');
   };
+  // With no pets yet, the body explains where to get one; the footer offers only that.
   return <Sheet {...common} footer={<>
     <UiButton size="s" tone="green" icon="paw" onPress={() => setFinding(true)}>获取宠物</UiButton>
-    <span className="ui-hint bag-message" role="status">{message || (cards.length ? '宠物跟着你一起挖矿，装备后增加挖矿力量' : '去蛋台开蛋，获得第一只宠物')}</span>
-    <span className="ui-grow" />
-    {selected && <UiButton size="s" tone={selected.equippedSlot !== null ? 'steel' : 'purple'} className="bag-compact-equip" onPress={() => toggle(selected)}>{selected.equippedSlot !== null ? '卸下' : '装备'}</UiButton>}
-    <UiButton size="s" tone="steel" disabled={!equipped} onPress={() => { session.pets.unequipAll(); setMessage('已卸下全部宠物'); }}>全部卸下</UiButton>
-    <UiButton size="s" tone="orange" className="bag-equip-best" disabled={!cards.length} onPress={() => { session.pets.equipBest(); setMessage('已装备最强的宠物'); }}>一键最佳</UiButton>
+    {cards.length > 0 && <>
+      <span className="ui-hint bag-message" role="status">{message || '宠物跟着你一起挖矿，装备后增加挖矿力量'}</span>
+      <span className="ui-grow" />
+      {selected && <UiButton size="s" tone={selected.equippedSlot !== null ? 'steel' : 'purple'} className="bag-compact-equip" onPress={() => toggle(selected)}>{selected.equippedSlot !== null ? '卸下' : '装备'}</UiButton>}
+      <UiButton size="s" tone="steel" disabled={!equipped} onPress={() => { session.pets.unequipAll(); setMessage('已卸下全部宠物'); }}>全部卸下</UiButton>
+      <UiButton size="s" tone="orange" className="bag-equip-best" onPress={() => { session.pets.equipBest(); setMessage('已装备最强的宠物'); }}>一键最佳</UiButton>
+    </>}
   </>}>
     {cards.length ? <div className="bag-pets">
       <div className="bag-pets-main"><div className="ui-row"><Chip icon="paw">已装备 <b>{equipped} / {pets.slots.length}</b></Chip><Chip>总加成 <b>{bonusLabel(pets.bonus.powerBonusBps)}</b></Chip><span className="ui-grow" /><Chip>{cards.length} 只</Chip></div>
@@ -83,7 +87,7 @@ function PetsTab({ session, pets, common, onClose }: Props & { pets: PetPanelSna
         {eggOf(selected.pet.speciesId) && <div className="ui-stat"><span>来自</span><b>{eggOf(selected.pet.speciesId)}</b></div>}
         <UiButton size="s" tone={selected.equippedSlot !== null ? 'steel' : 'purple'} onPress={() => toggle(selected)}>{selected.equippedSlot !== null ? '卸下' : '装备'}</UiButton>
       </aside>}
-    </div> : <div className="bag-empty ui-well"><PetArt speciesId="moss-slime" className="bag-empty-art" /><b className="ui-outline">还没有宠物</b><span className="ui-hint">点左下「获取宠物」，传送到蛋台开蛋</span></div>}
+    </div> : <div className="bag-empty ui-well"><PetArt speciesId="moss-slime" className="bag-empty-art" /><b className="ui-outline">还没有宠物</b><span className="ui-hint">点「获取宠物」去蛋台开蛋，装备后一起挖矿</span></div>}
   </Sheet>;
 }
 

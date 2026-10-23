@@ -56,8 +56,9 @@ test('each daily online threshold is collectible once and persists across reload
   assert.equal(rewards.claimOnline(5).status, 'already-claimed');
   assert.equal(rewards.claimOnline(10).status, 'not-ready');
   rewards.advance(1500);
-  for (const minute of [30, 10, 20]) assert.deepEqual(rewards.claimOnline(minute), { status: 'claimed', amount: 1 });
-  assert.equal(rewards.getSnapshot().balance, 4);
+  // Longer play is worth more: 1 / 1 / 2 / 3 lucky coins for the 5 / 10 / 20 / 30 minute gifts.
+  for (const [minute, amount] of [[30, 3], [10, 1], [20, 2]]) assert.deepEqual(rewards.claimOnline(minute), { status: 'claimed', amount });
+  assert.equal(rewards.getSnapshot().balance, 7);
   const before = rewards.exportData();
   assert.throws(() => rewards.claimOnline(7));
   assert.deepEqual(rewards.exportData(), before);
@@ -250,4 +251,15 @@ test('the double-sale boost is a timed prize: five minutes per win, counted down
   assert.deepEqual(restored.getSnapshot().timed, { speed: 30, luck: 0, sell: 0 });
   assert.equal(legacy.timed.sell, undefined, 'reading a save never mutates it');
   assert.throws(() => Rewards.fromData({ ...legacy, timed: { speed: 0, luck: 0, sell: -1 } }));
+});
+
+test('the rewards sheet opens on today\'s sign-in while it is unclaimed, otherwise on the online gifts', async () => {
+  const { rewardsTabFor, claimableRewards } = await import('../../src/game/ui/rewards/rewardState.ts');
+  const rewards = make();
+  assert.equal(rewardsTabFor(rewards.getSnapshot()), 'signin');
+  assert.equal(claimableRewards(rewards.getSnapshot()), 1);
+  rewards.claimDaily();
+  assert.equal(rewardsTabFor(rewards.getSnapshot()), 'online');
+  rewards.advance(600);
+  assert.equal(claimableRewards(rewards.getSnapshot()), 2, 'two online gifts ready');
 });

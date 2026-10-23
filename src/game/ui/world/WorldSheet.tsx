@@ -41,7 +41,7 @@ function TravelTab({ session, common, onClose }: { session: GameSession; common:
     <div className="ui-row"><Chip icon="gem">历史最深 <b>{number(Math.floor(state.maxDepth))} 米</b></Chip><span className="ui-hint">{world}</span></div>
     <div className="ui-cards world-cards">
       <div className="ui-card-tile" style={{ '--c': '#62c96b', '--c-lo': '#2f9a3d' } as CSSProperties}>
-        <Icon kind="home" className="ui-icon ui-card-art" /><h4 className="ui-outline">地表</h4><small>营地 · 商店 · 蛋台</small>
+        <Icon kind="home" className="ui-icon ui-card-art" /><h4 className="ui-outline">地表</h4><small>商店 · 蛋台</small>
         {surface ? <span className="ui-stamp">当前位置</span> : <UiButton size="s" tone="blue" onPress={() => { session.returnToSurface(); onClose(); }}>返回</UiButton>}
       </div>
       {state.destinations.map((room, index) => {
@@ -50,7 +50,7 @@ function TravelTab({ session, common, onClose }: { session: GameSession; common:
           {room.unlocked ? <Icon kind="portal" className="ui-icon ui-card-art" /> : <span className="ui-card-art world-lock" aria-hidden="true"><LockIcon /></span>}
           <h4 className="ui-outline">{room.name}</h4><small>地下 {number(room.depth)} 米</small>
           {room.unlocked ? <UiButton size="s" tone="green" aria-label={`传送到${room.name}`} onPress={() => go(room.id)}>传送</UiButton>
-            : <Bar value={state.maxDepth} max={room.depth} size="s" />}
+            : <Bar value={state.maxDepth} max={room.depth} size="s">{Math.floor(Math.min(state.maxDepth, room.depth))} / {room.depth} 米</Bar>}
         </div>;
       })}
     </div>

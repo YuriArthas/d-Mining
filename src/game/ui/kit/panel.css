@@ -21,6 +21,9 @@
 }
 .ui-sheet[data-size=m] { --sheet-w: 720px; --sheet-h: 400px; }
 .ui-sheet[data-size=s] { --sheet-w: 440px; height: auto; max-height: 100%; }
+/* Short single-screen sheets (egg odds, capsule prizes) fit their content instead of a fixed height. */
+.ui-sheet:is(.egg-sheet, .capsule-sheet) { height: auto; max-height: 100%; }
+.ui-sheet:is(.egg-sheet, .capsule-sheet) .ui-sheet-body { padding-top: 36px; }
 .ui-sheet[data-tabs=true] { grid-template-columns: auto minmax(0, 1fr); }
 .ui-sheet-title {
   position: absolute; z-index: 3; left: 50%; top: -27px; transform: translateX(-50%);
@@ -159,3 +162,5 @@
   .ui-card-tile[data-ready] { animation: none; }
   .ui-bar > i, .ui-toggle > i::after { transition: none; }
 }
+/* Small bars still carry their numbers (e.g. "0 / 400 米" under a locked layer). */
+.ui-bar[data-size=s] > span { font-size: 11px; -webkit-text-stroke-width: 2px; }

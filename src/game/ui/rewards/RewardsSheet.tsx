@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react';
 import type { GameSession } from '../../application/GameSession.ts';
-import { CAPSULE_REWARDS, ONLINE_REWARD_MINUTES, REWARD_CONFIG, SIGNIN_REWARDS } from '../../content/rewards.ts';
+import { CAPSULE_REWARDS, ONLINE_REWARD_MINUTES, ONLINE_REWARDS, REWARD_CONFIG, SIGNIN_REWARDS } from '../../content/rewards.ts';
 import type { RewardClaimResult, SpinResult } from '../../logic/Rewards.ts';
 import { formatNumber as number } from '../../presentation/formatNumber.ts';
 import { UiButton } from '../kit/controls.tsx';
@@ -8,22 +8,12 @@ import { Icon, type IconKind } from '../kit/icons.tsx';
 import { Bar, Chip, Sheet, type SheetTab } from '../kit/panel.tsx';
 import './rewards.css';
 
-export type RewardsTab = 'online' | 'signin' | 'invite';
+import { claimableRewards, readyOnlineRewards, rewardsTabFor, signin, type RewardsTab } from './rewardState.ts';
+export { claimableRewards, rewardsTabFor, type RewardsTab };
 type Claim = RewardClaimResult | { status: 'clipboard-failed' | 'unavailable' };
 type Snapshot = ReturnType<GameSession['getSnapshot']>;
 const clock = (seconds: number) => { const s = Math.max(0, Math.ceil(seconds)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
 
-function signin(rewards: Snapshot['rewards']) {
-  const signedToday = rewards.lastSigninDay === rewards.day;
-  const consecutive = rewards.lastSigninDay !== null && Date.parse(rewards.day) - Date.parse(rewards.lastSigninDay) === 86400000;
-  const claimDay = signedToday ? rewards.signinStreak : consecutive ? rewards.signinStreak + 1 : 1;
-  return { signedToday, index: (claimDay - 1) % SIGNIN_REWARDS.length };
-}
-/** Rewards a player can collect right now (HUD badge). */
-export function claimableRewards(rewards: Snapshot['rewards']) {
-  const online = ONLINE_REWARD_MINUTES.filter(m => !rewards.onlineClaimed.includes(m) && rewards.onlineSeconds >= m * 60).length;
-  return online + (signin(rewards).signedToday ? 0 : 1);
-}
 function claimText(result: Claim, done: string) {
   switch (result.status) {
     case 'claimed': return `${done}，获得 ${result.amount} 枚幸运币！`;
@@ -41,7 +31,7 @@ export function RewardsSheet({ session, tab, onTab, onClose }: { session: GameSe
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot), rewards = state.rewards;
   const [message, setMessage] = useState('');
   const [invite, setInvite] = useState(''), [copying, setCopying] = useState(false), copyingRef = useRef(false);
-  const online = ONLINE_REWARD_MINUTES.filter(m => !rewards.onlineClaimed.includes(m) && rewards.onlineSeconds >= m * 60).length;
+  const online = readyOnlineRewards(rewards);
   const day = signin(rewards);
   useEffect(() => setMessage(''), [tab]);
   const claim = (action: () => Claim, done: string) => { try { setMessage(claimText(action(), done)); } catch (error) { setMessage(`操作失败：${String(error)}`); } };
@@ -52,18 +42,18 @@ export function RewardsSheet({ session, tab, onTab, onClose }: { session: GameSe
   };
   const tabs: SheetTab<RewardsTab>[] = [
     { id: 'online', label: '在线', icon: 'gift', badge: online || undefined },
-    { id: 'signin', label: '签到', icon: 'coin', badge: day.signedToday ? undefined : 1 },
+    { id: 'signin', label: '签到', icon: 'luck', badge: day.signedToday ? undefined : 1 },
     { id: 'invite', label: '邀请', icon: 'paw' },
   ];
   const footer = <><span className="ui-hint" role="status">{message || '幸运币在地表扭蛋机抽奖：金币、加速、永久挖矿加速、双倍出售……'}</span><span className="ui-grow" />
     <UiButton size="s" tone="pink" icon="gift" onPress={() => { if (session.goTo('capsule') === 'travelling') onClose(); }}>传送到扭蛋机</UiButton></>;
   return <Sheet title="奖励" tabs={tabs} tab={tab} onTab={onTab} onClose={onClose} footer={footer}>
-    <div className="ui-row"><Chip icon="gift">幸运币 <b>{number(rewards.balance)}</b></Chip>
+    <div className="ui-row"><Chip icon="luck">幸运币 <b>{number(rewards.balance)}</b></Chip>
       <span className="ui-hint">{tab === 'online' ? `今日在线 ${clock(rewards.onlineSeconds)} · 每档每天领一次` : tab === 'signin' ? '连续签到 7 天一轮，断签从第 1 天重新开始' : `分享每天 +${REWARD_CONFIG.shareReward}，兑换朋友的邀请码 +${REWARD_CONFIG.inviteReward}`}</span></div>
     {tab === 'online' && <div className="ui-cards rewards-cards">{ONLINE_REWARD_MINUTES.map(minutes => {
       const claimed = rewards.onlineClaimed.includes(minutes), ready = !claimed && rewards.onlineSeconds >= minutes * 60;
       return <div key={minutes} className="ui-card-tile" data-ready={ready ? '' : undefined} style={ready ? { '--c': '#ffd447', '--c-lo': '#f08a14' } as CSSProperties : undefined}>
-        <h4 className="ui-outline">{minutes} 分钟</h4><Icon kind="gift" className="ui-icon ui-card-art" /><small>幸运币 ×{REWARD_CONFIG.onlineReward}</small>
+        <h4 className="ui-outline">{minutes} 分钟</h4><Icon kind="luck" className="ui-icon ui-card-art" /><b className="ui-outline">×{ONLINE_REWARDS[minutes]}</b>
         {claimed ? <span className="ui-stamp">已领取</span> : ready ? <UiButton size="s" tone="green" onPress={() => claim(() => session.claimOnlineReward(minutes), '领取成功')}>领取</UiButton>
           : <Bar value={rewards.onlineSeconds} max={minutes * 60}>{clock(minutes * 60 - rewards.onlineSeconds)}</Bar>}
       </div>;
@@ -71,7 +61,7 @@ export function RewardsSheet({ session, tab, onTab, onClose }: { session: GameSe
     {tab === 'signin' && <div className="rewards-days">{SIGNIN_REWARDS.map((amount, index) => {
       const claimed = index < day.index || (index === day.index && day.signedToday), current = index === day.index && !day.signedToday;
       return <div key={index} className="ui-card-tile" data-ready={current ? '' : undefined} style={current ? { '--c': '#ffd447', '--c-lo': '#f08a14' } as CSSProperties : undefined}>
-        <h4 className="ui-outline">第 {index + 1} 天</h4><Icon kind="coin" className="ui-icon ui-card-art" /><b className="ui-outline">×{amount}</b>
+        <h4 className="ui-outline">第 {index + 1} 天</h4><Icon kind="luck" className="ui-icon ui-card-art" /><b className="ui-outline">×{amount}</b>
         {claimed ? <span className="ui-stamp">已签</span> : current ? <UiButton size="s" tone="green" onPress={() => claim(() => session.claimDailyReward(), '签到成功')}>签到</UiButton> : <small>　</small>}
       </div>;
     })}</div>}
@@ -105,10 +95,10 @@ export function CapsuleSheet({ session, onClose }: { session: GameSession; onClo
   };
   const prize = result ? CAPSULE_REWARDS.find(r => r.id === result.reward)! : null;
   return <>
-    <Sheet title="幸运扭蛋机" subtitle="每次抽一项；已拥有的永久权益会换成金币" size="m" onClose={onClose} footer={<>
-      <Chip icon="gift">幸运币 <b>{number(rewards.balance)}</b></Chip>
+    <Sheet title="幸运扭蛋机" subtitle="每次抽一项；已拥有的永久权益会换成金币" size="m" className="capsule-sheet" onClose={onClose} footer={<>
+      <Chip icon="luck">幸运币 <b>{number(rewards.balance)}</b></Chip>
       <span className="ui-hint" role="status">{message || (!state.atMachine ? '走到扭蛋机旁边才能抽' : rewards.balance < REWARD_CONFIG.spinCost ? '幸运币不够，去奖励里领一些吧' : '')}</span><span className="ui-grow" />
-      <UiButton size="m" tone="pink" icon="gift" disabled={!state.atMachine || rewards.balance < REWARD_CONFIG.spinCost} onPress={spin}>抽一次 · {REWARD_CONFIG.spinCost} 幸运币</UiButton>
+      <UiButton size="m" tone="pink" icon="luck" disabled={!state.atMachine || rewards.balance < REWARD_CONFIG.spinCost} onPress={spin}>抽一次 · {REWARD_CONFIG.spinCost} 幸运币</UiButton>
     </>}>
       <div className="capsule-layout"><CapsuleArt />
         <div className="capsule-prizes">{CAPSULE_REWARDS.map(reward => {

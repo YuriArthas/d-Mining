@@ -7,7 +7,7 @@
 .rewards-days .ui-card-tile { padding: 6px 4px 8px; min-height: 140px; }
 .rewards-days h4 { font-size: 14px; }
 .rewards-days .ui-card-art { width: 40px; height: 40px; }
-.rewards-days b { font-size: 16px; color: var(--ui-text-gold); }
+.rewards-days b, .rewards-cards b { font-size: 16px; color: var(--ui-text-gold); }
 .rewards-invite { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .rewards-share { display: grid; gap: 8px; padding: 10px; align-content: start; }
 .rewards-share > b { font-size: 16px; }

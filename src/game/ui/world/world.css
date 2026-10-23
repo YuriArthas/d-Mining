@@ -1,5 +1,6 @@
 /* World container (传送 / 进度). */
-.world-cards { --card: 138px; }
+/* Every layer card in view: they share the width and wrap on narrow screens instead of running off the edge. */
+.world-cards { display: grid; grid-auto-flow: row; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); overflow: visible; }
 .world-cards .ui-card-tile { min-height: 168px; }
 .world-cards .ui-card-tile > .ui-btn, .world-cards .ui-card-tile > .ui-stamp, .world-cards .ui-card-tile > .ui-bar { margin-top: auto; }
 .world-cards .ui-bar { width: 100%; }
@@ -15,7 +16,6 @@
 .world-mat > b { font-size: 13px; text-align: right; white-space: nowrap; }
 @container game (max-width: 760px) {
   .world-gate { grid-template-columns: 160px minmax(0, 1fr); }
-  .world-cards { --card: 124px; }
 }
 @container game (max-height: 440px) {
   .world-mats { grid-template-columns: 1fr 1fr; }

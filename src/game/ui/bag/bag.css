@@ -22,14 +22,15 @@
 .bag-reserve { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .bag-reserve > b { font-size: 15px; white-space: nowrap; }
 
-.bag-gears { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; flex: 1; }
+/* Two cards sized to their content (they used to stretch to the sheet's full height). */
+.bag-gears { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-content: start; }
 .bag-gear { flex-direction: row; align-items: stretch; gap: 10px; padding: 10px; --c: #ffb84a; --c-lo: #d9761a; }
 .bag-gear[data-kind=backpacks] { --c: #c58cf0; --c-lo: #8b55cf; }
 .bag-gear-art { width: 104px; display: grid; justify-items: center; align-content: center; gap: 6px; flex: none; }
 .bag-gear-art > .ui-icon { width: 88px; height: 88px; }
 .bag-gear-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
 .bag-gear-info h4 { font-size: 20px; text-align: left; }
-.bag-gear-next { display: grid; justify-items: start; gap: 3px; margin-top: auto; padding: 6px 8px; }
+.bag-gear-next { display: grid; justify-items: start; gap: 3px; margin-top: 4px; padding: 6px 8px; }
 .bag-gear-next small { text-align: left; }
 .bag-gear-next b { font-size: 14px; }
 

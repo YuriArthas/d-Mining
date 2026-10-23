@@ -12,7 +12,7 @@ import { Hud } from './hud/Hud.tsx';
 import type { SystemControls } from './hud/SystemMenu.tsx';
 import { Icon } from './kit/icons.tsx';
 import { DepthGoalCard, TipMarker } from './TipsUi.tsx';
-import { CapsuleSheet, RewardsSheet, type RewardsTab } from './rewards/RewardsSheet.tsx';
+import { CapsuleSheet, RewardsSheet, rewardsTabFor, type RewardsTab } from './rewards/RewardsSheet.tsx';
 import { ShopPanel, showShopCategory } from './ShopPanel.tsx';
 import type { ShopCategory } from '../content/shopCatalog.ts';
 import { TargetHealth } from './TargetHealth.tsx';
@@ -80,7 +80,7 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
       actions={{
         openPets: () => { session.dismissTip('pets'); open({ kind: 'bag', tab: 'pets' }); }, openMinerals: () => open({ kind: 'bag', tab: 'ores' }),
         openShop: () => { session.dismissTip('shop'); openShop('tools'); }, openBackpacks: () => openShop('backpacks'),
-        openRewards: () => open({ kind: 'rewards', tab: 'online' }), openWorlds: () => open({ kind: 'world', tab: 'travel' }), openHelp: () => open({ kind: 'help' }),
+        openRewards: () => open({ kind: 'rewards', tab: rewardsTabFor(state.rewards) }), openWorlds: () => open({ kind: 'world', tab: 'travel' }), openHelp: () => open({ kind: 'help' }),
       }} />}
     {!modal && !shopOpen && <Controls input={input} surface={surface} />}
     {modal?.kind === 'bag' && <BagSheet session={session} tab={modal.tab} onTab={tab => setModal({ kind: 'bag', tab })} onClose={close} onShop={openShop} />}
