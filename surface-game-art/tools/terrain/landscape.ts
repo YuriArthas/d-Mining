@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { Kit, materials, rng, type V3 } from './kit.ts';
 import { createGroundTexture, createStoneTexture, createWaterTexture, createPathTexture, groundTextureBounds } from './terrainTexture.ts';
 import { readFileSync } from 'node:fs';
+import { ConvexGeometry } from 'three/addons/geometries/ConvexGeometry.js';
 
 // The hub plan (tools/export-pinewind-layout.mjs) owns plazas, paths, paving pads and clearances.
 type KeepClear = { kind: 'rect'; minX: number; maxX: number; minZ: number; maxZ: number } | { kind: 'circle'; x: number; z: number; radius: number };
@@ -271,6 +272,54 @@ function buildGround(kit: Kit) {
   const bank = meshFromData(banks, bankMaterial, 'Continuous faceted creek banks'); bank.castShadow = true; kit.group.add(bank);
 }
 
+/** A thin darker rim where sand meets grass, as in the original game: it keeps the light sand and the light
+ *  grass apart. The zero contour of `pathDistance` (marching squares on a 0.2 m grid over the paved area)
+ *  becomes a 0.16 m band just above the ground, one quad per contour segment. */
+function buildEdging(kit: Kit) {
+  const step = .2, half = .08, lift = .01, x0 = -18, x1 = 32, z0 = 2, z1 = 104;
+  const nx = Math.round((x1 - x0) / step), nz = Math.round((z1 - z0) / step), field = new Float32Array((nx + 1) * (nz + 1));
+  for (let j = 0; j <= nz; j++) for (let i = 0; i <= nx; i++) field[j * (nx + 1) + i] = pathDistance(x0 + i * step, z0 + j * step);
+  const positions: number[] = [], normals: number[] = [], colors: number[] = [], rim = new THREE.Color('#b99366');
+  const edgePoint = (i: number, j: number, di: number, dj: number) => {
+    const a = field[j * (nx + 1) + i], b = field[(j + dj) * (nx + 1) + i + di], t = a / (a - b);
+    return [x0 + (i + di * t) * step, z0 + (j + dj * t) * step] as const;
+  };
+  for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) {
+    const v = [field[j * (nx + 1) + i], field[j * (nx + 1) + i + 1], field[(j + 1) * (nx + 1) + i + 1], field[(j + 1) * (nx + 1) + i]];
+    const crossings: (readonly [number, number])[] = [];
+    // Cell edges in order: bottom, right, top, left; a sign change marks where the contour crosses.
+    if ((v[0] < 0) !== (v[1] < 0)) crossings.push(edgePoint(i, j, 1, 0));
+    if ((v[1] < 0) !== (v[2] < 0)) crossings.push(edgePoint(i + 1, j, 0, 1));
+    if ((v[3] < 0) !== (v[2] < 0)) crossings.push(edgePoint(i, j + 1, 1, 0));
+    if ((v[0] < 0) !== (v[3] < 0)) crossings.push(edgePoint(i, j, 0, 1));
+    for (let k = 0; k + 1 < crossings.length; k += 2) {
+      const [ax, az] = crossings[k], [bx, bz] = crossings[k + 1], length = Math.hypot(bx - ax, bz - az);
+      if (length < 1e-4) continue;
+      // No rim across the creek (the path stops at its banks; the bridge carries it) or in the mine opening.
+      const mx = (ax + bx) / 2, mz = (az + bz) / 2, river = riverAt(mx, mz);
+      if (river.distance < river.halfWidth + 1.3 || (Math.abs(mx) < 8.6 && Math.abs(mz) < 8.6)) continue;
+      // Extend each segment slightly along itself so neighbouring quads overlap instead of leaving cracks.
+      const ux = (bx - ax) / length, uz = (bz - az) / length, ox = -uz * half, oz = ux * half, ex = ux * .02, ez = uz * .02;
+      const quad = [[ax - ex + ox, az - ez + oz], [ax - ex - ox, az - ez - oz], [bx + ex - ox, bz + ez - oz], [bx + ex + ox, bz + ez + oz]];
+      for (const index of [0, 1, 2, 0, 2, 3]) {
+        const [x, z] = quad[index];
+        positions.push(x, landscapeHeight(x, z) + lift, z); normals.push(0, 1, 0); colors.push(rim.r, rim.g, rim.b);
+      }
+    }
+  }
+  // Wind every triangle upward.
+  for (let t = 0; t < positions.length; t += 9) {
+    const ax = positions[t], az = positions[t + 2], bx = positions[t + 3], bz = positions[t + 5], cx = positions[t + 6], cz = positions[t + 8];
+    if ((bx - ax) * (cz - az) - (bz - az) * (cx - ax) > 0) for (let k = 0; k < 3; k++) { const tmp = positions[t + 3 + k]; positions[t + 3 + k] = positions[t + 6 + k]; positions[t + 6 + k] = tmp; }
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+  geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+  const material = new THREE.MeshLambertMaterial({ vertexColors: true }); material.name = 'Sand edging';
+  const mesh = new THREE.Mesh(geometry, material); mesh.name = 'Sand edging'; mesh.castShadow = false; mesh.receiveShadow = true;
+  kit.group.add(mesh);
+}
 function placeNature(kit: Kit, getNature: NatureFactory, name: string, position: V3, scale: V3, yaw = 0) {
   const [x,,z]=position;
   for (const area of grounds.keepClear) {
@@ -284,8 +333,8 @@ function placeRock(kit: Kit, getNature: NatureFactory, position: V3, size: V3, y
   return placeNature(kit, getNature, variant % 2 ? 'rock_b' : 'rock_a', position, size, yaw);
 }
 function buildQuarry(kit: Kit, getNature: NatureFactory) {
-  for(const x of [-8.45,8.45])kit.box([x,.12,0],[.42,.24,16.7],'#d2bb80',[0,0,0],.04);
-  kit.box([0,.12,-8.45],[17.3,.24,.42],'#d2bb80',[0,0,0],.04);
+  for(const x of [-8.45,8.45])kit.box([x,.12,0],[.42,.24,16.7],'#e4d1a0',[0,0,0],.04);
+  kit.box([0,.12,-8.45],[17.3,.24,.42],'#e4d1a0',[0,0,0],.04);
 }
 function buildPaths(kit: Kit) {
   // Deliberate square paving clusters, not a smooth overlay hiding painted edges.
@@ -395,20 +444,117 @@ function meadowDetails(kit: Kit, getNature: NatureFactory) {
     placeNature(kit, getNature, 'grass', [x, landscapeHeight(x, z), z], [s, s, s], clump % 4 * Math.PI / 2);
   }
 }
-function buildBackdrop(kit: Kit, getNature: NatureFactory) {
-  for (const [x, z, w, h, d, seed] of [
-    [-31, -32, 7, 8, 6, 11], [-20, -39, 9, 10, 7, 23], [-6, -43, 11, 11, 7, 37],
-    [10, -42, 10, 12, 7, 43], [24, -35, 8, 8, 6, 59],
-    [-39, -21, 6, 6, 8, 67], [42, -23, 6, 8, 10, 79],
-    // Rocky shoulders where the ridge meets the gate's pass.
-    [-17.5, 74, 6, 7, 6, 83], [17.5, 75, 6, 8, 6, 91], [-25, 84, 8, 9, 7, 97], [26, 85, 8, 10, 7, 103],
-  ]) {
-    placeNature(kit, getNature, 'cliff', [x, landscapeHeight(x, z) - .2, z], [w, h, d], (seed % 4) * Math.PI / 2);
-    for (let i = 0; i < 2; i++) {
-      const a = .55 + i * 1.35, bx = x + Math.cos(a) * w * .76, bz = z + Math.sin(a) * d * .76;
-      placeRock(kit, getNature, [bx, landscapeHeight(bx, bz) - .1, bz], [w * .27, h * (.2 + i * .055), d * .28], i * Math.PI / 2, i);
-    }
+/** The valley is a bowl, as in the original game: tall faceted rock masses in warm terracotta close its
+ *  north, west and east, and rise from the wooded ridge on the south. Each mass carries a green crown and a
+ *  tree or two; a second, taller row stands behind, and two rows of woods line the foot. Polylines run
+ *  along the inner foot. A mass that would stand in the creek, on a path or in a kept-clear area is left
+ *  out, so the creek leaves through gorges and the pass with the gate stays open. Heights are metres
+ *  above the local ground: lowest toward the gorges, tallest behind the mine. */
+const CLIFF_WALLS: { points: [number, number][]; heights: [number, number]; woods: boolean }[] = [
+  { points: [[-57, 40], [-53, 20], [-50, 0], [-48, -20], [-42, -36]], heights: [17, 26], woods: true },
+  { points: [[-42, -36], [-26, -44], [-8, -47], [10, -46], [27, -42], [42, -37], [52, -44]], heights: [21, 30], woods: true },
+  { points: [[64, -54], [69, -22], [69, 10], [67, 36], [66, 62]], heights: [17, 26], woods: true },
+  // The south rim stands back on the ridge and stays low, with no woods of its own in front: the sun is in
+  // the south-west, and anything taller here throws its shadow over the portal ring and the spawn.
+  { points: [[-21, 80], [-36, 84], [-52, 81], [-69, 76]], heights: [8, 13], woods: false },
+  { points: [[21, 80], [36, 84], [52, 81], [67, 75]], heights: [8, 13], woods: false },
+];
+const VALLEY_CENTRE = { x: 0, z: 18 };
+function kept(x: number, z: number, margin: number) {
+  return grounds.keepClear.some(area => area.kind === 'rect'
+    ? x > area.minX - margin && x < area.maxX + margin && z > area.minZ - margin && z < area.maxZ + margin
+    : Math.hypot(x - area.x, z - area.z) < area.radius + margin);
+}
+/** Points along a wall every `step` metres (jittered), with the unit normal pointing out of the valley. */
+function wallStations(points: [number, number][], step: number, r: () => number, phase = 0) {
+  const stations: { x: number; z: number; nx: number; nz: number; s: number }[] = [];
+  let carried = phase;
+  for (let i = 0; i < points.length - 1; i++) {
+    const [ax, az] = points[i], [bx, bz] = points[i + 1], length = Math.hypot(bx - ax, bz - az);
+    let tx = (bx - ax) / length, tz = (bz - az) / length, nx = tz, nz = -tx;
+    if ((ax + bx) / 2 * nx - VALLEY_CENTRE.x * nx + ((az + bz) / 2 - VALLEY_CENTRE.z) * nz < 0) { nx = -nx; nz = -nz; }
+    for (let d = carried; d < length; d += step + (r() - .5) * step * .3) { stations.push({ x: ax + tx * d, z: az + tz * d, nx, nz, s: stations.length }); carried = d + step - length; }
+    if (carried < 0) carried = 0;
   }
+  return stations;
+}
+function rockColumn(r: () => number, x: number, z: number, radius: number, height: number, tint: readonly [THREE.Color, THREE.Color]) {
+  const ground = landscapeHeight(x, z), base = ground - 2.5, top = ground + height, sides = 7, spin = r() * Math.PI * 2;
+  const tilt = [(r() - .5) * .14, (r() - .5) * .14], points: THREE.Vector3[] = [];
+  // Rounded shoulders: the widest ring a third of the way up, then broad faces leaning in to the crown.
+  for (const [f, k] of [[0, .96], [.3, 1], [.62, .95], [.86, .8], [1, .58]]) for (let i = 0; i < sides; i++) {
+    const a = spin + (i + (r() - .5) * .55) / sides * Math.PI * 2, rr = radius * k * (.84 + r() * .3);
+    const px = x + Math.cos(a) * rr, pz = z + Math.sin(a) * rr;
+    points.push(new THREE.Vector3(px, base + (top - base) * f + (f === 1 ? (px - x) * tilt[0] + (pz - z) * tilt[1] : 0), pz));
+  }
+  const geometry = new ConvexGeometry(points), position = geometry.getAttribute('position'), colors: number[] = [], c = new THREE.Color();
+  for (let i = 0; i < position.count; i += 3) {
+    // One colour per broad face: warm brown at the foot turning dusty mauve higher up (as the original's
+    // cliffs), a little per-face variation and a darker foot.
+    const centre = (position.getY(i) + position.getY(i + 1) + position.getY(i + 2)) / 3, f = (centre - base) / (top - base);
+    c.copy(tint[0]).lerp(tint[1], smooth(.15, .7, f)).multiplyScalar((.92 + rng(Math.floor(x * 31 + z * 17 + i))() * .13) * (.84 + .16 * smooth(0, .55, f)));
+    for (let k = 0; k < 3; k++) colors.push(c.r, c.g, c.b);
+  }
+  geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+  return { geometry, points, top: Math.max(...points.slice(-sides).map(p => p.y)), crown: radius * .58 };
+}
+function greenCrown(r: () => number, x: number, z: number, top: number, radius: number, tint: THREE.Color) {
+  const points: THREE.Vector3[] = [], sides = 8, spin = r() * Math.PI * 2;
+  // A big dome as wide as the column's shoulders, overhanging its top on every side (as the original's).
+  for (const [dy, k] of [[-1.8, 1.35], [1.0, 1.62], [3.4, 1.18], [4.8, .46]]) for (let i = 0; i < sides; i++) {
+    const a = spin + (i + (r() - .5) * .5) / sides * Math.PI * 2, rr = radius * k * (.88 + r() * .24);
+    points.push(new THREE.Vector3(x + Math.cos(a) * rr, top + dy * (.85 + r() * .3), z + Math.sin(a) * rr));
+  }
+  const geometry = new ConvexGeometry(points), position = geometry.getAttribute('position'), normal = geometry.getAttribute('normal'), colors: number[] = [], c = new THREE.Color();
+  for (let i = 0; i < position.count; i += 3) {
+    c.copy(tint).multiplyScalar((.92 + rng(Math.floor(x * 13 + z * 29 + i))() * .14) * (normal.getY(i) > .6 ? 1.12 : .96));
+    for (let k = 0; k < 3; k++) colors.push(c.r, c.g, c.b);
+  }
+  geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+  return { geometry, top: Math.max(...points.map(p => p.y)) };
+}
+function buildCliffs(kit: Kit, getNature: NatureFactory) {
+  const rock = new THREE.MeshLambertMaterial({ vertexColors: true }); rock.name = 'Valley cliff rock';
+  const moss = new THREE.MeshLambertMaterial({ vertexColors: true }); moss.name = 'Valley cliff crown';
+  // Foot and top colours per rock, and the crowns' emerald, chosen side by side on the public build against
+  // the original game (tools/check-lighting-tone with live material tints).
+  const r = rng(91807), green = new THREE.Color('#5ebc91');
+  const stone = ([['#bf9495', '#c5a6ba'], ['#b4898a', '#ba99ac'], ['#c49f9f', '#cbb2c5']] as const).map(([foot, top]) => [new THREE.Color(foot), new THREE.Color(top)] as const);
+  const clear = (x: number, z: number, radius: number) => {
+    const river = riverAt(x, z);
+    return river.distance > radius + river.halfWidth + 2.5 && pathDistance(x, z) > radius + 2 && !kept(x, z, radius * .6);
+  };
+  let columns = 0;
+  CLIFF_WALLS.forEach((wall, w) => {
+    for (const [row, step] of [[0, 9.5], [1, 10.5]] as const) for (const at of wallStations(wall.points, step, r, row * 4.5)) {
+      const out = row ? 9 + r() * 4 : (r() - .5) * 3, x = at.x + at.nx * out, z = at.z + at.nz * out;
+      const radius = (row ? 6.5 + r() * 3 : 5.5 + r() * 2.5), wave = .5 + .5 * Math.sin(at.s * .9 + w * 2.3);
+      const height = wall.heights[0] + (wall.heights[1] - wall.heights[0]) * wave + (r() - .5) * 4 + (row ? 4 + r() * 5 : 0);
+      if (!clear(x, z, radius)) continue;
+      const column = rockColumn(r, x, z, radius, height, stone[Math.floor(r() * stone.length)]);
+      const mesh = new THREE.Mesh(column.geometry, rock); mesh.name = 'Valley cliff column'; mesh.castShadow = mesh.receiveShadow = true;
+      mesh.userData.hull = column.points.map(p => p.toArray()); kit.group.add(mesh); columns++;
+      const crown = greenCrown(r, x, z, column.top, column.crown, green);
+      const cap = new THREE.Mesh(crown.geometry, moss); cap.name = 'Valley cliff crown'; cap.castShadow = cap.receiveShadow = true; kit.group.add(cap);
+      // A tree or two near the crown's valley side breaks each top against the sky.
+      for (let k = row ? (r() < .5 ? 1 : 0) : r() < .3 ? 2 : r() < .85 ? 1 : 0; k > 0; k--) {
+        const a = r() * Math.PI * 2, d = column.crown * (.15 + r() * .45), tx = x - at.nx * column.crown * .35 + Math.cos(a) * d, tz = z - at.nz * column.crown * .35 + Math.sin(a) * d, h = 6 + r() * 5;
+        const tree = getNature(r() < .55 ? 'tree_pine' : 'tree_oak'); tree.name = 'Blockcraft cliff tree';
+        tree.scale.setScalar(h); kit.add(tree, [tx, crown.top - .9, tz], Math.floor(r() * 4) * Math.PI / 2);
+      }
+    }
+    // Two rows of woods along the foot, staggered, on the valley side.
+    if (wall.woods) for (const [inset, step, phase] of [[6.5, 7.5, 0], [12, 8, 3.8]] as const) for (const at of wallStations(wall.points, step, r, phase)) {
+      const x = at.x - at.nx * (inset + (r() - .5) * 2.5), z = at.z - at.nz * (inset + (r() - .5) * 2.5);
+      const river = riverAt(x, z);
+      if (river.distance < river.halfWidth + 3 || pathDistance(x, z) < 2.5) continue;
+      const h = 9 + r() * 6;
+      placeNature(kit, getNature, r() < .6 ? 'tree_pine' : 'tree_oak', [x, landscapeHeight(x, z), z], [h, h, h], Math.floor(r() * 4) * Math.PI / 2);
+    }
+  });
+  return columns;
+}
+function buildBackdrop(kit: Kit) {
   // Two connected mountain ranges: long angular slopes, broad saddles and only
   // a few short plateau shoulders. Block-built detail belongs near the player;
   // the distant skyline must continue to read as a valley, not a curtain wall.
@@ -416,8 +562,9 @@ function buildBackdrop(kit: Kit, getNature: NatureFactory) {
   // Only the north has distant ranges: the later worlds lie along +Z, so the south is closed by the
   // wooded ridge alone and the route to them stays clear.
   const ridges = [
-    { z: -112, tint: '#7cadd0', heights: [12, 23, 33, 38, 31, 35, 43, 42, 33, 28, 34, 41, 38, 28, 30, 21, 9], phase: 1.4, shoulders: [3, 6, 11], facing: 1 },
-    { z: -80, tint: '#608fae', heights: [8, 17, 24, 27, 24, 18, 23, 28, 25, 19, 16, 22, 29, 30, 24, 17, 7], phase: 3.1, shoulders: [3, 7, 13], facing: 1 },
+    // Forested blue-green, a step lighter than the near woods; grey-blue read as haze behind the cliffs.
+    { z: -112, tint: '#86bf9c', heights: [12, 23, 33, 38, 31, 35, 43, 42, 33, 28, 34, 41, 38, 28, 30, 21, 9], phase: 1.4, shoulders: [3, 6, 11], facing: 1 },
+    { z: -80, tint: '#68a882', heights: [8, 17, 24, 27, 24, 18, 23, 28, 25, 19, 16, 22, 29, 30, 24, 17, 7], phase: 3.1, shoulders: [3, 7, 13], facing: 1 },
   ];
   for (const ridge of ridges) {
     const spine: THREE.Vector3[] = [];
@@ -486,7 +633,7 @@ function buildWater() {
 export function buildLandscape(getNature: NatureFactory): { group: THREE.Group; water: THREE.Mesh[] } {
   random = rng(712044);
   const kit = new Kit(); kit.group.name = 'Pinewind playable valley';
-  buildGround(kit); buildQuarry(kit, getNature); buildPaths(kit); buildBackdrop(kit, getNature); plantings(kit, getNature); meadowDetails(kit, getNature);
+  buildGround(kit); buildEdging(kit); buildQuarry(kit, getNature); buildPaths(kit); buildBackdrop(kit); buildCliffs(kit, getNature); plantings(kit, getNature); meadowDetails(kit, getNature);
   kit.group.traverse(o=>{if(o instanceof THREE.Mesh && /Flowing meadow|Inset polygon|turf lips|creek banks/.test(o.name)){o.userData.surfaceGround=true;o.castShadow=false;}});
   return { group: kit.group, water: buildWater() };
 }

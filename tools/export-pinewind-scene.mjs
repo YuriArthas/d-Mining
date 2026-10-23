@@ -25,7 +25,10 @@ const solid=root=>{
  return {at:center.toArray(),half:[half.x,Math.max(.01,half.y),half.z],yaw:0,triangles:{vertices,indices}};
 };
 const built=buildLandscape(name=>{const node=nature.getObjectByName(name);if(!node)throw Error(name);return node.clone(true);});
-const colliders=[];built.group.traverse(o=>{if(o.isMesh&&(o.userData.surfaceGround||/trunk/i.test(o.name)))colliders.push(solid(o));});
+// Cliff columns collide as their own convex hulls (world-space points from the landscape builder).
+const hullSolid=points=>{const bounds=new THREE.Box3().setFromPoints(points.map(p=>new THREE.Vector3(...p))),center=bounds.getCenter(new THREE.Vector3()),half=bounds.getSize(new THREE.Vector3()).multiplyScalar(.5);
+ return {at:center.toArray(),half:half.toArray(),yaw:0,hull:points.flatMap(p=>[p[0]-center.x,p[1]-center.y,p[2]-center.z].map(v=>+v.toFixed(4)))};};
+const colliders=[];built.group.traverse(o=>{if(!o.isMesh)return;if(o.userData.hull)colliders.push(hullSolid(o.userData.hull));else if(o.userData.surfaceGround||/trunk/i.test(o.name))colliders.push(solid(o));});
 
 // Light bake casters: every static model except the distant mountains (far beyond any shadow) and the two
 // gate doors (they swing open, so they must not leave a door-shaped shadow behind). The open meadow and

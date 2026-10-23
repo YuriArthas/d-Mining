@@ -42,12 +42,14 @@ def paint_leaf(tile, base, shade, light, glint):
         rect(tile,x,y,w,h,light)
     rect(tile,5,5,5,2,glint)
 
-paint_leaf(0,(99,157,55),(91,149,52),(108,166,59),(116,172,65))
-paint_leaf(1,(124,179,58),(116,171,54),(134,187,64),(142,193,69))
-paint_leaf(2,(48,126,78),(44,119,76),(57,135,82),(64,141,87))
-paint_leaf(3,(62,145,85),(56,138,81),(70,153,89),(76,158,94))
-paint_leaf(4,(107,163,54),(98,155,50),(117,171,59),(124,177,64))
-paint_leaf(5,(130,183,66),(121,175,61),(139,191,71),(148,197,78))
+# Bright, saturated canopies (2026-10-23, compared with the original game): the earlier darker greens read
+# nearly black on the shaded and backlit sides of a dense wood.
+paint_leaf(0,(108,176,60),(99,167,56),(118,186,66),(127,193,72))
+paint_leaf(1,(136,198,64),(127,189,59),(147,207,71),(156,214,77))
+paint_leaf(2,(52,150,80),(47,141,76),(61,160,86),(69,167,92))
+paint_leaf(3,(68,170,88),(61,161,83),(77,179,94),(84,186,100))
+paint_leaf(4,(115,182,58),(106,173,54),(126,191,64),(134,198,70))
+paint_leaf(5,(142,202,72),(132,193,67),(152,211,78),(161,218,85))
 
 # Bark bands turn corners as broad rectangular furrows, with one cut branch knot.
 for tile,base,dark,light in [

@@ -141,6 +141,31 @@ test('the bridge deck leaves the path at ground level and arches gently; the fee
   }
  }finally{collisions.dispose();physics.dispose();}
 });
+test('cliffs enclose the valley outside the play area: the pass and the creek gorges stay open, and the walls stop the character',async()=>{
+ const hulls=PINEWIND_CAMP.surface.plan.solids.filter(s=>s.hull);
+ assert.ok(hulls.length>50,`${hulls.length} cliff columns`);
+ const gap=(s,x,z)=>Math.hypot(Math.max(0,Math.abs(x-s.at[0])-s.half[0]),Math.max(0,Math.abs(z-s.at[2])-s.half[2]));
+ for(const s of hulls){
+  assert.ok(gap(s,PINEWIND_PLAZA.x,PINEWIND_PLAZA.z)>PINEWIND_PLAZA.radius+15,`column at ${s.at} crowds the plaza`);
+  assert.ok(gap(s,PINEWIND_SPAWN.x,PINEWIND_SPAWN.z)>20,`column at ${s.at} crowds the spawn`);
+  // The pass through the gate and the route beyond it.
+  assert.ok(Math.abs(s.at[0])-s.half[0]>7||s.at[2]+s.half[2]<60,`column at ${s.at} blocks the pass`);
+  // The creek enters in the north-east and leaves in the west through gorges.
+  for(const [x,z] of [[61,-50],[-70,55]])assert.ok(gap(s,x,z)>2,`column at ${s.at} dams the creek`);
+ }
+ for(const zone of [...PINEWIND_CAMP.session.portals.map(p=>p.zone),...PINEWIND_CAMP.session.eggStations.map(e=>e.zone),PINEWIND_SERVICES.sale.trigger,PINEWIND_SERVICES.shop.trigger])
+  for(const s of hulls)assert.ok(gap(s,zone.x,zone.z)>10);
+ await initPhysics();const physics=new CharacterPhysics(false,true),collisions=new SceneryCollision(physics,[{id:'surface',depth:0,plan:PINEWIND_CAMP.surface.plan}]);
+ physics.world.createCollider(RAPIER.ColliderDesc.cuboid(100,1,100).setTranslation(0,-1,0));
+ try{
+  // Walk north behind the mine and west behind the sale house: the cliffs stop both walks.
+  for(const [start,yaw,axis,limit] of [[[0,.1,-14],0,2,-62],[[-30,.1,0],Math.PI/2,0,-70]]){
+   physics.teleport(start);
+   for(let i=0;i<900;i++){collisions.sync(physics.feet());physics.tick(0,1,yaw,false,true);}
+   assert.ok(physics.feet()[axis]>limit,`walked through the cliffs to ${physics.feet()}`);
+  }
+ }finally{collisions.dispose();physics.dispose();}
+});
 test('instant trips face the service building',()=>{
  const session=new GameSession(PINEWIND_CAMP.session);let trip=null;
  session.attach({cell:()=>0,pending:()=>false,mine:()=>false,cancelMining(){},returnToSurface(){},travelTo:(feet,look)=>{trip={feet,look};}});

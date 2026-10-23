@@ -8,8 +8,9 @@ export const ENVIRONMENT_CONFIG = {
   fog: { near: 38, far: 74 },
   surface: SURFACE_LIGHTING,
   sky: {
-    dayZenith: "#358edf",
-    dayHorizon: "#c5ebff",
+    // A saturated blue down to the horizon, as in the original game: the pale horizon read as haze.
+    dayZenith: "#2a86dd",
+    dayHorizon: "#7cc5f3",
     nightZenith: "#24385f",
     nightHorizon: "#647fa4",
     lighting: SURFACE_LIGHTING,

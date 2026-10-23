@@ -1,6 +1,9 @@
+import { Color } from "three";
 import type {
   Group,
   DirectionalLight,
+  Mesh,
+  MeshStandardMaterial,
   PerspectiveCamera,
   Scene,
   WebGLRenderer,
@@ -8,7 +11,7 @@ import type {
 import { gameAudio } from "../audio/GameAudio.ts";
 import { SURFACE_EXPOSURE, type SurfaceLookOverride } from "../world/SceneLighting.ts";
 import { applyToneGrade } from "../presentation/toneGrade.ts";
-import { ARCHITECTURE_ALBEDO, setArchitectureAlbedo } from "../presentation/albedoLift.ts";
+import { ARCHITECTURE_ALBEDO, setArchitectureAlbedo, setFoliageAlbedo } from "../presentation/albedoLift.ts";
 import { setBakedLightTuning } from "../presentation/bakedLight.ts";
 import type { PreparedGame } from "./startGame.ts";
 import type { GameSession } from "../application/GameSession.ts";
@@ -33,7 +36,10 @@ export type ValidationDebug = {
   }) => void;
   surfaceHeight: (x: number, z: number) => number | null;
   /** Try other surface light values and exposure live; null restores the game's. */
-  lightingLook: (look: (SurfaceLookOverride & { exposure?: number; grade?: boolean; albedo?: { saturation: number; brightness: number; bounce?: number }; baked?: false | { shadow?: number; ao?: number; aoBuildings?: number; aoDirect?: number } }) | null) => void;
+  lightingLook: (look: (SurfaceLookOverride & { exposure?: number; grade?: boolean; albedo?: { saturation: number; brightness: number; bounce?: number }; foliage?: { saturation?: number; brightness?: number; bounce?: number }; baked?: false | { shadow?: number; ao?: number; aoBuildings?: number; aoDirect?: number } }) | null) => void;
+  /** Verification only: multiply the colour of every material whose name matches a rule (case-insensitive
+   *  pattern, linear RGB factors), live; null restores the authored colours. Returns how many were tinted. */
+  materialTint: (rules: readonly { match: string; color: readonly [number, number, number] }[] | null) => number;
   /** Final audio output level (dBFS) and a recordable stream of it, for checks. */
   audioLevel: () => number | null;
   audioStream: () => MediaStream | null;
@@ -92,6 +98,7 @@ export function attachGameDebug(
     cameraView,
   } = current;
   const teleport = player.travelTo;
+  const tinted = new Map<MeshStandardMaterial, Color>();
   const debug: ValidationDebug = {
     advanceDayNight: seconds => environment.advanceDayNight(seconds),
     advanceOnline: seconds => session.advanceOnline(seconds),
@@ -213,8 +220,25 @@ export function attachGameDebug(
       applyToneGrade(gl, look?.grade ?? true);
       const albedo = look?.albedo ?? ARCHITECTURE_ALBEDO;
       setArchitectureAlbedo(albedo.saturation, albedo.brightness, albedo.bounce ?? ARCHITECTURE_ALBEDO.bounce);
+      setFoliageAlbedo(look?.foliage ?? null);
       // false: no baked light at all (for side-by-side checks); an object retunes it.
       setBakedLightTuning(look?.baked === false ? { shadow: 0, ao: 0, aoBuildings: 0 } : look?.baked ?? null);
+    },
+    materialTint: rules => {
+      for (const [material, color] of tinted) material.color.copy(color);
+      tinted.clear();
+      for (const rule of rules ?? []) {
+        const pattern = new RegExp(rule.match, "i"), factor = new Color(...rule.color);
+        scene.traverse(object => {
+          if (!(object as Mesh).isMesh) return;
+          for (const material of [(object as Mesh).material].flat() as MeshStandardMaterial[]) {
+            if (!material?.color || tinted.has(material) || !pattern.test(material.name)) continue;
+            tinted.set(material, material.color.clone());
+            material.color.multiply(factor);
+          }
+        });
+      }
+      return tinted.size;
     },
     audioLevel: () => gameAudio.outputLevel(),
     audioStream: () => gameAudio.outputStream(),

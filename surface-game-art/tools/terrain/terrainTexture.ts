@@ -4,8 +4,8 @@ import { rng } from './kit.ts';
 export type GroundKind = 'grass' | 'path' | 'sand' | 'stone' | 'bed';
 export const groundTextureBounds = { x: -96, z: -81, size: 192, pixels: 512 };
 const palette = {
-  grass: ['#74bf4c', '#6db748', '#7bc44f'],
-  path: ['#dfb272', '#edc786', '#cfa064'],
+  grass: ['#8fdd7b', '#87d673', '#98e485'],
+  path: ['#fdf1d6', '#fffaea', '#f1e1bf'],
   sand: ['#e6c584', '#f0d39a', '#d5b477'],
   stone: ['#a7bfc0', '#c0d0c9', '#8fa9b0'],
   bed: ['#398f9a', '#439ca4', '#337e8e'],
@@ -85,11 +85,12 @@ export function createWaterTexture() {
   return finish(data, size, 'Blockcraft water: authored 64px broad glints', true);
 }
 
-/** Sparse pixel accents remain on an otherwise broad, clean ochre road. */
+/** Sparse pixel accents remain on an otherwise broad, clean cream-sand road: the ground is a light, calm
+ *  stage so the buildings, portals and characters stand out (as in the original game). */
 export function createPathTexture() {
-  const size = 64, data = new Uint8Array(size * size * 4), base = rgba('#dfb272');
+  const size = 64, data = new Uint8Array(size * size * 4), base = rgba('#fdf1d6');
   for (let i = 0; i < size * size; i++) data.set(base, i * 4);
-  for (const [x, y, width, height, color] of [[5, 8, 9, 3, '#e7be82'], [10, 11, 7, 2, '#e7be82'], [38, 39, 11, 3, '#d4a56c'], [32, 41, 9, 2, '#d4a56c']] as const) {
+  for (const [x, y, width, height, color] of [[5, 8, 9, 3, '#fffaea'], [10, 11, 7, 2, '#fffaea'], [38, 39, 11, 3, '#f1e1bf'], [32, 41, 9, 2, '#f1e1bf']] as const) {
     for (let py = y; py < y + height; py++) for (let px = x; px < x + width; px++) data.set(rgba(color), (py * size + px) * 4);
   }
   return finish(data, size, 'Roblox path: sparse 64px accents', true);

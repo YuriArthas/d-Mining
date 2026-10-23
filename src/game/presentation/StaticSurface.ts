@@ -3,7 +3,7 @@ import { NearestFilter, NearestMipmapNearestFilter } from "three";
 import type { SurfaceContent } from "../content/campContent.ts";
 import type { AssetProfile } from "../content/assetProfiles.ts";
 import { Mesh, MeshStandardMaterial, type WebGLRenderer } from "three";
-import { liftAlbedo } from "./albedoLift.ts";
+import { liftAlbedo, liftFoliage } from "./albedoLift.ts";
 import { applyBakedLight, setBakedGround, setBakedSun } from "./bakedLight.ts";
 import { loadStandingLight, setStandingLight } from "./standingLight.ts";
 import standingLightUrl from "../assets/camp/pinewind-standing-light.png?url";
@@ -82,6 +82,8 @@ export async function loadStaticSurface(
       m.roughness=1;m.metalness=0;m.envMapIntensity=0;
       if(m.map){m.map.magFilter=NearestFilter;m.map.minFilter=NearestMipmapNearestFilter;}
       if(request.name==='pinewind-architecture')liftAlbedo(m);
+      // Woods, rocks and the cliff walls: lit all round like the original's valley, not near black in shade.
+      else if(m.name==='Nature_PixelAtlas_Opaque'||m.name.startsWith('Valley cliff'))liftFoliage(m);
       applyBakedLight(m);
     },onProgress);
     setBakedSun(content.authored.light.sun);

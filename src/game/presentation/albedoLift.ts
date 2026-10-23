@@ -9,24 +9,36 @@ import { Vector3, type MeshStandardMaterial } from 'three';
  *    grey; tops lit by the open sky keep the normal fill.
  *  The uniforms are shared, so every copy of the material follows one setting. */
 export const ARCHITECTURE_ALBEDO = { saturation: 1.25, brightness: 1.2, bounce: 3.6 } as const;
-/** Light bounced off the sunlit sand is warm. */
-const BOUNCE_TINT = [1.08, 1, 0.86] as const;
-
-const uniforms = {
-  albedoSaturation: { value: ARCHITECTURE_ALBEDO.saturation as number },
-  albedoBrightness: { value: ARCHITECTURE_ALBEDO.brightness as number },
-  albedoBounce: { value: new Vector3(1, 1, 1) },
+/** Trees, bushes and rocks (the shared nature atlas): canopies scatter sunlight, so in a dense wood their
+ *  shaded and backlit sides keep a good share of their own green instead of dropping to near black (the
+ *  original game's woods stay bright all round). Neutral fill, a slight lift of the atlas colour, and the
+ *  same lighter sky occlusion as the buildings (bakedLight.ts). */
+export const FOLIAGE_ALBEDO = { saturation: 1.12, brightness: 1.22, bounce: 3.6 } as const;
+type Look = { saturation: number; brightness: number; bounce: number };
+/** Light bounced off the sunlit sand is warm; light through leaves keeps its own colour. */
+const looks = {
+  architecture: { tint: [1.08, 1, 0.86] as const, bounce: ARCHITECTURE_ALBEDO.bounce as number, key: 'architecture-albedo-lift-v3', uniforms: uniformsFor(ARCHITECTURE_ALBEDO) },
+  foliage: { tint: [1, 1, 1] as const, bounce: FOLIAGE_ALBEDO.bounce as number, key: 'foliage-albedo-lift-v1', uniforms: uniformsFor(FOLIAGE_ALBEDO) },
 };
-let bounce: number = ARCHITECTURE_ALBEDO.bounce, daylight = 1;
+function uniformsFor(look: Look) {
+  return { albedoSaturation: { value: look.saturation }, albedoBrightness: { value: look.brightness }, albedoBounce: { value: new Vector3(1, 1, 1) } };
+}
+let daylight = 1;
 const applyBounce = () => {
-  const gain = 1 + (bounce - 1) * daylight;
-  uniforms.albedoBounce.value.set(...BOUNCE_TINT.map(t => gain * (1 + (t - 1) * daylight)) as [number, number, number]);
+  for (const look of Object.values(looks)) {
+    const gain = 1 + (look.bounce - 1) * daylight;
+    look.uniforms.albedoBounce.value.set(...look.tint.map(t => gain * (1 + (t - 1) * daylight)) as [number, number, number]);
+  }
 };
 applyBounce();
 
-export function liftAlbedo(material: MeshStandardMaterial) {
+export function liftAlbedo(material: MeshStandardMaterial) { lift(material, looks.architecture); }
+export function liftFoliage(material: MeshStandardMaterial) { lift(material, looks.foliage); }
+function lift(material: MeshStandardMaterial, look: (typeof looks)[keyof typeof looks]) {
   if (material.userData.albedoLift) return;
+  // Lifted materials also take the lighter sky occlusion (bakedLight.ts).
   material.userData.albedoLift = true;
+  const uniforms = look.uniforms;
   const previous = material.onBeforeCompile;
   material.onBeforeCompile = (shader, renderer) => {
     previous.call(material, shader, renderer);
@@ -43,7 +55,7 @@ export function liftAlbedo(material: MeshStandardMaterial) {
 		diffuseColor.rgb = pow( max( g, vec3( 0.0 ) ), vec3( 2.2 ) );
 	}`);
   };
-  material.customProgramCacheKey = () => 'architecture-albedo-lift-v3';
+  material.customProgramCacheKey = () => look.key;
 }
 
 /** Per frame: the extra fill fades out with the daylight (no glowing houses at night). */
@@ -53,7 +65,15 @@ export function setArchitectureDaylight(value: number) {
 
 /** Verification only: retune live (shared by every lifted material). */
 export function setArchitectureAlbedo(saturation: number, brightness: number, fill: number = ARCHITECTURE_ALBEDO.bounce) {
+  const { uniforms } = looks.architecture;
   uniforms.albedoSaturation.value = saturation;
   uniforms.albedoBrightness.value = brightness;
-  bounce = fill; applyBounce();
+  looks.architecture.bounce = fill; applyBounce();
+}
+/** Verification only: retune the foliage look live (null restores it). */
+export function setFoliageAlbedo(value: Partial<Look> | null) {
+  const look = { ...FOLIAGE_ALBEDO, ...value }, { uniforms } = looks.foliage;
+  uniforms.albedoSaturation.value = look.saturation;
+  uniforms.albedoBrightness.value = look.brightness;
+  looks.foliage.bounce = look.bounce; applyBounce();
 }

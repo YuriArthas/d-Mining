@@ -9,7 +9,8 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
 // Desktop by default (the current art checks are desktop only); DEVICE=mobile keeps the phone emulation.
 const MOBILE = process.env.DEVICE === 'mobile';
 const SUN = [-35, 60, 35];
-// null keeps the game's own values. Each variant may set day light values and exposure.
+// null keeps the game's own values. Each variant may set day light values and exposure, and `tint`
+// rules for window.__miningValidation.materialTint (material name pattern, linear RGB factors).
 const VARIANTS = JSON.parse(process.env.VARIANTS || 'null') ?? {
   current: null,
   sample: { exposure: 1, day: { moonPosition: SUN, moonColor: '#fff5de', moonIntensity: 3, skyColor: '#b5daff', groundColor: '#667b93', ambientIntensity: 0.55, environmentIntensity: 0.35 } },
@@ -59,7 +60,7 @@ const VIEWS = JSON.parse(process.env.VIEWS || 'null') ?? [
       await page.evaluate(v => { window.__miningValidation.teleport(v.at); window.__miningValidation.look(v.yaw, v.pitch); }, view);
       await page.waitForTimeout(2500); await draw(6);
       for (const [name, look] of Object.entries(VARIANTS)) {
-        await page.evaluate(look => window.__miningValidation.lightingLook(look), look);
+        await page.evaluate(look => { window.__miningValidation.lightingLook(look); window.__miningValidation.materialTint?.(look?.tint ?? null); }, look);
         await page.evaluate(v => window.__miningValidation.look(v.yaw, v.pitch), view);
         await page.waitForTimeout(700); await draw(5);
         const file = `${view.name}-${name}.png`;
@@ -68,7 +69,7 @@ const VIEWS = JSON.parse(process.env.VIEWS || 'null') ?? [
         console.log('SHOT', file);
       }
     }
-    await page.evaluate(() => window.__miningValidation.lightingLook(null));
+    await page.evaluate(() => { window.__miningValidation.lightingLook(null); window.__miningValidation.materialTint?.(null); });
   } catch (error) {
     report.errors.push(`script: ${error.stack || error.message}`); console.error(error); process.exitCode = 1;
     await page.screenshot({ path: path.join(dir, 'failure.png') }).catch(() => {});

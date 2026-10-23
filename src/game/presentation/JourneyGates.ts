@@ -78,7 +78,10 @@ export class JourneyGates {
     const solid=(half:[number,number,number],at:[number,number,number])=>{const c=physics.world.createCollider(RAPIER.ColliderDesc.cuboid(...half).setTranslation(...at));this.colliders.push(c);return c;};
     // A ground-level route runs from the spawn plaza through its rear gate.
     // The requirement belongs on the door itself, not on a floating guide panel.
-    box([5.4,.04,74],[0,.04,87],'#d6af67');
+    // World 1's authored landscape paves its own path through the gate to its edge (z 104): the route only
+    // bridges the rest of the way to world 2, instead of an unshaded strip laid over that path.
+    if(authoredGate(surface))box([5.4,.04,20],[0,.04,114],'#e8d3a0');
+    else box([5.4,.04,74],[0,.04,87],'#d6af67');
     for(const w of WORLD_REQUIREMENTS.slice(1)) {
       const world=w.id as 2|3,z=worldGateZ(world);
       if(world===3)box([10,.04,24],[0,.04,w.z-112],'#b6a994');

@@ -59,8 +59,9 @@ export class SurfaceEnvironment {
             vec3 sky;
             sky=mix(dayHorizon,dayZenith,pow(h,.45));
             vec2 p=d.xz/max(.16,h)*2.1+vec2(3.2,8.1);
-            float cloud=smoothstep(.48,.67,fbm(p*.55))*smoothstep(.18,.4,h);
-            vec3 cloudColor=mix(vec3(.65,.78,.89),vec3(.97,.97,.91),smoothstep(.48,.72,fbm(p*.55)));
+            // Fewer, whiter clouds: grey-blue cloud cover dulled the whole sky.
+            float cloud=smoothstep(.56,.72,fbm(p*.55))*smoothstep(.18,.4,h);
+            vec3 cloudColor=mix(vec3(.80,.89,.97),vec3(1.,.99,.96),smoothstep(.56,.76,fbm(p*.55)));
             sky=mix(sky,cloudColor,cloud*.94);
             float sunDot=max(dot(d,sunDirection),0.);
             sky+=vec3(.20,.16,.09)*pow(sunDot,96.);

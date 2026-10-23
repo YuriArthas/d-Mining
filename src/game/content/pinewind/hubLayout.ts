@@ -114,7 +114,7 @@ export const PINEWIND_GROUNDS = {
     { x: round(CAPSULE_MACHINE_AT[0] + Math.sin(CAPSULE_MACHINE_YAW) * 1.2), z: round(CAPSULE_MACHINE_AT[2] + Math.cos(CAPSULE_MACHINE_YAW) * 1.2), radius: 3.2 }, // capsule machine pad
   ],
   paths: [
-    { width: 2.7, points: [[0, 80], [0, 54], [0, 46], [0, 36.5], [0, 26], [0, 16], [0, 8]] },
+    { width: 2.7, points: [[0, 104], [0, 80], [0, 54], [0, 46], [0, 36.5], [0, 26], [0, 16], [0, 8]] },
     { width: 1.9, points: [[13.5, 21], [22, 21], [22, 15.5], [27, 15.5]] },
     { width: 1.9, points: [[22, 21], [22, 44.5], [27, 44.5]] },
     { width: 1.5, points: spawnArc },
@@ -123,7 +123,7 @@ export const PINEWIND_GROUNDS = {
   keepClear: [
     { kind: 'rect', minX: -10, maxX: 10, minZ: -10, maxZ: 10 },
     { kind: 'rect', minX: 20, maxX: 46, minZ: 12, maxZ: 48 },
-    { kind: 'rect', minX: -7, maxX: 7, minZ: 30, maxZ: 90 },
+    { kind: 'rect', minX: -7, maxX: 7, minZ: 30, maxZ: 104 },
     { kind: 'circle', x: PINEWIND_PLAZA.x, z: PINEWIND_PLAZA.z, radius: PINEWIND_PLAZA.radius + .5 },
     { kind: 'circle', x: PINEWIND_SPAWN.x, z: PINEWIND_SPAWN.z, radius: 15.5 },
     { kind: 'circle', x: PINEWIND_SERVICES.sale.center[0], z: PINEWIND_SERVICES.sale.center[2], radius: 7.5 },
