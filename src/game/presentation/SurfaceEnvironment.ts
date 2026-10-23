@@ -31,6 +31,7 @@ export class SurfaceEnvironment {
   private readonly filteredBlend:WebGLRenderTarget;
   private enabled = false;
   private disposed = false;
+  private environmentOverride:Partial<Record<SurfaceTime,number|undefined>>={};
   private prepared:Readonly<{daylight:number;surface:boolean;lightingStrength:number;lightingIntensity:number}>|null=null;
   private submitted:Readonly<{daylight:number;surface:boolean;lightingStrength:number;lightingIntensity:number}>|null=null;
   private submittedFrames=0;
@@ -141,8 +142,14 @@ export class SurfaceEnvironment {
     if(this.daylight>0&&this.daylight<1){
       this.scene.environment=this.filteredBlend.texture;
     }else this.scene.environment=this.filtered[this.daylight===1?'day':'night'].texture;
-    const {day,night}=this.config.lighting;
-    this.scene.environmentIntensity=(night.environmentIntensity+(day.environmentIntensity-night.environmentIntensity)*this.daylight)*this.lightingStrength;
+    const day=this.environmentOverride.day??this.config.lighting.day.environmentIntensity,night=this.environmentOverride.night??this.config.lighting.night.environmentIntensity;
+    this.scene.environmentIntensity=(night+(day-night)*this.daylight)*this.lightingStrength;
+  }
+  /** Verification only: image-based light strength per time of day (undefined keeps the config). */
+  setEnvironmentOverride(intensity:Partial<Record<SurfaceTime,number|undefined>>){
+    if(this.disposed)throw new Error('SurfaceEnvironment has been disposed');
+    this.environmentOverride=intensity;
+    if(this.enabled)this.applyEnvironment();
   }
   // Sky visibility and material lighting are independent. Deep in the first
   // shaft the opening may still reveal the sky, while its IBL contribution is zero.

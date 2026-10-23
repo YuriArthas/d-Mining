@@ -6,6 +6,8 @@ import type {
   WebGLRenderer,
 } from "three";
 import { gameAudio } from "../audio/GameAudio.ts";
+import { SURFACE_EXPOSURE, type SurfaceLookOverride } from "../world/SceneLighting.ts";
+import { applyToneGrade } from "../presentation/toneGrade.ts";
 import type { PreparedGame } from "./startGame.ts";
 import type { GameSession } from "../application/GameSession.ts";
 import type { GameInput } from "../GameInput.ts";
@@ -28,6 +30,8 @@ export type ValidationDebug = {
     reflection?: "live" | "frozen" | "off";
   }) => void;
   surfaceHeight: (x: number, z: number) => number | null;
+  /** Try other surface light values and exposure live; null restores the game's. */
+  lightingLook: (look: (SurfaceLookOverride & { exposure?: number; grade?: boolean }) | null) => void;
   /** Final audio output level (dBFS) and a recordable stream of it, for checks. */
   audioLevel: () => number | null;
   audioStream: () => MediaStream | null;
@@ -201,6 +205,11 @@ export function attachGameDebug(
         profiler.reflectionMode = options.reflection;
     },
     surfaceHeight: (x, z) => facilities.surfaceHeight(x, z),
+    lightingLook: look => {
+      environment.setLookOverride(look ? { day: look.day, night: look.night } : null);
+      gl.toneMappingExposure = look?.exposure ?? SURFACE_EXPOSURE;
+      applyToneGrade(gl, look?.grade ?? true);
+    },
     audioLevel: () => gameAudio.outputLevel(),
     audioStream: () => gameAudio.outputStream(),
     look: (yaw, pitch) => cameraView.look(yaw, pitch),

@@ -15,6 +15,11 @@ export const SURFACE_DAY={
  environmentIntensity:.55,
 } as const;
 export const SURFACE_LIGHTING={day:SURFACE_DAY,night:SURFACE_NIGHT} as const;
+/** One time of day's surface light: sun (or moon), sky/ground fill and image-based light. */
+export type SurfaceLookValues={moonPosition:readonly [number,number,number];moonColor:string;moonIntensity:number;skyColor:string;groundColor:string;ambientIntensity:number;environmentIntensity:number};
+export type SurfaceLookOverride=Partial<Record<SurfaceTime,Partial<SurfaceLookValues>>>;
+/** Renderer exposure under Neutral tone mapping. */
+export const SURFACE_EXPOSURE=1.08;
 export const SURFACE_AREA_LIGHT={id:'pit-area-key',position:[0,9.5,1],target:[0,-4,0],color:'#ffe0af',intensity:850,distance:44,angle:.95,penumbra:.7} as const;
 // All lights only illuminate; selected ground contact occlusion is baked offline.
 export const SURFACE_FILL_LIGHTS=[

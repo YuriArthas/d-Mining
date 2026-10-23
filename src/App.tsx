@@ -5,10 +5,10 @@ import {PINEWIND_CAMP as CAMP_CONTENT} from './game/content/pinewindSurface.ts';
 import {LoadingScreen,LoadingBoundary} from './game/ui/LoadingScreen.tsx';
 import {initialLoading,updateLoading,type LoadingEvent} from './game/ui/loadingState.ts';
 import type {RenderRate} from './game/movement.ts';
-import type {SurfaceTime} from './game/world/SceneLighting.ts';
+import {SURFACE_EXPOSURE, type SurfaceTime} from './game/world/SceneLighting.ts';
+import {applyToneGrade} from './game/presentation/toneGrade.ts';
 import { useCallback, useReducer, useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react';
 import { flushSync } from 'react-dom';
-import { NeutralToneMapping } from 'three';
 import { Canvas, unmountComponentAtNode, type RootState } from '@react-three/fiber';
 import { GAME_CONFIG } from './game/config.ts';
 import { GameInput, type InputSnapshot } from './game/GameInput.ts';
@@ -166,7 +166,7 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
       <div inert={showLoading || !!exitState || saveStatus.state === 'conflicted'} ref={surface} className="scene" tabIndex={0} aria-label="游戏视角，拖动观察，点按敲击，长按方块挖掘">
         <LoadingBoundary onFailure={failLoading}><Canvas
           ref={canvas}
-          onCreated={state => { scene.current = state; state.gl.toneMapping=NeutralToneMapping; state.gl.toneMappingExposure=1.08; }}
+          onCreated={state => { scene.current = state; applyToneGrade(state.gl); state.gl.toneMappingExposure=SURFACE_EXPOSURE; }}
           frameloop="never"
           shadows={false}
           resize={{ offsetSize: true }}

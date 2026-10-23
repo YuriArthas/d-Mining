@@ -7,7 +7,7 @@ import {
 } from "three";
 import type { SurfaceEnvironment, SkyConfig } from "./SurfaceEnvironment.ts";
 import type { SceneLightingRig } from "./SceneLightingRig.ts";
-import type { SurfaceTime } from "../world/SceneLighting.ts";
+import type { SurfaceLookOverride, SurfaceTime } from "../world/SceneLighting.ts";
 import { DayNightCycle } from '../logic/DayNightCycle.ts';
 
 export type EnvironmentConfig = Readonly<{
@@ -49,7 +49,7 @@ export type EnvironmentFrame = Readonly<{
 type Sky = Pick<
   SurfaceEnvironment,
   "setDaylight" | "setEnabled" | "setLightingStrength" | "prepareDraw" | "markSubmitted" | "dispose" | "diagnostics" | "active"
->;
+> & Partial<Pick<SurfaceEnvironment, "setEnvironmentOverride">>;
 type Lights = Pick<
   SceneLightingRig,
   "setDaylight" | "setSurfaceStrength" | "dispose" | "diagnostics"
@@ -74,6 +74,7 @@ export class EnvironmentController {
   private surfaceStrength = 0;
   private lastKey = "";
   private disposed = false;
+  private look: SurfaceLookOverride | null = null;
   updates = 0;
 
   constructor(
@@ -120,6 +121,11 @@ export class EnvironmentController {
   get surfaceTime(): SurfaceTime { return this.daylight >= .5 ? 'day' : 'night'; }
   // Exposed by the debug adapter only. The next normal frame owns all rendering updates.
   advanceDayNight(seconds: number) { return this.cycle.advance(seconds); }
+  /** Verification only: try other surface light values live (null restores the content's). */
+  setLookOverride(look: SurfaceLookOverride | null) {
+    this.look = look; this.lastKey = "";
+    this.sky.setEnvironmentOverride?.({ day: look?.day?.environmentIntensity, night: look?.night?.environmentIntensity });
+  }
 
   private apply(frame: EnvironmentFrame, delta?: number, cycleElapsed = 0) {
     if (this.disposed)
@@ -129,7 +135,7 @@ export class EnvironmentController {
     // deep shaft inherit daylight: reuse the entrance's existing smooth fade.
     const strength = this.surfaceStrength = frame.surface ? Math.max(0, Math.min(1, frame.surfaceLightStrength)) : 0;
     this.daylight = frame.time === 'auto' ? this.cycle.advance(cycleElapsed).daylight : frame.time === 'day' ? 1 : 0;
-    const { day, night } = config.surface, underground = config.underground;
+    const day = { ...config.surface.day, ...this.look?.day }, night = { ...config.surface.night, ...this.look?.night }, underground = config.underground;
     const blend = (a: number, b: number) => a + (b - a) * this.daylight;
     this.target.set(frame.sky);
     // Prewarm is immediate; normal frames retain the existing sky transition history.
