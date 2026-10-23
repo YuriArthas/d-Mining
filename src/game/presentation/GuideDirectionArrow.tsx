@@ -27,7 +27,8 @@ export function updateGuideRoute(group: Group, feet: readonly number[], target: 
   group.rotation.y=Math.atan2(dx,dz);
   const mesh=group.children[0] as Mesh<BufferGeometry,MeshBasicMaterial>;
   // Compact the whole head only on the final approach, never invert the shaft.
-  const width=Math.min(3.25,length/(layout.headAspect+layout.tailAspect+.15));
+  // Slim and slightly see-through: one quiet guide, not a road sign across the screen.
+  const width=Math.min(1.5,length/(layout.headAspect+layout.tailAspect+.15));
   const tail=width*layout.tailAspect,neck=length-width*layout.headAspect;
   const points=mesh.geometry.getAttribute('position');
   for(const [i,z] of [0,tail,neck,length].entries()){
@@ -43,7 +44,7 @@ export function GuideDirectionArrow({ arrowRef }: { arrowRef: RefObject<Group | 
   const resources=useMemo(()=>{
     texture.colorSpace=SRGBColorSpace;texture.anisotropy=4;
     return {geometry:geometry(),material:new MeshBasicMaterial({
-      map:texture,transparent:true,alphaTest:.03,depthWrite:false,depthTest:true,
+      map:texture,transparent:true,opacity:.78,alphaTest:.03,depthWrite:false,depthTest:true,
       side:DoubleSide,toneMapped:false,
     })};
   },[texture]);

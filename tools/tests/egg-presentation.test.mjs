@@ -121,3 +121,14 @@ test('moving between independent eggs updates the offer and physical UI anchor',
   assert.notEqual(session.getSnapshot(), before); assert.notEqual(before.eggId, session.getSnapshot().eggId);
   session.resetPosition(); assert.equal(session.getSnapshot().eggStation, null);
 });
+
+test('the mine label shows only while the mine is in view; off screen the ground arrow alone leads', async () => {
+  const { GuideMarkerProjector } = await import('../../src/game/presentation/GuideMarkerProjector.ts');
+  const projector = new GuideMarkerProjector(), element = { style: {}, dataset: {} };
+  const camera = new PerspectiveCamera(60, 16 / 9, .1, 100); camera.updateMatrixWorld();
+  projector.update(camera, [0, 0, -10], element);
+  assert.equal(element.style.visibility, 'visible'); assert.equal(element.style.left, '50%'); assert.equal(element.style.top, '50%');
+  for (const anchor of [[0, 0, 10], [100, 0, -10], null]) {
+    projector.update(camera, anchor, element); assert.equal(element.style.visibility, 'hidden');
+  }
+});

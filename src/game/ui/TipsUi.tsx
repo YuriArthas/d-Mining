@@ -4,23 +4,24 @@ import type { DepthGoal, Tip } from '../application/Tips.ts';
 import type { TipId } from '../logic/Onboarding.ts';
 import { GameButton } from './GameButton.tsx';
 import { Icon, type IconKind } from './kit/icons.tsx';
+import { Bar } from './kit/panel.tsx';
 import './tips.css';
-import arrowUrl from '../assets/guide-arrow/roblox-arrow-v1.webp';
 
 const touchControls = window.matchMedia('(any-pointer: coarse)');
 const subscribeTouch = (notify: () => void) => { touchControls.addEventListener('change', notify); return () => touchControls.removeEventListener('change', notify); };
 function useTouchControls() { return useSyncExternalStore(subscribeTouch, () => touchControls.matches); }
 
-/** The first-dig tip lives in the world: an arrow toward the mine, then a glowing ring on a block
- *  (GuideMarkerProjector and MiningLessonHighlight place it every frame). */
+/** The first-dig tip lives in the world: a ground arrow toward the mine with a label over the mine, then a
+ *  glowing ring on a block (GuideMarkerProjector and MiningLessonHighlight place it every frame). */
 export function TipMarker({ tip, anchor, hidden, marker }: { tip: Tip | null; anchor: readonly number[] | null; hidden: boolean; marker: RefObject<HTMLDivElement | null> }) {
   const touch = useTouchControls();
   if (hidden || !tip) return null;
   if (tip.anchor === 'dig') return <div key="dig" ref={marker} className="guide-dig-marker" data-input={touch ? 'touch' : 'mouse'} style={{ visibility: 'hidden' }} aria-hidden="true">
     <span className="guide-dig-ring" /><b className="guide-dig-caption">{touch ? '长按这里挖矿' : '鼠标移到这里 · 按住左键'}</b>
   </div>;
+  // Just the label over the mine while it is in view; the ground arrow leads the way otherwise.
   if (tip.anchor === 'mine' && anchor) return <div key="mine" ref={marker} className="guide-marker" style={{ visibility: 'hidden' }} aria-hidden="true">
-    <span className="guide-marker-arrow"><img src={arrowUrl} className="guide-arrow-image" alt="" /></span><b>去矿坑挖矿</b><small className="guide-offscreen">朝这个方向</small>
+    <b>去矿坑挖矿</b>
   </div>;
   return null;
 }
@@ -39,12 +40,12 @@ export function TipToast({ session, tip }: { session: GameSession; tip: Tip | nu
   </GameButton>;
 }
 
-/** Where the next layer is: a slim progress line, not a task list. */
+/** Where the next layer is: one compact strip in the HUD's style (like the resource capsules), not a task list. */
 export function DepthGoalCard({ goal }: { goal: DepthGoal | null }) {
   if (!goal) return null;
+  const now = Math.floor(goal.currentDepth);
   return <aside className="journey-goals" aria-label="探索目标" data-testid="journey-goals">
-    <div className="journey-depth"><span className="guide-kicker">下一层</span><strong>{goal.name}</strong>
-      <p>{Math.floor(goal.currentDepth)} / {goal.depth} 米</p>
-      <progress aria-label={`解锁${goal.name}的深度进度`} value={goal.currentDepth} max={goal.depth} /></div>
+    <div className="journey-depth"><span className="guide-kicker ui-outline">下一层</span><strong className="ui-outline">{goal.name}</strong></div>
+    <Bar value={now} max={goal.depth} size="s">{now} / {goal.depth} 米</Bar>
   </aside>;
 }

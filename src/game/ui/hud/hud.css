@@ -10,9 +10,9 @@
 .session-ui:not([data-panel=none]) .ui-hud,
 .game-shell:has(.session-ui:not([data-panel=none])) .game-header { display: none; }
 
-/* Left: resources, buffs and the current objective. */
+/* Left: help and settings on top (as the original game), then resources, buffs and the current objective. */
 .hud-left {
-  position: absolute; top: calc(var(--hud-edge) + var(--safe-top)); left: calc(var(--hud-edge) + var(--safe-left));
+  position: absolute; top: calc(var(--hud-edge) + var(--safe-top) + var(--hud-sys) + var(--hud-gap)); left: calc(var(--hud-edge) + var(--safe-left));
   display: grid; justify-items: start; gap: calc(var(--hud-gap) + 2px);
   width: var(--hud-left-w);
 }
@@ -34,22 +34,22 @@
 .hud-depth-kicker { font-size: 13px; --ui-stroke: 3px; }
 .hud-depth-value { font-size: 30px; line-height: 1.05; --ui-stroke: 5px; text-shadow: 0 3px 0 var(--ui-ink); }
 
-/* Right edge: help + settings beside the action column. */
+/* Right edge: the action column. */
 .hud-rail {
   position: absolute; top: calc(var(--hud-edge) + var(--safe-top)); right: calc(var(--hud-edge) + var(--safe-right));
   display: grid; gap: var(--hud-gap); justify-items: end;
 }
 .ui-hud .hud-rail .ui-tile { --tile: var(--hud-tile); }
+/* Top-left: help and settings, small, above the resource capsules. */
 .hud-system {
-  position: absolute; top: calc(var(--hud-edge) + var(--safe-top));
-  right: calc(var(--hud-edge) + var(--safe-right) + var(--hud-tile) + var(--hud-gap) + 6px);
+  position: absolute; top: calc(var(--hud-edge) + var(--safe-top)); left: calc(var(--hud-edge) + var(--safe-left));
   display: flex; gap: var(--hud-gap);
 }
 .ui-hud .hud-system .ui-tile { --tile: var(--hud-sys); }
 .hud-system .ui-tile > .ui-icon { left: 16%; top: 7%; width: 68%; height: 68%; }
 .hud-settings { position: relative; }
 .ui-hud .hud-settings-panel {
-  position: absolute; z-index: 6; top: calc(100% + 12px); right: calc(-1 * (var(--hud-tile) + var(--hud-gap) + 6px));
+  position: absolute; z-index: 6; top: calc(100% + 12px); left: calc(-1 * (var(--hud-sys) + var(--hud-gap)));
   width: 228px; max-height: calc(100cqh - var(--hud-sys) - 40px - var(--safe-top) - var(--safe-bottom)); overflow-y: auto;
   padding: 10px 12px 12px; display: grid; gap: 8px; pointer-events: auto; overscroll-behavior: contain;
 }
@@ -89,8 +89,8 @@
 .hud-center .target-health .hit-flash { animation: hud-hit .2s ease-out; }
 @keyframes hud-hit { from { background: #fff; } }
 
-/* Objective card (GuideCard / DepthGoalCard markup) inside the left column. */
-.hud-objective :is(.guide-card, .journey-goals) {
+/* Objective card (GuideCard markup) and the next-layer strip (DepthGoalCard) inside the left column. */
+.hud-objective .guide-card {
   position: static; transform: none; width: 100%; margin: 0; padding: 8px 12px 10px;
   border: var(--ui-edge) solid var(--ui-ink); border-left-width: var(--ui-edge); border-radius: 12px;
   background: linear-gradient(180deg, var(--ui-card), var(--ui-card-lo)); box-shadow: inset 0 2px 0 #ffffff26, 0 3px 0 var(--ui-ink);
@@ -100,14 +100,23 @@
   display: block; margin: 0 0 2px; letter-spacing: 0; font-family: var(--ui-font); font-size: 13px;
   color: var(--ui-text-gold); -webkit-text-stroke: 3px var(--ui-ink); paint-order: stroke fill;
 }
-.hud-objective :is(.guide-card, .journey-goals) strong {
+.hud-objective .guide-card strong {
   display: block; font-family: var(--ui-font); font-size: 17px; line-height: 1.25; color: #fff;
   -webkit-text-stroke: 3px var(--ui-ink); paint-order: stroke fill; text-shadow: 0 2px 0 var(--ui-ink);
 }
-.hud-objective :is(.guide-card, .journey-goals) p,
-.hud-objective .journey-goals span:not(.guide-kicker) { margin: 4px 0 0; font-size: 13px; line-height: 1.4; color: var(--ui-text-soft); }
-.hud-objective .journey-goals progress { width: 100%; height: 10px; margin-top: 6px; accent-color: var(--ui-gold); }
-.hud-objective .journey-mining:not(:first-child) { margin-top: 8px; padding-top: 6px; border-top: 2px solid #ffffff22; }
+.hud-objective .guide-card p { margin: 4px 0 0; font-size: 13px; line-height: 1.4; color: var(--ui-text-soft); }
+/* The next layer: the same bright capsule language as the coin and bag pills. */
+.hud-objective .journey-goals {
+  display: grid; gap: 5px; width: min(100%, 236px); padding: 6px 10px 8px;
+  border: var(--ui-edge) solid var(--ui-ink); border-radius: 14px; pointer-events: none;
+  background: linear-gradient(180deg, var(--ui-blue-hi) 0, var(--ui-blue) 48%, var(--ui-blue-lo) 100%);
+  box-shadow: inset 0 2px 0 #ffffff66, 0 3px 0 var(--ui-ink);
+}
+.hud-objective .journey-depth { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.hud-objective .journey-depth .guide-kicker { margin: 0; font-size: 12px; --ui-stroke: 3px; }
+.hud-objective .journey-depth strong { font-size: 17px; line-height: 1.1; color: #fff; --ui-stroke: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hud-objective .journey-goals .ui-bar { height: 18px; }
+.hud-objective .journey-goals .ui-bar > span { font-size: 12px; }
 .hud-objective .guide-card button {
   pointer-events: auto; min-height: 40px; margin-top: 8px; padding: 0 12px;
   border: var(--ui-edge) solid var(--ui-ink); border-radius: 10px;
@@ -149,11 +158,6 @@
 .game-shell .jump-button .ui-icon { width: 100%; height: 100%; }
 .game-shell .control-hint { display: none; }
 
-/* Projected world prompt over an egg stand (positioned by WorldPromptProjector). */
-
-/* World guidance labels stay below the depth banner. */
-.game-shell .guide-marker[data-offscreen=true] b,
-.game-shell .guide-offscreen { left: 50%; transform: translateX(-50%); top: calc(70px + var(--safe-top)); }
 
 /* Desktop and tablets: larger bodies, every action visible, no "more" fold. */
 @container game (min-width: 1000px) and (min-height: 620px) {
@@ -162,8 +166,10 @@
   .hud-center { top: calc(8px + var(--safe-top)); }
   .hud-depth-kicker { font-size: 18px; --ui-stroke: 4px; }
   .hud-depth-value { font-size: 46px; --ui-stroke: 6px; }
-  .hud-objective :is(.guide-card, .journey-goals) strong { font-size: 20px; }
-  .hud-objective :is(.guide-card, .journey-goals) p { font-size: 14px; }
+  .hud-objective .guide-card strong { font-size: 20px; }
+  .hud-objective .guide-card p { font-size: 14px; }
+  .hud-objective .journey-depth strong { font-size: 20px; }
+  .hud-objective .journey-goals { width: min(100%, 272px); }
 }
 /* Small phones (≤ 360px tall): tighter tiles, smaller controls, one-line objective detail. */
 @container game (max-height: 360px) {
@@ -171,10 +177,10 @@
   .hud-depth-kicker { font-size: 12px; }
   .hud-depth-value { font-size: 24px; --ui-stroke: 4px; }
   .hud-left { gap: 8px; }
-  .hud-objective :is(.guide-card, .journey-goals) { padding: 6px 10px 8px; }
-  .hud-objective :is(.guide-card, .journey-goals) strong { font-size: 15px; }
-  .hud-objective :is(.guide-card, .journey-goals) p { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
-  .hud-objective .journey-depth > p:last-of-type { display: none; }
+  .hud-objective .guide-card { padding: 6px 10px 8px; }
+  .hud-objective .guide-card strong { font-size: 15px; }
+  .hud-objective .guide-card p { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+  .hud-objective .journey-depth strong { font-size: 15px; }
   .game-shell .joystick { width: 112px; height: 112px; }
   .game-shell .joystick-knob { left: 28px; top: 28px; }
   .game-shell .jump-button { width: 64px; height: 64px; padding: 12px; }

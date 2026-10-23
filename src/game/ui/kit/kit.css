@@ -79,8 +79,8 @@
   padding: 0 calc(var(--pill-h) * .14) 0 calc(var(--pill-h) * 1.02);
   margin-left: calc(var(--pill-h) * .34);
   border: var(--ui-edge) solid var(--ui-ink); border-radius: 999px;
-  background: var(--ui-pattern) center / calc(var(--pill-h) * 1.2) repeat,
-    linear-gradient(180deg, var(--ui-blue-hi) 0, var(--ui-blue) 48%, var(--ui-blue-lo) 100%);
+  /* Plain gradient: the panels' diamond pattern read as empty slots inside a short capsule. */
+  background: linear-gradient(180deg, var(--ui-blue-hi) 0, var(--ui-blue) 48%, var(--ui-blue-lo) 100%);
   box-shadow: inset 0 2px 0 #ffffff66, 0 3px 0 var(--ui-ink);
   pointer-events: auto;
 }
