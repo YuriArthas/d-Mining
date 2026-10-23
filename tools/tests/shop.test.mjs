@@ -11,8 +11,9 @@ import { MinerAvatar } from '../../src/game/presentation/MinerAvatar.ts';
 const content=JOURNEY_CAMP.session;
 function funded(coins=1000) { const data=new GameSession(content).exportProgress();data.wallet.coins=coins;return GameSession.fromData(data,content); }
 function enter(s) { const {zone}=content.shops[0];s.updatePosition([zone.x,zone.y,zone.z],true);assert.ok(s.getSnapshot().shopId); }
-test('shop gates commands by proximity, affordability and sequential purchase; repeated touch never double-debits',()=>{
- const s=funded();const before=s.exportProgress();assert.equal(s.useShopItem('tools','tool-2').status,'unavailable');assert.deepEqual(s.exportProgress(),before);
+test('shop opens anywhere: purchases need affordability and sequence, never the shop circle; repeated touch never double-debits',()=>{
+ const away=funded();assert.equal(away.useShopItem('tools','tool-2').status,'upgraded','bought far from the shop');assert.equal(away.getSnapshot().coins,950);
+ const s=funded();
  enter(s);assert.equal(s.useShopItem('tools','tool-3').status,'locked');assert.equal(s.useShopItem('backpacks','journey-bag-3').status,'locked');assert.equal(s.getSnapshot().coins,1000);
  let commits=0;s.onProgressCommitted(()=>commits++);
  assert.equal(s.useShopItem('tools','tool-2').status,'upgraded');assert.equal(s.getSnapshot().coins,950);assert.equal(commits,1);

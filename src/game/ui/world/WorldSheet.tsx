@@ -35,9 +35,9 @@ function TravelTab({ session, common, onClose }: { session: GameSession; common:
   const go = (id: string) => {
     const result = session.travelTo(id);
     if (result === 'travelling') onClose();
-    else setMessage(result === 'away' ? '回到地表就能传送；抽到「便携传送」后随时可用' : result === 'locked' ? '还没有解锁这一层' : '现在无法传送，请稍后再试');
+    else setMessage(result === 'locked' ? '还没有解锁这一层' : '现在无法传送，请稍后再试');
   };
-  return <Sheet {...common} footer={<span className="ui-hint" role="status">{message || (state.canTravel ? '点「传送」立刻出发。到达新深度会永久解锁那一层的传送和宠物蛋。' : '回到地表就能传送；抽到「便携传送」后在哪都能用。')}</span>}>
+  return <Sheet {...common} footer={<span className="ui-hint" role="status">{message || '在哪都能传送。到达新深度会永久解锁那一层的传送和宠物蛋。'}</span>}>
     <div className="ui-row"><Chip icon="gem">历史最深 <b>{number(Math.floor(state.maxDepth))} 米</b></Chip><span className="ui-hint">{world}</span></div>
     <div className="ui-cards world-cards">
       <div className="ui-card-tile" style={{ '--c': '#62c96b', '--c-lo': '#2f9a3d' } as CSSProperties}>
@@ -49,7 +49,7 @@ function TravelTab({ session, common, onClose }: { session: GameSession; common:
         return <div key={room.id} className="ui-card-tile" data-locked={room.unlocked ? undefined : ''} style={{ '--c': c, '--c-lo': lo } as CSSProperties}>
           {room.unlocked ? <Icon kind="portal" className="ui-icon ui-card-art" /> : <span className="ui-card-art world-lock" aria-hidden="true"><LockIcon /></span>}
           <h4 className="ui-outline">{room.name}</h4><small>地下 {number(room.depth)} 米</small>
-          {room.unlocked ? <UiButton size="s" tone="green" disabled={!state.canTravel} aria-label={`传送到${room.name}`} onPress={() => go(room.id)}>传送</UiButton>
+          {room.unlocked ? <UiButton size="s" tone="green" aria-label={`传送到${room.name}`} onPress={() => go(room.id)}>传送</UiButton>
             : <Bar value={state.maxDepth} max={room.depth} size="s" />}
         </div>;
       })}
@@ -74,7 +74,7 @@ function ProgressTab({ session, common }: { session: GameSession; common: Common
     <UiButton size="s" tone="steel" onPress={() => setConfirm(false)}>取消</UiButton><UiButton size="s" tone="orange" disabled={!ready} onPress={pay}>确认缴纳</UiButton></>
     : <><span className="ui-hint" role="status">{message || (world.mineOpen ? `${world.name}矿区已开放` : !world.areaOpen ? '继续挖矿累计挖掘量，外门会自动打开' : atEntrance ? '材料和金币够了就能缴纳' : `走到${world.name}的矿口缴纳`)}</span><span className="ui-grow" />
       {!world.mineOpen && <UiButton size="s" tone="purple" icon="gem" onPress={() => { session.reserveWorldMaterials(world.id); setMessage('已保留所需材料，之后挖到的也会自动补足'); }}>保留材料</UiButton>}
-      {world.areaOpen && state.currentWorld !== world.id && <UiButton size="s" tone="blue" icon="portal" disabled={!state.canTravel} onPress={() => { const r = session.travelWorld(world.id); if (r !== 'travelling') setMessage('回到地表就能前往'); }}>前往{world.name}</UiButton>}
+      {world.areaOpen && state.currentWorld !== world.id && <UiButton size="s" tone="blue" icon="portal" onPress={() => { const r = session.travelWorld(world.id); if (r !== 'travelling') setMessage('现在无法前往，请稍后再试'); }}>前往{world.name}</UiButton>}
       {!world.mineOpen && atEntrance && <UiButton size="s" tone="orange" disabled={!ready} onPress={() => setConfirm(true)}>缴纳并开放</UiButton>}</>;
   return <Sheet {...common} footer={footer}>
     <div className="ui-row"><div className="ui-seg" role="group" aria-label="选择世界">{gates.map(w => <GameButton key={w.id} aria-pressed={w.id === world.id} blurAfterPress={false} onPress={() => { setSelected(w.id); setConfirm(false); setMessage(''); }}>{w.name}</GameButton>)}</div>

@@ -60,10 +60,10 @@ test('automatic hatch pays once per interval, stops away, and does not resume fr
   at(s,meadow);s.setAutoHatch(true);
   const restored=GameSession.fromData(s.exportProgress(),SESSION_CONTENT);assert.equal(restored.getSnapshot().autoHatch,null);
 });
-test('portable teleport never bypasses a locked layer; movement reward actually reaches the movement port',()=>{
+test('teleporting from a mine never bypasses a locked layer; movement reward actually reaches the movement port',()=>{
   const s=fixture(.81,p=>{p.rewards.timed.speed=2;});
   assert.equal(s.getMovementMultiplier(),2);s.advanceOnline(2);assert.equal(s.getMovementMultiplier(),1);
-  at(s,CAPSULE_MACHINE_ZONE);assert.equal(s.spinCapsule().reward,'travel');
+  at(s,CAPSULE_MACHINE_ZONE);assert.equal(s.spinCapsule().reward,'sell');
   s.updatePosition([90,-400,90],false);s.updatePosition([0,-20,0],false);
   const calls=[];s.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{},travelTo:p=>calls.push(p)});
   assert.equal(s.travelTo('fungal'),'locked');assert.equal(s.travelTo('old_mine'),'travelling');assert.equal(calls.length,1);
@@ -80,4 +80,16 @@ test('failed copy awards nothing; successful platform copies share one reward; i
     assert.equal(s.redeemInvite(createInviteCode('other-miner-123')).status,'claimed');assert.equal(s.getSnapshot().rewards.balance,before+3);
     assert.equal(s.redeemInvite(createInviteCode('third-miner-456')).status,'already-claimed');
   }finally{if(old)Object.defineProperty(globalThis,'navigator',old);else delete globalThis.navigator;}
+});
+test('the double-sale boost doubles the quote and the coins of a sale while it runs, and only then',()=>{
+  const sell=SESSION_CONTENT.sales[0];
+  const sale=boost=>{
+    const s=fixture(0,p=>{p.wallet.coins=0;p.rewards.timed.sell=boost;});
+    s.collected(Array.from({length:4},()=>({kind:64})));
+    const quoted=s.getSnapshot().sale;at(s,sell);
+    return {quoted:quoted.coins,coins:s.getSnapshot().coins};
+  };
+  const plain=sale(0),doubled=sale(60);
+  assert.ok(plain.coins>0);assert.equal(plain.quoted,plain.coins);
+  assert.equal(doubled.quoted,plain.quoted*2);assert.equal(doubled.coins,plain.coins*2);
 });

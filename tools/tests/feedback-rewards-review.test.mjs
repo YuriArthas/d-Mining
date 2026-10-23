@@ -107,12 +107,11 @@ test('leaving an egg station, explicit stop, or suspension prevents the next aut
   }
 });
 
-test('portable travel unlock changes access from a mine while preserving locked-floor rejection', () => {
+test('travel works from a mine for everyone, while locked floors stay rejected', () => {
   const reached = SESSION_CONTENT.destinations[0], locked = SESSION_CONTENT.destinations[1];
-  const session = sessionWith(data => { data.rewards.permanent.travel = true; data.exploration.maxDepth = reached.depth; });
+  const session = sessionWith(data => { data.exploration.maxDepth = reached.depth; });
   const arrivals = []; session.attach({ cell: () => 0, pending: () => false, mine: () => false, cancelMining() {}, returnToSurface() {}, travelTo: position => arrivals.push(position) });
   session.updatePosition([0, -20, 0], false);
-  assert.equal(session.getSnapshot().canTravel, true);
   assert.equal(session.travelTo(locked.id), 'locked');
   assert.equal(session.travelTo(reached.id), 'travelling');
   assert.deepEqual(arrivals, [reached.spawn]);

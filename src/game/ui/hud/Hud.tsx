@@ -11,7 +11,7 @@ import { TipToast } from '../TipsUi.tsx';
 import './hud.css';
 
 export type HudActions = {
-  openPets(): void; openShop(): void; openRewards(): void; openWorlds(): void; openMinerals(): void; openHelp(): void;
+  openPets(): void; openShop(): void; openBackpacks(): void; openRewards(): void; openWorlds(): void; openMinerals(): void; openHelp(): void;
 };
 
 /** Screen-space HUD. Zones mirror the original: resources left, depth top-centre, four
@@ -30,19 +30,20 @@ export function Hud({ session, actions, system, objective, target, prompts, tipH
   // Location is null until the first physics step; the game always starts on the surface.
   const surface = state.location !== 'mine' && state.location !== 'room';
   const depth = surface ? '地表' : `${number(Math.floor(state.depth))} 米`;
-  const { speed, luck } = state.rewards.timed;
+  const { speed, luck, sell } = state.rewards.timed;
   // HUD tips name a control on screen; the first-dig tip is drawn in the world instead.
   const tip = !tipHidden && state.tip && state.tip.anchor !== 'mine' && state.tip.anchor !== 'dig' ? state.tip : null;
   return <div className="ui-hud" data-location={state.location ?? 'surface'} data-tip={tip?.id}>
     <section className="hud-left" aria-label="资源与目标">
       <Pill icon="backpack" meter={bag.capacity > 0 ? bag.used / bag.capacity : 0} state={bag.isFull ? 'full' : undefined}
-        onPress={run(actions.openMinerals)} pressLabel="查看背包里的矿物" plus={{ label: '升级背包', onPress: run(actions.openShop) }}>
+        onPress={run(actions.openMinerals)} pressLabel="查看背包里的矿物" plus={{ label: '升级背包', onPress: run(actions.openBackpacks) }}>
         <span data-testid="bag-count" aria-label={`背包容量 ${number(bag.used)} / ${number(bag.capacity)}`}>{number(bag.used)} / {number(bag.capacity)}</span>
       </Pill>
       <Pill icon="coin" tone="gold"><span data-testid="coins" aria-label={`金币 ${number(state.coins)}`}>{number(state.coins)}</span></Pill>
-      {(speed > 0 || luck > 0) && <div className="hud-buffs">
+      {(speed > 0 || luck > 0 || sell > 0) && <div className="hud-buffs">
         {speed > 0 && <span className="ui-toast"><Icon kind="bolt" />移速 ×2 · {Math.ceil(speed)} 秒</span>}
         {luck > 0 && <span className="ui-toast"><Icon kind="clover" />稀有率 ×2 · {Math.ceil(luck)} 秒</span>}
+        {sell > 0 && <span className="ui-toast"><Icon kind="coin" />出售 ×2 · {Math.ceil(sell)} 秒</span>}
       </div>}
       {objective && <div className="hud-objective">{objective}</div>}
     </section>

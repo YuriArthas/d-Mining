@@ -55,7 +55,7 @@ export function RewardsSheet({ session, tab, onTab, onClose }: { session: GameSe
     { id: 'signin', label: '签到', icon: 'coin', badge: day.signedToday ? undefined : 1 },
     { id: 'invite', label: '邀请', icon: 'paw' },
   ];
-  const footer = <><span className="ui-hint" role="status">{message || '幸运币在地表扭蛋机抽奖：金币、加速、永久挖矿加速、便携传送……'}</span><span className="ui-grow" />
+  const footer = <><span className="ui-hint" role="status">{message || '幸运币在地表扭蛋机抽奖：金币、加速、永久挖矿加速、双倍出售……'}</span><span className="ui-grow" />
     <UiButton size="s" tone="pink" icon="gift" onPress={() => { if (session.goTo('capsule') === 'travelling') onClose(); }}>传送到扭蛋机</UiButton></>;
   return <Sheet title="奖励" tabs={tabs} tab={tab} onTab={onTab} onClose={onClose} footer={footer}>
     <div className="ui-row"><Chip icon="gift">幸运币 <b>{number(rewards.balance)}</b></Chip>
@@ -87,15 +87,15 @@ export function RewardsSheet({ session, tab, onTab, onClose }: { session: GameSe
   </Sheet>;
 }
 
-const PRIZE_ICON: Record<string, IconKind> = { coins: 'coin', speed: 'bolt', mining: 'pickaxe', travel: 'portal', autoHatch: 'paw', luck: 'clover' };
-const PERMANENT = new Set(['mining', 'travel', 'autoHatch']);
+const PRIZE_ICON: Record<string, IconKind> = { coins: 'coin', speed: 'bolt', mining: 'pickaxe', sell: 'coin', autoHatch: 'paw', luck: 'clover' };
+const PERMANENT = new Set(['mining', 'autoHatch']);
 type Spun = Extract<SpinResult, { status: 'spun' }>;
 
 /** Capsule machine: the prize table on one screen and a quick reveal for each spin. */
 export function CapsuleSheet({ session, onClose }: { session: GameSession; onClose(): void }) {
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot), rewards = state.rewards;
   const [result, setResult] = useState<Spun | null>(null), [message, setMessage] = useState('');
-  const note: Record<string, string> = { coins: `${number(state.capsuleCoins)} 金币`, speed: '5 分钟', mining: '永久', travel: '永久', autoHatch: '永久', luck: '5 分钟' };
+  const note: Record<string, string> = { coins: `${number(state.capsuleCoins)} 金币`, speed: '5 分钟', mining: '永久', sell: '5 分钟', autoHatch: '永久', luck: '5 分钟' };
   const spin = () => {
     try {
       const outcome = session.spinCapsule();
@@ -113,7 +113,7 @@ export function CapsuleSheet({ session, onClose }: { session: GameSession; onClo
       <div className="capsule-layout"><CapsuleArt />
         <div className="capsule-prizes">{CAPSULE_REWARDS.map(reward => {
           const owned = PERMANENT.has(reward.id) && rewards.permanent[reward.id as keyof typeof rewards.permanent];
-          const timed = reward.id === 'speed' || reward.id === 'luck' ? rewards.timed[reward.id] : 0;
+          const timed = reward.id === 'speed' || reward.id === 'luck' || reward.id === 'sell' ? rewards.timed[reward.id] : 0;
           return <div key={reward.id} className="ui-card-tile capsule-prize" data-kind={PERMANENT.has(reward.id) ? 'permanent' : reward.id === 'coins' ? 'coins' : 'timed'}>
             <Icon kind={PRIZE_ICON[reward.id]} className="ui-icon capsule-prize-art" />
             <div><b className="ui-outline">{reward.name}</b><strong className="ui-outline">{reward.weight}%</strong><small>{owned ? '已拥有' : timed > 0 ? `剩余 ${clock(timed)}` : note[reward.id]}</small></div>

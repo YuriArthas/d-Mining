@@ -14,7 +14,7 @@ import { bonusLabel } from '../pets/petDisplay.ts';
 import './bag.css';
 
 export type BagTab = 'pets' | 'ores' | 'gear';
-type Props = { session: GameSession; tab: BagTab; onTab(tab: BagTab): void; onClose(): void };
+type Props = { session: GameSession; tab: BagTab; onTab(tab: BagTab): void; onClose(): void; onShop(category: 'tools' | 'backpacks'): void };
 
 /** True when "一键最佳" would change the team: an empty slot can be filled or a stronger pet waits. */
 export function teamCanImprove(pets: PetPanelSnapshot) {
@@ -120,7 +120,7 @@ function OresTab({ session, common, onClose }: Props & { common: Common }) {
   </Sheet>;
 }
 
-function GearTab({ session, common, onClose }: Props & { common: Common }) {
+function GearTab({ session, common, onShop }: Props & { common: Common }) {
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot);
   const tools = state.shopCatalog.tools, bags = state.shopCatalog.backpacks;
   const tool = tools.find(item => item.level === state.pickaxe.level) ?? tools[0];
@@ -139,8 +139,8 @@ function GearTab({ session, common, onClose }: Props & { common: Common }) {
       </div>
     </div>;
   };
-  return <Sheet {...common} footer={<><span className="ui-hint">镐子和背包在地表商店购买；买过的旧装备可以免费换回。</span><span className="ui-grow" />
-    <UiButton size="s" tone="orange" icon="chest" onPress={() => { if (session.goTo('shop') === 'travelling') onClose(); }}>传送到商店</UiButton></>}>
+  return <Sheet {...common} footer={<><span className="ui-hint">在商店换更强的镐子和更大的背包；买过的旧装备可以免费换回。</span><span className="ui-grow" />
+    <UiButton size="s" tone="orange" icon="chest" onPress={() => onShop('tools')}>打开商店</UiButton></>}>
     <div className="bag-gears">{card('tools')}{card('backpacks')}</div>
   </Sheet>;
 }

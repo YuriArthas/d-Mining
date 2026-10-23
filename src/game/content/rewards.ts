@@ -12,13 +12,16 @@ export const REWARD_CONFIG = Object.freeze({
   movementMultiplier: 2,
   miningMultiplier: 1.5,
   luckMultiplier: 2,
+  /** Coins from every sale while the capsule's double-sale boost runs. */
+  sellMultiplier: 2,
 });
 
 export const CAPSULE_REWARDS = [
   { id: 'coins', name: '金币', weight: 65 },
   { id: 'speed', name: '移动速度 ×2', weight: 10 },
   { id: 'mining', name: '永久挖矿速度 ×1.5', weight: 5 },
-  { id: 'travel', name: '便携传送', weight: 5 },
+  // Was “便携传送” (teleport anywhere), which every player now has; a timed double sale instead.
+  { id: 'sell', name: '出售金币 ×2', weight: 5 },
   { id: 'autoHatch', name: '自动孵蛋', weight: 5 },
   { id: 'luck', name: '稀有宠物概率 ×2', weight: 10 },
 ] as const;

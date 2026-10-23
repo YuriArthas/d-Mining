@@ -1,12 +1,4 @@
-/* Shop: counter chooser (kit sheet) and the full-screen 3D showroom overlay. */
-.shop-categories { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.shop-category { min-height: 150px; padding: 12px 8px; cursor: pointer; touch-action: manipulation; --c: #ffb84a; --c-lo: #d9761a; color: #fff; }
-.shop-category[data-category=backpacks] { --c: #c58cf0; --c-lo: #8b55cf; }
-.shop-category > .ui-icon { width: 72px; height: 72px; }
-.shop-category strong { font-size: 24px; }
-.shop-category small { font: 700 12px/1.3 var(--ui-font-body); color: #fff; text-shadow: 0 1px 0 #0b2a4a; }
-.shop-category:focus-visible { outline: 3px solid #fff3a0; outline-offset: 3px; }
-
+/* Shop: the full-screen 3D showroom overlay. */
 .shop-showroom { position: absolute; inset: 0; z-index: 65; pointer-events: auto; touch-action: none; color: #fff; font: 700 13px/1.35 var(--ui-font-body); }
 .shop-item-heading { position: absolute; top: calc(8px + var(--safe-top)); left: 22%; width: 56%; text-align: center; pointer-events: none; }
 .shop-item-heading h1 { margin: 0 0 4px; font-size: 32px; line-height: 1.1; color: #8fe3ff; --ui-stroke: 5px; }

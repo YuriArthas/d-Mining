@@ -7,7 +7,7 @@ import { WORLD_REQUIREMENTS, worldRequirement, worldAtZ, worldAtFeet, worldSpawn
 import { JOURNEY_TOOL_PRICES, JOURNEY_BACKPACKS } from '../content/journeyResources.ts';
 import { ChallengeBoard } from '../logic/ChallengeBoard.ts';
 import { Rewards, type RewardOptions, type RewardClaimResult } from '../logic/Rewards.ts';
-import { stageCoinReward, type OnlineRewardMinutes } from '../content/rewards.ts';
+import { REWARD_CONFIG, stageCoinReward, type OnlineRewardMinutes } from '../content/rewards.ts';
 import { STAGES } from '../content/progression.ts';
 import { CAPSULE_MACHINE_ZONE } from '../content/feedbackFacilities.ts';
 import { CELL } from '../terrain/grid.ts';
@@ -80,11 +80,13 @@ export class GameSession {
   private autoHatchElapsed = 0;
   private lastAutoHatch: Extract<import('./PetService.ts').HatchResult, {status:'hatched'}> | null = null;
   private onlineAccumulated = 0;
-  private rewardEffects = {mining:false,travel:false,autoHatch:false,speed:false,luck:false};
+  private rewardEffects = {mining:false,autoHatch:false,speed:false,luck:false,sell:false};
   private syncRewardEffects() {
     const r=this.rewards.getSnapshot();
-    this.rewardEffects={...r.permanent,speed:r.timed.speed>0,luck:r.timed.luck>0};
+    this.rewardEffects={mining:r.permanent.mining,autoHatch:r.permanent.autoHatch,speed:r.timed.speed>0,luck:r.timed.luck>0,sell:r.timed.sell>0};
   }
+  /** What one item sells for right now: doubled while the capsule's double-sale boost runs. */
+  private salePrice = (itemId: string) => itemPrice(itemId) * (this.rewardEffects.sell ? REWARD_CONFIG.sellMultiplier : 1);
   getMovementMultiplier = () => this.rewardEffects.speed ? 2 : 1;
   private baseStatsKey = '';
   private cachedBaseStats = pickaxeStats(1);
@@ -319,11 +321,10 @@ export class GameSession {
       rewards: this.rewards.getSnapshot(),
       capsuleCoins: this.capsuleCoinReward(),
       atMachine: this.atMachine,
-      canTravel: this.canTravelNow(),
       autoHatch: this.autoHatchEgg,
       lastAutoHatch: this.lastAutoHatch,
       coins: this.wallet.getBalance(),
-      sale: quoteSale(this.content.journey?this.reservations.sellable(bag.items):bag.items, itemPrice),
+      sale: quoteSale(this.content.journey?this.reservations.sellable(bag.items):bag.items, this.salePrice),
       inSellZone: this.inSellZone,
       atHome: this.atHome,
       shopId: this.shopId,
@@ -558,7 +559,8 @@ export class GameSession {
     return {status:'upgraded',capacity:next.capacity,spent:next.price} as const;
   };
   useShopItem = (category:ShopCategory,id:string) => {
-    if(this.suspended||!this.shopId)return {status:'unavailable'} as const;
+    // The shop opens anywhere (HUD button or the surface shop); purchases do not need the shop circle.
+    if(this.suspended)return {status:'unavailable'} as const;
     const item=(category==='tools'?this.toolCatalog:this.bagCatalog).find(x=>x.id===id);
     if(!item)return {status:'unavailable'} as const;
     const owned=category==='tools'?item.level<=this.equipment.toolLevel:item.capacity!<=this.equipment.backpackCapacity;
@@ -705,7 +707,6 @@ export class GameSession {
     const room = this.content.destinations.find((r) => r.id === id);
     if (!room || !this.exploration.has(id)) return "locked" as const;
     if(this.content.journey&&((room.worldId??1)!==this.currentWorld||!this.worldProgress.mineOpen(this.currentWorld)))return 'locked' as const;
-    if (!this.canTravelNow()) return "away" as const;
     if (!this.world?.travelTo) return "unavailable" as const;
     return this.beginTravel(room);
   };
@@ -724,7 +725,7 @@ export class GameSession {
     if(this.content.journey)this.world.travelTo?.(worldSpawn(this.currentWorld));
     else this.world.returnToSurface();
     this.resetPosition();
-    this.notice = "走进金色圆圈出售，或踩左侧圆盘前往已解锁层";
+    this.notice = "";
     this.publish();
   };
   /** The surface hub doubles as the teleport station; portable travel works anywhere. */
@@ -736,7 +737,6 @@ export class GameSession {
     if (!this.sunken) { const keys = new Set<string>(); for (let i = 0; i + 1 < cells.length; i += 2) keys.add(cells[i] + ',' + cells[i + 1]); this.sunken = keys; }
     return this.sunken.has(Math.floor(feet[0] / CELL) + ',' + Math.floor(feet[2] / CELL));
   }
-  private canTravelNow() { return this.atHome || this.guideLocation === 'surface' || this.rewards.getSnapshot().permanent.travel; }
   private surfaceSpot(target: 'shop' | 'sale' | 'capsule' | { egg: string }): { feet: Coord; look: Coord } | null {
     const worldZ = this.content.journey ? worldRequirement(this.currentWorld).z : 0;
     const near = (zone: { y: number; z: number }) => zone.y >= -.1 && Math.abs(zone.z - worldZ) < 100;
@@ -762,7 +762,6 @@ export class GameSession {
   };
   travelWorld = (id: WorldId) => {
     if(this.suspended||!this.content.journey||!this.world?.travelTo)return 'unavailable' as const;
-    if(!this.canTravelNow())return 'away' as const;
     if(!this.worldProgress.areaOpen(id))return 'locked' as const;
     this.world.cancelMining();this.world.travelTo(worldSpawn(id));
     return 'travelling' as const;
@@ -776,8 +775,8 @@ export class GameSession {
     this.reservations.set(id,mode);this.committed(true);this.publish();
   };
   private executeSale() {
-    if(!this.content.journey)return sellAll(this.inventory,this.wallet,itemPrice);
-    const items=this.reservations.sellable(this.inventory.getSnapshot().items), quote=quoteSale(items,itemPrice);
+    if(!this.content.journey)return sellAll(this.inventory,this.wallet,this.salePrice);
+    const items=this.reservations.sellable(this.inventory.getSnapshot().items), quote=quoteSale(items,this.salePrice);
     if(quote.status==='overflow')return quote;
     if(!quote.count)return {status:'empty'} as const;
     if(!this.wallet.canCredit(quote.coins))return {status:'overflow'} as const;

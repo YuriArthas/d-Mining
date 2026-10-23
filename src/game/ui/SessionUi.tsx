@@ -13,7 +13,8 @@ import type { SystemControls } from './hud/SystemMenu.tsx';
 import { Icon } from './kit/icons.tsx';
 import { DepthGoalCard, TipMarker } from './TipsUi.tsx';
 import { CapsuleSheet, RewardsSheet, type RewardsTab } from './rewards/RewardsSheet.tsx';
-import { ShopPanel } from './ShopPanel.tsx';
+import { ShopPanel, showShopCategory } from './ShopPanel.tsx';
+import type { ShopCategory } from '../content/shopCatalog.ts';
 import { TargetHealth } from './TargetHealth.tsx';
 import { WorldSheet, type WorldTab } from './world/WorldSheet.tsx';
 
@@ -41,14 +42,16 @@ export function SessionUi({ shopView, session, input, surface, eggPrompt, guideM
   const [dismissedShop, setDismissedShop] = useState<string | null>(null);
   const [lastShop, setLastShop] = useState(state.shopId);
   if (lastShop !== state.shopId) { setLastShop(state.shopId); setDismissedShop(null); }
+  // The shop opens in place from the HUD (its counter chosen by the button), or on walking into the surface shop.
+  const [shopRequest, setShopRequest] = useState<ShopCategory | null>(null);
   const shop = useSyncExternalStore(shopView.subscribe, shopView.getSnapshot);
-  const shopOpen = !modal && state.shopId !== null && dismissedShop !== state.shopId;
-  useEffect(() => { input.reset(); if (shopOpen) { if (!shopView.active) shopView.categories(); } else shopView.close(); }, [shopOpen, shopView, input]);
+  const shopOpen = !modal && (shopRequest !== null || (state.shopId !== null && dismissedShop !== state.shopId));
+  useEffect(() => { input.reset(); if (shopOpen) { if (!shopView.active) showShopCategory(shopView, session.getSnapshot(), shopRequest ?? 'tools'); } else shopView.close(); }, [shopOpen, shopRequest, shopView, session, input]);
 
   const open = (next: Modal) => { input.reset(); setModal(next); };
   const close = () => { input.reset(); session.setAutoHatch(false); setModal(null); surface.current?.focus(); };
-  const closeShop = () => { input.reset(); setDismissedShop(state.shopId); shopView.close(); surface.current?.focus(); };
-  const openShop = () => { input.reset(); if (state.shopId) { setDismissedShop(null); shopView.categories(); } else session.goTo('shop'); };
+  const closeShop = () => { input.reset(); setShopRequest(null); setDismissedShop(state.shopId); shopView.close(); surface.current?.focus(); };
+  const openShop = (category: ShopCategory) => { input.reset(); setModal(null); setShopRequest(category); if (shopView.active) showShopCategory(shopView, state, category); };
   const lockedMine = !!state.atMineEntrance && state.worlds.some(w => w.id === state.atMineEntrance && !w.mineOpen);
 
   useEffect(() => {
@@ -74,14 +77,14 @@ export function SessionUi({ shopView, session, input, surface, eggPrompt, guideM
     {!modal && !shopOpen && <Hud session={session} system={system} objective={objective} prompts={prompts} target={<TargetHealth session={session} />} tipHidden={blocked || !focused}
       actions={{
         openPets: () => { session.dismissTip('pets'); open({ kind: 'bag', tab: 'pets' }); }, openMinerals: () => open({ kind: 'bag', tab: 'ores' }),
-        openShop: () => { session.dismissTip('shop'); openShop(); },
+        openShop: () => { session.dismissTip('shop'); openShop('tools'); }, openBackpacks: () => openShop('backpacks'),
         openRewards: () => open({ kind: 'rewards', tab: 'online' }), openWorlds: () => open({ kind: 'world', tab: 'travel' }), openHelp: () => open({ kind: 'help' }),
       }} />}
     {!modal && !shopOpen && <Controls input={input} surface={surface} />}
     {!modal && !shopOpen && state.eggStation && <button ref={eggPrompt} type="button" className="egg-world-prompt ui-btn" data-tone="orange" data-size="m" style={{ visibility: 'hidden' }} aria-label="查看宠物蛋" onClick={() => open({ kind: 'egg' })}>
       <Icon kind="paw" /><span className="ui-outline"><span className="desktop-hint">E · </span>查看宠物蛋</span>
     </button>}
-    {modal?.kind === 'bag' && <BagSheet session={session} tab={modal.tab} onTab={tab => setModal({ kind: 'bag', tab })} onClose={close} />}
+    {modal?.kind === 'bag' && <BagSheet session={session} tab={modal.tab} onTab={tab => setModal({ kind: 'bag', tab })} onClose={close} onShop={openShop} />}
     {modal?.kind === 'world' && <WorldSheet session={session} tab={modal.tab} onTab={tab => setModal({ kind: 'world', tab })} onClose={close} />}
     {modal?.kind === 'rewards' && <RewardsSheet session={session} tab={modal.tab} onTab={tab => setModal({ kind: 'rewards', tab })} onClose={close} />}
     {modal?.kind === 'egg' && state.eggId && <EggSheet key={state.eggStation!.id} session={session} eggId={state.eggId} onOpenPets={() => open({ kind: 'bag', tab: 'pets' })} onClose={close} />}

@@ -39,14 +39,15 @@ function setup() {
  s.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{},travelTo:p=>calls.push(p)});
  return {s,calls};
 }
-test('reaching depth outside a room unlocks travel, and only home may initiate it without the portable perk', () => {
+test('reaching depth outside a room unlocks travel, which works from anywhere, even right there in the mine', () => {
  const {s,calls}=setup();s.updatePosition([90,-399.999,90],false);
  assert.equal(s.getSnapshot().destinations[0].unlocked,false); s.updatePosition([90,-400,90],false);
  assert.equal(s.getSnapshot().destinations[0].unlocked,true);assert.equal(s.getSnapshot().destinations[1].unlocked,false);
- assert.equal(s.travelTo('old_mine'),'away');s.updatePosition([HOME_ZONE.x,HOME_ZONE.y,HOME_ZONE.z],true);
  assert.equal(s.travelTo('fungal'),'locked');assert.equal(s.travelTo('unknown'),'locked');
  assert.equal(s.travelTo('old_mine'),'travelling');assert.deepEqual(calls,[ROOMS[0].spawn]);
- assert.equal(s.travelTo('old_mine'),'away');s.resetPosition();assert.equal(s.getSnapshot().destinations[0].unlocked,true);
+ s.updatePosition([HOME_ZONE.x,HOME_ZONE.y,HOME_ZONE.z],true);
+ assert.equal(s.travelTo('old_mine'),'travelling');assert.equal(calls.length,2);
+ s.resetPosition();assert.equal(s.getSnapshot().destinations[0].unlocked,true);
 });
 test('standing at milestone contact height unlocks without requiring room entry or exact floor depth', () => {
  const {s}=setup();s.updatePosition([90,-399.973,90],false);assert.equal(s.getSnapshot().destinations[0].unlocked,false);

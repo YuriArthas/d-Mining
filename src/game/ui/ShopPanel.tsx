@@ -3,37 +3,29 @@ import type { GameSession } from '../application/GameSession.ts';
 import type { ShopCategory } from '../content/shopCatalog.ts';
 import type { ShopView } from '../presentation/ShopView.ts';
 import { formatNumber as number } from '../presentation/formatNumber.ts';
-import { GameButton } from './GameButton.tsx';
 import { CloseButton, Pill, Tile, UiButton } from './kit/controls.tsx';
-import { Icon } from './kit/icons.tsx';
-import { Chip, Sheet } from './kit/panel.tsx';
+import { Chip } from './kit/panel.tsx';
 import './shop.css';
 
-/** The tool & backpack shop: pick a counter, then browse items in the 3D mine-cart showroom. */
+/** Opens the showroom on a counter at the item the player has now. */
+export function showShopCategory(view: ShopView, state: ReturnType<GameSession['getSnapshot']>, category: ShopCategory) {
+  const items = state.shopCatalog[category];
+  const index = items.findIndex(item => category === 'tools' ? item.level === state.pickaxe.level : item.capacity === state.inventory.capacity);
+  view.show(category, items, Math.max(0, index));
+}
+
+/** The tool & backpack shop: browse items in the 3D mine-cart showroom; one tile switches counters. It opens
+ *  anywhere (the HUD button, the bag's plus, or walking into the surface shop). */
 export function ShopPanel({ session, view, onClose }: { session: GameSession; view: ShopView; onClose(): void }) {
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot);
   const display = useSyncExternalStore(view.subscribe, view.getSnapshot);
   const [message, setMessage] = useState('');
   useEffect(() => { setMessage(''); }, [display.mode, display.index]);
   useEffect(() => {
-    if (display.mode === 'categories') return;
     const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') { event.preventDefault(); onClose(); } };
     window.addEventListener('keydown', escape); return () => window.removeEventListener('keydown', escape);
-  }, [onClose, display.mode]);
-  const open = (category: ShopCategory) => {
-    const items = state.shopCatalog[category];
-    const index = items.findIndex(item => category === 'tools' ? item.level === state.pickaxe.level : item.capacity === state.inventory.capacity);
-    view.show(category, items, Math.max(0, index));
-  };
-  if (display.mode === 'categories') {
-    const tool = state.shopCatalog.tools.find(item => item.level === state.pickaxe.level), bag = state.shopCatalog.backpacks.find(item => item.capacity === state.inventory.capacity);
-    return <Sheet title="商店" size="s" onClose={onClose} label="商店分类" className="shop-chooser">
-      <div className="shop-categories">
-        <GameButton className="shop-category ui-card-tile" data-category="tools" onPress={() => open('tools')}><Icon kind="pickaxe" /><strong className="ui-outline">工具</strong><small>当前：{tool?.name}</small></GameButton>
-        <GameButton className="shop-category ui-card-tile" data-category="backpacks" onPress={() => open('backpacks')}><Icon kind="backpack" /><strong className="ui-outline">背包</strong><small>当前：{bag?.name}</small></GameButton>
-      </div>
-    </Sheet>;
-  }
+  }, [onClose]);
+  const open = (category: ShopCategory) => showShopCategory(view, state, category);
   if (display.mode !== 'tools' && display.mode !== 'backpacks') return null;
   const category = display.mode, items = state.shopCatalog[category], item = items[display.index];
   const owned = category === 'tools' ? item.level <= state.equipment.toolLevel : item.capacity! <= state.equipment.backpackCapacity;
@@ -50,7 +42,6 @@ export function ShopPanel({ session, view, onClose }: { session: GameSession; vi
   return <section className="shop-showroom" role="dialog" aria-modal="true" aria-label={category === 'tools' ? '工具商店' : '背包商店'} data-category={category} data-item={item.id}>
     <header className="shop-item-heading"><h1 className="ui-outline">{item.name}</h1><p>{item.description}</p></header>
     <nav className="shop-top-actions" aria-label="商店操作">
-      <Tile icon="grid" label="分类" className="shop-category-back" onPress={view.categories} />
       <Tile icon={category === 'tools' ? 'backpack' : 'pickaxe'} label={category === 'tools' ? '背包' : '工具'} tone="purple" className="shop-switch" aria-label={category === 'tools' ? '切换到背包商店' : '切换到工具商店'} onPress={() => open(category === 'tools' ? 'backpacks' : 'tools')} />
       <CloseButton label="关闭商店" onPress={onClose} />
     </nav>

@@ -144,7 +144,7 @@ test('only the redeemer gains two tokens, never self-redeems and never redeems a
 test('capsule sample boundaries match the configured 65/10/5/5/5/10 distribution', () => {
   const expected = [
     [0, 'coins'], [0.64999, 'coins'], [0.65, 'speed'], [0.74999, 'speed'],
-    [0.75, 'mining'], [0.79999, 'mining'], [0.8, 'travel'], [0.84999, 'travel'],
+    [0.75, 'mining'], [0.79999, 'mining'], [0.8, 'sell'], [0.84999, 'sell'],
     [0.85, 'autoHatch'], [0.89999, 'autoHatch'], [0.9, 'luck'], [0.99999, 'luck'],
   ];
   for (const [sample, reward] of expected) {
@@ -179,7 +179,7 @@ test('spins require funds, never reroll on snapshot, and invalid randomness has 
 });
 
 test('each permanent entitlement is granted once and repeat wins return caller-scaled coins', () => {
-  for (const [sample, entitlement] of [[0.77, 'mining'], [0.82, 'travel'], [0.87, 'autoHatch']]) {
+  for (const [sample, entitlement] of [[0.77, 'mining'], [0.87, 'autoHatch']]) {
     let rewards = funded(2, () => sample);
     let result = rewards.spin(300);
     assert.equal(result.duplicate, false); assert.equal(result.coinReward, 0);
@@ -200,13 +200,13 @@ test('timed buffs extend by five minutes, survive save without offline loss and 
   rewards.spin(100);
   assert.equal(rewards.getSnapshot().timed.speed, 540);
   sample = 0.95; rewards.spin(100);
-  assert.deepEqual(rewards.getSnapshot().timed, { speed: 540, luck: 300 });
+  assert.deepEqual(rewards.getSnapshot().timed, { speed: 540, luck: 300, sell: 0 });
   rewards = Rewards.fromData(rewards.exportData(), { day: () => '2026-11-19' });
-  assert.deepEqual(rewards.getSnapshot().timed, { speed: 540, luck: 300 });
+  assert.deepEqual(rewards.getSnapshot().timed, { speed: 540, luck: 300, sell: 0 });
   rewards.advance(301);
-  assert.deepEqual(rewards.getSnapshot().timed, { speed: 239, luck: 0 });
+  assert.deepEqual(rewards.getSnapshot().timed, { speed: 239, luck: 0, sell: 0 });
   rewards.advance(239);
-  assert.deepEqual(rewards.getSnapshot().timed, { speed: 0, luck: 0 });
+  assert.deepEqual(rewards.getSnapshot().timed, { speed: 0, luck: 0, sell: 0 });
   const before = rewards.exportData();
   for (const bad of [-1, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1]) assert.throws(() => rewards.advance(bad));
   assert.deepEqual(rewards.exportData(), before);
@@ -234,4 +234,20 @@ test('balance and timed overflow fail without committing a claim, spend or entit
 test('stage coins use the configured base-price multiplier and reject unsafe inputs', () => {
   assert.equal(stageCoinReward(1), 100); assert.equal(stageCoinReward(18), 1800);
   for (const bad of [0, -1, 0.1, NaN, Infinity, Number.MAX_SAFE_INTEGER]) assert.throws(() => stageCoinReward(bad));
+});
+
+test('the double-sale boost is a timed prize: five minutes per win, counted down, and older saves load without it', () => {
+  const rewards = funded(2, () => 0.82);
+  const won = rewards.spin(100);
+  assert.equal(won.reward, 'sell'); assert.equal(won.durationSeconds, 300); assert.equal(won.coinReward, 0);
+  rewards.spin(100);
+  assert.equal(rewards.getSnapshot().timed.sell, 600);
+  rewards.advance(100);
+  assert.equal(rewards.getSnapshot().timed.sell, 500);
+  // A save from before the boost has only the movement and luck timers (and the retired travel perk).
+  const legacy = rewards.exportData(); legacy.timed = { speed: 30, luck: 0 }; legacy.permanent.travel = true;
+  const restored = Rewards.fromData(legacy);
+  assert.deepEqual(restored.getSnapshot().timed, { speed: 30, luck: 0, sell: 0 });
+  assert.equal(legacy.timed.sell, undefined, 'reading a save never mutates it');
+  assert.throws(() => Rewards.fromData({ ...legacy, timed: { speed: 0, luck: 0, sell: -1 } }));
 });

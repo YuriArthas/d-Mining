@@ -15,8 +15,9 @@ export type RewardData = {
   signinStreak: number;
   lastShareDay: string | null;
   redeemedInviteId: string | null;
+  /** `travel` is a retired prize (teleporting is free for everyone); kept so older saves still load. */
   permanent: { mining: boolean; travel: boolean; autoHatch: boolean };
-  timed: { speed: number; luck: number };
+  timed: { speed: number; luck: number; sell: number };
 };
 export type RewardOptions = {
   day?: () => string;
@@ -78,9 +79,11 @@ function readData(value: unknown): RewardData {
   }
   const permanent = record(data.permanent, ['mining', 'travel', 'autoHatch'], '永久权益');
   if (Object.values(permanent).some(value => typeof value !== 'boolean')) throw new Error('永久权益标记无效');
-  const timed = record(data.timed, ['speed', 'luck'], '限时权益');
-  seconds(timed.speed, '移速剩余时间'); seconds(timed.luck, '幸运剩余时间');
-  return clone(data as RewardData);
+  // Saves from before the double-sale boost have no `sell` timer.
+  const legacy = !!data.timed && typeof data.timed === 'object' && !('sell' in data.timed);
+  const timed = record(data.timed, legacy ? ['speed', 'luck'] : ['speed', 'luck', 'sell'], '限时权益');
+  const restoredTimed = { speed: seconds(timed.speed, '移速剩余时间'), luck: seconds(timed.luck, '幸运剩余时间'), sell: legacy ? 0 : seconds(timed.sell, '双倍出售剩余时间') };
+  return clone({ ...data, timed: restoredTimed } as RewardData);
 }
 
 /** Session-owned domain state. Callers persist it together with any awarded coins. */
@@ -100,7 +103,7 @@ export class Rewards {
       this.data = {
         version: 1, balance: 0, inviteId, day, onlineSeconds: 0, onlineClaimed: [],
         lastSigninDay: null, signinStreak: 0, lastShareDay: null, redeemedInviteId: null,
-        permanent: { mining: false, travel: false, autoHatch: false }, timed: { speed: 0, luck: 0 },
+        permanent: { mining: false, travel: false, autoHatch: false }, timed: { speed: 0, luck: 0, sell: 0 },
       };
     }
   }
@@ -127,7 +130,8 @@ export class Rewards {
     if (!clockReversed) data.onlineSeconds = seconds(data.onlineSeconds + elapsedSeconds, '累计在线时长');
     data.timed.speed = Math.max(0, data.timed.speed - elapsedSeconds);
     data.timed.luck = Math.max(0, data.timed.luck - elapsedSeconds);
-    const changed = data.day !== this.data.day || data.onlineSeconds !== this.data.onlineSeconds || data.timed.speed !== this.data.timed.speed || data.timed.luck !== this.data.timed.luck;
+    data.timed.sell = Math.max(0, data.timed.sell - elapsedSeconds);
+    const changed = data.day !== this.data.day || data.onlineSeconds !== this.data.onlineSeconds || data.timed.speed !== this.data.timed.speed || data.timed.luck !== this.data.timed.luck || data.timed.sell !== this.data.timed.sell;
     if (changed) this.data = data;
     return { changed, clockReversed };
   }
@@ -194,7 +198,7 @@ export class Rewards {
     const data = clone(this.data), reward = selected.id;
     let duplicate = false, awardedCoins = 0, durationSeconds = 0;
     if (reward === 'coins') awardedCoins = coinReward;
-    else if (reward === 'speed' || reward === 'luck') {
+    else if (reward === 'speed' || reward === 'luck' || reward === 'sell') {
       data.timed[reward] = seconds(data.timed[reward] + REWARD_CONFIG.timedDurationSeconds, '限时权益剩余时间');
       durationSeconds = REWARD_CONFIG.timedDurationSeconds;
     } else {
