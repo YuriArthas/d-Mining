@@ -157,3 +157,27 @@ test('每帧报告所在位置：地表是山谷的曲子和风声，下到矿�
   assert.equal(h.scenes.at(-1).song, null);
   assert.equal(h.scenes.at(-1).ambience, null);
 });
+
+test('在河里走：每一步溅起水花，跳进水里水花更大，刚踩进水里也溅一下；岸上不溅', async () => {
+  const { PROTECTED_FLOOR } = await import('../../src/game/world/entrance.ts');
+  const { PINEWIND_CREEK } = await import('../../src/game/content/pinewind/hubLayout.ts');
+  const audio = { play: () => true, setScene: () => {} }, none = () => () => {};
+  const feedback = new MiningFeedback({ onFeedback: none, onOreCollected: none }, { cell: () => PROTECTED_FLOOR, layers: () => LAYERS, hub: f => f[1] > -1.3 }, audio);
+  const still = { contact: null, jump: false, land: null }, bank = [-20, -.2, 39], water = [-20, -.93, 41.2];
+  feedback.update(1 / 60, null, { ...still, step: .5 }, bank);
+  assert.equal(feedback.splash.diagnostics().splashes, 0, 'no splash on the bank');
+  feedback.update(1 / 60, null, still, water);
+  assert.equal(feedback.splash.diagnostics().splashes, 1, 'stepping into the water');
+  const entered = feedback.splash.diagnostics().drops;
+  feedback.update(1 / 60, null, { ...still, step: .5 }, water);
+  assert.equal(feedback.splash.diagnostics().splashes, 2, 'a footstep in the water');
+  assert.ok(feedback.splash.diagnostics().drops > entered && feedback.splash.diagnostics().ripples >= 2);
+  feedback.splash.random = () => .5;
+  const before = feedback.splash.diagnostics().drops;
+  feedback.update(1 / 60, null, { ...still, land: .8 }, water);
+  assert.ok(feedback.splash.diagnostics().drops - before >= 18, 'a landing throws up a big splash');
+  for (let i = 0; i < 180; i++) feedback.update(1 / 60, null, still, water);
+  assert.deepEqual(feedback.splash.diagnostics().drops, 0, 'droplets fall back into the water');
+  assert.ok(PINEWIND_CREEK.water > water[1]);
+  feedback.dispose();
+});

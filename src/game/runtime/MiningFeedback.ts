@@ -6,7 +6,9 @@ import type { HitMaterial } from '../audio/sfx.ts';
 import { Soundscape, type PlaceSound } from '../audio/soundscape.ts';
 import { layerAtDepth, type Layer } from '../content/layers.ts';
 import { resourceByKind } from '../content/resources.ts';
+import { PINEWIND_CREEK } from '../content/pinewind/hubLayout.ts';
 import { HitEffects, type BlockColors } from '../presentation/HitEffects.ts';
+import { WaterSplash } from '../presentation/WaterSplash.ts';
 import { CELL, type Coord } from '../terrain/SparseWorld.ts';
 import { footSurface } from './footSurface.ts';
 
@@ -47,6 +49,8 @@ export function pickupTier(itemId: string) {
  *  It also tells the audio where the player is (music and ambience) and what they walk on. */
 export class MiningFeedback {
   readonly effects = new HitEffects();
+  readonly splash = new WaterSplash();
+  private wading = false;
   private readonly soundscape = new Soundscape();
   private theme = 'meadow_mine';
   private pending: FeedbackStrike | null = null;
@@ -77,13 +81,22 @@ export class MiningFeedback {
         this.audio.play({ type: 'break', material: hitMaterial(strike.kind) });
       } else this.pending = strike;
     }
-    if (moments.step != null) this.audio.play({ type: 'step', surface: this.surface(feet), strength: moments.step });
+    // Wading in the creek: every step, a landing and the moment the feet go under the surface splash.
+    const wading = feet[1] < PINEWIND_CREEK.water + .05 && this.surface(feet) === 'water';
+    if (moments.step != null) {
+      const surface = wading ? 'water' : this.surface(feet);
+      this.audio.play({ type: 'step', surface, strength: moments.step });
+      if (wading) this.splash.splash(feet[0], PINEWIND_CREEK.water, feet[2], .3 + moments.step * .2);
+    }
     if (moments.jump) this.audio.play({ type: 'jump' });
     if (moments.land !== null) {
       this.audio.play({ type: 'land', strength: moments.land });
-      if (moments.land > 0.45) this.effects.dust(feet, this.ground(feet));
-    }
+      if (wading) this.splash.splash(feet[0], PINEWIND_CREEK.water, feet[2], .55 + moments.land * .6);
+      else if (moments.land > 0.45) this.effects.dust(feet, this.ground(feet));
+    } else if (wading && !this.wading) this.splash.splash(feet[0], PINEWIND_CREEK.water, feet[2], .6);
+    this.wading = wading;
     this.effects.update(delta);
+    this.splash.update(delta);
   }
 
   travel() { this.pending = null; this.audio.play({ type: 'travel' }); }
@@ -98,7 +111,7 @@ export class MiningFeedback {
     return footSurface(feet, { cell: c => this.ports.cell(c), theme: () => this.theme, hub: f => this.ports.hub?.(f) ?? false });
   }
 
-  dispose() { for (const detach of this.detach) detach(); this.effects.dispose(); this.audio.setScene(QUIET_SCENE); }
+  dispose() { for (const detach of this.detach) detach(); this.effects.dispose(); this.splash.dispose(); this.audio.setScene(QUIET_SCENE); }
 
   private readonly onSession = (event: SessionFeedback) => {
     switch (event.type) {

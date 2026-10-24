@@ -44,6 +44,8 @@ export type ValidationDebug = {
   audioLevel: () => number | null;
   audioStream: () => MediaStream | null;
   look: (yaw: number, pitch: number) => void;
+  /** Slows the creek splashes (1 = normal) so screenshots can catch them. */
+  splashTimeScale: (scale: number) => void;
   canMine: (coord: Coord) => boolean;
   cell: (coord: Coord) => number | null;
   mine: (coord: Coord) => boolean;
@@ -158,7 +160,7 @@ export function attachGameDebug(
       eggLabels: current.eggLabels.diagnostics(),
       petFollowers: current.petFollowers.diagnostics(),
       avatar: current.minerAvatar.diagnostics(),
-      feedback: { audio: gameAudio.diagnostics(), effects: current.feedback.effects.diagnostics() },
+      feedback: { audio: gameAudio.diagnostics(), effects: current.feedback.effects.diagnostics(), splash: current.feedback.splash.diagnostics(), surface: current.feedback.surface(physics.feet()) },
       combat: session.combatDebug(),
       sellZone: current.content.session.sales[0],
       samples: terrain.sampleStats(),
@@ -243,6 +245,7 @@ export function attachGameDebug(
     audioLevel: () => gameAudio.outputLevel(),
     audioStream: () => gameAudio.outputStream(),
     look: (yaw, pitch) => cameraView.look(yaw, pitch),
+    splashTimeScale: scale => { current.feedback.splash.timeScale = scale; },
     cell: (coord) => terrain.cell(coord),
     canMine: (coord) => terrain.canMine(coord),
     hit: session.hit,

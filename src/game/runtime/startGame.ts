@@ -237,10 +237,11 @@ export async function startGame(options: StartGameOptions) {
     const feedback = new MiningFeedback(session, {
       cell: (cell) => terrain.cell(cell),
       layers: (cell) => generationAtZ(terrain.world.generation, cell[2]).layers,
-      hub: (feet) => !!content.surface.authored && feet[1] > -0.6 && worldAtFeet(feet) === 1,
+      // Down to the creek bed (about -0.95 m); the mine's first cells start at -2 m.
+      hub: (feet) => !!content.surface.authored && feet[1] > -1.3 && worldAtFeet(feet) === 1,
     });
     scope.defer(() => feedback.dispose());
-    root.add(feedback.effects.group);
+    root.add(feedback.effects.group, feedback.splash.group);
     scope.defer(
       session.attach({
         cell: (cell) => terrain.cell(cell),
