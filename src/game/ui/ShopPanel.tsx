@@ -40,6 +40,8 @@ export function ShopPanel({ session, view, onClose }: { session: GameSession; vi
   const blocked = !action.enabled || !display.ready || !!display.error;
   // Items still to buy show their price on the button; further ones too, on a greyed button.
   const priced = offer === 'next' || offer === 'locked';
+  // How the button feels: buy now, short of coins, further up the ladder, owned or worn.
+  const mood = offer === 'next' ? (action.enabled ? 'buy' : 'short') : offer === 'locked' ? 'locked' : offer === 'owned' ? (action.enabled ? 'owned' : 'locked') : 'equipped';
   const purchase = () => {
     const result = session.useShopItem(category, item.id);
     setMessage(result.status === 'upgraded' ? '购买成功，已装备！' : result.status === 'equipped' ? '已装备' : result.status === 'insufficient' ? '金币不足' : result.status === 'too-small' ? '背包装不下现有矿石，先去卖掉' : result.status === 'locked' ? '请先购买上一件' : '请重新进入商店');
@@ -65,18 +67,18 @@ export function ShopPanel({ session, view, onClose }: { session: GameSession; vi
     <footer className="shop-under" data-state={offer}>
       <div className="shop-stats">{offerStats(category, item, items, state).map(stat => {
         const gain = Math.round((stat.value - stat.current) * 100) / 100;
-        return <span key={stat.key} className="shop-stat">
-          <Icon kind={stat.key === 'speed' ? 'bolt' : stat.key === 'capacity' ? 'backpack' : 'pickaxe'} />
+        return <span key={stat.key} className="shop-stat" data-kind={stat.key}>
+          <i className="shop-stat-icon"><Icon kind={stat.key === 'speed' ? 'bolt' : stat.key === 'capacity' ? 'backpack' : 'pickaxe'} /></i>
           <b className="ui-outline">{stat.key === 'power' ? '+' : ''}{number(stat.value)}{stat.unit}</b>
-          {gain > 0 && <em className="shop-gain ui-outline">▲{number(gain)}</em>}
+          {gain > 0 && <em className="shop-gain ui-outline" key={item.id}>▲{number(gain)}</em>}
         </span>;
       })}</div>
-      <UiButton size="l" tone={offer === 'owned' ? 'purple' : offer === 'locked' ? 'steel' : priced && action.enabled ? 'green' : 'orange'} icon={priced ? 'coin' : undefined} className="shop-buy"
-        data-short={action.short != null || undefined} data-testid="shop-buy" disabled={blocked} onPress={purchase}
+      <UiButton size="l" tone={mood === 'buy' ? 'green' : mood === 'short' ? 'red' : mood === 'owned' ? 'purple' : mood === 'equipped' ? 'blue' : 'steel'} icon={priced ? 'coin' : undefined}
+        className="shop-buy" data-mood={mood} data-testid="shop-buy" disabled={blocked} onPress={purchase}
         aria-label={offer === 'locked' ? `先买上一件，${number(item.price)} 金币` : priced ? (action.enabled ? `购买，${number(item.price)} 金币` : `还差 ${number(action.short ?? item.price)} 金币`) : action.label}>
-        {priced ? number(item.price) : action.label}
+        {priced ? number(item.price) : mood === 'equipped' ? '✓ 已装备' : action.label}
       </UiButton>
-      <div className="shop-feedback ui-outline" role="status">{message}</div>
+      <div className="shop-hint ui-outline" data-mood={message ? 'message' : mood} role="status">{message || (mood === 'short' ? `还差 ${number(action.short!)}` : mood === 'locked' ? '先买上一件' : '')}</div>
     </footer>
   </section>;
 }

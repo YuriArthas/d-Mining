@@ -19,24 +19,55 @@
 .shop-prev { left: calc(18px + var(--safe-left)); }
 .shop-next { right: calc(18px + var(--safe-right)); }
 
-/* Under the cart: the numbers, then the one button. */
-.shop-under { position: absolute; left: 50%; bottom: calc(5% + var(--safe-bottom)); transform: translateX(-50%); display: grid; justify-items: center; gap: 10px; }
-.shop-stats { display: flex; gap: 22px; }
-.shop-stat { display: flex; align-items: center; gap: 6px; }
-.shop-stat .ui-icon { width: 30px; height: 30px; }
-.shop-stat b { font-size: 26px; --ui-stroke: 5px; }
-.shop-gain { font-style: normal; font-size: 16px; color: #8df07c; --ui-stroke: 4px; }
-.shop-buy { min-width: 240px; font-size: 24px; }
-.shop-buy[data-short] { color: #ffb0a8; }
-.shop-feedback { min-height: 18px; font-size: 14px; --ui-stroke: 3px; }
+/* Under the cart: the numbers as chunky badges, then the one big button. */
+.shop-under { position: absolute; left: 50%; bottom: calc(5% + var(--safe-bottom)); transform: translateX(-50%); display: grid; justify-items: center; gap: 14px; }
+.shop-stats { display: flex; gap: 18px; }
+.shop-stat { --disc: var(--ui-orange); --disc-lo: var(--ui-orange-lo); position: relative; display: flex; align-items: center; height: 46px; padding: 0 18px 0 52px;
+  border: 3px solid var(--ui-ink); border-radius: 999px; box-shadow: inset 0 -4px 0 #00000030, 0 4px 0 var(--ui-ink);
+  background: linear-gradient(180deg, #ffffff30 0, #ffffff0c 40%, transparent 41%), linear-gradient(180deg, #2a78c8, #154a86); }
+.shop-stat[data-kind=speed] { --disc: var(--ui-gold); --disc-lo: var(--ui-gold-lo); }
+.shop-stat[data-kind=capacity] { --disc: var(--ui-red); --disc-lo: var(--ui-red-lo); }
+.shop-stat-icon { position: absolute; left: -10px; top: 50%; transform: translateY(-50%); width: 56px; height: 56px; display: grid; place-items: center;
+  border: 3px solid var(--ui-ink); border-radius: 50%; box-shadow: inset 0 -4px 0 #00000030, 0 3px 0 var(--ui-ink);
+  background: linear-gradient(180deg, #ffffff66 0, #ffffff14 42%, transparent 43%), linear-gradient(180deg, var(--disc), var(--disc-lo)); }
+.shop-stat-icon .ui-icon { width: 34px; height: 34px; filter: drop-shadow(0 2px 0 #0b2a4a66); }
+.shop-stat b { font-size: 28px; line-height: 1; --ui-stroke: 5px; }
+/* The gain over what is worn now: a green tag pinned to the badge's corner. */
+.shop-gain { position: absolute; top: -14px; right: -12px; padding: 2px 8px; border: 2px solid var(--ui-ink); border-radius: 999px; font-style: normal; font-size: 15px; line-height: 1.2;
+  background: linear-gradient(180deg, #8ff07a, var(--ui-green-lo)); --ui-stroke: 3px; transform: rotate(6deg); animation: shop-gain-in .35s cubic-bezier(.2, 1.4, .4, 1); }
+@keyframes shop-gain-in { from { opacity: 0; transform: rotate(6deg) scale(.4); } }
+
+.shop-buy.ui-btn { position: relative; overflow: hidden; min-width: 300px; min-height: 68px; padding: 0 30px; gap: 10px; border-radius: 20px; font-size: 32px;
+  border-width: 4px; box-shadow: inset 0 -6px 0 #00000030, 0 6px 0 var(--ui-ink); }
+.shop-buy.ui-btn > .ui-icon { width: 42px; height: 42px; filter: drop-shadow(0 3px 0 #0b2a4a66); }
+.shop-buy.ui-btn > .ui-outline { --ui-stroke: 6px; }
+/* The states read by colour, never by a washed-out grey. */
+.shop-buy.ui-btn:disabled { filter: none; opacity: 1; }
+.shop-buy[data-mood=buy] { animation: shop-buy-pulse 1.6s ease-in-out infinite; }
+.shop-buy[data-mood=buy]::after { content: ""; position: absolute; top: -20%; bottom: -20%; width: 40%; left: -60%; pointer-events: none;
+  background: linear-gradient(100deg, transparent, #ffffff70, transparent); transform: skewX(-18deg); animation: shop-buy-shine 2.6s ease-in-out infinite; }
+@keyframes shop-buy-pulse { 50% { transform: scale(1.035); } }
+@keyframes shop-buy-shine { 0%, 55% { left: -60%; } 85%, 100% { left: 130%; } }
+.shop-buy[data-mood=short] { --tone: #b8484a; --tone-lo: #6e2228; }
+.shop-buy[data-mood=short] > .ui-outline { color: #ffc9c2; }
+.shop-buy[data-mood=short] > .ui-icon, .shop-buy[data-mood=locked] > .ui-icon { filter: grayscale(.6) brightness(.85) drop-shadow(0 3px 0 #0b2a4a66); }
+.shop-buy[data-mood=locked] { --tone: #5d7290; --tone-lo: #34465f; }
+.shop-buy[data-mood=locked] > .ui-outline { color: #c9d6e6; }
+.shop-buy[data-mood=equipped] { --tone: #2fb3e8; --tone-lo: #1676b0; cursor: default; }
+.shop-hint { min-height: 20px; margin-top: -4px; font-size: 16px; --ui-stroke: 4px; }
+.shop-hint[data-mood=short] { color: #ffb4ab; }
+.shop-hint[data-mood=locked] { color: #c9d6e6; }
 
 .shop-loading { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); padding: 14px 20px; font-size: 16px; text-align: center; display: grid; gap: 8px; justify-items: center; }
 .session-ui[data-panel=shop] .ui-hud, .game-shell:has(.session-ui[data-panel=shop]) .game-header { display: none; }
 @container game (max-height: 560px) {
   .shop-name { font-size: 28px; }
-  .shop-stat b { font-size: 20px; }
-  .shop-stat .ui-icon { width: 24px; height: 24px; }
-  .shop-buy { min-width: 200px; font-size: 20px; }
+  .shop-stat { height: 38px; padding: 0 14px 0 44px; }
+  .shop-stat-icon { width: 46px; height: 46px; }
+  .shop-stat-icon .ui-icon { width: 28px; height: 28px; }
+  .shop-stat b { font-size: 22px; }
+  .shop-buy.ui-btn { min-width: 230px; min-height: 54px; font-size: 24px; }
+  .shop-buy.ui-btn > .ui-icon { width: 32px; height: 32px; }
   .shop-top-actions .ui-tile { --tile: 46px; }
   .shop-wallet .ui-pill { --pill-h: 30px; }
 }
