@@ -1,79 +1,42 @@
-/* Shop: the full-screen 3D showroom overlay. The camera glides along the carts; the info card stands on the
-   right, the rail of every item along the bottom. */
-.shop-showroom { --card-w: 340px; --rail-h: 66px; position: absolute; inset: 0; z-index: 65; pointer-events: auto; touch-action: none; color: #fff; font: 700 13px/1.35 var(--ui-font-body); }
-.shop-showroom::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 70% 75% at 38% 45%, transparent 55%, #0b1424 140%); }
+/* Shop: the full-screen 3D showroom overlay. The camera glides along the carts; the screen carries only the
+   item's name above its cart, its numbers and one button below it. */
+.shop-showroom { position: absolute; inset: 0; z-index: 65; pointer-events: auto; touch-action: none; color: #fff; font: 700 13px/1.35 var(--ui-font-body); }
+.shop-showroom::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 65% 70% at 50% 42%, transparent 55%, #0b1424 140%); }
 .shop-showroom > * { z-index: 1; }
 .shop-wallet { position: absolute; top: calc(12px + var(--safe-top)); left: calc(14px + var(--safe-left)); display: flex; gap: 10px; --pill-h: 34px; }
 .shop-wallet .ui-pill { --pill-h: 34px; }
 .shop-top-actions { position: absolute; top: calc(10px + var(--safe-top)); right: calc(12px + var(--safe-right)); display: flex; gap: 8px; align-items: flex-start; }
 .shop-top-actions .ui-tile { --tile: 52px; }
-.shop-arrow { position: absolute; top: 44%; width: 56px; min-width: 56px; height: 56px; padding: 0; font-size: 26px; }
-.shop-prev { left: calc(14px + var(--safe-left)); }
-.shop-next { right: calc(var(--card-w) + 34px + var(--safe-right)); }
 
-/* Info card. */
-.shop-card { position: absolute; right: calc(16px + var(--safe-right)); top: calc(76px + var(--safe-top)); max-height: calc(100% - var(--rail-h) - 110px); width: var(--card-w);
-  display: flex; flex-direction: column; gap: 10px; padding: 16px 18px 14px; box-sizing: border-box; overflow: hidden;
-  border-radius: 20px; border: 3px solid #8fdcff55; background: linear-gradient(180deg, #17406ef2, #0c2748f2); box-shadow: 0 10px 0 #0a1f3a88, inset 0 2px 0 #ffffff22;
-  --tier: #8fe3ff; animation: shop-card-in .32s cubic-bezier(.2, .9, .25, 1.15); }
-.shop-card::before { content: ""; position: absolute; inset: 0 0 auto; height: 5px; background: var(--tier); box-shadow: 0 0 18px var(--tier); }
-.shop-card[data-tier=fine] { --tier: #66e0ff; }
-.shop-card[data-tier=star] { --tier: #ffcf4a; }
-@keyframes shop-card-in { from { opacity: 0; transform: translateX(26px) scale(.98); } }
-.shop-card-tags { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-.shop-tier, .shop-level, .shop-badge { padding: 3px 9px; border-radius: 999px; font-size: 12px; line-height: 1.2; }
-.shop-tier { background: var(--tier); color: #0d2747; }
-.shop-level { background: #ffffff1c; color: var(--ui-text-soft); }
-.shop-badge { margin-left: auto; }
-.shop-badge[data-kind=equipped] { background: var(--ui-green); color: #0e3a10; }
-.shop-badge[data-kind=owned] { background: var(--ui-purple); color: #fff; }
-.shop-card h1 { margin: 0; font-size: 32px; line-height: 1.1; color: var(--tier); --ui-stroke: 5px; }
-.shop-description { margin: 0; color: var(--ui-text-soft); font-size: 13px; }
-.shop-stat-list { display: grid; gap: 10px; padding: 12px; border-radius: 14px; background: #0a1e38aa; }
-.shop-stat { display: grid; grid-template-columns: 26px 1fr auto auto; align-items: center; gap: 2px 8px; }
-.shop-stat .ui-icon { width: 24px; height: 24px; }
-.shop-stat-label { color: var(--ui-text-soft); }
-.shop-stat-value { font-size: 18px; }
-.shop-delta { padding: 1px 7px; border-radius: 999px; font-size: 12px; background: #f0636333; color: #ff9c9c; }
-.shop-delta[data-up=true] { background: #52d23d33; color: #8df07c; }
-/* Bars: where the player is now (pale), and the item over it (blue; green when it is an upgrade). */
-.shop-meter { grid-column: 1 / -1; position: relative; height: 8px; border-radius: 999px; background: #ffffff14; overflow: hidden; }
-.shop-meter i { position: absolute; inset: 0 auto 0 0; border-radius: inherit; transition: width .45s cubic-bezier(.2, .9, .25, 1); }
-.shop-meter-item { background: var(--ui-blue-hi); opacity: .85; }
-.shop-meter-item[data-up=true] { background: var(--ui-green); }
-.shop-meter-now { background: #ffffff55; z-index: 1; }
-.shop-price { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px; }
-.shop-price .ui-icon { width: 30px; height: 30px; }
-.shop-price b { font-size: 30px; color: var(--ui-text-gold); --ui-stroke: 5px; }
-.shop-buy { width: 100%; }
-.shop-feedback { min-height: 18px; text-align: center; font-size: 12px; color: var(--ui-text-soft); }
+/* The name: the tier speaks through its colour (plain, 精工 cyan, 星辉 gold). */
+.shop-name { position: absolute; top: calc(9% + var(--safe-top)); left: 50%; transform: translateX(-50%); margin: 0; white-space: nowrap; pointer-events: none;
+  font-size: 40px; line-height: 1.1; color: #fff; --ui-stroke: 6px; animation: shop-name-in .3s cubic-bezier(.2, .9, .25, 1.2); }
+.shop-name[data-tier=fine] { color: #7fe6ff; }
+.shop-name[data-tier=star] { color: #ffd84d; }
+@keyframes shop-name-in { from { opacity: 0; transform: translate(-50%, 8px) scale(.96); } }
 
-/* Rail of every item: jump straight to one, the camera glides there. */
-.shop-rail { position: absolute; left: calc(14px + var(--safe-left)); right: calc(16px + var(--safe-right)); bottom: calc(12px + var(--safe-bottom)); height: var(--rail-h);
-  display: flex; gap: 6px; align-items: center; padding: 6px 10px; box-sizing: border-box; overflow-x: auto; overflow-y: hidden; scrollbar-width: none;
-  border-radius: 16px; background: #0b2342cc; box-shadow: inset 0 2px 0 #ffffff14; }
-.shop-rail::-webkit-scrollbar { display: none; }
-.shop-cell { flex: 0 0 auto; display: grid; justify-items: center; align-content: center; gap: 1px; width: 52px; height: 52px; padding: 0; border-radius: 12px; cursor: pointer;
-  border: 2px solid #ffffff22; background: #1c4a7a; color: #fff; font: 800 12px/1 var(--ui-font-body); transition: transform .18s, background .18s, border-color .18s; }
-.shop-cell .ui-icon { width: 24px; height: 24px; }
-.shop-cell[data-tier=fine] { background: #1a5a86; }
-.shop-cell[data-tier=star] { background: #5b4a1f; }
-.shop-cell[data-state=locked] { opacity: .55; }
-.shop-cell[data-state=owned] { border-color: var(--ui-purple); }
-.shop-cell[data-state=equipped] { border-color: var(--ui-green); box-shadow: 0 0 0 2px #52d23d55; }
-.shop-cell[data-state=next] { border-color: var(--ui-gold); }
-.shop-cell[aria-current=true] { transform: translateY(-4px) scale(1.08); border-color: #fff; background: var(--ui-blue); box-shadow: 0 0 14px #6ad6ffaa; }
-.shop-cell:hover { transform: translateY(-2px); }
+.shop-arrow { position: absolute; top: 42%; width: 60px; min-width: 60px; height: 60px; padding: 0; font-size: 26px; }
+.shop-prev { left: calc(18px + var(--safe-left)); }
+.shop-next { right: calc(18px + var(--safe-right)); }
 
-.shop-loading { position: absolute; left: 38%; top: 42%; transform: translate(-50%, -50%); padding: 14px 20px; font-size: 16px; text-align: center; display: grid; gap: 8px; justify-items: center; }
+/* Under the cart: the numbers, then the one button. */
+.shop-under { position: absolute; left: 50%; bottom: calc(5% + var(--safe-bottom)); transform: translateX(-50%); display: grid; justify-items: center; gap: 10px; }
+.shop-stats { display: flex; gap: 22px; }
+.shop-stat { display: flex; align-items: center; gap: 6px; }
+.shop-stat .ui-icon { width: 30px; height: 30px; }
+.shop-stat b { font-size: 26px; --ui-stroke: 5px; }
+.shop-gain { font-style: normal; font-size: 16px; color: #8df07c; --ui-stroke: 4px; }
+.shop-buy { min-width: 240px; font-size: 24px; }
+.shop-buy[data-short] { color: #ffb0a8; }
+.shop-feedback { min-height: 18px; font-size: 14px; --ui-stroke: 3px; }
+
+.shop-loading { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); padding: 14px 20px; font-size: 16px; text-align: center; display: grid; gap: 8px; justify-items: center; }
 .session-ui[data-panel=shop] .ui-hud, .game-shell:has(.session-ui[data-panel=shop]) .game-header { display: none; }
 @container game (max-height: 560px) {
-  .shop-showroom { --card-w: 290px; --rail-h: 54px; }
-  .shop-card { padding: 12px 14px 10px; gap: 7px; }
-  .shop-card h1 { font-size: 24px; }
-  .shop-description { display: none; }
-  .shop-cell { width: 42px; height: 42px; }
-  .shop-cell .ui-icon { width: 18px; height: 18px; }
+  .shop-name { font-size: 28px; }
+  .shop-stat b { font-size: 20px; }
+  .shop-stat .ui-icon { width: 24px; height: 24px; }
+  .shop-buy { min-width: 200px; font-size: 20px; }
   .shop-top-actions .ui-tile { --tile: 46px; }
   .shop-wallet .ui-pill { --pill-h: 30px; }
 }

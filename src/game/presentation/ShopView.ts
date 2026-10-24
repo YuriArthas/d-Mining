@@ -141,15 +141,15 @@ export class ShopView {
     [rig.x,rig.v]=springStep(rig.x,rig.v,this.state.index*SHOWROOM.spacing,dt);
     rig.intro=damp(rig.intro,1,2.4,dt);rig.px=damp(rig.px,this.pointer.x,3,dt);rig.py=damp(rig.py,this.pointer.y,3,dt);
     const travel=Math.min(1,Math.abs(rig.v)/16),open=1-(1-rig.intro)**3;
-    // Three-quarter view from the right of the bay, the product a little left of centre (the info card sits on
-    // the right). The camera pulls back while it travels and looks ahead the way it is going, drifts slightly
-    // when idle and leans toward the pointer.
+    // Straight in front of the bay, the cart in the middle of the screen with its neighbours at the edges and
+    // room below for the numbers and the buy button. The camera pulls back while it travels and looks a little
+    // ahead the way it is going, drifts slightly when idle and leans toward the pointer.
     const narrow=this.camera.aspect<1.2;
-    const sway=Math.sin(this.clock*.32)*.12,bob=Math.sin(this.clock*.41)*.05;
-    this.camera.position.set(rig.x+2.7+sway+rig.px*.45,4.4+bob+.8*travel+2*(1-open)-rig.py*.3,(narrow?17:14.6)+3.2*travel+7*(1-open));
-    this.look.set(rig.x+(narrow?0:2.2)+Math.max(-4,Math.min(4,rig.v*.07))+rig.px*.2,2.9-rig.py*.12,0);
+    const sway=Math.sin(this.clock*.32)*.08,bob=Math.sin(this.clock*.41)*.04;
+    this.camera.position.set(rig.x+sway+rig.px*.35,4.1+bob+.7*travel+2*(1-open)-rig.py*.25,(narrow?18:14)+3.2*travel+7*(1-open));
+    this.look.set(rig.x+Math.max(-3,Math.min(3,rig.v*.05))+rig.px*.15,1.95-rig.py*.1,0);
     this.camera.lookAt(this.look);this.camera.updateProjectionMatrix();
-    const spotX=rig.x;this.spot.position.set(spotX+1.2,10,6);this.spot.target.position.set(spotX,2.6,0);this.spot.target.updateMatrixWorld();
+    const spotX=rig.x;this.spot.position.set(spotX,10,6);this.spot.target.position.set(spotX,2.6,0);this.spot.target.updateMatrixWorld();
     this.spot.intensity=damp(this.spot.intensity,5,4,dt);
     for(const [index,station] of this.strip.children.entries()){
       const data=station.userData as {focus:number;spin:number;baseY:number},pivot=station.getObjectByName('turntable');
