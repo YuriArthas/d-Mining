@@ -11,6 +11,7 @@ import { HelpSheet } from './HelpSheet.tsx';
 import { Hud } from './hud/Hud.tsx';
 import type { SystemControls } from './hud/SystemMenu.tsx';
 import { Icon } from './kit/icons.tsx';
+import { DevUnlockPage } from './DevUnlock.tsx';
 import { DepthGoalCard, TipMarker } from './TipsUi.tsx';
 import { CapsuleSheet, RewardsSheet, rewardsTabFor, type RewardsTab } from './rewards/RewardsSheet.tsx';
 import { ShopPanel, showShopCategory } from './ShopPanel.tsx';
@@ -35,6 +36,7 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
     return () => { window.removeEventListener('focus', update); window.removeEventListener('blur', update); document.removeEventListener('visibilitychange', update); };
   }, []);
   const [modal, setModal] = useState<Modal | null>(null);
+  const [devUnlock, setDevUnlock] = useState(false);
   useEffect(() => { if (blocked || !focused || modal?.kind !== 'egg') session.setAutoHatch(false); }, [blocked, focused, modal, session]);
 
   // Leaving an egg stand closes its sheet; arriving at a new shop re-arms the auto-open.
@@ -100,5 +102,7 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
     {modal?.kind === 'capsule' && <CapsuleSheet session={session} onClose={close} />}
     {modal?.kind === 'help' && <HelpSheet session={session} onClose={close} />}
     {shopOpen && shop.mode !== 'closed' && <ShopPanel session={session} view={shopView} onClose={closeShop} />}
+    {!blocked && <button className="dev-unlock-button" onClick={() => { input.reset(); setDevUnlock(v => !v); }}>解锁</button>}
+    {devUnlock && <DevUnlockPage session={session} onClose={() => { setDevUnlock(false); surface.current?.focus(); }} />}
   </div>;
 }

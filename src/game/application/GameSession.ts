@@ -777,6 +777,27 @@ export class GameSession {
     this.resetPosition();
     return 'travelling' as const;
   };
+  /** The test unlock page: every world and layer with its state. */
+  devUnlocks = () => {
+    const worlds=this.content.journey?WORLD_REQUIREMENTS:WORLD_REQUIREMENTS.slice(0,1);
+    return worlds.map(w=>({id:w.id,name:w.name,open:!this.content.journey||this.worldProgress.mineOpen(w.id),
+      layers:this.content.destinations.filter(d=>(d.worldId??1)===w.id).map(d=>({id:d.id,name:d.name,depth:d.depth,unlocked:!!this.explorations.get(w.id)?.has(d.id)}))}));
+  };
+  /** Test shortcut: opens a world (and the ones before it) as if its requirements were paid. */
+  devUnlockWorld = (id: WorldId) => {
+    if(!this.content.journey)return;
+    this.worldProgress.openThrough(id);this.committed(true);this.publish();
+  };
+  /** Test shortcut: unlocks one layer (and its world), or every layer when no id is given. */
+  devUnlockLayer = (id?: string) => {
+    const rooms=this.content.destinations.filter(d=>id===undefined||d.id===id);
+    for(const room of rooms){
+      const world=(room.worldId??1) as WorldId;
+      if(this.content.journey)this.worldProgress.openThrough(world);
+      this.explorations.get(this.content.journey?world:1)?.grant(room.id);
+    }
+    this.committed(true);this.publish();
+  };
   reserveWorldMaterials = (id: WorldId) => {
     if(this.suspended||!this.content.journey||this.worldProgress.mineOpen(id))return false;
     this.reservations.reserveWorld(id);this.committed(true);this.publish();return true;

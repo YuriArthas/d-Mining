@@ -27,5 +27,10 @@ export class WorldProgress {
     if (!this.areaOpen(id) || (id > 1 && !this.mineOpen((id - 1) as WorldId))) throw Error('尚未满足矿区开放条件');
     this.mines.add(id);
   }
+  /** Testing shortcut: credits enough history to enter world `id` and opens its mine and every one before it. */
+  openThrough(id: WorldId) {
+    this.mined = Math.max(this.mined, worldRequirement(id).mined);
+    for (const w of WORLD_REQUIREMENTS) if (w.id <= id) this.mines.add(w.id);
+  }
   exportData(): WorldProgressData { return { version: 1, minedVolume: this.mined, openMines: WORLD_REQUIREMENTS.filter(w => this.mines.has(w.id)).map(w => w.id) }; }
 }

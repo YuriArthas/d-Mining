@@ -21,6 +21,11 @@ export class Exploration {
     }
     return added;
   }
+  /** Testing shortcut: admits a destination without changing the recorded depth. */
+  grant(id: string) {
+    if (!this.milestones.some(m => m.id === id)) throw Error(`未知目的地: ${id}`);
+    this.unlocked.add(id);
+  }
   has(id: string) { return this.access.has(id) || this.unlocked.has(id); }
   exportData() { return { version: 1 as const, maxDepth: this.maximum, unlockedDestinationIds: [...this.unlocked] }; }
   static fromData(value: unknown, milestones: readonly Readonly<{id:string;depth:number}>[], access: readonly string[] = []) {

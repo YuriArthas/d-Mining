@@ -1,0 +1,6 @@
+/* The testing unlock page and its corner button: plain on purpose. */
+.dev-unlock-button { position: absolute; z-index: 90; left: 2px; bottom: 2px; padding: 0 4px; font: 10px/14px sans-serif; opacity: .55; pointer-events: auto; }
+.dev-unlock { position: absolute; z-index: 95; inset: 40px; overflow: auto; padding: 12px 16px; background: #fff; color: #000; font: 14px/1.5 sans-serif; pointer-events: auto; }
+.dev-unlock h3 { margin: 10px 0 4px; font-size: 16px; }
+.dev-unlock ul { margin: 0; padding-left: 20px; }
+.dev-unlock button { font: inherit; }

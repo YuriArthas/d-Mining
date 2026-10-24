@@ -157,3 +157,17 @@ test('the new map uses an explicit separate test save; legacy terrain is never s
   const location={pathname:'/games/mining-test/index.html',search:''};assert.notEqual(saveNamespace(location,'journey-v1').name,saveNamespace(location).name);
   assert.throws(()=>compatibleHead({formatVersion:1,revision:1,savedAt:0,world:{generationVersion:9,seed:0,regionEncoding:1},regionCount:0},JOURNEY_GENERATION),/不兼容/);
 });
+test('the testing unlock page opens worlds and layers, and the result survives a reload', () => {
+  const s=new GameSession(content);
+  const deep=content.destinations.filter(d=>(d.worldId??1)===3).at(-1);
+  s.devUnlockLayer(deep.id);
+  const after=s.devUnlocks();
+  assert.deepEqual(after.map(w=>w.open),[true,true,true]);
+  assert.equal(after[2].layers.find(l=>l.id===deep.id).unlocked,true);
+  assert.equal(after[2].layers.filter(l=>l.unlocked).length,1);
+  s.devUnlockLayer();
+  assert.ok(s.devUnlocks().every(w=>w.layers.every(l=>l.unlocked)));
+  const reloaded=GameSession.fromData(s.exportProgress(),content);
+  assert.ok(reloaded.devUnlocks().every(w=>w.open&&w.layers.every(l=>l.unlocked)));
+  assert.equal(reloaded.getSnapshot().maxDepth,0);
+});
