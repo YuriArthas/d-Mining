@@ -32,3 +32,12 @@ export function worldAtFeet(feet: readonly number[]): WorldId {
   if(feet[1]<-.1)return worldAtZ(feet[2]);
   return feet[2]>worldGateZ(3)?3:feet[2]>worldGateZ(2)?2:1;
 }
+/** Each world's teleport station: on the surface west of the spawn, facing it. Walking onto its pad opens
+ *  that world's layers; travelling to a world from anywhere arrives here. */
+export const STATION_LOCAL = { x: -10, z: 55 } as const;
+export function worldStation(id: WorldId) {
+  const z0 = worldRequirement(id).z, x = STATION_LOCAL.x, z = z0 + STATION_LOCAL.z;
+  const spawn = worldSpawn(id), yaw = Math.atan2(spawn[0] - x, spawn[2] - z);
+  const pad = { x: x + Math.sin(yaw) * 2.8, z: z + Math.cos(yaw) * 2.8 };
+  return { x, z, yaw, zone: { ...pad, y: 0, radius: 1.8, heightTolerance: .3, hysteresis: .3, lookAt: [x, 2.2, z] as const } };
+}

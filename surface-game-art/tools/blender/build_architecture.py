@@ -621,18 +621,34 @@ for tier in layout['tiers']:
 for i,p in enumerate(layout['steps']):
     model('TerraceStep_'+str(i),(p['x'],0,p['z']))
     box('Terrace_Step',(0,p['y']/2,0),(p['width'],p['y'],p['depth']),2)
-for i,p in enumerate(layout['portals']):
-    model('Portal_'+p['id'],(p['x'],0,p['z']),p['yaw'])
-    slab('Portal_Base',stepped_outline(2.6,2.0,.23),0,.16,11)
-    for x in [-1.05,1.05]:
-        box('Portal_Pier',(x,.32,0),(.52,.64,.72),19)
-        box('Portal_Post',(x,1.48,0),(.34,2.4,.38),1)
-        box('Portal_Collar',(x,2.45,0),(.48,.32,.52),0)
-    # Every slot looks like the first portal (as the game has always shown them); each keeps its own
-    # model so its baked light belongs to its own place.
-    box('Portal_Header',(0,2.72,0),(2.85,.40,.66),5)
-    box('Portal_GoldLine',(0,2.94,0),(2.5,.10,.48),8)
-    prism('Portal_Crest',[(x,y+2.72) for x,y in stepped_outline(.58,.58,.15)],.36,.50,17)
+# TELEPORT STATION: one per world, replacing the ring of layer portals. A stepped octagonal platform, two
+# chunky stone pillars with gold bands, a teal-roofed lintel with a crest, and a broad teal ring in the opening
+# (the swirling portal disc inside it is a runtime effect). Its front (+Z) faces the spawn.
+st=layout['station']
+model('Teleport_Station',(st['x'],0,st['z']),st['yaw'])
+octagon=lambda r:[(math.cos(math.pi/8+i*math.pi/4)*r,math.sin(math.pi/8+i*math.pi/4)*r) for i in range(8)]
+slab('Station_Plinth',octagon(3.15),0,.24,19)
+slab('Station_Deck',octagon(2.8),.24,.42,11)
+slab('Station_GoldRim',octagon(2.86),.40,.46,8)
+slab('Station_Inlay',octagon(1.55),.42,.47,13)
+for side in (-1,1):
+    x=side*1.9
+    slab('Station_PillarFoot',[(x+u,v) for u,v in stepped_outline(1.15,1.15,.22)],.42,1.0,19)
+    slab('Station_Pillar',[(x+u,v) for u,v in stepped_outline(.86,.86,.18)],1.0,4.75,3)
+    for y in (1.6,3.9): slab('Station_PillarBand',[(x+u,v) for u,v in stepped_outline(.98,.98,.2)],y,y+.22,8)
+    slab('Station_PillarCap',[(x+u,v) for u,v in stepped_outline(1.12,1.12,.22)],4.75,5.1,0)
+    lamp('Station_Lamp',(x,3.25,.62),.85)
+box('Station_Lintel',(0,5.38,0),(4.9,.62,1.05),10)
+box('Station_LintelGold',(0,5.06,.54),(4.4,.12,.1),8)
+for sz in (-1,1): tilted_box('Station_Roof',(0,5.98,sz*.36),(5.3,.26,.95),6,sz*.62,'X')
+box('Station_RoofRidge',(0,6.26,0),(5.5,.22,.3),13)
+prism('Station_Crest',[(x,y+6.75) for x,y in stepped_outline(.78,.9,.2)],-.14,.14,7)
+prism('Station_CrestGold',[(x,y+6.75) for x,y in stepped_outline(.46,.56,.12)],.15,.22,8)
+circle=[(math.cos(2*math.pi*i/20)*1.62,math.sin(2*math.pi*i/20)*1.62) for i in range(20)]
+ring('Station_Ring',circle,.82,-.16,.16,2.75,13)
+ring('Station_RingGold',[(x*1.05,y*1.05) for x,y in circle],.93,.17,.24,2.75,8)
+for side in (-1,1): box('Station_RingStrut',(side*1.42,2.75,0),(.5,.34,.3),0)
+for side in (-1,1): crate('Station_Crate',(side*2.95,.42,-1.55),.62)
 
 # Functional furniture: a newly authored shell; its live label is attached in-game.
 # A faceted teal toy cabinet with a recessed capsule display and bold roof/collars.
@@ -686,7 +702,7 @@ for side,sx in (('L',-1),('R',1)):
 # is applied to them. Preserve nearest sampling and the authored atlas UVs.
 bevel_count=0
 for ob in [o for o in bpy.data.objects if o.type=='MESH']:
-    prominent=any(key in ob.name for key in ('Shop_CornerTimber','Shop_PorchPost','Forge_FrontPost','Pack_CornerTimber','Pack_SideTimber','Bridge_PostCap','Shop_FoundationCap','Pack_FoundationCap'))
+    prominent=any(key in ob.name for key in ('Shop_CornerTimber','Shop_PorchPost','Forge_FrontPost','Pack_CornerTimber','Pack_SideTimber','Station_Pillar','Bridge_PostCap','Shop_FoundationCap','Pack_FoundationCap'))
     if not prominent: continue
     bpy.context.view_layer.objects.active=ob
     mod=ob.modifiers.new('BroadSingleChamfer','BEVEL'); mod.width=.055; mod.segments=1

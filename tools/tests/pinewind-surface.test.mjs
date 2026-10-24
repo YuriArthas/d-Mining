@@ -5,7 +5,7 @@ import {createCampContent} from '../../src/game/content/campContent.ts';
 import {withPinewindSurface,PINEWIND_CAMP} from '../../src/game/content/pinewindSurface.ts';
 import {PORTAL_SLOTS} from '../../src/game/content/portalSlots.ts';
 import {LAYERS} from '../../src/game/content/layers.ts';
-import {PINEWIND_PLAZA,PINEWIND_SERVICES,PINEWIND_FACILITIES,PINEWIND_PORTAL_SLOTS,PINEWIND_EGG_DISPLAYS,PINEWIND_EGG_TIERS,PINEWIND_TERRACE,PINEWIND_SPAWN} from '../../src/game/content/pinewind/hubLayout.ts';
+import {PINEWIND_PLAZA,PINEWIND_SERVICES,PINEWIND_FACILITIES,PINEWIND_STATION,PINEWIND_EGG_DISPLAYS,PINEWIND_EGG_TIERS,PINEWIND_TERRACE,PINEWIND_SPAWN} from '../../src/game/content/pinewind/hubLayout.ts';
 import {assembleAuthoredSurface} from '../../src/game/presentation/assembleAuthoredSurface.ts';
 import {initPhysics,CharacterPhysics,RAPIER} from '../../src/game/validation/physics.ts';
 import {SceneryCollision} from '../../src/game/presentation/SceneryCollision.ts';
@@ -28,15 +28,18 @@ test('the hub owns world-1 surface zones; rules, rooms, worlds and the tutorial 
  // The live content carries the same zones into the game session.
  assert.deepEqual(PINEWIND_CAMP.session.sales[0],PINEWIND_SERVICES.sale.trigger);
 });
-test('portals follow the Pinewind slots for the visible model, both jamb colliders and the session zone',()=>{
- const base=createCampContent(LAYERS,{...PORTAL_SLOTS,core:{...PORTAL_SLOTS.core,x:-23,z:18,yaw:0}}),art=withPinewindSurface(base);
- for(const p of art.hub.portals){
-  const slot=PINEWIND_PORTAL_SLOTS[p.id],model=art.surface.authored.instances.find(m=>m.portalId===p.id);
-  assert.deepEqual(model.at,[slot.x,0,slot.z]);
-  for(const sign of [-1,1]){const x=slot.x+Math.cos(slot.yaw)*1.05*sign,z=slot.z-Math.sin(slot.yaw)*1.05*sign;
-   assert.ok(art.surface.plan.solids.some(s=>Math.abs(s.at[0]-x)<1e-9&&Math.abs(s.at[2]-z)<1e-9&&s.half[0]===.25),`${p.id} jamb`);}
-  const zone=art.session.portals.find(q=>q.id===p.id).zone;assert.equal(zone.x,slot.x);assert.equal(zone.z,slot.z);
- }
+test('no ring of layer portals: one teleport station west of the spawn, its model, pillars and pad where the session expects them',async()=>{
+ const {worldStation}=await import('../../src/game/content/worldJourney.ts');
+ assert.deepEqual(PINEWIND_CAMP.hub.portals,[]);assert.deepEqual(PINEWIND_CAMP.session.portals,[]);
+ assert.equal(PINEWIND_CAMP.surface.authored.instances.some(i=>i.node?.startsWith('Portal_')),false);
+ const st=worldStation(1),model=PINEWIND_CAMP.surface.authored.instances.find(i=>i.node==='Teleport_Station');
+ assert.deepEqual(model.at,[st.x,0,st.z]);assert.equal(PINEWIND_STATION.x,st.x);
+ assert.deepEqual(PINEWIND_CAMP.session.stations.map(s=>s.worldId),[1,2,3]);
+ assert.deepEqual(PINEWIND_CAMP.session.stations[0].zone,st.zone);
+ // The station faces the spawn and its pad lies between them.
+ const toSpawn=Math.atan2(PINEWIND_SPAWN.x-st.x,PINEWIND_SPAWN.z-st.z);assert.ok(Math.abs(st.yaw-toSpawn)<1e-9);
+ assert.ok(Math.hypot(st.zone.x-PINEWIND_SPAWN.x,st.zone.z-PINEWIND_SPAWN.z)<Math.hypot(st.x-PINEWIND_SPAWN.x,st.z-PINEWIND_SPAWN.z));
+ assert.equal(PINEWIND_CAMP.surface.plan.solids.filter(s=>Math.hypot(s.at[0]-st.x,s.at[2]-st.z)<2.5&&s.half[0]===.45).length,2,'two pillars');
 });
 test('plaza plan: services face the plaza without touching the mine, the headframe or each other',()=>{
  const footprint=(kind,size,forward)=>{const {x,z,yaw}=PINEWIND_FACILITIES[kind].anchor,f=[Math.sin(yaw),Math.cos(yaw)],s=[Math.cos(yaw),-Math.sin(yaw)],c=[x+f[0]*forward,z+f[1]*forward];
@@ -200,7 +203,7 @@ test('布局 v5：出售在东北，镐子店和背包店在西侧，从出生�
  const roots0 = PINEWIND_CAMP.surface.authored.instances.map(i => i.node);
  for (const gone of ['Challenge_Board', 'Pet_Conservatory']) assert.equal(roots0.includes(gone), false, gone);
  assert.equal(PINEWIND_CAMP.surface.plan.signs.some(s => s.title === 'PETS'), false, 'no PETS sign');
- assert.deepEqual(PINEWIND_CAMP.surface.plan.signs.map(s => s.title).sort(), ['BACKPACK', 'PICKAXE', 'SELL']);
+ assert.deepEqual(PINEWIND_CAMP.surface.plan.signs.map(s => s.title).sort(), ['BACKPACK', 'PICKAXE', 'SELL', '传送站']);
  assert.ok(Math.hypot(CAPSULE_MACHINE_ZONE.x - CAPSULE_MACHINE_AT[0], CAPSULE_MACHINE_ZONE.z - CAPSULE_MACHINE_AT[2]) < 2, 'capsule zone in front of it');
  // The authored gate stands on the gameplay gate line, its doors hinged at the opening's edges.
  assert.equal(PINEWIND_GATE.z, worldGateZ(2));

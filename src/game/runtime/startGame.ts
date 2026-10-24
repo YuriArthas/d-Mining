@@ -33,6 +33,7 @@ import { PetFollowers } from "../presentation/PetFollowers.ts";
 import { MinerAvatar } from "../presentation/MinerAvatar.ts";
 import { EggStandLabels } from "../presentation/EggStandLabels.ts";
 import { LockedEggs } from "../presentation/LockedEggs.ts";
+import { TeleportStations } from "../presentation/TeleportStations.ts";
 import { disposeScenery } from "../presentation/disposeScenery.ts";
 import { SurfaceHubView } from "../presentation/SurfaceHubView.ts";
 import { prepareShaders } from "../presentation/prepareShaders.ts";
@@ -271,6 +272,9 @@ export async function startGame(options: StartGameOptions) {
     // Eggs not unlocked yet stand as black silhouettes under a "???" label that keeps their price.
     const lockedEggs = new LockedEggs(surface.group, content.hub.eggs);
     scope.defer(() => lockedEggs.dispose());
+    // Journey worlds: each world's teleport station gets its swirling portal disc.
+    const stations = content.worlds ? new TeleportStations() : null;
+    if (stations) { root.add(stations.group); scope.defer(() => stations.dispose()); }
     const updateEggLabels = () => {
       const eggs = session.pets.getSnapshot().eggs, unlocked = (id: string) => eggs.some(egg => egg.id === id && egg.unlocked);
       eggLabels.setUnlocked(unlocked); lockedEggs.setUnlocked(unlocked);
@@ -370,6 +374,7 @@ export async function startGame(options: StartGameOptions) {
       cameraGrade,
       eggLabels,
       lockedEggs,
+      stations,
       petFollowers,
       minerAvatar,
       feedback,

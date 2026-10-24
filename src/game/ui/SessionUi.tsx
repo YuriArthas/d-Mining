@@ -17,7 +17,7 @@ import { ShopPanel, showShopCategory } from './ShopPanel.tsx';
 import type { ShopCategory } from '../content/shopCatalog.ts';
 import { MYSTERY_EGG_NAME } from '../content/petAppearance.ts';
 import { TargetHealth } from './TargetHealth.tsx';
-import { WorldSheet, type WorldTab } from './world/WorldSheet.tsx';
+import { StationSheet, WorldSheet, type WorldTab } from './world/WorldSheet.tsx';
 
 type Modal =
   | { kind: 'bag'; tab: BagTab } | { kind: 'world'; tab: WorldTab } | { kind: 'rewards'; tab: RewardsTab }
@@ -40,6 +40,11 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
   // Leaving an egg stand closes its sheet; arriving at a new shop re-arms the auto-open.
   const [lastEggStation, setLastEggStation] = useState(state.eggStation?.id);
   if (lastEggStation !== state.eggStation?.id) { setLastEggStation(state.eggStation?.id); if (modal?.kind === 'egg') setModal(null); }
+  // The teleport station opens its layer list on stepping onto the pad; closing it holds until the player steps off.
+  const [stationDismissed, setStationDismissed] = useState(false);
+  const [lastStation, setLastStation] = useState(state.atStation);
+  if (lastStation !== state.atStation) { setLastStation(state.atStation); setStationDismissed(false); }
+  const stationOpen = !!state.atStation && !stationDismissed && !modal;
   const [dismissedShop, setDismissedShop] = useState<string | null>(null);
   const [lastShop, setLastShop] = useState(state.shopId);
   if (lastShop !== state.shopId) { setLastShop(state.shopId); setDismissedShop(null); }
@@ -69,8 +74,9 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
     return () => window.removeEventListener('keydown', press);
   });
 
-  const panel = modal?.kind ?? (shopOpen ? 'shop' : 'none');
-  const tipHidden = !!modal || shopOpen || blocked || !focused;
+  const panel = modal?.kind ?? (shopOpen ? 'shop' : stationOpen ? 'station' : 'none');
+  const tipHidden = !!modal || shopOpen || stationOpen || blocked || !focused;
+  useEffect(() => { if (stationOpen) input.reset(); }, [stationOpen, input]);
   const objective = !blocked && <DepthGoalCard goal={selectDepthGoal(state.maxDepth, state.destinations)} />;
   const prompts = <>
     {lockedMine && <GameButton className="ui-btn" data-tone="orange" data-size="m" onPress={() => open({ kind: 'world', tab: 'progress' })}><Icon kind="globe" /><span className="ui-outline"><span className="desktop-hint">E · </span>查看矿区要求</span></GameButton>}
@@ -87,6 +93,7 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
       }} />}
     {!modal && !shopOpen && <Controls input={input} surface={surface} />}
     {modal?.kind === 'bag' && <BagSheet session={session} tab={modal.tab} onTab={tab => setModal({ kind: 'bag', tab })} onClose={close} onShop={openShop} />}
+    {stationOpen && <StationSheet session={session} onClose={() => { input.reset(); setStationDismissed(true); surface.current?.focus(); }} />}
     {modal?.kind === 'world' && <WorldSheet session={session} tab={modal.tab} onTab={tab => setModal({ kind: 'world', tab })} onClose={close} />}
     {modal?.kind === 'rewards' && <RewardsSheet session={session} tab={modal.tab} onTab={tab => setModal({ kind: 'rewards', tab })} onClose={close} />}
     {modal?.kind === 'egg' && state.eggId && <EggSheet key={state.eggStation!.id} session={session} eggId={state.eggId} onOpenPets={() => open({ kind: 'bag', tab: 'pets' })} onClose={close} />}

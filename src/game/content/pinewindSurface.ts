@@ -6,7 +6,7 @@ import {JOURNEY_CAMP,JOURNEY_GENERATION} from './journeyCamp.ts';
 import {CatmullRomCurve3,Vector3} from 'three';
 import {CELL} from '../terrain/grid.ts';
 import {
- PINEWIND_SERVICES, PINEWIND_PORTAL_SLOTS, PINEWIND_PORTAL_RADIUS, PINEWIND_EGG_DISPLAYS, PINEWIND_EGG_TIERS,
+ PINEWIND_SERVICES, PINEWIND_STATION, PINEWIND_STATION_SIGN, PINEWIND_EGG_DISPLAYS, PINEWIND_EGG_TIERS,
  PINEWIND_TERRACE, PINEWIND_STAIR_STEPS, PINEWIND_CREEK,
 } from './pinewind/hubLayout.ts';
 import type {AuthoredInstance, AuthoredLight} from './authoredSurface.ts';
@@ -39,27 +39,24 @@ export function withPinewindSurface(base:CampContent):CampContent {
  if(shaft.minX!==-8||shaft.maxX!==8||shaft.minZ!==-8||shaft.maxZ!==8)throw Error('Pinewind assets require the authored 16m square shaft; regenerate for changed dimensions');
  const eggIds=new Set((base.session.petContent?.eggs??[]).map(egg=>egg.id));
  const eggs=PINEWIND_EGG_DISPLAYS.filter(display=>eggIds.has(display.eggId));
- const portals=base.hub.portals.map(p=>{
-  const slot=PINEWIND_PORTAL_SLOTS[p.id];if(!slot)throw Error(`Missing Pinewind portal slot: ${p.id}`);
-  return {...p,...slot,zone:{...p.zone,x:slot.x,z:slot.z,radius:PINEWIND_PORTAL_RADIUS}};
- });
+ // No ring of layer portals: the teleport station (session.stations) opens this world's layers.
+ const portals:typeof base.hub.portals=[];
  const services=[PINEWIND_SERVICES.sale,PINEWIND_SERVICES.shop,PINEWIND_SERVICES.bags];
  const models=roots.filter(r=>!r.node.startsWith('Portal_')&&!r.node.startsWith('Egg_')).map(r=>instance(r.node));
+ {const p=models.find(r=>r.node==='Teleport_Station');if(!p)throw Error('Missing authored surface node Teleport_Station');p.at=[PINEWIND_STATION.x,0,PINEWIND_STATION.z];p.rotation=rotation(PINEWIND_STATION.yaw);}
  for(const [node,service] of [['Merchant_Store',PINEWIND_SERVICES.sale],['Copper_Forge',PINEWIND_SERVICES.shop],['Pack_Shop',PINEWIND_SERVICES.bags]] as const){
   const p=models.find(r=>r.node===node)!;p.at=[service.placement.x,0,service.placement.z];p.rotation=rotation(service.placement.yaw);
  }
  for(const p of eggs){const model=instance('Egg_'+p.id);model.at=[p.x,p.y,p.z];model.rotation=rotation(p.yaw);models.push(model);}
- // Each portal uses its own model: its baked light belongs to its own slot.
- for(const p of portals){const model=instance('Portal_'+p.id);model.at=[p.x,0,p.z];model.rotation=rotation(p.yaw);model.portalId=p.id;models.push(model);}
  for(const model of models)model.ground=model.node==='Creek_Bridge'||model.node?.startsWith('Terrace')===true;
  models.unshift({asset:'pinewind-landscape',at:[0,0,0],rotation:[0,0,0,1],scale:[1,1,1]});
  const solids:Solid[]=[...authored.solids as Solid[],...PINEWIND_TERRACE_SOLIDS,...services.map(s=>s.solid)];
  for(const p of eggs)solids.push({at:[p.x,p.y+1.5,p.z],half:[.95,1.5,.95],yaw:0});
- for(const p of portals)solids.push({at:[p.x,.08,p.z],half:[1.3,.08,1],yaw:p.yaw});
- for(const p of portals)for(const sign of [-1,1])solids.push({at:[p.x+Math.cos(p.yaw)*1.05*sign,1.5,p.z-Math.sin(p.yaw)*1.05*sign],half:[.25,1.5,.25],yaw:p.yaw});
+ // The station's two pillars behind its pad (the step-up platform is walkable ground).
+ {const {x,z,yaw}=PINEWIND_STATION;for(const side of [-1,1])solids.push({at:[x+Math.cos(yaw)*1.9*side,2.4,z-Math.sin(yaw)*1.9*side],half:[.45,2.4,.45],yaw});}
  const surface:SurfaceContent={...base.surface,placements:[],profiles:{},
   authored:{version:'pinewind-plaza-v4',instances:models,groundAssets:['pinewind-landscape'],opensSpawnPassage:true,light:{...authored.light,sun:authored.light.sun as [number,number,number]} satisfies AuthoredLight},
-  plan:{shapes:services.map(s=>s.ring),signs:services.map(s=>s.sign),solids},
+  plan:{shapes:services.map(s=>s.ring),signs:[...services.map(s=>s.sign),PINEWIND_STATION_SIGN],solids},
  };
  // The first entries of sales/shops are world 1's surface services (see sessionContentFor); the backpack
  // shop joins right after the pickaxe shop and opens on its own counter.

@@ -18,27 +18,57 @@ const LAYER_COLORS: readonly [RegExp, string, string][] = [
 const FALLBACK = [['#62a8e8', '#2f6fb4'], ['#9fb85c', '#6b8530'], ['#e88aa8', '#b4536f']] as const;
 const layerColor = (name: string, index: number) => { const hit = LAYER_COLORS.find(([pattern]) => pattern.test(name)); return hit ? [hit[1], hit[2]] : FALLBACK[index % FALLBACK.length]; };
 
-/** Places: teleport between unlocked layers, and the long-term gates to the next worlds. */
+/** Worlds: travel to a world's teleport station, and the long-term gates to the next worlds. Layers are chosen
+ *  on the station itself (StationSheet). */
 export function WorldSheet({ session, tab, onTab, onClose }: { session: GameSession; tab: WorldTab; onTab(tab: WorldTab): void; onClose(): void }) {
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot);
   const tabs: SheetTab<WorldTab>[] = [{ id: 'travel', label: '传送', icon: 'portal' }, ...(state.journey ? [{ id: 'progress' as const, label: '进度', icon: 'globe' as const }] : [])];
   const common = { title: '世界', tabs, tab, onTab, onClose };
-  return tab === 'progress' && state.journey ? <ProgressTab session={session} common={common} /> : <TravelTab session={session} common={common} onClose={onClose} />;
+  if (tab === 'progress' && state.journey) return <ProgressTab session={session} common={common} />;
+  return state.journey ? <WorldsTab session={session} common={common} onClose={onClose} onTab={onTab} />
+    : <Sheet {...common}><LayerCards session={session} onClose={onClose} /></Sheet>;
 }
 type Common = { title: string; tabs: SheetTab<WorldTab>[]; tab: WorldTab; onTab(tab: WorldTab): void; onClose(): void };
+const WORLD_COLORS = [['#62c96b', '#2f9a3d'], ['#5fc0b8', '#2f8a84'], ['#e9c46a', '#b88a2a']] as const;
 
-function TravelTab({ session, common, onClose }: { session: GameSession; common: Common; onClose(): void }) {
+function WorldsTab({ session, common, onClose, onTab }: { session: GameSession; common: Common; onClose(): void; onTab(tab: WorldTab): void }) {
+  const state = useSyncExternalStore(session.subscribe, session.getSnapshot);
+  const [message, setMessage] = useState('');
+  const go = (id: WorldId) => { const r = session.travelWorld(id); if (r === 'travelling') onClose(); else setMessage(r === 'locked' ? '这个世界还没开放' : '现在无法前往，请稍后再试'); };
+  return <Sheet {...common} footer={<span className="ui-hint" role="status">{message || '前往一个世界会到达它的传送站，站上去选择要去的层。'}</span>}>
+    <div className="ui-cards world-cards">{state.worlds.map((world, i) => {
+      const [c, lo] = WORLD_COLORS[i % WORLD_COLORS.length], here = world.id === state.currentWorld;
+      return <div key={world.id} className="ui-card-tile" data-locked={world.areaOpen ? undefined : ''} style={{ '--c': c, '--c-lo': lo } as CSSProperties}>
+        {world.areaOpen ? <Icon kind="globe" className="ui-icon ui-card-art" /> : <span className="ui-card-art world-lock" aria-hidden="true"><LockIcon /></span>}
+        <h4 className="ui-outline">{world.name}</h4>
+        {here ? <>{state.atStation ? <span className="ui-stamp">在传送站</span> : <UiButton size="s" tone="blue" aria-label={`去${world.name}传送站`} onPress={() => go(world.id)}>去传送站</UiButton>}<small>当前所在</small></>
+          : world.areaOpen ? <UiButton size="s" tone="green" icon="portal" aria-label={`前往${world.name}`} onPress={() => go(world.id)}>前往</UiButton>
+          : <UiButton size="s" tone="steel" onPress={() => onTab('progress')}>查看开放条件</UiButton>}
+      </div>;
+    })}</div>
+  </Sheet>;
+}
+
+/** The teleport station: this world's surface and its layers. */
+export function StationSheet({ session, onClose }: { session: GameSession; onClose(): void }) {
+  const state = useSyncExternalStore(session.subscribe, session.getSnapshot);
+  const world = state.worlds.find(w => w.id === state.currentWorld)?.name ?? '';
+  return <Sheet title={`${world}传送站`} subtitle={`历史最深 ${formatDepth(state.maxDepth)}`} size="m" onClose={onClose} className="station-sheet"
+    footer={<span className="ui-hint">到达新深度会永久解锁那一层。</span>}>
+    <LayerCards session={session} onClose={onClose} />
+  </Sheet>;
+}
+
+function LayerCards({ session, onClose }: { session: GameSession; onClose(): void }) {
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot);
   const [message, setMessage] = useState('');
   const surface = state.location !== 'mine' && state.location !== 'room';
-  const world = state.worlds.find(w => w.id === state.currentWorld)?.name ?? '地表';
   const go = (id: string) => {
     const result = session.travelTo(id);
     if (result === 'travelling') onClose();
     else setMessage(result === 'locked' ? '还没有解锁这一层' : '现在无法传送，请稍后再试');
   };
-  return <Sheet {...common} footer={<span className="ui-hint" role="status">{message || '在哪都能传送。到达新深度会永久解锁那一层的传送和宠物蛋。'}</span>}>
-    <div className="ui-row"><Chip icon="gem">历史最深 <b>{formatDepth(state.maxDepth)}</b></Chip><span className="ui-hint">{world}</span></div>
+  return <>
     <div className="ui-cards world-cards">
       <div className="ui-card-tile" style={{ '--c': '#62c96b', '--c-lo': '#2f9a3d' } as CSSProperties}>
         <Icon kind="home" className="ui-icon ui-card-art" /><h4 className="ui-outline">地表</h4><small>商店 · 蛋台</small>
@@ -54,7 +84,8 @@ function TravelTab({ session, common, onClose }: { session: GameSession; common:
         </div>;
       })}
     </div>
-  </Sheet>;
+    {message && <p className="ui-hint" role="status">{message}</p>}
+  </>;
 }
 
 function ProgressTab({ session, common }: { session: GameSession; common: Common }) {

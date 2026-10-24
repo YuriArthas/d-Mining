@@ -3,6 +3,7 @@ import { deriveFacility } from '../../world/deriveFacility.ts';
 import { EGG_DISPLAY_ROWS } from '../petAppearance.ts';
 import type { Sign } from '../../world/sceneryKit.ts';
 import { CAPSULE_MACHINE_AT, CAPSULE_MACHINE_YAW } from '../feedbackFacilities.ts';
+import { worldStation } from '../worldJourney.ts';
 
 /** Pinewind hub plan for world 1. One source for the playable zones, collision, the
  *  runtime composition and the offline art pipeline (tools/export-pinewind-layout.mjs).
@@ -65,20 +66,11 @@ export const PINEWIND_SERVICES = { sale: service('sale'), shop: service('shop'),
 /** The gate to the next world stands in the pass of the wooded ridge behind the portal ring. */
 export const PINEWIND_GATE = { x: 0, z: 69, opening: 8, height: 9.6, wallTo: 14 } as const;
 
-/** Portals ring the spawn: walk south from the spawn to travel, north over the bridge to work. */
-const aroundSpawn = (theta: number, radius = 12) => ({
-  x: round(PINEWIND_SPAWN.x + Math.sin(theta) * radius),
-  z: round(PINEWIND_SPAWN.z + Math.cos(theta) * radius),
-  // Face the spawn: local +Z points from the portal back to the ring centre.
-  yaw: round(theta + Math.PI),
-});
-export const PINEWIND_PORTAL_SLOTS: Readonly<Record<string, Readonly<{ x: number; z: number; yaw: number }>>> = {
-  old_mine: aroundSpawn(-90 * DEG), fungal: aroundSpawn(-60 * DEG), crystal: aroundSpawn(-30 * DEG),
-  ruins: aroundSpawn(30 * DEG), frozen: aroundSpawn(60 * DEG), volcanic: aroundSpawn(90 * DEG),
-  // Later legacy layers keep valid outer slots; the live first world has six portals.
-  fossil: aroundSpawn(-45 * DEG, 18), machinery: aroundSpawn(45 * DEG, 18), core: aroundSpawn(75 * DEG, 18),
-};
-export const PINEWIND_PORTAL_RADIUS = 1.6;
+/** The teleport station west of the spawn, facing it (worldJourney.ts owns the spot for every world). Its
+ *  pad opens this world's layers; the big word floats over the arch. */
+const station = worldStation(1);
+export const PINEWIND_STATION = { x: station.x, z: station.z, yaw: round(station.yaw), pad: { x: round(station.zone.x), z: round(station.zone.z) } } as const;
+export const PINEWIND_STATION_SIGN: Sign = { at: [station.x, 7.6, station.z], yaw: round(station.yaw), width: 4.4, title: '传送站', subtitle: '', color: '#9ff3ff', background: '#18283d' };
 
 /** Three egg terraces facing the plaza. Rows step up 2.2 m and alternate by half a bay,
  *  so the always-on name/price labels never stack. Progression runs north to south and low to high:
@@ -122,12 +114,12 @@ export const PINEWIND_PROPS = {
 /** Ground plan for the offline landscape: sandy plazas, path ribbons, paving pads and
  *  the areas vegetation must keep clear. Exported to surface-game-art/layout.json. */
 const CAPSULE_FRONT = [round(CAPSULE_MACHINE_AT[0] + Math.sin(CAPSULE_MACHINE_YAW) * 1.2), round(CAPSULE_MACHINE_AT[2] + Math.cos(CAPSULE_MACHINE_YAW) * 1.2)] as const;
-const spawnArc = Array.from({ length: 11 }, (_, i) => { const t = (-100 + i * 20) * DEG; return [round(Math.sin(t) * 12), round(46 + Math.cos(t) * 12)]; });
 export const PINEWIND_GROUNDS = {
   plazas: [
     PINEWIND_PLAZA,
     { x: PINEWIND_SPAWN.x, z: PINEWIND_SPAWN.z, radius: 4.6 },
     { x: CAPSULE_FRONT[0], z: CAPSULE_FRONT[1], radius: 3.2 }, // capsule machine pad
+    { x: PINEWIND_STATION.pad.x, z: PINEWIND_STATION.pad.z, radius: 3.4 }, // teleport station forecourt
   ],
   paths: [
     { width: 2.7, points: [[0, 104], [0, 80], [0, 54], [0, 46], [0, 36.5], [0, 26], [0, 16], [0, 8]] },
@@ -135,7 +127,7 @@ export const PINEWIND_GROUNDS = {
     // Past the terrace stairs to the capsule machine where the pet house used to stand.
     { width: 1.7, points: [[24.5, 15.5], [26.5, 12.8], [CAPSULE_FRONT[0], CAPSULE_FRONT[1]]] },
     { width: 1.9, points: [[22, 21], [22, 44.5], [27, 44.5]] },
-    { width: 1.5, points: spawnArc },
+    { width: 1.7, points: [[PINEWIND_SPAWN.x, PINEWIND_SPAWN.z], [PINEWIND_STATION.pad.x, PINEWIND_STATION.pad.z]] },
   ],
   pads: [[0, 16], ...Object.values(PINEWIND_SERVICES).map(s => [s.trigger.x, s.trigger.z] as const), [22, 29], [0, 47]],
   keepClear: [
@@ -149,5 +141,6 @@ export const PINEWIND_GROUNDS = {
     { kind: 'circle', x: PINEWIND_SERVICES.bags.center[0], z: PINEWIND_SERVICES.bags.center[2], radius: 7 },
     { kind: 'rect', minX: -PINEWIND_GATE.wallTo - 1, maxX: PINEWIND_GATE.wallTo + 1, minZ: PINEWIND_GATE.z - 4, maxZ: PINEWIND_GATE.z + 4 },
     { kind: 'circle', x: CAPSULE_MACHINE_AT[0], z: CAPSULE_MACHINE_AT[2], radius: 4 },
+    { kind: 'circle', x: PINEWIND_STATION.x, z: PINEWIND_STATION.z, radius: 6 },
   ],
 } as const;

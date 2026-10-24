@@ -1,5 +1,5 @@
 import type { FootSurface } from '../audio/sfx.ts';
-import { PINEWIND_BRIDGE, PINEWIND_CREEK, PINEWIND_GROUNDS, PINEWIND_PORTAL_SLOTS, PINEWIND_STAIR_STEPS, PINEWIND_TERRACE } from '../content/pinewind/hubLayout.ts';
+import { PINEWIND_BRIDGE, PINEWIND_CREEK, PINEWIND_GROUNDS, PINEWIND_STAIR_STEPS, PINEWIND_STATION, PINEWIND_TERRACE } from '../content/pinewind/hubLayout.ts';
 import { resourceByKind } from '../content/resources.ts';
 import { CELL, type Coord } from '../terrain/SparseWorld.ts';
 import { PROTECTED_FLOOR } from '../world/entrance.ts';
@@ -37,7 +37,7 @@ function onPath(x: number, z: number) {
 export function hubSurface(x: number, z: number, raised: boolean): FootSurface {
   if (Math.abs(x - PINEWIND_BRIDGE.x) < PINEWIND_BRIDGE.width / 2 && Math.abs(z - PINEWIND_BRIDGE.z) < PINEWIND_BRIDGE.halfSpan) return 'wood';
   if (PINEWIND_GROUNDS.pads.some(([px, pz]) => Math.hypot(x - px, z - pz) < PAD_RADIUS)) return 'stone';
-  if (Object.values(PINEWIND_PORTAL_SLOTS).some(p => Math.hypot(x - p.x, z - p.z) < 1.4)) return 'stone';
+  if (Math.hypot(x - PINEWIND_STATION.x, z - PINEWIND_STATION.z) < 2.8) return 'stone';
   if (raised) {
     const onStairs = PINEWIND_STAIR_STEPS.some(s => Math.abs(x - s.x) <= s.width / 2 && Math.abs(z - s.z) <= s.depth / 2);
     const onTerrace = z >= PINEWIND_TERRACE.minZ && z <= PINEWIND_TERRACE.maxZ && x > 20;

@@ -3,7 +3,7 @@ import { LAYERS, type Layer } from './layers.ts';
 import { roomsFor } from '../world/rooms.ts';
 import { roomPlan } from '../world/scenery.ts';
 import type { ScenerySite } from '../presentation/SceneryCollision.ts';
-import { WORLD_REQUIREMENTS, worldSpawn, worldAtZ, type WorldId } from './worldJourney.ts';
+import { WORLD_REQUIREMENTS, worldSpawn, worldAtZ, worldStation, type WorldId } from './worldJourney.ts';
 import { PET_CONTENT } from './pets.ts';
 import { JOURNEY_RESOURCES } from './journeyResources.ts';
 import { EGG_STAGES } from './progression.ts';
@@ -32,6 +32,7 @@ export const JOURNEY_CAMP: CampContent = (() => {
       sales:[...first.session.sales,...JOURNEY_WORLDS.slice(1).flatMap(w=>[{x:-16,y:0,z:w.z+44,radius:3,heightTolerance:.3,hysteresis:.3},...w.rooms.map(r=>r.sell)])],
       shops:[...first.session.shops,...JOURNEY_WORLDS.slice(1).flatMap(w=>[{id:`world${w.id}.shop`,zone:{x:16,y:0,z:w.z+44,radius:3,heightTolerance:.3,hysteresis:.3}},...w.rooms.filter(r=>r.shop).map(r=>({id:r.id,zone:r.shop!}))])],
       homes:WORLD_REQUIREMENTS.map(w=>({worldId:w.id,zone:{x:0,y:0,z:worldSpawn(w.id)[2],radius:6,heightTolerance:.3,hysteresis:.3}})),
+      stations:WORLD_REQUIREMENTS.map(w=>({worldId:w.id,zone:worldStation(w.id).zone})),
     },
   };
 })();

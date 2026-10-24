@@ -61,6 +61,8 @@ export class GameSession {
   private get exploration() { return this.explorations.get(this.currentWorld)!; }
   private hasDestination = (id: string) => [...this.explorations.values()].some(e => e.has(id));
   private readonly homes: {worldId:WorldId;detector:ZoneDetector}[];
+  private readonly stations: {worldId:WorldId;detector:ZoneDetector}[];
+  private atStation = false;
   private toolOffer() {
     if (!this.content.journey) return pickaxeOffer(this.equipment.toolLevel,this.wallet.getBalance());
     const level=this.equipment.toolLevel, price=JOURNEY_TOOL_PRICES[level] ?? 0;
@@ -192,6 +194,7 @@ export class GameSession {
     this.worldProgress = new WorldProgress(data?.worldProgress);
     this.reservations = new MineralReservation(data?.reservations,id=>ORE_ITEMS.some(r=>r.itemId===id));
     this.homes = (content.homes??[]).map(h=>({worldId:h.worldId,detector:new ZoneDetector(h.zone)}));
+    this.stations = (content.stations??[]).map(h=>({worldId:h.worldId,detector:new ZoneDetector(h.zone)}));
     this.rewards = data?.rewards === undefined ? new Rewards(petDependencies.rewards) : Rewards.fromData(data.rewards, petDependencies.rewards);
     this.syncRewardEffects();
     this.wallet = data ? Wallet.fromData(data.wallet) : new Wallet(content.initialCoins ?? 0);
@@ -323,6 +326,8 @@ export class GameSession {
       sale: quoteSale(this.content.journey?this.reservations.sellable(bag.items):bag.items, this.salePrice),
       inSellZone: this.inSellZone,
       atHome: this.atHome,
+      /** Standing on the current world's teleport station pad. */
+      atStation: this.atStation,
       shopId: this.shopId,
       /** The page the shop counter the player stands at opens on. */
       shopCategory: this.content.shops.find(s => s.id === this.shopId)?.category ?? 'tools',
@@ -628,6 +633,9 @@ export class GameSession {
       for(const h of this.homes)h.detector.update(feet,grounded);
       const inside=this.homes.some(h=>h.worldId===this.currentWorld&&h.detector.isInside);
       if(inside!==this.atHome){this.atHome=inside;changed=true;}
+      for(const st of this.stations)st.detector.update(feet,grounded);
+      const onPad=this.stations.some(st=>st.worldId===this.currentWorld&&st.detector.isInside);
+      if(onPad!==this.atStation){this.atStation=onPad;changed=true;}
     }
     for (const shop of this.shops) shop.detector.update(feet, grounded);
     const activeShop =
@@ -694,6 +702,7 @@ export class GameSession {
     this.eggStation = null;
     this.home.reset();
     for(const h of this.homes)h.detector.reset();
+    for(const st of this.stations)st.detector.reset();this.atStation=false;
     this.atMineEntrance=null;
     this.atHome = false;
     this.shopId = null;
@@ -761,7 +770,11 @@ export class GameSession {
   travelWorld = (id: WorldId) => {
     if(this.suspended||!this.content.journey||!this.world?.travelTo)return 'unavailable' as const;
     if(!this.worldProgress.areaOpen(id))return 'locked' as const;
-    this.world.cancelMining();this.world.travelTo(worldSpawn(id));
+    // Arrive at the world's teleport station, facing it.
+    this.world.cancelMining();
+    const station=this.content.stations?.find(st=>st.worldId===id)?.zone;
+    if(station)this.world.travelTo([station.x,station.y+.1,station.z],station.lookAt);else this.world.travelTo(worldSpawn(id));
+    this.resetPosition();
     return 'travelling' as const;
   };
   reserveWorldMaterials = (id: WorldId) => {

@@ -1,8 +1,8 @@
 import { BoxGeometry, CanvasTexture, DoubleSide, Group, Mesh, MeshBasicMaterial, MeshStandardMaterial, PlaneGeometry, SRGBColorSpace, type Material, type Object3D } from 'three';
 import { RAPIER, type CharacterPhysics } from '../validation/physics.ts';
 import type { GameSession } from '../application/GameSession.ts';
-import { WORLD_REQUIREMENTS, worldGateZ } from '../content/worldJourney.ts';
-import type { SceneryPlan, Solid } from '../world/sceneryKit.ts';
+import { STATION_LOCAL, WORLD_REQUIREMENTS, worldGateZ } from '../content/worldJourney.ts';
+import type { SceneryPlan, Solid, V3 } from '../world/sceneryKit.ts';
 import { Planner } from '../world/sceneryKit.ts';
 import { themeById } from '../content/themes.ts';
 import { disposeScenery } from './disposeScenery.ts';
@@ -35,6 +35,14 @@ export function journeySurfacePlan(z:number):SceneryPlan {
   for(const x of [-13,13])p.box([x,.025,z],[8,.02,32],'#b6a994');
   for(const offset of [-14,14])p.box([0,.025,z+offset],[34,.02,8],'#b6a994');
   const local=new Planner();local.booth(-16,0,44,theme,false,3);local.booth(16,0,44,theme,true,3);local.rim(theme);
+  // The world's teleport station west of the spawn (its pad opens this world's layers): a round platform, two
+  // pillars, a lintel and a ring around the portal disc (TeleportStations draws the disc).
+  {const st=STATION_LOCAL,yaw=Math.atan2(-st.x,46-st.z),across=(d:number,y:number):V3=>[st.x+Math.cos(yaw)*d,y,st.z-Math.sin(yaw)*d];
+   local.shape('cylinder',[st.x,.2,st.z],[3.1,.4,3.1],'#7f93a8');local.shape('cylinder',[st.x,.44,st.z],[2.7,.08,2.7],theme.accent,[0,0,0],true);
+   for(const side of [-1,1]){local.box(across(side*1.9,2.5),[.85,5,.85],'#8b9cb0',true,[0,yaw,0]);local.box(across(side*1.9,5.1),[1.1,.35,1.1],'#273d56',false,[0,yaw,0]);}
+   local.box([st.x,5.45,st.z],[4.9,.6,1],'#273d56',false,[0,yaw,0]);
+   local.shape('torus',[st.x,2.75,st.z],[1.45,.18,Math.PI*2],theme.accent,[0,yaw,0],true);
+   local.sign([st.x,7.4,st.z],4.4,'传送站','',theme);}
   for(const shape of local.plan.shapes)p.plan.shapes.push({...shape,at:[shape.at[0],shape.at[1],shape.at[2]+z]});
   for(const solid of local.plan.solids)p.plan.solids.push({...solid,at:[solid.at[0],solid.at[1],solid.at[2]+z]});
   for(const sign of local.plan.signs)p.plan.signs.push({...sign,at:[sign.at[0],sign.at[1],sign.at[2]+z]});
