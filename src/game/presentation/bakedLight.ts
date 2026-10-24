@@ -3,8 +3,8 @@ import { DataTexture, ShaderChunk, Vector3, Vector4, type MeshStandardMaterial, 
 /** How the baked light (tools: surface-game-art/tools/terrain/bakeLight.mjs) is applied while playing.
  *  The bake stores two values per texel or vertex: sky occlusion (red) and sun visibility (green).
  *  - Sun visibility multiplies the directional light only while it shines from the baked sun direction
- *    (the daytime key light). As the key light swings toward the moon at dusk the baked shadows fade, so
- *    they never point the wrong way; underground and at night they are off.
+ *    (the surface sun). Down the shaft the key light moves to the layer's own top light and the baked
+ *    shadows fade, so they never point the wrong way; underground they are off.
  *  - Sky occlusion multiplies the sky/ground fill fully and the direct light by `aoDirect`, which keeps a
  *    little contact darkening on sunlit ground.
  *  - `shadow` < 1 leaves a share of the sun in the fully shaded areas: shade stays readable.

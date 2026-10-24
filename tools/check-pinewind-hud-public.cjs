@@ -82,10 +82,7 @@ const dir = path.resolve(process.env.ARTIFACT_DIR || 'artifacts/pinewind-hud-pub
     await page.mouse.down({ button: 'right' }); await page.mouse.move(780, 390, { steps: 4 }); await page.mouse.up({ button: 'right' });
     await page.waitForFunction(yaw => Math.abs(window.__miningValidation.snapshot().view.yaw - yaw) > .01, yaw);
     check('Transparent center still receives a real right-mouse camera drag');
-    await page.evaluate(() => { window.__miningValidation.look(0, .22); window.__miningValidation.advanceDayNight(450); });
-    await page.waitForFunction(() => window.__miningValidation.snapshot().dayNight.daylight === 0);
-    await shot('03-hud-night');
-    await page.evaluate(() => window.__miningValidation.advanceDayNight(450));
+    await page.evaluate(() => window.__miningValidation.look(0, .22));
     await page.getByRole('button', { name: '跳过引导', exact: true }).click();
     await page.waitForFunction(() => !!document.querySelector('.journey-goals'));
     assert.equal(await page.locator('.journey-goals').evaluate(el => getComputedStyle(el).backgroundColor), 'rgba(0, 0, 0, 0)');

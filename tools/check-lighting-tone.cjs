@@ -9,13 +9,13 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
 // Desktop by default (the current art checks are desktop only); DEVICE=mobile keeps the phone emulation.
 const MOBILE = process.env.DEVICE === 'mobile';
 const SUN = [-35, 60, 35];
-// null keeps the game's own values. Each variant may set day light values and exposure, and `tint`
+// null keeps the game's own values. Each variant may set surface light values and exposure, and `tint`
 // rules for window.__miningValidation.materialTint (material name pattern, linear RGB factors).
 const VARIANTS = JSON.parse(process.env.VARIANTS || 'null') ?? {
   current: null,
-  sample: { exposure: 1, day: { moonPosition: SUN, moonColor: '#fff5de', moonIntensity: 3, skyColor: '#b5daff', groundColor: '#667b93', ambientIntensity: 0.55, environmentIntensity: 0.35 } },
-  matte: { exposure: 1, day: { moonPosition: SUN, moonColor: '#fff5de', moonIntensity: 3, skyColor: '#b5daff', groundColor: '#667b93', ambientIntensity: 0.85, environmentIntensity: 0.1 } },
-  warm: { exposure: 1, day: { moonPosition: SUN, moonColor: '#fff0d6', moonIntensity: 3.1, skyColor: '#d6e6f0', groundColor: '#8f8a68', ambientIntensity: 0.6, environmentIntensity: 0.25 } },
+  sample: { exposure: 1, surface: { sunPosition: SUN, sunColor: '#fff5de', sunIntensity: 3, skyColor: '#b5daff', groundColor: '#667b93', ambientIntensity: 0.55, environmentIntensity: 0.35 } },
+  matte: { exposure: 1, surface: { sunPosition: SUN, sunColor: '#fff5de', sunIntensity: 3, skyColor: '#b5daff', groundColor: '#667b93', ambientIntensity: 0.85, environmentIntensity: 0.1 } },
+  warm: { exposure: 1, surface: { sunPosition: SUN, sunColor: '#fff0d6', sunIntensity: 3.1, skyColor: '#d6e6f0', groundColor: '#8f8a68', ambientIntensity: 0.6, environmentIntensity: 0.25 } },
 };
 const VIEWS = JSON.parse(process.env.VIEWS || 'null') ?? [
   { name: 'spawn', label: '出生点看矿井', at: [0, 0.1, 47], yaw: 0, pitch: 0.34 },
@@ -48,13 +48,6 @@ const VIEWS = JSON.parse(process.env.VIEWS || 'null') ?? [
     const failed = await page.evaluate(() => document.body.innerText.includes('暂时没能进入矿场') ? document.body.innerText.slice(0, 300) : null);
     if (failed) throw new Error('load failed: ' + failed);
     await press(MOBILE ? 600 : 1100, MOBILE ? 120 : 260); await page.waitForTimeout(500);
-    // Fixed time of day through the debug setting (auto → day → night).
-    const time = process.env.TIME === 'night' ? '夜晚' : '白天';
-    await tap(page.getByRole('button', { name: '设置', exact: true }).first());
-    await tap(page.getByRole('button', { name: /^昼夜：/ }).first());
-    if (time === '夜晚') await tap(page.getByRole('button', { name: /^昼夜：/ }).first());
-    await page.getByRole('button', { name: `昼夜：${time}` }).waitFor();
-    await press(MOBILE ? 420 : 800, MOBILE ? 200 : 450); await page.waitForTimeout(400);
     await page.addStyleTag({ content: '.ui-hud,.hud-debug-tools,.joystick,.jump-button{display:none!important}' });
     for (const view of VIEWS) {
       await page.evaluate(v => { window.__miningValidation.teleport(v.at); window.__miningValidation.look(v.yaw, v.pitch); }, view);

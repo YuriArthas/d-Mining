@@ -95,18 +95,7 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
     await fs.writeFile(path.join(dir, 'surface-walk.webm'), Buffer.from(await recording, 'base64'));
     report.screenshots.push({ name: 'surface-walk.webm', label: '12 s recording of the game output on the surface' });
 
-    // 3. Night: the drums rest and crickets replace the birds.
-    for (let i = 0; i < 40 && (await audio()).scene.daylight > 0.1; i++) { await page.evaluate(() => window.__miningValidation.advanceDayNight(30)); await page.waitForTimeout(150); }
-    const crickets0 = (await audio()).ambience.played.cricket ?? 0, birds0 = (await audio()).ambience.played.bird ?? 0;
-    await page.waitForTimeout(4000);
-    a = await audio();
-    assert.ok(a.scene.rhythm < 0.1, `drums rest at night: ${a.scene.rhythm}`);
-    assert.ok((a.ambience.played.cricket ?? 0) > crickets0 + 3, 'crickets at night');
-    assert.equal(a.ambience.played.bird ?? 0, birds0, 'no birds at night');
-    await shot('01-night', 'night on the surface: crickets, no drums');
-    await check('At night the drums fade out and crickets replace the birds.');
-
-    // 4. Underground: the old mine's own piece and cave ambience, with echoing footsteps on its floor.
+    // 3. Underground: the old mine's own piece and cave ambience, with echoing footsteps on its floor.
     await page.evaluate(() => { window.__miningValidation.teleport([1, -399.9, 4.5]); window.__miningValidation.look(.35, .35); });
     await page.waitForFunction(() => window.__miningValidation.snapshot().feedback.audio.player?.playing === 'timber', null, { timeout: 30000 });
     a = await audio();
@@ -119,7 +108,7 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
     await shot('02-old-mine', 'old mine station: its own music and cave ambience');
     await check(`In the old mine (400 m) its own piece and cave ambience play (output ${report.levels.oldMine} dBFS); footsteps sound on ${station.surfaces.join('/')}.`);
 
-    // 5. Settings: music and sound switch separately and stay switched after a reload.
+    // 4. Settings: music and sound switch separately and stay switched after a reload.
     await tap(button('设置'));
     await page.getByRole('button', { name: '音乐：开' }).waitFor();
     await shot('03-settings', 'settings: 音乐 and 音效 switches');

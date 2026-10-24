@@ -33,10 +33,10 @@ export async function song(id: SongId, cycle = 0, rhythm = 1, lead = 1, muffle =
   });
 }
 
-export async function ambience(id: AmbienceId, daylight: number, seconds: number) {
+export async function ambience(id: AmbienceId, seconds: number) {
   return render(seconds, (ctx, mixer, noise) => {
     const a = new Ambience(ctx, mixer.ambience, mixer.ambienceWet, noise, makeLoopNoise(ctx), seeded(5));
-    a.setScene({ id, daylight });
+    a.setScene(id);
     return a;
   });
 }

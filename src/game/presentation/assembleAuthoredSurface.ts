@@ -28,7 +28,7 @@ export function assembleAuthoredSurface(assets:Awaited<ReturnType<typeof loadMod
   bundle.retain(group);
   // Baked light lives in the materials (bakedLight.ts); the key light's direction decides when it shows.
   const baked={map:0,vertex:0};group.traverse(o=>{if(!(o instanceof Mesh))return;for(const m of (Array.isArray(o.material)?o.material:[o.material]) as Material[])if(m.userData.bakedLightApplied)baked[(m as {aoMap?:unknown}).aoMap?'map':'vertex']++;});
-  let time='day',daylight=1,shadowEnabled=true;
-  return {group,retain:()=>bundle.retain(group),dispose,details:{beginDraw(){},update(t,elapsed,enabled=true,_strength=1,blend=t==='day'?1:0){time=t;daylight=blend;shadowEnabled=enabled;setBakedLightEnabled(enabled);setCreekTime(elapsed);setLockedEggTime(elapsed);},diagnostics:()=>({version:art.version,time,daylight,shadowEnabled,bakedLight:{...art.light,meshes:baked,...bakedLightState(),realtimeShadowMaps:0},nativeResolution:true,distanceUnloading:false})}};
+  let shadowEnabled=true;
+  return {group,retain:()=>bundle.retain(group),dispose,details:{beginDraw(){},update(elapsed,enabled){shadowEnabled=enabled;setBakedLightEnabled(enabled);setCreekTime(elapsed);setLockedEggTime(elapsed);},diagnostics:()=>({version:art.version,shadowEnabled,bakedLight:{...art.light,meshes:baked,...bakedLightState(),realtimeShadowMaps:0},nativeResolution:true,distanceUnloading:false})}};
  }catch(error){dispose();throw error;}
 }

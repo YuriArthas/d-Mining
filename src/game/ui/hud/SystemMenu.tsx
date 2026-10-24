@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import type { RenderRate } from '../../movement.ts';
-import type { SurfaceTime } from '../../world/SceneLighting.ts';
 import { Tile, UiButton } from '../kit/controls.tsx';
 
 /** Shell-level settings and lifecycle actions, owned by App and rendered by the HUD. */
@@ -10,7 +9,6 @@ export type SystemControls = {
   music: boolean; toggleMusic(): void;
   sound: boolean; toggleSound(): void;
   stylized: boolean; toggleStylized(): void;
-  timeOfDay: SurfaceTime | 'auto'; toggleTimeOfDay(): void; autoTimeOfDay(): void;
   debug: boolean; hosted: boolean;
   exit(): void;
 };
@@ -38,8 +36,6 @@ export function SystemMenu({ system, onHelp }: { system: SystemControls; onHelp(
         <UiButton size="s" tone="steel" aria-pressed={system.shadows} onPress={system.toggleShadows}>阴影：{system.shadows ? '开' : '关'}</UiButton>
         {system.debug && <>
           <UiButton size="s" tone="steel" aria-pressed={system.stylized} onPress={system.toggleStylized}>画面：{system.stylized ? '风格化' : '原始'}</UiButton>
-          <UiButton size="s" tone="steel" onPress={system.toggleTimeOfDay}>{system.timeOfDay === 'auto' ? '昼夜：自动' : system.timeOfDay === 'day' ? '昼夜：白天' : '昼夜：夜晚'}</UiButton>
-          {system.timeOfDay !== 'auto' && <UiButton size="s" tone="steel" onPress={system.autoTimeOfDay}>恢复自动昼夜</UiButton>}
         </>}
         <UiButton size="s" tone="red" icon="exit" aria-label={system.hosted ? '退出游戏，返回游戏列表' : '退出游戏'} onPress={() => { setOpen(false); system.exit(); }}>退出游戏</UiButton>
       </section>}

@@ -151,13 +151,13 @@ test('脚步声按脚下材质出声：地下岩石是石头，地表广场是�
 
 test('每帧报告所在位置：地表是山谷的曲子和风声，下到矿井变成闷住的曲子和洞穴声；退出后静音', () => {
   const h = harness();
-  h.feedback.place({ theme: 'meadow_mine', surfaceLight: 1, daylight: 1 });
+  h.feedback.place({ theme: 'meadow_mine', surfaceLight: 1 });
   assert.equal(h.scenes.at(-1).song, 'meadow');
   assert.equal(h.scenes.at(-1).ambience, 'meadow');
-  h.feedback.place({ theme: 'meadow_mine', surfaceLight: 0, daylight: 1 });
+  h.feedback.place({ theme: 'meadow_mine', surfaceLight: 0 });
   assert.equal(h.scenes.at(-1).ambience, 'shallow');
   assert.equal(h.scenes.at(-1).muffle, 1);
-  h.feedback.place({ theme: 'lava_cave', surfaceLight: 0, daylight: 1 });
+  h.feedback.place({ theme: 'lava_cave', surfaceLight: 0 });
   assert.deepEqual([h.scenes.at(-1).song, h.scenes.at(-1).ambience], ['lava', 'lava']);
   h.feedback.dispose();
   assert.equal(h.scenes.at(-1).song, null);

@@ -5,7 +5,7 @@ import { gunzipSync } from 'node:zlib';
 import { MeshStandardMaterial, Texture, ShaderChunk } from 'three';
 import authored from '../../src/game/content/pinewind/authored.json' with { type: 'json' };
 import { GAME_CONTENT, GAME_GENERATION } from '../../src/game/content/gameContent.ts';
-import { PINEWIND_DAY } from '../../src/game/content/pinewindSurface.ts';
+import { SURFACE_DAYLIGHT } from '../../src/game/world/SceneLighting.ts';
 import { applyBakedLight, setBakedLightEnabled, setBakedLightTuning, bakedLightState, BAKED_LIGHT } from '../../src/game/presentation/bakedLight.ts';
 import { TEXTURE_UPLOAD_LIMITS } from '../../src/game/presentation/uploadSurfaceTexture.ts';
 
@@ -28,7 +28,7 @@ function ktxFormat(ktx) {
 const occlusionTextures = ({ json }) => [...new Set(json.materials.filter(m => m.occlusionTexture).map(m => m.occlusionTexture.index))];
 
 test('the bake was traced toward the daytime sun the game uses, and the game reads that direction', () => {
-  assert.deepEqual(authored.light.sun, [...PINEWIND_DAY.moonPosition]);
+  assert.deepEqual(authored.light.sun, [...SURFACE_DAYLIGHT.sunPosition]);
   assert.deepEqual(GAME_CONTENT.surface.authored.light.sun, authored.light.sun);
   assert.equal(authored.light.version, 'pinewind-baked-light-v1');
   assert.equal(authored.light.ground.resolution, 1536);

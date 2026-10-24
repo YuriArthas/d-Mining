@@ -18,12 +18,12 @@ const TICK_MS = 100;
  *  surface music is muffled (heard down the shaft) and effects echo (underground). */
 export type AudioScene = Readonly<{
   song: SongId | null; rhythm: number; lead: number; muffle: number;
-  ambience: AmbienceId | null; daylight: number; cave: number;
+  ambience: AmbienceId | null; cave: number;
 }>;
-export const QUIET_SCENE: AudioScene = { song: null, rhythm: 1, lead: 1, muffle: 0, ambience: null, daylight: 1, cave: 0 };
+export const QUIET_SCENE: AudioScene = { song: null, rhythm: 1, lead: 1, muffle: 0, ambience: null, cave: 0 };
 const sameScene = (a: AudioScene, b: AudioScene) =>
   a.song === b.song && a.ambience === b.ambience && Math.abs(a.rhythm - b.rhythm) < 0.02 && Math.abs(a.lead - b.lead) < 0.02 &&
-  Math.abs(a.muffle - b.muffle) < 0.02 && Math.abs(a.daylight - b.daylight) < 0.02 && Math.abs(a.cave - b.cave) < 0.02;
+  Math.abs(a.muffle - b.muffle) < 0.02 && Math.abs(a.cave - b.cave) < 0.02;
 
 type SettingStore = Pick<Storage, 'getItem' | 'setItem'>;
 function settingStore(): SettingStore | null {
@@ -74,7 +74,7 @@ export class GameAudio {
     this.remember(SOUND_KEY, enabled);
     if (this.context && this.mixer) {
       setGates(this.context, this.mixer.soundGates, enabled ? 1 : 0);
-      this.ambience?.setScene({ id: enabled ? this.scene.ambience : null, daylight: this.scene.daylight });
+      this.ambience?.setScene(enabled ? this.scene.ambience : null);
     }
     this.settle();
   }
@@ -199,7 +199,7 @@ export class GameAudio {
     const context = this.context, mixer = this.mixer, scene = this.scene;
     if (!context || !mixer) return;
     this.music?.setScene({ song: scene.song, rhythm: scene.rhythm, lead: scene.lead });
-    this.ambience?.setScene({ id: this.sound ? scene.ambience : null, daylight: scene.daylight });
+    this.ambience?.setScene(this.sound ? scene.ambience : null);
     const now = context.currentTime, smooth = immediate ? 0.01 : 0.6;
     // Muffled: heard from up the shaft, darker (log-interpolated cut-off down to ~900 Hz) and quieter.
     const muffle = Math.max(0, Math.min(1, scene.muffle)), cutoff = 20000 * (900 / 20000) ** muffle;

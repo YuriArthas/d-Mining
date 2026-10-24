@@ -4,14 +4,12 @@ import { environmentDepthAtFeet, playerDepthAtFeet } from "../logic/PlayerDepth.
 import type { PreparedGame } from "./startGame.ts";
 import type { GameInput } from "../GameInput.ts";
 import type { LoadingEvent } from "../ui/loadingState.ts";
-import type { SurfaceTime } from "../world/SceneLighting.ts";
 import type { ProbeMode } from "../presentation/PerformanceProbe.ts";
 import { stratumAtDepth } from "../terrain/strata.ts";
 import { themeById } from "../content/themes.ts";
 import { HALL_BY_LAYER, undergroundHall } from "../content/underground/halls.ts";
 import { mineralName } from "../terrain/minerals.ts";
 import { generationAtZ } from '../terrain/SparseWorld.ts';
-import { setArchitectureDaylight } from '../presentation/albedoLift.ts';
 import { Vector3 } from "three";
 import { bakedLightState, bakedSunAlignment, bakedSunDirection, setStandingSun } from '../presentation/bakedLight.ts';
 import { standingSun } from '../presentation/standingLight.ts';
@@ -27,7 +25,6 @@ export function updateGame(
   input: GameInput,
   gl: WebGLRenderer,
   settings: {
-    timeOfDay: SurfaceTime | 'auto';
     sceneShadowsEnabled: boolean;
     probeMode: ProbeMode;
   },
@@ -36,7 +33,7 @@ export function updateGame(
 ) {
   if (current.session.suspended) { current.minerAvatar.cancelMining(); return; }
   const { camera, avatar, contactShadow, sunShadow } = view;
-  const { timeOfDay, sceneShadowsEnabled, probeMode } = settings;
+  const { sceneShadowsEnabled, probeMode } = settings;
   const delta = Math.min(Math.max(elapsed, 0), 0.1);
   const onlineElapsed = document.hidden || current.timing.skipElapsed ? 0 : Math.min(Math.max(elapsed,0),1);
   current.timing.skipElapsed=false;
@@ -69,13 +66,12 @@ export function updateGame(
       ),
       theme = themeById(layer.theme);
     const lightStrength = surfaceLightStrengthAtFeet(currentFeet[1]);
-    current.feedback.place({ theme: layer.theme, surfaceLight: lightStrength, daylight: environment.daylightBlend });
+    current.feedback.place({ theme: layer.theme, surfaceLight: lightStrength });
     gl.shadowMap.enabled = false;
     environment.update(
       {
         surface: theme.motif === "meadow",
         surfaceLightStrength: lightStrength,
-        time: timeOfDay,
         depth: layer.from,
         sky: theme.sky,
         groundLight: theme.groundLight,
@@ -83,16 +79,8 @@ export function updateGame(
         cave: HALL_BY_LAYER[layer.id] ? undergroundHall(HALL_BY_LAYER[layer.id]).hall.look : undefined,
       },
       delta,
-      onlineElapsed,
     );
-    setArchitectureDaylight(environment.daylightBlend);
-    current.facilities.updateSurface(
-      environment.surfaceTime,
-      performance.now() / 1000,
-      sceneShadowsEnabled && probeMode !== "no-shadows",
-      lightStrength,
-      environment.daylightBlend,
-    );
+    current.facilities.updateSurface(performance.now() / 1000, sceneShadowsEnabled && probeMode !== "no-shadows");
     player.step(elapsed, cameraView.angles.yaw, () => cameraView.rig.reset());
     if (
       !startup.firstPlayableMs &&
@@ -153,8 +141,8 @@ export function updateGame(
 }
 
 const keyDirection = new Vector3();
-/** By day the miner takes the baked sun at its feet (darker in shade) and casts a decal shadow along the
- *  baked sun's direction, faded in shade, at night, underground and with shadows switched off. */
+/** On the surface the miner takes the baked sun at its feet (darker in shade) and casts a decal shadow along the
+ *  baked sun's direction, faded in shade, underground and with shadows switched off. */
 function updateMinerSunlight(avatar: Group, sunShadow: Group | null, feet: readonly number[], environment: PreparedGame['environment'], strength: number, opacity: number) {
   const baked = bakedLightState().active, sun = baked ? standingSun(feet[0], feet[1], feet[2]) : 1;
   setStandingSun(sun);

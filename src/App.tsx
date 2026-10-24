@@ -3,7 +3,7 @@ import {GAME_CONTENT,GAME_GENERATION} from './game/content/gameContent.ts';
 import {LoadingScreen,LoadingBoundary} from './game/ui/LoadingScreen.tsx';
 import {initialLoading,updateLoading,type LoadingEvent} from './game/ui/loadingState.ts';
 import type {RenderRate} from './game/movement.ts';
-import {SURFACE_EXPOSURE, type SurfaceTime} from './game/world/SceneLighting.ts';
+import {SURFACE_EXPOSURE} from './game/world/SceneLighting.ts';
 import {applyToneGrade} from './game/presentation/toneGrade.ts';
 import { useCallback, useReducer, useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react';
 import { flushSync } from 'react-dom';
@@ -48,7 +48,6 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
   const scene = useRef<RootState | null>(null);
   const exiting = useRef(false);
   const [exited, setExited] = useState(false);
-  const [timeOfDay,setTimeOfDay]=useState<SurfaceTime | 'auto'>('auto');
   const [shadowsEnabled,setShadowsEnabled]=useState(true);
   const [stylized,setStylized]=useState(()=>new URLSearchParams(location.search).get('look')==='graded');
   const [renderRate,setRenderRate]=useState<RenderRate>('display');
@@ -142,7 +141,7 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
     music, toggleMusic: () => { settle(); gameAudio.toggleMusic(); },
     sound, toggleSound: () => { settle(); gameAudio.toggle(); },
     stylized, toggleStylized: () => { settle(); setStylized(v => !v); },
-    timeOfDay, toggleTimeOfDay: () => { settle(); setTimeOfDay(t => t === 'day' ? 'night' : 'day'); }, autoTimeOfDay: () => { settle(); setTimeOfDay('auto'); },
+
     debug, hosted, exit: () => void exit(),
   };
 
@@ -170,7 +169,7 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
           gl={{ antialias: true }}
           fallback={<p>当前浏览器无法启动 3D 画面，请使用支持 WebGL2 的浏览器。</p>}
         >
-          <ValidationScene shopView={shopView} guideMarker={guideMarker} savedGame={savedGame} stylized={stylized} content={GAME_CONTENT} renderRate={renderRate} shadowsEnabled={shadowsEnabled} probeMode={probeMode} input={input} onStatus={setStatus} onLoading={onLoading} onPerformance={setPerformanceStats} session={session} timeOfDay={timeOfDay} />
+          <ValidationScene shopView={shopView} guideMarker={guideMarker} savedGame={savedGame} stylized={stylized} content={GAME_CONTENT} renderRate={renderRate} shadowsEnabled={shadowsEnabled} probeMode={probeMode} input={input} onStatus={setStatus} onLoading={onLoading} onPerformance={setPerformanceStats} session={session} />
         </Canvas></LoadingBoundary>
       </div>
       <header inert={!!exitState} className="game-header" style={{display:showLoading?'none':undefined}}>

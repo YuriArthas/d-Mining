@@ -16,7 +16,7 @@ function setup(){
   getScissorTest(){return this.scissorTest;},setScissorTest(v){this.scissorTest=v;},
   compileAsync:async()=>{},
  };
- return {grade,renderer,calls,scene,camera,draw:on=>grade.draw(renderer,scene,camera,on,CAMERA_LOOKS.night)};
+ return {grade,renderer,calls,scene,camera,draw:on=>grade.draw(renderer,scene,camera,on,CAMERA_LOOKS.underground)};
 }
 test('grade renders the world once, copies display pixels once, and bypasses all extra work when off',()=>{
  const c=setup();c.draw(false);assert.deepEqual(c.calls,['scene']);assert.equal(c.grade.diagnostics().allocations,0);

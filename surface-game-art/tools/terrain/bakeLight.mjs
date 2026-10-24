@@ -13,7 +13,7 @@ import { buildBvh, shareBvh } from './rayBvh.mjs';
 
 export const LIGHT_BAKE = {
   version: 'pinewind-baked-light-v1',
-  /** The daytime key light's position (PINEWIND_DAY.moonPosition); the light shines toward the origin. */
+  /** The sun's position (SURFACE_DAYLIGHT.sunPosition in src/game/world/SceneLighting.ts); the light shines toward the origin. */
   sun: [-35, 60, 35],
   /** Angular radius of the sun's disc: sets how soft shadow edges are (wider further from the caster). */
   sunRadiusDeg: 0.8, sunSamples: 32,

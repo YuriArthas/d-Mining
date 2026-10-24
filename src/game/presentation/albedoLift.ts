@@ -4,7 +4,7 @@ import { Vector3, type MeshStandardMaterial } from 'three';
  *  teleport station) under the strong-sun, weak-fill daylight:
  *  - the atlas colour is made brighter and more saturated before lighting (brightness is a gamma
  *    lift, black and white stay put; saturation pushes away from grey; both in display space);
- *  - by day the buildings take extra warm fill on walls and undersides (`bounce`), like the sunlit
+ *  - the buildings take extra warm fill on walls and undersides (`bounce`), like the sunlit
  *    sand plaza reflecting onto the house fronts, so walls facing away from the sun do not drop into
  *    grey; tops lit by the open sky keep the normal fill.
  *  The uniforms are shared, so every copy of the material follows one setting. */
@@ -23,12 +23,8 @@ const looks = {
 function uniformsFor(look: Look) {
   return { albedoSaturation: { value: look.saturation }, albedoBrightness: { value: look.brightness }, albedoBounce: { value: new Vector3(1, 1, 1) } };
 }
-let daylight = 1;
 const applyBounce = () => {
-  for (const look of Object.values(looks)) {
-    const gain = 1 + (look.bounce - 1) * daylight;
-    look.uniforms.albedoBounce.value.set(...look.tint.map(t => gain * (1 + (t - 1) * daylight)) as [number, number, number]);
-  }
+  for (const look of Object.values(looks)) look.uniforms.albedoBounce.value.set(...look.tint.map(t => look.bounce * t) as [number, number, number]);
 };
 applyBounce();
 
@@ -56,11 +52,6 @@ function lift(material: MeshStandardMaterial, look: (typeof looks)[keyof typeof 
 	}`);
   };
   material.customProgramCacheKey = () => look.key;
-}
-
-/** Per frame: the extra fill fades out with the daylight (no glowing houses at night). */
-export function setArchitectureDaylight(value: number) {
-  daylight = Math.max(0, Math.min(1, value)); applyBounce();
 }
 
 /** Verification only: retune live (shared by every lifted material). */

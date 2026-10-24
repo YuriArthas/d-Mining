@@ -1,8 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {MeshStandardMaterial,Texture,ShaderLib} from 'three';
+import {MeshStandardMaterial,Texture} from 'three';
 import {pruneInactiveMaps} from '../../src/game/presentation/MaterialPreparation.ts';
-import {withCompactLights,compileCompactLights} from '../../src/game/presentation/compactLights.ts';
 
 test('pruning keeps packed roughness and active normal channels, removes only zero multipliers',()=>{
  const packed=new Texture(),normal=new Texture(),m=new MeshStandardMaterial({metalness:0,metalnessMap:packed,roughnessMap:packed,normalMap:normal});
@@ -11,17 +10,4 @@ test('pruning keeps packed roughness and active normal channels, removes only ze
  assert.equal(m.normalMap,null);assert.equal(m.aoMap,null);assert.equal(m.roughnessMap,packed);
  const metallic=new MeshStandardMaterial({metalness:1,metalnessMap:packed});pruneInactiveMaps(metallic);assert.equal(metallic.metalnessMap,packed);
  m.dispose();metallic.dispose();packed.dispose();normal.dispose();
-});
-test('material copies retain one shader cache identity after repeated decoration',()=>{
- const a=withCompactLights(new MeshStandardMaterial()),key=a.customProgramCacheKey();
- for(let i=0;i<4;i++)withCompactLights(a);assert.equal(a.customProgramCacheKey(),key);
- const b=a.clone();b.onBeforeCompile=a.onBeforeCompile;b.customProgramCacheKey=a.customProgramCacheKey;withCompactLights(b);assert.equal(b.customProgramCacheKey(),key);a.dispose();b.dispose();
-});
-test('spotlight loop preserves Three lighting and one bounded uniform loop without ten copies',()=>{
- const shader={uniforms:{},vertexShader:ShaderLib.standard.vertexShader,fragmentShader:ShaderLib.standard.fragmentShader};
- compileCompactLights(shader);compileCompactLights(shader);
- assert.equal(shader.uniforms.miningSpotCount.value,10);
- assert.equal((shader.fragmentShader.match(/i < miningSpotCount/g)||[]).length,1);
- assert.ok(shader.fragmentShader.includes('getSpotLightInfo( spotLight, geometryPosition, directLight )'));
- assert.equal((shader.fragmentShader.match(/uniform int miningSpotCount/g)||[]).length,1);
 });

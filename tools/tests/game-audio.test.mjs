@@ -87,7 +87,7 @@ test('音乐和音效分开开关，各自记住；两个都关掉才暂停声�
 test('场景决定曲目和环境声；开蛋、解锁这些大时刻会把音乐压低一下', () => withAudioContext(() => {
   const audio = new GameAudio(store());
   audio.random = seeded(4);
-  audio.setScene({ song: 'meadow', rhythm: 1, lead: 1, muffle: 0, ambience: 'meadow', daylight: 1, cave: 0 });
+  audio.setScene({ song: 'meadow', rhythm: 1, lead: 1, muffle: 0, ambience: 'meadow', cave: 0 });
   audio.unlock();
   const context = audio['context'];
   for (let i = 0; i < 20; i++) { context.currentTime += 0.1; audio.tick(); }

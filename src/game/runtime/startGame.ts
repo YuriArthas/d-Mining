@@ -16,7 +16,6 @@ import type {
 import type { GameInput } from "../GameInput.ts";
 import type { GameSession } from "../application/GameSession.ts";
 import type { LoadingEvent } from "../ui/loadingState.ts";
-import type { SurfaceTime } from "../world/SceneLighting.ts";
 import { generationAtZ } from "../terrain/SparseWorld.ts";
 import { GAME_GENERATION } from "../content/gameContent.ts";
 import { stratumAtDepth } from "../terrain/strata.ts";
@@ -26,7 +25,6 @@ import { TerrainStream } from "../validation/TerrainStream.ts";
 import { prepareSpawnTerrain } from "../validation/prepareSpawnTerrain.ts";
 import { loadStaticSurface } from "../presentation/StaticSurface.ts";
 import { SurfaceEnvironment } from "../presentation/SurfaceEnvironment.ts";
-import { SceneLightingRig } from "../presentation/SceneLightingRig.ts";
 import { EnvironmentController } from "../presentation/EnvironmentController.ts";
 import { SceneryView } from "../presentation/SceneryView.ts";
 import { SceneryCollision } from "../presentation/SceneryCollision.ts";
@@ -77,7 +75,7 @@ export type StartGameOptions = {
   restoredWorld?: SparseWorld;
   previewLayer: string | null;
   signal: AbortSignal;
-  settings: () => { time: SurfaceTime | 'auto'; bakedShadows: boolean };
+  settings: () => { bakedShadows: boolean };
   onStatus: (text: string) => void;
   onLoading: (event: LoadingEvent) => void;
 };
@@ -132,23 +130,14 @@ export async function startGame(options: StartGameOptions) {
       scene,
       content.environment.sky,
     );
-    let lights: SceneLightingRig;
-    try {
-      lights = new SceneLightingRig();
-    } catch (error) {
-      sky.dispose();
-      throw error;
-    }
     const environment = new EnvironmentController(
       scene,
       ambient,
       sun,
       sky,
-      lights,
       content.environment,
     );
     scope.defer(() => environment.dispose());
-    root.add(lights.group);
     onStatus("正在载入矿场场景");
     let assetCount = 0,
       assetTotal = 0,
@@ -305,20 +294,11 @@ export async function startGame(options: StartGameOptions) {
       theme = themeById(layer.theme);
     cameraView.prepare(physics, camera);
     avatar.position.set(...feet);
-    let warmTime: SurfaceTime | 'auto';
-    do {
-      const settings = options.settings();
-      warmTime = settings.time;
-      facilities.updateSurface(
-        warmTime==='auto'?'night':warmTime,
-        performance.now() / 1000,
-        settings.bakedShadows,
-        surfaceLightStrengthAtFeet(feet[1]),
-      );
+    {
+      facilities.updateSurface(performance.now() / 1000, options.settings().bakedShadows);
       environment.prepare({
         surface: theme.motif === "meadow",
         surfaceLightStrength: surfaceLightStrengthAtFeet(feet[1]),
-        time: warmTime,
         depth: layer.from,
         sky: theme.sky,
         groundLight: theme.groundLight,
@@ -338,7 +318,7 @@ export async function startGame(options: StartGameOptions) {
       startup.warmupPrograms += warm.newPrograms;
       startup.warmupObjects += warm.objects;
       startup.parallelShaderCompile = warm.parallel;
-    } while (warmTime !== options.settings().time);
+    }
     check();
     await cameraGrade.prepare(renderer, abort.signal);
     check();

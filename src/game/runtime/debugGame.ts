@@ -9,7 +9,7 @@ import type {
   WebGLRenderer,
 } from "three";
 import { gameAudio } from "../audio/GameAudio.ts";
-import { SURFACE_EXPOSURE, type SurfaceLookOverride } from "../world/SceneLighting.ts";
+import { SURFACE_EXPOSURE, type SurfaceLook } from "../world/SceneLighting.ts";
 import { applyToneGrade } from "../presentation/toneGrade.ts";
 import { ARCHITECTURE_ALBEDO, setArchitectureAlbedo, setFoliageAlbedo } from "../presentation/albedoLift.ts";
 import { setBakedLightTuning } from "../presentation/bakedLight.ts";
@@ -25,7 +25,6 @@ import type { RenderProfiler } from "../presentation/RenderProfiler.ts";
 import { GAME_CONFIG } from "../config.ts";
 import { mineralName } from "../terrain/minerals.ts";
 export type ValidationDebug = {
-  advanceDayNight: (seconds: number) => void;
   advanceOnline: (seconds: number) => void;
   snapshot: () => unknown;
   performance: (options: {
@@ -34,7 +33,7 @@ export type ValidationDebug = {
   }) => void;
   surfaceHeight: (x: number, z: number) => number | null;
   /** Try other surface light values and exposure live; null restores the game's. */
-  lightingLook: (look: (SurfaceLookOverride & { exposure?: number; grade?: boolean; albedo?: { saturation: number; brightness: number; bounce?: number }; foliage?: { saturation?: number; brightness?: number; bounce?: number }; baked?: false | { shadow?: number; ao?: number; aoBuildings?: number; aoDirect?: number } }) | null) => void;
+  lightingLook: (look: ({ surface?: Partial<SurfaceLook>; exposure?: number; grade?: boolean; albedo?: { saturation: number; brightness: number; bounce?: number }; foliage?: { saturation?: number; brightness?: number; bounce?: number }; baked?: false | { shadow?: number; ao?: number; aoBuildings?: number; aoDirect?: number } }) | null) => void;
   /** Verification only: multiply the colour of every material whose name matches a rule (case-insensitive
    *  pattern, linear RGB factors), live; null restores the authored colours. Returns how many were tinted. */
   materialTint: (rules: readonly { match: string; color: readonly [number, number, number] }[] | null) => number;
@@ -98,7 +97,6 @@ export function attachGameDebug(
   const teleport = player.travelTo;
   const tinted = new Map<MeshStandardMaterial, Color>();
   const debug: ValidationDebug = {
-    advanceDayNight: seconds => environment.advanceDayNight(seconds),
     advanceOnline: seconds => session.advanceOnline(seconds),
     snapshot: () => ({
       ...terrain.snapshot(),
@@ -120,7 +118,6 @@ export function attachGameDebug(
         cameraDistance: GAME_CONFIG.camera.distance,
       },
       startup: { ...startup, sky: environment?.sky.diagnostics() },
-      dayNight: environment.dayNightSnapshot,
       travelling: !!player.travelling,
       facilities: {
         ...facilities.diagnostics(),
@@ -135,9 +132,8 @@ export function attachGameDebug(
           intensity: sun.intensity,
         },
         ambient: environment.ambientSnapshot,
-        cameraDaylightBlend: environment.cameraDaylightBlend,
+        surfaceBlend: environment.surfaceBlend,
         shadowPolicy: "baked-light",
-        surfaceArea: environment?.lights.diagnostics(),
         cameraFar: (activeCamera as PerspectiveCamera).far,
         surfaceFog: !!scene.fog,
         lightingUpdates: environment?.updates ?? 0,
@@ -203,7 +199,7 @@ export function attachGameDebug(
     },
     surfaceHeight: (x, z) => facilities.surfaceHeight(x, z),
     lightingLook: look => {
-      environment.setLookOverride(look ? { day: look.day, night: look.night } : null);
+      environment.setLookOverride(look?.surface ?? null);
       gl.toneMappingExposure = look?.exposure ?? SURFACE_EXPOSURE;
       applyToneGrade(gl, look?.grade ?? true);
       const albedo = look?.albedo ?? ARCHITECTURE_ALBEDO;

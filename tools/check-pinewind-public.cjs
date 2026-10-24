@@ -46,17 +46,6 @@ const dir=path.resolve(process.env.ARTIFACT_DIR||'artifacts/pinewind-public');
   await page.waitForFunction(()=>window.__miningValidation.snapshot().facilities.surfaceDetails.shadowEnabled===true);
   check('Mainline baked-shadow toggle controls the new authored contact shadows');
   if(process.env.PINEWIND_SMOKE==='1')return;
-  if(process.env.PINEWIND_NIGHT_ONLY==='1'){
-   await page.getByRole('button',{name:'跳过引导',exact:true}).click();
-   await page.evaluate(()=>window.__miningValidation.advanceDayNight(450));
-   await page.waitForFunction(()=>window.__miningValidation.snapshot().dayNight.daylight===0,null,{timeout:120000});
-   await shot('10-night-settled');report.night=await snap();
-   assert.equal(report.night.dayNight.daylight,0);assert.equal(report.night.facilities.surfaceDetails.daylight,0);
-   assert.equal(report.night.facilities.surfaceShading.distanceUnloading,false);
-   assert.ok(Math.abs(report.night.position[2]-46)<.5);assert.deepEqual(report.errors,[]);
-   check('Night lighting and resident scenery are captured after camera and GPU submission settle');
-   return;
-  }
   const look=async(yaw,pitch=.22)=>{const frame=await page.evaluate(({yaw,pitch})=>{window.__miningValidation.look(yaw,pitch);return window.__miningValidation.snapshot().frames;},{yaw,pitch});await page.waitForFunction(n=>window.__miningValidation.snapshot().frames>n,frame,{timeout:120000});};
   const travel=async position=>{await page.evaluate(p=>window.__miningValidation.teleport(p),position);await ready();await page.waitForFunction(()=>window.__miningValidation.snapshot().grounded,null,{timeout:120000});};
   const walk=async(predicate,arg,key='w')=>{await page.locator('.game-shell').focus();await page.keyboard.down(key);try{await page.waitForFunction(({code,arg,key})=>{const done=(0,eval)('('+code+')')(arg);if(done)window.dispatchEvent(new KeyboardEvent('keyup',{code:'Key'+key.toUpperCase(),key,bubbles:true}));return done;},{code:predicate.toString(),arg,key},{timeout:180000,polling:'raf'});}finally{await page.keyboard.up(key);}console.log('WALK',JSON.stringify((await snap()).position));};
@@ -118,10 +107,7 @@ const dir=path.resolve(process.env.ARTIFACT_DIR||'artifacts/pinewind-public');
   const gate=await snap();assert.ok(gate.position[2]<secondWorldGate);assert.equal(gate.economy.worlds[1].areaOpen,false);await shot('09c-world-gate');
   check('The rear route remains walkable and the second-world gate still blocks below its mining threshold');
   await travel([0,.1,46]);await look(0,.22);
-  await page.evaluate(()=>window.__miningValidation.advanceDayNight(450));
-  await page.waitForFunction(()=>window.__miningValidation.snapshot().dayNight.daylight===0,null,{timeout:120000});await shot('10-night');
   assert.equal((await snap()).facilities.surfaceShading.distanceUnloading,false);
-  check('Existing automatic day/night cycle works with the new resident surface');
   await page.evaluate(()=>window.__miningSave.flush());await page.reload({waitUntil:'domcontentloaded'});await ready();
   const saved=await snap();assert.equal(saved.economy.minedVolume,sold.economy.minedVolume);assert.equal(saved.economy.coins,sold.economy.coins);
   check('Mined volume and sale currency survive reload in an isolated IndexedDB save');

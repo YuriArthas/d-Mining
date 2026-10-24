@@ -1,7 +1,6 @@
 import {addAuthoredRoom} from './AuthoredRoomView.ts';
 import {createWorldText} from './WorldText.ts';
 import { compactSceneryGeometry } from './compactSceneryGeometry.ts';
-import { withCompactLights } from './compactLights.ts';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { BoxGeometry, BufferAttribute, BufferGeometry, Color, SphereGeometry, TorusGeometry, CylinderGeometry, DodecahedronGeometry, Group, Mesh, MeshBasicMaterial, MeshStandardMaterial, Euler, Matrix4, RingGeometry } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
@@ -42,7 +41,7 @@ export function createScenery(plan:SceneryPlan):Group {
     const merged=mergeGeometries(pieces,false);pieces.forEach(g=>g.dispose());
     if(!merged)throw new Error('场景几何合并失败');
     merged.computeBoundingSphere();
-    const mesh=new Mesh(merged,glow?new MeshBasicMaterial({vertexColors:true}):withCompactLights(new MeshStandardMaterial({vertexColors:true,roughness:plastic?.48:1,metalness:0,flatShading:!plastic})));
+    const mesh=new Mesh(merged,glow?new MeshBasicMaterial({vertexColors:true}):new MeshStandardMaterial({vertexColors:true,roughness:plastic?.48:1,metalness:0,flatShading:!plastic}));
     mesh.castShadow=!glow;mesh.receiveShadow=!glow;group.add(mesh);
   }
   if(plan.authored)addAuthoredRoom(group,plan.authored);

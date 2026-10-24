@@ -58,10 +58,10 @@ test('十首曲子：每段格数正确、音都在乐器音域里、强拍旋�
 test('每个矿层主题都有自己的曲子', () => {
   const ids = new Set(SONGS.map(s => s.id)), soundscape = new Soundscape();
   for (const theme of THEMES) {
-    const scene = soundscape.scene({ theme: theme.id, surfaceLight: 0, daylight: 1 });
+    const scene = soundscape.scene({ theme: theme.id, surfaceLight: 0 });
     assert.ok(ids.has(scene.song), `${theme.id} plays ${scene.song}`);
   }
-  assert.equal(new Set(THEMES.map(t => new Soundscape().scene({ theme: t.id, surfaceLight: 0, daylight: 1 }).song)).size, 10, 'ten different pieces');
+  assert.equal(new Set(THEMES.map(t => new Soundscape().scene({ theme: t.id, surfaceLight: 0 }).song)).size, 10, 'ten different pieces');
 });
 
 function player(song = 'meadow') {

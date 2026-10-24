@@ -17,14 +17,6 @@ const root=(name:string)=>{const p=roots.find(r=>r.node===name);if(!p)throw Erro
 const instance=(name:string):AuthoredInstance=>({...root(name),asset:'pinewind-architecture',at:[...root(name).at],rotation:[...root(name).rotation],scale:[...root(name).scale]});
 const rotation=(yaw:number):[number,number,number,number]=>[0,Math.sin(yaw/2),0,Math.cos(yaw/2)];
 
-/** Daytime light over the valley, chosen side by side on the public build (tools/check-lighting-tone):
- *  a strong warm-white sun from behind the arriving player, and a weak, nearly neutral sky/ground fill
- *  so shaded sides stay readable without the old cyan haze. Intensities assume exposure 1.08. */
-export const PINEWIND_DAY={
- moonPosition:[-35,60,35] as [number,number,number],moonColor:'#ffeed2',moonIntensity:3.18,
- skyColor:'#d9e4ea',groundColor:'#867f5c',ambientIntensity:.38,environmentIntensity:.163,
-} as const;
-
 /** Terrace and stair shells; the egg terraces render as authored blocks. */
 export const PINEWIND_TERRACE_SOLIDS:readonly Solid[]=[
  ...PINEWIND_EGG_TIERS.map(t=>({at:[t.x,t.y/2,(PINEWIND_TERRACE.minZ+PINEWIND_TERRACE.maxZ)/2],half:[PINEWIND_TERRACE.width/2,t.y/2,(PINEWIND_TERRACE.maxZ-PINEWIND_TERRACE.minZ)/2],yaw:0} as Solid)),

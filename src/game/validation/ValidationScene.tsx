@@ -26,7 +26,6 @@ import {
 } from "../presentation/PerformanceMeter.ts";
 import type { ProbeMode } from "../presentation/PerformanceProbe.ts";
 import type { LoadingEvent } from "../ui/loadingState.ts";
-import type { SurfaceTime } from "../world/SceneLighting.ts";
 import type { GameInput } from "../GameInput.ts";
 import type { GameSession } from "../application/GameSession.ts";
 import { ContactShadow } from "../presentation/ContactShadow.tsx";
@@ -43,7 +42,6 @@ export function ValidationScene({
   onLoading,
   onPerformance,
   session,
-  timeOfDay,
   stylized,
   guideMarker,
 }: {
@@ -54,7 +52,6 @@ export function ValidationScene({
   renderRate: RenderRate;
   shadowsEnabled: boolean;
   probeMode: ProbeMode;
-  timeOfDay: SurfaceTime | 'auto';
   stylized: boolean;
   input: GameInput;
   onStatus: (text: string) => void;
@@ -71,8 +68,8 @@ export function ValidationScene({
   const loadingReleased = useRef(false);
   const guideProjector = useRef(new GuideMarkerProjector());
   const guideArrow = useRef<Group>(null);
-  const settings = useRef({ timeOfDay, sceneShadowsEnabled });
-  settings.current = { timeOfDay, sceneShadowsEnabled };
+  const settings = useRef({ sceneShadowsEnabled });
+  settings.current = { sceneShadowsEnabled };
   const { advance, gl, scene, camera: activeCamera } = useThree();
   const activeRate = useRef(renderRate);
   activeRate.current = renderRate;
@@ -105,7 +102,6 @@ export function ValidationScene({
       previewLayer: params.get("debug") === "1" ? params.get("layer") : null,
       signal: controller.signal,
       settings: () => ({
-        time: settings.current.timeOfDay,
         bakedShadows: settings.current.sceneShadowsEnabled,
       }),
       onStatus,
@@ -202,7 +198,7 @@ export function ValidationScene({
           if (shopView.render(gl, delta)) return;
           current.environment.prepareDraw();
           drewWorld = true;
-          current.cameraGrade.draw(gl, scene, camera, stylized && probeMode !== "unlit", blendedCameraLook(current.environment.cameraDaylightBlend));
+          current.cameraGrade.draw(gl, scene, camera, stylized && probeMode !== "unlit", blendedCameraLook(current.environment.surfaceBlend));
         } finally {
           scene.overrideMaterial = override;
           profiler.current?.endFrame();
@@ -286,7 +282,7 @@ export function ValidationScene({
       },
       input,
       gl,
-      { timeOfDay, sceneShadowsEnabled, probeMode },
+      { sceneShadowsEnabled, probeMode },
       onStatus,
       onLoading,
     );

@@ -5,7 +5,7 @@
 const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
 const fs = require('node:fs/promises'), path = require('node:path');
 const SONGS = ['meadow', 'timber', 'mushroom', 'crystal', 'ruins', 'ice', 'lava', 'fossil', 'machine', 'core'];
-const ZONES = [['meadow', 1], ['meadow', 0], ['shallow', 1], ['timber', 1], ['mushroom', 1], ['crystal', 1], ['ruins', 1], ['ice', 1], ['lava', 1], ['fossil', 1], ['machine', 1], ['core', 1]];
+const ZONES = ['meadow', 'shallow', 'timber', 'mushroom', 'crystal', 'ruins', 'ice', 'lava', 'fossil', 'machine', 'core'];
 const SURFACES = ['grass', 'sand', 'dirt', 'stone', 'wood', 'metal', 'ice', 'crystal'];
 (async () => {
   const dir = path.resolve(process.argv[2] || 'artifacts/music'), what = process.argv[3] || 'all', excerpt = Number(process.env.EXCERPT || 30);
@@ -48,18 +48,17 @@ const SURFACES = ['grass', 'sand', 'dirt', 'stone', 'wood', 'metal', 'ice', 'cry
     // raised by a fixed gain so it is comfortable to hear on its own (relative levels within a kind kept).
     const jobs = [
       ...SONGS.map(id => ({ name: `song-${id}`, kind: 'song', args: [id, 0], from: 'theme', seconds: Number(process.env.SONG_SECONDS || 6), gain: 4 })),
-      { name: 'ambience-meadow-day', kind: 'ambience', args: ['meadow', 1, 9], from: 1, seconds: 6, gain: 5.6 },
-      { name: 'ambience-meadow-night', kind: 'ambience', args: ['meadow', 0, 8], from: 1, seconds: 5, gain: 5.6 },
-      { name: 'ambience-timber', kind: 'ambience', args: ['timber', 1, 9], from: 1, seconds: 5, gain: 5.6 },
-      { name: 'ambience-lava', kind: 'ambience', args: ['lava', 1, 9], from: 1, seconds: 5, gain: 5.6 },
-      { name: 'ambience-machine', kind: 'ambience', args: ['machine', 1, 9], from: 1, seconds: 5, gain: 5.6 },
+      { name: 'ambience-meadow', kind: 'ambience', args: ['meadow', 9], from: 1, seconds: 6, gain: 5.6 },
+      { name: 'ambience-timber', kind: 'ambience', args: ['timber', 9], from: 1, seconds: 5, gain: 5.6 },
+      { name: 'ambience-lava', kind: 'ambience', args: ['lava', 9], from: 1, seconds: 5, gain: 5.6 },
+      { name: 'ambience-machine', kind: 'ambience', args: ['machine', 9], from: 1, seconds: 5, gain: 5.6 },
       { name: 'steps', kind: 'stepTour', args: [['grass', 'sand', 'stone', 'wood', 'metal', 'ice']], from: 0, seconds: 10, gain: 3 },
     ];
     // CLIP_QUALITY=high: stereo at 64 kbps (songs) / 48 kbps, for hosting; default mono 20 kbps for embedding.
     const high = process.env.CLIP_QUALITY === 'high', clips = {};
     for (const job of jobs) {
       if (high && job.kind === 'song') job.seconds = Number(process.env.SONG_SECONDS || 10);
-      if (high && job.kind === 'ambience') { job.seconds = 8; job.args = [job.args[0], job.args[1], 10]; }
+      if (high && job.kind === 'ambience') { job.seconds = 8; job.args = [job.args[0], 10]; }
       Object.assign(job, { bitrate: high ? (job.kind === 'song' ? 64000 : 48000) : 20000, channels: high ? 2 : 1 });
       clips[job.name] = await evaluate(async job => {
         const p = window.preview, args = job.kind === 'song' ? [...job.args, 1, 1, 0, p.firstTheme(job.args[0]) + job.seconds + 1] : job.args;
@@ -75,11 +74,10 @@ const SURFACES = ['grass', 'sand', 'dirt', 'stone', 'wood', 'metal', 'ice', 'cry
     await run('songs', SONGS.map(id => ({ kind: 'song', args: [id, 0], label: id })), excerpt);
     await run('songs-b', SONGS.map(id => ({ kind: 'song', args: [id, 1], label: `${id}-b` })), 0);
     await run('mixes', [
-      { kind: 'song', args: ['meadow', 0, 0, 1, 0], label: 'meadow-night' },
       { kind: 'song', args: ['meadow', 0, 0, 0.85, 1], label: 'meadow-shaft' },
     ], 0);
   }
-  if (what === 'ambience' || what === 'all') await run('ambience', ZONES.map(([id, day]) => ({ kind: 'ambience', args: [id, day, 30], label: `${id}${day ? '' : '-night'}` })), 20);
+  if (what === 'ambience' || what === 'all') await run('ambience', ZONES.map(id => ({ kind: 'ambience', args: [id, 30], label: id })), 20);
   if (what === 'steps' || what === 'all') {
     await run('steps', SURFACES.map(s => ({ kind: 'steps', args: [s], label: s })), 3);
     await run('cues', [

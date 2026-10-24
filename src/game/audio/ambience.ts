@@ -3,14 +3,11 @@ import { hiss, tone, type Voice } from './synth.ts';
 /** Where the player is, for the background sound: the valley above ground, the shallow dig under it,
  *  or one of the themed layers. */
 export type AmbienceId = 'meadow' | 'shallow' | 'timber' | 'mushroom' | 'crystal' | 'ruins' | 'ice' | 'lava' | 'fossil' | 'machine' | 'core';
-export type AmbienceScene = Readonly<{ id: AmbienceId | null; daylight: number }>;
 
 type Ports = Readonly<{ ctx: BaseAudioContext; dry: AudioNode; wet: AudioNode; noise: AudioBuffer; loop: AudioBuffer; random: () => number }>;
 type Bed = Readonly<{ output: GainNode; sources: readonly AudioScheduledSourceNode[]; nodes: readonly AudioNode[]; update?: (now: number) => void }>;
 type Emitter = Readonly<{
   name: string; every: readonly [number, number];
-  /** Chance (0..1) that a due event actually sounds, from the scene (birds by day, crickets by night). */
-  weight?: (scene: AmbienceScene) => number;
   play: (v: Voice, ports: Ports) => void;
 }>;
 type Zone = Readonly<{ beds: readonly ((p: Ports, out: AudioNode) => Bed)[]; emitters: readonly Emitter[] }>;
@@ -107,10 +104,6 @@ function bird(v: Voice) {
     tone(v, { from: base * 0.86, to: base * 0.82, sweep: 0.25, peak, attack: 0.03, decay: 0.26, start: 0.3 });
   }
 }
-function cricket(v: Voice) {
-  const f = 4300 + v.random() * 600, peak = 0.009 + v.random() * 0.008;
-  for (let i = 0; i < 3; i++) tone(v, { from: f, peak, attack: 0.004, decay: 0.014, start: i * 0.03 });
-}
 function leaves(v: Voice) {
   hiss(v, { filter: 'highpass', from: 2400 + v.random() * 1500, q: 0.5, peak: 0.018 + v.random() * 0.012, attack: 0.25, decay: 0.7 });
 }
@@ -193,8 +186,6 @@ function surge(v: Voice) {
   tone(v, { from: 330, to: 1320, sweep: 1.4, peak: 0.006, attack: 0.6, decay: 1 });
 }
 
-const day = (s: AmbienceScene) => s.daylight;
-const night = (s: AmbienceScene) => 1 - s.daylight;
 const UNDER: readonly Emitter[] = [
   { name: 'drip', every: [1.4, 4.5], play: drip },
   { name: 'rumble', every: [28, 60], play: rumble },
@@ -204,8 +195,7 @@ export const ZONES: Readonly<Record<AmbienceId, Zone>> = {
   meadow: {
     beds: [wind(0.05, 650, 0.6, 0.6)],
     emitters: [
-      { name: 'bird', every: [1.8, 6], weight: day, play: bird },
-      { name: 'cricket', every: [0.35, 0.95], weight: night, play: cricket },
+      { name: 'bird', every: [1.8, 6], play: bird },
       { name: 'leaves', every: [4, 10], play: leaves },
     ],
   },
@@ -228,7 +218,7 @@ type Active = { id: AmbienceId; beds: Bed[]; slots: GainNode[]; nodes: AudioNode
  *  occasional events at random times and sides. Changing place cross-fades the beds. */
 export class Ambience {
   private readonly ports: Ports;
-  private scene: AmbienceScene = { id: null, daylight: 1 };
+  private id: AmbienceId | null = null;
   private active: Active | null = null;
   private fading: { zone: Active; until: number }[] = [];
   readonly played: Record<string, number> = {};
@@ -237,12 +227,11 @@ export class Ambience {
     this.ports = { ctx, dry, wet, noise, loop, random };
   }
 
-  setScene(scene: AmbienceScene) {
-    const changed = scene.id !== this.scene.id;
-    this.scene = scene;
-    if (!changed) return;
+  setScene(id: AmbienceId | null) {
+    if (id === this.id) return;
+    this.id = id;
     if (this.active) this.fadeOut(this.active);
-    this.active = scene.id ? this.start(scene.id) : null;
+    this.active = id ? this.start(id) : null;
   }
 
   tick() {
@@ -254,10 +243,8 @@ export class Ambience {
     ZONES[zone.id].emitters.forEach((emitter, i) => {
       while (zone.next[i] < now + LOOKAHEAD) {
         const t = Math.max(now, zone.next[i]);
-        if (random() < (emitter.weight?.(this.scene) ?? 1)) {
-          emitter.play({ ctx, out: zone.slots[Math.floor(random() * zone.slots.length) % zone.slots.length], t, noise: this.ports.noise, random }, this.ports);
-          this.played[emitter.name] = (this.played[emitter.name] ?? 0) + 1;
-        }
+        emitter.play({ ctx, out: zone.slots[Math.floor(random() * zone.slots.length) % zone.slots.length], t, noise: this.ports.noise, random }, this.ports);
+        this.played[emitter.name] = (this.played[emitter.name] ?? 0) + 1;
         zone.next[i] = t + emitter.every[0] + random() * (emitter.every[1] - emitter.every[0]);
       }
     });
@@ -270,7 +257,7 @@ export class Ambience {
   }
 
   diagnostics() {
-    return { id: this.active?.id ?? null, daylight: this.scene.daylight, beds: this.active?.beds.length ?? 0, fading: this.fading.length, played: { ...this.played } };
+    return { id: this.active?.id ?? null, beds: this.active?.beds.length ?? 0, fading: this.fading.length, played: { ...this.played } };
   }
 
   private start(id: AmbienceId): Active {

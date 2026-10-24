@@ -1,19 +1,18 @@
 import type { EnvironmentConfig } from "../presentation/EnvironmentController.ts";
 import { GAME_CONFIG } from "../config.ts";
-import { SURFACE_LIGHTING } from "./SceneLighting.ts";
+import { SURFACE_DAYLIGHT } from "./SceneLighting.ts";
 
 export const ENVIRONMENT_CONFIG = {
   initialBackground: GAME_CONFIG.background,
   transitionSpeed: 4,
   fog: { near: 38, far: 74 },
-  surface: SURFACE_LIGHTING,
+  surface: SURFACE_DAYLIGHT,
   sky: {
-    // A saturated blue down to the horizon, as in the original game: the pale horizon read as haze.
-    dayZenith: "#2a86dd",
-    dayHorizon: "#7cc5f3",
-    nightZenith: "#24385f",
-    nightHorizon: "#647fa4",
-    lighting: SURFACE_LIGHTING,
+    // A saturated blue down to the horizon, as in the original game: a pale horizon read as haze.
+    zenith: "#2a86dd",
+    horizon: "#7cc5f3",
+    sunPosition: SURFACE_DAYLIGHT.sunPosition,
+    environmentIntensity: SURFACE_DAYLIGHT.environmentIntensity,
   },
   underground: {
     skyColor: "#eef4ef",

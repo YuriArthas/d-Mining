@@ -11,7 +11,7 @@ import { PET_CONTENT } from './pets.ts';
 import { JOURNEY_RESOURCES } from './journeyResources.ts';
 import { EGG_STAGES } from './progression.ts';
 import { PINEWIND_EGG_DISPLAYS, PINEWIND_SERVICES } from './pinewind/hubLayout.ts';
-import { CREEK_CELLS, PINEWIND_DAY, pinewindSurface } from './pinewindSurface.ts';
+import { CREEK_CELLS, pinewindSurface } from './pinewindSurface.ts';
 
 /** World 1's surface: authored art and its collision, signs and service rings around the open mine shaft. */
 export type SurfaceContent = Readonly<{
@@ -79,13 +79,7 @@ export const GAME_CONTENT = {
   surface: pinewindSurface(first.rooms, eggs),
   eggs,
   returnPoint: worldSpawn(1),
-  environment: {
-    ...ENVIRONMENT_CONFIG,
-    initialTime: 'day',
-    surface: { ...ENVIRONMENT_CONFIG.surface, day: { ...ENVIRONMENT_CONFIG.surface.day, ...PINEWIND_DAY } },
-    // The sky's sun disc and its image-based light follow the same sun.
-    sky: { ...ENVIRONMENT_CONFIG.sky, lighting: { ...ENVIRONMENT_CONFIG.sky.lighting, day: { moonPosition: PINEWIND_DAY.moonPosition, environmentIntensity: PINEWIND_DAY.environmentIntensity } } },
-  } as import('../presentation/EnvironmentController.ts').EnvironmentConfig,
+  environment: ENVIRONMENT_CONFIG as import('../presentation/EnvironmentController.ts').EnvironmentConfig,
 } as const;
 export type GameContent = typeof GAME_CONTENT;
 

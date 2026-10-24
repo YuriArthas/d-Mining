@@ -2,7 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {surfaceLightStrength, surfaceLightStrengthAtFeet, SURFACE_LIGHT_FADE} from '../../src/game/world/SurfaceLightFade.ts';
 import {CELL} from '../../src/game/terrain/grid.ts';
-import {SceneLightingRig} from '../../src/game/presentation/SceneLightingRig.ts';
 
 test('entrance stays lit and the old two-block cutoff fades continuously to zero at 15 blocks',()=>{
  assert.equal(SURFACE_LIGHT_FADE.end,15*CELL);
@@ -21,28 +20,6 @@ test('entrance stays lit and the old two-block cutoff fades continuously to zero
   assert.ok(previous-strength<.002);
   previous=strength;
  }
-});
-
-test('descent and ascent scale every night light together without shadows',()=>{
- const rig=new SceneLightingRig();
- try{
-  rig.setTime('night');
-  const lights=[rig.key,...rig.fills];
-  const levels=lights.map(l=>l.intensity);
-  for(const depth of [0,4,4.01,6,16,28,29.99,30,32,30,28,16,6,4,0]){
-   const strength=surfaceLightStrength(depth);
-   rig.setSurfaceStrength(strength);
-   lights.forEach((l,i)=>{assert.equal(l.intensity,levels[i]*strength);assert.equal(l.castShadow,false);});
-   assert.equal(rig.diagnostics().activeLights,strength>0?lights.length:0);
-   assert.equal(rig.setSurfaceStrength(strength),false,'stationary frames skip light updates');
-  }
-  rig.setSurfaceStrength(.25);rig.setTime('day');
-  assert.equal(rig.diagnostics().activeLights,0);
-  rig.setTime('night');assert.equal(rig.diagnostics().activeLights,lights.length);
-  assert.equal(rig.key.intensity,levels[0]*.25);
-  rig.setSurfaceStrength(0);rig.setTime('day');rig.setTime('night');
-  assert.equal(rig.diagnostics().activeLights,0);
- }finally{rig.dispose();}
 });
 
 // Measured grounded feet include Rapier's .025m skin and .002m contact slack.

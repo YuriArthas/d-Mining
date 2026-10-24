@@ -3,7 +3,6 @@ import { yieldLoadingTask } from "./prepareShaders.ts";
 import { Group, Mesh, Raycaster, Vector3 } from "three";
 import type { ScenerySite } from "./SceneryCollision.ts";
 import { createScenery, disposeScenery } from "./SceneryMesh.ts";
-import type { SurfaceTime } from "../world/SceneLighting.ts";
 import { sceneryGeometryMemory } from "./sceneryGeometryMemory.ts";
 
 // Ordinary scene props use independent visual/physical residency. The voxel floor
@@ -46,14 +45,8 @@ export class SceneryView {
       onProgress(i + 1, this.sites.length);
     }
   }
-  updateSurface(
-    time: SurfaceTime,
-    elapsed: number,
-    bakedShadowsEnabled: boolean,
-    lightStrength = 1,
-    daylightBlend = time === 'day' ? 1 : 0,
-  ) {
-    this.surface.details.update(time, elapsed, bakedShadowsEnabled, lightStrength, daylightBlend);
+  updateSurface(elapsed: number, bakedShadowsEnabled: boolean) {
+    this.surface.details.update(elapsed, bakedShadowsEnabled);
   }
   beginSurfaceDraw() {
     this.surface.details.beginDraw();

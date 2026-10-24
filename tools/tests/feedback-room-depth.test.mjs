@@ -36,24 +36,23 @@ function physicsAtRoom(room) {
 function ticks(physics, count) {
   for (let i = 0; i < count; i++) physics.tick(0, 0, 0, false, true);
 }
-function visualFrame(feet, grounded, time = 'night') {
+function visualFrame(feet, grounded) {
   const layer = stratumAtDepth(environmentDepthAtFeet(feet, grounded, destinations), GAME_CONTENT.layers);
   const theme = themeById(layer.theme);
   return { surface: theme.motif === 'meadow', surfaceLightStrength: surfaceLightStrengthAtFeet(feet[1]),
-    time, depth: layer.from, sky: theme.sky, groundLight: theme.groundLight, sceneryRevision: 0 };
+    depth: layer.from, sky: theme.sky, groundLight: theme.groundLight, sceneryRevision: 0 };
 }
 function environment() {
   const scene = new Scene(), ambient = new HemisphereLight(), key = new DirectionalLight();
-  const sky = { active: false, lightingStrength: 0, setEnabled(value) { this.active = value; }, setLightingStrength(value) { this.lightingStrength = value; }, setDaylight() {}, prepareDraw() {}, markSubmitted() {}, dispose() {}, diagnostics() { return {}; } };
-  const lights = { strength: 0, setSurfaceStrength(value) { this.strength = value; }, setDaylight() {}, dispose() {}, diagnostics() { return {}; } };
-  const controller = new EnvironmentController(scene, ambient, key, sky, lights, GAME_CONTENT.environment);
+  const sky = { active: false, lightingStrength: 0, setEnabled(value) { this.active = value; }, setLightingStrength(value) { this.lightingStrength = value; }, prepareDraw() {}, markSubmitted() {}, dispose() {}, diagnostics() { return {}; } };
+  const controller = new EnvironmentController(scene, ambient, key, sky, GAME_CONTENT.environment);
   const lightState = () => [ambient.color.getHex(), ambient.groundColor.getHex(), ambient.intensity,
     key.color.getHex(), key.intensity, ...key.position.toArray(), ...key.target.position.toArray()];
-  return { scene, sky, lights, controller, lightState };
+  return { scene, sky, controller, lightState };
 }
 
 for (const room of rooms) {
-  test(`${room.id}: actual authored floor and Rapier skin count as the milestone and retain underground day/night lighting`, () => {
+  test(`${room.id}: actual authored floor and Rapier skin count as the milestone and keep the underground lighting`, () => {
     const fixture = physicsAtRoom(room), env = environment();
     try {
       const physics = fixture.physics;
@@ -68,11 +67,11 @@ for (const room of rooms) {
       assert.equal(session.exportProgress().exploration.maxDepth, room.depth);
       assert.equal(playerDepthAtFeet(feet, true, destinations), room.depth);
       env.controller.prepare(visualFrame(feet, true));
-      const night = env.lightState();
-      env.controller.update(visualFrame(feet, true, 'day'), .016);
-      assert.deepEqual(env.lightState(), night);
+      const underground = env.lightState();
+      env.controller.update(visualFrame(feet, true), .016);
+      assert.deepEqual(env.lightState(), underground);
       assert.equal(env.sky.active, false);
-      assert.equal(env.lights.strength, 0);
+      assert.equal(env.controller.surfaceBlend, 0);
       assert.ok(env.scene.fog);
     } finally { env.controller.dispose(); fixture.dispose(); }
   });
@@ -90,7 +89,7 @@ for (const room of rooms) {
       for (let i = 0; i < 90; i++) {
         const feet = physics.feet();
         peak = Math.max(peak, feet[1]);
-        const frame = visualFrame(feet, physics.grounded, i % 2 ? 'day' : 'night');
+        const frame = visualFrame(feet, physics.grounded);
         assert.equal(frame.depth, room.depth);
         env.controller.update(frame, .016);
         assert.deepEqual(env.lightState(), baseline);
