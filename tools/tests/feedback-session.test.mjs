@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { GameSession } from '../../src/game/application/GameSession.ts';
-import { SESSION_CONTENT } from '../../src/game/world/sessionContent.ts';
+import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
+const SESSION_CONTENT = GAME_CONTENT.session;
 import { CAPSULE_MACHINE_ZONE } from '../../src/game/content/feedbackFacilities.ts';
 import { createInviteCode } from '../../src/game/logic/InviteCode.ts';
 import { pickaxeStats } from '../../src/game/logic/Pickaxe.ts';
@@ -19,7 +20,7 @@ test('depth alone unlocks travel and eggs; old depth fills missing unlocks while
   const s=fixture();s.updatePosition([90,-400,90],false);
   assert.equal(s.getSnapshot().destinations[0].unlocked,true);
   assert.equal(s.pets.getSnapshot().eggs.find(e=>e.id==='pebble-egg').unlocked,true);
-  const old=s.exportProgress();old.exploration.maxDepth=800;old.exploration.unlockedDestinationIds=[];
+  const old=s.exportProgress();old.worldExploration[1]={...old.worldExploration[1],maxDepth:800,unlockedDestinationIds:[]};
   const restored=GameSession.fromData(old,SESSION_CONTENT);
   assert.deepEqual(restored.getSnapshot().destinations.filter(d=>d.unlocked).map(d=>d.id),['old_mine','fungal']);
   // Saves from before the leaderboard was retired still load, and it is not written back.
@@ -57,7 +58,7 @@ test('automatic hatch pays once per interval, stops away, and does not resume fr
   const s=fixture(0,p=>{p.rewards.permanent.autoHatch=true;});
   assert.equal(s.setAutoHatch(true),false);at(s,meadow);assert.equal(s.setAutoHatch(true),true);
   const before=s.getSnapshot().coins;s.advanceOnline(2);
-  assert.equal(s.pets.getSnapshot().pets.length,1);assert.equal(s.getSnapshot().coins,before-80);
+  assert.equal(s.pets.getSnapshot().pets.length,1);assert.equal(s.getSnapshot().coins,before-SESSION_CONTENT.petContent.eggs.find(e=>e.id==='meadow-egg').price);
   at(s,{x:0,y:0,z:40});s.advanceOnline(10);assert.equal(s.pets.getSnapshot().pets.length,1);assert.equal(s.getSnapshot().autoHatch,null);
   at(s,meadow);s.setAutoHatch(true);
   const restored=GameSession.fromData(s.exportProgress(),SESSION_CONTENT);assert.equal(restored.getSnapshot().autoHatch,null);

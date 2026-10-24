@@ -22,11 +22,10 @@ const layerColor = (name: string, index: number) => { const hit = LAYER_COLORS.f
  *  on the station itself (StationSheet). */
 export function WorldSheet({ session, tab, onTab, onClose }: { session: GameSession; tab: WorldTab; onTab(tab: WorldTab): void; onClose(): void }) {
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot);
-  const tabs: SheetTab<WorldTab>[] = [{ id: 'travel', label: '传送', icon: 'portal' }, ...(state.journey ? [{ id: 'progress' as const, label: '进度', icon: 'globe' as const }] : [])];
+  const tabs: SheetTab<WorldTab>[] = [{ id: 'travel', label: '传送', icon: 'portal' }, { id: 'progress', label: '进度', icon: 'globe' }];
   const common = { title: '世界', tabs, tab, onTab, onClose };
-  if (tab === 'progress' && state.journey) return <ProgressTab session={session} common={common} />;
-  return state.journey ? <WorldsTab session={session} common={common} onClose={onClose} onTab={onTab} />
-    : <Sheet {...common}><LayerCards session={session} onClose={onClose} /></Sheet>;
+  if (tab === 'progress') return <ProgressTab session={session} common={common} />;
+  return <WorldsTab session={session} common={common} onClose={onClose} onTab={onTab} />;
 }
 type Common = { title: string; tabs: SheetTab<WorldTab>[]; tab: WorldTab; onTab(tab: WorldTab): void; onClose(): void };
 const WORLD_COLORS = [['#62c96b', '#2f9a3d'], ['#5fc0b8', '#2f8a84'], ['#e9c46a', '#b88a2a']] as const;

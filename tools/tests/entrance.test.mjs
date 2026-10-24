@@ -1,9 +1,12 @@
-import {SESSION_CONTENT} from '../../src/game/world/sessionContent.ts';
+import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
+const SESSION_CONTENT = GAME_CONTENT.session;
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { SparseWorld, regionOf, sampleXYZ, WORLD_GENERATION } from '../../src/game/terrain/SparseWorld.ts';
 import {initialExcavationDepth} from '../../src/game/world/SurfaceExcavation.ts';
-import { ROOMS } from '../../src/game/world/rooms.ts';
+import { roomsFor } from '../../src/game/world/rooms.ts';
+import { LAYERS } from '../../src/game/content/layers.ts';
+const ROOMS = roomsFor(LAYERS);
 import { inEntrance, PROTECTED_FLOOR } from '../../src/game/world/entrance.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
 import { TerrainStream } from '../../src/game/validation/TerrainStream.ts';

@@ -5,14 +5,15 @@ import {resolve,dirname} from 'node:path';
 import {LAYERS} from '../../src/game/content/layers.ts';
 import {ROOM_SCENES} from '../../src/game/content/rooms/sceneDefinitions.ts';
 import {roomSceneAsset} from '../../src/game/content/rooms/sceneAssets.ts';
-import {roomsFor,ROOMS} from '../../src/game/world/rooms.ts';
+import {roomsFor} from '../../src/game/world/rooms.ts';
 import {roomPlan} from '../../src/game/world/scenery.ts';
 import {authoredRoomPlan} from '../../src/game/world/authoredRoomPlan.ts';
 import {createScenery,disposeScenery} from '../../src/game/presentation/SceneryMesh.ts';
 import {roomIllumination} from '../../src/game/presentation/roomIllumination.ts';
 import {GameSession} from '../../src/game/application/GameSession.ts';
-import {sessionContentFor} from '../../src/game/world/sessionContent.ts';
-import {CAMP_CONTENT} from '../../src/game/content/campContent.ts';
+import {GAME_CONTENT} from '../../src/game/content/gameContent.ts';
+
+const ROOMS=roomsFor(LAYERS);
 
 const scene=()=>structuredClone(ROOM_SCENES['timber-station-v2']);
 const customRoom=(definition,layers=LAYERS)=>roomsFor(layers,{...ROOM_SCENES,'timber-station-v2':definition})[0];
@@ -35,9 +36,7 @@ test('moving the sale anchor moves its models, independent colliders, light mark
  assert.equal(movedLamps.length,roomSceneAsset('old-mine-v2').layout.groups.find(g=>g.id==='sale').lamps.length);
  for(const delta of movedLamps)assert.deepEqual(delta,[0,0,2]);
  assert.deepEqual(after.authored.instances.filter(i=>i.name==='shaft-fence-post'),before.authored.instances.filter(i=>i.name==='shaft-fence-post'));
- const raw=CAMP_CONTENT.session;
- const content=sessionContentFor([room],raw.portals.filter(p=>p.id===room.id),{sale:raw.sales[0],shop:raw.shops[0].zone,home:raw.home});
- const session=new GameSession(content);session.updatePosition([room.sell.x,room.sell.y,room.sell.z],true);
+ const session=new GameSession({...GAME_CONTENT.session,sales:[room.sell]});session.updatePosition([room.sell.x,room.sell.y,room.sell.z],true);
  assert.equal(session.getSnapshot().inSellZone,true);
  session.updatePosition([ROOMS[0].sell.x,ROOMS[0].sell.y,ROOMS[0].sell.z],true);
  assert.equal(session.getSnapshot().inSellZone,false);
@@ -47,7 +46,7 @@ test('another layer can bind the authored kit, custom spawn and shop without har
  definition.facilities.shop={...definition.facilities.sell,at:[13,0,13]};
  definition.signs.push({...definition.signs[1],anchor:'shop',title:'UPGRADE'});
  definition.rings.push({...definition.rings[0],anchor:'shop'});
- const layers=LAYERS.map(l=>l.id==='old_mine'?{...l,scene:undefined}:l.id==='fungal'?{...l,scene:'timber-station-v2'}:l);
+ const layers=LAYERS.map(l=>l.id==='fungal'?{...l,scene:'timber-station-v2'}:l);
  const room=roomsFor(layers,{...ROOM_SCENES,'timber-station-v2':definition})[1],plan=roomPlan(room);
  assert.deepEqual(room.spawn,[2,-799.9,12]);assert.equal(plan.signs[0].subtitle,'03 / 800 米');
  assert.equal(plan.signs.at(-1).title,'UPGRADE');assert.equal(plan.shapes.at(-1).at[0],13);

@@ -1,6 +1,5 @@
 import {addAuthoredRoom} from './AuthoredRoomView.ts';
 import {createWorldText} from './WorldText.ts';
-import { createMeadowGround } from './MeadowGround.ts';
 import { compactSceneryGeometry } from './compactSceneryGeometry.ts';
 import { stabilizeShadows } from './stableShadow.ts';
 import { createSurfaceMaterial, createSurfaceNoise, SURFACE_SHADER_VERSION, type SurfaceFinish } from './SurfaceMaterial.ts';
@@ -85,7 +84,6 @@ export function createScenery(plan:SceneryPlan):Group {
     const mesh=new Mesh(merged,glow?new MeshBasicMaterial({vertexColors:true}):sculpted?createSurfaceMaterial(category as SurfaceFinish,noise!):stabilizeShadows(new MeshStandardMaterial({vertexColors:true,side:category==='stone'?DoubleSide:undefined,roughness:category==='metal'?.3:category==='stone'?.92:category==='leaves'?.86:sculpted?.42:plastic?.48:smooth?.7:1,metalness:category==='metal'?.35:0,flatShading:!smooth})));
     mesh.castShadow=!glow&&!['water','trail','grass','ground'].includes(category);mesh.receiveShadow=!glow;group.add(mesh);
   }
-  if(plan.meadow)group.add(createMeadowGround(noise!));
   if(plan.authored)addAuthoredRoom(group,plan.authored);
   for(const sign of plan.signs)group.add(createWorldText(sign));
   return group;

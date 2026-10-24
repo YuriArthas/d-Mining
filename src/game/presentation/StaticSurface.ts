@@ -1,167 +1,49 @@
 import { assembleAuthoredSurface } from "./assembleAuthoredSurface.ts";
-import { NearestFilter, NearestMipmapNearestFilter } from "three";
-import type { SurfaceContent } from "../content/campContent.ts";
-import type { AssetProfile } from "../content/assetProfiles.ts";
-import { Mesh, MeshStandardMaterial, type WebGLRenderer } from "three";
+import { Mesh, NearestFilter, NearestMipmapNearestFilter, type MeshStandardMaterial, type WebGLRenderer } from "three";
+import type { SurfaceContent } from "../content/gameContent.ts";
 import { liftAlbedo, liftFoliage } from "./albedoLift.ts";
 import { applyCreekWater } from "./creekWater.ts";
 import { applyBakedLight, setBakedGround, setBakedSun } from "./bakedLight.ts";
 import { loadStandingLight, setStandingLight } from "./standingLight.ts";
 import standingLightUrl from "../assets/camp/pinewind-standing-light.png?url";
-import { SurfaceDetails } from "./SurfaceDetails.ts";
-import {
-  styleMineBlock,
-  styleMineLens,
-  styleMineBadge,
-} from "./MineAtmosphere.ts";
 import { loadModelAssets, type ModelRequest } from "./ModelAssetLoader.ts";
-import { assembleSurface } from "./assembleSurface.ts";
-const urls = import.meta.glob("../assets/camp/*.part", {
-  eager: true,
-  query: "?url",
-  import: "default",
-}) as Record<string, string>;
-const manifests = import.meta.glob("../assets/camp/*.manifest.json", {
-  eager: true,
-  import: "default",
-}) as Record<
-  string,
-  {
-    parts: string[];
-    bytes: number;
-    decodedBytes: number;
-    taskId?: string;
-    generationId?: string;
-    materialProfile?: string;
-    source: string;
-  }
->;
+const urls = import.meta.glob("../assets/camp/*.part", { eager: true, query: "?url", import: "default" }) as Record<string, string>;
+const manifests = import.meta.glob("../assets/camp/*.manifest.json", { eager: true, import: "default" }) as Record<string, ModelRequest["manifest"]>;
 
-function styleMaterial(
-  m: MeshStandardMaterial,
-  request: ModelRequest,
-  details: SurfaceDetails,
-  profile: AssetProfile,
-  materials: SurfaceContent["materials"],
-) {
-  const { manifest } = request;
-  m.metalness = materials.standard.metalness;
-  m.roughness = Math.max(m.roughness, materials.standard.roughnessFloor);
-  m.envMapIntensity = materials.standard.envMapIntensity;
-  if (profile.material === "block") styleMineBlock(m);
-  if (manifest.materialProfile === "authored-color") {
-    m.roughness = materials.authoredColor.roughness;
-    m.envMapIntensity = materials.authoredColor.envMapIntensity;
-  }
-  if (profile.material === "lens") styleMineLens(m, details.night);
-  if (profile.material === "badge") styleMineBadge(m);
-  if (profile.roughness !== undefined) m.roughness = profile.roughness;
-  if (profile.metalness !== undefined) m.metalness = profile.metalness;
-  if (profile.envMapIntensity !== undefined)
-    m.envMapIntensity = profile.envMapIntensity;
-}
-
+/** Loads world 1's authored surface (and the halls that ship with it) with its baked light. */
 export async function loadStaticSurface(
   renderer: WebGLRenderer,
   content: SurfaceContent,
   signal: AbortSignal,
   onProgress?: (done: number, total: number) => void,
 ) {
-  if (content.authored) {
-    const light=content.authored.light;
-    // The characters' sun grid downloads alongside the models (a small PNG).
-    const standing=loadStandingLight(standingLightUrl,light.ground,light.standing.heightStep,signal);
-    standing.catch(()=>{});
-    const requests:ModelRequest[]=[...new Set(content.authored.instances.map(p=>p.asset))].map(name=>{
-      const manifest=manifests[`../assets/camp/${name}.manifest.json`];
-      if(!manifest)throw Error(`缺少模型清单 ${name}`);
-      return {name,manifest,coordinateSpace:'authored',parts:manifest.parts.map(part=>{
-        const url=urls[`../assets/camp/${part}`];if(!url)throw Error(`缺少模型资源 ${part}`);return url;
-      }),bytes:manifest.bytes,decodedBytes:manifest.decodedBytes,instances:content.authored!.instances.filter(p=>p.asset===name).length};
-    });
-    const assets=await loadModelAssets(renderer,requests,signal,(m,request)=>{
-      m.roughness=1;m.metalness=0;m.envMapIntensity=0;
-      if(m.map){m.map.magFilter=NearestFilter;m.map.minFilter=NearestMipmapNearestFilter;}
-      if(request.name==='pinewind-architecture')liftAlbedo(m);
-      // Woods, rocks and the cliff walls: lit all round like the original's valley, not near black in shade.
-      else if(m.name==='Nature_PixelAtlas_Opaque'||m.name.startsWith('Valley cliff'))liftFoliage(m);
-      if(m.name==='Creek water')applyCreekWater(m);
-      applyBakedLight(m);
-    },onProgress);
-    setBakedSun(content.authored.light.sun);
-    let groundLight=null as MeshStandardMaterial['aoMap'];
-    assets.templates.get('pinewind-landscape')?.traverse(o=>{if(!groundLight&&o instanceof Mesh&&o.userData.surfaceGround!==false){const m=o.material as MeshStandardMaterial;if(m.aoMap)groundLight=m.aoMap;}});
-    setBakedGround(groundLight,content.authored.light.ground);
-    const scene=assembleAuthoredSurface(assets,content);
-    try{setStandingLight(await standing);}catch(error){scene.dispose();throw error;}
-    const dispose=scene.dispose;
-    scene.dispose=()=>{setStandingLight(null);setBakedGround(null,light.ground);dispose();};
-    return scene;
-  }
-  const start = performance.now(),
-    details = new SurfaceDetails(content.details);
-  const names = [...new Set(content.placements.map((p) => p.asset))];
-  try {
-    const requests = names.map((name) => {
-      const manifest = manifests[`../assets/camp/${name}.manifest.json`];
-      if (!manifest) throw new Error(`缺少矿场模型: ${name}`);
-      const parts = manifest.parts.map((part) => {
-        const url = urls[`../assets/camp/${part}`];
-        if (!url) throw new Error(`缺少模型资源块: ${part}`);
-        return url;
-      });
-      return {
-        name,
-        manifest,
-        parts,
-        bytes: manifest.bytes,
-        decodedBytes: manifest.decodedBytes,
-        instances: content.placements.filter((p) => p.asset === name).length,
-      };
-    });
-    const styled = new Set<MeshStandardMaterial>();
-    const assets = await loadModelAssets(
-      renderer,
-      requests,
-      signal,
-      (material, request) => {
-        if (styled.has(material)) return;
-        styled.add(material);
-        styleMaterial(
-          material,
-          request,
-          details,
-          content.profiles[request.name],
-          content.materials,
-        );
-      },
-      onProgress,
-      (root, { name }) => {
-        const lamp = content.profiles[name].lamp;
-        if (!lamp) return;
-        const done = new Set<MeshStandardMaterial>();
-        root.traverse((o) => {
-          if (!(o instanceof Mesh)) return;
-          for (const m of (Array.isArray(o.material)
-            ? o.material
-            : [o.material]) as MeshStandardMaterial[]) {
-            if (done.has(m)) continue;
-            done.add(m);
-            details.installLamp(m, lamp);
-          }
-        });
-      },
-      details.ownedTextures,
-    );
-    return assembleSurface(
-      assets,
-      details,
-      content,
-      start,
-      new URLSearchParams(location.search).get("batching") !== "0",
-    );
-  } catch (error) {
-    details.dispose();
-    throw error;
-  }
+  const light=content.authored.light;
+  // The characters' sun grid downloads alongside the models (a small PNG).
+  const standing=loadStandingLight(standingLightUrl,light.ground,light.standing.heightStep,signal);
+  standing.catch(()=>{});
+  const requests:ModelRequest[]=[...new Set(content.authored.instances.map(p=>p.asset))].map(name=>{
+    const manifest=manifests[`../assets/camp/${name}.manifest.json`];
+    if(!manifest)throw Error(`缺少模型清单 ${name}`);
+    return {name,manifest,coordinateSpace:'authored',parts:manifest.parts.map(part=>{
+      const url=urls[`../assets/camp/${part}`];if(!url)throw Error(`缺少模型资源 ${part}`);return url;
+    }),bytes:manifest.bytes,decodedBytes:manifest.decodedBytes,instances:content.authored.instances.filter(p=>p.asset===name).length};
+  });
+  const assets=await loadModelAssets(renderer,requests,signal,(m,request)=>{
+    m.roughness=1;m.metalness=0;m.envMapIntensity=0;
+    if(m.map){m.map.magFilter=NearestFilter;m.map.minFilter=NearestMipmapNearestFilter;}
+    if(request.name==='pinewind-architecture')liftAlbedo(m);
+    // Woods, rocks and the cliff walls: lit all round like the original's valley, not near black in shade.
+    else if(m.name==='Nature_PixelAtlas_Opaque'||m.name.startsWith('Valley cliff'))liftFoliage(m);
+    if(m.name==='Creek water')applyCreekWater(m);
+    applyBakedLight(m);
+  },onProgress);
+  setBakedSun(content.authored.light.sun);
+  let groundLight=null as MeshStandardMaterial['aoMap'];
+  assets.templates.get('pinewind-landscape')?.traverse(o=>{if(!groundLight&&o instanceof Mesh&&o.userData.surfaceGround!==false){const m=o.material as MeshStandardMaterial;if(m.aoMap)groundLight=m.aoMap;}});
+  setBakedGround(groundLight,content.authored.light.ground);
+  const scene=assembleAuthoredSurface(assets,content);
+  try{setStandingLight(await standing);}catch(error){scene.dispose();throw error;}
+  const dispose=scene.dispose;
+  scene.dispose=()=>{setStandingLight(null);setBakedGround(null,light.ground);dispose();};
+  return scene;
 }

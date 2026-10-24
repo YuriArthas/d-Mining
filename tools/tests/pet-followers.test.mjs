@@ -4,7 +4,8 @@ import { BoxGeometry, PerspectiveCamera } from 'three';
 import { PetFollowers } from '../../src/game/presentation/PetFollowers.ts';
 import { PET_CONTENT } from '../../src/game/content/pets.ts';
 import { petAppearance } from '../../src/game/content/petAppearance.ts';
-import { PET_DISPLAYS } from '../../src/game/world/SurfaceHub.ts';
+import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
+const PET_DISPLAYS = GAME_CONTENT.eggs;
 import { PetService } from '../../src/game/application/PetService.ts';
 import { Wallet } from '../../src/game/logic/Wallet.ts';
 

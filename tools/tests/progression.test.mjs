@@ -3,14 +3,14 @@ import assert from 'node:assert/strict';
 import { STAGES, EGG_STAGES, upgradePrice } from '../../src/game/content/progression.ts';
 import { RESOURCES, resourceByKind } from '../../src/game/content/resources.ts';
 import { PET_CONTENT } from '../../src/game/content/pets.ts';
-import { SESSION_CONTENT } from '../../src/game/world/sessionContent.ts';
+import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
+const SESSION_CONTENT = GAME_CONTENT.session;
 import { GameSession } from '../../src/game/application/GameSession.ts';
 import { SparseWorld, WORLD_GENERATION } from '../../src/game/terrain/SparseWorld.ts';
 import { generatedMineral } from '../../src/game/terrain/strata.ts';
 import { saveNamespace } from '../../src/game/persistence/SaveBootstrap.ts';
 import { LAYERS } from '../../src/game/content/layers.ts';
 import { formatNumber } from '../../src/game/presentation/formatNumber.ts';
-import { simulate } from '../balance/simulate.mjs';
 function goToEgg(session,eggId) {
  const station=SESSION_CONTENT.eggStations.find(station=>station.eggId===eggId);
  session.updatePosition([station.zone.x,station.zone.y,station.zone.z],true);
@@ -31,7 +31,7 @@ test('historical depth grants every reached layer and its eggs without coins or 
  s.updatePosition(room.spawn,false);
  assert.equal(s.getSnapshot().destinations.find(d=>d.id===room.id).unlocked,false);
  s.updatePosition([90,-900,90],false);
- const reached=SESSION_CONTENT.destinations.filter(d=>d.depth<=900).map(d=>d.id);
+ const reached=SESSION_CONTENT.destinations.filter(d=>d.worldId===1&&d.depth<=900).map(d=>d.id);
  assert.deepEqual(s.getSnapshot().destinations.filter(d=>d.unlocked).map(d=>d.id),reached);
  assert.equal(s.getSnapshot().coins,0);
  s.updatePosition([90,0,90],true);
@@ -52,14 +52,14 @@ test('locked eggs consume neither currency nor RNG; access changes refresh the s
  assert.equal(s.pets.getSnapshot().eggs.find(e=>e.id==='pebble-egg').canAfford,true);
  goToEgg(s,'pebble-egg');
  assert.equal(s.pets.hatch('pebble-egg').status,'hatched');assert.equal(rolls,1);
- assert.equal(s.getSnapshot().coins,coins-PET_CONTENT.eggs.find(e=>e.id==='pebble-egg').price);
+ assert.equal(s.getSnapshot().coins,coins-SESSION_CONTENT.petContent.eggs.find(e=>e.id==='pebble-egg').price);
 });
 test('pet power cannot bypass advanced ore level; common and deep rock have no hard lock',()=>{
  const initial=new GameSession(SESSION_CONTENT).exportProgress();
  initial.pets.inventory.pets=[{id:'strong',speciesId:'core-guardian',level:1}];initial.pets.equipment.slots=['strong',null,null];
  let kind=17,now=0,queued=0;
  const s=new GameSession(SESSION_CONTENT,50,()=>now,{},initial);
- s.attach({cell:()=>kind,pending:()=>false,mine:()=>{queued++;return true;},cancelMining(){},returnToSurface(){}});
+ s.attach({cell:()=>kind,pending:()=>false,mine:()=>{queued++;return true;},cancelMining(){}});
  const cell=[0,-250,0];s.selectTarget(cell);
  assert.deepEqual(s.hit(cell),{status:'locked',requiredLevel:8});
  assert.equal(s.combatDebug().damagedCells,0);assert.equal(s.combatDebug().nextAttackAt,0);assert.equal(queued,0);
@@ -69,7 +69,7 @@ test('pet power cannot bypass advanced ore level; common and deep rock have no h
  }
  const earned=s.exportProgress();earned.pickaxe.level=8;delete earned.equipment; /* Legacy active-gear fixture. */
  const ready=GameSession.fromData(earned,SESSION_CONTENT);kind=17;
- ready.attach({cell:()=>17,pending:()=>false,mine:()=>true,cancelMining(){},returnToSurface(){}});
+ ready.attach({cell:()=>17,pending:()=>false,mine:()=>true,cancelMining(){}});
  assert.equal(ready.hit(cell).status,'breaking');
 });
 test('shallow rock begins below each room; deep rock belongs to the room above',()=>{
@@ -93,15 +93,6 @@ test('prices and HP remain safe integers, front four have one egg and later stag
   for(let level=stage.entryLevel;level<stage.exitLevel;level++)assert.ok(Number.isSafeInteger(upgradePrice(level))&&upgradePrice(level)>0);
  }
  assert.equal(formatNumber(1234567),'123万');assert.equal(formatNumber(999),'999');
-});
-test('calculator repeats decisions and RNG, accounts all elapsed time, and separates strategies',()=>{
- const a=simulate({seed:23,stages:2}),b=simulate({seed:23,stages:2});
- assert.deepEqual(a,b);assert.equal(a.completed,true);
- assert.ok(Math.abs(Object.values(a.breakdown).reduce((x,y)=>x+y,0)-a.elapsedMinutes*60)<1e-6);
- assert.ok(a.purchases.some(p=>p.action==='pickaxe'));assert.ok(a.purchases.some(p=>p.action==='meadow-egg'));
- assert.ok(a.milestones.every(m=>m.coins>=0));
- const fast=simulate({seed:23,stages:2,policy:'efficient'});
- assert.notDeepEqual(a.purchases,fast.purchases);
 });
 test('large numbers read in 万 / 亿 and depths always in full metres', async () => {
  const { formatDepth } = await import('../../src/game/presentation/formatNumber.ts');

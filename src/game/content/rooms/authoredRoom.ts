@@ -15,15 +15,16 @@ export type RoomRenderStyle = {
 };
 // Lightweight metadata: safe for gameplay and voxel workers. Never imports meshes.
 export type RoomSceneDefinition = {
-  asset: string;
-  /** An authored hall (src/game/content/underground) replaces the kit: its art loads with the authored scene
+  /** The scene kit the room is built from, and its look (`render`). */
+  asset?: string;
+  /** An authored hall (src/game/content/underground) instead of a kit: its art loads with the authored scene
    *  and its colliders come from the offline build; signs and rings still come from here. */
   hall?: string;
   referenceSize: number[];
   facilities: RoomFacilities;
   signs: {anchor: RoomAnchor; offset: number[]; width: number; title: string; subtitle: string; color: string; background: string; yaw?: number}[];
   rings: {anchor: 'sell' | 'shop'; offset: number[]; height: number; color: string; glow: boolean}[];
-  render: RoomRenderStyle;
+  render?: RoomRenderStyle;
 };
 export type RoomInstance = {
   name: string; mesh: string; material: string;

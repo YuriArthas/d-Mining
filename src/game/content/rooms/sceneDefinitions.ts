@@ -7,7 +7,7 @@ import ruins from './ruins.scene.json' with {type:'json'};
 import crystal from './crystal.scene.json' with {type:'json'};
 import fungal from './fungal.scene.json' with {type:'json'};
 import {OLD_MINE_SCENE} from './oldMine.ts';
-import type {RoomSceneDefinition, RoomFacilities} from './authoredRoom.ts';
+import type {RoomSceneDefinition} from './authoredRoom.ts';
 
 export const ROOM_SCENES: Readonly<Record<string, RoomSceneDefinition>> = {
   'ruins-station-v1': ruins as RoomSceneDefinition,
@@ -20,23 +20,18 @@ export const ROOM_SCENES: Readonly<Record<string, RoomSceneDefinition>> = {
   'fungal-station-v1': fungal as RoomSceneDefinition,
   'crystal-station-v1': crystal as RoomSceneDefinition,
 };
-// Existing layers retain their previous layout until their art is migrated.
-export const LEGACY_ROOM_REFERENCE = [40,20,40] as const;
-export const LEGACY_ROOM_FACILITIES: RoomFacilities = {
-  spawn: {at:[0,0,11],clearance:.1},
-  sell: {at:[-12,0,12],radius:1.7,heightTolerance:.25,hysteresis:.25},
-  shop: {at:[12,0,12],radius:1.7,heightTolerance:.25,hysteresis:.25},
-};
 const vector=(v:readonly number[])=>v.length===3&&v.every(Number.isFinite);
 export function validateRoomScene(id:string,scene:RoomSceneDefinition){
   const fail=(field:string):never=>{throw Error(`无效房间场景 ${id}: ${field}`);};
-  if(!scene.asset||!vector(scene.referenceSize)||scene.referenceSize.some(v=>v<=0))fail('referenceSize/asset');
+  if(!!scene.asset===!!scene.hall||!vector(scene.referenceSize)||scene.referenceSize.some(v=>v<=0))fail('referenceSize/asset');
+  if(scene.asset&&!scene.render)fail('render');
   const f=scene.facilities;
   if(!vector(f.spawn.at)||!Number.isFinite(f.spawn.clearance)||f.spawn.clearance<0)fail('spawn');
   for(const zone of [f.sell,f.shop])if(zone&&(!vector(zone.at)||![zone.radius,zone.heightTolerance,zone.hysteresis].every(Number.isFinite)||zone.radius<=0||zone.heightTolerance<0||zone.hysteresis<0))fail('zone');
   const anchor=(a:string)=>['room','spawn','sell','shop'].includes(a)&&(a!=='shop'||!!f.shop);
   for(const sign of scene.signs)if(!anchor(sign.anchor)||!vector(sign.offset)||!(sign.width>0)||!Number.isFinite(sign.width)||/\{(?!name\}|number\}|depth\})/.test(sign.title+sign.subtitle))fail('sign');
   for(const ring of scene.rings)if(!['sell','shop'].includes(ring.anchor)||!anchor(ring.anchor)||!vector(ring.offset)||!Number.isFinite(ring.height)||ring.height<=0)fail('ring');
+  if(!scene.render)return;
   const {atlas,surface,lighting:l}=scene.render;
   if(!Number.isInteger(atlas.columns)||!Number.isInteger(atlas.rows)||atlas.columns<1||atlas.rows<1||!Number.isFinite(atlas.gutter)||atlas.gutter<0||!Number.isFinite(atlas.repeat)||atlas.repeat<=0)fail('atlas');
   if(!Object.values(surface).every(v=>Number.isFinite(v)&&v>=0)||surface.roughness>1||surface.metalness>1)fail('surface');

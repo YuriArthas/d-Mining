@@ -1,9 +1,9 @@
 import test from 'node:test';
+import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
 import assert from 'node:assert/strict';
 import { Scene, HemisphereLight, DirectionalLight } from 'three';
 import { playerDepthAtFeet, environmentDepthAtFeet } from '../../src/game/logic/PlayerDepth.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
-import { CAMP_CONTENT } from '../../src/game/content/campContent.ts';
 import { themeById } from '../../src/game/content/themes.ts';
 import { stratumAtDepth } from '../../src/game/terrain/strata.ts';
 import { initPhysics, CharacterPhysics, RAPIER } from '../../src/game/validation/physics.ts';
@@ -15,8 +15,8 @@ import { EnvironmentController } from '../../src/game/presentation/EnvironmentCo
 import { surfaceLightStrengthAtFeet } from '../../src/game/world/SurfaceLightFade.ts';
 
 await initPhysics();
-const destinations = CAMP_CONTENT.session.destinations;
-const rooms = CAMP_CONTENT.rooms.filter(room => ['old_mine', 'fungal'].includes(room.id));
+const destinations = GAME_CONTENT.session.destinations;
+const rooms = GAME_CONTENT.rooms.filter(room => ['old_mine', 'fungal'].includes(room.id));
 function physicsAtRoom(room) {
   const physics = new CharacterPhysics(false);
   const floorRegion = Math.floor(-room.depth / (CELL * COLLISION_SIZE));
@@ -27,7 +27,7 @@ function physicsAtRoom(room) {
         .setTranslation(...coord.map(value => value * COLLISION_SIZE * CELL)),
     );
   }
-  const scenery = new SceneryCollision(physics, createScenerySites(CAMP_CONTENT.rooms, CAMP_CONTENT.surface.plan));
+  const scenery = new SceneryCollision(physics, createScenerySites(GAME_CONTENT.rooms, GAME_CONTENT.surface.plan));
   scenery.sync(room.spawn);
   physics.teleport(room.spawn);
   return { physics, dispose() { scenery.dispose(); physics.dispose(); } };
@@ -36,7 +36,7 @@ function ticks(physics, count) {
   for (let i = 0; i < count; i++) physics.tick(0, 0, 0, false, true);
 }
 function visualFrame(feet, grounded, time = 'night') {
-  const layer = stratumAtDepth(environmentDepthAtFeet(feet, grounded, destinations), CAMP_CONTENT.layers);
+  const layer = stratumAtDepth(environmentDepthAtFeet(feet, grounded, destinations), GAME_CONTENT.layers);
   const theme = themeById(layer.theme);
   return { surface: theme.motif === 'meadow', surfaceLightStrength: surfaceLightStrengthAtFeet(feet[1]),
     time, depth: layer.from, sky: theme.sky, groundLight: theme.groundLight, sceneryRevision: 0 };
@@ -45,7 +45,7 @@ function environment() {
   const scene = new Scene(), ambient = new HemisphereLight(), key = new DirectionalLight();
   const sky = { active: false, lightingStrength: 0, setEnabled(value) { this.active = value; }, setLightingStrength(value) { this.lightingStrength = value; }, setDaylight() {}, prepareDraw() {}, markSubmitted() {}, dispose() {}, diagnostics() { return {}; } };
   const lights = { strength: 0, setSurfaceStrength(value) { this.strength = value; }, setDaylight() {}, dispose() {}, diagnostics() { return {}; } };
-  const controller = new EnvironmentController(scene, ambient, key, sky, lights, CAMP_CONTENT.environment);
+  const controller = new EnvironmentController(scene, ambient, key, sky, lights, GAME_CONTENT.environment);
   const lightState = () => [ambient.color.getHex(), ambient.groundColor.getHex(), ambient.intensity,
     key.color.getHex(), key.intensity, ...key.position.toArray(), ...key.target.position.toArray()];
   return { scene, sky, lights, controller, lightState };
@@ -60,7 +60,7 @@ for (const room of rooms) {
       const feet = physics.feet();
       assert.equal(physics.grounded, true);
       assert.ok(-feet[1] + .04 < room.depth, 'the real floor exceeds the previous generic contact tolerance');
-      const session = GameSession.createNew(CAMP_CONTENT.session);
+      const session = GameSession.createNew(GAME_CONTENT.session);
       session.updatePosition(feet, true);
       assert.equal(session.getSnapshot().depth, room.depth);
       assert.equal(session.getSnapshot().destinations.find(destination => destination.id === room.id).unlocked, true);
@@ -96,7 +96,7 @@ for (const room of rooms) {
         assert.equal(env.sky.active, false);
         if (!physics.grounded) {
           airborneFrames++;
-          const freshSession = GameSession.createNew(CAMP_CONTENT.session);
+          const freshSession = GameSession.createNew(GAME_CONTENT.session);
           freshSession.updatePosition(feet, false);
           assert.equal(freshSession.getSnapshot().destinations.find(destination => destination.id === room.id).unlocked, false);
           assert.ok(freshSession.exportProgress().exploration.maxDepth < room.depth);
@@ -120,7 +120,7 @@ test('airborne room entry and grounded objects above its floor window never gran
     { feet: [room.roomBounds.maxX, room.spawn[1], 11], grounded: true },
   ];
   for (const { feet, grounded } of samples) {
-    const session = GameSession.createNew(CAMP_CONTENT.session);
+    const session = GameSession.createNew(GAME_CONTENT.session);
     session.updatePosition(feet, grounded);
     assert.equal(session.getSnapshot().destinations.find(destination => destination.id === room.id).unlocked, false);
     assert.ok(session.exportProgress().exploration.maxDepth < room.depth);
@@ -135,7 +135,7 @@ test('natural descent outside room bounds keeps exact airborne thresholds and th
     { y: -399.975, grounded: true, unlocked: true },
     { y: -399.9, grounded: true, unlocked: false },
   ]) {
-    const feet = [90, y, 90], session = GameSession.createNew(CAMP_CONTENT.session);
+    const feet = [90, y, 90], session = GameSession.createNew(GAME_CONTENT.session);
     session.updatePosition(feet, grounded);
     assert.equal(session.getSnapshot().destinations.find(destination => destination.id === 'old_mine').unlocked, unlocked);
     assert.equal(session.exportProgress().exploration.maxDepth, -y + (grounded ? .04 : 0));

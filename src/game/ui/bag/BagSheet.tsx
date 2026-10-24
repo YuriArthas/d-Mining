@@ -103,7 +103,7 @@ function OresTab({ session, common, onClose }: Props & { common: Common }) {
   const needed = (id: string) => state.worlds.some(w => !w.mineOpen && w.materials.some(m => m.itemId === id));
   const sale = state.sale.status === 'quoted' ? state.sale : null;
   return <Sheet {...common} footer={<>
-    {selected && state.journey ? <div className="bag-reserve"><b className="ui-outline">{selected.item.name}</b>
+    {selected ? <div className="bag-reserve"><b className="ui-outline">{selected.item.name}</b>
       <div className="ui-seg" role="group" aria-label={`${selected.item.name}保留方式`}>
         {([['none', '不保留'], ...(needed(selected.id) ? [['needed', '保留所需']] : []), ['all', '全部保留']] as [ 'none' | 'needed' | 'all', string][]).map(([mode, label]) =>
           <GameButton key={mode} aria-pressed={selected.reservation?.mode === mode} blurAfterPress={false} onPress={() => session.reserveMineral(selected.id, mode)}>{label}</GameButton>)}

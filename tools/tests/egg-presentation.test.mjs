@@ -5,9 +5,9 @@ import { PerspectiveCamera, Vector3, Quaternion } from 'three';
 import { createWorldText } from '../../src/game/presentation/WorldText.ts';
 import { EggStandLabels, EGG_LABEL } from '../../src/game/presentation/EggStandLabels.ts';
 import { disposeScenery } from '../../src/game/presentation/disposeScenery.ts';
-import { PET_DISPLAYS } from '../../src/game/world/SurfaceHub.ts';
 import { PET_CONTENT } from '../../src/game/content/pets.ts';
-import { SESSION_CONTENT } from '../../src/game/world/sessionContent.ts';
+import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
+const SESSION_CONTENT = GAME_CONTENT.session, PET_DISPLAYS = GAME_CONTENT.eggs;
 import { GameSession } from '../../src/game/application/GameSession.ts';
 
 test('egg labels keep extruded glyphs and front/side colours in one draw, plus one draw of plates', () => {

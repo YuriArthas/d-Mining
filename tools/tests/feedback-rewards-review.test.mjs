@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { GameSession } from '../../src/game/application/GameSession.ts';
-import { SESSION_CONTENT } from '../../src/game/world/sessionContent.ts';
+import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
+const SESSION_CONTENT = GAME_CONTENT.session, EGG = SESSION_CONTENT.petContent.eggs.find(e => e.id === 'meadow-egg').price;
 import { CAPSULE_MACHINE_ZONE } from '../../src/game/content/feedbackFacilities.ts';
 import { parseInviteCode } from '../../src/game/logic/InviteCode.ts';
 import { initPhysics, CharacterPhysics, RAPIER } from '../../src/game/validation/physics.ts';
@@ -28,7 +29,7 @@ function atEgg(session) {
 }
 
 test('capsule spend and deepest-stage coin award appear in one persisted receipt and do not teach selling', () => {
-  const session = sessionWith(data => { data.rewards.balance = 2; data.exploration.maxDepth = 800; });
+  const session = sessionWith(data => { data.rewards.balance = 2; data.worldExploration[1].maxDepth = 800; });
   atMachine(session);
   const captures = []; session.onProgressCommitted(({ urgent }) => { if (urgent) captures.push(session.exportProgress()); });
   const award = session.getSnapshot().capsuleCoins, coins = session.getSnapshot().coins;
@@ -61,7 +62,7 @@ test('permanent mining win changes real mining stats and retains value at the sp
 
 test('lucky probability refresh and actual hatch share the same boundaries, including expiration', () => {
   let rolls = 0, ids = 0;
-  const boosted = sessionWith(data => { data.rewards.timed.luck = 2; data.wallet.coins = 240; }, { random: () => { rolls++; return 0.5; }, createPetId: () => `lucky-${++ids}` });
+  const boosted = sessionWith(data => { data.rewards.timed.luck = 2; data.wallet.coins = 3 * EGG; }, { random: () => { rolls++; return 0.5; }, createPetId: () => `lucky-${++ids}` });
   const baseline = sessionWith();
   atEgg(boosted);
   const boostedEgg = boosted.pets.getSnapshot().eggs.find(e => e.id === 'meadow-egg');
@@ -77,31 +78,31 @@ test('lucky probability refresh and actual hatch share the same boundaries, incl
   assert.deepEqual(expired.outcomes, normalEgg.outcomes);
   const second = boosted.pets.hatch('meadow-egg');
   assert.equal(second.status, 'hatched'); assert.equal(second.pet.speciesId, 'quarry-mole');
-  assert.equal(rolls, 2); assert.equal(boosted.getSnapshot().coins, 80);
+  assert.equal(rolls, 2); assert.equal(boosted.getSnapshot().coins, EGG);
 });
 
 test('auto hatch charges real egg price, commits each pet once and stops when money runs out', () => {
   let id = 0;
-  const session = sessionWith(data => { data.wallet.coins = 160; data.rewards.permanent.autoHatch = true; }, { createPetId: () => `auto-${++id}`, random: () => 0 });
+  const session = sessionWith(data => { data.wallet.coins = 2 * EGG; data.rewards.permanent.autoHatch = true; }, { createPetId: () => `auto-${++id}`, random: () => 0 });
   atEgg(session); const captures = [];
   session.onProgressCommitted(({ urgent }) => { if (urgent) captures.push(session.exportProgress()); });
   assert.equal(session.setAutoHatch(true), true);
-  session.advanceOnline(1); assert.equal(session.getSnapshot().coins, 160);
-  session.advanceOnline(1); assert.equal(session.getSnapshot().coins, 80);
+  session.advanceOnline(1); assert.equal(session.getSnapshot().coins, 2 * EGG);
+  session.advanceOnline(1); assert.equal(session.getSnapshot().coins, EGG);
   session.advanceOnline(2); assert.equal(session.getSnapshot().coins, 0);
   session.advanceOnline(2); assert.equal(session.getSnapshot().autoHatch, null);
   assert.equal(captures.length, 2);
-  assert.equal(captures[0].pets.inventory.pets.length, 1); assert.equal(captures[0].wallet.coins, 80);
+  assert.equal(captures[0].pets.inventory.pets.length, 1); assert.equal(captures[0].wallet.coins, EGG);
   assert.equal(captures[1].pets.inventory.pets.length, 2); assert.equal(captures[1].wallet.coins, 0);
   assert.equal(GameSession.fromData(captures[1], SESSION_CONTENT).pets.getSnapshot().pets.length, 2);
 });
 
 test('leaving an egg station, explicit stop, or suspension prevents the next automatic purchase', () => {
-  for (const stop of [s => s.updatePosition([80, 0, 80], true), s => s.setAutoHatch(false), s => s.setSuspended(true)]) {
-    const session = sessionWith(data => { data.wallet.coins = 160; data.rewards.permanent.autoHatch = true; });
+  for (const stop of [s => s.updatePosition([0, 0, 40], true), s => s.setAutoHatch(false), s => s.setSuspended(true)]) {
+    const session = sessionWith(data => { data.wallet.coins = 2 * EGG; data.rewards.permanent.autoHatch = true; });
     atEgg(session); assert.equal(session.setAutoHatch(true), true); session.advanceOnline(1);
     stop(session); session.advanceOnline(5);
-    assert.equal(session.getSnapshot().coins, 160);
+    assert.equal(session.getSnapshot().coins, 2 * EGG);
     assert.equal(session.pets.getSnapshot().pets.length, 0);
     assert.equal(session.exportProgress().pets.inventory.pets.length, 0);
   }
@@ -109,8 +110,8 @@ test('leaving an egg station, explicit stop, or suspension prevents the next aut
 
 test('travel works from a mine for everyone, while locked floors stay rejected', () => {
   const reached = SESSION_CONTENT.destinations[0], locked = SESSION_CONTENT.destinations[1];
-  const session = sessionWith(data => { data.exploration.maxDepth = reached.depth; });
-  const arrivals = []; session.attach({ cell: () => 0, pending: () => false, mine: () => false, cancelMining() {}, returnToSurface() {}, travelTo: position => arrivals.push(position) });
+  const session = sessionWith(data => { data.worldExploration[1].maxDepth = reached.depth; });
+  const arrivals = []; session.attach({ cell: () => 0, pending: () => false, mine: () => false, cancelMining() {}, travelTo: position => arrivals.push(position) });
   session.updatePosition([0, -20, 0], false);
   assert.equal(session.travelTo(locked.id), 'locked');
   assert.equal(session.travelTo(reached.id), 'travelling');

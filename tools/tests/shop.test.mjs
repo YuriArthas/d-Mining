@@ -4,11 +4,11 @@ import { readFileSync } from 'node:fs';
 import { Texture } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { GameSession } from '../../src/game/application/GameSession.ts';
-import { JOURNEY_CAMP } from '../../src/game/content/journeyCamp.ts';
+import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
 import { JOURNEY_CAPACITIES, JOURNEY_TOOL_PRICES } from '../../src/game/content/journeyResources.ts';
 import { EquipmentCollection } from '../../src/game/logic/EquipmentCollection.ts';
 import { MinerAvatar } from '../../src/game/presentation/MinerAvatar.ts';
-const content=JOURNEY_CAMP.session;
+const content=GAME_CONTENT.session;
 function funded(coins=1000) { const data=new GameSession(content).exportProgress();data.wallet.coins=coins;return GameSession.fromData(data,content); }
 function enter(s) { const {zone}=content.shops[0];s.updatePosition([zone.x,zone.y,zone.z],true);assert.ok(s.getSnapshot().shopId); }
 test('shop opens anywhere: purchases need affordability and sequence, never the shop circle; repeated touch never double-debits',()=>{

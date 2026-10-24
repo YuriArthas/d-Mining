@@ -10,7 +10,9 @@ export function authoredRoomPlan(room:RestRoom,providedAsset?:RoomSceneAsset):Sc
   const definition=room.sceneDefinition;
   if(!definition)throw Error(`房间未配置独立场景: ${room.id}`);
   if(definition.hall&&!providedAsset)return hallPlan(room,definition.hall);
-  const {kit,layout}=providedAsset??roomSceneAsset(definition.asset);
+  const render=definition.render;
+  if(!render||(!definition.asset&&!providedAsset))throw Error(`房间缺少场景配置: ${room.id}`);
+  const {kit,layout}=providedAsset??roomSceneAsset(definition.asset!);
   const reference=definition.referenceSize;
   const scale:V3=[room.layout.widthCells*CELL/reference[0],room.layout.heightCells*CELL/reference[1],room.layout.depthCells*CELL/reference[2]];
   const origin:V3=[room.x,0,room.z];
@@ -25,7 +27,7 @@ export function authoredRoomPlan(room:RestRoom,providedAsset?:RoomSceneAsset):Sc
   const instances:NonNullable<SceneryPlan['authored']>['instances'][number][]=[],solids:Solid[]=[],lamps:number[][]=[],lightSolids:Solid[]=[];
   const ids=new Set<string>();
   const vector=(v:readonly number[])=>v.length===3&&v.every(Number.isFinite);
-  const atlas=definition.render.atlas;
+  const atlas=render.atlas;
   if(layout.textureSize!==kit.texture.size||kit.texture.size%atlas.columns||kit.texture.size%atlas.rows||Math.min(kit.texture.size/atlas.columns,kit.texture.size/atlas.rows)<=atlas.gutter*2)throw Error(`图集尺寸与场景配置不符: ${room.id}`);
   for(const material of Object.values(layout.materials))if(!Number.isInteger(material.tile)||material.tile<0||material.tile>=atlas.columns*atlas.rows)throw Error(`无效图集单元: ${room.id}`);
   for(const group of layout.groups){
@@ -69,7 +71,7 @@ export function authoredRoomPlan(room:RestRoom,providedAsset?:RoomSceneAsset):Sc
     }),
     solids,
     signs:definition.signs.filter(s=>s.anchor!=='shop'||room.shop).map(s=>({at:at(s.anchor,s.offset),width:s.width,title:text(s.title),subtitle:text(s.subtitle),color:s.color,background:s.background})),
-    authored:{kit,materials:layout.materials,render:definition.render,referenceSize:reference,origin,scale,instances,lightSolids,lamps},
+    authored:{kit,materials:layout.materials,render,referenceSize:reference,origin,scale,instances,lightSolids,lamps},
   };
 }
 

@@ -1,5 +1,6 @@
 import {resourceByKind} from '../../src/game/content/resources.ts';
-import {SESSION_CONTENT} from '../../src/game/world/sessionContent.ts';
+import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
+const SESSION_CONTENT = GAME_CONTENT.session;
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { BlockHealth } from '../../src/game/logic/BlockHealth.ts';

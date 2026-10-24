@@ -12,7 +12,8 @@ import { GameSession } from '../../src/game/application/GameSession.ts';
 import { Wallet } from '../../src/game/logic/Wallet.ts';
 import { Pickaxe } from '../../src/game/logic/Pickaxe.ts';
 import { PET_CONTENT } from './fixtures/pets.ts';
-import { SESSION_CONTENT as LIVE_SESSION_CONTENT } from '../../src/game/world/sessionContent.ts';
+import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
+const LIVE_SESSION_CONTENT = GAME_CONTENT.session;
 
 const SESSION_CONTENT = {...LIVE_SESSION_CONTENT, initialCoins:200, petContent:PET_CONTENT};
 function goToEgg(session,eggId='meadow-egg') {

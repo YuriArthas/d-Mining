@@ -119,10 +119,6 @@ export function attachGameDebug(
           spawn: r.spawn,
           layout: r.layout,
         })),
-        servicePlacements: current.content.surface.placements.filter(
-          (p) =>
-            p.asset === "simulator-exchange" || p.asset === "simulator-upgrade",
-        ),
       },
       player: {
         height: GAME_CONFIG.player.height,

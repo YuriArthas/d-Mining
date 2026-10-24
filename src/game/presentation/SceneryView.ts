@@ -1,4 +1,4 @@
-import type { SurfaceScene } from "./assembleSurface.ts";
+import type { SurfaceScene } from "./SurfaceScene.ts";
 import { yieldLoadingTask } from "./prepareShaders.ts";
 import { Group, Mesh, Raycaster, Vector3 } from "three";
 import type { ScenerySite } from "./SceneryCollision.ts";
@@ -72,11 +72,7 @@ export class SceneryView {
   }
   diagnostics() {
     return {
-      ponds: this.visuals.get("surface")?.userData.ponds ?? null,
-      boundaryStitching:
-        this.visuals.get("surface")?.userData.boundaryStitching ?? null,
       surfaceDetails: this.surface.details.diagnostics() ?? null,
-      surfaceHub: this.visuals.get("surface")?.userData.hub ?? null,
       visuals: [...this.visuals.keys()],
       authoredRooms: Object.fromEntries([...this.visuals].filter(([,g])=>g.userData.authoredRoom).map(([id,g])=>[id,g.userData.authoredRoom])),
       geometryMemory: Object.fromEntries(this.geometryMemory),

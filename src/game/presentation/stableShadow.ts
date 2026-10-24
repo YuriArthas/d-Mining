@@ -1,4 +1,3 @@
-import {compileLocalPointLights} from './LocalPointLighting.ts';
 import {SURFACE_FILL_LIGHTS} from '../world/SceneLighting.ts';
 import { ShaderChunk, type MeshStandardMaterial } from 'three';
 
@@ -50,7 +49,6 @@ export function compileCompactLights(shader:Parameters<MeshStandardMaterial['onB
 const installed=new WeakSet<MeshStandardMaterial['onBeforeCompile']>();
 export function compileStableShadow(shader:Parameters<MeshStandardMaterial['onBeforeCompile']>[0]) {
   compileShadowFilter(shader,SHADOW_FILTER_TAPS);
-  compileLocalPointLights(shader);
   compileCompactLights(shader);
 }
 export function stabilizeShadows<T extends MeshStandardMaterial>(material:T):T {

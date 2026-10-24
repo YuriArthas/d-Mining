@@ -1,6 +1,5 @@
 import { ShopView } from './game/presentation/ShopView.ts';
-import {withInitialAccess} from "./game/content/initialAccess.ts";
-import {PINEWIND_CAMP as CAMP_CONTENT,PINEWIND_GENERATION} from './game/content/pinewindSurface.ts';
+import {GAME_CONTENT,GAME_GENERATION} from './game/content/gameContent.ts';
 import {LoadingScreen,LoadingBoundary} from './game/ui/LoadingScreen.tsx';
 import {initialLoading,updateLoading,type LoadingEvent} from './game/ui/loadingState.ts';
 import type {RenderRate} from './game/movement.ts';
@@ -39,10 +38,8 @@ declare global {
   }
 }
 
-const SAVE_CONTENT = withInitialAccess(CAMP_CONTENT.session);
-const SAVE_GENERATION = PINEWIND_GENERATION;
 export function App() {
-  return <SaveEntry content={SAVE_CONTENT} generation={SAVE_GENERATION}>{game => <GameView savedGame={game} />}</SaveEntry>;
+  return <SaveEntry content={GAME_CONTENT.session} generation={GAME_GENERATION}>{game => <GameView savedGame={game} />}</SaveEntry>;
 }
 function GameView({ savedGame }: { savedGame: SavedGame }) {
   const hosted = /\/games\/mining(?:-test|-surface-play)?\/(?:index\.html)?$/.test(window.location.pathname);
@@ -173,7 +170,7 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
           gl={{ antialias: true }}
           fallback={<p>当前浏览器无法启动 3D 画面，请使用支持 WebGL2 的浏览器。</p>}
         >
-          <ValidationScene shopView={shopView} guideMarker={guideMarker} savedGame={savedGame} stylized={stylized} content={CAMP_CONTENT} renderRate={renderRate} shadowsEnabled={shadowsEnabled} probeMode={probeMode} input={input} onStatus={setStatus} onLoading={onLoading} onPerformance={setPerformanceStats} session={session} timeOfDay={timeOfDay} />
+          <ValidationScene shopView={shopView} guideMarker={guideMarker} savedGame={savedGame} stylized={stylized} content={GAME_CONTENT} renderRate={renderRate} shadowsEnabled={shadowsEnabled} probeMode={probeMode} input={input} onStatus={setStatus} onLoading={onLoading} onPerformance={setPerformanceStats} session={session} timeOfDay={timeOfDay} />
         </Canvas></LoadingBoundary>
       </div>
       <header inert={!!exitState} className="game-header" style={{display:showLoading?'none':undefined}}>

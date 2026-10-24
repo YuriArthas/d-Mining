@@ -5,7 +5,9 @@ import { compactSceneryGeometry } from '../../src/game/presentation/compactScene
 import { sceneryGeometryMemory } from '../../src/game/presentation/sceneryGeometryMemory.ts';
 import { createScenery, disposeScenery } from '../../src/game/presentation/SceneryMesh.ts';
 import { roomPlan } from '../../src/game/world/scenery.ts';
-import { ROOMS } from '../../src/game/world/rooms.ts';
+import { roomsFor } from '../../src/game/world/rooms.ts';
+import { LAYERS } from '../../src/game/content/layers.ts';
+const ROOMS = roomsFor(LAYERS);
 
 test('indexing preserves triangle corner attributes, hard normals and UV seams',()=>{
  for(const source of [new BoxGeometry(),new TorusGeometry(1,.1,32,160)]){

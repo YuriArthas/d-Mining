@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { GameSession } from '../../src/game/application/GameSession.ts';
-import { PINEWIND_CAMP } from '../../src/game/content/pinewindSurface.ts';
+import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
 import { worldStation } from '../../src/game/content/worldJourney.ts';
 
 test('传送站：站上去打开本世界的层列表；去传送站从哪都到站台前面，面朝传送站', () => {
-  const session = new GameSession(PINEWIND_CAMP.session); let trip = null;
+  const session = new GameSession(GAME_CONTENT.session); let trip = null;
   session.attach({ cell: () => 0, pending: () => false, mine: () => false, cancelMining() {}, returnToSurface() {}, travelTo: (feet, look) => { trip = { feet, look }; } });
   const st = worldStation(1);
   session.updatePosition([0, .1, 46], true);

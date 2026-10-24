@@ -1,6 +1,7 @@
 import {resourceByKind} from '../../src/game/content/resources.ts';
-import {SURFACE_SELL as SELL_ZONE} from '../../src/game/world/rooms.ts';
-import {SESSION_CONTENT} from '../../src/game/world/sessionContent.ts';
+
+import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
+const SESSION_CONTENT = GAME_CONTENT.session, SELL_ZONE = SESSION_CONTENT.sales[0];
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { Inventory } from '../../src/game/logic/Inventory.ts';
@@ -88,7 +89,7 @@ test('zone reports only edges, uses grounded/height and radial hysteresis',()=>{
 });
 test('session wires cancel-before-sale; snapshots publish only consistent inventory/wallet state',()=>{
  const session=new GameSession(SESSION_CONTENT, 1),events=[],observed=[];
- const detach=session.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining:()=>events.push('cancel'),returnToSurface:()=>events.push('return')});
+ const detach=session.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining:()=>events.push('cancel'),travelTo:()=>events.push('return')});
  const unsub=session.subscribe(()=>observed.push(session.getSnapshot()));
  session.collected([{kind:3},{kind:4}]);assert.equal(session.requestMine([[0,-1,0]]),false);
  session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);

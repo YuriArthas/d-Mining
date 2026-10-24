@@ -1,12 +1,13 @@
 import {resourceByKind} from '../../src/game/content/resources.ts';
-import {SURFACE_SELL as SELL_ZONE} from '../../src/game/world/rooms.ts';
-import {SESSION_CONTENT} from '../../src/game/world/sessionContent.ts';
+
+import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
+const SESSION_CONTENT = GAME_CONTENT.session, SELL_ZONE = SESSION_CONTENT.sales[0];
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { BlockHealth } from '../../src/game/logic/BlockHealth.ts';
 import { MiningCombat } from '../../src/game/application/MiningCombat.ts';
 import { Pickaxe, pickaxeStats } from '../../src/game/logic/Pickaxe.ts';
-import { pickaxeOffer, upgradePickaxe } from '../../src/game/application/PickaxeUpgrade.ts';
+import { JOURNEY_TOOL_PRICES } from '../../src/game/content/journeyResources.ts';
 import { Wallet } from '../../src/game/logic/Wallet.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
 import { ORE_ITEMS } from '../../src/game/application/items.ts';
@@ -34,17 +35,6 @@ test('speed doubles every five levels; overflow becomes power above 16 attacks p
  }
  assert.throws(()=>pickaxeStats(0));assert.throws(()=>pickaxeStats(Number.MAX_SAFE_INTEGER));
  assert.equal(Pickaxe.fromData({version:1,level:26}).getSnapshot().power,540);
- const maximum=new Pickaxe(230),funds=new Wallet(1000);
- assert.equal(pickaxeOffer(230,1000).next,null);
- assert.equal(upgradePickaxe(230,maximum,funds).status,'limit');
- assert.equal(funds.getBalance(),1000);assert.equal(maximum.getSnapshot().level,230);
-});
-test('pickaxe upgrade validates funds and expected level, spends once, and continues after speed cap',()=>{
- const axe=new Pickaxe(),wallet=new Wallet(pickaxeOffer(1,0).price-1);assert.equal(pickaxeOffer(1,4).canAfford,false);
- assert.equal(upgradePickaxe(1,axe,wallet).status,'insufficient');assert.equal(wallet.getBalance(),pickaxeOffer(1,0).price-1);wallet.credit(1);
- assert.equal(upgradePickaxe(1,axe,wallet).status,'upgraded');assert.equal(axe.getSnapshot().level,2);assert.equal(wallet.getBalance(),0);
- assert.equal(upgradePickaxe(1,axe,wallet).status,'stale');axe.setLevel(61);wallet.credit(pickaxeOffer(61,0).price);
- assert.equal(upgradePickaxe(61,axe,wallet).status,'upgraded');assert.equal(axe.getSnapshot().power,161280);assert.equal(axe.getSnapshot().speed,16);
 });
 test('first strike immediate; switching targets, tapping again and waiting do not grant burst hits',()=>{
  const f=setup(),c=f.combat;assert.equal(c.hit('a',0).remaining,20);
@@ -111,7 +101,7 @@ test('all configured minerals take exactly ceil(HP / power) blows',()=>{
  }
 });
 test('session publishes target changes only when needed; partial HP survives travel and targets',()=>{
- let now=0;const s=new GameSession(SESSION_CONTENT, 50,()=>now),changes=[];s.attach({cell:()=>4,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{}});
+ let now=0;const s=new GameSession(SESSION_CONTENT, 50,()=>now),changes=[];s.attach({cell:()=>4,pending:()=>false,mine:()=>true,cancelMining:()=>{}});
  const a=[8,-1,-25],b=[9,-1,-25];const unsub=s.subscribe(()=>changes.push(s.getSnapshot()));
  s.selectTarget(a);for(let i=0;i<100;i++)s.selectTarget([...a]);assert.equal(changes.length,1);
  assert.equal(s.hit(a).status,'hit');assert.equal(s.getSnapshot().target.hp,resourceByKind(4).maxHp-10);assert.equal(s.getSnapshot().inventory.used,0);
@@ -126,7 +116,7 @@ test('session accepts only one target and credits destroyed results even when al
  s.collected([{kind:1}]);solid=false;s.collected([{cell:a,kind:3}]);assert.equal(s.getSnapshot().inventory.used,4);assert.equal(s.combatDebug().damagedCells,0);
 });
 test('session pickaxe purchase publishes consistent level/coins without changing running cooldown',()=>{
- let now=0;const s=new GameSession({...SESSION_CONTENT,initialCoins:pickaxeOffer(1,0).price}, 50,()=>now);s.attach({cell:()=>16,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{}});
+ let now=0;const s=new GameSession({...SESSION_CONTENT,initialCoins:JOURNEY_TOOL_PRICES[1]}, 50,()=>now);s.attach({cell:()=>16,pending:()=>false,mine:()=>true,cancelMining:()=>{}});
  s.collected(Array.from({length:5},()=>({kind:1})));s.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);s.resetPosition();
  const a=[14,-1,-25];s.hit(a);const snapshots=[];s.subscribe(()=>snapshots.push(s.getSnapshot()));
  assert.equal(s.upgradePickaxe(1).status,'upgraded');assert.equal(snapshots.length,1);assert.equal(snapshots[0].coins,5*resourceByKind(1).price);assert.equal(snapshots[0].pickaxe.power,15);

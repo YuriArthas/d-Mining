@@ -3,14 +3,9 @@ import { versionOne } from './data.ts';
 export class Exploration {
   private maximum = 0;
   private unlocked = new Set<string>();
-  private access = new Set<string>();
   private readonly milestones: readonly Readonly<{ id: string; depth: number }>[];
-  constructor(milestones: readonly Readonly<{ id: string; depth: number }>[], initiallyUnlocked:readonly string[] = []) {
+  constructor(milestones: readonly Readonly<{ id: string; depth: number }>[]) {
     this.milestones = milestones;
-    for(const id of initiallyUnlocked){
-      if(!milestones.some(m=>m.id===id))throw Error(`未知初始解锁目的地: ${id}`);
-      this.access.add(id);
-    }
   }
   visit(depth: number) {
     if (!Number.isFinite(depth) || depth < 0) return [];
@@ -26,12 +21,12 @@ export class Exploration {
     if (!this.milestones.some(m => m.id === id)) throw Error(`未知目的地: ${id}`);
     this.unlocked.add(id);
   }
-  has(id: string) { return this.access.has(id) || this.unlocked.has(id); }
+  has(id: string) { return this.unlocked.has(id); }
   exportData() { return { version: 1 as const, maxDepth: this.maximum, unlockedDestinationIds: [...this.unlocked] }; }
-  static fromData(value: unknown, milestones: readonly Readonly<{id:string;depth:number}>[], access: readonly string[] = []) {
+  static fromData(value: unknown, milestones: readonly Readonly<{id:string;depth:number}>[]) {
     const data = versionOne(value), maximum = data.maxDepth;
     if (typeof maximum !== 'number' || !Number.isFinite(maximum) || maximum < 0 || !Array.isArray(data.unlockedDestinationIds)) throw Error('探索数据错误');
-    const result = new Exploration(milestones, access);
+    const result = new Exploration(milestones);
     for (const id of data.unlockedDestinationIds) {
       if (typeof id !== 'string' || !milestones.some(m => m.id === id) || result.unlocked.has(id)) throw Error('未知或重复的解锁目的地');
       result.unlocked.add(id);

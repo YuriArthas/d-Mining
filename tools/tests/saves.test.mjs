@@ -3,8 +3,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { GameSession } from "../../src/game/application/GameSession.ts";
 import { PetCommands } from "../../src/game/application/PetCommands.ts";
-import { SESSION_CONTENT as LIVE_SESSION_CONTENT } from "../../src/game/world/sessionContent.ts";
-import { withInitialAccess } from "../../src/game/content/initialAccess.ts";
+import { GAME_CONTENT } from "../../src/game/content/gameContent.ts";
 import {
   SparseWorld,
   WORLD_GENERATION,
@@ -17,7 +16,7 @@ import {
 } from "../../src/game/persistence/saveTypes.ts";
 import { compatibleHead } from "../../src/game/persistence/saveMigrations.ts";
 import { saveNamespace } from "../../src/game/persistence/SaveBootstrap.ts";
-const SESSION_CONTENT = {...LIVE_SESSION_CONTENT, initialCoins:200, petContent:PET_CONTENT};
+const SESSION_CONTENT = {...GAME_CONTENT.session, initialCoins:200, petContent:PET_CONTENT};
 function goToEgg(session) {
   const station=SESSION_CONTENT.eggStations.find(station=>station.eggId==='meadow-egg');
   session.updatePosition([station.zone.x,station.zone.y,station.zone.z],true);
@@ -111,21 +110,17 @@ test("restore rejects missing/unknown/partial data, never creates a new player",
     { ...good, pets: undefined },
     {
       ...good,
-      exploration: {
-        version: 1,
-        maxDepth: 2,
-        unlockedDestinationIds: ["missing"],
-      },
+      worldExploration: { ...good.worldExploration, 1: { version: 1, maxDepth: 2, unlockedDestinationIds: ["missing"] } },
     },
   ])
     assert.throws(() => GameSession.fromData(value, SESSION_CONTENT));
   assert.equal(GameSession.createNew(SESSION_CONTENT).getSnapshot().coins, 200);
 });
-test("preview access is not earned; actual depth changes notify without a new unlock", () => {
-  const s = GameSession.createNew(withInitialAccess({...SESSION_CONTENT,initiallyUnlocked:SESSION_CONTENT.destinations.map(d=>d.id)})),
+test("actual depth changes notify; reaching a layer unlocks it and survives a reload", () => {
+  const s = GameSession.createNew(SESSION_CONTENT),
     notifications = [];
   s.onProgressCommitted((c) => notifications.push(c));
-  assert.ok(s.getSnapshot().destinations.every((d) => d.unlocked));
+  assert.ok(s.getSnapshot().destinations.every((d) => !d.unlocked));
   assert.deepEqual(s.exportProgress().exploration.unlockedDestinationIds, []);
   s.updatePosition([0, -10.2, 0], false);
   assert.equal(notifications.length, 1);

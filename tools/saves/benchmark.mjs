@@ -1,7 +1,8 @@
 // Pure-data fixture; no private playable preview or device FPS claims.
 import { writeFileSync, mkdirSync } from "node:fs";
 import { GameSession } from "../../src/game/application/GameSession.ts";
-import { SESSION_CONTENT } from "../../src/game/world/sessionContent.ts";
+import { GAME_CONTENT } from "../../src/game/content/gameContent.ts";
+const SESSION_CONTENT = GAME_CONTENT.session;
 import { SparseWorld } from "../../src/game/terrain/SparseWorld.ts";
 const world = new SparseWorld(),
   cells = [];

@@ -1,5 +1,4 @@
 {
-  "asset": "fungal-v1",
   "referenceSize": [
     40,
     20,
@@ -102,45 +101,5 @@
       "glow": true
     }
   ],
-  "render": {
-    "atlas": {
-      "columns": 2,
-      "rows": 2,
-      "gutter": 1,
-      "repeat": 0.23
-    },
-    "surface": {
-      "roughness": 1,
-      "metalness": 0,
-      "envMapIntensity": 0,
-      "glowIntensity": 1.15
-    },
-    "lighting": {
-      "resolution": 64,
-      "lampStrength": 0.42,
-      "horizontalFalloff": 24,
-      "color": [
-        0.25,
-        0.64,
-        0.51
-      ],
-      "height": 3.8,
-      "verticalFalloff": 0.095,
-      "ceiling": {
-        "bottomBrightness": 1.08,
-        "topBrightness": 0.76,
-        "from": 7,
-        "to": 19
-      },
-      "contact": {
-        "floorThreshold": 0.1,
-        "maxHalfHeight": 7,
-        "strength": 0.24,
-        "falloff": 4,
-        "fadeFrom": 0.1,
-        "fadeTo": 1.4
-      }
-    }
-  },
   "hall": "fungal-hall"
 }

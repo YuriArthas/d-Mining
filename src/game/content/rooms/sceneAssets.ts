@@ -12,8 +12,6 @@ import ruinsKit from '../../assets/rooms/ruins-v1.json' with {type:'json'};
 import ruinsLayout from './ruins.layout.json' with {type:'json'};
 import crystalKit from '../../assets/rooms/crystal-v1.json' with {type:'json'};
 import crystalLayout from './crystal.layout.json' with {type:'json'};
-import fungalKit from '../../assets/rooms/fungal-v1.json' with {type:'json'};
-import fungalLayout from './fungal.layout.json' with {type:'json'};
 import kit from '../../assets/rooms/old-mine-v2.json' with {type:'json'};
 import layout from './oldMine.layout.json' with {type:'json'};
 import type {RoomSceneAsset, RoomLayoutData} from './authoredRoom.ts';
@@ -26,7 +24,6 @@ const ASSETS: Readonly<Record<string,RoomSceneAsset>> = {
   'machinery-v1': {kit:machineryKit,layout:machineryLayout as RoomLayoutData},
   'core-v1': {kit:coreKit,layout:coreLayout as RoomLayoutData},
   'old-mine-v2': {kit,layout:layout as RoomLayoutData},
-  'fungal-v1': {kit:fungalKit,layout:fungalLayout as RoomLayoutData},
   'crystal-v1': {kit:crystalKit,layout:crystalLayout as RoomLayoutData},
 };
 export function roomSceneAsset(id:string):RoomSceneAsset {

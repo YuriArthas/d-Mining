@@ -2,14 +2,15 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { WorldProgress } from '../../src/game/logic/WorldProgress.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
-import { JOURNEY_CAMP, JOURNEY_GENERATION, JOURNEY_WORLDS } from '../../src/game/content/journeyCamp.ts';
+import { GAME_CONTENT, GAME_GENERATION } from '../../src/game/content/gameContent.ts';
+import { JOURNEY_WORLDS } from '../../src/game/content/journeyWorlds.ts';
 import { WORLD_REQUIREMENTS, worldRequirement, worldSpawn, worldGateZ, worldAtFeet } from '../../src/game/content/worldJourney.ts';
 import { JOURNEY_CAPACITIES, JOURNEY_TOOL_PRICES, JOURNEY_BACKPACKS } from '../../src/game/content/journeyResources.ts';
 import { resourceById, resourceByKind } from '../../src/game/content/resources.ts';
 import { SparseWorld, generationAtZ } from '../../src/game/terrain/SparseWorld.ts';
 import { compatibleHead } from '../../src/game/persistence/saveMigrations.ts';
 import { saveNamespace } from '../../src/game/persistence/SaveBootstrap.ts';
-const content=JOURNEY_CAMP.session;
+const content=GAME_CONTENT.session;
 function prepared(id=2,{volume=worldRequirement(id).mined,coins=worldRequirement(id).coins,materials=true}={}) {
   const data=new GameSession(content).exportProgress();
   data.onboarding={...data.onboarding,status:'skipped'};data.worldProgress.minedVolume=volume;data.wallet.coins=coins;
@@ -120,11 +121,11 @@ test('exploration and return destinations are scoped to the current world',()=>{
   const restored=GameSession.fromData(live.exportProgress(),content);restored.updatePosition(worldSpawn(2),true);assert.equal(restored.getSnapshot().destinations.filter(d=>d.unlocked).length,2);
 });
 test('three separate mines have 6 layers each, distinct resources and stable independent excavation saves',()=>{
-  const world=new SparseWorld(JOURNEY_GENERATION),cells=[[0,-10,0],[0,-10,112],[0,-10,224]],before=cells.map(c=>world.cell(c));
+  const world=new SparseWorld(GAME_GENERATION),cells=[[0,-10,0],[0,-10,112],[0,-10,224]],before=cells.map(c=>world.cell(c));
   assert.equal(new Set(before).size,3);
   world.remove([cells[1]]);assert.equal(world.cell(cells[1]),0);assert.equal(world.cell(cells[0]),before[0]);assert.equal(world.cell(cells[2]),before[2]);
-  const restored=new SparseWorld(JOURNEY_GENERATION);for(const region of world.captureChanges().regions)restored.restoreRegion(region);assert.equal(restored.cell(cells[1]),0);assert.equal(restored.cell(cells[2]),before[2]);
-  for(const w of JOURNEY_WORLDS){assert.equal(w.layers.length,7);assert.equal(w.rooms.length,6);assert.equal(generationAtZ(JOURNEY_GENERATION,w.z/2).layers,w.layers);assert.equal(world.cell([0,-1401,w.z/2]),7);}
+  const restored=new SparseWorld(GAME_GENERATION);for(const region of world.captureChanges().regions)restored.restoreRegion(region);assert.equal(restored.cell(cells[1]),0);assert.equal(restored.cell(cells[2]),before[2]);
+  for(const w of JOURNEY_WORLDS){assert.equal(w.layers.length,7);assert.equal(w.rooms.length,6);assert.equal(generationAtZ(GAME_GENERATION,w.z/2).layers,w.layers);assert.equal(world.cell([0,-1401,w.z/2]),7);}
 });
 test('each entry material really occurs in its listed source layer and complete payment fits that world’s best bag',()=>{
   for(const w of WORLD_REQUIREMENTS.slice(1)){
@@ -138,7 +139,7 @@ test('v11 mine holes keep their original saved coordinates after moving the late
     {region:[0,-1,-7],removed:new Uint16Array([96,96])},
     {region:[0,-1,-14],removed:new Uint16Array([96,96])},
   ];
-  const world=new SparseWorld(JOURNEY_GENERATION);
+  const world=new SparseWorld(GAME_GENERATION);
   assert.ok(world.canMine([0,-10,112]));assert.ok(world.canMine([0,-10,224]));
   for(const r of oldRegions)world.restoreRegion(r);
   assert.equal(world.cell([0,-10,112]),0);assert.equal(world.cell([0,-10,224]),0);
@@ -149,13 +150,13 @@ test('v11 mine holes keep their original saved coordinates after moving the late
     {region:[0,-1,-7],removed:new Uint16Array([96,97])},
     {region:[0,-1,-14],removed:new Uint16Array([96,97])},
   ]);
-  const restored=new SparseWorld(JOURNEY_GENERATION);
+  const restored=new SparseWorld(GAME_GENERATION);
   for(const r of world.captureChanges().regions)restored.restoreRegion(r);
   for(const z of [112,224])for(const x of [0,1])assert.equal(restored.cell([x,-10,z]),0);
 });
 test('the new map uses an explicit separate test save; legacy terrain is never silently reinterpreted',()=>{
   const location={pathname:'/games/mining-test/index.html',search:''};assert.notEqual(saveNamespace(location,'journey-v1').name,saveNamespace(location).name);
-  assert.throws(()=>compatibleHead({formatVersion:1,revision:1,savedAt:0,world:{generationVersion:9,seed:0,regionEncoding:1},regionCount:0},JOURNEY_GENERATION),/不兼容/);
+  assert.throws(()=>compatibleHead({formatVersion:1,revision:1,savedAt:0,world:{generationVersion:9,seed:0,regionEncoding:1},regionCount:0},GAME_GENERATION),/不兼容/);
 });
 test('the testing unlock page opens worlds and layers, and the result survives a reload', () => {
   const s=new GameSession(content);

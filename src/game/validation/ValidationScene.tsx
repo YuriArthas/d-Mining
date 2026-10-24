@@ -3,7 +3,7 @@ import { GuideMarkerProjector } from '../presentation/GuideMarkerProjector.ts';
 import { GuideDirectionArrow, updateGuideRoute } from '../presentation/GuideDirectionArrow.tsx';
 import type { SavedGame } from '../persistence/SaveBootstrap.ts';
 import { blendedCameraLook } from '../content/cameraLook.ts';
-import type { CampContent } from "../content/campContent.ts";
+import type { GameContent } from "../content/gameContent.ts";
 import { useEffect, useRef, type RefObject } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import {
@@ -55,7 +55,7 @@ export function ValidationScene({
 }: {
   shopView: ShopView;
   guideMarker: RefObject<HTMLDivElement | null>;
-  content: CampContent;
+  content: GameContent;
   savedGame: SavedGame;
   renderRate: RenderRate;
   shadowsEnabled: boolean;

@@ -24,11 +24,9 @@ import { Inventory } from "../logic/Inventory.ts";
 import { Wallet } from "../logic/Wallet.ts";
 import { ZoneDetector } from "../logic/ZoneDetector.ts";
 import { Mining } from "./Mining.ts";
-import { quoteSale, sellAll } from "./Sale.ts";
-import { BACKPACK_TIERS, backpackOffer } from "./BackpackUpgrade.ts";
+import { quoteSale } from "./Sale.ts";
 import { Pickaxe, pickaxeStats } from "../logic/Pickaxe.ts";
 import { MiningCombat } from "./MiningCombat.ts";
-import { pickaxeOffer } from "./PickaxeUpgrade.ts";
 import { oreDrops, oreDefinition, itemDefinition, ORE_ITEMS, itemVolume, itemPrice } from "./items.ts";
 import type { Coord } from "../terrain/SparseWorld.ts";
 export type WorldCommands = {
@@ -37,7 +35,6 @@ export type WorldCommands = {
   pending(target: Coord): boolean;
   mine(targets: readonly Coord[]): boolean;
   cancelMining(): void;
-  returnToSurface(): void;
   /** Teleport; `lookAt` turns the camera toward what the player came to use. */
   travelTo?(feet: Coord, lookAt?: Coord): void;
 };
@@ -52,7 +49,7 @@ export type SessionFeedback =
 export class GameSession {
   private readonly equipment: EquipmentCollection;
   private readonly bagCatalog;
-  private toolCatalog;
+  private readonly toolCatalog;
   private readonly worldProgress: WorldProgress;
   private readonly reservations: MineralReservation;
   private currentWorld: WorldId = 1;
@@ -64,13 +61,11 @@ export class GameSession {
   private readonly stations: {worldId:WorldId;detector:ZoneDetector}[];
   private atStation = false;
   private toolOffer() {
-    if (!this.content.journey) return pickaxeOffer(this.equipment.toolLevel,this.wallet.getBalance());
     const level=this.equipment.toolLevel, price=JOURNEY_TOOL_PRICES[level] ?? 0;
     const next=level<30?pickaxeStats(level+1):null;
     return Object.freeze({next,price,canAfford:!!next&&this.wallet.getBalance()>=price});
   }
   private bagOffer() {
-    if (!this.content.journey) return backpackOffer(this.equipment.backpackCapacity,this.wallet.getBalance());
     const next=JOURNEY_BACKPACKS.find(t=>t.capacity>this.equipment.backpackCapacity)??null;
     return Object.freeze({next,canAfford:!!next&&this.wallet.getBalance()>=next.price});
   }
@@ -142,7 +137,7 @@ export class GameSession {
   exportProgress(): ProgressDataV1 {
     return { version: 1 as const, equipment:this.equipment.exportData(), rewards:this.rewards.exportData(), wallet: this.wallet.exportData(), inventory: this.inventory.exportData(),
       onboarding: this.onboarding.getSnapshot(), pickaxe: this.pickaxe.exportData(), pets: this.petService.exportData(), exploration: this.explorations.get(1)!.exportData(),
-      ...(this.content.journey?{worldProgress:this.worldProgress.exportData(),reservations:this.reservations.exportData(),worldExploration:Object.fromEntries([...this.explorations].map(([id,e])=>[id,e.exportData()]))}:{}) };
+      worldProgress:this.worldProgress.exportData(),reservations:this.reservations.exportData(),worldExploration:Object.fromEntries([...this.explorations].map(([id,e])=>[id,e.exportData()])) };
   }
   static createNew(content: SessionContent) { return new GameSession(content); }
   static fromData(data: unknown, content: SessionContent) { return new GameSession(content, 50, undefined, {}, versionOne(data)); }
@@ -156,8 +151,6 @@ export class GameSession {
   private world: WorldCommands | null = null;
   private readonly content: SessionContent;
   private readonly zones: ZoneDetector[];
-  private readonly portals: { id: string; detector: ZoneDetector }[];
-  private readonly home: ZoneDetector;
   private readonly shops: { id: string; detector: ZoneDetector }[];
   private atHome = false;
   private shopId: string | null = null;
@@ -201,16 +194,16 @@ export class GameSession {
     this.pickaxe = data ? Pickaxe.fromData(data.pickaxe) : new Pickaxe();
     this.inventory = data ? Inventory.fromData(data.inventory, itemVolume) : new Inventory(capacity, itemVolume);
     this.equipment = new EquipmentCollection(this.pickaxe.getSnapshot().level,this.inventory.capacity,data?.equipment);
-    this.toolCatalog = shopTools(!!content.journey,this.equipment.toolLevel);
-    this.bagCatalog = shopBackpacks(!!content.journey);
-    if (content.journey) {
+    this.toolCatalog = shopTools();
+    this.bagCatalog = shopBackpacks();
+    {
       const savedExplorations=data?.worldExploration as Record<string,unknown>|undefined;
       if(savedExplorations!==undefined&&(!savedExplorations||typeof savedExplorations!=='object'||Array.isArray(savedExplorations)))throw Error('世界探索记录错误');
       for (const w of WORLD_REQUIREMENTS) {
         const destinations=content.destinations.filter(d=>(d.worldId??1)===w.id), saved=savedExplorations?.[w.id]??(w.id===1?data?.exploration:undefined);
         this.explorations.set(w.id,saved===undefined?new Exploration(destinations):Exploration.fromData(saved,destinations));
       }
-    } else this.explorations.set(1,data ? Exploration.fromData(data.exploration, content.destinations, content.initiallyUnlocked) : new Exploration(content.destinations, content.initiallyUnlocked));
+    }
     const petService = new PetService({
       content: content.petContent ?? { pets: [], eggs: [], equipSlots: 3 },
       wallet: this.wallet,
@@ -235,11 +228,6 @@ export class GameSession {
       return { station, detector: new ZoneDetector(station.zone) };
     });
     this.zones = content.sales.map((zone) => new ZoneDetector(zone));
-    this.portals = content.portals.map((p) => ({
-      id: p.id,
-      detector: new ZoneDetector(p.zone),
-    }));
-    this.home = new ZoneDetector(content.home);
     this.shops = content.shops.map((p) => ({
       id: p.id,
       detector: new ZoneDetector(p.zone),
@@ -305,17 +293,17 @@ export class GameSession {
     const bag=this.inventory.getSnapshot(), tip=this.tip?tipView(this.tip,this.tipState()):null;
     return Object.freeze({
       equipment: this.equipment.exportData(), shopCatalog:{tools:this.toolCatalog,backpacks:this.bagCatalog},
-      journey: !!this.content.journey, currentWorld: this.currentWorld, atMineEntrance:this.atMineEntrance,
+      currentWorld: this.currentWorld, atMineEntrance:this.atMineEntrance,
       minedVolume:this.worldProgress.minedVolume,
-      worlds:this.content.journey?WORLD_REQUIREMENTS.map(w=>({...w,areaOpen:this.worldProgress.areaOpen(w.id),mineOpen:this.worldProgress.mineOpen(w.id),
+      worlds:WORLD_REQUIREMENTS.map(w=>({...w,areaOpen:this.worldProgress.areaOpen(w.id),mineOpen:this.worldProgress.mineOpen(w.id),
         remaining:Math.max(0,w.mined-this.worldProgress.minedVolume),
-        materials:w.materials.map(m=>({...m,name:itemDefinition(m.itemId).name,owned:bag.items[m.itemId]??0,reserved:this.reservations.quantity(m.itemId,bag.items[m.itemId]??0)}))})):[],
+        materials:w.materials.map(m=>({...m,name:itemDefinition(m.itemId).name,owned:bag.items[m.itemId]??0,reserved:this.reservations.quantity(m.itemId,bag.items[m.itemId]??0)}))})),
       mineralReservations:Object.fromEntries(Object.entries(bag.items).map(([id,n])=>[id,{reserved:this.reservations.quantity(id,n),sellable:n-this.reservations.quantity(id,n),mode:this.reservations.mode(id)}])),
       onboarding: this.onboarding.getSnapshot(), tip,
       // The first-dig tip points across the map at the mine until the player gets there.
       tipAnchor: tip?.anchor==='mine'?this.content.onboarding?.entrance??null:null,
       inventory: this.inventory.getSnapshot(),
-      backpackLevel: 1 + (this.content.journey?JOURNEY_BACKPACKS:BACKPACK_TIERS).filter(tier => tier.capacity <= bag.capacity).length,
+      backpackLevel: 1 + JOURNEY_BACKPACKS.filter(tier => tier.capacity <= bag.capacity).length,
       maxDepth: this.exploration.maxDepth,
       rewards: this.rewards.getSnapshot(),
       capsuleCoins: this.capsuleCoinReward(),
@@ -323,7 +311,7 @@ export class GameSession {
       autoHatch: this.autoHatchEgg,
       lastAutoHatch: this.lastAutoHatch,
       coins: this.wallet.getBalance(),
-      sale: quoteSale(this.content.journey?this.reservations.sellable(bag.items):bag.items, this.salePrice),
+      sale: quoteSale(this.reservations.sellable(bag.items), this.salePrice),
       inSellZone: this.inSellZone,
       atHome: this.atHome,
       /** Standing on the current world's teleport station pad. */
@@ -336,7 +324,7 @@ export class GameSession {
       miningStats: this.miningAttributes.getSnapshot(),
       depth: this.depth,
       location: this.guideLocation,
-      destinations: this.content.destinations.filter(r=>!this.content.journey||(r.worldId??1)===this.currentWorld).map((r) => ({
+      destinations: this.content.destinations.filter(r=>(r.worldId??1)===this.currentWorld).map((r) => ({
         id: r.id,
         name: r.name,
         depth: r.depth,
@@ -369,10 +357,8 @@ export class GameSession {
     };
   }
   private mineableKind(cell: Coord) {
-    if (this.content.journey) {
-      const id=worldAtZ(cell[2]*2);
-      if(id!==this.currentWorld||!this.worldProgress.mineOpen(id))return null;
-    }
+    const id=worldAtZ(cell[2]*CELL);
+    if(id!==this.currentWorld||!this.worldProgress.mineOpen(id))return null;
     return this.world?.canMine?.(cell) === false
       ? null
       : this.world?.cell(cell);
@@ -464,7 +450,8 @@ export class GameSession {
     };
   }
   private capsuleCoinReward() {
-    const stage=this.content.destinations.filter(d=>this.exploration.maxDepth>=d.depth).length;
+    // The deepest layer reached in the current world sets the prize (other worlds' layers share the same depths).
+    const stage=this.content.destinations.filter(d=>(d.worldId??1)===this.currentWorld&&this.exploration.maxDepth>=d.depth).length;
     return stageCoinReward(STAGES[Math.min(stage,STAGES.length-1)].basePrice);
   }
   private finishReward(result: RewardClaimResult) {
@@ -547,7 +534,6 @@ export class GameSession {
     if(!offer.next)return {status:'limit'} as const;
     if(!this.wallet.debit(offer.price)){this.feedback({type:'denied',reason:'coins'});return {status:'insufficient'} as const;}
     this.pickaxe.setLevel(offer.next.level);this.equipment.toolLevel=offer.next.level;
-    if(!this.content.journey)this.toolCatalog=shopTools(false,this.equipment.toolLevel);
     this.committed(true);this.refreshTarget();this.publish();this.feedback({type:'purchased'});
     return {status:'upgraded',level:offer.next.level,spent:offer.price} as const;
   };
@@ -584,15 +570,13 @@ export class GameSession {
   updatePosition(feet: readonly number[], grounded: boolean) {
     if (this.suspended) return;
     let changed = false;
-    if(this.content.journey){
-      const id=worldAtFeet(feet);
-      if(!this.worldProgress.areaOpen(id)||feet[1]<-1&&!this.worldProgress.mineOpen(id)){
-        this.world?.travelTo?.(worldSpawn(this.worldProgress.areaOpen(id)?id:this.currentWorld));return;
-      }
-      if(id!==this.currentWorld){this.currentWorld=id;this.stopAutoHatch();changed=true;}
-      const entrance=Math.abs(feet[0])<12&&Math.abs(Math.abs(feet[2]-worldRequirement(id).z)-12)<6&&Math.abs(feet[1])<2?id:null;
-      if(entrance!==this.atMineEntrance){this.atMineEntrance=entrance;changed=true;}
+    const world=worldAtFeet(feet);
+    if(!this.worldProgress.areaOpen(world)||feet[1]<-1&&!this.worldProgress.mineOpen(world)){
+      this.world?.travelTo?.(worldSpawn(this.worldProgress.areaOpen(world)?world:this.currentWorld));return;
     }
+    if(world!==this.currentWorld){this.currentWorld=world;this.stopAutoHatch();changed=true;}
+    const mineEntrance=Math.abs(feet[0])<12&&Math.abs(Math.abs(feet[2]-worldRequirement(world).z)-12)<6&&Math.abs(feet[1])<2?world:null;
+    if(mineEntrance!==this.atMineEntrance){this.atMineEntrance=mineEntrance;changed=true;}
     const machineEvent=this.machineZone.update(feet,grounded);
     if(machineEvent){this.atMachine=machineEvent==='enter';changed=true;}
     const sampledDepth = playerDepthAtFeet(feet, grounded, this.content.destinations);
@@ -617,26 +601,19 @@ export class GameSession {
     if(atMine!==this.atMine){this.atMine=atMine;changed=true;}
     const near=!!entrance&&Math.hypot(feet[0]-entrance[0],feet[2]-entrance[2])<14;
     if(location!==this.guideLocation||near!==this.nearMine){this.guideLocation=location;this.nearMine=near;changed=true;}
-    const added = this.exploration.visit(this.content.journey&&!this.worldProgress.mineOpen(this.currentWorld)?0:sampledDepth);
+    const added = this.exploration.visit(this.worldProgress.mineOpen(this.currentWorld)?sampledDepth:0);
     if (this.exploration.maxDepth !== oldMaximum || added.length) { changed=true; this.committed(added.length > 0); }
     if (added.length) {
       this.notice = `已解锁 ${this.content.destinations.find((r) => r.id === added.at(-1))!.name}，回到地表可传送；对应宠物蛋已解锁`;
       changed = true;
       this.feedback({ type: 'unlocked' });
     }
-    const homeEvent = this.home.update(feet, grounded);
-    if (homeEvent) {
-      this.atHome = homeEvent === "enter";
-      changed = true;
-    }
-    if(this.content.journey){
-      for(const h of this.homes)h.detector.update(feet,grounded);
-      const inside=this.homes.some(h=>h.worldId===this.currentWorld&&h.detector.isInside);
-      if(inside!==this.atHome){this.atHome=inside;changed=true;}
-      for(const st of this.stations)st.detector.update(feet,grounded);
-      const onPad=this.stations.some(st=>st.worldId===this.currentWorld&&st.detector.isInside);
-      if(onPad!==this.atStation){this.atStation=onPad;changed=true;}
-    }
+    for(const h of this.homes)h.detector.update(feet,grounded);
+    const inside=this.homes.some(h=>h.worldId===this.currentWorld&&h.detector.isInside);
+    if(inside!==this.atHome){this.atHome=inside;changed=true;}
+    for(const st of this.stations)st.detector.update(feet,grounded);
+    const onPad=this.stations.some(st=>st.worldId===this.currentWorld&&st.detector.isInside);
+    if(onPad!==this.atStation){this.atStation=onPad;changed=true;}
     for (const shop of this.shops) shop.detector.update(feet, grounded);
     const activeShop =
       this.shops.find((shop) => shop.detector.isInside)?.id ?? null;
@@ -672,21 +649,6 @@ export class GameSession {
             ? "没有可出售的矿物"
             : "金币数值超出范围";
     }
-    let stepped: string | null = null;
-    for (const portal of this.portals)
-      if (portal.detector.update(feet, grounded) === "enter")
-        stepped = portal.id;
-    if (stepped) {
-      const room = this.content.destinations.find((r) => r.id === stepped)!;
-      if (this.exploration.has(stepped) && this.world?.travelTo) {
-        this.beginTravel(room);
-        return;
-      }
-      this.notice = this.exploration.has(stepped)
-        ? "传送暂不可用"
-        : `历史最深达到 ${room.depth} 米后解锁${room.name}`;
-      changed = true;
-    }
     if (changed) this.publish();
   }
   resetPosition() {
@@ -700,7 +662,6 @@ export class GameSession {
     for (const station of this.eggStations) station.detector.reset();
     this.eggId = null;
     this.eggStation = null;
-    this.home.reset();
     for(const h of this.homes)h.detector.reset();
     for(const st of this.stations)st.detector.reset();this.atStation=false;
     this.atMineEntrance=null;
@@ -713,7 +674,7 @@ export class GameSession {
     if (this.suspended) return "unavailable" as const;
     const room = this.content.destinations.find((r) => r.id === id);
     if (!room || !this.exploration.has(id)) return "locked" as const;
-    if(this.content.journey&&((room.worldId??1)!==this.currentWorld||!this.worldProgress.mineOpen(this.currentWorld)))return 'locked' as const;
+    if((room.worldId??1)!==this.currentWorld||!this.worldProgress.mineOpen(this.currentWorld))return 'locked' as const;
     if (!this.world?.travelTo) return "unavailable" as const;
     return this.beginTravel(room);
   };
@@ -729,8 +690,7 @@ export class GameSession {
   returnToSurface = () => {
     if (this.suspended || !this.world) return;
     this.world.cancelMining();
-    if(this.content.journey)this.world.travelTo?.(worldSpawn(this.currentWorld));
-    else this.world.returnToSurface();
+    this.world.travelTo?.(worldSpawn(this.currentWorld));
     this.resetPosition();
     this.notice = "";
     this.publish();
@@ -745,7 +705,7 @@ export class GameSession {
     return this.sunken.has(Math.floor(feet[0] / CELL) + ',' + Math.floor(feet[2] / CELL));
   }
   private surfaceSpot(target: 'shop' | 'sale' | 'capsule' | { egg: string }): { feet: Coord; look: Coord } | null {
-    const worldZ = this.content.journey ? worldRequirement(this.currentWorld).z : 0;
+    const worldZ = worldRequirement(this.currentWorld).z;
     const near = (zone: { y: number; z: number }) => zone.y >= -.1 && Math.abs(zone.z - worldZ) < 100;
     // Arrive facing the counter: zones may name their building; older content faces +Z buildings.
     const facingBuilding = (zone: { x: number; y: number; z: number; lookAt?: readonly [number, number, number] }) =>
@@ -768,7 +728,7 @@ export class GameSession {
     return 'travelling' as const;
   };
   travelWorld = (id: WorldId) => {
-    if(this.suspended||!this.content.journey||!this.world?.travelTo)return 'unavailable' as const;
+    if(this.suspended||!this.world?.travelTo)return 'unavailable' as const;
     if(!this.worldProgress.areaOpen(id))return 'locked' as const;
     // Arrive at the world's teleport station, facing it.
     this.world.cancelMining();
@@ -779,13 +739,11 @@ export class GameSession {
   };
   /** The test unlock page: every world and layer with its state. */
   devUnlocks = () => {
-    const worlds=this.content.journey?WORLD_REQUIREMENTS:WORLD_REQUIREMENTS.slice(0,1);
-    return worlds.map(w=>({id:w.id,name:w.name,open:!this.content.journey||this.worldProgress.mineOpen(w.id),
+    return WORLD_REQUIREMENTS.map(w=>({id:w.id,name:w.name,open:this.worldProgress.mineOpen(w.id),
       layers:this.content.destinations.filter(d=>(d.worldId??1)===w.id).map(d=>({id:d.id,name:d.name,depth:d.depth,unlocked:!!this.explorations.get(w.id)?.has(d.id)}))}));
   };
   /** Test shortcut: opens a world (and the ones before it) as if its requirements were paid. */
   devUnlockWorld = (id: WorldId) => {
-    if(!this.content.journey)return;
     this.worldProgress.openThrough(id);this.committed(true);this.publish();
   };
   /** Test shortcut: unlocks one layer (and its world), or every layer when no id is given. */
@@ -793,21 +751,20 @@ export class GameSession {
     const rooms=this.content.destinations.filter(d=>id===undefined||d.id===id);
     for(const room of rooms){
       const world=(room.worldId??1) as WorldId;
-      if(this.content.journey)this.worldProgress.openThrough(world);
-      this.explorations.get(this.content.journey?world:1)?.grant(room.id);
+      this.worldProgress.openThrough(world);
+      this.explorations.get(world)?.grant(room.id);
     }
     this.committed(true);this.publish();
   };
   reserveWorldMaterials = (id: WorldId) => {
-    if(this.suspended||!this.content.journey||this.worldProgress.mineOpen(id))return false;
+    if(this.suspended||this.worldProgress.mineOpen(id))return false;
     this.reservations.reserveWorld(id);this.committed(true);this.publish();return true;
   };
   reserveMineral = (id: string, mode: 'none'|'all'|'needed') => {
-    if(this.suspended||!this.content.journey)return;
+    if(this.suspended)return;
     this.reservations.set(id,mode);this.committed(true);this.publish();
   };
   private executeSale() {
-    if(!this.content.journey)return sellAll(this.inventory,this.wallet,this.salePrice);
     const items=this.reservations.sellable(this.inventory.getSnapshot().items), quote=quoteSale(items,this.salePrice);
     if(quote.status==='overflow')return quote;
     if(!quote.count)return {status:'empty'} as const;
@@ -823,7 +780,7 @@ export class GameSession {
     this.publish();return result;
   };
   unlockWorldMine = (id: WorldId) => {
-    if(this.suspended||!this.content.journey)return {status:'unavailable'} as const;
+    if(this.suspended)return {status:'unavailable'} as const;
     if(this.worldProgress.mineOpen(id))return {status:'already-open'} as const;
     if(!this.worldProgress.areaOpen(id))return {status:'area-locked'} as const;
     if(this.atMineEntrance!==id||this.currentWorld!==id)return {status:'away'} as const;

@@ -4,7 +4,8 @@ import { readFileSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
 import { MeshStandardMaterial, Texture, ShaderChunk } from 'three';
 import authored from '../../src/game/content/pinewind/authored.json' with { type: 'json' };
-import { PINEWIND_CAMP, PINEWIND_DAY } from '../../src/game/content/pinewindSurface.ts';
+import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
+import { PINEWIND_DAY } from '../../src/game/content/pinewindSurface.ts';
 import { applyBakedLight, setBakedLightEnabled, setBakedLightTuning, bakedLightState, BAKED_LIGHT } from '../../src/game/presentation/bakedLight.ts';
 import { TEXTURE_UPLOAD_LIMITS } from '../../src/game/presentation/uploadSurfaceTexture.ts';
 
@@ -28,7 +29,7 @@ const occlusionTextures = ({ json }) => [...new Set(json.materials.filter(m => m
 
 test('the bake was traced toward the daytime sun the game uses, and the game reads that direction', () => {
   assert.deepEqual(authored.light.sun, [...PINEWIND_DAY.moonPosition]);
-  assert.deepEqual(PINEWIND_CAMP.surface.authored.light.sun, authored.light.sun);
+  assert.deepEqual(GAME_CONTENT.surface.authored.light.sun, authored.light.sun);
   assert.equal(authored.light.version, 'pinewind-baked-light-v1');
   assert.equal(authored.light.ground.resolution, 1536);
   // The old projected overlay (a second copy of the ground) is gone.
@@ -66,18 +67,15 @@ test('every baked surface carries its bake: ground and buildings a second UV set
   for (const mesh of arch.meshes) for (const p of mesh.primitives) assert.ok('TEXCOORD_1' in p.attributes, mesh.name);
 });
 
-test('buildings stand exactly where they were baked; every portal uses its own model', () => {
+test('buildings stand exactly where they were baked', () => {
   const roots = new Map(authored.roots.map(r => [r.node, r]));
-  for (const p of PINEWIND_CAMP.surface.authored.instances.filter(p => p.asset === 'pinewind-architecture')) {
+  for (const p of GAME_CONTENT.surface.authored.instances.filter(p => p.asset === 'pinewind-architecture')) {
     const root = roots.get(p.node);
     assert.ok(root, p.node);
     for (let i = 0; i < 3; i++) assert.ok(Math.abs(root.at[i] - p.at[i]) < 1e-3, `${p.node} position`);
     const dot = root.rotation.reduce((sum, v, i) => sum + v * p.rotation[i], 0);
     assert.ok(Math.abs(Math.abs(dot) - 1) < 1e-5, `${p.node} rotation`);
   }
-  const portals = PINEWIND_CAMP.surface.authored.instances.filter(p => p.portalId);
-  assert.equal(new Set(portals.map(p => p.node)).size, portals.length);
-  for (const p of portals) assert.equal(p.node, 'Portal_' + p.portalId);
 });
 
 test('material patch: baked sun only on the directional light from the baked direction; occlusion on the fill', () => {

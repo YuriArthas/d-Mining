@@ -1,18 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createCampContent} from '../../src/game/content/campContent.ts';
+import {roomsFor} from '../../src/game/world/rooms.ts';
 import {LAYERS} from '../../src/game/content/layers.ts';
-import {PORTAL_SLOTS} from '../../src/game/content/portalSlots.ts';
 import {roomPlan} from '../../src/game/world/scenery.ts';
 import {Matrix4} from 'three';
 import {createScenery,disposeScenery,sceneryShapeGeometry} from '../../src/game/presentation/SceneryMesh.ts';
 import {ZoneDetector} from '../../src/game/logic/ZoneDetector.ts';
-const campWithRoom=room=>createCampContent(LAYERS.map(l=>l.id==='old_mine'?{...l,room}:l));
+const oldMineWith=room=>roomsFor(LAYERS.map(l=>l.id==='old_mine'?{...l,room}:l))[0];
 const bounds=s=>{const g=sceneryShapeGeometry(s);g.computeBoundingBox();const b=g.boundingBox.clone();g.dispose();return b;};
 
 test('authored room scales rotated instances and colliders together while preserving the global shaft',()=>{
- const room=campWithRoom({centerX:0,centerZ:0,widthCells:40,depthCells:24,heightCells:12}).rooms[0];
- const plan=roomPlan(room),before=roomPlan(createCampContent().rooms[0]);
+ const room=oldMineWith({centerX:0,centerZ:0,widthCells:40,depthCells:24,heightCells:12});
+ const plan=roomPlan(room),before=roomPlan(roomsFor(LAYERS)[0]);
  const a=createScenery({...before,signs:[]}),b=createScenery({...plan,signs:[]});
  try{
   const base=a.children.find(m=>m.name==='old-mine-v2:block:copper');
@@ -33,7 +32,7 @@ test('authored room scales rotated instances and colliders together while preser
 });
 
 test('scaled rooms keep the sale ring and actual trigger radius aligned',()=>{
- const room=campWithRoom({centerX:0,centerZ:0,widthCells:40,depthCells:24,heightCells:12}).rooms[0];
+ const room=oldMineWith({centerX:0,centerZ:0,widthCells:40,depthCells:24,heightCells:12});
  const ring=roomPlan(room).shapes.find(s=>s.interaction&&s.size[1]===.12);
  assert.equal(ring.size[0],room.sell.radius);
  assert.equal(ring.worldScale,undefined);
@@ -43,13 +42,6 @@ test('scaled rooms keep the sale ring and actual trigger radius aligned',()=>{
 });
 
 test('configuration rejects translated facilities that occupy the fixed shaft',()=>{
- assert.throws(()=>campWithRoom({centerX:6,centerZ:-6,widthCells:20,depthCells:20,heightCells:10}),/占用垂直入口/);
- assert.doesNotThrow(()=>campWithRoom({centerX:0,centerZ:1,widthCells:20,depthCells:20,heightCells:10}));
-});
-
-test('portal validation rejects overlapping entries and hysteresis, with both destination IDs',()=>{
- for(const offset of [0,.1,3.5]){
-  assert.throws(()=>createCampContent(LAYERS,{...PORTAL_SLOTS,fungal:{...PORTAL_SLOTS.fungal,x:PORTAL_SLOTS.old_mine.x,z:PORTAL_SLOTS.old_mine.z-offset}}),/重叠: old_mine \/ fungal/);
- }
- assert.doesNotThrow(()=>createCampContent());
+ assert.throws(()=>roomPlan(oldMineWith({centerX:6,centerZ:-6,widthCells:20,depthCells:20,heightCells:10})),/占用垂直入口/);
+ assert.doesNotThrow(()=>roomPlan(oldMineWith({centerX:0,centerZ:1,widthCells:20,depthCells:20,heightCells:10})));
 });

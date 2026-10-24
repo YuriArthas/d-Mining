@@ -1,7 +1,6 @@
-import {roomScene, ROOM_SCENES, LEGACY_ROOM_REFERENCE, LEGACY_ROOM_FACILITIES} from '../content/rooms/sceneDefinitions.ts';
+import {roomScene, ROOM_SCENES} from '../content/rooms/sceneDefinitions.ts';
 import type {RoomSceneDefinition, RoomZone} from '../content/rooms/authoredRoom.ts';
 import {ROOM_LAYOUT} from '../content/roomLayout.ts';
-import { SURFACE_HOME, SURFACE_SALE } from './surfaceLayout.ts';
 import { LAYERS, layerAtDepth, type Layer } from '../content/layers.ts';
 import { CELL } from '../terrain/grid.ts';
 import {ENTRANCE_WORLD} from './entrance.ts';
@@ -10,13 +9,14 @@ import type { ZoneConfig } from '../logic/ZoneDetector.ts';
 export function roomsFor(layers: readonly Layer[],definitions:Readonly<Record<string,RoomSceneDefinition>>=ROOM_SCENES) {
  return Object.freeze(layers.slice(1).map((l,index)=>{
   const layout=l.room??ROOM_LAYOUT,x=layout.centerX*CELL,z=layout.centerZ*CELL;
-  const sceneDefinition=l.scene?roomScene(l.scene,definitions):undefined;
-  const reference=sceneDefinition?.referenceSize??LEGACY_ROOM_REFERENCE;
+  if(!l.scene)throw Error(`休整层缺少场景: ${l.id}`);
+  const sceneDefinition=roomScene(l.scene,definitions);
+  const reference=sceneDefinition.referenceSize;
   const scale=[layout.widthCells*CELL/reference[0],layout.heightCells*CELL/reference[1],layout.depthCells*CELL/reference[2]];
-  const facilities=sceneDefinition?.facilities??LEGACY_ROOM_FACILITIES;
+  const facilities=sceneDefinition.facilities;
   if(l.shop&&!facilities.shop)throw Error(`房间缺少商店位置: ${l.id}`);
   const point=(at:readonly number[])=>[x+at[0]*scale[0],-l.from+at[1]*scale[1],z+at[2]*scale[2]] as const;
-  if(sceneDefinition)for(const [name,facility] of Object.entries(facilities)){
+  for(const [name,facility] of Object.entries(facilities)){
     if(!facility||(name==='shop'&&!l.shop))continue;
     const [px,py,pz]=point(facility.at);
     if(Math.abs(px-x)>=layout.widthCells*CELL/2||Math.abs(pz-z)>=layout.depthCells*CELL/2||py< -l.from||py>= -l.from+layout.heightCells*CELL)throw Error(`房间功能点越界 ${l.id}: ${name}`);
@@ -29,9 +29,7 @@ export function roomsFor(layers: readonly Layer[],definitions:Readonly<Record<st
    sell:zone(facilities.sell),shop:l.shop?zone(facilities.shop!):null});
  }));
 }
-export const ROOMS = roomsFor(LAYERS);
-export type RestRoom = typeof ROOMS[number];
-export const HOME_ZONE: ZoneConfig = SURFACE_HOME;
+export type RestRoom = ReturnType<typeof roomsFor>[number];
 // Query only procedural occupancy. No voxel allocation or excavation records.
 // A floor bounds the air just above it. Look up the layer 10 cells below the sample;
 // this avoids scanning all rooms on every procedural voxel query.
@@ -66,4 +64,3 @@ export function onRoomFloor(x:number,y:number,z:number,layers:readonly Layer[]=L
  return l.from>0&&y===-l.from/CELL-1&&inRoomFootprint(x,z,l.room??ROOM_LAYOUT);
 }
 
-export const SURFACE_SELL = Object.freeze(SURFACE_SALE);

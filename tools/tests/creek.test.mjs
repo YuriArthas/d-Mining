@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { CatmullRomCurve3, Vector3 } from 'three';
-import { PINEWIND_CAMP, PINEWIND_GENERATION, creekFloorCells } from '../../src/game/content/pinewindSurface.ts';
+import { GAME_CONTENT, GAME_GENERATION } from '../../src/game/content/gameContent.ts';
+import { creekFloorCells } from '../../src/game/content/pinewindSurface.ts';
 import { PINEWIND_CREEK, PINEWIND_PLAZA, PINEWIND_SPAWN, PINEWIND_BRIDGE } from '../../src/game/content/pinewind/hubLayout.ts';
-import { JOURNEY_GENERATION } from '../../src/game/content/journeyCamp.ts';
 import { buildRegion } from '../../src/game/terrain/meshing.ts';
 import { COLLISION_SIZE, CELL, sampleXYZ } from '../../src/game/terrain/SparseWorld.ts';
 import { PROTECTED_FLOOR } from '../../src/game/world/entrance.ts';
@@ -13,13 +13,13 @@ import { GameSession } from '../../src/game/application/GameSession.ts';
 import { footSurface } from '../../src/game/runtime/footSurface.ts';
 
 const cells = new Set();
-for (let i = 0; i < PINEWIND_GENERATION.surfaceCut.length; i += 2) cells.add(PINEWIND_GENERATION.surfaceCut[i] + ',' + PINEWIND_GENERATION.surfaceCut[i + 1]);
+for (let i = 0; i < GAME_GENERATION.surfaceCut.length; i += 2) cells.add(GAME_GENERATION.surfaceCut[i] + ',' + GAME_GENERATION.surfaceCut[i + 1]);
 const cellAt = (x, z) => Math.floor(x / CELL) + ',' + Math.floor(z / CELL);
 const line = new CatmullRomCurve3(PINEWIND_CREEK.points.map(([x, z]) => new Vector3(x, 0, z))).getPoints(220);
 
 test('the voxel floor is cut under the whole sunken creek and nowhere near the plaza, spawn or mine; the generation version is kept for saves', () => {
-  assert.deepEqual(creekFloorCells(), [...PINEWIND_GENERATION.surfaceCut]);
-  assert.equal(PINEWIND_GENERATION.version, JOURNEY_GENERATION.version, 'saves keep loading');
+  assert.deepEqual(creekFloorCells(), [...GAME_GENERATION.surfaceCut]);
+  assert.equal(GAME_GENERATION.version, 11, 'saves keep loading');
   const reach = PINEWIND_CREEK.width.base - PINEWIND_CREEK.width.wave + PINEWIND_CREEK.bank;
   // Every point of the corridor (centre line out to the bank tops) inside the authored ground lies in a cut cell.
   for (let i = 0; i < line.length - 1; i++) {
@@ -33,14 +33,14 @@ test('the voxel floor is cut under the whole sunken creek and nowhere near the p
   for (const [x, z, what] of [[PINEWIND_PLAZA.x, PINEWIND_PLAZA.z, 'plaza'], [PINEWIND_SPAWN.x, PINEWIND_SPAWN.z, 'spawn'], [0, 0, 'mine'], [-20.5, 14, 'sale'], [18.5, 11, 'shop']])
     assert.ok(!cells.has(cellAt(x, z)), `${what} must keep its floor`);
   // Gameplay data is untouched: the cut cells stay protected floor (nothing to mine, saves unaffected).
-  const [cx, cz] = PINEWIND_GENERATION.surfaceCut;
-  assert.equal(sampleXYZ(cx, -1, cz, new Map(), PINEWIND_GENERATION), PROTECTED_FLOOR);
+  const [cx, cz] = GAME_GENERATION.surfaceCut;
+  assert.equal(sampleXYZ(cx, -1, cz, new Map(), GAME_GENERATION), PROTECTED_FLOOR);
 });
 
 test('terrain meshes leave the cut floor out: no voxel top surface inside the creek, the rest of the floor unchanged', () => {
   const region = [-3, -1, 2], origin = region.map(v => v * COLLISION_SIZE * CELL);
   for (const kind of ['collision', 'render']) {
-    const cut = buildRegion(kind, region, COLLISION_SIZE, [], PINEWIND_GENERATION).mesh, whole = buildRegion(kind, region, COLLISION_SIZE, [], JOURNEY_GENERATION).mesh;
+    const cut = buildRegion(kind, region, COLLISION_SIZE, [], GAME_GENERATION).mesh, whole = buildRegion(kind, region, COLLISION_SIZE, [], { ...GAME_GENERATION, surfaceCut: undefined }).mesh;
     // Triangles of the top surface (all three corners at y = 0): none may lie over a cut cell.
     const tops = mesh => { const out = []; for (let t = 0; t < mesh.indices.length; t += 3) {
       const v = [0, 1, 2].map(k => mesh.indices[t + k] * 3);
@@ -63,9 +63,9 @@ test('terrain meshes leave the cut floor out: no voxel top surface inside the cr
 
 test('a character walks down into the creek, wades across and climbs out, on real voxel and bank collision', async () => {
   await initPhysics();
-  const physics = new CharacterPhysics(false, true), collisions = new SceneryCollision(physics, [{ id: 'surface', depth: 0, plan: PINEWIND_CAMP.surface.plan }]);
+  const physics = new CharacterPhysics(false, true), collisions = new SceneryCollision(physics, [{ id: 'surface', depth: 0, plan: GAME_CONTENT.surface.plan }]);
   for (let x = -4; x <= -1; x++) for (let z = 1; z <= 3; z++) {
-    const coord = [x, -1, z], mesh = buildRegion('collision', coord, COLLISION_SIZE, [], PINEWIND_GENERATION).mesh;
+    const coord = [x, -1, z], mesh = buildRegion('collision', coord, COLLISION_SIZE, [], GAME_GENERATION).mesh;
     if (mesh.indices.length) physics.world.createCollider(RAPIER.ColliderDesc.trimesh(mesh.positions, mesh.indices, RAPIER.TriMeshFlags.FIX_INTERNAL_EDGES).setTranslation(...coord.map(v => v * COLLISION_SIZE * CELL)));
   }
   try {
@@ -80,7 +80,7 @@ test('a character walks down into the creek, wades across and climbs out, on rea
 });
 
 test('standing in the creek is still the surface (not the mine) and sounds like wading', () => {
-  const session = new GameSession(PINEWIND_CAMP.session);
+  const session = new GameSession(GAME_CONTENT.session);
   session.attach({ cell: () => 0, pending: () => false, mine: () => false, cancelMining() {}, returnToSurface() {}, travelTo() {} });
   session.updatePosition([-20, -.93, 41.2], true);
   assert.equal(session.getSnapshot().location, 'surface');

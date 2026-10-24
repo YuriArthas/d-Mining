@@ -1,20 +1,21 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { GameSession } from '../../src/game/application/GameSession.ts';
-import { SESSION_CONTENT } from '../../src/game/world/sessionContent.ts';
+import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
+const SESSION_CONTENT = GAME_CONTENT.session;
 import { TIP_GAP, TIP_SECONDS, selectDepthGoal } from '../../src/game/application/Tips.ts';
 import { Onboarding, TIP_IDS } from '../../src/game/logic/Onboarding.ts';
 
 // One-time tips: a handful of hints, each shown once, never a task chain.
 let now = 0;
-const world = { cell: () => 8, pending: () => false, mine: () => true, cancelMining() {}, returnToSurface() {} };
+const world = { cell: () => 64, pending: () => false, mine: () => true, cancelMining() {} };
 const fresh = () => { now = 0; const s = new GameSession(SESSION_CONTENT, 50, () => now); s.attach(world); return s; };
 const restore = data => { const s = new GameSession(SESSION_CONTENT, 50, () => now, {}, data); s.attach(world); return s; };
 const tip = s => s.getSnapshot().tip;
 const area = SESSION_CONTENT.onboarding.mineArea, atMine = [(area.minX + area.maxX) / 2, 0, (area.minZ + area.maxZ) / 2];
 const sale = SESSION_CONTENT.sales[0], farFromMine = [0, 0, 46];
 const tick = (s, seconds) => { now += seconds; s.advanceOnline(Math.max(1, seconds)); };
-const fill = (s, count = 50) => s.collected(Array.from({ length: count }, () => ({ kind: 8 })));
+const fill = (s, count = 50) => s.collected(Array.from({ length: count }, () => ({ kind: 64 })));
 const sell = s => { s.updatePosition([sale.x, sale.y, sale.z], true); s.resetPosition(); };
 const learnedSave = (change = () => {}) => {
   const data = new GameSession(SESSION_CONTENT).exportProgress();
@@ -31,7 +32,7 @@ test('新玩家只有一个提示：先指向矿坑，到了矿坑点亮一块�
   s.updatePosition(atMine, true);
   assert.deepEqual(tip(s), { id: 'dig', anchor: 'dig' });
   assert.equal(s.getSnapshot().tipAnchor, null);
-  s.collected([{ kind: 8 }]);
+  s.collected([{ kind: 64 }]);
   assert.equal(tip(s), null);
   assert.deepEqual(s.getSnapshot().onboarding.seen, ['dig']);
   const again = restore(s.exportProgress());
@@ -41,17 +42,17 @@ test('新玩家只有一个提示：先指向矿坑，到了矿坑点亮一块�
 
 test('出售提示只在第一次装满背包时出现：卖掉或几秒后自动收起，以后装满不再提示', () => {
   const s = fresh();
-  s.updatePosition(atMine, true); s.collected([{ kind: 8 }]);
+  s.updatePosition(atMine, true); s.collected([{ kind: 64 }]);
   now = TIP_GAP + 1; fill(s, 49);
   assert.equal(tip(s)?.id, 'sell');
   sell(s);
   assert.equal(tip(s), null);
   assert.ok(s.getSnapshot().onboarding.seen.includes('sell'));
   now += 100; s.updatePosition(atMine, true); fill(s, 50);
-  assert.equal(tip(s), null, 'a full bag later on gets no tip');
+  assert.notEqual(tip(s)?.id, 'sell', 'a full bag later on gets no sell tip');
 
   const ignored = fresh();
-  ignored.updatePosition(atMine, true); ignored.collected([{ kind: 8 }]);
+  ignored.updatePosition(atMine, true); ignored.collected([{ kind: 64 }]);
   now = TIP_GAP + 1; fill(ignored, 49);
   assert.equal(tip(ignored)?.id, 'sell');
   tick(ignored, TIP_SECONDS.sell + 1);
@@ -101,7 +102,7 @@ test('卖出和采集才记录事实，空卖、失败和锁定方块都不算',
   s.onProgressCommitted(() => captures.push(s.exportProgress()));
   s.updatePosition(farFromMine, true); s.hit([0, -5, 0]);
   assert.equal(s.exportProgress().onboarding.minedOnce, false);
-  s.collected([{ kind: 8 }]);
+  s.collected([{ kind: 64 }]);
   assert.equal(captures.at(-1).onboarding.minedOnce, true);
   assert.equal(captures.at(-1).onboarding.minedCount, 1);
   sell(s);
@@ -113,8 +114,10 @@ test('卖出和采集才记录事实，空卖、失败和锁定方块都不算',
   empty.attach({ ...world, cell: () => 17, mine: () => false });
   empty.updatePosition([0, 0, 0], true);
   assert.equal(empty.hit([0, -201, 0]).status, 'locked');
+  // The blow that would break the block cannot queue its removal: nothing was mined.
   empty.attach({ ...world, mine: () => false });
-  assert.equal(empty.hit([0, -5, 0]).status, 'unavailable');
+  let blow; do { now += 1; blow = empty.hit([0, -5, 0]); } while (blow.status === 'hit');
+  assert.equal(blow.status, 'unavailable');
   assert.equal(empty.exportProgress().onboarding.minedOnce, false);
 });
 

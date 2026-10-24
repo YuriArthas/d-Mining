@@ -1,10 +1,10 @@
 import type { SparseWorld } from '../terrain/SparseWorld.ts';
-import { JourneyGates, journeySurfacePlan, spawnPassageSolids, openSpawnPassage } from '../presentation/JourneyGates.ts';
+import { JourneyGates, journeySurfacePlan } from '../presentation/JourneyGates.ts';
 import { CameraGrade } from '../presentation/CameraGrade.ts';
 import { FeedbackFixtures } from '../presentation/FeedbackFixtures.ts';
 import { FEEDBACK_COLLISION_SITE } from '../content/feedbackFacilities.ts';
 import { surfaceLightStrengthAtFeet } from '../world/SurfaceLightFade.ts';
-import type { CampContent } from "../content/campContent.ts";
+import type { GameContent } from "../content/gameContent.ts";
 import type {
   Group,
   HemisphereLight,
@@ -17,7 +17,8 @@ import type { GameInput } from "../GameInput.ts";
 import type { GameSession } from "../application/GameSession.ts";
 import type { LoadingEvent } from "../ui/loadingState.ts";
 import type { SurfaceTime } from "../world/SceneLighting.ts";
-import { WORLD_GENERATION, generationAtZ } from "../terrain/SparseWorld.ts";
+import { generationAtZ } from "../terrain/SparseWorld.ts";
+import { GAME_GENERATION } from "../content/gameContent.ts";
 import { stratumAtDepth } from "../terrain/strata.ts";
 import { themeById } from "../content/themes.ts";
 import { CharacterPhysics, initPhysics } from "../validation/physics.ts";
@@ -36,7 +37,6 @@ import { LockedEggs } from "../presentation/LockedEggs.ts";
 import { TeleportStations } from "../presentation/TeleportStations.ts";
 import { CaveLights } from "../presentation/CaveLights.ts";
 import { disposeScenery } from "../presentation/disposeScenery.ts";
-import { SurfaceHubView } from "../presentation/SurfaceHubView.ts";
 import { prepareShaders } from "../presentation/prepareShaders.ts";
 import { createScenerySites } from "../world/createScenerySites.ts";
 import { PlayerController } from "./PlayerController.ts";
@@ -65,7 +65,7 @@ export function createStartupStats() {
 }
 export type PreparedGame = Awaited<ReturnType<typeof startGame>>;
 export type StartGameOptions = {
-  content: CampContent;
+  content: GameContent;
   renderer: WebGLRenderer;
   scene: Scene;
   root: Group;
@@ -158,12 +158,8 @@ export async function startGame(options: StartGameOptions) {
     const worldTask = initPhysics().then(async () => {
       check();
       startup.physicsMs = performance.now() - startup.started;
-      const generation = options.restoredWorld?.generation ?? {
-        ...WORLD_GENERATION,
-        samples: options.samples,
-        layers: content.layers,
-      };
-      const physics = new CharacterPhysics(generation.samples,!!generation.worlds);
+      const generation = options.restoredWorld?.generation ?? { ...GAME_GENERATION, samples: options.samples };
+      const physics = new CharacterPhysics(generation.samples,true);
       scope.defer(() => physics.dispose());
       const terrain = new TerrainStream(
         physics,
@@ -241,7 +237,7 @@ export async function startGame(options: StartGameOptions) {
       cell: (cell) => terrain.cell(cell),
       layers: (cell) => generationAtZ(terrain.world.generation, cell[2]).layers,
       // Down to the creek bed (about -0.95 m); the mine's first cells start at -2 m.
-      hub: (feet) => !!content.surface.authored && feet[1] > -1.3 && worldAtFeet(feet) === 1,
+      hub: (feet) => feet[1] > -1.3 && worldAtFeet(feet) === 1,
     });
     scope.defer(() => feedback.dispose());
     root.add(feedback.effects.group, feedback.splash.group);
@@ -259,26 +255,24 @@ export async function startGame(options: StartGameOptions) {
           // Tall targets (egg stands with their prompt) get a steeper view so the prompt clears the top HUD.
           if (lookAt) cameraView.look(Math.atan2(feet[0] - lookAt[0], feet[2] - lookAt[2]), lookAt[1] - feet[1] > 1.5 ? .5 : .32);
         },
-        returnToSurface: () => { feedback.travel(); player.travelTo(content.returnPoint); },
       }),
     );
     const interaction = new MiningInteraction(session);
     scope.defer(() => interaction.dispose());
     root.add(interaction.group);
     surface.retain();
-    if(content.worlds&&!content.surface.authored?.opensSpawnPassage)openSpawnPassage(surface.group);
-    const eggLabels = new EggStandLabels(content.hub.eggs, session.pets.getSnapshot().eggs);
+    const eggLabels = new EggStandLabels(content.eggs, session.pets.getSnapshot().eggs);
     root.add(eggLabels.group);
     scope.defer(() => disposeScenery(eggLabels.group));
     // Eggs not unlocked yet stand as black silhouettes under a "???" label that keeps their price.
-    const lockedEggs = new LockedEggs(surface.group, content.hub.eggs);
+    const lockedEggs = new LockedEggs(surface.group, content.eggs);
     scope.defer(() => lockedEggs.dispose());
     // Underground halls: their light sources as a fixed pool of point lights, and the helmet lamp.
     const caveLights = new CaveLights(content.rooms.map(r => ({ id: r.id, x: r.x, z: r.z, depth: r.depth })));
     root.add(caveLights.group); scope.defer(() => caveLights.dispose());
-    // Journey worlds: each world's teleport station gets its swirling portal disc.
-    const stations = content.worlds ? new TeleportStations() : null;
-    if (stations) { root.add(stations.group); scope.defer(() => stations.dispose()); }
+    // Each world's teleport station gets its swirling portal disc.
+    const stations = new TeleportStations();
+    root.add(stations.group); scope.defer(() => stations.dispose());
     const updateEggLabels = () => {
       const eggs = session.pets.getSnapshot().eggs, unlocked = (id: string) => eggs.some(egg => egg.id === id && egg.unlocked);
       eggLabels.setUnlocked(unlocked); lockedEggs.setUnlocked(unlocked);
@@ -292,21 +286,14 @@ export async function startGame(options: StartGameOptions) {
       card.equippedSlot === null ? [] : [{ ...card.pet, slot: card.equippedSlot }]));
     updatePets();
     scope.defer(session.pets.subscribe(updatePets));
-    const hub = new SurfaceHubView(surface.group, content.hub),
-      updateHub = () => {
-        hub.update(session.getSnapshot().destinations);
-      };
-    updateHub();
-    scope.defer(session.subscribe(updateHub));
-    const mainPlan=content.worlds&&!content.surface.authored?.opensSpawnPassage?{...content.surface.plan,solids:spawnPassageSolids(content.surface.plan.solids)}:content.surface.plan;
-    const sites = [...createScenerySites(content.rooms, mainPlan),FEEDBACK_COLLISION_SITE,...content.extraSites??[],
-      ...content.worlds?.slice(1).map(w=>({id:`world${w.id}.surface`,depth:0,plan:journeySurfacePlan(w.z)}))??[]],
+    const sites = [...createScenerySites(content.rooms, content.surface.plan),FEEDBACK_COLLISION_SITE,...content.extraSites,
+      ...content.worlds.slice(1).map(w=>({id:`world${w.id}.surface`,depth:0,plan:journeySurfacePlan(w.z)}))],
       sceneryCollision = new SceneryCollision(physics, sites);
     scope.defer(() => sceneryCollision.dispose());
     const facilities = new SceneryView(surface, sites);
     scope.defer(() => facilities.dispose());
     root.add(facilities.group, terrain.group);
-    if(content.worlds){const gates=new JourneyGates(physics,session,surface.group);root.add(gates.group);scope.defer(()=>gates.dispose());}
+    const gates=new JourneyGates(physics,session,surface.group);root.add(gates.group);scope.defer(()=>gates.dispose());
     const feedbackFixtures = new FeedbackFixtures();
     root.add(feedbackFixtures.group);
     scope.defer(() => feedbackFixtures.dispose());

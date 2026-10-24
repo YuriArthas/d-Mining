@@ -3,8 +3,7 @@ import assert from 'node:assert/strict';
 import { initPhysics, CharacterPhysics, RAPIER } from '../../src/game/validation/physics.ts';
 import { SceneryCollision } from '../../src/game/presentation/SceneryCollision.ts';
 import { createScenerySites } from '../../src/game/world/createScenerySites.ts';
-import { CAMP_CONTENT } from '../../src/game/content/campContent.ts';
-import { PINEWIND_CAMP } from '../../src/game/content/pinewindSurface.ts';
+import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
 import { FEEDBACK_COLLISION_SITE, CAPSULE_MACHINE_ZONE } from '../../src/game/content/feedbackFacilities.ts';
 import { ZoneDetector } from '../../src/game/logic/ZoneDetector.ts';
 import { buildRegion } from '../../src/game/terrain/meshing.ts';
@@ -22,7 +21,7 @@ for (let x = -1; x <= 1; x++) for (let z = 0; z <= 3; z++) {
   if (mesh.indices.length) floorMeshes.push({ coord, mesh });
 }
 
-function setup({ floor = true, feedback = true, floorFirst = false, scenery = true, at = AT, plan = CAMP_CONTENT.surface.plan } = {}) {
+function setup({ floor = true, feedback = true, floorFirst = false, scenery = true, at = AT, plan = GAME_CONTENT.surface.plan } = {}) {
   const physics = new CharacterPhysics(false), floorHandles = [];
   function installFloor() {
     if (!floor) return;
@@ -32,7 +31,7 @@ function setup({ floor = true, feedback = true, floorFirst = false, scenery = tr
     ));
   }
   if (floorFirst) installFloor();
-  const sites = scenery ? createScenerySites(CAMP_CONTENT.rooms, plan) : [];
+  const sites = scenery ? createScenerySites(GAME_CONTENT.rooms, plan) : [];
   if (feedback) sites.push(FEEDBACK_COLLISION_SITE);
   const collisions = new SceneryCollision(physics, sites);
   collisions.sync(at);
@@ -79,7 +78,7 @@ test('the existing roadside curb also finds real ground without any new feedback
 test('walking over the curb, falling onto it and returning from the spawn all retain stable support', () => {
   for (const route of ['walk', 'fall', 'return']) {
     // The machine stands in the live hub (north of the egg terraces), so the routes run through its scenery.
-    const scene = setup({ plan: PINEWIND_CAMP.surface.plan });
+    const scene = setup({ plan: GAME_CONTENT.surface.plan });
     try {
       const p = scene.physics;
       if (route === 'walk') {

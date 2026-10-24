@@ -3,8 +3,11 @@ import assert from 'node:assert/strict';
 import { MiningFeedback, hitMaterial, pickupTier } from '../../src/game/runtime/MiningFeedback.ts';
 import { HitEffects } from '../../src/game/presentation/HitEffects.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
-import { SESSION_CONTENT } from '../../src/game/world/sessionContent.ts';
-import { SURFACE_SELL as SELL_ZONE } from '../../src/game/world/rooms.ts';
+import { resourceByKind } from '../../src/game/content/resources.ts';
+import { JOURNEY_BACKPACKS } from '../../src/game/content/journeyResources.ts';
+import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
+const SESSION_CONTENT = GAME_CONTENT.session, SELL_ZONE = SESSION_CONTENT.sales[0];
+
 import { LAYERS } from '../../src/game/content/layers.ts';
 import { itemPrice } from '../../src/game/application/items.ts';
 import { Color } from 'three';
@@ -113,16 +116,18 @@ test('碎屑寿命有限、数量有上限，闪光很快消失', () => {
 test('会话发出出售、购买、余额不足和满包拒绝事件', () => {
   let now = 0;
   const session = new GameSession(SESSION_CONTENT, undefined, () => now), events = [];
-  session.attach({ cell: () => 1, pending: () => false, mine: () => true, cancelMining: () => {}, returnToSurface: () => {} });
+  session.attach({ cell: () => 1, pending: () => false, mine: () => true, cancelMining: () => {} });
   session.onFeedback(e => events.push(e));
-  session.collected(Array.from({ length: 20 }, () => ({ kind: 1 })));
+  // The richer ore of world 1's surface: enough for the first bag without filling the starting one.
+  const [first, second] = JOURNEY_BACKPACKS, ore = resourceByKind(67), count = Math.ceil(first.price / ore.price);
+  session.collected(Array.from({ length: count }, () => ({ kind: ore.kind })));
   session.updatePosition([SELL_ZONE.x, SELL_ZONE.y, SELL_ZONE.z], true); session.resetPosition();
-  assert.deepEqual(events.shift(), { type: 'sold', coins: 20 * itemPrice('ore.stone'), count: 20 });
-  assert.equal(session.upgradeBackpack('bag-100').status, 'upgraded');
+  assert.deepEqual(events.shift(), { type: 'sold', coins: count * ore.price, count });
+  assert.equal(session.upgradeBackpack(first.id).status, 'upgraded');
   assert.deepEqual(events.shift(), { type: 'purchased' });
-  assert.equal(session.upgradeBackpack('bag-200').status, 'insufficient');
+  assert.equal(session.upgradeBackpack(second.id).status, 'insufficient');
   assert.deepEqual(events.shift(), { type: 'denied', reason: 'coins' });
-  session.collected(Array.from({ length: 100 }, () => ({ kind: 1 })));
+  session.collected(Array.from({ length: first.capacity }, () => ({ kind: 64 })));
   assert.deepEqual(events.shift(), { type: 'denied', reason: 'full' }, 'the moment the bag fills');
   now = 0.5; assert.equal(session.requestMine([[0, -1, 0]]), false);
   assert.deepEqual(events, [], 'holding on a block does not buzz again right away');

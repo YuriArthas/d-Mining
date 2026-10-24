@@ -1,15 +1,14 @@
 import {resourceByKind} from '../../src/game/content/resources.ts';
-import {BACKPACK_TIERS} from '../../src/game/application/BackpackUpgrade.ts';
 import {pickaxeStats} from '../../src/game/logic/Pickaxe.ts';
-import {SURFACE_SELL as SELL_ZONE} from '../../src/game/world/rooms.ts';
-import {SESSION_CONTENT} from '../../src/game/world/sessionContent.ts';
+
+import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
+const SESSION_CONTENT = GAME_CONTENT.session, SELL_ZONE = SESSION_CONTENT.sales[0];
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { Inventory } from '../../src/game/logic/Inventory.ts';
 import { Wallet } from '../../src/game/logic/Wallet.ts';
 import { Mining } from '../../src/game/application/Mining.ts';
 import { quoteSale, sellAll } from '../../src/game/application/Sale.ts';
-import { upgradeBackpack } from '../../src/game/application/BackpackUpgrade.ts';
 import { ORE_ITEMS, itemVolume, itemPrice, itemDefinition } from '../../src/game/application/items.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
 const batch=(count,itemId='stone')=>[{itemId,count}];
@@ -65,17 +64,13 @@ test('mining checks existing occupied volume, accepts oversize yield and never t
  assert.equal(mine.request(['gold']),'accepted');mine.collected(batch(1,'gold'));assert.equal(bag.getSnapshot().used,57);assert.equal(mine.request(['next']),'full');
  mine.collected([...batch(2,'gem'),...batch(1,'large')]);assert.equal(bag.getSnapshot().used,167);assert.equal(requests.length,1);
 });
-test('weighted capacity upgrades preserve pieces and occupied volume and reopen mining',()=>{
- const bag=new Inventory(50,volume),wallet=new Wallet(BACKPACK_TIERS[0].price);bag.add([...batch(47),...batch(1,'gold')]);
- assert.equal(upgradeBackpack('bag-100',bag,wallet).status,'upgraded');assert.equal(bag.getSnapshot().used,57);assert.equal(bag.getSnapshot().totalCount,48);assert.equal(bag.isFull(),false);assert.equal(wallet.getBalance(),0);
-});
 test('resource quantities remain stable and definitions are immutable',()=>{
  for(const r of ORE_ITEMS){assert.ok(r.volume>0&&r.maxHp>0&&r.price>0);assert.ok(Object.isFrozen(r));assert.equal(itemVolume(r.itemId),r.volume);assert.equal(itemPrice(r.itemId),r.price);}
  assert.throws(()=>{ORE_ITEMS[0].volume=99});assert.throws(()=>itemDefinition('unknown'));
 });
 test('session shows mixed-unit snapshots and sells completed overflow at independent prices once',()=>{
  let now=0,solid=true;const initial=new GameSession(SESSION_CONTENT).exportProgress(); initial.pickaxe.level=28;delete initial.equipment; /* Legacy active-gear fixture. */ const session=new GameSession(SESSION_CONTENT,50,()=>now,{},initial);
- session.attach({cell:()=>solid?5:0,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{}});
+ session.attach({cell:()=>solid?5:0,pending:()=>false,mine:()=>true,cancelMining:()=>{}});
  session.collected(Array.from({length:47},()=>({kind:8})));const cell=[11,-1,-25];session.selectTarget(cell);
  assert.equal(session.getSnapshot().target.volume,10);assert.equal(session.getSnapshot().target.price,resourceByKind(5).price);
  const hits=Math.ceil(resourceByKind(5).maxHp/pickaxeStats(28).power); for(let i=0;i<hits;i++){now=i*.5;assert.equal(session.hit(cell).status,i===hits-1?'breaking':'hit')}

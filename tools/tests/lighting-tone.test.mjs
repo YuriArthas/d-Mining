@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Color, CustomToneMapping, NeutralToneMapping, ShaderChunk } from 'three';
-import { PINEWIND_CAMP, PINEWIND_DAY } from '../../src/game/content/pinewindSurface.ts';
+import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
+import { PINEWIND_DAY } from '../../src/game/content/pinewindSurface.ts';
 import { TONE_GRADE, applyToneGrade } from '../../src/game/presentation/toneGrade.ts';
 
 const luminance = hex => { const c = new Color(hex); return 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b; };
@@ -9,7 +10,7 @@ const luminance = hex => { const c = new Color(hex); return 0.2126 * c.r + 0.715
 const saturation = hex => { const v = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)), max = Math.max(...v), min = Math.min(...v); return max ? (max - min) / max : 0; };
 
 test('白天的太阳在进场玩家身后（西南），天空里的太阳和环境光用同一个方向', () => {
-  const env = PINEWIND_CAMP.environment;
+  const env = GAME_CONTENT.environment;
   const [x, y, z] = env.surface.day.moonPosition;
   assert.ok(z > 0 && x < 0 && y > 0, `sun from the south-west, above: ${[x, y, z]}`);
   assert.deepEqual(env.sky.lighting.day.moonPosition, env.surface.day.moonPosition, 'sky sun disc follows the light');
@@ -17,7 +18,7 @@ test('白天的太阳在进场玩家身后（西南），天空里的太阳和�
 });
 
 test('白天的补光远弱于太阳且接近中性：阴面看得清，但不再泛青发灰', () => {
-  const day = PINEWIND_CAMP.environment.surface.day, [x, y, z] = day.moonPosition;
+  const day = GAME_CONTENT.environment.surface.day, [x, y, z] = day.moonPosition;
   const elevation = Math.atan2(y, Math.hypot(x, z));
   // Light reaching flat ground (Lambert, per unit albedo): direct sun versus sky/ground fill and IBL.
   const sun = day.moonIntensity * Math.sin(elevation) * luminance(day.moonColor) / Math.PI;

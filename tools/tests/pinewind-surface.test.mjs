@@ -1,45 +1,39 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {Group,Mesh,BoxGeometry,MeshStandardMaterial,Texture} from 'three';
-import {createCampContent} from '../../src/game/content/campContent.ts';
-import {withPinewindSurface,PINEWIND_CAMP} from '../../src/game/content/pinewindSurface.ts';
-import {PORTAL_SLOTS} from '../../src/game/content/portalSlots.ts';
-import {LAYERS} from '../../src/game/content/layers.ts';
+import {GAME_CONTENT} from '../../src/game/content/gameContent.ts';
 import {PINEWIND_PLAZA,PINEWIND_SERVICES,PINEWIND_FACILITIES,PINEWIND_STATION,PINEWIND_EGG_DISPLAYS,PINEWIND_EGG_TIERS,PINEWIND_TERRACE,PINEWIND_SPAWN} from '../../src/game/content/pinewind/hubLayout.ts';
 import {assembleAuthoredSurface} from '../../src/game/presentation/assembleAuthoredSurface.ts';
 import {initPhysics,CharacterPhysics,RAPIER} from '../../src/game/validation/physics.ts';
 import {SceneryCollision} from '../../src/game/presentation/SceneryCollision.ts';
 import {GameSession} from '../../src/game/application/GameSession.ts';
 
-test('the hub owns world-1 surface zones; rules, rooms, worlds and the tutorial pass through unchanged',()=>{
- const base=createCampContent(),art=withPinewindSurface(base);
- for(const key of ['layers','rooms','returnPoint'])assert.equal(art[key],base[key],key);
- for(const key of ['destinations','petContent','onboarding','home','homes','journey'])assert.equal(art.session[key],base.session[key],key);
- assert.deepEqual(art.session.sales.slice(1),base.session.sales.slice(1),'room sale zones unchanged');
- assert.deepEqual(art.session.sales[0],PINEWIND_SERVICES.sale.trigger);
- assert.deepEqual(art.session.shops.find(s=>s.id==='surface-upgrade').zone,PINEWIND_SERVICES.shop.trigger);
- // The pickaxe forge opens on tools, the pack shop beside it on backpacks; room shops are unchanged.
- assert.deepEqual(art.session.shops.slice(0,2).map(s=>[s.id,s.category]),[['surface-upgrade','tools'],['surface-bags','backpacks']]);
- assert.deepEqual(art.session.shops.find(s=>s.id==='surface-bags').zone,PINEWIND_SERVICES.bags.trigger);
- assert.deepEqual(art.session.shops.filter(s=>!s.id.startsWith('surface-')),base.session.shops.filter(s=>s.id!=='surface-upgrade'));
- assert.equal(art.session.eggStations.length,PINEWIND_EGG_DISPLAYS.length);
- assert.equal(art.surface.placements.length,0);
- assert.deepEqual([...new Set(art.surface.authored.instances.map(p=>p.asset))].sort(),['fungal-hall','pinewind-architecture','pinewind-landscape']);
- // The live content carries the same zones into the game session.
- assert.deepEqual(PINEWIND_CAMP.session.sales[0],PINEWIND_SERVICES.sale.trigger);
+test('world 1 surface services are the Pinewind buildings; the halls ship with the surface art',()=>{
+ const session=GAME_CONTENT.session;
+ assert.deepEqual(session.sales[0],PINEWIND_SERVICES.sale.trigger);
+ // The pickaxe forge opens on tools, the pack shop beside it on backpacks.
+ assert.deepEqual(session.shops.slice(0,2).map(s=>[s.id,s.category]),[['surface-upgrade','tools'],['surface-bags','backpacks']]);
+ assert.deepEqual(session.shops[0].zone,PINEWIND_SERVICES.shop.trigger);
+ assert.deepEqual(session.shops[1].zone,PINEWIND_SERVICES.bags.trigger);
+ // Every room keeps its own counters.
+ for(const room of GAME_CONTENT.worlds.flatMap(w=>w.rooms)){
+  assert.ok(session.sales.some(z=>z.x===room.sell.x&&z.z===room.sell.z&&z.y===room.sell.y),room.id);
+  if(room.shop)assert.ok(session.shops.some(s=>s.id===room.id),room.id);
+ }
+ assert.equal(session.eggStations.length,PINEWIND_EGG_DISPLAYS.length);
+ assert.deepEqual([...new Set(GAME_CONTENT.surface.authored.instances.map(p=>p.asset))].sort(),['fungal-hall','pinewind-architecture','pinewind-landscape']);
 });
-test('no ring of layer portals: one teleport station west of the spawn, its model, pillars and pad where the session expects them',async()=>{
+test('one teleport station west of the spawn, its model, pillars and pad where the session expects them',async()=>{
  const {worldStation}=await import('../../src/game/content/worldJourney.ts');
- assert.deepEqual(PINEWIND_CAMP.hub.portals,[]);assert.deepEqual(PINEWIND_CAMP.session.portals,[]);
- assert.equal(PINEWIND_CAMP.surface.authored.instances.some(i=>i.node?.startsWith('Portal_')),false);
- const st=worldStation(1),model=PINEWIND_CAMP.surface.authored.instances.find(i=>i.node==='Teleport_Station');
+ assert.equal(GAME_CONTENT.surface.authored.instances.some(i=>i.node?.startsWith('Portal_')),false);
+ const st=worldStation(1),model=GAME_CONTENT.surface.authored.instances.find(i=>i.node==='Teleport_Station');
  assert.deepEqual(model.at,[st.x,0,st.z]);assert.equal(PINEWIND_STATION.x,st.x);
- assert.deepEqual(PINEWIND_CAMP.session.stations.map(s=>s.worldId),[1,2,3]);
- assert.deepEqual(PINEWIND_CAMP.session.stations[0].zone,st.zone);
+ assert.deepEqual(GAME_CONTENT.session.stations.map(s=>s.worldId),[1,2,3]);
+ assert.deepEqual(GAME_CONTENT.session.stations[0].zone,st.zone);
  // The station faces the spawn and its pad lies between them.
  const toSpawn=Math.atan2(PINEWIND_SPAWN.x-st.x,PINEWIND_SPAWN.z-st.z);assert.ok(Math.abs(st.yaw-toSpawn)<1e-9);
  assert.ok(Math.hypot(st.zone.x-PINEWIND_SPAWN.x,st.zone.z-PINEWIND_SPAWN.z)<Math.hypot(st.x-PINEWIND_SPAWN.x,st.z-PINEWIND_SPAWN.z));
- assert.equal(PINEWIND_CAMP.surface.plan.solids.filter(s=>Math.hypot(s.at[0]-st.x,s.at[2]-st.z)<2.5&&s.half[0]===.45).length,2,'two pillars');
+ assert.equal(GAME_CONTENT.surface.plan.solids.filter(s=>Math.hypot(s.at[0]-st.x,s.at[2]-st.z)<2.5&&s.half[0]===.45).length,2,'two pillars');
 });
 test('plaza plan: services face the plaza without touching the mine, the headframe or each other',()=>{
  const footprint=(kind,size,forward)=>{const {x,z,yaw}=PINEWIND_FACILITIES[kind].anchor,f=[Math.sin(yaw),Math.cos(yaw)],s=[Math.cos(yaw),-Math.sin(yaw)],c=[x+f[0]*forward,z+f[1]*forward];
@@ -74,14 +68,14 @@ test('egg rows step up and alternate by half a bay, so overhead labels never sta
 });
 function fake(){
  const template=new Group(),node=new Group(),geometry=new BoxGeometry(),map=new Texture(),material=new MeshStandardMaterial({map});node.name='test';node.add(new Mesh(geometry,material));template.add(node);
- const content={authored:{version:'test',instances:[{asset:'test',node:'test',at:[3,0,4],rotation:[0,0,0,1],scale:[1,1,1],portalId:'core'}]},plan:{solids:[],shapes:[],signs:[]}};
+ const content={authored:{version:'test',instances:[{asset:'test',node:'test',at:[3,0,4],rotation:[0,0,0,1],scale:[1,1,1]}]},plan:{solids:[],shapes:[],signs:[]}};
  return {assets:{templates:new Map([['test',template]]),stats:[]},content,resources:[geometry,map,material]};
 }
-test('interactive roots survive assembly, retain later material clones, and dispose once per independent scene',()=>{
+test('placed roots survive assembly, retain later material clones, and dispose once per independent scene',()=>{
  const a=fake(),b=fake(),first=assembleAuthoredSurface(a.assets,a.content),second=assembleAuthoredSurface(b.assets,b.content),counts=new Map();
  for(const r of [...a.resources,...b.resources])r.addEventListener('dispose',()=>counts.set(r,(counts.get(r)??0)+1));
- const portal=first.group.children.find(p=>p.userData.portalId==='core');assert.ok(portal);assert.deepEqual(portal.position.toArray(),[3,0,4]);
- const clone=portal.children[0].material.clone();let cloneDisposals=0;clone.addEventListener('dispose',()=>cloneDisposals++);portal.children[0].material=clone;
+ const root=first.group.children.find(p=>p.name==='test');assert.ok(root);assert.deepEqual(root.position.toArray(),[3,0,4]);
+ const clone=root.children[0].material.clone();let cloneDisposals=0;clone.addEventListener('dispose',()=>cloneDisposals++);root.children[0].material=clone;
  first.retain();first.dispose();first.dispose();assert.equal(cloneDisposals,1);
  for(const r of a.resources)assert.equal(counts.get(r),1);for(const r of b.resources)assert.equal(counts.get(r),undefined);
  second.dispose();for(const r of b.resources)assert.equal(counts.get(r),1);
@@ -90,8 +84,8 @@ test('assembly rejects missing named nodes and releases already-loaded resources
  const f=fake();f.content.authored.instances[0].node='missing';let disposed=0;f.resources[0].addEventListener('dispose',()=>disposed++);
  assert.throws(()=>assembleAuthoredSurface(f.assets,f.content),/Missing surface node/);assert.equal(disposed,1);
 });
-test('actual character collision: bridge, both services, every portal, the first egg and the top terrace without a jump',async()=>{
- await initPhysics();const physics=new CharacterPhysics(false,true),collisions=new SceneryCollision(physics,[{id:'surface',depth:0,plan:PINEWIND_CAMP.surface.plan}]);
+test('actual character collision: bridge, both services, the teleport station, the first egg and the top terrace without a jump',async()=>{
+ await initPhysics();const physics=new CharacterPhysics(false,true),collisions=new SceneryCollision(physics,[{id:'surface',depth:0,plan:GAME_CONTENT.surface.plan}]);
  // The production voxel floor outside the mine is at y=0.
  physics.world.createCollider(RAPIER.ColliderDesc.cuboid(100,1,100).setTranslation(0,-1,0));
  // Steer like a player: movement direction for yaw ψ is (-sin ψ, -cos ψ).
@@ -104,11 +98,10 @@ test('actual character collision: bridge, both services, every portal, the first
    physics.teleport([PINEWIND_PLAZA.x,.1,PINEWIND_PLAZA.z]);const ring=PINEWIND_SERVICES[kind].trigger;
    assert.ok(walkTo(ring.x,ring.z,ring.radius*.6),`${kind} ring blocked at ${physics.feet()}`);
   }
-  for(const p of PINEWIND_CAMP.session.portals){
-   physics.teleport([PINEWIND_SPAWN.x,.1,PINEWIND_SPAWN.z]);
-   assert.ok(walkTo(p.zone.x,p.zone.z,p.zone.radius*.6),`portal ${p.id} blocked at ${physics.feet()}`);
-  }
-  const first=PINEWIND_CAMP.session.eggStations.find(s=>s.eggId==='meadow-egg');
+  const pad=GAME_CONTENT.session.stations[0].zone;
+  physics.teleport([PINEWIND_SPAWN.x,.1,PINEWIND_SPAWN.z]);
+  assert.ok(walkTo(pad.x,pad.z,pad.radius*.6),`station pad blocked at ${physics.feet()}`);
+  const first=GAME_CONTENT.session.eggStations.find(s=>s.eggId==='meadow-egg');
   physics.teleport([PINEWIND_PLAZA.x+6,.1,PINEWIND_PLAZA.z]);
   assert.ok(walkTo(first.zone.x,first.zone.z,first.zone.radius*.6),`first egg blocked at ${physics.feet()}`);
   assert.ok(Math.abs(physics.feet()[1]-first.zone.y)<first.zone.heightTolerance,'stands on the egg terrace');
@@ -119,7 +112,7 @@ test('actual character collision: bridge, both services, every portal, the first
 test('the bridge deck leaves the path at ground level and arches gently; the feet stay on the boards on every lane, both ways',async()=>{
  await initPhysics();
  const {PINEWIND_BRIDGE:B}=await import('../../src/game/content/pinewind/hubLayout.ts');
- const plan=PINEWIND_CAMP.surface.plan,x0=B.x-4,x1=B.x+4,z0=B.z-B.halfSpan-4,z1=B.z+B.halfSpan+4;
+ const plan=GAME_CONTENT.surface.plan,x0=B.x-4,x1=B.x+4,z0=B.z-B.halfSpan-4,z1=B.z+B.halfSpan+4;
  // Visible surfaces around the bridge: the colliders are the authored meshes themselves (deck, rails, ground).
  const tris=[];
  for(const s of plan.solids.filter(s=>s.triangles)){const {vertices:v,indices:I}=s.triangles;
@@ -152,7 +145,7 @@ test('the bridge deck leaves the path at ground level and arches gently; the fee
  }finally{collisions.dispose();physics.dispose();}
 });
 test('cliffs enclose the valley outside the play area: the pass and the creek gorges stay open, and the walls stop the character',async()=>{
- const hulls=PINEWIND_CAMP.surface.plan.solids.filter(s=>s.hull);
+ const hulls=GAME_CONTENT.surface.plan.solids.filter(s=>s.hull);
  assert.ok(hulls.length>50,`${hulls.length} cliff columns`);
  const gap=(s,x,z)=>Math.hypot(Math.max(0,Math.abs(x-s.at[0])-s.half[0]),Math.max(0,Math.abs(z-s.at[2])-s.half[2]));
  for(const s of hulls){
@@ -163,9 +156,9 @@ test('cliffs enclose the valley outside the play area: the pass and the creek go
   // The creek enters in the north-east and leaves in the west through gorges.
   for(const [x,z] of [[61,-50],[-70,55]])assert.ok(gap(s,x,z)>2,`column at ${s.at} dams the creek`);
  }
- for(const zone of [...PINEWIND_CAMP.session.portals.map(p=>p.zone),...PINEWIND_CAMP.session.eggStations.map(e=>e.zone),...Object.values(PINEWIND_SERVICES).map(s=>s.trigger)])
+ for(const zone of [...GAME_CONTENT.session.stations.map(s=>s.zone),...GAME_CONTENT.session.eggStations.map(e=>e.zone),...Object.values(PINEWIND_SERVICES).map(s=>s.trigger)])
   for(const s of hulls)assert.ok(gap(s,zone.x,zone.z)>10);
- await initPhysics();const physics=new CharacterPhysics(false,true),collisions=new SceneryCollision(physics,[{id:'surface',depth:0,plan:PINEWIND_CAMP.surface.plan}]);
+ await initPhysics();const physics=new CharacterPhysics(false,true),collisions=new SceneryCollision(physics,[{id:'surface',depth:0,plan:GAME_CONTENT.surface.plan}]);
  physics.world.createCollider(RAPIER.ColliderDesc.cuboid(100,1,100).setTranslation(0,-1,0));
  try{
   // Walk north behind the mine and west behind the sale house: the cliffs stop both walks.
@@ -177,7 +170,7 @@ test('cliffs enclose the valley outside the play area: the pass and the creek go
  }finally{collisions.dispose();physics.dispose();}
 });
 test('instant trips face the service building',()=>{
- const session=new GameSession(PINEWIND_CAMP.session);let trip=null;
+ const session=new GameSession(GAME_CONTENT.session);let trip=null;
  session.attach({cell:()=>0,pending:()=>false,mine:()=>false,cancelMining(){},returnToSurface(){},travelTo:(feet,look)=>{trip={feet,look};}});
  assert.equal(session.goTo('shop'),'travelling');
  assert.deepEqual(trip.look,PINEWIND_SERVICES.shop.center);
@@ -200,14 +193,14 @@ test('布局 v5：出售在东北，镐子店和背包店在西侧，从出生�
  assert.ok(!headframe(CAPSULE_MACHINE_AT[0], CAPSULE_MACHINE_AT[2], 1.3), 'capsule clear of the headframe');
  for (const service of [sale, shop, bags]) assert.ok(Math.hypot(CAPSULE_MACHINE_AT[0] - service[0], CAPSULE_MACHINE_AT[2] - service[2]) > 6.5, `capsule clear of ${service}`);
  assert.ok(CAPSULE_MACHINE_AT[2] + 1.3 < 14, 'capsule north of the terrace stairs');
- const roots0 = PINEWIND_CAMP.surface.authored.instances.map(i => i.node);
+ const roots0 = GAME_CONTENT.surface.authored.instances.map(i => i.node);
  for (const gone of ['Challenge_Board', 'Pet_Conservatory']) assert.equal(roots0.includes(gone), false, gone);
- assert.equal(PINEWIND_CAMP.surface.plan.signs.some(s => s.title === 'PETS'), false, 'no PETS sign');
- assert.deepEqual(PINEWIND_CAMP.surface.plan.signs.map(s => s.title).sort(), ['BACKPACK', 'PICKAXE', 'SELL', '传送站']);
+ assert.equal(GAME_CONTENT.surface.plan.signs.some(s => s.title === 'PETS'), false, 'no PETS sign');
+ assert.deepEqual(GAME_CONTENT.surface.plan.signs.map(s => s.title).sort(), ['BACKPACK', 'PICKAXE', 'SELL', '传送站']);
  assert.ok(Math.hypot(CAPSULE_MACHINE_ZONE.x - CAPSULE_MACHINE_AT[0], CAPSULE_MACHINE_ZONE.z - CAPSULE_MACHINE_AT[2]) < 2, 'capsule zone in front of it');
  // The authored gate stands on the gameplay gate line, its doors hinged at the opening's edges.
  assert.equal(PINEWIND_GATE.z, worldGateZ(2));
- const roots = new Map(PINEWIND_CAMP.surface.authored.instances.map(i => [i.node, i]));
+ const roots = new Map(GAME_CONTENT.surface.authored.instances.map(i => [i.node, i]));
  assert.deepEqual(roots.get('World_Gate').at, [PINEWIND_GATE.x, 0, PINEWIND_GATE.z]);
  for (const [node, sx] of [['World_Gate_DoorL', -1], ['World_Gate_DoorR', 1]])
   assert.deepEqual(roots.get(node).at, [PINEWIND_GATE.x + sx * PINEWIND_GATE.opening / 2, 0, PINEWIND_GATE.z], node);

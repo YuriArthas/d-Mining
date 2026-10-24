@@ -48,32 +48,6 @@ export function journeySurfacePlan(z:number):SceneryPlan {
   for(const sign of local.plan.signs)p.plan.signs.push({...sign,at:[sign.at[0],sign.at[1],sign.at[2]+z]});
   return p.plan;
 }
-// Open the retaining wall behind spawn; the mine-side wall stays intact.
-export function spawnPassageSolids(solids:readonly Solid[]):Solid[] {
-  return solids.flatMap(s=>{
-    if(s.at[2]-s.half[2]>=106||s.at[2]+s.half[2]<=66||s.at[1]+s.half[1]<=0||Math.abs(s.at[0])>=s.half[0]+7)return [s];
-    const left=s.at[0]-s.half[0],right=s.at[0]+s.half[0];
-    return [[left,Math.min(right,-7)],[Math.max(left,7),right]].filter(([l,r])=>r>l).map(([l,r])=>({...s,at:[(l+r)/2,s.at[1],s.at[2]] as [number,number,number],half:[(r-l)/2,s.half[1],s.half[2]] as [number,number,number]}));
-  });
-}
-export function openSpawnPassage(root:Group) {
-  const seen=new Set<Material>();
-  root.traverse(object=>{
-    if(!(object instanceof Mesh))return;
-    for(const material of (Array.isArray(object.material)?object.material:[object.material]) as Material[]) {
-      if(seen.has(material))continue;seen.add(material);
-      const previous=material.onBeforeCompile,key=material.customProgramCacheKey.bind(material);
-      material.onBeforeCompile=(shader,renderer)=>{
-        previous.call(material,shader,renderer);
-        shader.vertexShader='varying vec3 passagePosition;\n'+shader.vertexShader;
-        shader.vertexShader=shader.vertexShader.replace('#include <project_vertex>','#include <project_vertex>\nvec4 passageLocal=vec4(transformed,1.);\n#ifdef USE_INSTANCING\npassageLocal=instanceMatrix*passageLocal;\n#endif\npassagePosition=(modelMatrix*passageLocal).xyz;');
-        shader.fragmentShader='varying vec3 passagePosition;\n'+shader.fragmentShader;
-        shader.fragmentShader=shader.fragmentShader.replace('#include <clipping_planes_fragment>','#include <clipping_planes_fragment>\nif(abs(passagePosition.x)<7. && passagePosition.z > 66. && passagePosition.z < 106. && passagePosition.y > .06) discard;');
-      };
-      const oldKey=key();material.customProgramCacheKey=()=>oldKey+'-spawn-passage';material.needsUpdate=true;
-    }
-  });
-}
 export class JourneyGates {
   readonly group=new Group();
   private readonly colliders:RAPIER.Collider[]=[];
