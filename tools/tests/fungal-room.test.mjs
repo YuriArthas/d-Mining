@@ -21,7 +21,7 @@ test('蘑菇洞穴 is an authored hall: no kit, its colliders keep the shaft ope
  for(const zone of [room.sell,room.shop])for(const s of plan.solids.filter(s=>s.half[1]>.1))
   assert.ok(Math.abs(zone.x-s.at[0])>s.half[0]+.3||Math.abs(zone.z-s.at[2])>s.half[2]+.3||s.hull,`ring at ${zone.x},${zone.z} blocked by ${s.at}`);
  const session=new GameSession(GAME_CONTENT.session);
- session.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining(){},travelTo(){}});
+ session.attach({cell:()=>64,pending:()=>false,mine:()=>true,cancelMining(){},travelTo(){}});
  session.updatePosition([room.sell.x,room.sell.y,room.sell.z],true);assert.equal(session.getSnapshot().inSellZone,true);
  session.updatePosition([room.shop.x,room.shop.y,room.shop.z],true);assert.equal(session.getSnapshot().shopId,'fungal');
 });

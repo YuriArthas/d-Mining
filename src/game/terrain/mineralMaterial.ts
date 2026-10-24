@@ -1,11 +1,11 @@
 import { stabilizeShadows } from '../presentation/stableShadow.ts';
 import { applyBakedGroundTop } from '../presentation/bakedLight.ts';
 import { Color, DataTexture, MeshPhysicalMaterial, LinearFilter, LinearMipmapLinearFilter, NearestFilter, RGBAFormat, ShaderChunk, SRGBColorSpace } from 'three';
-import {LAYERS,type Layer} from '../content/layers.ts';
+import type {Layer} from '../content/layers.ts';
 import {resourceByKind} from '../content/resources.ts';
 import { ATLAS_COLUMNS, ATLAS_ROWS, ATLAS_WIDTH, ATLAS_HEIGHT, TILE_SIZE, mineralAtlas, mineralResponseAtlas, TERRAIN_MATERIALS } from './minerals.ts';
 
-export function createMineralMaterial(layers:readonly Layer[]=LAYERS, worlds?:readonly Readonly<{layers:readonly Layer[]}>[]) {
+export function createMineralMaterial(layers:readonly Layer[], worlds?:readonly Readonly<{layers:readonly Layer[]}>[]) {
   const hosts=worlds?worlds.flatMap((w,id)=>w.layers.map(layer=>({layer,world:id}))):layers.map(layer=>({layer,world:0}));
   const pixels = mineralAtlas(),responsePixels=mineralResponseAtlas();
   const atlas = new DataTexture(pixels, ATLAS_WIDTH, ATLAS_HEIGHT, RGBAFormat);

@@ -18,7 +18,7 @@ test('capacity API is independent of upgrades: increasing/decreasing preserves c
  bag.setCapacity(0);assert.equal(bag.getSnapshot(),state);
 });
 test('session publishes one coherent purchase snapshot and mining immediately uses updated capacity',()=>{
- const session=new GameSession(SESSION_CONTENT),observed=[];session.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining:()=>{}});
+ const session=new GameSession(SESSION_CONTENT),observed=[];session.attach({cell:()=>64,pending:()=>false,mine:()=>true,cancelMining:()=>{}});
  const first=JOURNEY_BACKPACKS[0],ore=resourceByKind(64+3),rock=resourceByKind(64),count=Math.ceil(first.price/ore.price);
  session.collected(Array.from({length:count},()=>({kind:ore.kind})));session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);session.resetPosition();
  session.collected(Array.from({length:50/rock.volume+7},()=>({kind:rock.kind})));assert.equal(session.requestMine([[0,-1,0]]),false);

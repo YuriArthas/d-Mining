@@ -2,7 +2,9 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { raycastCells } from '../../src/game/terrain/raycast.ts';
 import { selectCell, SELECTION } from '../../src/game/terrain/selection.ts';
-import { SparseWorld, CELL, WORLD_GENERATION } from '../../src/game/terrain/SparseWorld.ts';
+import { SparseWorld, CELL, generationAtZ } from '../../src/game/terrain/SparseWorld.ts';
+import { initialExcavationDepth } from '../../src/game/world/SurfaceExcavation.ts';
+import { GENERATION } from './fixtures/world.mjs';
 import { pointerNdc } from '../../src/game/aim.ts';
 const source = (...cells) => c => cells.some(v => v.every((n, i) => n === c[i])) ? 1 : 0;
 
@@ -27,12 +29,14 @@ test('near either side of a grid edge selects the actual side without snapping',
   }
 });
 test('query follows sparse edits across both region grids and observes maximum range', () => {
-  const world = new SparseWorld({...WORLD_GENERATION,samples:true}), sample = c => world.cell(c);
-  for (const x of [7,8,15,16,-16]) {
-    assert.deepEqual(raycastCells([2*x+1,3,-19], [0,-1,0], 8, sample).cell, [x,-1,-10]);
-    world.remove([[x,-1,-10]]);
-    assert.deepEqual(raycastCells([2*x+1,3,-19], [0,-1,0], 8, sample).cell, [x,-2,-10]);
-    assert.equal(raycastCells([2*x+1,3,-19], [0,-1,0], 4, sample), null);
+  // The open mine's columns (x -4..3) straddle the seam of both region grids at x 0.
+  const world = new SparseWorld(generationAtZ(GENERATION, 0)), sample = c => world.cell(c), z = -1;
+  for (const x of [-4, -1, 0, 3]) {
+    const top = -1 - initialExcavationDepth(x, z), reach = 3 - (top + 1) * CELL;
+    assert.deepEqual(raycastCells([2*x+1,3,2*z+1], [0,-1,0], 16, sample).cell, [x,top,z]);
+    world.remove([[x,top,z]]);
+    assert.deepEqual(raycastCells([2*x+1,3,2*z+1], [0,-1,0], 16, sample).cell, [x,top-1,z]);
+    assert.equal(raycastCells([2*x+1,3,2*z+1], [0,-1,0], reach + CELL - .5, sample), null);
   }
 });
 test('invalid and empty rays terminate with bounded logical queries', () => {

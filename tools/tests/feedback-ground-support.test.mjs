@@ -1,3 +1,6 @@
+import { generationAtZ as worldAtZ } from '../../src/game/terrain/SparseWorld.ts';
+import { GENERATION as GAME_GENERATION_FIXTURE } from './fixtures/world.mjs';
+const WORLD1 = worldAtZ(GAME_GENERATION_FIXTURE, 0);
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { initPhysics, CharacterPhysics, RAPIER } from '../../src/game/validation/physics.ts';
@@ -17,12 +20,12 @@ const Z = CAPSULE_MACHINE_ZONE, AT = [Z.x, 0, Z.z];
 const CURB = [12, 0, 31.8];
 const floorMeshes = [];
 for (let x = -1; x <= 1; x++) for (let z = 0; z <= 3; z++) {
-  const coord = [x, -1, z], mesh = buildRegion('collision', coord, COLLISION_SIZE, []).mesh;
+  const coord = [x, -1, z], mesh = buildRegion('collision', coord, COLLISION_SIZE, [], WORLD1).mesh;
   if (mesh.indices.length) floorMeshes.push({ coord, mesh });
 }
 
 function setup({ floor = true, feedback = true, floorFirst = false, scenery = true, at = AT, plan = GAME_CONTENT.surface.plan } = {}) {
-  const physics = new CharacterPhysics(false), floorHandles = [];
+  const physics = new CharacterPhysics(), floorHandles = [];
   function installFloor() {
     if (!floor) return;
     for (const { coord, mesh } of floorMeshes) floorHandles.push(physics.world.createCollider(
@@ -122,7 +125,7 @@ test('removing the real floor beside a curb immediately removes jump eligibility
 });
 
 test('a vertical wall alone never counts as a walkable support plane', () => {
-  const p = new CharacterPhysics(false);
+  const p = new CharacterPhysics();
   try {
     p.world.createCollider(RAPIER.ColliderDesc.cuboid(0.2, 10, 10).setTranslation(12.5, 0, 32));
     p.teleport([12, 0, 31.8]); ticks(p, 60);

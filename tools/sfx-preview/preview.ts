@@ -4,7 +4,7 @@ import { CUE_LENGTH, makeNoise, playCue, type SfxCue } from '../../src/game/audi
 
 const RATE = 44100;
 const CUES: { name: string; cue: SfxCue }[] = [
-  ...(['soil', 'rock', 'ore', 'gem'] as const).flatMap(material => [
+  ...(['rock', 'ore', 'gem'] as const).flatMap(material => [
     { name: `hit ${material}`, cue: { type: 'hit', material } as SfxCue },
     { name: `break ${material}`, cue: { type: 'break', material } as SfxCue },
   ]),

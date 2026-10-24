@@ -1,8 +1,6 @@
-import { STAGES } from '../content/progression.ts';
 import { CELL } from './grid.ts';
-import { LAYERS, layerAtDepth, type Layer } from '../content/layers.ts';
+import { layerAtDepth, type Layer } from '../content/layers.ts';
 import {oreChanceAtDepth} from '../content/oreDistribution.ts';
-export const STRATA = LAYERS;
 export const stratumAtDepth = layerAtDepth;
 const weightTotals=new WeakMap<Layer,number>();
 // Avalanche every bit of the exact cell coordinate. Never quantize into veins.
@@ -11,10 +9,11 @@ export function mineralRoll(x:number,y:number,z:number,seed:number){
  h=Math.imul(h^(h>>>16),0x7feb352d);h=Math.imul(h^(h>>>15),0x846ca68b);
  return ((h^(h>>>16))>>>0)/4294967296;
 }
-export function generatedMineral(x: number, y: number, z: number, seed: number, layers: readonly Layer[] = LAYERS) {
+/** Below this many metres under a layer's top its rock turns dense (the layer's `deepKind`); the next layer starts 400 m down. */
+export const DEEP_ROCK_AT = 280;
+export function generatedMineral(x: number, y: number, z: number, seed: number, layers: readonly Layer[]) {
  const depth=-(y+1)*CELL,layer=layerAtDepth(depth,layers);
- const stage = STAGES[layers.indexOf(layer)];
- if (depth - layer.from >= (stage?.deepAt ?? 280) && (layer.deepKind ?? stage?.deepKind)) return (layer.deepKind ?? stage!.deepKind);
+ if (layer.deepKind && depth - layer.from >= DEEP_ROCK_AT) return layer.deepKind;
  const roll=mineralRoll(x,y,z,seed),chance=oreChanceAtDepth(depth);
  if(roll>=chance||!layer.ores.length)return layer.base;
  let total=weightTotals.get(layer);

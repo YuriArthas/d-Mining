@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {resolve,dirname} from 'node:path';
-import {LAYERS} from '../../src/game/content/layers.ts';
+import { WORLD1_LAYERS as LAYERS } from './fixtures/world.mjs';
 import {ROOM_SCENES} from '../../src/game/content/rooms/sceneDefinitions.ts';
 import {roomSceneAsset} from '../../src/game/content/rooms/sceneAssets.ts';
 import {roomsFor} from '../../src/game/world/rooms.ts';

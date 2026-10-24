@@ -23,8 +23,7 @@ import type { PerformanceSnapshot } from "../presentation/PerformanceMeter.ts";
 import type { RenderSubmission } from "../presentation/RenderSubmission.ts";
 import type { RenderProfiler } from "../presentation/RenderProfiler.ts";
 import { GAME_CONFIG } from "../config.ts";
-import { COURSE_SPAWN } from "../validation/course.ts";
-import { ORE_SAMPLES, mineralName } from "../terrain/minerals.ts";
+import { mineralName } from "../terrain/minerals.ts";
 export type ValidationDebug = {
   advanceDayNight: (seconds: number) => void;
   advanceOnline: (seconds: number) => void;
@@ -59,10 +58,6 @@ export type ValidationDebug = {
     location:
       | "surface"
       | "deep"
-      | "course"
-      | "uniform"
-      | "bands"
-      | "checker"
       | readonly [number, number, number],
   ) => void;
 };
@@ -163,7 +158,6 @@ export function attachGameDebug(
       feedback: { audio: gameAudio.diagnostics(), effects: current.feedback.effects.diagnostics(), splash: current.feedback.splash.diagnostics(), surface: current.feedback.surface(physics.feet()) },
       combat: session.combatDebug(),
       sellZone: current.content.session.sales[0],
-      samples: terrain.sampleStats(),
       terrainVisuals: terrain.render.diagnostics(),
       position: physics.feet(),
       guideMining: {visible:interaction.lesson.group.visible,cell:interaction.lesson.cell},
@@ -260,22 +254,14 @@ export function attachGameDebug(
           ? current.content.returnPoint
           : location === "deep"
             ? current.content.rooms[current.content.rooms.length - 1].spawn
-            : location === "course"
-              ? COURSE_SPAWN
-              : location === "uniform"
-                ? ORE_SAMPLES[0].spawn
-                : location === "bands"
-                  ? ORE_SAMPLES[1].spawn
-                  : location === "checker"
-                    ? ORE_SAMPLES[2].spawn
-                    : location;
+            : location;
       if (
         feet.some((v) => !Number.isFinite(v)) ||
         feet[0] < -95 ||
         feet[0] > 103 ||
         feet[2] < -95 ||
-        feet[2] > (current.content.worlds ? 551 : 103) ||
-        feet[1] < (current.content.worlds ? -2799 : -3999) ||
+        feet[2] > 551 ||
+        feet[1] < -2799 ||
         feet[1] > 20
       )
         throw new Error("验证位置超出矿区");

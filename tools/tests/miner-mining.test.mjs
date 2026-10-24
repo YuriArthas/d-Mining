@@ -69,13 +69,13 @@ test('边跑边挖保持原有腿部动作；攻速改变不排队补播',async(
 test('挥镐只响应实际伤害：冷却、满包、锁定、空点与零伤害重试均不触发',()=>{
   let result={status:'hit',damage:10},speed=2,allowed=true,ready=true,calls=0;
   const session={observeBlockDamage:()=>()=>{},selectTarget:()=>{},hit:()=>{calls++;return result;},getSnapshot:()=>({miningStats:{speed}})};
-  const terrain={ready:()=>ready,canMine:()=>allowed,cell:c=>c[2]===-2?1:0,measurements:{add:()=>{}},render:{pipeline:{residents:new Map()}}};
+  const terrain={ready:()=>ready,canMine:()=>allowed,cell:c=>c[2]===-2?64:0,measurements:{add:()=>{}},render:{pipeline:{residents:new Map()}}};
   const camera=new PerspectiveCamera(60,1,.1,100);camera.position.set(1,1,3);camera.lookAt(1,1,-3);
   const input=new GameInput(),interaction=new MiningInteraction(session);
   const update=()=>interaction.update(camera,[1,0,1],false,input,terrain);
   try{
     input.point(0,0,true);input.mine('mouse',true);update();
-    assert.deepEqual(interaction.strike,{target:[1,1,-3],speed:2,cell:[0,0,-2],kind:1,breaking:false});
+    assert.deepEqual(interaction.strike,{target:[1,1,-3],speed:2,cell:[0,0,-2],kind:64,breaking:false});
     for(const status of ['cooldown','full','locked','pending','unavailable']){
       result={status};update();assert.equal(interaction.strike,null,status);
     }

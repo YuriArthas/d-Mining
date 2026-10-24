@@ -68,7 +68,7 @@ test('teleporting from a mine never bypasses a locked layer; movement reward act
   assert.equal(s.getMovementMultiplier(),2);s.advanceOnline(2);assert.equal(s.getMovementMultiplier(),1);
   at(s,CAPSULE_MACHINE_ZONE);assert.equal(s.spinCapsule().reward,'sell');
   s.updatePosition([90,-400,90],false);s.updatePosition([0,-20,0],false);
-  const calls=[];s.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{},travelTo:p=>calls.push(p)});
+  const calls=[];s.attach({cell:()=>64,pending:()=>false,mine:()=>true,cancelMining:()=>{},travelTo:p=>calls.push(p)});
   assert.equal(s.travelTo('fungal'),'locked');assert.equal(s.travelTo('old_mine'),'travelling');assert.equal(calls.length,1);
 });
 test('failed copy awards nothing; successful platform copies share one reward; invite only awards recipient',async()=>{

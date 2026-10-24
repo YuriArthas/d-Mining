@@ -76,7 +76,6 @@ export type StartGameOptions = {
   input: GameInput;
   session: GameSession;
   restoredWorld?: SparseWorld;
-  samples: boolean;
   previewLayer: string | null;
   signal: AbortSignal;
   settings: () => { time: SurfaceTime | 'auto'; bakedShadows: boolean };
@@ -158,16 +157,10 @@ export async function startGame(options: StartGameOptions) {
     const worldTask = initPhysics().then(async () => {
       check();
       startup.physicsMs = performance.now() - startup.started;
-      const generation = options.restoredWorld?.generation ?? { ...GAME_GENERATION, samples: options.samples };
-      const physics = new CharacterPhysics(generation.samples,true);
+      const generation = options.restoredWorld?.generation ?? GAME_GENERATION;
+      const physics = new CharacterPhysics();
       scope.defer(() => physics.dispose());
-      const terrain = new TerrainStream(
-        physics,
-        undefined,
-        session.collected,
-        generation,
-        options.restoredWorld,
-      );
+      const terrain = new TerrainStream(physics, generation, undefined, session.collected, options.restoredWorld);
       scope.defer(() => {
         terrain.group.removeFromParent();
         terrain.dispose();

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {initPhysics, CharacterPhysics} from '../../src/game/validation/physics.ts';
 import {SceneryCollision} from '../../src/game/presentation/SceneryCollision.ts';
 test('ordinary colliders use independent near/far hysteresis and release before borrowed world',async()=>{
- await initPhysics();const physics=new CharacterPhysics(false),base=physics.world.colliders.len();
+ await initPhysics();const physics=new CharacterPhysics(),base=physics.world.colliders.len();
  const sites=[{id:'test',depth:400,plan:{solids:[{at:[0,1,0],half:[1,1,1],yaw:0}],shapes:[],signs:[]}}];
  const collisions=new SceneryCollision(physics,sites);
  collisions.sync([0,0,0]);assert.equal(collisions.count,0);

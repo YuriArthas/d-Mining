@@ -1,3 +1,4 @@
+import { installCourse, GENERATION } from './fixtures/world.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { Vector3 } from 'three';
@@ -5,10 +6,10 @@ import { ThirdPersonCamera, cameraClearance } from '../../src/game/ThirdPersonCa
 import { CharacterPhysics, initPhysics, RAPIER } from '../../src/game/validation/physics.ts';
 import { GAME_CONFIG } from '../../src/game/config.ts';
 import { buildRegion } from '../../src/game/terrain/meshing.ts';
-import { CELL, WORLD_GENERATION, RENDER_SIZE as CHUNK } from '../../src/game/terrain/SparseWorld.ts';
+import { CELL, generationAtZ } from '../../src/game/terrain/SparseWorld.ts';
 await initPhysics();
 const ID={x:0,y:0,z:0,w:1};
-function setup(){const p=new CharacterPhysics();p.world.createCollider(RAPIER.ColliderDesc.cuboid(90,.5,90).setTranslation(0,-.5,0));p.world.step();return p;}
+function setup(){const p=installCourse(new CharacterPhysics());p.world.createCollider(RAPIER.ColliderDesc.cuboid(90,.5,90).setTranslation(0,-.5,0));p.world.step();return p;}
 function check(rig,p){
  assert.equal(rig.obstructed(p.world,p.collider),false,JSON.stringify(rig.snapshot()));
  assert.ok(rig.position.toArray().every(Number.isFinite));
@@ -60,10 +61,11 @@ test('inner/outer corners and narrow corridor remain clear throughout a complete
   }
  }finally{p.dispose();}
 });
-test('actual voxel shaft descent and steep pitch preserve camera clearance',()=>{
+test('actual voxel pit descent and steep pitch preserve camera clearance',()=>{
+ // The mine's initial pit: its deepest column drops four cells (8 m) between steep voxel walls.
  const p=new CharacterPhysics(),r=new ThirdPersonCamera();try{
-  for(const z of [-1,0]){const data=buildRegion('collision',[-1,-1,z],CHUNK,[],{...WORLD_GENERATION,samples:true}),m=data.mesh;p.world.createCollider(RAPIER.ColliderDesc.trimesh(m.positions,m.indices,RAPIER.TriMeshFlags.FIX_INTERNAL_EDGES).setTranslation(-CELL*CHUNK,-CELL*CHUNK,z*CELL*CHUNK));}
-  p.teleport([-23,.05,0]);
+  for(const x of [-1,0])for(const z of [-1,0]){const m=buildRegion('collision',[x,-1,z],8,[],generationAtZ(GENERATION,0)).mesh;p.world.createCollider(RAPIER.ColliderDesc.trimesh(m.positions,m.indices,RAPIER.TriMeshFlags.FIX_INTERNAL_EDGES).setTranslation(x*CELL*8,-CELL*8,z*CELL*8));}
+  p.teleport([1,.05,-1]);
   for(let i=0;i<100;i++){p.tick(0,0,0,false,true);r.update(p.world,p.collider,p.feet(),i*.08,i<60?1.4:-.4,1/60,844/390);check(r,p);}
   assert.ok(p.grounded&&p.feet()[1]<-7.9);
  }finally{p.dispose();}

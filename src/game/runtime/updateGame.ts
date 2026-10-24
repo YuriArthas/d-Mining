@@ -21,14 +21,12 @@ export function updateGame(
   view: {
     camera: PerspectiveCamera;
     avatar: Group;
-    fixtures: Group;
     contactShadow: Mesh | null;
     sunShadow?: Group | null;
   },
   input: GameInput,
   gl: WebGLRenderer,
   settings: {
-    samples: boolean;
     timeOfDay: SurfaceTime | 'auto';
     sceneShadowsEnabled: boolean;
     probeMode: ProbeMode;
@@ -37,8 +35,8 @@ export function updateGame(
   onLoading: (event: LoadingEvent) => void,
 ) {
   if (current.session.suspended) { current.minerAvatar.cancelMining(); return; }
-  const { camera, avatar, fixtures, contactShadow, sunShadow } = view;
-  const { samples, timeOfDay, sceneShadowsEnabled, probeMode } = settings;
+  const { camera, avatar, contactShadow, sunShadow } = view;
+  const { timeOfDay, sceneShadowsEnabled, probeMode } = settings;
   const delta = Math.min(Math.max(elapsed, 0), 0.1);
   const onlineElapsed = document.hidden || current.timing.skipElapsed ? 0 : Math.min(Math.max(elapsed,0),1);
   current.timing.skipElapsed=false;
@@ -60,7 +58,7 @@ export function updateGame(
   try {
     const currentFeet = player.travelling ?? physics.feet();
     const sceneryStart = performance.now();
-    if (!samples) current.sceneryCollision.sync(currentFeet);
+    current.sceneryCollision.sync(currentFeet);
     terrain.measurements.add(
       "sceneResidencyMs",
       performance.now() - sceneryStart,
@@ -95,11 +93,6 @@ export function updateGame(
       lightStrength,
       environment.daylightBlend,
     );
-    physics.setSurfaceActive(
-      currentFeet[1] > -48 &&
-        Math.abs(currentFeet[0]) < 64 &&
-        Math.abs(currentFeet[2] - 16) < 64,
-    );
     player.step(elapsed, cameraView.angles.yaw, () => cameraView.rig.reset());
     if (
       !startup.firstPlayableMs &&
@@ -110,7 +103,6 @@ export function updateGame(
       startup.firstPlayableMs = performance.now() - startup.started;
     const feet = physics.feet(),
       drawnFeet = physics.interpolatedFeet(player.fixed.alpha);
-    fixtures.visible = feet[1] > -64;
     if (contactShadow)
       contactShadow.visible = lightStrength > 0 && physics.grounded;
     cameraView.update(

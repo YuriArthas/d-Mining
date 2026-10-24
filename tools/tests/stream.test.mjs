@@ -1,3 +1,5 @@
+import { installCourse, GENERATION } from './fixtures/world.mjs';
+import { resourceByKind } from '../../src/game/content/resources.ts';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
 const SESSION_CONTENT = GAME_CONTENT.session;
 import assert from 'node:assert/strict';
@@ -8,7 +10,8 @@ import { buildRegion } from '../../src/game/terrain/meshing.ts';
 import { Inventory } from '../../src/game/logic/Inventory.ts';
 import { Mining } from '../../src/game/application/Mining.ts';
 import { oreDrops } from '../../src/game/application/items.ts';
-import { SparseWorld, chunkKey, regionOf, WORLD_GENERATION } from '../../src/game/terrain/SparseWorld.ts';
+import { SparseWorld, chunkKey, regionOf, generationAtZ } from '../../src/game/terrain/SparseWorld.ts';
+const WORLD1 = generationAtZ(GENERATION, 0);
 await initPhysics();
 class WorkerProbe {
  requests=[];onmessage=null;onerror=null;onmessageerror=null;terminated=false;
@@ -16,7 +19,7 @@ class WorkerProbe {
  flush(){const job=this.requests.shift();if(!job)return false;const results=job.regions.map(r=>({version:r.version,data:buildRegion(job.kind,r.coord,job.size,r.edits,job.generation)}));this.onmessage?.({data:{id:job.id,epoch:job.epoch,transaction:job.transaction,results}});return true;}
  terminate(){this.terminated=true;}
 }
-function setup(onExcavated){const p=new CharacterPhysics();p.teleport([0,2.1,16]);const workers=[],stream=new TerrainStream(p,()=>{const w=new WorkerProbe();workers.push(w);return w;},onExcavated,{...WORLD_GENERATION,samples:true});stream.recenter(p.feet());return {p,stream,workers};}
+function setup(onExcavated){const p=installCourse(new CharacterPhysics());p.teleport([0,2.1,16]);const workers=[],stream=new TerrainStream(p,WORLD1,()=>{const w=new WorkerProbe();workers.push(w);return w;},onExcavated);stream.recenter(p.feet());return {p,stream,workers};}
 function drain(s,workers){for(let i=0;i<500;i++){s.process();for(const w of workers)w.flush();const v=s.snapshot();if(!v.pendingEdit&&!v.inFlight&&!v.queue)return;}throw new Error('stream did not drain');}
 function finish(f){f.stream.dispose();assert.ok(f.workers.every(w=>w.terminated));f.p.dispose();}
 test('render and physics have independent windows; logical data exists without either cache',()=>{
@@ -29,7 +32,8 @@ test('render and physics have independent windows; logical data exists without e
  }finally{finish(f);}
 });
 test('batched excavation keeps source and active colliders unchanged until both layers prepare',()=>{
- const f=setup();try{const {stream:s,workers:w,p}=f;drain(s,w);const cells=[[0,-1,0],[1,-1,0],[2,-1,0],[7,-1,0],[8,-1,0],[15,-1,0],[16,-1,0]];
+ const f=setup();try{const {stream:s,workers:w,p}=f;drain(s,w);// Under the protected floor, across region seams (7/8, 15/16).
+ const cells=[[0,-2,10],[1,-2,10],[2,-2,10],[7,-2,10],[8,-2,10],[15,-2,10],[16,-2,10]];
  const oldHandles=[...s.collision.handles];for(const c of cells)assert.ok(s.mine(c));assert.equal(s.mine(cells[0]),false);s.process();
  // Collision worker finishes first; render worker deliberately remains outstanding.
  for(let i=0;i<10;i++){w[1].flush();s.process();}
@@ -42,9 +46,9 @@ test('batched excavation keeps source and active colliders unchanged until both 
  }finally{finish(f);}
 });
 test('travel cancels staged edits and discards delayed replies without resurrecting old terrain',()=>{
- const f=setup();try{const {stream:s,workers:w}=f;drain(s,w);assert.ok(s.mine([1,-1,1]));s.process();
+ const f=setup();try{const {stream:s,workers:w}=f;drain(s,w);assert.ok(s.mine([1,-2,10]));s.process();
  s.relocate([0,-1999.9,0]);for(const worker of w)worker.flush();drain(s,w);
- assert.ok(s.cell([1,-1,1]));assert.equal(s.snapshot().committedEdits,0);assert.ok(s.snapshot().staleResults>0);
+ assert.ok(s.cell([1,-2,10]));assert.equal(s.snapshot().committedEdits,0);assert.ok(s.snapshot().staleResults>0);
  assert.ok(s.mine([0,-1001,0]));drain(s,w);s.relocate([90,.1,90]);drain(s,w);s.relocate([0,-1999.9,0]);drain(s,w);assert.equal(s.cell([0,-1001,0]),0);
  }finally{finish(f);}
 });
@@ -56,8 +60,8 @@ test('pending input is bounded and drains in immutable batches without duplicate
 });
 test('movement during construction extends transaction dependencies to newly wanted regions',()=>{
  const f=setup();try{const {stream:s,workers:w}=f;drain(s,w);
- assert.ok(s.mine([31,-1,0]));s.process();s.recenter([64,.1,0],true);drain(s,w);
- assert.equal(s.cell([31,-1,0]),0);for(const item of s.collision.pipeline.residents.values())assert.ok(s.collision.pipeline.has(item.coord));
+ assert.ok(s.mine([31,-2,0]));s.process();s.recenter([64,.1,0],true);drain(s,w);
+ assert.equal(s.cell([31,-2,0]),0);for(const item of s.collision.pipeline.residents.values())assert.ok(s.collision.pipeline.has(item.coord));
  }finally{finish(f);}
 });
 
@@ -66,26 +70,26 @@ test('12-cell collection spans worker jobs; admission checks once, committed rew
  const f=setup(resources=>{assert.ok(resources.every(r=>f.stream.cell(r.cell)===0));receipts.push(resources);mining.collected(resources)});
  mining=new Mining(bag,targets=>f.stream.mineMany(targets),oreDrops);
  try{drain(f.stream,f.workers);
- const cells=Array.from({length:12},(_,x)=>[x,-1,-25]);
+ const cells=Array.from({length:12},(_,x)=>[x,-2,-25]);
  assert.equal(mining.request([...cells,cells[0],[0,1,0]]),'accepted');
  f.stream.process();bag.add([{itemId:'gift',count:3}]);
  for(let i=0;i<10;i++){f.workers[1].flush();f.stream.process();}
  assert.equal(bag.getSnapshot().used,3);assert.ok(cells.every(c=>f.stream.cell(c)>0));
  drain(f.stream,f.workers);assert.equal(receipts.length,1);assert.equal(receipts[0].length,12);assert.equal(bag.getSnapshot().used,15);
- assert.equal(f.stream.snapshot().revision,1);assert.equal(mining.request([[15,-1,-25]]),'full');assert.ok(f.stream.cell([15,-1,-25])>0);
+ assert.equal(f.stream.snapshot().revision,1);assert.equal(mining.request([[15,-2,-25]]),'full');assert.ok(f.stream.cell([15,-2,-25])>0);
  f.stream.process();assert.equal(bag.getSnapshot().used,15);
  }finally{finish(f);}
 });
 test('cancelled and late terrain results do not reward; cancellation preserves committed edits',()=>{
  const receipts=[],f=setup(resources=>receipts.push(resources));
- try{drain(f.stream,f.workers);assert.ok(f.stream.mineMany([[0,-1,-25],[1,-1,-25]]));drain(f.stream,f.workers);
- assert.equal(receipts.length,1);assert.ok(f.stream.mineMany([[2,-1,-25],[3,-1,-25]]));f.stream.process();
+ try{drain(f.stream,f.workers);assert.ok(f.stream.mineMany([[0,-2,-25],[1,-2,-25]]));drain(f.stream,f.workers);
+ assert.equal(receipts.length,1);assert.ok(f.stream.mineMany([[2,-2,-25],[3,-2,-25]]));f.stream.process();
  const saved = f.stream.world.captureChanges(), recovered = new SparseWorld(f.stream.world.generation);
  for(const region of saved.regions)recovered.restoreRegion(region);
- assert.equal(recovered.cell([0,-1,-25]),0);assert.ok(recovered.cell([2,-1,-25])>0);
+ assert.equal(recovered.cell([0,-2,-25]),0);assert.ok(recovered.cell([2,-2,-25])>0);
  f.stream.cancelPending();
- drain(f.stream,f.workers);assert.equal(receipts.length,1);assert.equal(f.stream.cell([0,-1,-25]),0);assert.ok(f.stream.cell([2,-1,-25])>0);
- assert.ok(f.stream.mineMany([[2,-1,-25],[3,-1,-25]]));drain(f.stream,f.workers);assert.equal(receipts.length,2);
+ drain(f.stream,f.workers);assert.equal(receipts.length,1);assert.equal(f.stream.cell([0,-2,-25]),0);assert.ok(f.stream.cell([2,-2,-25])>0);
+ assert.ok(f.stream.mineMany([[2,-2,-25],[3,-2,-25]]));drain(f.stream,f.workers);assert.equal(receipts.length,2);
  }finally{finish(f);}
 });
 
@@ -93,19 +97,20 @@ test('combat damage survives streaming; actual removal alone awards and clears H
  const {GameSession}=await import('../../src/game/application/GameSession.ts');
  let now=0;const session=new GameSession(SESSION_CONTENT, 1,()=>now),receipts=[];
  const f=setup(resources=>{receipts.push(resources);session.collected(resources)}),s=f.stream;
- session.attach({cell:c=>s.cell(c),pending:c=>s.pending(c),mine:cs=>s.mineMany(cs),cancelMining:()=>s.cancelPending(),returnToSurface:()=>{}});
+ session.attach({cell:c=>s.cell(c),pending:c=>s.pending(c),mine:cs=>s.mineMany(cs),cancelMining:()=>s.cancelPending()});
  try{
-  drain(s,f.workers);const c=[8,-1,-25];assert.equal(session.blockHealth(c),30);
+  drain(s,f.workers);const c=[8,-2,-25],block=resourceByKind(s.cell(c)),hp=block.maxHp,blows=Math.ceil(hp/10);
+  assert.equal(session.blockHealth(c),hp);assert.ok(blows>=3);
   const before=s.snapshot();assert.equal(session.hit(c).status,'hit');drain(s,f.workers);
-  assert.equal(session.blockHealth(c),20);assert.equal(s.snapshot().revision,before.revision);assert.equal(receipts.length,0);
-  s.relocate([0,-1999.9,0]);drain(s,f.workers);assert.equal(session.blockHealth(c),20);
-  s.relocate([17,.1,-47]);drain(s,f.workers);for(let i=1;i<2;i++){now=i*.5;assert.equal(session.hit(c).status,'hit')}
-  now=1;assert.equal(session.hit(c).status,'breaking');s.process();
+  assert.equal(session.blockHealth(c),hp-10);assert.equal(s.snapshot().revision,before.revision);assert.equal(receipts.length,0);
+  s.relocate([0,-1999.9,0]);drain(s,f.workers);assert.equal(session.blockHealth(c),hp-10);
+  s.relocate([17,.1,-47]);drain(s,f.workers);for(let i=1;i<blows-1;i++){now=i*.5;assert.equal(session.hit(c).status,'hit')}
+  now=(blows-1)*.5;assert.equal(session.hit(c).status,'breaking');s.process();
   // An independent completed collection fills the bag while this destruction is prepared.
-  session.collected([{kind:1}]);
+  session.collected([{kind:64}]);
   for(let i=0;i<10;i++){f.workers[1].flush();s.process();}
   assert.ok(s.cell(c));assert.equal(session.blockHealth(c),0);assert.equal(session.getSnapshot().inventory.used,1);
-  drain(s,f.workers);assert.equal(s.cell(c),0);assert.equal(receipts.length,1);assert.equal(session.getSnapshot().inventory.used,6);
+  drain(s,f.workers);assert.equal(s.cell(c),0);assert.equal(receipts.length,1);assert.equal(session.getSnapshot().inventory.used,1+block.volume);
   assert.equal(session.combatDebug().damagedCells,0);assert.equal(session.blockHealth(c),null);
  }finally{finish(f)}
 });
@@ -113,13 +118,13 @@ test('cancelled lethal strike keeps sparse damage and retries without duplicate 
  const {GameSession}=await import('../../src/game/application/GameSession.ts');
  let now=0;const initial=new GameSession(SESSION_CONTENT).exportProgress();initial.pickaxe.level=31;delete initial.equipment; /* Legacy active-gear fixture. */const session=new GameSession(SESSION_CONTENT,50,()=>now,{},initial),receipts=[];
  const f=setup(resources=>{receipts.push(resources);session.collected(resources)}),s=f.stream;
- session.attach({cell:c=>s.cell(c),pending:c=>s.pending(c),mine:cs=>s.mineMany(cs),cancelMining:()=>s.cancelPending(),returnToSurface:()=>{}});
+ session.attach({cell:c=>s.cell(c),pending:c=>s.pending(c),mine:cs=>s.mineMany(cs),cancelMining:()=>s.cancelPending()});
  try{
-  drain(s,f.workers);const c=[0,-1,-25];assert.equal(session.hit(c).status,'breaking');s.process();
+  drain(s,f.workers);const c=[0,-2,-25],volume=resourceByKind(s.cell(c)).volume;assert.equal(session.hit(c).status,'breaking');s.process();
   s.relocate([0,-1999.9,0]);drain(s,f.workers);assert.ok(s.cell(c));assert.equal(receipts.length,0);assert.equal(session.blockHealth(c),0);
   assert.equal(session.hit(c).status,'cooldown');now=.5;
   assert.deepEqual(session.hit(c),{status:'breaking',remaining:0,damage:0});drain(s,f.workers);
-  assert.equal(receipts.length,1);assert.equal(session.getSnapshot().inventory.used,1);assert.equal(session.combatDebug().damagedCells,0);
+  assert.equal(receipts.length,1);assert.equal(session.getSnapshot().inventory.used,volume);assert.equal(session.combatDebug().damagedCells,0);
   assert.equal(session.hit(c).status,'unavailable');drain(s,f.workers);assert.equal(receipts.length,1);
  }finally{finish(f)}
 });

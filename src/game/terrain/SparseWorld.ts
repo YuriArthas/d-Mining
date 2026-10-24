@@ -1,20 +1,17 @@
 import { WorldSaveChanges, type WorldCaptureToken } from './WorldSaveChanges.ts';
 import { readRegion } from './WorldSaveCodec.ts';
-import { LAYERS, type Layer } from '../content/layers.ts';
+import type { Layer } from '../content/layers.ts';
 import { generatedMineral } from './strata.ts';
-import { sampleMineral } from './minerals.ts';
 export { CELL } from './grid.ts';
 import { CELL } from './grid.ts';
 import { inEntrance, PROTECTED_FLOOR } from '../world/entrance.ts';
 import {surfaceExcavated} from '../world/SurfaceExcavation.ts';
 import { roomAir, onRoomFloor } from '../world/rooms.ts';
-import { SHAFT } from '../validation/course.ts';
 export type Coord = readonly [number, number, number];
 /** `surfaceCut`: surface floor cells (y = -1, flattened x,z pairs) left out of the terrain meshes, render and
  *  collision alike, where the authored surface sinks below the floor (world 1's creek bed). They stay protected
  *  floor for mining, saves and every cell query, so the generation version and saves are unaffected. */
-export type WorldGeneration = Readonly<{ version: number; seed: number; samples: boolean; layers: readonly Layer[]; worlds?: readonly Readonly<{z:number;layers:readonly Layer[]}>[]; surfaceCut?: readonly number[] }>;
-export const WORLD_GENERATION: WorldGeneration = Object.freeze({ version: 9, seed: 0, samples: false, layers: LAYERS });
+export type WorldGeneration = Readonly<{ version: number; seed: number; layers: readonly Layer[]; worlds?: readonly Readonly<{z:number;layers:readonly Layer[]}>[]; surfaceCut?: readonly number[] }>;
 const localGenerations = new WeakMap<WorldGeneration, readonly WorldGeneration[]>();
 const surfaceCuts = new WeakMap<WorldGeneration, ReadonlySet<number>>();
 const cutKey = (x: number, z: number) => (x + 2048) * 4096 + z + 2048;
@@ -83,7 +80,7 @@ function apply(edits: Edits, cells: readonly Coord[]) {
   }
   for (const [key, indices] of groups) edits.set(key, mergeRemoved(edits.get(key), indices));
 }
-export function baseXYZ(x: number, y: number, z: number, generation: WorldGeneration = WORLD_GENERATION): number {
+export function baseXYZ(x: number, y: number, z: number, generation: WorldGeneration): number {
   if (generation.worlds) {
     if (!inBounds([x,y,z],generation)) return 0;
     const area = generation.worlds[z > 168 ? 2 : z > 56 ? 1 : 0];
@@ -94,14 +91,12 @@ export function baseXYZ(x: number, y: number, z: number, generation: WorldGenera
     return baseXYZ(x,y,localZ,generationAtZ(generation,z));
   }
   if (x < -48 || x > 51 || y < -2000 || y > -1 || z < -48 || z > 51) return 0;
-  if (!generation.samples && surfaceExcavated(x,y,z)) return 0;
+  if (surfaceExcavated(x,y,z)) return 0;
   if (roomAir(x, y, z, generation.layers)) return 0;
-  if (generation.samples && y >= -1000 && y <= -993 && x >= -8 && x < 8 && z >= -8 && z < 8) return 0;
-  if (generation.samples && y >= SHAFT.minY && x >= SHAFT.minX && x <= SHAFT.maxX && z >= SHAFT.minZ && z <= SHAFT.maxZ) return 0;
-  if (!generation.samples && !inEntrance(x, z) && (y === -1 || onRoomFloor(x, y, z, generation.layers))) return PROTECTED_FLOOR;
-  return (generation.samples ? sampleMineral(x, y, z) : null) ?? generatedMineral(x, y, z, generation.seed, generation.layers);
+  if (!inEntrance(x, z) && (y === -1 || onRoomFloor(x, y, z, generation.layers))) return PROTECTED_FLOOR;
+  return generatedMineral(x, y, z, generation.seed, generation.layers);
 }
-export function sampleXYZ(x: number, y: number, z: number, edits: Edits, generation: WorldGeneration = WORLD_GENERATION) {
+export function sampleXYZ(x: number, y: number, z: number, edits: Edits, generation: WorldGeneration) {
   const base = baseXYZ(x, y, z, generation); // Check bounds before looking up the bounded numeric key.
   return base && contains(edits.get(bucketKey(Math.floor(x / 16), Math.floor(y / 16), Math.floor(z / 16))), indexXYZ(x, y, z)) ? 0 : base;
 }
@@ -118,7 +113,7 @@ export function affectedRegions(cell: Coord, size: number, generation?: WorldGen
 }
 export class SparseWorld {
   readonly generation: WorldGeneration;
-  constructor(generation: WorldGeneration = WORLD_GENERATION) { this.generation = Object.freeze({ ...generation }); }
+  constructor(generation: WorldGeneration) { this.generation = Object.freeze({ ...generation }); }
   private readonly edits: Edits = new Map();
   readonly saveChanges = new WorldSaveChanges();
   hasUnsavedChanges() { return this.saveChanges.pending; }

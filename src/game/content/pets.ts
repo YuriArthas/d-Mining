@@ -1,5 +1,5 @@
 import { EGG_STAGES, STAGES } from './progression.ts';
-import { LAYERS } from './layers.ts';
+import { LAYER_TEMPLATES } from './layers.ts';
 import type { PetContent, PetDefinition, EggDefinition, PetRarity } from '../logic/pets/types.ts';
 
 // Appearance identities and real draw weights; all economic values come from progression.
@@ -129,8 +129,8 @@ const progressionOffers = offers.map(entry => {
   return {
     pets: entry.pets.map((pet, i) => ({...pet, powerBonusBps: Math.round(stage.petBonusBps * (premium ? 2 : 1) * [1, 1.2, 1.6, 2.3, 3.5][i])})),
     offer: {...entry.offer, price: stage.eggPrice * (premium ? 8 : 1),
-      requiredDestination: index === 0 ? undefined : LAYERS[index].id,
-      unlockName: index === 0 ? undefined : LAYERS[index].name},
+      requiredDestination: index === 0 ? undefined : LAYER_TEMPLATES[index].id,
+      unlockName: index === 0 ? undefined : LAYER_TEMPLATES[index].name},
   };
 });
 export const PET_CONTENT: PetContent = {

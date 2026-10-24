@@ -89,19 +89,20 @@ test('zone reports only edges, uses grounded/height and radial hysteresis',()=>{
 });
 test('session wires cancel-before-sale; snapshots publish only consistent inventory/wallet state',()=>{
  const session=new GameSession(SESSION_CONTENT, 1),events=[],observed=[];
- const detach=session.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining:()=>events.push('cancel'),travelTo:()=>events.push('return')});
+ const detach=session.attach({cell:()=>64,pending:()=>false,mine:()=>true,cancelMining:()=>events.push('cancel'),travelTo:()=>events.push('return')});
  const unsub=session.subscribe(()=>observed.push(session.getSnapshot()));
- session.collected([{kind:3},{kind:4}]);assert.equal(session.requestMine([[0,-1,0]]),false);
+ session.collected([{kind:66},{kind:67}]);assert.equal(session.requestMine([[0,-1,0]]),false);
  session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);
- assert.deepEqual(events,['cancel']);assert.equal(observed.at(-1).coins,SESSION_CONTENT.initialCoins+resourceByKind(3).price+resourceByKind(4).price);assert.equal(observed.at(-1).inventory.used,0);
+ assert.deepEqual(events,['cancel']);assert.equal(observed.at(-1).coins,SESSION_CONTENT.initialCoins+resourceByKind(66).price+resourceByKind(67).price);assert.equal(observed.at(-1).inventory.used,0);
  const count=observed.length;session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);assert.equal(observed.length,count);
  assert.equal(session.requestMine([[0,-1,0]]),false);
- session.returnToSurface();assert.deepEqual(events,['cancel','cancel','return']);assert.equal(session.getSnapshot().coins,SESSION_CONTENT.initialCoins+resourceByKind(3).price+resourceByKind(4).price);
+ session.returnToSurface();assert.deepEqual(events,['cancel','cancel','return']);assert.equal(session.getSnapshot().coins,SESSION_CONTENT.initialCoins+resourceByKind(66).price+resourceByKind(67).price);
  assert.equal(session.requestMine([[0,-1,0]]),true);unsub();detach();assert.equal(session.requestMine([[0,-1,0]]),false);
 });
 test('session completed yield is credited even if bag is already full; return preserves it',()=>{
- const session=new GameSession(SESSION_CONTENT, 1);session.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining:()=>{},returnToSurface:()=>{}});
- assert.equal(session.requestMine([[0,-1,0]]),true);session.collected([{kind:1}]);session.collected([{kind:2},{kind:6}]);
- assert.equal(session.getSnapshot().inventory.used,18);session.returnToSurface();assert.equal(session.getSnapshot().inventory.used,18);
- assert.equal(oreDrops([{kind:1},{kind:2},{kind:3},{kind:4},{kind:5},{kind:6}]).length,6);
+ const session=new GameSession(SESSION_CONTENT, 1);session.attach({cell:()=>64,pending:()=>false,mine:()=>true,cancelMining:()=>{}});
+ assert.equal(session.requestMine([[0,-1,0]]),true);session.collected([{kind:64}]);session.collected([{kind:65},{kind:78}]);
+ const used=[64,65,78].reduce((n,k)=>n+resourceByKind(k).volume,0);
+ assert.equal(session.getSnapshot().inventory.used,used);session.returnToSurface();assert.equal(session.getSnapshot().inventory.used,used);
+ assert.equal(oreDrops([{kind:64},{kind:65},{kind:66},{kind:67},{kind:71},{kind:78}]).length,6);
 });

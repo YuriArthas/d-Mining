@@ -4,10 +4,9 @@ import assert from "node:assert/strict";
 import { GameSession } from "../../src/game/application/GameSession.ts";
 import { PetCommands } from "../../src/game/application/PetCommands.ts";
 import { GAME_CONTENT } from "../../src/game/content/gameContent.ts";
-import {
-  SparseWorld,
-  WORLD_GENERATION,
-} from "../../src/game/terrain/SparseWorld.ts";
+import { SparseWorld, generationAtZ } from "../../src/game/terrain/SparseWorld.ts";
+import { GENERATION } from "./fixtures/world.mjs";
+const WORLD1 = generationAtZ(GENERATION, 0);
 import { readRegion } from "../../src/game/terrain/WorldSaveCodec.ts";
 import { SaveCoordinator } from "../../src/game/persistence/SaveCoordinator.ts";
 import {
@@ -25,7 +24,7 @@ const head = () => ({
   formatVersion: 1,
   revision: 1,
   savedAt: 1,
-  world: { generationVersion: 9, seed: 0, regionEncoding: 1 },
+  world: { generationVersion: 11, seed: 0, regionEncoding: 1 },
   regionCount: 0,
 });
 const deferred = () => {
@@ -45,7 +44,7 @@ function fixture(commit = async () => {}, minedBefore = false) {
   const data = GameSession.createNew(SESSION_CONTENT).exportProgress();
   if (minedBefore) data.onboarding = { ...data.onboarding, minedOnce: true };
   const session = GameSession.fromData(data, SESSION_CONTENT),
-    world = new SparseWorld();
+    world = new SparseWorld(WORLD1);
   // Establish valid gameplay proximity before tracking save notifications.
   goToEgg(session);
   const batches = [];
@@ -82,7 +81,7 @@ test("session round-trip restores resources and equipment without granting start
   goToEgg(s);
   const pet = s.pets.hatch("meadow-egg").pet;
   s.pets.equip(pet.id);
-  s.collected(Array.from({ length: 60 }, () => ({ kind: 8 })));
+  s.collected(Array.from({ length: 60 }, () => ({ kind: 64 })));
   s.upgradePickaxe(1);
   s.updatePosition([0, -123.5, 0], false);
   const data = s.exportProgress(),
@@ -96,7 +95,7 @@ test("session round-trip restores resources and equipment without granting start
     restored.getSnapshot().miningStats,
     s.getSnapshot().miningStats,
   );
-  data.inventory.items["ore.soil"] = 1;
+  data.inventory.items["journey.rock.0"] = 1;
   assert.equal(restored.getSnapshot().inventory.used, 60);
 });
 test("restore rejects missing/unknown/partial data, never creates a new player", () => {
@@ -164,11 +163,11 @@ test("pet commands settle first, notify once, and rejected commands do not dirty
   assert.equal(s.getSnapshot().coins, 190);
 });
 test("world captures independent sparse data and restores negative coordinates", () => {
-  const world = new SparseWorld();
+  const world = new SparseWorld(WORLD1);
   assert.equal(world.remove(cells).length, 3);
   const capture = world.captureChanges();
   assert.equal(capture.regions.length, 1);
-  const restored = new SparseWorld();
+  const restored = new SparseWorld(WORLD1);
   for (const region of capture.regions) restored.restoreRegion(region);
   for (const cell of cells) assert.equal(restored.cell(cell), 0);
   assert.equal(restored.removed, 3);
@@ -178,7 +177,7 @@ test("world captures independent sparse data and restores negative coordinates",
   assert.equal(restored.cell([-7, -30, -10]), baseline);
 });
 test("world capture acknowledgment does not clear a later edit in the same region", () => {
-  const w = new SparseWorld();
+  const w = new SparseWorld(WORLD1);
   w.remove([cells[0]]);
   const a = w.captureChanges();
   w.remove([cells[1]]);
@@ -207,18 +206,18 @@ test("world codec rejects malformed ranges, protected floors, duplicates, and ou
     readRegion({ region: [0, -1, 0], removed: null }, () => false),
   );
   assert.throws(() =>
-    new SparseWorld().restoreRegion({ region: [3, -2, 0], removed: null }),
+    new SparseWorld(WORLD1).restoreRegion({ region: [3, -2, 0], removed: null }),
   );
-  const w = new SparseWorld();
+  const w = new SparseWorld(WORLD1);
   w.remove([cells[0]]);
   const data = w.captureChanges().regions[0],
-    restored = new SparseWorld();
+    restored = new SparseWorld(WORLD1);
   restored.restoreRegion(data);
   assert.throws(() => restored.restoreRegion(data));
   assert.throws(() => w.restoreRegion(data));
 });
 test("fully removed region restores compactly without allocating voxel objects", () => {
-  const w = new SparseWorld();
+  const w = new SparseWorld(WORLD1);
   w.restoreRegion({ region: [0, -3, 0], removed: null });
   assert.equal(w.removed, 4096);
   assert.equal(w.stats().editBytes, 0);
@@ -233,17 +232,17 @@ test("one write in flight; edit B survives acknowledgment of A and saves a coher
   });
   try {
     f.world.remove([cells[0]]);
-    f.session.collected([{ kind: 8 }]);
+    f.session.collected([{ kind: 64 }]);
     const flushing = f.saves.flush();
     assert.equal(f.batches.length, 1);
     f.world.remove([cells[1]]);
-    f.session.collected([{ kind: 8 }]);
+    f.session.collected([{ kind: 64 }]);
     assert.equal(f.batches.length, 1);
-    assert.equal(f.batches[0].progress.inventory.items["ore.soil"], 1);
+    assert.equal(f.batches[0].progress.inventory.items["journey.rock.0"], 1);
     gate.resolve();
     await flushing;
     assert.equal(f.batches.length, 2);
-    assert.equal(f.batches[1].progress.inventory.items["ore.soil"], 2);
+    assert.equal(f.batches[1].progress.inventory.items["journey.rock.0"], 2);
     assert.equal(f.batches[1].expectedRevision, 2);
     assert.equal(f.batches[1].head.revision, 3);
     assert.equal(f.world.saveChanges.pending, false);
@@ -260,14 +259,14 @@ test("failed commit retains dirty world and economy; retry does not duplicate re
   });
   try {
     f.world.remove([cells[0]]);
-    f.session.collected([{ kind: 8 }]);
+    f.session.collected([{ kind: 64 }]);
     await assert.rejects(f.saves.flush(), /quota/);
     assert.equal(f.saves.getStatus().revision, 1);
     assert.equal(f.world.saveChanges.pending, true);
     assert.equal(f.saves.getStatus().state, "failed");
     fail = false;
     await f.saves.flush();
-    assert.equal(f.session.exportProgress().inventory.items["ore.soil"], 1);
+    assert.equal(f.session.exportProgress().inventory.items["journey.rock.0"], 1);
     assert.equal(f.batches[1].expectedRevision, 1);
     assert.equal(f.saves.getStatus().revision, 2);
   } finally {
@@ -306,7 +305,7 @@ test("idle flush performs no write, and unrelated pet save does not rewrite ackn
     await f.saves.flush();
     assert.equal(f.batches.length, 0);
     f.world.remove([cells[0]]);
-    f.session.collected([{ kind: 8 }]);
+    f.session.collected([{ kind: 64 }]);
     await f.saves.flush();
     f.session.pets.hatch("meadow-egg");
     await f.saves.flush();
@@ -316,15 +315,15 @@ test("idle flush performs no write, and unrelated pet save does not rewrite ackn
     await f.dispose();
   }
 });
-test("database namespaces are stable and separate production, preview, acceptance, and sample worlds", () => {
+test("database namespaces are stable and separate production, preview and acceptance worlds", () => {
   assert.equal(
     saveNamespace({ pathname: "/games/mining/index.html", search: "" }).name,
-    "mining:production:progression-v1",
+    "mining:production:journey-v1",
   );
   assert.equal(
-    saveNamespace({ pathname: "/games/mining-test/index.html", search: "" })
+    saveNamespace({ pathname: "/games/mining-surface-play/index.html", search: "" })
       .name,
-    "mining:test:progression-v1",
+    "mining:test:journey-v1",
   );
   assert.equal(
     saveNamespace({
@@ -332,13 +331,6 @@ test("database namespaces are stable and separate production, preview, acceptanc
       search: "?debug=1&saveTest=case-1",
     }).name,
     "mining:acceptance:case-1",
-  );
-  assert.equal(
-    saveNamespace({
-      pathname: "/games/mining/index.html",
-      search: "?debug=1&samples=1",
-    }).name,
-    "mining:production:progression-v1:samples",
   );
   assert.throws(() =>
     saveNamespace({ pathname: "/", search: "?debug=1&saveTest=../../bad" }),
@@ -349,26 +341,26 @@ test("unknown formats and changed terrain generations are rejected without silen
   assert.throws(() =>
     compatibleHead(
       { ...head(), world: { ...head().world, generationVersion: 7 } },
-      WORLD_GENERATION,
+      WORLD1,
     ),
   );
-  assert.throws(() => readHead({ ...head(), regionCount: 7000 }));
-  assert.equal(compatibleHead(head(), WORLD_GENERATION).revision, 1);
+  assert.throws(() => readHead({ ...head(), regionCount: 20000 }));
+  assert.equal(compatibleHead(head(), WORLD1).revision, 1);
 });
 
 test("continuous normal changes keep the original two-second deadline", async (t) => {
   t.mock.timers.enable({ apis: ["setTimeout"] });
   const f = fixture(undefined, true);
   try {
-    f.session.collected([{ kind: 8 }]);
+    f.session.collected([{ kind: 64 }]);
     for (let i = 0; i < 3; i++) {
       t.mock.timers.tick(500);
-      f.session.collected([{ kind: 8 }]);
+      f.session.collected([{ kind: 64 }]);
     }
     assert.equal(f.batches.length, 0);
     t.mock.timers.tick(500);
     assert.equal(f.batches.length, 1);
-    assert.equal(f.batches[0].progress.inventory.items["ore.soil"], 4);
+    assert.equal(f.batches[0].progress.inventory.items["journey.rock.0"], 4);
     await f.saves.flush();
     t.mock.timers.tick(10000);
     assert.equal(f.batches.length, 1);
@@ -380,7 +372,7 @@ test("urgent request shortens a normal save deadline", async (t) => {
   t.mock.timers.enable({ apis: ["setTimeout"] });
   const f = fixture(undefined, true);
   try {
-    f.session.collected([{ kind: 8 }]);
+    f.session.collected([{ kind: 64 }]);
     t.mock.timers.tick(100);
     f.session.pets.hatch("meadow-egg");
     t.mock.timers.tick(0);
@@ -400,10 +392,10 @@ test("ordinary edits during a slow write do not turn autosave into continuous wr
     if (!writes++) await gate.promise;
   });
   try {
-    f.session.collected([{ kind: 8 }]);
+    f.session.collected([{ kind: 64 }]);
     t.mock.timers.tick(2000);
     assert.equal(f.batches.length, 1);
-    f.session.collected([{ kind: 8 }]);
+    f.session.collected([{ kind: 64 }]);
     gate.resolve();
     for (let i = 0; i < 10; i++) await Promise.resolve();
     t.mock.timers.tick(1500);
@@ -424,7 +416,7 @@ test("a saving-status subscriber can flush without starting a reentrant transact
     if (f.saves.getStatus().state === "saving") nested = f.saves.flush();
   });
   try {
-    f.session.collected([{ kind: 8 }]);
+    f.session.collected([{ kind: 64 }]);
     await f.saves.flush();
     await nested;
     assert.equal(f.batches.length, 1);

@@ -27,13 +27,13 @@ type Ports = Readonly<{
 
 const SAND = new Color('#d6bf92');
 const STONE = new Color('#8d948c');
-const GLASSY = new Set(['crystal', 'gem', 'star', 'ice', 'amber']);
+const GLASSY = new Set(['gem']);
 // Feedback must never break a frame: unknown kinds fall back to plain rock.
 const resource = (kind: number) => { try { return resourceByKind(kind); } catch { return null; } };
 
 export function hitMaterial(kind: number): HitMaterial {
   const found = resource(kind);
-  if (!found || found.base) return found?.pattern === 'soil' ? 'soil' : 'rock';
+  if (!found || found.base) return 'rock';
   return GLASSY.has(found.pattern) ? 'gem' : 'ore';
 }
 /** Pickup sound by the ore's class within its layer (prices grow exponentially between layers):

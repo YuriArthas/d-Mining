@@ -18,10 +18,10 @@ test('crystal station keeps its floor and ceiling aperture, independent sale, an
  const view=createScenery({...plan,signs:[]});
  try{assert.ok(sceneryGeometryMemory(view).instanceTriangles<40000);assert.equal(plan.authored.kit.texture.size,64);}finally{disposeScenery(view)}
  const session=new GameSession(GAME_CONTENT.session),moves=[];
- session.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining(){},travelTo:p=>moves.push(p)});
+ session.attach({cell:()=>64,pending:()=>false,mine:()=>true,cancelMining(){},travelTo:p=>moves.push(p)});
  assert.equal(session.travelTo('crystal'),'locked');
  session.updatePosition([room.x,-room.depth+.027,room.z],true);
  assert.equal(session.travelTo('crystal'),'travelling');assert.deepEqual(moves,[room.spawn]);
- session.collected([{kind:5}]);session.updatePosition([room.sell.x,room.sell.y,room.sell.z],true);
+ session.collected([{kind:71}]);session.updatePosition([room.sell.x,room.sell.y,room.sell.z],true);
  assert.equal(session.getSnapshot().inSellZone,true);assert.equal(session.getSnapshot().inventory.used,0);assert.ok(session.getSnapshot().coins>0);assert.equal(session.getSnapshot().shopId,null);
 });

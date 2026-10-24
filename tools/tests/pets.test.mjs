@@ -187,8 +187,8 @@ test('UI adapter publishes coherent snapshots, filters unrelated frames, release
 test('session uses pet power for real combat without resetting damage or cooldown', () => {
   let now = 0, serial = 0;
   const session = new GameSession(SESSION_CONTENT, 50, () => now, { random: () => 0, createPetId: () => `p${++serial}` });
-  session.attach({ cell: () => 2, pending: () => false, mine: () => true, cancelMining() {}, returnToSurface() {} });
-  session.collected(Array.from({ length: 30 }, () => ({ kind: 1 })));
+  session.attach({ cell: () => 65, pending: () => false, mine: () => true, cancelMining() {} });
+  session.collected(Array.from({ length: 30 }, () => ({ kind: 64 })));
   const sale = SESSION_CONTENT.sales[0]; session.updatePosition([sale.x, sale.y, sale.z], true); session.resetPosition();
   const target = [0, -1, 0]; assert.equal(session.hit(target).damage, 10);
   const cooldown = session.combatDebug().nextAttackAt;

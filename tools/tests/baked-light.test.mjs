@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
 import { MeshStandardMaterial, Texture, ShaderChunk } from 'three';
 import authored from '../../src/game/content/pinewind/authored.json' with { type: 'json' };
-import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
+import { GAME_CONTENT, GAME_GENERATION } from '../../src/game/content/gameContent.ts';
 import { PINEWIND_DAY } from '../../src/game/content/pinewindSurface.ts';
 import { applyBakedLight, setBakedLightEnabled, setBakedLightTuning, bakedLightState, BAKED_LIGHT } from '../../src/game/presentation/bakedLight.ts';
 import { TEXTURE_UPLOAD_LIMITS } from '../../src/game/presentation/uploadSurfaceTexture.ts';
@@ -110,7 +110,7 @@ test('the top of the mine reads the ground bake on upward surface faces only; de
   const { ShaderLib, Texture: T } = await import('three');
   const { createMineralMaterial } = await import('../../src/game/terrain/mineralMaterial.ts');
   const { setBakedGround } = await import('../../src/game/presentation/bakedLight.ts');
-  const { material, dispose } = createMineralMaterial();
+  const { material, dispose } = createMineralMaterial(GAME_GENERATION.layers, GAME_GENERATION.worlds);
   const shader = { uniforms: {}, vertexShader: ShaderLib.physical.vertexShader, fragmentShader: ShaderLib.physical.fragmentShader };
   material.onBeforeCompile(shader, null);
   assert.match(shader.fragmentShader, /vTerrainNormalY > 0\.5 && vTerrainWorld\.y > -0\.6/);

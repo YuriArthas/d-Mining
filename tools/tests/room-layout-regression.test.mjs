@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {roomsFor} from '../../src/game/world/rooms.ts';
-import {LAYERS} from '../../src/game/content/layers.ts';
+import { WORLD1_LAYERS as LAYERS } from './fixtures/world.mjs';
 import {roomPlan} from '../../src/game/world/scenery.ts';
 import {Matrix4} from 'three';
 import {createScenery,disposeScenery,sceneryShapeGeometry} from '../../src/game/presentation/SceneryMesh.ts';

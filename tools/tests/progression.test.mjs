@@ -1,15 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { STAGES, EGG_STAGES, upgradePrice } from '../../src/game/content/progression.ts';
+import { STAGES, EGG_STAGES } from '../../src/game/content/progression.ts';
 import { RESOURCES, resourceByKind } from '../../src/game/content/resources.ts';
 import { PET_CONTENT } from '../../src/game/content/pets.ts';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
 const SESSION_CONTENT = GAME_CONTENT.session;
 import { GameSession } from '../../src/game/application/GameSession.ts';
-import { SparseWorld, WORLD_GENERATION } from '../../src/game/terrain/SparseWorld.ts';
-import { generatedMineral } from '../../src/game/terrain/strata.ts';
+import { SparseWorld, generationAtZ } from '../../src/game/terrain/SparseWorld.ts';
+import { generatedMineral, DEEP_ROCK_AT } from '../../src/game/terrain/strata.ts';
 import { saveNamespace } from '../../src/game/persistence/SaveBootstrap.ts';
-import { LAYERS } from '../../src/game/content/layers.ts';
+import { WORLD1_LAYERS as LAYERS, GENERATION } from './fixtures/world.mjs';
 import { formatNumber } from '../../src/game/presentation/formatNumber.ts';
 function goToEgg(session,eggId) {
  const station=SESSION_CONTENT.eggStations.find(station=>station.eggId===eggId);
@@ -23,7 +23,6 @@ test('new progression saves start empty and never share the legacy preview slot'
  goToEgg(s,'meadow-egg');
  assert.equal(s.pets.hatch('meadow-egg').status,'insufficient-coins');
  assert.notEqual(saveNamespace({pathname:'/games/mining-test/index.html',search:''}).name,'mining:test');
- assert.equal(WORLD_GENERATION.version,9);
 });
 test('historical depth grants every reached layer and its eggs without coins or room discovery',()=>{
  const s=new GameSession(SESSION_CONTENT),room=SESSION_CONTENT.destinations[1];
@@ -54,35 +53,35 @@ test('locked eggs consume neither currency nor RNG; access changes refresh the s
  assert.equal(s.pets.hatch('pebble-egg').status,'hatched');assert.equal(rolls,1);
  assert.equal(s.getSnapshot().coins,coins-SESSION_CONTENT.petContent.eggs.find(e=>e.id==='pebble-egg').price);
 });
-test('pet power cannot bypass advanced ore level; common and deep rock have no hard lock',()=>{
+test('pet power cannot bypass a later world\'s ore level; world 1 ores and dense rock have no hard lock',()=>{
  const initial=new GameSession(SESSION_CONTENT).exportProgress();
  initial.pets.inventory.pets=[{id:'strong',speciesId:'core-guardian',level:1}];initial.pets.equipment.slots=['strong',null,null];
- let kind=17,now=0,queued=0;
+ let kind=94,now=0,queued=0;
  const s=new GameSession(SESSION_CONTENT,50,()=>now,{},initial);
  s.attach({cell:()=>kind,pending:()=>false,mine:()=>{queued++;return true;},cancelMining(){}});
  const cell=[0,-250,0];s.selectTarget(cell);
- assert.deepEqual(s.hit(cell),{status:'locked',requiredLevel:8});
+ assert.deepEqual(s.hit(cell),{status:'locked',requiredLevel:10});
  assert.equal(s.combatDebug().damagedCells,0);assert.equal(s.combatDebug().nextAttackAt,0);assert.equal(queued,0);
  assert.equal(s.getSnapshot().target.locked,true);
- for(kind of [3,4,...STAGES.map(stage=>stage.deepKind)]){
+ for(kind of [66,67,...LAYERS.map(layer=>layer.deepKind)]){
   now++;assert.notEqual(s.hit([kind,-250,0]).status,'locked');
  }
- const earned=s.exportProgress();earned.pickaxe.level=8;delete earned.equipment; /* Legacy active-gear fixture. */
- const ready=GameSession.fromData(earned,SESSION_CONTENT);kind=17;
- ready.attach({cell:()=>17,pending:()=>false,mine:()=>true,cancelMining(){}});
+ const earned=s.exportProgress();earned.pickaxe.level=10;delete earned.equipment; /* Legacy active-gear fixture. */
+ const ready=GameSession.fromData(earned,SESSION_CONTENT);kind=94;
+ ready.attach({cell:()=>94,pending:()=>false,mine:()=>true,cancelMining(){}});
  assert.equal(ready.hit(cell).status,'breaking');
 });
 test('shallow rock begins below each room; deep rock belongs to the room above',()=>{
- const world=new SparseWorld();
+ const world=new SparseWorld(generationAtZ(GENERATION,0));
  for(let i=0;i<LAYERS.length;i++){
-  const layer=LAYERS[i],stage=STAGES[i],floor=-layer.from/2;
+  const layer=LAYERS[i],floor=-layer.from/2;
   const below=world.cell([0,floor-(i?1:5),0]);
   assert.ok([layer.base,...layer.ores.map(o=>o.kind)].includes(below));
-  assert.equal(generatedMineral(30,floor-1-stage.deepAt/2,30,0),stage.deepKind);
-  const deep=resourceByKind(stage.deepKind),shallow=resourceByKind(layer.base);
+  assert.equal(generatedMineral(30,floor-1-DEEP_ROCK_AT/2,30,0,LAYERS),layer.deepKind);
+  const deep=resourceByKind(layer.deepKind),shallow=resourceByKind(layer.base);
   assert.ok(deep.maxHp>shallow.maxHp);assert.ok(deep.price/deep.maxHp<shallow.price/shallow.maxHp);
   assert.equal(deep.requiredLevel,0);
-  if(i){assert.equal(world.cell([30,floor,30]),STAGES[i-1].deepKind);assert.equal(world.cell([0,floor,0]),0);}
+  if(i){assert.equal(world.cell([30,floor,30]),LAYERS[i-1].deepKind);assert.equal(world.cell([0,floor,0]),0);}
  }
 });
 test('prices and HP remain safe integers, front four have one egg and later stages have two',()=>{
@@ -90,7 +89,6 @@ test('prices and HP remain safe integers, front four have one egg and later stag
  for(const stage of STAGES){
   const eggs=PET_CONTENT.eggs.filter(e=>EGG_STAGES[e.id][0]===stage.index);
   assert.equal(eggs.length,stage.index<4?1:2);
-  for(let level=stage.entryLevel;level<stage.exitLevel;level++)assert.ok(Number.isSafeInteger(upgradePrice(level))&&upgradePrice(level)>0);
  }
  assert.equal(formatNumber(1234567),'123万');assert.equal(formatNumber(999),'999');
 });

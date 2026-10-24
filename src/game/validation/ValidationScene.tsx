@@ -35,7 +35,6 @@ import {
   SHADOW_FILTER_ID,
 } from "../presentation/stableShadow.ts";
 import { GAME_CONFIG } from "../config.ts";
-import { BOXES, RAMP } from "./physics.ts";
 
 export function ValidationScene({
   content,
@@ -68,13 +67,9 @@ export function ValidationScene({
   onPerformance: (value: PerformanceSnapshot) => void;
   session: GameSession;
 }) {
-  const params = new URLSearchParams(location.search),
-    samples = params.get("debug") === "1" && params.get("samples") === "1";
-  const surfaceBoxes = samples ? BOXES : [],
-    ramp = samples ? RAMP : null;
+  const params = new URLSearchParams(location.search);
   const root = useRef<Group>(null),
-    avatar = useRef<Group>(null),
-    fixtures = useRef<Group>(null);
+    avatar = useRef<Group>(null);
   const runtime = useRef<PreparedGame | null>(null);
   const contactShadow = useRef<Mesh>(null);
   const sunShadow = useRef<Group>(null);
@@ -112,7 +107,6 @@ export function ValidationScene({
       input,
       session,
       restoredWorld: savedGame.world,
-      samples,
       previewLayer: params.get("debug") === "1" ? params.get("layer") : null,
       signal: controller.signal,
       settings: () => ({
@@ -283,7 +277,7 @@ export function ValidationScene({
 
   useFrame(({ camera }, elapsed) => {
     const game = runtime.current;
-    if (!game || !avatar.current || !fixtures.current) return;
+    if (!game || !avatar.current) return;
     const gear = session.getSnapshot();
     game.minerAvatar.setEquipment(gear.pickaxe.level, gear.backpackLevel);
     if (shopView.active) {
@@ -299,13 +293,12 @@ export function ValidationScene({
       {
         camera: camera as PerspectiveCamera,
         avatar: avatar.current,
-        fixtures: fixtures.current,
         contactShadow: contactShadow.current,
         sunShadow: sunShadow.current,
       },
       input,
       gl,
-      { samples, timeOfDay, sceneShadowsEnabled, probeMode },
+      { timeOfDay, sceneShadowsEnabled, probeMode },
       onStatus,
       onLoading,
     );
@@ -339,42 +332,6 @@ export function ValidationScene({
         color="#ffefd5"
         intensity={2.5}
       />
-      <group ref={fixtures}>
-        {surfaceBoxes.map((box, i) => (
-          <mesh
-            receiveShadow
-            key={i}
-            position={box.center as [number, number, number]}
-          >
-            <boxGeometry
-              args={box.half.map((v) => v * 2) as [number, number, number]}
-            />
-            <meshStandardMaterial
-              color={box.color}
-              roughness={1}
-              onBeforeCompile={compileStableShadow}
-            />
-          </mesh>
-        ))}
-        {ramp && (
-          <mesh castShadow receiveShadow>
-            <bufferGeometry onUpdate={(g) => g.computeVertexNormals()}>
-              <bufferAttribute
-                attach="attributes-position"
-                args={[ramp.positions, 3]}
-              />
-              <bufferAttribute attach="index" args={[ramp.indices, 1]} />
-            </bufferGeometry>
-            <meshStandardMaterial
-              color="#dfd0ad"
-              roughness={0.85}
-              flatShading
-              onBeforeCompile={compileStableShadow}
-              customProgramCacheKey={() => `ramp-${SHADOW_FILTER_ID}`}
-            />
-          </mesh>
-        )}
-      </group>
       <group ref={avatar}>
         <ContactShadow shadowRef={contactShadow} sunShadowRef={sunShadow} />
       </group>

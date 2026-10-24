@@ -54,7 +54,8 @@ export function readHead(value: unknown): SaveHeadV1 {
   )
     throw Error("世界标识错误");
   const regionCount = integer(data.regionCount as number, "区域数量");
-  if (regionCount > (world.generationVersion === 11 ? 18375 : 6125)) throw Error("矿坑区域数量超出世界范围");
+  // Three worlds of 16-cell regions (see SparseWorld LIMITS and the world corridor).
+  if (regionCount > 18375) throw Error("矿坑区域数量超出世界范围");
   return {
     formatVersion: 1,
     revision,

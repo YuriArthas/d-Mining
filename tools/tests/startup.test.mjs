@@ -1,3 +1,4 @@
+import { installCourse, GENERATION } from './fixtures/world.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { prepareSpawnTerrain } from '../../src/game/validation/prepareSpawnTerrain.ts';
@@ -17,7 +18,7 @@ class Worker {
  }
  terminate(){this.closed=true;}
 }
-function setup(mode){const physics=new CharacterPhysics(),workers=[];const terrain=new TerrainStream(physics,()=>{const w=new Worker(mode);workers.push(w);return w});return {physics,terrain,workers,dispose(){terrain.dispose();physics.dispose()}}}
+function setup(mode){const physics=installCourse(new CharacterPhysics()),workers=[];const terrain=new TerrainStream(physics,GENERATION,()=>{const w=new Worker(mode);workers.push(w);return w});return {physics,terrain,workers,dispose(){terrain.dispose();physics.dispose()}}}
 test('spawn terrain becomes ready without any render frame or physics tick',async()=>{
  const f=setup(),controller=new AbortController(),progress=[];
  try{await prepareSpawnTerrain(f.terrain,f.physics.feet(),controller.signal,(done,total)=>progress.push([done,total]));

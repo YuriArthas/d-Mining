@@ -1,3 +1,6 @@
+import { generationAtZ as worldAtZ } from '../../src/game/terrain/SparseWorld.ts';
+import { GENERATION as GAME_GENERATION_FIXTURE } from './fixtures/world.mjs';
+const WORLD1 = worldAtZ(GAME_GENERATION_FIXTURE, 0);
 import test from 'node:test';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
 import assert from 'node:assert/strict';
@@ -18,10 +21,10 @@ await initPhysics();
 const destinations = GAME_CONTENT.session.destinations;
 const rooms = GAME_CONTENT.rooms.filter(room => ['old_mine', 'fungal'].includes(room.id));
 function physicsAtRoom(room) {
-  const physics = new CharacterPhysics(false);
+  const physics = new CharacterPhysics();
   const floorRegion = Math.floor(-room.depth / (CELL * COLLISION_SIZE));
   for (let x = -1; x <= 0; x++) for (let y = floorRegion - 1; y <= floorRegion; y++) {
-    const coord = [x, y, 0], { mesh } = buildRegion('collision', coord, COLLISION_SIZE, []);
+    const coord = [x, y, 0], { mesh } = buildRegion('collision', coord, COLLISION_SIZE, [], WORLD1);
     if (mesh.indices.length) physics.world.createCollider(
       RAPIER.ColliderDesc.trimesh(mesh.positions, mesh.indices, RAPIER.TriMeshFlags.FIX_INTERNAL_EDGES)
         .setTranslation(...coord.map(value => value * COLLISION_SIZE * CELL)),

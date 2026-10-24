@@ -85,7 +85,7 @@ test('assembly rejects missing named nodes and releases already-loaded resources
  assert.throws(()=>assembleAuthoredSurface(f.assets,f.content),/Missing surface node/);assert.equal(disposed,1);
 });
 test('actual character collision: bridge, both services, the teleport station, the first egg and the top terrace without a jump',async()=>{
- await initPhysics();const physics=new CharacterPhysics(false,true),collisions=new SceneryCollision(physics,[{id:'surface',depth:0,plan:GAME_CONTENT.surface.plan}]);
+ await initPhysics();const physics=new CharacterPhysics(),collisions=new SceneryCollision(physics,[{id:'surface',depth:0,plan:GAME_CONTENT.surface.plan}]);
  // The production voxel floor outside the mine is at y=0.
  physics.world.createCollider(RAPIER.ColliderDesc.cuboid(100,1,100).setTranslation(0,-1,0));
  // Steer like a player: movement direction for yaw ψ is (-sin ψ, -cos ψ).
@@ -128,7 +128,7 @@ test('the bridge deck leaves the path at ground level and arches gently; the fee
  }
  assert.ok(deck(B.x,B.z)>B.rise-.05&&deck(B.x,B.z)<B.rise+.1,'deck rises to its crown');
  for(let z=-B.halfSpan;z<B.halfSpan;z+=.25){const slope=Math.abs(deck(B.x,B.z+z+.25)-deck(B.x,B.z+z))/.25;assert.ok(slope<Math.tan(20*Math.PI/180),`slope ${slope.toFixed(2)} at ${z}`);}
- const physics=new CharacterPhysics(false,true),collisions=new SceneryCollision(physics,[{id:'surface',depth:0,plan}]);
+ const physics=new CharacterPhysics(),collisions=new SceneryCollision(physics,[{id:'surface',depth:0,plan}]);
  physics.world.createCollider(RAPIER.ColliderDesc.cuboid(100,1,100).setTranslation(0,-1,0));
  try{
   for(const dir of [-1,1])for(const x of [-1.6,-.8,0,.8,1.6]){
@@ -158,7 +158,7 @@ test('cliffs enclose the valley outside the play area: the pass and the creek go
  }
  for(const zone of [...GAME_CONTENT.session.stations.map(s=>s.zone),...GAME_CONTENT.session.eggStations.map(e=>e.zone),...Object.values(PINEWIND_SERVICES).map(s=>s.trigger)])
   for(const s of hulls)assert.ok(gap(s,zone.x,zone.z)>10);
- await initPhysics();const physics=new CharacterPhysics(false,true),collisions=new SceneryCollision(physics,[{id:'surface',depth:0,plan:GAME_CONTENT.surface.plan}]);
+ await initPhysics();const physics=new CharacterPhysics(),collisions=new SceneryCollision(physics,[{id:'surface',depth:0,plan:GAME_CONTENT.surface.plan}]);
  physics.world.createCollider(RAPIER.ColliderDesc.cuboid(100,1,100).setTranslation(0,-1,0));
  try{
   // Walk north behind the mine and west behind the sale house: the cliffs stop both walks.
@@ -171,7 +171,7 @@ test('cliffs enclose the valley outside the play area: the pass and the creek go
 });
 test('instant trips face the service building',()=>{
  const session=new GameSession(GAME_CONTENT.session);let trip=null;
- session.attach({cell:()=>0,pending:()=>false,mine:()=>false,cancelMining(){},returnToSurface(){},travelTo:(feet,look)=>{trip={feet,look};}});
+ session.attach({cell:()=>0,pending:()=>false,mine:()=>false,cancelMining(){},travelTo:(feet,look)=>{trip={feet,look};}});
  assert.equal(session.goTo('shop'),'travelling');
  assert.deepEqual(trip.look,PINEWIND_SERVICES.shop.center);
  assert.equal(trip.feet[0],PINEWIND_SERVICES.shop.trigger.x);

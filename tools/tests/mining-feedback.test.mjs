@@ -8,7 +8,7 @@ import { JOURNEY_BACKPACKS } from '../../src/game/content/journeyResources.ts';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
 const SESSION_CONTENT = GAME_CONTENT.session, SELL_ZONE = SESSION_CONTENT.sales[0];
 
-import { LAYERS } from '../../src/game/content/layers.ts';
+import { WORLD1_LAYERS as LAYERS } from './fixtures/world.mjs';
 import { itemPrice } from '../../src/game/application/items.ts';
 import { Color } from 'three';
 
@@ -28,12 +28,12 @@ const feet = [0, 0, 6];
 
 test('普通命中在镐尖落下那一帧出声、飞碎屑；最后一击立刻炸开，不再补一下命中声', () => {
   const h = harness();
-  h.feedback.update(1 / 60, { cell: [0, 0, 1], kind: 4, breaking: false }, h.still, feet);
+  h.feedback.update(1 / 60, { cell: [0, 0, 1], kind: 67, breaking: false }, h.still, feet);
   assert.deepEqual(h.cues, [], 'nothing before the pick lands');
   h.feedback.update(1 / 60, null, { ...h.still, contact: [1, 0.2, 2.6] }, feet);
   assert.deepEqual(h.cues, [{ type: 'hit', material: 'ore' }]);
   assert.ok(h.feedback.effects.diagnostics().particles >= 7 && h.feedback.effects.diagnostics().flashing);
-  h.feedback.update(1 / 60, { cell: [0, 0, 1], kind: 4, breaking: true }, h.still, feet);
+  h.feedback.update(1 / 60, { cell: [0, 0, 1], kind: 67, breaking: true }, h.still, feet);
   assert.deepEqual(h.cues.at(-1), { type: 'break', material: 'ore' });
   const spawned = h.feedback.effects.diagnostics().spawned;
   h.feedback.update(1 / 60, null, { ...h.still, contact: [1, 0.2, 2.6] }, feet);
@@ -45,12 +45,12 @@ test('普通命中在镐尖落下那一帧出声、飞碎屑；最后一击立�
 test('镐子落下时方块已被挖走就不出命中声；传送清掉待播的命中', () => {
   let kind = 1;
   const h = harness(() => kind);
-  h.feedback.update(1 / 60, { cell: [0, -1, 0], kind: 1, breaking: false }, h.still, feet);
+  h.feedback.update(1 / 60, { cell: [0, -1, 0], kind: 64, breaking: false }, h.still, feet);
   kind = 0;
   h.feedback.update(1 / 60, null, { ...h.still, contact: [1, 0.2, 2.6] }, feet);
   assert.deepEqual(h.cues, []);
   kind = 1;
-  h.feedback.update(1 / 60, { cell: [0, -1, 0], kind: 1, breaking: false }, h.still, feet);
+  h.feedback.update(1 / 60, { cell: [0, -1, 0], kind: 64, breaking: false }, h.still, feet);
   h.feedback.travel();
   h.feedback.update(1 / 60, null, { ...h.still, contact: [1, 0.2, 2.6] }, feet);
   assert.deepEqual(h.cues, [{ type: 'travel' }]);
@@ -69,7 +69,7 @@ test('起跳、落地有声；重落地扬尘，轻落地不扬尘', () => {
 test('出售、购买、奖励、孵蛋、解锁、拒绝和拾取各有对应音效；未知物品不报错', () => {
   const h = harness();
   for (const event of [{ type: 'sold', coins: 5, count: 3 }, { type: 'purchased' }, { type: 'reward' }, { type: 'hatched', tier: 2, auto: false }, { type: 'hatched', tier: 0, auto: true }, { type: 'unlocked' }, { type: 'denied', reason: 'full' }]) h.emit(event);
-  h.collect([{ itemId: 'ore.stone', count: 3 }, { itemId: 'ore.crystal', count: 1 }]);
+  h.collect([{ itemId: 'journey.rock.0', count: 3 }, { itemId: 'journey.emerald', count: 1 }]);
   h.collect([{ itemId: 'not-a-real-item', count: 1 }]);
   assert.deepEqual(h.cues, [
     { type: 'sell' }, { type: 'purchase' }, { type: 'reward' }, { type: 'hatch', tier: 2, auto: false }, { type: 'hatch', tier: 0, auto: true },
@@ -81,10 +81,11 @@ test('出售、购买、奖励、孵蛋、解锁、拒绝和拾取各有对应�
 });
 
 test('命中材质与拾取音高按矿物属性划分', () => {
-  assert.equal(hitMaterial(1), 'rock'); assert.equal(hitMaterial(8), 'soil'); assert.equal(hitMaterial(11), 'rock');
-  assert.equal(hitMaterial(4), 'ore'); assert.equal(hitMaterial(6), 'gem'); assert.equal(hitMaterial(22), 'gem');
+  // World 1's rock and its dense rock, coal (vein), copper (metal) and emerald (gem).
+  assert.equal(hitMaterial(64), 'rock'); assert.equal(hitMaterial(65), 'rock');
+  assert.equal(hitMaterial(66), 'ore'); assert.equal(hitMaterial(67), 'ore'); assert.equal(hitMaterial(74), 'gem');
   assert.equal(hitMaterial(9999), 'rock', 'unknown kinds fall back instead of throwing');
-  assert.deepEqual(['ore.stone', 'ore.soil', 'ore.copper', 'ore.crystal', 'ore.diamond', 'unknown'].map(pickupTier), [0, 0, 1, 2, 2, 0]);
+  assert.deepEqual(['journey.rock.0', 'journey.rock.0.deep', 'journey.copper', 'journey.emerald', 'journey.diamond', 'unknown'].map(pickupTier), [0, 0, 1, 2, 2, 0]);
 });
 
 test('碎屑从朝向玩家且露在空气里的面飞出，不会埋进相邻方块', () => {
@@ -116,7 +117,7 @@ test('碎屑寿命有限、数量有上限，闪光很快消失', () => {
 test('会话发出出售、购买、余额不足和满包拒绝事件', () => {
   let now = 0;
   const session = new GameSession(SESSION_CONTENT, undefined, () => now), events = [];
-  session.attach({ cell: () => 1, pending: () => false, mine: () => true, cancelMining: () => {} });
+  session.attach({ cell: () => 64, pending: () => false, mine: () => true, cancelMining: () => {} });
   session.onFeedback(e => events.push(e));
   // The richer ore of world 1's surface: enough for the first bag without filling the starting one.
   const [first, second] = JOURNEY_BACKPACKS, ore = resourceByKind(67), count = Math.ceil(first.price / ore.price);

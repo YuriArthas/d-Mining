@@ -5,10 +5,7 @@ import { CELL, type Coord } from '../terrain/SparseWorld.ts';
 import { PROTECTED_FLOOR } from '../world/entrance.ts';
 
 /** What a footstep sounds like on each terrain pattern. */
-const PATTERN: Readonly<Record<string, FootSurface>> = {
-  soil: 'dirt', rock: 'stone', strata: 'stone', chunk: 'stone', vein: 'stone', fossil: 'stone', amber: 'stone',
-  core: 'stone', ice: 'ice', metal: 'metal', crystal: 'crystal', gem: 'crystal', star: 'crystal',
-};
+const PATTERN: Readonly<Record<string, FootSurface>> = { rock: 'stone', vein: 'stone', metal: 'metal', gem: 'crystal' };
 /** Rest-station floors and decks in each layer theme. */
 const FLOOR: Readonly<Record<string, FootSurface>> = {
   meadow_mine: 'grass', timber_mine: 'wood', mushroom_cave: 'dirt', crystal_cave: 'crystal', buried_ruins: 'stone',

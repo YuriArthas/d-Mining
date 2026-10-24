@@ -17,11 +17,11 @@ for(const world of GAME_CONTENT.worlds)for(const room of world.localRooms.filter
 // World 1's rooms: reaching one admits travel to it; its counters work.
 for(const room of GAME_CONTENT.rooms)test(`${room.id}: reaching it admits travel; its counters work`,()=>{
  const session=new GameSession(GAME_CONTENT.session),moves=[];
- session.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining(){},travelTo:p=>moves.push(p)});
+ session.attach({cell:()=>64,pending:()=>false,mine:()=>true,cancelMining(){},travelTo:p=>moves.push(p)});
  assert.equal(session.travelTo(room.id),'locked');
  session.updatePosition([room.x,-room.depth+.027,room.z],true);
  assert.equal(session.travelTo(room.id),'travelling');assert.deepEqual(moves,[room.spawn]);
- session.collected([{kind:5}]);session.updatePosition([room.sell.x,room.sell.y,room.sell.z],true);
+ session.collected([{kind:71}]);session.updatePosition([room.sell.x,room.sell.y,room.sell.z],true);
  assert.equal(session.getSnapshot().inventory.used,0);assert.equal(session.getSnapshot().inSellZone,true);
  if(room.shop){session.updatePosition([room.shop.x,room.shop.y,room.shop.z],true);assert.equal(session.getSnapshot().shopId,room.id)}else assert.equal(session.getSnapshot().shopId,null);
 });

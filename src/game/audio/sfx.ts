@@ -3,7 +3,7 @@
  *  tests and offline renders reuse them. Levels are per cue; the bus adds a gentle compressor. */
 import { hiss, makeNoise, tone, vary, type Voice } from './synth.ts';
 
-export type HitMaterial = 'soil' | 'rock' | 'ore' | 'gem';
+export type HitMaterial = 'rock' | 'ore' | 'gem';
 export type SfxCue =
   | Readonly<{ type: 'hit'; material: HitMaterial }>
   | Readonly<{ type: 'break'; material: HitMaterial }>
@@ -33,12 +33,6 @@ const sparkle = (v: Voice, start: number, count = 3, peak = 0.05) =>
 // (for headphones) with a midrange knock that carries on a phone.
 function hit(v: Voice, material: HitMaterial) {
   const d = vary(v);
-  if (material === 'soil') {
-    hiss(v, { filter: 'lowpass', from: 1700 * d, to: 520, sweep: 0.07, q: 0.7, peak: 0.45, decay: 0.09 });
-    tone(v, { wave: 'triangle', from: 380 * d, to: 250, sweep: 0.05, peak: 0.5, attack: 0.002, decay: 0.08 });
-    tone(v, { from: 150 * d, to: 62, sweep: 0.08, peak: 0.45, attack: 0.002, decay: 0.12 });
-    return;
-  }
   // Pick on stone: a bright chip, a stony knock, a short thump and a dry tick.
   hiss(v, { filter: 'bandpass', from: 3300 * d, to: 2300, sweep: 0.04, q: 0.8, peak: 0.5, attack: 0.001, decay: 0.05 });
   hiss(v, { filter: 'highpass', from: 2200, q: 0.7, peak: 0.35, attack: 0.001, decay: 0.03 });
@@ -56,13 +50,13 @@ function hit(v: Voice, material: HitMaterial) {
 }
 
 function crumble(v: Voice, material: HitMaterial) {
-  const d = vary(v, 0.05), soft = material === 'soil';
-  hiss(v, { filter: 'lowpass', from: (soft ? 1500 : 2600) * d, to: soft ? 240 : 320, sweep: 0.32, q: 0.8, peak: 0.5, attack: 0.003, decay: 0.34 });
-  tone(v, { wave: 'triangle', from: (soft ? 360 : 520) * d, to: soft ? 220 : 300, sweep: 0.06, peak: 0.42, attack: 0.002, decay: 0.09 });
+  const d = vary(v, 0.05);
+  hiss(v, { filter: 'lowpass', from: 2600 * d, to: 320, sweep: 0.32, q: 0.8, peak: 0.5, attack: 0.003, decay: 0.34 });
+  tone(v, { wave: 'triangle', from: 520 * d, to: 300, sweep: 0.06, peak: 0.42, attack: 0.002, decay: 0.09 });
   tone(v, { from: 120 * d, to: 42, sweep: 0.16, peak: 0.5, attack: 0.002, decay: 0.2 });
   // Falling grains scattered over the first fifth of a second.
   for (let i = 0; i < 6; i++) {
-    hiss(v, { filter: soft ? 'lowpass' : 'bandpass', from: soft ? 900 + v.random() * 600 : 1400 + v.random() * 2400, q: 2, peak: 0.15 + v.random() * 0.15, attack: 0.001, decay: 0.02 + v.random() * 0.025, start: 0.015 + v.random() * 0.17 });
+    hiss(v, { filter: 'bandpass', from: 1400 + v.random() * 2400, q: 2, peak: 0.15 + v.random() * 0.15, attack: 0.001, decay: 0.02 + v.random() * 0.025, start: 0.015 + v.random() * 0.17 });
   }
   if (material === 'ore') notes(v, [1320, 1980], 0.035, 0.07, 0.42, 'sine', 0.02);
   if (material === 'gem') sparkle(v, 0.03, 3, 0.055);

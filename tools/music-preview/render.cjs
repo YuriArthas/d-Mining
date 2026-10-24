@@ -83,7 +83,7 @@ const SURFACES = ['grass', 'sand', 'dirt', 'stone', 'wood', 'metal', 'ice', 'cry
   if (what === 'steps' || what === 'all') {
     await run('steps', SURFACES.map(s => ({ kind: 'steps', args: [s], label: s })), 3);
     await run('cues', [
-      { kind: 'cue', args: [{ type: 'hit', material: 'rock' }], label: 'hit-rock' }, { kind: 'cue', args: [{ type: 'hit', material: 'soil' }], label: 'hit-soil' },
+      { kind: 'cue', args: [{ type: 'hit', material: 'rock' }], label: 'hit-rock' },
       { kind: 'cue', args: [{ type: 'pickup', tier: 1 }], label: 'pickup' }, { kind: 'cue', args: [{ type: 'ui' }], label: 'ui' },
       { kind: 'cue', args: [{ type: 'land', strength: 0.6 }], label: 'land' },
     ], 0);

@@ -70,12 +70,12 @@ test('resource quantities remain stable and definitions are immutable',()=>{
 });
 test('session shows mixed-unit snapshots and sells completed overflow at independent prices once',()=>{
  let now=0,solid=true;const initial=new GameSession(SESSION_CONTENT).exportProgress(); initial.pickaxe.level=28;delete initial.equipment; /* Legacy active-gear fixture. */ const session=new GameSession(SESSION_CONTENT,50,()=>now,{},initial);
- session.attach({cell:()=>solid?5:0,pending:()=>false,mine:()=>true,cancelMining:()=>{}});
- session.collected(Array.from({length:47},()=>({kind:8})));const cell=[11,-1,-25];session.selectTarget(cell);
- assert.equal(session.getSnapshot().target.volume,10);assert.equal(session.getSnapshot().target.price,resourceByKind(5).price);
- const hits=Math.ceil(resourceByKind(5).maxHp/pickaxeStats(28).power); for(let i=0;i<hits;i++){now=i*.5;assert.equal(session.hit(cell).status,i===hits-1?'breaking':'hit')}
- solid=false;session.collected([{cell,kind:5}]);let s=session.getSnapshot();assert.equal(s.inventory.used,57);assert.equal(s.inventory.totalCount,48);assert.deepEqual(s.sale,{status:'quoted',count:48,coins:47+resourceByKind(5).price});
- solid=true;now+=.5;assert.equal(session.hit([12,-1,-25]).status,'full');assert.equal(session.blockHealth([12,-1,-25]),resourceByKind(5).maxHp);
- session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);s=session.getSnapshot();assert.equal(s.coins,SESSION_CONTENT.initialCoins+47+resourceByKind(5).price);assert.equal(s.inventory.totalCount,0);assert.match(s.notice,/48 件.*金币/);
- session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);assert.equal(session.getSnapshot().coins,SESSION_CONTENT.initialCoins+47+resourceByKind(5).price);
+ session.attach({cell:()=>solid?71:0,pending:()=>false,mine:()=>true,cancelMining:()=>{}});
+ session.collected(Array.from({length:47},()=>({kind:64})));const cell=[11,-1,-25];session.selectTarget(cell);
+ assert.equal(session.getSnapshot().target.volume,resourceByKind(71).volume);assert.equal(session.getSnapshot().target.price,resourceByKind(71).price);
+ const hits=Math.ceil(resourceByKind(71).maxHp/pickaxeStats(28).power); for(let i=0;i<hits;i++){now=i*.5;assert.equal(session.hit(cell).status,i===hits-1?'breaking':'hit')}
+ solid=false;session.collected([{cell,kind:71}]);let s=session.getSnapshot();assert.equal(s.inventory.used,47+resourceByKind(71).volume);assert.equal(s.inventory.totalCount,48);assert.deepEqual(s.sale,{status:'quoted',count:48,coins:47+resourceByKind(71).price});
+ solid=true;now+=.5;assert.equal(session.hit([12,-1,-25]).status,'full');assert.equal(session.blockHealth([12,-1,-25]),resourceByKind(71).maxHp);
+ session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);s=session.getSnapshot();assert.equal(s.coins,SESSION_CONTENT.initialCoins+47+resourceByKind(71).price);assert.equal(s.inventory.totalCount,0);assert.match(s.notice,/48 件.*金币/);
+ session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);assert.equal(session.getSnapshot().coins,SESSION_CONTENT.initialCoins+47+resourceByKind(71).price);
 });

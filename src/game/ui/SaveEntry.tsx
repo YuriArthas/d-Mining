@@ -29,11 +29,11 @@ export function SaveEntry({
     setGame(null);
     const task = cleanup.current.then(async () => {
       abort.signal.throwIfAborted();
-      const target = saveNamespace(location,generation.worlds?'journey-v1':undefined);
+      const target = saveNamespace(location);
       return openSavedGame(
         target.name,
         content,
-        { ...generation, samples: target.samples },
+        generation,
         abort.signal,
         (text) => {
           if (!abort.signal.aborted) setMessage(text);

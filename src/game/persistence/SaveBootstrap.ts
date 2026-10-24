@@ -1,4 +1,3 @@
-import { PROGRESSION_VERSION } from '../content/progression.ts';
 import { GameSession } from "../application/GameSession.ts";
 import type { SessionContent } from "../application/SessionContent.ts";
 import { SparseWorld, type WorldGeneration } from "../terrain/SparseWorld.ts";
@@ -106,13 +105,12 @@ export async function openSavedGame(
     throw error;
   }
 }
+/** Saves of the three-world journey live apart from every older save (`journey-v1`). */
 export function saveNamespace(
   location: Pick<Location, "pathname" | "search">,
-  progression = PROGRESSION_VERSION,
-): { name: string; samples: boolean } {
+): { name: string } {
   const params = new URLSearchParams(location.search),
     debug = params.get("debug") === "1";
-  const samples = debug && params.get("samples") === "1";
   const testId = debug ? params.get("saveTest") : null;
   if (testId && !/^[a-zA-Z0-9_-]{1,80}$/.test(testId))
     throw Error("存档验收标识错误");
@@ -121,8 +119,7 @@ export function saveNamespace(
     : "test";
   return {
     name: testId
-      ? `mining:acceptance:${testId}${samples ? ":samples" : ""}`
-      : `mining:${mode}:${progression}${samples ? ":samples" : ""}`,
-    samples,
+      ? `mining:acceptance:${testId}`
+      : `mining:${mode}:journey-v1`,
   };
 }

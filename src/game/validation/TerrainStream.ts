@@ -1,6 +1,5 @@
-import { ORE_SAMPLES } from '../terrain/minerals.ts';
 import { type CharacterPhysics } from './physics.ts';
-import { SparseWorld, WORLD_GENERATION, type WorldGeneration, CELL, RENDER_SIZE, COLLISION_SIZE, regionOf, chunkKey, validRegion, inBounds, type Coord } from '../terrain/SparseWorld.ts';
+import { SparseWorld, type WorldGeneration, CELL, RENDER_SIZE, COLLISION_SIZE, regionOf, chunkKey, validRegion, inBounds, type Coord } from '../terrain/SparseWorld.ts';
 import { RenderTerrain, CollisionTerrain } from '../terrain/TerrainLayers.ts';
 import { Measurements, type WorkerFactory } from '../terrain/RegionPipeline.ts';
 export type ExcavatedCell = Readonly<{ cell: Coord; kind: number }>;
@@ -19,7 +18,7 @@ export class TerrainStream {
   error: string | null = null;
   private readonly physics: CharacterPhysics;
   private onExcavated: (resources: readonly ExcavatedCell[]) => void;
-  constructor(physics: CharacterPhysics, factory: WorkerFactory = () => new Worker(new URL('./terrain.worker.ts', import.meta.url), { type: 'module' }), onExcavated: (resources: readonly ExcavatedCell[]) => void = () => {}, generation: WorldGeneration = WORLD_GENERATION, restoredWorld?: SparseWorld) {
+  constructor(physics: CharacterPhysics, generation: WorldGeneration, factory: WorkerFactory = () => new Worker(new URL('./terrain.worker.ts', import.meta.url), { type: 'module' }), onExcavated: (resources: readonly ExcavatedCell[]) => void = () => {}, restoredWorld?: SparseWorld) {
     this.world = restoredWorld ?? new SparseWorld(generation);
     this.onExcavated = onExcavated;
     this.physics = physics;
@@ -102,14 +101,6 @@ export class TerrainStream {
   relocate(feet: readonly number[]) {
     this.cancelPending();
     this.render.pipeline.relocate(feet); this.collision.pipeline.relocate(feet); this.lastCenter = ''; this.recenter(feet, true);
-  }
-  sampleStats() {
-    return ORE_SAMPLES.map(sample => {
-      const render = this.render.pipeline.residents.get(chunkKey([sample.x / 16, -1, sample.z / 16]));
-      const physical = [0, 1, 2, 3].map(i => this.collision.pipeline.residents.get(chunkKey([sample.x / 8 + (i % 2), -1, sample.z / 8 + Math.floor(i / 2)])));
-      return { name: sample.name, renderTriangles: render?.resource.triangles ?? null,
-        collisionTriangles: physical.every(Boolean) ? physical.reduce((n, r) => n + r!.resource.triangles, 0) : null };
-    });
   }
   snapshot() {
     const r = this.render.pipeline, p = this.collision.pipeline, visuals = [...r.residents.values()].map(v => v.resource), physical = [...p.residents.values()].map(v => v.resource);

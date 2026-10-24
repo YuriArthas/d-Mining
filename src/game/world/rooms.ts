@@ -1,7 +1,7 @@
 import {roomScene, ROOM_SCENES} from '../content/rooms/sceneDefinitions.ts';
 import type {RoomSceneDefinition, RoomZone} from '../content/rooms/authoredRoom.ts';
 import {ROOM_LAYOUT} from '../content/roomLayout.ts';
-import { LAYERS, layerAtDepth, type Layer } from '../content/layers.ts';
+import { layerAtDepth, type Layer } from '../content/layers.ts';
 import { CELL } from '../terrain/grid.ts';
 import {ENTRANCE_WORLD} from './entrance.ts';
 import type { ZoneConfig } from '../logic/ZoneDetector.ts';
@@ -53,13 +53,13 @@ function inRoomFootprint(x:number,z:number,layout:typeof ROOM_LAYOUT){
  return x>=layout.centerX-layout.widthCells/2&&x<layout.centerX+layout.widthCells/2
   &&z>=layout.centerZ-layout.depthCells/2&&z<layout.centerZ+layout.depthCells/2;
 }
-export function roomAir(x:number,y:number,z:number,layers:readonly Layer[]=LAYERS){
+export function roomAir(x:number,y:number,z:number,layers:readonly Layer[]){
  if(!insideAnyRoomBounds(x,z,layers))return false;
  const l=layerBelowCell(y,layers);if(!l)return false;
  const layout=l.room??ROOM_LAYOUT,floor=-l.from/CELL;
  return inRoomFootprint(x,z,layout)&&y>=floor&&y<floor+layout.heightCells;
 }
-export function onRoomFloor(x:number,y:number,z:number,layers:readonly Layer[]=LAYERS){
+export function onRoomFloor(x:number,y:number,z:number,layers:readonly Layer[]){
  const l=layerAtDepth(-(y+1)*CELL,layers);
  return l.from>0&&y===-l.from/CELL-1&&inRoomFootprint(x,z,l.room??ROOM_LAYOUT);
 }

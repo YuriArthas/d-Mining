@@ -144,7 +144,7 @@ test('failed clipboard does not award; copied WeChat and Douyin text redeem and 
 await initPhysics();
 test('double movement multiplier doubles ground distance while the character still collides with walls', () => {
   function measure(multiplier, wall = false) {
-    const physics = new CharacterPhysics(false);
+    const physics = new CharacterPhysics();
     try {
       physics.world.createCollider(RAPIER.ColliderDesc.cuboid(50, 0.5, 50).setTranslation(0, -0.5, 0));
       if (wall) physics.world.createCollider(RAPIER.ColliderDesc.cuboid(0.1, 5, 10).setTranslation(4, 5, 0));

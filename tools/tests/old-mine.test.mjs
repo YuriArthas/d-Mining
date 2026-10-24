@@ -22,7 +22,7 @@ test('a new save starts with every layer locked; reaching a layer\'s depth admit
  const session=new GameSession(GAME_CONTENT.session),moves=[];
  assert.deepEqual(session.getSnapshot().destinations.filter(d=>d.unlocked).map(d=>d.id),[]);
  assert.equal(session.getSnapshot().depth,0);
- session.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining(){},travelTo:p=>moves.push(p)});
+ session.attach({cell:()=>64,pending:()=>false,mine:()=>true,cancelMining(){},travelTo:p=>moves.push(p)});
  assert.equal(session.travelTo('old_mine'),'locked');
  session.updatePosition([room.x,-room.depth+.027,room.z],true);
  assert.deepEqual(session.getSnapshot().destinations.filter(d=>d.unlocked).map(d=>d.id),['old_mine']);

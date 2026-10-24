@@ -6,7 +6,7 @@ import { sceneryGeometryMemory } from '../../src/game/presentation/sceneryGeomet
 import { createScenery, disposeScenery } from '../../src/game/presentation/SceneryMesh.ts';
 import { roomPlan } from '../../src/game/world/scenery.ts';
 import { roomsFor } from '../../src/game/world/rooms.ts';
-import { LAYERS } from '../../src/game/content/layers.ts';
+import { WORLD1_LAYERS as LAYERS } from './fixtures/world.mjs';
 const ROOMS = roomsFor(LAYERS);
 
 test('indexing preserves triangle corner attributes, hard normals and UV seams',()=>{

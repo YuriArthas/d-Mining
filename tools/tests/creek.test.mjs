@@ -63,7 +63,7 @@ test('terrain meshes leave the cut floor out: no voxel top surface inside the cr
 
 test('a character walks down into the creek, wades across and climbs out, on real voxel and bank collision', async () => {
   await initPhysics();
-  const physics = new CharacterPhysics(false, true), collisions = new SceneryCollision(physics, [{ id: 'surface', depth: 0, plan: GAME_CONTENT.surface.plan }]);
+  const physics = new CharacterPhysics(), collisions = new SceneryCollision(physics, [{ id: 'surface', depth: 0, plan: GAME_CONTENT.surface.plan }]);
   for (let x = -4; x <= -1; x++) for (let z = 1; z <= 3; z++) {
     const coord = [x, -1, z], mesh = buildRegion('collision', coord, COLLISION_SIZE, [], GAME_GENERATION).mesh;
     if (mesh.indices.length) physics.world.createCollider(RAPIER.ColliderDesc.trimesh(mesh.positions, mesh.indices, RAPIER.TriMeshFlags.FIX_INTERNAL_EDGES).setTranslation(...coord.map(v => v * COLLISION_SIZE * CELL)));
@@ -81,7 +81,7 @@ test('a character walks down into the creek, wades across and climbs out, on rea
 
 test('standing in the creek is still the surface (not the mine) and sounds like wading', () => {
   const session = new GameSession(GAME_CONTENT.session);
-  session.attach({ cell: () => 0, pending: () => false, mine: () => false, cancelMining() {}, returnToSurface() {}, travelTo() {} });
+  session.attach({ cell: () => 0, pending: () => false, mine: () => false, cancelMining() {}, travelTo() {} });
   session.updatePosition([-20, -.93, 41.2], true);
   assert.equal(session.getSnapshot().location, 'surface');
   session.updatePosition([-20, -2.05, 41.2], true);

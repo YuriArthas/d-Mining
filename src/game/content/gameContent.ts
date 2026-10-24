@@ -90,4 +90,4 @@ export const GAME_CONTENT = {
 export type GameContent = typeof GAME_CONTENT;
 
 /** Terrain generation: world 1's creek bed is cut out of the voxel floor meshes. The version stays, so saves still fit. */
-export const GAME_GENERATION = Object.freeze({ version: 11, seed: 0, samples: false, layers: first.layers, worlds: JOURNEY_WORLDS, surfaceCut: CREEK_CELLS });
+export const GAME_GENERATION = Object.freeze({ version: 11, seed: 0, layers: first.layers, worlds: JOURNEY_WORLDS, surfaceCut: CREEK_CELLS });

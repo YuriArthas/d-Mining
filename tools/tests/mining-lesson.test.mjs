@@ -7,7 +7,7 @@ import { ORE_ITEMS } from '../../src/game/application/items.ts';
 test('lesson proactively highlights a visible, reachable, unlocked real block and hides when disabled',()=>{
  const camera=new PerspectiveCamera(55,1.6,.08,100);camera.position.set(0,6,12);camera.lookAt(0,0,0);camera.updateMatrixWorld();
  const feet=[0,0,5],element={style:{},dataset:{},querySelector:()=>({textContent:''})};
- const terrain={cell:([x,y,z])=>y===-1&&Math.abs(x)<=2&&Math.abs(z)<=2?8:0,canMine(c){return this.cell(c)>0;}};
+ const terrain={cell:([x,y,z])=>y===-1&&Math.abs(x)<=2&&Math.abs(z)<=2?64:0,canMine(c){return this.cell(c)>0;}};
  const lesson=new MiningLessonHighlight();
  try {
   lesson.update(camera,feet,null,terrain,1,element,true);

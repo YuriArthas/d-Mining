@@ -111,7 +111,7 @@ test('卖出和采集才记录事实，空卖、失败和锁定方块都不算',
   const empty = fresh();
   sell(empty);
   assert.equal(empty.exportProgress().onboarding.soldOnce, false);
-  empty.attach({ ...world, cell: () => 17, mine: () => false });
+  empty.attach({ ...world, cell: () => 94, mine: () => false });
   empty.updatePosition([0, 0, 0], true);
   assert.equal(empty.hit([0, -201, 0]).status, 'locked');
   // The blow that would break the block cannot queue its removal: nothing was mined.

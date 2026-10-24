@@ -1,11 +1,12 @@
+import { installCourse } from './fixtures/world.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { initPhysics, CharacterPhysics, RAPIER } from '../../src/game/validation/physics.ts';
 await initPhysics();
-function setup(){const p=new CharacterPhysics();const floor=p.world.createCollider(RAPIER.ColliderDesc.cuboid(40,0.5,40).setTranslation(0,-0.5,0));return {p,floor};}
+function setup(){const p=installCourse(new CharacterPhysics());const floor=p.world.createCollider(RAPIER.ColliderDesc.cuboid(40,0.5,40).setTranslation(0,-0.5,0));return {p,floor};}
 function tick(p,n,x=0,y=0,jump=false){for(let i=0;i<n;i++)p.tick(x,y,0,jump&&i===0,true);}
 test('production spawn and former deck footprint are flat without invisible ramp colliders',()=>{
- const p=new CharacterPhysics(false);try{
+ const p=new CharacterPhysics();try{
   p.world.createCollider(RAPIER.ColliderDesc.cuboid(80,.5,80).setTranslation(0,-.5,0));
   tick(p,30);assert.ok(p.grounded);assert.ok(p.feet()[1]<.05);
   p.teleport([0,.05,6.5]);tick(p,20);
@@ -37,7 +38,7 @@ test('removing supporting terrain causes falling; unavailable collision region f
 
 
 test('idle capsule on ordinary platform remains stable without camera-height oscillation',()=>{
- const p=new CharacterPhysics();try{
+ const p=installCourse(new CharacterPhysics());try{
   p.teleport([0,2.05,16]);tick(p,120);const heights=[];for(let i=0;i<300;i++){tick(p,1);heights.push(p.feet()[1]);}
   assert.ok(Math.max(...heights)-Math.min(...heights)<0.001);
   assert.ok(heights.every(y=>y>=2&&y<2.1));
@@ -86,7 +87,7 @@ test('inner wall corner blocks the capsule; reversing away releases it',()=>{
  }finally{p.dispose();}
 });
 test('terminal-speed fall hits a thin floor; a full mining-cell ledge is not snapped down',()=>{
- const p=new CharacterPhysics();try{
+ const p=installCourse(new CharacterPhysics());try{
   p.world.createCollider(RAPIER.ColliderDesc.cuboid(5,0.025,5).setTranslation(20,-0.025,0));
   p.teleport([20,90,0]);let lowest=Infinity;
   for(let i=0;i<300;i++){tick(p,1);lowest=Math.min(lowest,p.feet()[1]);}
@@ -98,7 +99,7 @@ test('terminal-speed fall hits a thin floor; a full mining-cell ledge is not sna
  }finally{p.dispose();}
 });
 test('ordinary floor triangle seams and independent chunk seams stay walkable',()=>{
- const p=new CharacterPhysics();try{
+ const p=installCourse(new CharacterPhysics());try{
   for(let i=0;i<3;i++)p.world.createCollider(RAPIER.ColliderDesc.trimesh(
    new Float32Array([20+i*4,0,-4,24+i*4,0,-4,20+i*4,0,4,24+i*4,0,4]),
    new Uint32Array([0,2,1,1,2,3]),RAPIER.TriMeshFlags.FIX_INTERNAL_EDGES));
@@ -108,7 +109,7 @@ test('ordinary floor triangle seams and independent chunk seams stay walkable',(
  }finally{p.dispose();}
 });
 test('shaft staircase requires jumping and provides a continuous route to the surface',()=>{
- const p=new CharacterPhysics();try{
+ const p=installCourse(new CharacterPhysics());try{
   p.world.createCollider(RAPIER.ColliderDesc.cuboid(8,0.5,8).setTranslation(-24,-8.5,0));
   p.teleport([-24,-7.95,-7]);tick(p,20);tick(p,30,-1,0);
   assert.ok(p.feet()[0]>-25.7);assert.ok(p.feet()[1]<-7.9);
@@ -133,7 +134,7 @@ test('ground found past a rejected steep edge never pulls the feet into the coll
  // board beyond it, whose outer edge 0.16 m higher meets the capsule at 45.6° on these lanes, over a path.
  const board=[-2.5,.5921,41.7267,2.5,.5921,41.7267,2.5,.9203,40.6559],slab=[-3.065,.43,43.045,3.065,.43,43.045,3.065,.43,41.355];
  const vertices=new Float32Array([...board,...slab]),indices=new Uint32Array([0,1,2,3,4,5]),lanes=[1.7,1.75,1.8,1.85,1.9];
- const lowest=(x,guard)=>{const p=new CharacterPhysics(false);try{
+ const lowest=(x,guard)=>{const p=new CharacterPhysics();try{
   if(!guard)p.buries=()=>false;
   p.world.createCollider(RAPIER.ColliderDesc.cuboid(20,1,20).setTranslation(0,-.965,40));
   p.world.createCollider(RAPIER.ColliderDesc.trimesh(vertices,indices,RAPIER.TriMeshFlags.FIX_INTERNAL_EDGES));

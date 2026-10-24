@@ -1,3 +1,6 @@
+import { generationAtZ as worldAtZ } from '../../src/game/terrain/SparseWorld.ts';
+import { GENERATION as GAME_GENERATION_FIXTURE } from './fixtures/world.mjs';
+const WORLD1 = worldAtZ(GAME_GENERATION_FIXTURE, 0);
 import {resourceByKind} from '../../src/game/content/resources.ts';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
 const SESSION_CONTENT = GAME_CONTENT.session, HOME_ZONE = SESSION_CONTENT.homes[0].zone, SURFACE_SHOP = SESSION_CONTENT.shops[0].zone;
@@ -7,7 +10,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { Exploration } from '../../src/game/logic/Exploration.ts';
 import { roomsFor } from '../../src/game/world/rooms.ts';
-import { LAYERS } from '../../src/game/content/layers.ts';
+import { WORLD1_LAYERS as LAYERS } from './fixtures/world.mjs';
 import { SparseWorld, CELL, baseXYZ } from '../../src/game/terrain/SparseWorld.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
 import { buildRegion } from '../../src/game/terrain/meshing.ts';
@@ -15,19 +18,19 @@ import { buildRegion } from '../../src/game/terrain/meshing.ts';
 test('rooms are local 20 by 20 by 10 cavities with solid perimeter, ceiling and an aligned mineable entrance', () => {
  for (const r of TEMPLATE_ROOMS) {
   const x=r.x/CELL,z=r.z/CELL,y=-r.depth/CELL;
-  for (let dx=-10;dx<10;dx++) for (let dz=-10;dz<10;dz++) for (let dy=0;dy<10;dy++) assert.equal(baseXYZ(x+dx,y+dy,z+dz),0);
-  for (const c of [[x-11,y,z],[x+10,y,z],[x,y,z-11],[x,y,z+10],[x,y+10,z],[x+8,y-1,z+8]]) assert.ok(baseXYZ(...c),c.join(','));
-  const world=new SparseWorld();assert.deepEqual(world.stats(),{editedRegions:0,editBytes:0,fullAirRegions:0});
+  for (let dx=-10;dx<10;dx++) for (let dz=-10;dz<10;dz++) for (let dy=0;dy<10;dy++) assert.equal(baseXYZ(x+dx,y+dy,z+dz,WORLD1),0);
+  for (const c of [[x-11,y,z],[x+10,y,z],[x,y,z-11],[x,y,z+10],[x,y+10,z],[x+8,y-1,z+8]]) assert.ok(baseXYZ(...c,WORLD1),c.join(','));
+  const world=new SparseWorld(WORLD1);assert.deepEqual(world.stats(),{editedRegions:0,editBytes:0,fullAirRegions:0});
   assert.equal(world.remove([[x+8,y-1,z+8]]).length,0);assert.equal(world.cell([x+8,y-1,z+8]),7);
   assert.ok(world.canMine([x,y-1,z])); // aligned entrance remains mineral
  }
 });
 test('room boundary has separately merged render and collision surfaces', () => {
  const coord=[1,-25,1]; // collision region touches first room floor/side
- const collision=buildRegion('collision',coord,8,[]).mesh;
- const visual=buildRegion('render',coord,8,[]).mesh;
+ const collision=buildRegion('collision', coord, 8, [], WORLD1).mesh;
+ const visual=buildRegion('render', coord, 8, [], WORLD1).mesh;
  assert.ok(collision.indices.length>0);assert.ok(visual.indices.length>=collision.indices.length);
- assert.equal(collision.tiles.length,0);assert.equal(new SparseWorld().stats().editBytes,0);
+ assert.equal(collision.tiles.length,0);assert.equal(new SparseWorld(WORLD1).stats().editBytes,0);
 });
 test('depth milestones unlock independently of rooms and retain progress on ascent', () => {
  const p=new Exploration(TEMPLATE_ROOMS);
@@ -39,7 +42,7 @@ test('depth milestones unlock independently of rooms and retain progress on asce
 });
 function setup() {
  const s=new GameSession(SESSION_CONTENT),calls=[];
- s.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining:()=>{},travelTo:p=>calls.push(p)});
+ s.attach({cell:()=>64,pending:()=>false,mine:()=>true,cancelMining:()=>{},travelTo:p=>calls.push(p)});
  return {s,calls};
 }
 test('reaching depth outside a room unlocks travel, which works from anywhere, even right there in the mine', () => {
@@ -59,14 +62,14 @@ test('standing at milestone contact height unlocks without requiring room entry 
 test('each underground sale zone sells once per entry; shops exit independently', () => {
  const {s}=setup();
  for(const r of ROOMS){
-  s.collected([{kind:5}]);s.updatePosition([r.sell.x,r.sell.y,r.sell.z],true);
+  s.collected([{kind:71}]);s.updatePosition([r.sell.x,r.sell.y,r.sell.z],true);
   assert.equal(s.getSnapshot().inventory.used,0);const coins=s.getSnapshot().coins;
   s.updatePosition([r.sell.x,r.sell.y,r.sell.z],true);assert.equal(s.getSnapshot().coins,coins);
   s.updatePosition([r.x+15,-r.depth,r.z],true);assert.equal(s.getSnapshot().inSellZone,false);
  }
  const r=ROOMS[1];s.updatePosition([r.shop.x,r.shop.y,r.shop.z],true);assert.equal(s.getSnapshot().shopId,r.id);
  assert.equal(s.getSnapshot().inSellZone,false);s.updatePosition([r.x,-r.depth,r.z],true);assert.equal(s.getSnapshot().shopId,null);
- assert.equal(s.getSnapshot().coins,SESSION_CONTENT.initialCoins+resourceByKind(5).price*ROOMS.length);
+ assert.equal(s.getSnapshot().coins,SESSION_CONTENT.initialCoins+resourceByKind(71).price*ROOMS.length);
 });
 
 test('surface upgrade kiosk reuses shop lifecycle and survives direct transfers between shops',()=>{

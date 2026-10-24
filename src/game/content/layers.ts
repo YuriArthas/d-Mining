@@ -3,19 +3,21 @@ import { resourceByKind } from './resources.ts';
 import { themeById } from './themes.ts';
 export type Layer = Readonly<{ id: string; name: string; from: number; theme: string; scene?:string; base: number; deepKind?: number; ores: readonly Readonly<{kind:number;weight:number}>[]; shop: boolean; room?:RoomLayout }>;
 export const WORLD_DEPTH = 4000;
-// The sole depth schedule. IDs remain stable when a layer moves.
-export const LAYERS: readonly Layer[] = Object.freeze([
-  {id:'surface',name:'草地矿场',from:0,theme:'meadow_mine',base:8,ores:[{kind:3,weight:12},{kind:4,weight:10}],shop:false},
-  {id:'old_mine',name:'老矿井',from:400,theme:'timber_mine',scene:'timber-station-v2',base:1,ores:[{kind:3,weight:8},{kind:4,weight:10},{kind:16,weight:8},{kind:17,weight:5}],shop:false},
-  {id:'fungal',name:'蘑菇洞穴',from:800,theme:'mushroom_cave',scene:'fungal-station-v1',base:9,ores:[{kind:3,weight:5},{kind:4,weight:8},{kind:18,weight:12},{kind:25,weight:10}],shop:true},
-  {id:'crystal',name:'水晶洞穴',from:1200,theme:'crystal_cave',scene:'crystal-station-v1',base:2,ores:[{kind:6,weight:16},{kind:19,weight:10},{kind:20,weight:7}],shop:false},
-  {id:'ruins',name:'地下遗迹',from:1600,theme:'buried_ruins',scene:'ruins-station-v1',base:10,ores:[{kind:5,weight:12},{kind:21,weight:10}],shop:true},
-  {id:'frozen',name:'冰封矿洞',from:2000,theme:'frozen_cave',scene:'frozen-station-v1',base:11,ores:[{kind:22,weight:12}],shop:false},
-  {id:'volcanic',name:'熔岩矿洞',from:2400,theme:'lava_cave',scene:'volcanic-station-v1',base:12,ores:[{kind:23,weight:12},{kind:24,weight:12}],shop:true},
-  {id:'fossil',name:'巨型化石',from:2800,theme:'fossil_cave',scene:'fossil-station-v1',base:13,ores:[{kind:26,weight:15}],shop:false},
-  {id:'machinery',name:'古代机械',from:3200,theme:'ancient_machine',scene:'machinery-station-v1',base:14,ores:[{kind:27,weight:10},{kind:28,weight:13},{kind:29,weight:13}],shop:true},
-  {id:'core',name:'地心秘境',from:3600,theme:'core_sanctum',scene:'core-station-v1',base:15,ores:[{kind:30,weight:14},{kind:31,weight:9}],shop:true},
-].map(l => Object.freeze({...l, ores:Object.freeze(l.ores.map(o=>Object.freeze(o)))})));
+/** The ten layer looks the worlds are built from: name, theme and rest-room scene. Each world picks seven
+ *  (surface plus six rest layers) and gives them their own depths, blocks and ores (journeyWorlds.ts). */
+export type LayerTemplate = Readonly<{ id: string; name: string; theme: string; scene?: string }>;
+export const LAYER_TEMPLATES: readonly LayerTemplate[] = Object.freeze([
+  {id:'surface',name:'草地矿场',theme:'meadow_mine'},
+  {id:'old_mine',name:'老矿井',theme:'timber_mine',scene:'timber-station-v2'},
+  {id:'fungal',name:'蘑菇洞穴',theme:'mushroom_cave',scene:'fungal-station-v1'},
+  {id:'crystal',name:'水晶洞穴',theme:'crystal_cave',scene:'crystal-station-v1'},
+  {id:'ruins',name:'地下遗迹',theme:'buried_ruins',scene:'ruins-station-v1'},
+  {id:'frozen',name:'冰封矿洞',theme:'frozen_cave',scene:'frozen-station-v1'},
+  {id:'volcanic',name:'熔岩矿洞',theme:'lava_cave',scene:'volcanic-station-v1'},
+  {id:'fossil',name:'巨型化石',theme:'fossil_cave',scene:'fossil-station-v1'},
+  {id:'machinery',name:'古代机械',theme:'ancient_machine',scene:'machinery-station-v1'},
+  {id:'core',name:'地心秘境',theme:'core_sanctum',scene:'core-station-v1'},
+].map(l => Object.freeze(l)));
 export function validateLayers(layers: readonly Layer[]) {
   const ids = new Set<string>(), bases = new Set<number>();
   for (const [i,l] of layers.entries()) {
@@ -38,8 +40,7 @@ export function validateLayers(layers: readonly Layer[]) {
   }
   if(!layers.length)throw new Error('楼层配置为空');
 }
-validateLayers(LAYERS);
-export function layerAtDepth(depth: number, layers: readonly Layer[] = LAYERS): Layer {
+export function layerAtDepth(depth: number, layers: readonly Layer[]): Layer {
   let lo=0,hi=layers.length;
   while(lo+1<hi){const mid=(lo+hi)>>>1;if(layers[mid].from<=depth)lo=mid;else hi=mid;}
   return layers[lo];

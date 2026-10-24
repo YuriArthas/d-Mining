@@ -19,7 +19,7 @@ function prepared(id=2,{volume=worldRequirement(id).mined,coins=worldRequirement
   return GameSession.fromData(data,content);
 }
 const enterMine=(s,id)=>s.updatePosition([0,0,worldRequirement(id).z-12],true);
-function commands(s){const travels=[];s.attach({cell:()=>64,pending:()=>false,mine:()=>true,cancelMining(){},returnToSurface(){},travelTo:p=>travels.push(p)});return travels;}
+function commands(s){const travels=[];s.attach({cell:()=>64,pending:()=>false,mine:()=>true,cancelMining(){},travelTo:p=>travels.push(p)});return travels;}
 
 test('outer gates check lifetime weighted volume exactly at 1m and 100m; opening a mine never spends that volume',()=>{
   const p=new WorldProgress();p.collect(999_999);assert.equal(p.areaOpen(2),false);p.collect(1);assert.equal(p.areaOpen(2),true);assert.equal(p.mineOpen(2),false);
@@ -155,7 +155,7 @@ test('v11 mine holes keep their original saved coordinates after moving the late
   for(const z of [112,224])for(const x of [0,1])assert.equal(restored.cell([x,-10,z]),0);
 });
 test('the new map uses an explicit separate test save; legacy terrain is never silently reinterpreted',()=>{
-  const location={pathname:'/games/mining-test/index.html',search:''};assert.notEqual(saveNamespace(location,'journey-v1').name,saveNamespace(location).name);
+  assert.equal(saveNamespace({pathname:'/games/mining-surface-play/index.html',search:''}).name,'mining:test:journey-v1');
   assert.throws(()=>compatibleHead({formatVersion:1,revision:1,savedAt:0,world:{generationVersion:9,seed:0,regionEncoding:1},regionCount:0},GAME_GENERATION),/不兼容/);
 });
 test('the testing unlock page opens worlds and layers, and the result survives a reload', () => {

@@ -38,7 +38,7 @@ test('同类音效连发会合并，不同类不受影响', () => withAudioConte
 test('每个音效都在声明的时长内结束，单个声部不过载，指数包络不碰零', () => {
   const ctx = new FakeContext(), noise = makeNoise(ctx, 1);
   const cues = [
-    ...['soil', 'rock', 'ore', 'gem'].flatMap(material => [{ type: 'hit', material }, { type: 'break', material }]),
+    ...['rock', 'ore', 'gem'].flatMap(material => [{ type: 'hit', material }, { type: 'break', material }]),
     ...[0, 1, 2].map(tier => ({ type: 'pickup', tier })),
     { type: 'sell' }, { type: 'jump' }, { type: 'land', strength: 1 }, { type: 'ui' }, { type: 'purchase' }, { type: 'reward' },
     ...[0, 3].flatMap(tier => [{ type: 'hatch', tier }, { type: 'hatch', tier, auto: true }]),

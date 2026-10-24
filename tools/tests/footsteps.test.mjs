@@ -57,12 +57,13 @@ test('脚下材质：地表按广场布局分草地、沙地、小路、石板�
   assert.equal(hubSurface(0, 16, false), 'stone', 'paving pad');
   assert.equal(hubSurface(0, 36.5, true), 'wood', 'the creek bridge');
   assert.equal(hubSurface(34, 30, true), 'stone', 'egg terrace');
-  assert.deepEqual([1, 8, 11, 14, 6, 22, 3].map(kindSurface), ['stone', 'dirt', 'ice', 'metal', 'crystal', 'crystal', 'stone']);
+  // World 1's rock, its coal and copper, and a gem (emerald).
+  assert.deepEqual([64, 66, 67, 74].map(kindSurface), ['stone', 'stone', 'metal', 'crystal']);
   const cells = { '-1': 7 }, ports = theme => ({ cell: c => cells[c[1]] ?? 0, theme: () => theme, hub: f => f[1] > -0.6 });
   assert.equal(footSurface([3, 0.02, 20], ports('meadow_mine')), 'sand', 'hub floor uses the ground plan');
   cells['-401'] = 7;
   assert.equal(footSurface([3, -800 + 0.02, 20], ports('ancient_machine')), 'metal', 'machine station floor');
-  cells['-402'] = 11;
-  assert.equal(footSurface([3, -802 + 0.02, 20], ports('frozen_cave')), 'ice', 'standing on ice rock');
+  cells['-402'] = 74;
+  assert.equal(footSurface([3, -802 + 0.02, 20], ports('frozen_cave')), 'crystal', 'standing on a gem');
   assert.equal(footSurface([3, -804.5, 20], ports('timber_mine')), 'wood', 'on a station deck above the voxels');
 });
