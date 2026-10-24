@@ -13,7 +13,7 @@ export function buildHall(getProp: GetProp) {
   const { waterfall, pond } = HALL;
   const kit = caveKit(HALL, 200001, {
     rock: ['#7493b2', '#a8c4de'], upper: ['#8aa8c8', '#6482a4'], ceiling: ['#4e6888', '#6e8cae'],
-    stalactite: ['#a4c8e8', '#e4f6ff'], joint: '#3a5068', stones: ['#94adc4', '#9fb7cc', '#8aa3bb', '#9ab0c2', '#8299b2'], curb: '#a2b8cc',
+    stalactite: ['#a4c8e8', '#e4f6ff'], joint: '#dcecf6', stones: ['#94adc4', '#9fb7cc', '#8aa3bb', '#9ab0c2', '#8299b2'], curb: '#a2b8cc',
   }, [
     ...HALL.spires.slice(0, 4).map(s => ({ x: s.at[0], z: s.at[2], radius: s.height * .3 })),
     { x: 17.5, z: waterfall.z, radius: waterfall.width / 2 },
@@ -37,7 +37,8 @@ export function buildHall(getProp: GetProp) {
     }
   }
   kit.ceiling(80, [ice, frost], .28);
-  kit.floor();
+  // Big ice plates with frost-white cracks between them.
+  kit.floor({ kind: 'shards', size: 3.4, gap: .12, height: [.04, .06] });
   kit.patches(kit.wallSpots(20, HALL.spires.map(s => [s.at[0], s.at[2], s.height * .32] as const)), snow, '#e2eef8', 'Cave snow', [ice], 1, 1.4);
   kit.pitRim();
 

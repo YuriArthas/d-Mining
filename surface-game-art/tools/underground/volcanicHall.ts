@@ -1,5 +1,5 @@
-// Offline: the 熔岩矿洞 rest hall on the shared cave shell (caveKit.ts), with props from build_volcanic.py. Cool
-// grey-violet basalt, hexagonal column clusters along the walls, a raised lava basin with drifting crust plates,
+// Offline: the 熔岩矿洞 rest hall on the shared cave shell (caveKit.ts), with props from build_volcanic.py. Red-brown
+// basalt over a column-top floor with lava in its seams, hexagonal column clusters along the walls, a raised lava basin with drifting crust plates,
 // ember vents, glowing ember cracks running over the rock faces, ash patches with ember specks.
 import * as THREE from 'three';
 import { caveKit, colour, glow, matte, type GetProp } from './caveKit.ts';
@@ -7,8 +7,8 @@ import { VOLCANIC_HALL as HALL } from '../../../src/game/content/underground/vol
 
 export function buildHall(getProp: GetProp) {
   const kit = caveKit(HALL, 240001, {
-    rock: ['#56546e', '#7e7a9a'], upper: ['#625e7c', '#423f56'], ceiling: ['#34314a', '#4c4864'],
-    stalactite: ['#504c64', '#7a7494'], joint: '#22202c', stones: ['#78748a', '#827e94', '#6e6a82', '#7a768a'], curb: '#77738a',
+    rock: ['#6a3e36', '#965c4c'], upper: ['#74463c', '#4a2c26'], ceiling: ['#3c221e', '#583530'],
+    stalactite: ['#5c3a32', '#8c5a4a'], joint: '#4a1206', stones: ['#6e5450', '#785c56', '#644a46', '#725852'], curb: '#7a5a52',
   }, [
     ...HALL.columns.slice(0, 4).map(c => ({ x: c.at[0], z: c.at[2], radius: c.radius * .9 })),
     { x: HALL.pool.at[0], z: HALL.pool.at[2], radius: HALL.pool.radius + .6 },
@@ -19,8 +19,9 @@ export function buildHall(getProp: GetProp) {
 
   kit.walls();
   kit.ceiling(60, [lava, ember], .18);
-  kit.floor();
-  kit.patches(kit.wallSpots(22, HALL.columns.slice(0, 4).map(c => [c.at[0], c.at[2], c.radius * 1.1] as const)), ash, '#4a4652', 'Cave ash', [lava, ember], .5, 2.4);
+  // Basalt column tops, each at its own height, with lava glowing in the seams.
+  kit.floor({ kind: 'hex', radius: 1.05, gap: .16, height: [.03, .085] }, glow('Cave glow seam', '#ff4a10', .6));
+  kit.patches(kit.wallSpots(22, HALL.columns.slice(0, 4).map(c => [c.at[0], c.at[2], c.radius * 1.1] as const)), ash, '#54403a', 'Cave ash', [lava, ember], .5, 2.4);
   kit.pitRim();
 
   // LAVA BASIN: a ring of basalt rim stones round a glowing surface with a few dark crust plates.
@@ -36,7 +37,7 @@ export function buildHall(getProp: GetProp) {
     const a = r() * Math.PI * 2, d = Math.sqrt(r()) * (poolR - 1), size = .35 + r() * .35, pts: THREE.Vector2[] = [];
     for (let k = 0; k < 6; k++) { const b = k / 6 * Math.PI * 2, rr = size * (.75 + r() * .4); pts.push(new THREE.Vector2(poolAt[0] + Math.cos(a) * d + Math.cos(b) * rr, -(poolAt[2] + Math.sin(a) * d + Math.sin(b) * rr))); }
     const g = new THREE.ExtrudeGeometry(new THREE.Shape(pts), { depth: .06, bevelEnabled: false }).rotateX(-Math.PI / 2).toNonIndexed(); g.translate(0, .41, 0); g.computeVertexNormals();
-    add(new THREE.Mesh(colour(g, (_y, _i, n) => new THREE.Color(n.y > .5 ? '#3a3440' : '#ff8a3a')), crust), 'Cave lava crust');
+    add(new THREE.Mesh(colour(g, (_y, _i, n) => new THREE.Color(n.y > .5 ? '#3e2a26' : '#ff8a3a')), crust), 'Cave lava crust');
   }
   box([poolAt[0], .3, poolAt[2]], [poolR * .8, .3, poolR * .8]);
 

@@ -2,11 +2,11 @@
   "parts": [
     "old-mine-hall.000.part"
   ],
-  "bytes": 261495,
-  "decodedBytes": 454380,
-  "sha256": "2858100055c3170868d0cff0d2b70428ede879d216de53ed528af98ea428a701",
-  "sourceSha256": "c748b3b93521df00db3a6b7389307f9a6229ce299b904d31630c481a3981f233",
-  "triangles": 20054,
+  "bytes": 284657,
+  "decodedBytes": 563292,
+  "sha256": "e5dce4cb96a9bde26a186c29707cd89045817552219cf5b42a1699adc3bf07f6",
+  "sourceSha256": "05bd595a05f873d4d84434244025bd1120ebf5a24fc75547eee0370ed4081ba8",
+  "triangles": 28130,
   "source": "old_mine hall: Blender props (surface-game-art/tools/blender/build_old_mine.py) and an offline procedural cave shell (surface-game-art/tools/underground/oldMineHall.ts on caveKit.ts); baked occlusion per vertex",
   "materialProfile": "authored-color",
   "coordinateSpace": "authored",

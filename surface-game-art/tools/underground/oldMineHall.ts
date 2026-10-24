@@ -13,7 +13,7 @@ export function buildHall(getProp: GetProp) {
   const L = HALL.layout;
   const kit = caveKit(HALL, 40001, {
     rock: ['#86684e', '#b08a64'], upper: ['#957358', '#654c38'], ceiling: ['#56422f', '#7a5d44'],
-    stalactite: ['#735842', '#a58462'], joint: '#3e2e22', stones: ['#9a8670', '#a5917a', '#8c7a66', '#988a78'], curb: '#8e7a66',
+    stalactite: ['#735842', '#a58462'], joint: '#4a3828', stones: ['#9a8670', '#a5917a', '#8c7a66', '#988a78'], curb: '#8e7a66',
   }, [
     ...L.hoists.map(h => ({ x: h.at[0], z: h.at[1], radius: 4.8 })),
     ...L.timberSets.map(t => ({ x: t.at[0], z: t.at[1], radius: 3 })),
@@ -25,7 +25,8 @@ export function buildHall(getProp: GetProp) {
 
   kit.walls();
   kit.ceiling(55, [amber], .12);
-  kit.floor();
+  // Boardwalk on packed earth: planks pointing at the walls, a few missing.
+  kit.floor({ kind: 'planks', width: .62, gap: .07, missing: .06, height: [.04, .07], stones: ['#a07446', '#ac7e4e', '#946a40', '#b48a58'] });
   kit.patches(kit.wallSpots(18, [[-12.8, -1, 2.4], [12.8, 3, 2.4], [L.depot[0], L.depot[1], 3]]), dirt, '#7c6448', 'Cave dirt', [amber], 1, 1.4);
   kit.pitRim();
 

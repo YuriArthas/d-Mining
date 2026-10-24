@@ -2,11 +2,11 @@
   "parts": [
     "crystal-hall.000.part"
   ],
-  "bytes": 416678,
-  "decodedBytes": 657220,
-  "sha256": "299aefe2e21e6b297041eb2d5d0e990bbfba81dc6c3e4aba1ba83da02da5f69e",
-  "sourceSha256": "2c4d31076afe19255dd2adca47afbd2d0db3ce340f57045656ac43837a5e9520",
-  "triangles": 28328,
+  "bytes": 452860,
+  "decodedBytes": 717472,
+  "sha256": "36b94260ba6879bfc46acfa3a7e518fcbbffb32e441b30b13c3ec481cc65c5dc",
+  "sourceSha256": "113693ec9e037404467c246dd1b7c1379d201a77e151ad9f9826735ace9a241d",
+  "triangles": 31592,
   "source": "crystal hall: Blender props (surface-game-art/tools/blender/build_crystal.py) and an offline procedural cave shell (surface-game-art/tools/underground/crystalHall.ts on caveKit.ts); baked occlusion per vertex",
   "materialProfile": "authored-color",
   "coordinateSpace": "authored",

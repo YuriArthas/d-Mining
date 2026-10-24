@@ -35,7 +35,8 @@ export function buildHall(getProp: GetProp) {
 
   kit.walls();
   kit.ceiling(56, glows, .3);
-  kit.floor();
+  // Crazy paving of polished stone, its seams glowing faintly violet.
+  kit.floor({ kind: 'shards', size: 2.3, gap: .16 }, glow('Cave glow seam', '#9a6cff', .5));
   kit.patches(kit.wallSpots(22, HALL.spires.map(s => [s.at[0], s.at[2], 1.2 + s.height * .16] as const)), sand, '#6c7cc0', 'Cave crystal sand', [G.cyan, G.pink], .55, 4);
   kit.pitRim();
 

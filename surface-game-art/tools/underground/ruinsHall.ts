@@ -8,7 +8,7 @@ import { RUINS_HALL as HALL } from '../../../src/game/content/underground/ruinsH
 export function buildHall(getProp: GetProp) {
   const kit = caveKit(HALL, 160001, {
     rock: ['#a68e6c', '#d0b88e'], upper: ['#bca47e', '#8a7452'], ceiling: ['#705c40', '#977e5a'],
-    stalactite: ['#9c8464', '#ccb288'], joint: '#54452f', stones: ['#d8c49a', '#e0cca4', '#ccb68c', '#d4c09c'], curb: '#c2aa80',
+    stalactite: ['#9c8464', '#ccb288'], joint: '#7a6a4c', stones: ['#d8c49a', '#e0cca4', '#ccb68c', '#d4c09c'], curb: '#c2aa80',
   }, [
     ...HALL.columns.map(c => ({ x: c.at[0], z: c.at[2], radius: 1.6 })),
     ...HALL.guardians.map(([x, z]) => ({ x, z, radius: 2 })),
@@ -20,7 +20,8 @@ export function buildHall(getProp: GetProp) {
 
   kit.walls();
   kit.ceiling(56, [jade, flame], .15);
-  kit.floor();
+  // Laid temple paving: rows of slabs of random width, a few cracked across or lost.
+  kit.floor({ kind: 'ashlar', row: [1.5, 2.3], width: [1.4, 3.2], gap: .09, cracked: .12, missing: .04, height: [.04, .07] });
   kit.patches(kit.wallSpots(18, HALL.columns.map(c => [c.at[0], c.at[2], 1.7] as const)), moss, '#5f8e40', 'Cave moss', [jade], .6, 2);
   kit.pitRim();
 

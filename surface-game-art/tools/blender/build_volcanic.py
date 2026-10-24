@@ -8,10 +8,10 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from cave_props import start, finish, model, mesh, box, lathe, prism, stepped, circle, spike, stall, lantern_post, name_board, pit_post
 
 TILES = [
-    ('3a3846', [(4, 6, 24, 3, '484656'), (6, 24, 18, 2, '2e2c38')]),          # 0 dark basalt frame
+    ('3e2a28', [(4, 6, 24, 3, '4c3632'), (6, 24, 18, 2, '32221f')]),          # 0 dark basalt frame
     ('7a5a44', [(4, 5, 24, 3, '8a6a52'), (6, 24, 19, 2, '6a4c38')]),          # 1 counter timber
-    ('6e6a82', [(4, 5, 10, 3, '7c7892'), (18, 20, 10, 6, '605c74')]),         # 2 basalt
-    ('4c4852', [(3, 4, 9, 3, '5a5662'), (17, 20, 9, 4, '403c46')]),           # 3 ash
+    ('7a5650', [(4, 5, 10, 3, '8a645c'), (18, 20, 10, 6, '6a4a44')]),         # 2 basalt
+    ('54423e', [(3, 4, 9, 3, '62504a'), (17, 20, 9, 4, '483834')]),           # 3 ash
     ('545a68', [(4, 4, 3, 3, '9aa0b0'), (25, 4, 3, 3, '9aa0b0'), (4, 25, 3, 3, '9aa0b0'), (25, 25, 3, 3, '9aa0b0'), (2, 14, 28, 2, '464b58')]),  # 4 iron roof, rivets
     ('b0603c', [(2, 6, 28, 3, 'c0704a'), (2, 20, 28, 3, '98502e')]),          # 5 rust copper
     ('cfc6cc', [(4, 4, 3, 24, 'bdb4bc')]),                                    # 6 pale ash
@@ -21,11 +21,11 @@ TILES = [
     ('2c2e38', [(4, 5, 22, 3, '3a3c48')]),                                    # 10 iron
     ('f2be56', [(3, 3, 26, 4, 'ffd27a'), (5, 26, 24, 3, 'e2ad49')]),          # 11 gold
     ('e0603a', [(4, 4, 8, 20, 'ff9a6a'), (18, 8, 6, 16, 'b03a24')]),          # 12 fire ore
-    ('6a6072', [(2, 10, 28, 3, '7a7084'), (2, 20, 28, 3, '5a5262')]),         # 13 chain
-    ('514a66', [(4, 5, 24, 3, '5e5674')]),                                    # 14 board plank
+    ('6a5a56', [(2, 10, 28, 3, '7a6862'), (2, 20, 28, 3, '5a4c48')]),         # 13 chain
+    ('5a3a34', [(4, 5, 24, 3, '684640')]),                                    # 14 board plank
     ('16141c', []),                                                           # 15 shadow
-    ('2c2638', [(5, 4, 6, 22, '6a5890'), (19, 8, 4, 16, '4a3e66')]),          # 16 obsidian, violet sheen
-    ('9692ae', [(5, 5, 22, 22, 'a4a0bc')]),                                   # 17 basalt column top
+    ('2a1e1e', [(5, 4, 6, 22, '7a3a32'), (19, 8, 4, 16, '58302a')]),          # 16 obsidian, red sheen
+    ('a08078', [(5, 5, 22, 22, 'ae8e84')]),                                   # 17 basalt column top
 ]
 start('Volcanic', 'volcanic', TILES, glowing={7, 8, 9})
 

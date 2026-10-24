@@ -38,8 +38,8 @@ export const VOLCANIC_HALL = {
     { at: [12, 3.8, 13.6], color: '#ffc27a', intensity: 60, distance: 18 },
     { at: [0, 3.2, 16.4], color: '#ff8030', intensity: 70, distance: 22 },
   ],
-  /** The mood: violet-grey fill from above, ember red from below, a dark plum fog. */
-  look: { sky: '#9ca2d8', ground: '#5a3026', ambient: 1.15, key: '#c8ccff', keyIntensity: 1, fog: '#241a28' },
+  /** The mood: warm ember fill from above, deep red from below, a dark oxblood fog. */
+  look: { sky: '#ffa080', ground: '#6a2414', ambient: 1.1, key: '#ffc4a4', keyIntensity: .95, fog: '#32120c' },
 } as const;
 // Checked against the shared frame without its extra theme data counting as excess.
 VOLCANIC_HALL satisfies HallDefinition;

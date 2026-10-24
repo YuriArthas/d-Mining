@@ -55,6 +55,33 @@ export type CavePalette = Readonly<{
   rock: readonly [string, string]; upper: readonly [string, string]; ceiling: readonly [string, string];
   stalactite: readonly [string, string]; joint: string; stones: readonly string[]; curb: string;
 }>;
+type P2 = [number, number];
+/** The floor ring's paving (see caveKit().floor); `stones` overrides the palette's stone colours, `height` the
+ *  range of stone heights (keep under 9 cm: the player walks on a 4 cm slab). */
+export type FloorStyle = Readonly<{ stones?: readonly string[]; height?: readonly [number, number] }> & (
+  | Readonly<{ kind: 'flags' }>
+  | Readonly<{ kind: 'shards'; size: number; gap: number }>
+  | Readonly<{ kind: 'hex'; radius: number; gap: number }>
+  | Readonly<{ kind: 'planks'; width: number; gap: number; missing?: number }>
+  | Readonly<{ kind: 'ashlar'; row: readonly [number, number]; width: readonly [number, number]; gap: number; cracked: number; missing: number }>);
+/** Keep the part of a convex polygon where nx * x + nz * z >= d. */
+function clip(poly: P2[], nx: number, nz: number, d: number) {
+  const out: P2[] = [];
+  for (let i = 0; i < poly.length; i++) {
+    const a = poly[i], b = poly[(i + 1) % poly.length], da = nx * a[0] + nz * a[1] - d, db = nx * b[0] + nz * b[1] - d;
+    if (da >= 0) out.push(a);
+    if ((da >= 0) !== (db >= 0)) { const t = da / (da - db); out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]); }
+  }
+  return out;
+}
+const centre = (poly: P2[]): P2 => [poly.reduce((s, p) => s + p[0], 0) / poly.length, poly.reduce((s, p) => s + p[1], 0) / poly.length];
+const area = (poly: P2[]) => Math.abs(poly.reduce((s, p, i) => { const q = poly[(i + 1) % poly.length]; return s + p[0] * q[1] - q[0] * p[1]; }, 0)) / 2;
+/** Pull every corner toward the centre by half the joint width. */
+function shrink(poly: P2[], gap: number) {
+  if (poly.length < 3) return [];
+  const [cx, cz] = centre(poly);
+  return poly.map(([x, z]): P2 => { const d = Math.hypot(x - cx, z - cz), k = Math.max(0, 1 - gap / 2 / Math.max(d, 1e-6)); return [cx + (x - cx) * k, cz + (z - cz) * k]; });
+}
 /** Round areas the lower wall masses and wall-foot props keep clear of at floor level (landmarks). */
 export type KeepOut = Readonly<{ x: number; z: number; radius: number }>;
 
@@ -146,25 +173,96 @@ export function caveKit(hall: HallDefinition, seed: number, palette: CavePalette
       }
     },
 
-    /** FLOOR RING: dark joints, then large irregular flagstones on a staggered grid (each a little turned, so the
-     *  floor never reads as tiles), and the walkable slabs the player stands on (the stones' mean top, 4 cm). */
-    floor(stones = palette.stones) {
+    /** FLOOR RING: the joint ground (palette.joint; `joint` may make it glow, as lava or crystal seams), then the
+     *  hall's own paving over it (visual only), and the walkable slabs the player stands on (4 cm). Paving kinds:
+     *  flags: large irregular six-sided flags on a staggered grid (蘑菇洞穴);
+     *  shards: random cells of a jittered grid (crazy paving, ice plates), `size` apart;
+     *  hex: basalt column tops of `radius`, each at its own height;
+     *  planks: boards of random length pointing at the walls, a few missing;
+     *  ashlar: rows of laid slabs of random width, a few cracked in two or missing. */
+    floor(style: FloorStyle = { kind: 'flags' }, joint?: THREE.Material) {
       for (const [x0, x1, z0, z1] of [[-HALF, -PIT, -HALF, HALF], [PIT, HALF, -HALF, HALF], [-PIT, PIT, -HALF, -PIT], [-PIT, PIT, PIT, HALF]]) {
         const g = new THREE.PlaneGeometry(x1 - x0, z1 - z0).rotateX(-Math.PI / 2).toNonIndexed(); g.translate((x0 + x1) / 2, .006, (z0 + z1) / 2);
-        colour(g, () => new THREE.Color(palette.joint)); add(new THREE.Mesh(g, M.floor), 'Cave floor joints');
+        colour(g, () => new THREE.Color(palette.joint)); add(new THREE.Mesh(g, joint ?? M.floor), 'Cave floor joints');
       }
-      const tints = stones.map(c => new THREE.Color(c));
-      for (let row = 0, z = -HALF; z < HALF; z += 2.6, row++) for (let x = -HALF - (row % 2) * 1.3; x < HALF; x += 2.6) {
-        const cx = x + 1.3 + (r() - .5) * .3, cz = z + 1.3 + (r() - .5) * .3, turn = (r() - .5) * .25;
-        if (inPit(cx, cz)) continue;
-        const corners = [[-1, -.6], [-.3, -1], [1, -.85], [.9, .4], [.4, 1], [-.95, .8]].map(([u, v]) => {
-          const k = 1.22 - r() * .16, px = u * k, pz = v * k;
-          return new THREE.Vector2(cx + px * Math.cos(turn) - pz * Math.sin(turn), cz + px * Math.sin(turn) + pz * Math.cos(turn));
-        });
-        const h = .03 + r() * .03;
-        const g = new THREE.ExtrudeGeometry(new THREE.Shape(corners.map(p => new THREE.Vector2(p.x, -p.y))), { depth: h, bevelEnabled: false }).rotateX(-Math.PI / 2).toNonIndexed(); g.computeVertexNormals();
-        const c = tints[Math.floor(r() * tints.length)].clone().multiplyScalar(.92 + r() * .14);
+      const tints = (style.stones ?? palette.stones).map(c => new THREE.Color(c));
+      const tint = () => tints[Math.floor(r() * tints.length)].clone().multiplyScalar(.9 + r() * .18);
+      const [h0, h1] = style.kind === 'flags' ? [.03, .06] : style.height ?? [.03, .06];
+      const slab = (poly: P2[], gap: number, h = h0 + r() * (h1 - h0), c = tint()) => {
+        const cut = shrink(outsidePit(poly), gap);
+        if (area(cut) < .04) return;
+        const g = new THREE.ExtrudeGeometry(new THREE.Shape(cut.map(([x, z]) => new THREE.Vector2(x, -z))), { depth: h, bevelEnabled: false }).rotateX(-Math.PI / 2).toNonIndexed(); g.computeVertexNormals();
         add(new THREE.Mesh(colour(g, () => c), M.floor), 'Cave flagstone');
+      };
+      // A polygon outside the pit: cut along the pit side its centre lies beyond (the curb covers the seam).
+      const outsidePit = (poly: P2[]) => {
+        const [cx, cz] = centre(poly), ax = Math.abs(cx) - PIT, az = Math.abs(cz) - PIT;
+        if (ax < 0 && az < 0) return [];
+        return ax >= az ? clip(poly, Math.sign(cx), 0, PIT) : clip(poly, 0, Math.sign(cz), PIT);
+      };
+      if (style.kind === 'flags') {
+        // Large irregular flags on a staggered grid, each a little turned, so the floor never reads as tiles.
+        for (let row = 0, z = -HALF; z < HALF; z += 2.6, row++) for (let x = -HALF - (row % 2) * 1.3; x < HALF; x += 2.6) {
+          const cx = x + 1.3 + (r() - .5) * .3, cz = z + 1.3 + (r() - .5) * .3, turn = (r() - .5) * .25;
+          if (inPit(cx, cz)) continue;
+          const corners = [[-1, -.6], [-.3, -1], [1, -.85], [.9, .4], [.4, 1], [-.95, .8]].map(([u, v]) => {
+            const k = 1.22 - r() * .16, px = u * k, pz = v * k;
+            return new THREE.Vector2(cx + px * Math.cos(turn) - pz * Math.sin(turn), cz + px * Math.sin(turn) + pz * Math.cos(turn));
+          });
+          const h = .03 + r() * .03;
+          const g = new THREE.ExtrudeGeometry(new THREE.Shape(corners.map(p => new THREE.Vector2(p.x, -p.y))), { depth: h, bevelEnabled: false }).rotateX(-Math.PI / 2).toNonIndexed(); g.computeVertexNormals();
+          const c = tints[Math.floor(r() * tints.length)].clone().multiplyScalar(.92 + r() * .14);
+          add(new THREE.Mesh(colour(g, () => c), M.floor), 'Cave flagstone');
+        }
+      } else if (style.kind === 'shards') {
+        const n = Math.ceil(HALF * 2 / style.size) + 2, sites: P2[][] = [];
+        for (let i = 0; i < n; i++) { sites.push([]); for (let j = 0; j < n; j++) sites[i].push([-HALF + (i - .5 + r() * .8 + .1) * style.size, -HALF + (j - .5 + r() * .8 + .1) * style.size]); }
+        for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+          const [px, pz] = sites[i][j], e = style.size * 1.6;
+          let cell: P2[] = [[px - e, pz - e], [px + e, pz - e], [px + e, pz + e], [px - e, pz + e]];
+          for (let di = -2; di <= 2; di++) for (let dj = -2; dj <= 2; dj++) {
+            const q = sites[i + di]?.[j + dj]; if (!q || (!di && !dj)) continue;
+            // Keep the side nearer this site: (q - p) . x <= (|q|^2 - |p|^2) / 2.
+            cell = clip(cell, px - q[0], pz - q[1], (px * px + pz * pz - q[0] * q[0] - q[1] * q[1]) / 2);
+          }
+          slab(cell, style.gap);
+        }
+      } else if (style.kind === 'hex') {
+        const R = style.radius, w = R * 1.5, hgt = R * Math.sqrt(3);
+        for (let i = -Math.ceil(HALF / w) - 1; i <= Math.ceil(HALF / w) + 1; i++) for (let j = -Math.ceil(HALF / hgt) - 1; j <= Math.ceil(HALF / hgt) + 1; j++) {
+          const cx = i * w, cz = j * hgt + (i & 1 ? hgt / 2 : 0);
+          slab(Array.from({ length: 6 }, (_, k): P2 => [cx + Math.cos(k * Math.PI / 3) * R, cz + Math.sin(k * Math.PI / 3) * R]), style.gap);
+        }
+      } else if (style.kind === 'planks') {
+        // North and south of the pit the boards run north-south, east and west they run east-west: toward the walls.
+        for (const along of ['z', 'x'] as const) for (let u = -HALF; u < HALF; u += style.width) {
+          for (let v = -HALF - r() * 2; v < HALF;) {
+            const length = 1.4 + r() * 2, mid = v + length / 2, x = along === 'z' ? u + style.width / 2 : mid, z = along === 'z' ? mid : u + style.width / 2;
+            const ours = along === 'z' ? Math.abs(z) >= Math.abs(x) : Math.abs(x) > Math.abs(z);
+            if (ours && r() >= (style.missing ?? 0)) {
+              const [a0, a1, b0, b1] = along === 'z' ? [u, u + style.width, v, v + length] : [v, v + length, u, u + style.width];
+              slab([[a0, b0], [a1, b0], [a1, b1], [a0, b1]], style.gap);
+            }
+            v += length;
+          }
+        }
+      } else {
+        for (let z = -HALF; z < HALF;) {
+          const depth = style.row[0] + r() * (style.row[1] - style.row[0]);
+          for (let x = -HALF - r() * 2; x < HALF;) {
+            const width = style.width[0] + r() * (style.width[1] - style.width[0]), roll = r();
+            const rect: P2[] = [[x, z], [x + width, z], [x + width, z + depth], [x, z + depth]];
+            if (roll < style.missing) { /* a lost slab: the joint ground shows */ }
+            else if (roll < style.missing + style.cracked) {
+              // Cracked across: two pieces split along a line from the near edge to the far edge.
+              const t0 = x + width * (.25 + r() * .5), t1 = x + width * (.25 + r() * .5), c = tint(), h = h0 + r() * (h1 - h0);
+              slab([[x, z], [t0, z], [t1, z + depth], [x, z + depth]], style.gap, h, c);
+              slab([[t0, z], [x + width, z], [x + width, z + depth], [t1, z + depth]], style.gap, h - .01, c);
+            } else slab(rect, style.gap);
+            x += width;
+          }
+          z += depth;
+        }
       }
       // Low enough that standing here still counts as the room's floor (PlayerDepth: within the spawn clearance).
       for (const [x0, x1, z0, z1] of [[-HALF, -PIT, -HALF, HALF], [PIT, HALF, -HALF, HALF], [-PIT, PIT, -HALF, -PIT], [-PIT, PIT, PIT, HALF]])
