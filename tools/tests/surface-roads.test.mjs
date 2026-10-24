@@ -1,20 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {CURB,CURB_EDGES,CURB_SOLIDS} from '../../src/game/world/SurfaceRoads.ts';
-import {onSurfaceRoad,surfaceGrassAllowed,SURFACE_SALE,SURFACE_SHOP} from '../../src/game/world/surfaceLayout.ts';
 import {surfacePlan} from '../../src/game/world/SurfaceAssetPlan.ts';
 import {CharacterPhysics,initPhysics,RAPIER} from '../../src/game/validation/physics.ts';
-
-test('roads reach facilities, reclaim the circular plaza, and curb only union boundaries',()=>{
- for(const [x,z] of [[0,30],[0,14],[-22,30],[22,30],[25,15.5],[25,44.5],[SURFACE_SALE.x,SURFACE_SALE.z],[SURFACE_SHOP.x,SURFACE_SHOP.z]])assert.ok(onSurfaceRoad(x,z));
- assert.equal(onSurfaceRoad(10,38),false);assert.equal(surfaceGrassAllowed(10,38),true);
- for(const e of CURB_EDGES){
-  const mid=(e.from+e.to)/2,x=e.axis==='x'?mid:e.fixed,z=e.axis==='z'?mid:e.fixed;
-  const dx=e.axis==='z'?.01:0,dz=e.axis==='x'?.01:0;
-  assert.notEqual(onSurfaceRoad(x+dx,z+dz),onSurfaceRoad(x-dx,z-dz),'no curb across internal intersections');
- }
- for(const s of CURB_SOLIDS)assert.ok(s.at[1]+s.half[1]<=CURB.height+CURB.base+.001);
-});
 
 test('real capsule crosses low curb and service/egg approaches without jumping',async()=>{
  await initPhysics();

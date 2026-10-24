@@ -4,21 +4,25 @@ import {readFileSync,readdirSync} from 'node:fs';
 import {gunzipSync} from 'node:zlib';
 import {createHash} from 'node:crypto';
 import { QUARRY_PLACEMENTS } from '../../src/game/world/QuarryLayout.ts';
+import { PINEWIND_CAMP } from '../../src/game/content/pinewindSurface.ts';
+// The authored scene (Pinewind surface, underground halls) ships here too; its art rules live in its own tests.
+const AUTHORED=new Set(PINEWIND_CAMP.surface.authored.instances.map(p=>p.asset));
 
-test('shipped quarry models use role-sized GPU-compressed mip chains and exact transport parts',()=>{
+test('shipped models keep exact transport parts; quarry models use role-sized GPU-compressed mip chains and exact transport parts',()=>{
  const directory=new URL('../../src/game/assets/camp/',import.meta.url);
  const files=readdirSync(directory).filter(name=>name.endsWith('.manifest.json'));
  // bank-steps remains in the asset library but is no longer placed or downloaded.
  // Keep an explicit inventory so unexpected missing/extra assets still fail.
- assert.deepEqual(files.map(f=>f.replace('.manifest.json','')).sort(),[...new Set(QUARRY_PLACEMENTS.map(p=>p.asset)),'bank-steps'].sort());let textures=0,texturedModels=0,authoredModels=0,triangles=0,downloadBytes=0;
+ assert.deepEqual(files.map(f=>f.replace('.manifest.json','')).sort(),[...new Set([...QUARRY_PLACEMENTS.map(p=>p.asset),...AUTHORED]),'bank-steps'].sort());let textures=0,texturedModels=0,authoredModels=0,triangles=0,downloadBytes=0;
  for(const file of files){
   const manifest=JSON.parse(readFileSync(new URL(file,directory)));
   const packed=Buffer.concat(manifest.parts.map(name=>readFileSync(new URL(name,directory))));
-  downloadBytes+=packed.length;
   const parts=manifest.parts.map(name=>readFileSync(new URL(name,directory)));
   assert.ok(parts.every(part=>part.length<=4*1024*1024));
   const joined=Buffer.concat(parts);assert.deepEqual(joined,packed);
   assert.equal(joined.length,manifest.bytes);assert.equal(createHash('sha256').update(joined).digest('hex'),manifest.sha256);
+  if(AUTHORED.has(file.replace('.manifest.json','')))continue;
+  downloadBytes+=packed.length;
   const buffer=gunzipSync(packed),jsonLength=buffer.readUInt32LE(12);
   const document=JSON.parse(buffer.subarray(20,20+jsonLength)),binaryStart=28+jsonLength;
   const count=document.meshes.reduce((n,m)=>n+m.primitives.reduce((n,p)=>n+document.accessors[p.indices??p.attributes.POSITION].count/3,0),0);

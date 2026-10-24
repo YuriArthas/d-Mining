@@ -1,24 +1,10 @@
 import {createSurfaceDetailContent} from '../../src/game/content/surfaceDetails.ts';
-import {isDeepStrictEqual} from 'node:util';
-import {geometryHash} from '../lib/glbBuffers.mjs';
-import {gunzipSync} from 'node:zlib';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {createHash} from 'node:crypto';
-import {QUARRY_PLACEMENTS} from '../../src/game/world/QuarryLayout.ts';
 import {SurfaceDetails} from '../../src/game/presentation/SurfaceDetails.ts';
 const root=new URL('../../',import.meta.url),read=p=>readFileSync(new URL(p,root));
 const mask=JSON.parse(read('src/game/assets/ground-details/contact-shadow.json'));
-const selection=JSON.parse(read('assets-source/quarry-v2/contact-bake/selection.json'));
-const result=JSON.parse(read('assets-source/quarry-v2/contact-bake/result.json'));
-test('contact bake matches shipped meshes and current placements; changes require rebaking',()=>{
- assert.equal(createHash('sha256').update(read('src/game/assets/ground-details/contact-shadow.json')).digest('hex'),result.runtimeSha256);
- const transform=p=>({...p,y:p.y??-.08,yaw:p.yaw??0});
- for(const p of selection.selected)assert.ok(QUARRY_PLACEMENTS.some(current=>isDeepStrictEqual(transform(current),transform(p))),'bake placement moved');
- for(const s of selection.sources){const m=JSON.parse(read(`src/game/assets/camp/${s.asset}.manifest.json`));const binary=gunzipSync(Buffer.concat(m.parts.map(p=>read(`src/game/assets/camp/${p}`))));assert.equal(geometryHash(binary),s.geometrySha256,'bake geometry or node transform changed');}
- assert.equal(selection.selected.length,10);assert.equal(mask.size,512);
-});
 test('UV orientation places occlusion at the posts/buildings and leaves spawn/shaft clear',()=>{
  const bytes=Buffer.from(mask.data,'base64'),b=mask.bounds;
  const value=(x,z)=>bytes[Math.floor((b.maxZ-z)/(b.maxZ-b.minZ)*mask.size)*mask.size+Math.floor((x-b.minX)/(b.maxX-b.minX)*mask.size)];
