@@ -3,8 +3,8 @@
  *  16 m mine pit in the middle stays open voxel floor to dig down from. One source for the offline art build
  *  (tools/build-underground.mjs) and the game (placement, lights, colliders). */
 
-export type HallLight = Readonly<{ at: readonly [number, number, number]; color: string; intensity: number; distance: number }>;
-export type HallMushroom = Readonly<{ at: readonly [number, number, number]; height: number; cap: number; tint: 'teal' | 'violet'; yaw: number }>;
+type HallLight = Readonly<{ at: readonly [number, number, number]; color: string; intensity: number; distance: number }>;
+type HallMushroom = Readonly<{ at: readonly [number, number, number]; height: number; cap: number; tint: 'teal' | 'violet'; yaw: number }>;
 
 const mushroom = (x: number, z: number, height: number, cap: number, tint: 'teal' | 'violet', yaw = 0): HallMushroom => ({ at: [x, 0, z], height, cap, tint, yaw });
 

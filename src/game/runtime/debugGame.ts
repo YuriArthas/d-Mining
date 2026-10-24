@@ -24,7 +24,7 @@ import type { RenderSubmission } from "../presentation/RenderSubmission.ts";
 import type { RenderProfiler } from "../presentation/RenderProfiler.ts";
 import { GAME_CONFIG } from "../config.ts";
 import { mineralName } from "../terrain/minerals.ts";
-export type ValidationDebug = {
+type ValidationDebug = {
   advanceOnline: (seconds: number) => void;
   snapshot: () => unknown;
   performance: (options: {
@@ -166,7 +166,6 @@ export function attachGameDebug(
       facing: avatar?.rotation.y,
       frames: timing.frames,
       renderer: {
-        cameraGrade: current.cameraGrade.diagnostics(),
         programs: gl.info.programs?.length ?? 0,
         renderRate: renderState().rate,
         probeMode: renderState().probe,

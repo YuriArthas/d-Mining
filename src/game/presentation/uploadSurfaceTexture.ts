@@ -13,7 +13,7 @@ export function planTextureUploads(textures:Iterable<Texture>,limits:{maxTexture
  }
  if(batch.textures.length)batches.push(batch);return batches;
 }
-export type TextureUploadStats={textures:number;batches:number;waitMs:number;maxBatchBytes:number};
+type TextureUploadStats={textures:number;batches:number;waitMs:number;maxBatchBytes:number};
 // Only one bounded batch is in flight. Fence completion covers every texture in
 // that batch; the next model still cannot decode until this model finishes.
 export async function uploadSurfaceTextures(renderer:WebGLRenderer,textures:Iterable<Texture>,signal:AbortSignal):Promise<TextureUploadStats>{

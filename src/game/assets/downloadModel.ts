@@ -1,5 +1,5 @@
 import {fetchAssetParts} from './fetchAssetParts.ts';
-export interface ModelDownload {parts:readonly string[];bytes:number;decodedBytes:number}
+interface ModelDownload {parts:readonly string[];bytes:number;decodedBytes:number}
 /** Stream gzip directly into a reserved buffer, rejecting incorrect metadata
  * before any out-of-bounds write. Never retain/join all transport chunks. */
 export async function downloadModel(asset:ModelDownload,signal:AbortSignal){

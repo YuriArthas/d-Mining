@@ -9,7 +9,7 @@ export type DrumId =
   | 'kick' | 'snare' | 'clap' | 'hat' | 'shaker' | 'woodblock' | 'rim' | 'tomLow' | 'tomHigh'
   | 'frameDum' | 'frameTek' | 'tick' | 'triangle' | 'timpani' | 'bubble';
 
-export type NoteVoice = Readonly<{
+type NoteVoice = Readonly<{
   ctx: BaseAudioContext; out: AudioNode; t: number; midi: number; seconds: number; velocity: number;
   random: () => number; noise: AudioBuffer;
 }>;
@@ -261,7 +261,7 @@ export function playNote(id: InstrumentId, v: NoteVoice): number {
   }
 }
 
-export type DrumVoice = Omit<NoteVoice, 'midi' | 'seconds'>;
+type DrumVoice = Omit<NoteVoice, 'midi' | 'seconds'>;
 
 /** Plays one drum hit; returns when it has gone silent. */
 export function playDrum(id: DrumId, v: DrumVoice): number {

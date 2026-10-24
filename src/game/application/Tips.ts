@@ -1,7 +1,7 @@
 import { TIP_IDS, type TipId } from '../logic/Onboarding.ts';
 
 /** Where a tip points: the mine on the map, the first block to dig, or a HUD control. */
-export type TipAnchor = 'mine' | 'dig' | 'sell' | 'shop' | 'pets';
+type TipAnchor = 'mine' | 'dig' | 'sell' | 'shop' | 'pets';
 export type Tip = Readonly<{ id: TipId; anchor: TipAnchor }>;
 export type TipState = Readonly<{
   seen: (id: TipId) => boolean;

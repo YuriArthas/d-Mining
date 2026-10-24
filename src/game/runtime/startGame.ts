@@ -1,6 +1,5 @@
 import type { SparseWorld } from '../terrain/SparseWorld.ts';
 import { JourneyGates, journeySurfacePlan } from '../presentation/JourneyGates.ts';
-import { CameraGrade } from '../presentation/CameraGrade.ts';
 import { FeedbackFixtures } from '../presentation/FeedbackFixtures.ts';
 import { FEEDBACK_COLLISION_SITE } from '../content/feedbackFacilities.ts';
 import { surfaceLightStrengthAtFeet } from '../world/SurfaceLightFade.ts';
@@ -44,7 +43,7 @@ import { MiningFeedback } from "./MiningFeedback.ts";
 import { worldAtFeet } from "../content/worldJourney.ts";
 import { DisposalScope } from "./DisposalScope.ts";
 
-export function createStartupStats() {
+function createStartupStats() {
   return {
     started: performance.now(),
     physicsMs: 0,
@@ -61,7 +60,7 @@ export function createStartupStats() {
   };
 }
 export type PreparedGame = Awaited<ReturnType<typeof startGame>>;
-export type StartGameOptions = {
+type StartGameOptions = {
   content: GameContent;
   renderer: WebGLRenderer;
   scene: Scene;
@@ -123,8 +122,6 @@ export async function startGame(options: StartGameOptions) {
   try {
     check();
     renderer.shadowMap.autoUpdate = false;
-    const cameraGrade = new CameraGrade();
-    scope.defer(() => cameraGrade.dispose());
     const sky = new SurfaceEnvironment(
       renderer,
       scene,
@@ -320,8 +317,6 @@ export async function startGame(options: StartGameOptions) {
       startup.parallelShaderCompile = warm.parallel;
     }
     check();
-    await cameraGrade.prepare(renderer, abort.signal);
-    check();
     onLoading({ stage: "shaders", done: 1, total: 1, complete: true });
     return {
       session,
@@ -334,7 +329,6 @@ export async function startGame(options: StartGameOptions) {
       sceneryCollision,
       environment,
       cameraView,
-      cameraGrade,
       eggLabels,
       lockedEggs,
       stations,

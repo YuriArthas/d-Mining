@@ -1,6 +1,6 @@
 // Gameplay requirements; world entry and mine ownership are separate permanent facts.
 export type WorldId = 1 | 2 | 3;
-export type WorldRequirement = Readonly<{
+type WorldRequirement = Readonly<{
   id: WorldId; name: string; z: number; mined: number; coins: number;
   materials: readonly Readonly<{ itemId: string; count: number; layer: number }>[];
 }>;

@@ -6,7 +6,7 @@ import test from 'node:test';
 import { Inventory } from '../../src/game/logic/Inventory.ts';
 import { Wallet } from '../../src/game/logic/Wallet.ts';
 import { Mining } from '../../src/game/application/Mining.ts';
-import { quoteSale, sellAll } from '../../src/game/application/Sale.ts';
+import { quoteSale, sellItems } from '../../src/game/application/Sale.ts';
 import { ORE_ITEMS, itemVolume, itemPrice, itemDefinition } from '../../src/game/application/items.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
 
@@ -45,17 +45,17 @@ test('weighted DTO remains quantity based; restore recalculates fullness using i
 test('independent sale quote uses quantity times price, never volume or capacity; quote is read only',()=>{
  const bag=new Inventory(1,volume),wallet=new Wallet(7);bag.add([...batch(2,'gold'),...batch(3,'gem')]);const before=bag.getSnapshot();
  assert.deepEqual(quoteSale(before.items,price),{status:'quoted',count:5,coins:320});assert.equal(bag.getSnapshot(),before);assert.equal(before.used,65);
- assert.deepEqual(sellAll(bag,wallet,price),{status:'sold',count:5,coins:320});assert.equal(wallet.getBalance(),327);assert.equal(bag.getSnapshot().used,0);
- assert.deepEqual(sellAll(bag,wallet,price),{status:'empty'});assert.equal(wallet.getBalance(),327);
+ assert.deepEqual(sellItems(bag,wallet,price),{status:'sold',count:5,coins:320});assert.equal(wallet.getBalance(),327);assert.equal(bag.getSnapshot().used,0);
+ assert.deepEqual(sellItems(bag,wallet,price),{status:'empty'});assert.equal(wallet.getBalance(),327);
 });
 test('pricing failure and unsafe proceeds preserve inventory and wallet',()=>{
  for(const pricing of [()=>{throw Error('missing price')},()=>-1,()=>NaN]){
   const bag=new Inventory(50,volume),wallet=new Wallet(5);bag.add(batch(1,'gold'));const before=bag.getSnapshot();
-  assert.throws(()=>sellAll(bag,wallet,pricing));assert.equal(bag.getSnapshot(),before);assert.equal(wallet.getBalance(),5);
+  assert.throws(()=>sellItems(bag,wallet,pricing));assert.equal(bag.getSnapshot(),before);assert.equal(wallet.getBalance(),5);
  }
  for(const [count,balance] of [[2,0],[1,1]]){
   const bag=new Inventory(50),wallet=new Wallet(balance);bag.add(batch(count));const before=bag.getSnapshot();
-  assert.deepEqual(sellAll(bag,wallet,()=>Number.MAX_SAFE_INTEGER),{status:'overflow'});assert.equal(bag.getSnapshot(),before);assert.equal(wallet.getBalance(),balance);
+  assert.deepEqual(sellItems(bag,wallet,()=>Number.MAX_SAFE_INTEGER),{status:'overflow'});assert.equal(bag.getSnapshot(),before);assert.equal(wallet.getBalance(),balance);
  }
 });
 test('mining checks existing occupied volume, accepts oversize yield and never truncates completed batches',()=>{

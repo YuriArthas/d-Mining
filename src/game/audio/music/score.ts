@@ -49,7 +49,7 @@ const QUALITIES: Readonly<Record<string, readonly number[]>> = {
   add9: [0, 4, 7, 14], madd9: [0, 3, 7, 14], dim: [0, 3, 6], aug: [0, 4, 8], '6': [0, 4, 7, 9], m6: [0, 3, 7, 9],
   '9': [0, 4, 7, 10, 14], m9: [0, 3, 7, 10, 14], maj9: [0, 4, 7, 11, 14], '5': [0, 7], m7b5: [0, 3, 6, 10],
 };
-export type Chord = Readonly<{ root: number; intervals: readonly number[]; bass: number }>;
+type Chord = Readonly<{ root: number; intervals: readonly number[]; bass: number }>;
 export function parseChord(symbol: string): Chord {
   const m = /^([A-G](?:#|b)?)([a-z0-9]*)(?:\/([A-G](?:#|b)?))?$/.exec(symbol);
   const intervals = m && QUALITIES[m[2]];

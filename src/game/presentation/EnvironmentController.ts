@@ -24,7 +24,7 @@ export type EnvironmentConfig = Readonly<{
     keyOffset: readonly [number, number, number];
   }>;
 }>;
-export type EnvironmentFrame = Readonly<{
+type EnvironmentFrame = Readonly<{
   surface: boolean;
   surfaceLightStrength: number;
   depth: number;

@@ -1,6 +1,6 @@
 import { CELL, type Coord } from './SparseWorld.ts';
 
-export type VoxelHit = { cell: Coord; distance: number; point: Coord };
+type VoxelHit = { cell: Coord; distance: number; point: Coord };
 // Amanatides-Woo traversal over the logical source, independent of both meshes.
 // Cells are half-open. At a crossed edge/corner all tied axes advance together:
 // a cell merely touched at a zero-area edge is not an intervening solid.

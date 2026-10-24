@@ -2,8 +2,8 @@ import type { V3, Solid } from '../../world/sceneryKit.ts';
 
 export type RoomAnchor = 'room' | 'spawn' | 'sell' | 'shop';
 export type RoomZone = {at: number[]; radius: number; heightTolerance: number; hysteresis: number};
-export type RoomFacilities = {spawn: {at: number[]; clearance: number}; sell: RoomZone; shop: RoomZone | null};
-export type RoomRenderStyle = {
+type RoomFacilities = {spawn: {at: number[]; clearance: number}; sell: RoomZone; shop: RoomZone | null};
+type RoomRenderStyle = {
   atlas: {columns: number; rows: number; gutter: number; repeat: number};
   surface: {roughness: number; metalness: number; envMapIntensity: number; glowIntensity: number};
   lighting: {
@@ -26,13 +26,13 @@ export type RoomSceneDefinition = {
   rings: {anchor: 'sell' | 'shop'; offset: number[]; height: number; color: string; glow: boolean}[];
   render?: RoomRenderStyle;
 };
-export type RoomInstance = {
+type RoomInstance = {
   name: string; mesh: string; material: string;
   at: number[]; scale: number[]; rotation: number[]; fixed: boolean; floor?: string;
 };
-export type RoomLamp = {at: number[]; fixed: boolean};
-export type RoomMaterial = {color: string; tile: number; glow: boolean};
-export type RoomKit = {
+type RoomLamp = {at: number[]; fixed: boolean};
+type RoomMaterial = {color: string; tile: number; glow: boolean};
+type RoomKit = {
   id: string;
   meshes: Record<string, {positions:number[]; normals:number[]; uv:number[]; indices:number[]}>;
   texture: {size:number; data:string};

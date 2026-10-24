@@ -3,7 +3,7 @@ import { compileCycle, trackInstrument, type CompiledCycle, type Layer, type Not
 import { songById, type SongId } from './songs.ts';
 
 /** What should be playing: the piece and how full the arrangement is (0..1 per optional layer). */
-export type MusicScene = Readonly<{ song: SongId | null; rhythm: number; lead: number }>;
+type MusicScene = Readonly<{ song: SongId | null; rhythm: number; lead: number }>;
 
 const LOOKAHEAD = 0.6;
 const FADE_OUT = 2.2;

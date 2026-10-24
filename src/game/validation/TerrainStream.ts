@@ -2,7 +2,7 @@ import { type CharacterPhysics } from './physics.ts';
 import { SparseWorld, type WorldGeneration, CELL, COLLISION_SIZE, chunkKey, validRegion, inBounds, type Coord } from '../terrain/SparseWorld.ts';
 import { RenderTerrain, CollisionTerrain } from '../terrain/TerrainLayers.ts';
 import { Measurements, type WorkerFactory } from '../terrain/RegionPipeline.ts';
-export type ExcavatedCell = Readonly<{ cell: Coord; kind: number }>;
+type ExcavatedCell = Readonly<{ cell: Coord; kind: number }>;
 export class TerrainStream {
   readonly world: SparseWorld;
   readonly measurements = new Measurements();

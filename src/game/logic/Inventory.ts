@@ -1,8 +1,8 @@
 import { integer } from './numbers.ts';
 export type ItemBatch = readonly Readonly<{ itemId: string; count: number }>[];
-export type UnitVolume = (itemId: string) => number;
+type UnitVolume = (itemId: string) => number;
 export type InventoryDataV1 = { version: 1; capacity: number; items: Record<string, number> };
-export type InventorySnapshot = Readonly<{ capacity: number; used: number; totalCount: number; isFull: boolean; items: Readonly<Record<string, number>> }>;
+type InventorySnapshot = Readonly<{ capacity: number; used: number; totalCount: number; isFull: boolean; items: Readonly<Record<string, number>> }>;
 const oneUnit: UnitVolume = () => 1;
 function counts(batch: ItemBatch) {
   const result = new Map<string, number>();

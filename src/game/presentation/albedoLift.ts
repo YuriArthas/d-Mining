@@ -13,7 +13,7 @@ export const ARCHITECTURE_ALBEDO = { saturation: 1.25, brightness: 1.2, bounce: 
  *  shaded and backlit sides keep a good share of their own green instead of dropping to near black (the
  *  original game's woods stay bright all round). Neutral fill, a slight lift of the atlas colour, and the
  *  same lighter sky occlusion as the buildings (bakedLight.ts). */
-export const FOLIAGE_ALBEDO = { saturation: 1.12, brightness: 1.22, bounce: 3.6 } as const;
+const FOLIAGE_ALBEDO = { saturation: 1.12, brightness: 1.22, bounce: 3.6 } as const;
 type Look = { saturation: number; brightness: number; bounce: number };
 /** Light bounced off the sunlit sand is warm; light through leaves keeps its own colour. */
 const looks = {

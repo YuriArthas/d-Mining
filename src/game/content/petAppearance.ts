@@ -1,6 +1,6 @@
 // Presentation only. Logic/catalog/save data never import this file.
-export type PetAppearance = Readonly<{ color: string; label: string; radius: number }>;
-export const PET_APPEARANCES: Readonly<Record<string, PetAppearance>> = {
+type PetAppearance = Readonly<{ color: string; label: string; radius: number }>;
+const PET_APPEARANCES: Readonly<Record<string, PetAppearance>> = {
   'moss-slime': { color: '#7ecf69', label: '苔团', radius: 0.42 },
   'quarry-mole': { color: '#bc986a', label: '鼠', radius: 0.44 },
   'amber-fox': { color: '#eca341', label: '狐', radius: 0.46 },
@@ -51,16 +51,6 @@ export const PET_APPEARANCES: Readonly<Record<string, PetAppearance>> = {
   'frost-friend': { color: '#9df1e8', label: '兔', radius: 0.46 },
   'frost-wing': { color: '#9dc0f1', label: '鹰', radius: 0.48 },
   'frost-guardian': { color: '#81ecd1', label: '熊', radius: 0.52 },
-  'jade-blob': { color: '#55c995', label: '翠团', radius: 0.42 },
-  'jade-scout': { color: '#3cbe9f', label: '虫', radius: 0.44 },
-  'jade-friend': { color: '#61cd7f', label: '狐', radius: 0.46 },
-  'jade-wing': { color: '#7cd5d3', label: '雀', radius: 0.48 },
-  'jade-guardian': { color: '#46c456', label: '鹿', radius: 0.52 },
-  'moon-blob': { color: '#af9cf1', label: '月团', radius: 0.42 },
-  'moon-scout': { color: '#b082ee', label: '兔', radius: 0.44 },
-  'moon-friend': { color: '#9ca0f1', label: '猫', radius: 0.46 },
-  'moon-wing': { color: '#d39cf1', label: '枭', radius: 0.48 },
-  'moon-guardian': { color: '#8fa2f0', label: '龙', radius: 0.52 },
   'ruin-blob': { color: '#c9b879', label: '砂团', radius: 0.42 },
   'ruin-scout': { color: '#bfbf60', label: '鼠', radius: 0.44 },
   'ruin-friend': { color: '#cdaa84', label: '猫', radius: 0.46 },

@@ -18,7 +18,7 @@ const instance=(name:string):AuthoredInstance=>({...root(name),asset:'pinewind-a
 const rotation=(yaw:number):[number,number,number,number]=>[0,Math.sin(yaw/2),0,Math.cos(yaw/2)];
 
 /** Terrace and stair shells; the egg terraces render as authored blocks. */
-export const PINEWIND_TERRACE_SOLIDS:readonly Solid[]=[
+const PINEWIND_TERRACE_SOLIDS:readonly Solid[]=[
  ...PINEWIND_EGG_TIERS.map(t=>({at:[t.x,t.y/2,(PINEWIND_TERRACE.minZ+PINEWIND_TERRACE.maxZ)/2],half:[PINEWIND_TERRACE.width/2,t.y/2,(PINEWIND_TERRACE.maxZ-PINEWIND_TERRACE.minZ)/2],yaw:0} as Solid)),
  ...PINEWIND_STAIR_STEPS.map(s=>({at:[s.x,s.y/2,s.z],half:[s.width/2,s.y/2,s.depth/2],yaw:0} as Solid)),
 ];

@@ -6,7 +6,7 @@ import { Inventory } from '../../src/game/logic/Inventory.ts';
 import { Wallet } from '../../src/game/logic/Wallet.ts';
 import { ZoneDetector } from '../../src/game/logic/ZoneDetector.ts';
 import { Mining } from '../../src/game/application/Mining.ts';
-import { sellAll } from '../../src/game/application/Sale.ts';
+import { sellItems } from '../../src/game/application/Sale.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
 import { oreDrops } from '../../src/game/application/items.ts';
 
@@ -72,12 +72,12 @@ test('failed world request and empty completion grant nothing',()=>{
 });
 test('sale is independent of mining/scene and sells all quantities including overflow at one coin',()=>{
  const bag=new Inventory(1),wallet=new Wallet(7);bag.add([...item(3,'gift'),...item(8,'gem')]);
- assert.deepEqual(sellAll(bag,wallet,()=>1),{status:'sold',count:11,coins:11});assert.equal(wallet.getBalance(),18);assert.equal(bag.getSnapshot().used,0);
- assert.deepEqual(sellAll(bag,wallet,()=>1),{status:'empty'});assert.equal(wallet.getBalance(),18);
+ assert.deepEqual(sellItems(bag,wallet,()=>1),{status:'sold',count:11,coins:11});assert.equal(wallet.getBalance(),18);assert.equal(bag.getSnapshot().used,0);
+ assert.deepEqual(sellItems(bag,wallet,()=>1),{status:'empty'});assert.equal(wallet.getBalance(),18);
 });
 test('wallet overflow is checked before sale removes inventory',()=>{
  const bag=new Inventory(1),wallet=new Wallet(Number.MAX_SAFE_INTEGER);bag.add(item(2));
- assert.equal(sellAll(bag,wallet,()=>1).status,'overflow');assert.equal(bag.getSnapshot().used,2);assert.equal(wallet.getBalance(),Number.MAX_SAFE_INTEGER);
+ assert.equal(sellItems(bag,wallet,()=>1).status,'overflow');assert.equal(bag.getSnapshot().used,2);assert.equal(wallet.getBalance(),Number.MAX_SAFE_INTEGER);
 });
 test('zone reports only edges, uses grounded/height and radial hysteresis',()=>{
  const zone=new ZoneDetector(SELL_ZONE),c=SELL_ZONE,p=[c.x,c.y,c.z];

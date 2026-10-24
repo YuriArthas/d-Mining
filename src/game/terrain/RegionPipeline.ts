@@ -1,6 +1,6 @@
 import { SparseWorld, CELL, chunkKey, validRegion, affectedRegions, type Coord } from './SparseWorld.ts';
 import type { LayerKind, BuildJob, BuildReply, RegionData } from './meshing.ts';
-export interface WorkerPort {
+interface WorkerPort {
   onmessage: ((event: MessageEvent<BuildReply>) => void) | null;
   onerror: ((event: ErrorEvent) => void) | null;
   onmessageerror: ((event: MessageEvent) => void) | null;
@@ -15,7 +15,7 @@ export class Measurements {
 }
 export type Resident<T> = { coord: Coord; version: number; resource: T };
 type Stage<T> = { coord: Coord; version: number; resource?: T };
-export interface RegionAdapter<T> {
+interface RegionAdapter<T> {
   prepare(data: RegionData): T;
   activate(resource: T): void;
   dispose(resource: T): void;

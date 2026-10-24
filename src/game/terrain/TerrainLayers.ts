@@ -3,8 +3,8 @@ import { RAPIER, type CharacterPhysics } from '../validation/physics.ts';
 import { CELL, RENDER_SIZE, COLLISION_SIZE, SparseWorld } from './SparseWorld.ts';
 import { createMineralMaterial } from './mineralMaterial.ts';
 import { RegionPipeline, Measurements, type WorkerFactory } from './RegionPipeline.ts';
-export type RenderResource = { mesh?: Mesh; wire?: Mesh; bytes: number; triangles: number };
-export type CollisionResource = { collider?: RAPIER.Collider; bytes: number; triangles: number };
+type RenderResource = { mesh?: Mesh; wire?: Mesh; bytes: number; triangles: number };
+type CollisionResource = { collider?: RAPIER.Collider; bytes: number; triangles: number };
 export class RenderTerrain {
   readonly group = new Group();
   readonly pipeline: RegionPipeline<RenderResource>;

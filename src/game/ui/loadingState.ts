@@ -1,5 +1,5 @@
 export const LOADING_STAGES = ['assets','terrain','rooms','shaders'] as const;
-export type LoadingStage = typeof LOADING_STAGES[number];
+type LoadingStage = typeof LOADING_STAGES[number];
 export type LoadingEvent = {stage:LoadingStage;done:number;total:number;complete?:boolean}|{ready:true}|{error:string}|{reset:true};
 // Fixed work shares, not an elapsed-time estimate. First rendered frame owns the final 2%.
 const STAGE_SHARE:Record<LoadingStage,number>={assets:.55,terrain:.05,rooms:.10,shaders:.28};

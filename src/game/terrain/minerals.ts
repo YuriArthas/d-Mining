@@ -5,7 +5,7 @@ export const MINERALS = RESOURCES.map(r=>({id:r.kind,name:r.name,color:r.color})
 // Explicit atlas slots; stable logical IDs are never derived from array positions.
 export const TERRAIN_MATERIALS = [...MINERALS, {id:7,name:'固定地面',color:THEMES[0].floor}].sort((a,b)=>a.id-b.id);
 export const TILE_SIZE = 64;
-export const ATLAS_TILES = TERRAIN_MATERIALS.length + THEMES.length - 1;
+const ATLAS_TILES = TERRAIN_MATERIALS.length + THEMES.length - 1;
 export const ATLAS_COLUMNS = 16;
 export const ATLAS_ROWS = Math.ceil(ATLAS_TILES / ATLAS_COLUMNS);
 export const ATLAS_WIDTH = ATLAS_COLUMNS * TILE_SIZE;

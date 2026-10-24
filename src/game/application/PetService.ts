@@ -9,7 +9,7 @@ export type HatchResult =
   | Readonly<{ status: 'hatched'; eggId: string; pet: PetInstance; spent: number }>
   | Readonly<{ status: 'unknown-egg' | 'insufficient-coins' | 'locked' | 'unavailable' }>;
 export type EquipOwnedResult = EquipResult | Readonly<{ status: 'not-owned' }>;
-export type PetServiceDependencies = {
+type PetServiceDependencies = {
   content: PetContent;
   wallet: Pick<Wallet, 'getBalance' | 'debit'>;
   random: () => number;

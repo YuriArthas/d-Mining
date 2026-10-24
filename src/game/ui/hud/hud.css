@@ -71,7 +71,7 @@
 .hud-notice { display: block; max-width: 100%; }
 .hud-notice:empty { display: none; }
 .hud-notice .ui-toast { white-space: normal; text-align: center; justify-content: center; }
-.hud-bottom .journey-mine-prompt, .hud-bottom .capsule-world-prompt, .hud-bottom .egg-world-prompt { position: static; transform: none; }
+.hud-bottom .capsule-world-prompt, .hud-bottom .egg-world-prompt { position: static; transform: none; }
 
 /* Mining target card (TargetHealth markup). */
 .hud-center .target-health {
@@ -89,22 +89,11 @@
 .hud-center .target-health .hit-flash { animation: hud-hit .2s ease-out; }
 @keyframes hud-hit { from { background: #fff; } }
 
-/* Objective card (GuideCard markup) and the next-layer strip (DepthGoalCard) inside the left column. */
-.hud-objective .guide-card {
-  position: static; transform: none; width: 100%; margin: 0; padding: 8px 12px 10px;
-  border: var(--ui-edge) solid var(--ui-ink); border-left-width: var(--ui-edge); border-radius: 12px;
-  background: linear-gradient(180deg, var(--ui-card), var(--ui-card-lo)); box-shadow: inset 0 2px 0 #ffffff26, 0 3px 0 var(--ui-ink);
-  color: var(--ui-text-soft); font: 700 13px/1.4 var(--ui-font-body); pointer-events: none; text-shadow: none;
-}
+/* The next-layer strip (DepthGoalCard) inside the left column. */
 .hud-objective .guide-kicker {
   display: block; margin: 0 0 2px; letter-spacing: 0; font-family: var(--ui-font); font-size: 13px;
   color: var(--ui-text-gold); -webkit-text-stroke: 3px var(--ui-ink); paint-order: stroke fill;
 }
-.hud-objective .guide-card strong {
-  display: block; font-family: var(--ui-font); font-size: 17px; line-height: 1.25; color: #fff;
-  -webkit-text-stroke: 3px var(--ui-ink); paint-order: stroke fill; text-shadow: 0 2px 0 var(--ui-ink);
-}
-.hud-objective .guide-card p { margin: 4px 0 0; font-size: 13px; line-height: 1.4; color: var(--ui-text-soft); }
 /* The next layer: the same bright capsule language as the coin and bag pills. */
 .hud-objective .journey-goals {
   display: grid; gap: 5px; width: min(100%, 236px); padding: 6px 10px 8px;
@@ -117,19 +106,6 @@
 .hud-objective .journey-depth strong { font-size: 17px; line-height: 1.1; color: #fff; --ui-stroke: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .hud-objective .journey-goals .ui-bar { height: 18px; }
 .hud-objective .journey-goals .ui-bar > span { font-size: 12px; }
-.hud-objective .guide-card button {
-  pointer-events: auto; min-height: 40px; margin-top: 8px; padding: 0 12px;
-  border: var(--ui-edge) solid var(--ui-ink); border-radius: 10px;
-  background: linear-gradient(180deg, #ffffff59 0, #ffffff1a 38%, transparent 39%), linear-gradient(180deg, var(--ui-steel), var(--ui-steel-lo));
-  box-shadow: 0 3px 0 var(--ui-ink); color: #fff; font: 800 14px/1 var(--ui-font);
-  -webkit-text-stroke: 2px var(--ui-ink); paint-order: stroke fill; text-decoration: none; cursor: pointer;
-}
-.hud-objective .guide-card .guide-continue { display: block; width: 100%; background: linear-gradient(180deg, #ffffff59 0, #ffffff1a 38%, transparent 39%), linear-gradient(180deg, var(--ui-green), var(--ui-green-lo)); }
-.hud-objective .guide-card[data-step=dig] { border-color: #8a5a00; box-shadow: 0 0 0 2px #ffd447, 0 3px 0 var(--ui-ink); }
-.hud-objective .guide-mouse-instruction { display: flex; align-items: center; gap: 10px; margin-top: 6px; padding: 6px 8px; border-radius: 8px; background: #ffd44722; }
-.hud-objective .guide-mouse-instruction b { display: block; color: var(--ui-text-gold); font-size: 16px; }
-.hud-objective .guide-left-mouse { width: 30px; height: 42px; }
-.hud-objective .guide-complete button { display: block; width: 100%; }
 
 /* New-ore feed: short toasts under the depth banner, clear of the character. */
 .ui-hud .ore-pickup-feed { display: grid; justify-items: center; gap: 5px; pointer-events: none; }
@@ -166,8 +142,6 @@
   .hud-center { top: calc(8px + var(--safe-top)); }
   .hud-depth-kicker { font-size: 18px; --ui-stroke: 4px; }
   .hud-depth-value { font-size: 46px; --ui-stroke: 6px; }
-  .hud-objective .guide-card strong { font-size: 20px; }
-  .hud-objective .guide-card p { font-size: 14px; }
   .hud-objective .journey-depth strong { font-size: 20px; }
   .hud-objective .journey-goals { width: min(100%, 272px); }
 }
@@ -177,9 +151,6 @@
   .hud-depth-kicker { font-size: 12px; }
   .hud-depth-value { font-size: 24px; --ui-stroke: 4px; }
   .hud-left { gap: 8px; }
-  .hud-objective .guide-card { padding: 6px 10px 8px; }
-  .hud-objective .guide-card strong { font-size: 15px; }
-  .hud-objective .guide-card p { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
   .hud-objective .journey-depth strong { font-size: 15px; }
   .game-shell .joystick { width: 112px; height: 112px; }
   .game-shell .joystick-knob { left: 28px; top: 28px; }
@@ -188,8 +159,6 @@
   .hud-center .target-health { padding: 5px 10px 6px; }
 }
 .hud-objective:empty { display: none; }
-/* Skip stays available in Help on touch screens; keep the active objective compact. */
-@media (any-pointer: coarse) { .hud-objective .guide-skip { display: none; } }
 @media (prefers-reduced-motion: reduce) {
   .hud-sell[data-state=full] { animation: none; }
   .ui-hud .ore-pickup { animation: hud-ore-still var(--pickup-lifetime) linear forwards; }

@@ -2,7 +2,6 @@ import type { ShopView } from '../presentation/ShopView.ts';
 import { GuideMarkerProjector } from '../presentation/GuideMarkerProjector.ts';
 import { GuideDirectionArrow, updateGuideRoute } from '../presentation/GuideDirectionArrow.tsx';
 import type { SavedGame } from '../persistence/SaveBootstrap.ts';
-import { blendedCameraLook } from '../content/cameraLook.ts';
 import type { GameContent } from "../content/gameContent.ts";
 import { useEffect, useRef, type RefObject } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
@@ -42,7 +41,6 @@ export function ValidationScene({
   onLoading,
   onPerformance,
   session,
-  stylized,
   guideMarker,
 }: {
   shopView: ShopView;
@@ -52,7 +50,6 @@ export function ValidationScene({
   renderRate: RenderRate;
   shadowsEnabled: boolean;
   probeMode: ProbeMode;
-  stylized: boolean;
   input: GameInput;
   onStatus: (text: string) => void;
   onLoading: (event: LoadingEvent) => void;
@@ -198,7 +195,7 @@ export function ValidationScene({
           if (shopView.render(gl, delta)) return;
           current.environment.prepareDraw();
           drewWorld = true;
-          current.cameraGrade.draw(gl, scene, camera, stylized && probeMode !== "unlit", blendedCameraLook(current.environment.surfaceBlend));
+          gl.render(scene, camera);
         } finally {
           scene.overrideMaterial = override;
           profiler.current?.endFrame();

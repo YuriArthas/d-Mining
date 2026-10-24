@@ -3,7 +3,7 @@ import { integer } from "../logic/numbers.ts";
 import type { ProgressDataV1 } from "../application/SessionProgress.ts";
 export type { ProgressDataV1 } from "../application/SessionProgress.ts";
 import type { RegionDataV1 } from "../terrain/WorldSaveCodec.ts";
-export type WorldIdentity = {
+type WorldIdentity = {
   generationVersion: number;
   seed: number;
   regionEncoding: 1;

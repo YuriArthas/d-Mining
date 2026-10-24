@@ -2,7 +2,7 @@
  *  filtered-noise voices with exponential envelopes, scheduled on any BaseAudioContext so tests and
  *  offline renders can reuse them. */
 export type Voice = Readonly<{ ctx: BaseAudioContext; out: AudioNode; t: number; noise: AudioBuffer; random: () => number }>;
-export const SILENT = 0.0001;
+const SILENT = 0.0001;
 
 /** Deterministic xorshift noise in [-1, 1]: identical sounds every session, no Math.random at load. */
 function fillNoise(data: Float32Array, seed: number) {
@@ -58,7 +58,7 @@ export function tone(v: Voice, { wave = 'sine', from, to = from, sweep = 0.05, p
   osc.start(t); osc.stop(t + attack + decay + 0.02);
 }
 
-export type Hiss = { filter: BiquadFilterType; from: number; to?: number; sweep?: number; q?: number; peak: number; attack?: number; decay: number; start?: number };
+type Hiss = { filter: BiquadFilterType; from: number; to?: number; sweep?: number; q?: number; peak: number; attack?: number; decay: number; start?: number };
 export function hiss(v: Voice, { filter, from, to = from, sweep = 0.05, q = 1, peak, attack = 0.002, decay, start = 0 }: Hiss) {
   const source = v.ctx.createBufferSource(), biquad = v.ctx.createBiquadFilter(), t = v.t + start;
   source.buffer = v.noise;

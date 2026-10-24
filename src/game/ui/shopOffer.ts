@@ -8,10 +8,10 @@ type Snapshot = Readonly<{
   backpackUpgrade: Readonly<{ next?: Readonly<{ id: string }> | null }>;
 }>;
 
-export type OfferState = 'equipped' | 'owned' | 'next' | 'locked';
+type OfferState = 'equipped' | 'owned' | 'next' | 'locked';
 /** The step of the tier ladder an item sits on: 1-10 plain, 11-20 精工, 21-30 星辉. */
-export type OfferTier = 'plain' | 'fine' | 'star';
-export type OfferStat = Readonly<{ key: 'power' | 'speed' | 'capacity'; label: string; value: number; current: number; max: number; unit: string }>;
+type OfferTier = 'plain' | 'fine' | 'star';
+type OfferStat = Readonly<{ key: 'power' | 'speed' | 'capacity'; label: string; value: number; current: number; max: number; unit: string }>;
 
 export const offerTier = (item: ShopItem): OfferTier => item.level <= 10 ? 'plain' : item.level <= 20 ? 'fine' : 'star';
 

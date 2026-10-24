@@ -57,7 +57,7 @@ export function Toggle({ on, label, onPress }: { on: boolean; label: string; onP
   return <GameButton className="ui-toggle" aria-pressed={on} blurAfterPress={false} onPress={onPress}><i aria-hidden="true" /><span className="ui-outline">{label}</span></GameButton>;
 }
 
-export const RARITY_LABEL: Record<PetRarity, string> = { common: '普通', rare: '稀有', epic: '史诗', legendary: '传说' };
+const RARITY_LABEL: Record<PetRarity, string> = { common: '普通', rare: '稀有', epic: '史诗', legendary: '传说' };
 export function RarityTag({ rarity }: { rarity: PetRarity }) {
   return <span className="ui-rarity" data-rarity={rarity}>{RARITY_LABEL[rarity]}</span>;
 }

@@ -24,12 +24,12 @@ import { Inventory } from "../logic/Inventory.ts";
 import { Wallet } from "../logic/Wallet.ts";
 import { ZoneDetector } from "../logic/ZoneDetector.ts";
 import { Mining } from "./Mining.ts";
-import { quoteSale } from "./Sale.ts";
+import { quoteSale, sellItems } from "./Sale.ts";
 import { Pickaxe, pickaxeStats } from "../logic/Pickaxe.ts";
 import { MiningCombat } from "./MiningCombat.ts";
 import { oreDrops, oreDefinition, itemDefinition, ORE_ITEMS, itemVolume, itemPrice } from "./items.ts";
 import type { Coord } from "../terrain/SparseWorld.ts";
-export type WorldCommands = {
+type WorldCommands = {
   cell(target: Coord): number | null;
   canMine?(target: Coord): boolean;
   pending(target: Coord): boolean;
@@ -763,14 +763,9 @@ export class GameSession {
     if(this.suspended)return;
     this.reservations.set(id,mode);this.committed(true);this.publish();
   };
+  /** Sells everything except the minerals kept for opening the next worlds. */
   private executeSale() {
-    const items=this.reservations.sellable(this.inventory.getSnapshot().items), quote=quoteSale(items,this.salePrice);
-    if(quote.status==='overflow')return quote;
-    if(!quote.count)return {status:'empty'} as const;
-    if(!this.wallet.canCredit(quote.coins))return {status:'overflow'} as const;
-    if(!this.inventory.remove(Object.entries(items).map(([itemId,count])=>({itemId,count}))))throw Error('售卖库存发生变化');
-    this.wallet.credit(quote.coins);
-    return {status:'sold',count:quote.count,coins:quote.coins} as const;
+    return sellItems(this.inventory,this.wallet,this.salePrice,this.reservations.sellable(this.inventory.getSnapshot().items));
   }
   sellAvailable = () => {
     if(this.suspended||!this.inSellZone)return {status:'unavailable'} as const;

@@ -2,7 +2,7 @@
  *  `standing`): a coarse top-down grid of the sun 1 m above the floor, plus the floor height, read on the
  *  CPU once per frame for the player. Off the grid, high above the floor (terraces, the bridge deck) or
  *  below it (inside the mine) the character counts as fully sunlit, like before. */
-export type StandingLightGrid = {
+type StandingLightGrid = {
   size: number; data: Uint8ClampedArray | Uint8Array; x0: number; z0: number; span: number; heightStep: number;
 };
 /** Further than this from the floor below, the floor's light says nothing about the character. */

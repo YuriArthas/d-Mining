@@ -12,10 +12,10 @@ import { WaterSplash } from '../presentation/WaterSplash.ts';
 import { CELL, type Coord } from '../terrain/SparseWorld.ts';
 import { footSurface } from './footSurface.ts';
 
-export type FeedbackStrike = Readonly<{ cell: Coord; kind: number; breaking: boolean }>;
+type FeedbackStrike = Readonly<{ cell: Coord; kind: number; breaking: boolean }>;
 /** `contact` is the pick tip's world position on the frame the swing reaches the block; `step` is a
  *  foot planting (with its strength). */
-export type AvatarMoments = Readonly<{ contact: readonly number[] | null; jump: boolean; land: number | null; step?: number | null }>;
+type AvatarMoments = Readonly<{ contact: readonly number[] | null; jump: boolean; land: number | null; step?: number | null }>;
 type Ports = Readonly<{
   /** Current block kind, or 0/null once mined. */
   cell(cell: Coord): number | null;

@@ -21,7 +21,7 @@ export const ROOM_SCENES: Readonly<Record<string, RoomSceneDefinition>> = {
   'crystal-station-v1': crystal as RoomSceneDefinition,
 };
 const vector=(v:readonly number[])=>v.length===3&&v.every(Number.isFinite);
-export function validateRoomScene(id:string,scene:RoomSceneDefinition){
+function validateRoomScene(id:string,scene:RoomSceneDefinition){
   const fail=(field:string):never=>{throw Error(`无效房间场景 ${id}: ${field}`);};
   if(!!scene.asset===!!scene.hall||!vector(scene.referenceSize)||scene.referenceSize.some(v=>v<=0))fail('referenceSize/asset');
   if(scene.asset&&!scene.render)fail('render');

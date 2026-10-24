@@ -49,7 +49,6 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
   const exiting = useRef(false);
   const [exited, setExited] = useState(false);
   const [shadowsEnabled,setShadowsEnabled]=useState(true);
-  const [stylized,setStylized]=useState(()=>new URLSearchParams(location.search).get('look')==='graded');
   const [renderRate,setRenderRate]=useState<RenderRate>('display');
   const [loading,dispatchLoading]=useReducer(updateLoading,undefined,initialLoading);
   const onLoading=useCallback((event:LoadingEvent)=>{
@@ -140,9 +139,9 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
     shadows: shadowsEnabled, toggleShadows: () => { settle(); setShadowsEnabled(v => !v); },
     music, toggleMusic: () => { settle(); gameAudio.toggleMusic(); },
     sound, toggleSound: () => { settle(); gameAudio.toggle(); },
-    stylized, toggleStylized: () => { settle(); setStylized(v => !v); },
 
-    debug, hosted, exit: () => void exit(),
+
+    hosted, exit: () => void exit(),
   };
 
   if (exited) {
@@ -169,7 +168,7 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
           gl={{ antialias: true }}
           fallback={<p>当前浏览器无法启动 3D 画面，请使用支持 WebGL2 的浏览器。</p>}
         >
-          <ValidationScene shopView={shopView} guideMarker={guideMarker} savedGame={savedGame} stylized={stylized} content={GAME_CONTENT} renderRate={renderRate} shadowsEnabled={shadowsEnabled} probeMode={probeMode} input={input} onStatus={setStatus} onLoading={onLoading} onPerformance={setPerformanceStats} session={session} />
+          <ValidationScene shopView={shopView} guideMarker={guideMarker} savedGame={savedGame} content={GAME_CONTENT} renderRate={renderRate} shadowsEnabled={shadowsEnabled} probeMode={probeMode} input={input} onStatus={setStatus} onLoading={onLoading} onPerformance={setPerformanceStats} session={session} />
         </Canvas></LoadingBoundary>
       </div>
       <header inert={!!exitState} className="game-header" style={{display:showLoading?'none':undefined}}>
@@ -181,7 +180,7 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
             {performanceStats&&<div className="performance-detail">{`绘制 ${performanceStats.mainCalls} · 三角 ${(performanceStats.triangles/10000).toFixed(1)}万 · GPU 等待跳帧 ${performanceStats.skipPercent.toFixed(0)}%`}</div>}
             {performanceStats&&<div className="performance-detail">{`RAF ${performanceStats.rafFps.toFixed(1)} · 调度跳过 ${performanceStats.scheduleSkipPercent.toFixed(0)}% · 同步 ${performanceStats.waitCpuMs.toFixed(1)} ms`}</div>}
             {performanceStats&&<div className="performance-detail">{!performanceStats.gpu?.enabled?'GPU 计时关闭（避免同步查询干扰）':performanceStats.gpu?.supported?`GPU 主画面 ${performanceStats.gpu.mainMs?.toFixed(1)??'—'} ms`:'GPU 计时：此浏览器不支持'}</div>}
-            <PerformanceProbeUi stylized={stylized} renderRate={renderRate} shadowsEnabled={shadowsEnabled} stats={performanceStats} onMode={changeProbeMode} />
+            <PerformanceProbeUi renderRate={renderRate} shadowsEnabled={shadowsEnabled} stats={performanceStats} onMode={changeProbeMode} />
             </div></details>
           </div>
           <InputMonitor input={input} /><ValidationPanel />

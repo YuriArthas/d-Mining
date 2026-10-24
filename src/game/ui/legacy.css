@@ -3,13 +3,13 @@
 .game-shell--roblox-hud button:focus-visible { outline: 3px solid #fff294; outline-offset: 5px; }
 
 /* World guidance labels */
-.game-shell--roblox-hud .guide-marker b, .game-shell--roblox-hud .guide-offscreen,
+.game-shell--roblox-hud .guide-marker b,
 .game-shell--roblox-hud .guide-dig-caption {
   background: none; border: 0; box-shadow: none; color: #fff2a3;
   font-family: var(--ui-font); font-size: 16px; font-weight: 900; -webkit-text-stroke: 3px var(--ui-ink); paint-order: stroke fill;
 }
 @media (any-pointer: coarse) {
-  .game-shell--roblox-hud .guide-marker b, .game-shell--roblox-hud .guide-offscreen,
+  .game-shell--roblox-hud .guide-marker b,
   .game-shell--roblox-hud .guide-dig-caption { font-size: 14px; }
 }
 

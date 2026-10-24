@@ -5,7 +5,7 @@ export type Layer = Readonly<{ id: string; name: string; from: number; theme: st
 export const WORLD_DEPTH = 4000;
 /** The ten layer looks the worlds are built from: name, theme and rest-room scene. Each world picks seven
  *  (surface plus six rest layers) and gives them their own depths, blocks and ores (journeyWorlds.ts). */
-export type LayerTemplate = Readonly<{ id: string; name: string; theme: string; scene?: string }>;
+type LayerTemplate = Readonly<{ id: string; name: string; theme: string; scene?: string }>;
 export const LAYER_TEMPLATES: readonly LayerTemplate[] = Object.freeze([
   {id:'surface',name:'草地矿场',theme:'meadow_mine'},
   {id:'old_mine',name:'老矿井',theme:'timber_mine',scene:'timber-station-v2'},

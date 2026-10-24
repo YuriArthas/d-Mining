@@ -1,6 +1,6 @@
 import { versionOne } from './data.ts';
 import { integer } from './numbers.ts';
-export const PICKAXE_BALANCE = Object.freeze({ basePower: 10, powerPerLevel: 5, baseSpeed: 2, speedEvery: 5, speedMultiplier: 2, maxSpeed: 16 });
+const PICKAXE_BALANCE = Object.freeze({ basePower: 10, powerPerLevel: 5, baseSpeed: 2, speedEvery: 5, speedMultiplier: 2, maxSpeed: 16 });
 export function pickaxeStats(level: number, speedMultiplier = 1) {
   if (!integer(level, '镐子等级')) throw new Error('镐子等级必须大于 0');
   const c = PICKAXE_BALANCE;

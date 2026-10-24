@@ -10,7 +10,7 @@ export const PET_FACES = ['slime', 'mole', 'rabbit', 'fox', 'cat', 'owl', 'bird'
 export type PetFace = (typeof PET_FACES)[number];
 export const PET_PATTERNS = ['moss', 'stone', 'spots', 'facets', 'copper', 'runes', 'waves', 'frost', 'embers', 'cracks', 'bones', 'honey', 'rivets', 'sheen', 'stars', 'core'] as const;
 export type PetPattern = (typeof PET_PATTERNS)[number];
-export const PET_SPARKLES = ['sparkle', 'leaf', 'ember', 'bubble', 'snow', 'star'] as const;
+const PET_SPARKLES = ['sparkle', 'leaf', 'ember', 'bubble', 'snow', 'star'] as const;
 export type PetSparkle = (typeof PET_SPARKLES)[number];
 
 export type PetLook = Readonly<{
@@ -23,7 +23,7 @@ const FACE_BY_LABEL: Readonly<Record<string, PetFace>> = {
   虫: 'bug', 蜂: 'bee', 蝶: 'butterfly', 鹿: 'deer', 熊: 'bear', 龟: 'turtle', 鲸: 'whale', 鱼: 'fish', 蟹: 'crab', 蛙: 'frog',
   狮: 'lion', 牛: 'bull', 蝠: 'bat', 蜥: 'lizard', 兽: 'beast', 龙: 'dragon',
 };
-export const petFace = (label: string): PetFace => label.endsWith('团') ? 'slime' : FACE_BY_LABEL[label] ?? 'beast';
+const petFace = (label: string): PetFace => label.endsWith('团') ? 'slime' : FACE_BY_LABEL[label] ?? 'beast';
 
 /** Each egg's material and sparkle, so a whole egg reads as one family. */
 const EGG_THEMES: Readonly<Record<string, Readonly<{ pattern: PetPattern; sparkle: PetSparkle; tint: string }>>> = {

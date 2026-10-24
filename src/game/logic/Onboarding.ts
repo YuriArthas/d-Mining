@@ -18,7 +18,7 @@ export type OnboardingData = Readonly<{
   minedCount: number;
 }>;
 /** What the player has already shown they know, for saves made before tips existed. */
-export type LearningEvidence = { level: number; pets: number; equipped: boolean };
+type LearningEvidence = { level: number; pets: number; equipped: boolean };
 
 export class Onboarding {
   private data: OnboardingData;

@@ -1,7 +1,7 @@
 import { BoxGeometry, DataTexture, DynamicDrawUsage, Group, InstancedBufferAttribute, InstancedMesh, LinearMipmapLinearFilter, Matrix4, MeshBasicMaterial, NearestFilter, RGBAFormat, ShaderChunk, SRGBColorSpace } from 'three';
 import { CELL, RENDER_SIZE, chunkKey, regionOf, type Coord } from '../terrain/SparseWorld.ts';
 import { crackAtlas, crackStage, CRACK_STAGES, CRACK_TILE } from './cracks.ts';
-export type BlockDamage = Readonly<{ cell: Coord; hp: number; maximum: number }>;
+type BlockDamage = Readonly<{ cell: Coord; hp: number; maximum: number }>;
 type Mark = { cell: Coord; stage: number };
 type Resident = { coord: Coord; resource: { mesh?: unknown } };
 type Overlay = { mesh: InstancedMesh; stages: InstancedBufferAttribute; capacity: number };

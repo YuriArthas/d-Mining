@@ -57,6 +57,6 @@ export function buildRegion(kind: LayerKind, coord: Coord, size: number, snapsho
   }, size, kind === 'collision');
   return { coord, mesh, buildMs: performance.now() - start };
 }
-export type RegionJob = { coord: Coord; version: number; edits: EditSnapshot };
+type RegionJob = { coord: Coord; version: number; edits: EditSnapshot };
 export type BuildJob = { generation: WorldGeneration; id: number; epoch: number; transaction: number; kind: LayerKind; size: number; regions: RegionJob[] };
 export type BuildReply = { id: number; epoch: number; transaction: number; results?: { version: number; data: RegionData }[]; error?: string };

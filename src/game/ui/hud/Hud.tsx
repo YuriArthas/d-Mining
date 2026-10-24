@@ -10,7 +10,7 @@ import { SystemMenu, type SystemControls } from './SystemMenu.tsx';
 import { TipToast } from '../TipsUi.tsx';
 import './hud.css';
 
-export type HudActions = {
+type HudActions = {
   openPets(): void; openShop(): void; openBackpacks(): void; openRewards(): void; openWorlds(): void; openMinerals(): void; openHelp(): void;
 };
 

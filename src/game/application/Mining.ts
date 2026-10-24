@@ -1,5 +1,5 @@
 import type { ItemBatch } from '../logic/Inventory.ts';
-export type MineResult = 'accepted' | 'full' | 'unavailable';
+type MineResult = 'accepted' | 'full' | 'unavailable';
 // World scheduling stays behind requestWorld. Completed excavation never rechecks capacity.
 export class Mining<Target, Resource> {
   private inventory: { isFull(): boolean; add(items: ItemBatch): void };

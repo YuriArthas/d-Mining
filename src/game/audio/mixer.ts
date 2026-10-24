@@ -21,7 +21,7 @@ export type Mixer = Readonly<{
 export const MUSIC_LEVEL = 0.26;
 
 /** A synthetic room: decorrelated stereo noise with an exponential tail that darkens as it decays. */
-export function makeReverb(ctx: BaseAudioContext, seconds = 2.2) {
+function makeReverb(ctx: BaseAudioContext, seconds = 2.2) {
   const length = Math.round(ctx.sampleRate * seconds), buffer = ctx.createBuffer(2, length, ctx.sampleRate);
   for (let c = 0; c < 2; c++) {
     const data = buffer.getChannelData(c);

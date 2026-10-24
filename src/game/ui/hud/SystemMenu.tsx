@@ -8,8 +8,7 @@ export type SystemControls = {
   shadows: boolean; toggleShadows(): void;
   music: boolean; toggleMusic(): void;
   sound: boolean; toggleSound(): void;
-  stylized: boolean; toggleStylized(): void;
-  debug: boolean; hosted: boolean;
+  hosted: boolean;
   exit(): void;
 };
 
@@ -34,9 +33,6 @@ export function SystemMenu({ system, onHelp }: { system: SystemControls; onHelp(
         <UiButton size="s" tone="steel" aria-pressed={system.music} onPress={system.toggleMusic}>音乐：{system.music ? '开' : '关'}</UiButton>
         <UiButton size="s" tone="steel" aria-pressed={system.sound} onPress={system.toggleSound}>音效：{system.sound ? '开' : '关'}</UiButton>
         <UiButton size="s" tone="steel" aria-pressed={system.shadows} onPress={system.toggleShadows}>阴影：{system.shadows ? '开' : '关'}</UiButton>
-        {system.debug && <>
-          <UiButton size="s" tone="steel" aria-pressed={system.stylized} onPress={system.toggleStylized}>画面：{system.stylized ? '风格化' : '原始'}</UiButton>
-        </>}
         <UiButton size="s" tone="red" icon="exit" aria-label={system.hosted ? '退出游戏，返回游戏列表' : '退出游戏'} onPress={() => { setOpen(false); system.exit(); }}>退出游戏</UiButton>
       </section>}
     </div>

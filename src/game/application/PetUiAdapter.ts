@@ -4,7 +4,7 @@ import type { PetService, HatchResult, EquipOwnedResult } from './PetService.ts'
 export type PetCardView = Readonly<{
   pet: PetInstance; name: string; rarity: PetRarity; powerBonusBps: number; equippedSlot: number | null;
 }>;
-export type EggOfferView = Readonly<{
+type EggOfferView = Readonly<{
   id: string; name: string; price: number; canAfford: boolean; unlocked: boolean; unlockName?: string;
   outcomes: readonly Readonly<{ speciesId: string; name: string; rarity: PetRarity; probability: number; powerBonusBps: number }>[];
 }>;
@@ -17,7 +17,7 @@ export type PetPanelSnapshot = Readonly<{
   effectiveStats: MiningStats;
   eggs: readonly EggOfferView[];
 }>;
-export interface PetUiApi {
+interface PetUiApi {
   getSnapshot(): PetPanelSnapshot;
   subscribe(listener: () => void): () => void;
   hatch(eggId: string): HatchResult;

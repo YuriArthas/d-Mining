@@ -4,10 +4,10 @@ import type { Solid } from '../../world/sceneryKit.ts';
 
 /** Authored underground halls (the surface pipeline taken below ground): their definition and the colliders
  *  the offline build exported, in hall metres (origin at the room's floor centre). */
-export const UNDERGROUND_HALLS = {
+const UNDERGROUND_HALLS = {
   'fungal-hall': { hall: FUNGAL_HALL, solids: fungalSolids.solids as Solid[] },
 } as const;
-export type HallId = keyof typeof UNDERGROUND_HALLS;
+type HallId = keyof typeof UNDERGROUND_HALLS;
 export function undergroundHall(id: string) {
   const entry = (UNDERGROUND_HALLS as Record<string, (typeof UNDERGROUND_HALLS)[HallId]>)[id];
   if (!entry) throw Error(`未知地下大厅: ${id}`);

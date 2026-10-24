@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { petLook } from '../content/petLooks.ts';
 import { PetModel, PetTextures } from './pets/PetModel.ts';
 
-export type FollowerPet = Readonly<{ id: string; speciesId: string; level: number; slot: number }>;
+type FollowerPet = Readonly<{ id: string; speciesId: string; level: number; slot: number }>;
 type Follower = {
   pet: FollowerPet; model: PetModel; placed: boolean;
   from: Vector3; to: Vector3; hop: number; hopping: boolean; hopSeconds: number; hopHeight: number;

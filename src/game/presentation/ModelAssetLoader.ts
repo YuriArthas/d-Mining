@@ -21,7 +21,7 @@ import {
   uploadSurfaceTextures,
   TEXTURE_UPLOAD_LIMITS,
 } from "./uploadSurfaceTexture.ts";
-export type ModelManifest = {
+type ModelManifest = {
   parts: string[];
   bytes: number;
   decodedBytes: number;

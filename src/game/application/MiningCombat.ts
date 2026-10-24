@@ -1,7 +1,7 @@
 import { BlockHealth } from '../logic/BlockHealth.ts';
 import { AttackCooldown } from '../logic/AttackCooldown.ts';
-export type HitResult = Readonly<{ status: 'locked'; requiredLevel: number }> | Readonly<{ status: 'hit' | 'breaking'; remaining: number; damage: number }> | Readonly<{ status: 'full' | 'cooldown' | 'pending' | 'unavailable' }>;
-export type CombatPorts<Target> = {
+type HitResult = Readonly<{ status: 'locked'; requiredLevel: number }> | Readonly<{ status: 'hit' | 'breaking'; remaining: number; damage: number }> | Readonly<{ status: 'full' | 'cooldown' | 'pending' | 'unavailable' }>;
+type CombatPorts<Target> = {
   isFull(): boolean;
   stats(): { power: number; speed: number };
   level?(): number;

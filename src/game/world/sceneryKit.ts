@@ -5,7 +5,7 @@ export type Shape = { type:'box'|'rock'|'cylinder'|'ring'|'cap'|'torus'; at:V3; 
 export type Solid = { at:V3; half:V3; yaw:number; hull?:number[]; triangles?:{vertices:number[];indices:number[]} };
 export type Sign = { at:V3; width:number; title:string; subtitle:string; color:string; background:string; style?:'facility'; yaw?:number };
 export type SceneryPlan = { shapes:Shape[]; solids:Solid[]; signs:Sign[]; style?:'plastic'; authored?:AuthoredRoom };
-export const WOOD='#986b48', DARK='#594536', METAL='#425658', CREAM='#f0ddb0';
+const WOOD='#986b48', METAL='#425658', CREAM='#f0ddb0';
 // Pure descriptors shared by visual and physical residency. No Three.js/Rapier dependency.
 export class Planner {
   readonly plan:SceneryPlan={shapes:[],solids:[],signs:[]};

@@ -16,7 +16,7 @@ import { Exploration } from '../../src/game/logic/Exploration.ts';
 import { Inventory } from '../../src/game/logic/Inventory.ts';
 import { Wallet } from '../../src/game/logic/Wallet.ts';
 import { oreDrops, itemVolume, itemPrice } from '../../src/game/application/items.ts';
-import { sellAll } from '../../src/game/application/Sale.ts';
+import { sellItems } from '../../src/game/application/Sale.ts';
 const ROOMS=roomsFor(LAYERS),surfacePlan=()=>GAME_CONTENT.surface.plan;
 
 test('eighty-four journey resources, four per layer of every world; fixed floor is not an item',()=>{
@@ -51,7 +51,7 @@ test('visual floor themes split independently while collision remains identical'
 test('every resource flows through the same unrestricted inventory and sale APIs',()=>{
  const bag=new Inventory(1,itemVolume),wallet=new Wallet();
  bag.add(oreDrops(RESOURCES));assert.equal(bag.getSnapshot().totalCount,RESOURCES.length);assert.ok(bag.isFull());
- const expected=RESOURCES.reduce((n,r)=>n+r.price,0);assert.equal(sellAll(bag,wallet,itemPrice).coins,expected);assert.equal(wallet.getBalance(),expected);assert.equal(bag.getSnapshot().used,0);
+ const expected=RESOURCES.reduce((n,r)=>n+r.price,0);assert.equal(sellItems(bag,wallet,itemPrice).coins,expected);assert.equal(wallet.getBalance(),expected);assert.equal(bag.getSnapshot().used,0);
 });
 test('scene plans have finite geometry and keep landing and service centers out of ordinary solids',()=>{
  const plans=[surfacePlan(),...ROOMS.map(roomPlan)];

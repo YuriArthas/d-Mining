@@ -5,12 +5,12 @@ import { AnimationClip, Euler, MathUtils, Quaternion, QuaternionKeyframeTrack, V
  *  therefore a local Euler rotation in degrees (three.js 'XYZ'): +X swings a hanging limb forward
  *  and up but tips the torso and head back, +Y turns toward the miner's left, +Z lifts the right
  *  arm outward (the left arm inward). Poses read the rig only for leg lengths, so feet stay planted. */
-export const MINER_BONES = [
+const MINER_BONES = [
   'Root', 'LowerTorso', 'UpperTorso', 'Head',
   'LeftUpperArm', 'LeftLowerArm', 'LeftHand', 'RightUpperArm', 'RightLowerArm', 'RightHand',
   'LeftUpperLeg', 'LeftLowerLeg', 'LeftFoot', 'RightUpperLeg', 'RightLowerLeg', 'RightFoot',
 ] as const;
-export type MinerBone = (typeof MINER_BONES)[number];
+type MinerBone = (typeof MINER_BONES)[number];
 export const UPPER_BODY = new Set<string>(['UpperTorso', 'Head', 'LeftUpperArm', 'LeftLowerArm', 'LeftHand', 'RightUpperArm', 'RightLowerArm', 'RightHand']);
 
 type Rotation = readonly [x: number, y: number, z: number];

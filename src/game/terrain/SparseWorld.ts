@@ -32,7 +32,7 @@ export function generationAtZ(generation:WorldGeneration,z:number) {
   if(!local){local=generation.worlds.map(w=>({...generation,worlds:undefined,layers:w.layers}));localGenerations.set(generation,local);}
   return local[z > 168 ? 2 : z > 56 ? 1 : 0];
 }
-export const INDEX_SIZE = 16; // Sparse spatial index only; never a dense voxel allocation.
+const INDEX_SIZE = 16; // Sparse spatial index only; never a dense voxel allocation.
 export const RENDER_SIZE = 16;
 export const COLLISION_SIZE = 8;
 export const LIMITS = { minX: -48, maxX: 51, minY: -2000, maxY: -1, minZ: -48, maxZ: 51 };
@@ -50,7 +50,7 @@ const bucketKey = (x: number, y: number, z: number) => x + 3 + 7 * (savedRegionZ
 const indexXYZ = (x: number, y: number, z: number) => (x & 15) + 16 * ((y & 15) + 16 * (z & 15));
 // Sorted inclusive runs [start,end,...]. null denotes an entirely removed index region.
 export type Runs = Uint16Array | null;
-export type Edits = Map<number, Runs>;
+type Edits = Map<number, Runs>;
 export type EditSnapshot = [number, Runs][];
 export function contains(runs: Runs | undefined, index: number) {
   if (runs === null) return true;

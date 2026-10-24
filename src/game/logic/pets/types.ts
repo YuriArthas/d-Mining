@@ -1,6 +1,6 @@
-export type PetId = string;
-export type PetSpeciesId = string;
-export type EggId = string;
+type PetId = string;
+type PetSpeciesId = string;
+type EggId = string;
 export type PetRarity = 'common' | 'rare' | 'epic' | 'legendary';
 export type PetDefinition = Readonly<{
   id: PetSpeciesId;

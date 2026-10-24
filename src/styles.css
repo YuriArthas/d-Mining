@@ -76,9 +76,6 @@ button { font: inherit; touch-action: manipulation; }
 .mineral-legend { display: flex; flex-wrap: wrap; gap: 3px 8px; max-width: 280px; margin-top: 4px; }
 .mineral-legend span { display: inline-flex; align-items: center; gap: 3px; }
 .mineral-legend i { width: 8px; height: 8px; border: 1px solid #ffffff70; }
-.ore-samples { max-width: 300px; margin-top: 5px; }
-.ore-samples summary { cursor: pointer; }
-.ore-samples button { font-size: 10px; }
 
 .target-health { position: absolute; z-index: 2; top: calc(88px + var(--safe-top)); left: calc(10px + var(--safe-left)); width: 160px; padding: 6px 8px; background: #142c31ed; border-radius: 9px; pointer-events: none; font-size: 12px; }
 .target-health > div:first-child { display: flex; justify-content: space-between; gap: 8px; }
