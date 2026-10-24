@@ -6,23 +6,26 @@ import {roomPlan} from '../../src/game/world/scenery.ts';
 import {Matrix4} from 'three';
 import {createScenery,disposeScenery,sceneryShapeGeometry} from '../../src/game/presentation/SceneryMesh.ts';
 import {ZoneDetector} from '../../src/game/logic/ZoneDetector.ts';
-const oldMineWith=room=>roomsFor(LAYERS.map(l=>l.id==='old_mine'?{...l,room}:l))[0];
+// The kit machinery (worlds 2 and 3) on the first rest layer, with the crystal kit.
+const kitLayers=room=>LAYERS.map(l=>l.id==='old_mine'?{...l,scene:'crystal-station-v1',...(room?{room}:{})}:l);
+const oldMineWith=room=>roomsFor(kitLayers(room))[0];
 const bounds=s=>{const g=sceneryShapeGeometry(s);g.computeBoundingBox();const b=g.boundingBox.clone();g.dispose();return b;};
 
 test('authored room scales rotated instances and colliders together while preserving the global shaft',()=>{
  const room=oldMineWith({centerX:0,centerZ:0,widthCells:40,depthCells:24,heightCells:12});
- const plan=roomPlan(room),before=roomPlan(roomsFor(LAYERS)[0]);
+ const plan=roomPlan(room),before=roomPlan(roomsFor(kitLayers())[0]);
  const a=createScenery({...before,signs:[]}),b=createScenery({...plan,signs:[]});
  try{
-  const base=a.children.find(m=>m.name==='old-mine-v2:block:copper');
+  const base=a.children.find(m=>m.name==='crystal-v1:crystal:amethyst');
   const scaled=b.children.find(m=>m.name===base.name);
   const scale=new Matrix4().makeScale(2,1.2,1.2),m=new Matrix4(),n=new Matrix4();
   for(let i=0;i<base.count;i++){
    base.getMatrixAt(i,m);scaled.getMatrixAt(i,n);m.premultiply(scale);
    m.elements.forEach((v,j)=>assert.ok(Math.abs(v-n.elements[j])<1e-5));
   }
-  const solid=before.solids.find(s=>s.at[0]===-17.8&&s.at[1]===5);
-  const moved=plan.solids.find(s=>s.at[0]===-35.6&&s.at[1]===6);
+  const solid=before.solids.find(s=>!s.hull&&s.at[0]<-10);
+  const moved=plan.solids[before.solids.indexOf(solid)];
+  assert.ok(Math.abs(moved.at[0]-solid.at[0]*2)<1e-9&&Math.abs(moved.at[1]-solid.at[1]*1.2)<1e-9);
   assert.deepEqual(moved.half,solid.half.map((v,i)=>v*[2,1.2,1.2][i]));
   assert.deepEqual(plan.authored.instances.filter(p=>p.fixed&&!p.floor),before.authored.instances.filter(p=>p.fixed&&!p.floor));
   for(const p of plan.authored.instances.filter(p=>p.floor)){

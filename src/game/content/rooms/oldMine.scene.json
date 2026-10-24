@@ -1,5 +1,4 @@
 {
-  "asset": "old-mine-v2",
   "referenceSize": [
     40,
     20,
@@ -10,7 +9,7 @@
       "at": [
         0,
         0,
-        11
+        12
       ],
       "clearance": 0.1
     },
@@ -18,9 +17,9 @@
       "at": [
         -12,
         0,
-        12
+        11.4
       ],
-      "radius": 1.7,
+      "radius": 1.8,
       "heightTolerance": 0.25,
       "hysteresis": 0.25
     },
@@ -31,27 +30,28 @@
       "anchor": "room",
       "offset": [
         0,
-        8.1,
-        -14.13
+        6.05,
+        -17.05
       ],
-      "width": 4.4,
+      "width": 5.4,
       "title": "{name}",
-      "subtitle": "{number} / {depth} 米",
-      "color": "#f5ce8a",
-      "background": "#3c4653"
+      "subtitle": "{number} / {depth} \u7c73",
+      "color": "#ffe2b0",
+      "background": "#3e2c20"
     },
     {
       "anchor": "sell",
       "offset": [
         0,
-        4.3,
-        -1.7
+        5.9,
+        1.4
       ],
-      "width": 3.7,
+      "width": 3.2,
       "title": "SELL",
       "subtitle": "",
-      "color": "#fff0bf",
-      "background": "#695038"
+      "color": "#ffe08a",
+      "background": "#3e2c20",
+      "yaw": 3.14159
     }
   ],
   "rings": [
@@ -63,48 +63,9 @@
         0
       ],
       "height": 0.12,
-      "color": "#ffd281",
+      "color": "#ffd387",
       "glow": true
     }
   ],
-  "render": {
-    "atlas": {
-      "columns": 2,
-      "rows": 2,
-      "gutter": 1,
-      "repeat": 0.28
-    },
-    "surface": {
-      "roughness": 1,
-      "metalness": 0,
-      "envMapIntensity": 0,
-      "glowIntensity": 1.6
-    },
-    "lighting": {
-      "resolution": 64,
-      "lampStrength": 0.58,
-      "horizontalFalloff": 20,
-      "color": [
-        0.68,
-        0.4,
-        0.18
-      ],
-      "height": 3.2,
-      "verticalFalloff": 0.14,
-      "ceiling": {
-        "bottomBrightness": 0.98,
-        "topBrightness": 0.6,
-        "from": 6,
-        "to": 18
-      },
-      "contact": {
-        "floorThreshold": 0.1,
-        "maxHalfHeight": 6,
-        "strength": 0.3,
-        "falloff": 5,
-        "fadeFrom": 0.1,
-        "fadeTo": 1.3
-      }
-    }
-  }
+  "hall": "old-mine-hall"
 }

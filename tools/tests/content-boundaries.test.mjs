@@ -25,7 +25,7 @@ test('one translated and rotated facility descriptor aligns placement, collider,
 });
 // A kit room (the crystal cave) follows changed dimensions; authored halls keep their own fixed size.
 test('changed depth, theme and room dimensions agree across physics generation, view and destination',()=>{
- const layers=LAYERS.map(l=>l.id==='crystal'?{...l,from:1300,theme:'frozen_cave',room:{centerX:0,centerZ:0,widthCells:24,depthCells:22,heightCells:12}}:l);
+ const layers=LAYERS.map(l=>l.id==='crystal'?{...l,scene:'crystal-station-v1',from:1300,theme:'frozen_cave',room:{centerX:0,centerZ:0,widthCells:24,depthCells:22,heightCells:12}}:l);
  const room=roomsFor(layers).find(r=>r.id==='crystal');
  const generation={...generationAtZ(GENERATION,0),layers},world=new SparseWorld(generation),workerWorld=new SparseWorld(structuredClone(generation));
  for(const cell of [[11,-650,0],[11,-639,0],[12,-650,0],[11,-638,0],[11,-651,0]])assert.equal(world.cell(cell),workerWorld.cell(cell));

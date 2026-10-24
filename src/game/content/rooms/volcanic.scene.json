@@ -1,5 +1,4 @@
 {
-  "asset": "volcanic-v1",
   "referenceSize": [
     40,
     20,
@@ -18,7 +17,7 @@
       "at": [
         -12,
         0,
-        12
+        11.4
       ],
       "radius": 1.8,
       "heightTolerance": 0.25,
@@ -28,7 +27,7 @@
       "at": [
         12,
         0,
-        12
+        11.4
       ],
       "radius": 1.8,
       "heightTolerance": 0.25,
@@ -40,40 +39,42 @@
       "anchor": "room",
       "offset": [
         0,
-        7.0,
-        -12.9
+        6.05,
+        -17.05
       ],
-      "width": 4.7,
+      "width": 5.4,
       "title": "{name}",
-      "subtitle": "{number} / {depth} 米",
-      "color": "#baa592",
-      "background": "#32495a"
+      "subtitle": "{number} / {depth} \u7c73",
+      "color": "#ffe0b8",
+      "background": "#2e1a16"
     },
     {
       "anchor": "sell",
       "offset": [
         0,
-        4.3,
-        -1.9
+        5.9,
+        1.4
       ],
       "width": 3.2,
       "title": "SELL",
       "subtitle": "",
-      "color": "#ffe5a3",
-      "background": "#374653"
+      "color": "#ffe08a",
+      "background": "#2e1a16",
+      "yaw": 3.14159
     },
     {
       "anchor": "shop",
       "offset": [
         0,
-        4.3,
-        -1.9
+        5.9,
+        1.4
       ],
       "width": 3.2,
       "title": "UPGRADE",
       "subtitle": "",
-      "color": "#b8ffe8",
-      "background": "#374653"
+      "color": "#9ff7e6",
+      "background": "#2e1a16",
+      "yaw": 3.14159
     }
   ],
   "rings": [
@@ -100,44 +101,5 @@
       "glow": true
     }
   ],
-  "render": {
-    "atlas": {
-      "columns": 2,
-      "rows": 2,
-      "gutter": 1,
-      "repeat": 0.23
-    },
-    "surface": {
-      "roughness": 1,
-      "metalness": 0,
-      "envMapIntensity": 0,
-      "glowIntensity": 1.1
-    },
-    "lighting": {
-      "resolution": 64,
-      "lampStrength": 0.42,
-      "horizontalFalloff": 24,
-      "color": [
-        0.75,
-        0.32,
-        0.14
-      ],
-      "height": 3.8,
-      "verticalFalloff": 0.095,
-      "ceiling": {
-        "bottomBrightness": 1.08,
-        "topBrightness": 0.76,
-        "from": 7,
-        "to": 19
-      },
-      "contact": {
-        "floorThreshold": 0.1,
-        "maxHalfHeight": 7,
-        "strength": 0.24,
-        "falloff": 4,
-        "fadeFrom": 0.1,
-        "fadeTo": 1.4
-      }
-    }
-  }
+  "hall": "volcanic-hall"
 }

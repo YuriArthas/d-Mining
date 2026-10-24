@@ -33,12 +33,13 @@ PINEWIND_RELEASE_RECORD=artifacts/<名字>-release.json node tools/publish-pinew
   node tools/export-pinewind-scene.mjs       # 生成地形、摆放、离线烘焙光照（约 100 秒）
   KTX_BIN=<ktx 目录> node tools/pack-pinewind.mjs
   ```
-- 地下大厅（目前：第一世界第二层 蘑菇洞穴）：
+- 地下大厅（第一世界的六个休整层：old-mine、fungal、crystal、ruins、frozen、volcanic）：
   ```bash
-  (cd surface-game-art && blender -b --python tools/blender/build_fungal.py)
-  KTX_BIN=<ktx 目录> node tools/build-underground.mjs
+  (cd surface-game-art && blender -b --python tools/blender/build_<id>.py)   # 道具，共用 cave_props.py
+  KTX_BIN=<ktx 目录> node tools/build-underground.mjs <id>                   # 洞穴外壳（共用 caveKit.ts）、烘焙、打包
   ```
-- 其余地下层仍用 Blender 场景套件：`tools/blender/build-old-mine.py`、`build-crystal.py`、`build-chamber.py -- <id>`。
+  每层的数据在 `src/game/content/underground/<id>Hall.ts`，离线搭建在 `surface-game-art/tools/underground/<id>Hall.ts`。
+- 第二、三世界的休整层仍用 Blender 场景套件：`tools/blender/build-crystal.py`、`build-chamber.py -- <id>`。
 
 运行时模型在 `src/game/assets/scene/`，测试 `tools/tests/shipped-assets.test.mjs` 保证这里只有游戏实际摆放的模型。
 

@@ -6,9 +6,9 @@ import { WORLD_REQUIREMENTS } from './worldJourney.ts';
 
 export const JOURNEY_WORLDS = WORLD_REQUIREMENTS.map(world => {
   const T = LAYER_TEMPLATES, templates = world.id===1 ? T.slice(0,7) : [T[0],T[7],T[8],T[3],T[4],T[5],T[9]];
-  const layers: readonly Layer[] = templates.map((source,local) => {
+  const layers: readonly Layer[] = templates.map(({laterScene,...source},local) => {
     const index=(world.id-1)*7+local, base=64+index*4;
-    return {...source,id:world.id===1?source.id:`world${world.id}.${local}`,from:local*400,base,deepKind:base+1,
+    return {...source,scene:world.id===1?source.scene:laterScene??source.scene,id:world.id===1?source.id:`world${world.id}.${local}`,from:local*400,base,deepKind:base+1,
       name:local===0?world.name+'矿场':source.name,
       ores:[{kind:base+2,weight:12},{kind:base+3,weight:10}],shop:local>0&&local%2===0};
   });

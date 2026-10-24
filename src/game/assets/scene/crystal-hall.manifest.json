@@ -1,0 +1,16 @@
+{
+  "parts": [
+    "crystal-hall.000.part"
+  ],
+  "bytes": 221161,
+  "decodedBytes": 354240,
+  "sha256": "c05ff21903b4a6b1f1105db7d3067c670fecfa987fc5ec18dbabd877a112c2f2",
+  "sourceSha256": "eda68bf37c77b7e8fd04bafa39a54dc2c1662ae1b103cd35036af258b6c9a3e1",
+  "triangles": 15028,
+  "source": "crystal hall: Blender props (surface-game-art/tools/blender/build_crystal.py) and an offline procedural cave shell (surface-game-art/tools/underground/crystalHall.ts on caveKit.ts); baked occlusion per vertex",
+  "materialProfile": "authored-color",
+  "coordinateSpace": "authored",
+  "geometryEdits": false,
+  "textureEncoding": "KTX2 UASTC",
+  "reference": "tools/build-underground.mjs"
+}

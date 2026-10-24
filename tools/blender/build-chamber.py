@@ -1,6 +1,6 @@
 """Generate one new geometric theme kit, without loading any existing model.
 Usage: blender -b --python tools/blender/build-chamber.py -- ruins
-Scenes: ruins, frozen, volcanic, fossil, machinery, core.
+Scenes: ruins, frozen, fossil, machinery, core (worlds 2 and 3; world 1's layers are authored halls). The style list keeps the retired volcanic slot so the others keep their palettes.
 Placement and visual/collision/light declarations stay in each scene's JSON.
 """
 import bpy,bmesh,math,sys
@@ -8,7 +8,7 @@ from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from room_export import export_room
 slug=sys.argv[sys.argv.index('--')+1]
-assert slug in ['ruins','frozen','volcanic','fossil','machinery','core']
+assert slug in ['ruins','frozen','fossil','machinery','core']
 bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
 meshes={}
 def take(name):
@@ -23,7 +23,7 @@ bpy.ops.mesh.primitive_cylinder_add(vertices=16,radius=1,depth=1,rotation=(math.
 if slug in ['frozen','core']:
  n=6;v=[(math.cos(a*2*math.pi/n)*r,y,math.sin(a*2*math.pi/n)*r) for r,y in [(1,0),(.7,.72)] for a in range(n)]+[(0,1,0)]
  f=[tuple(reversed(range(n)))]+[(i,(i+1)%n,(i+1)%n+n,i+n) for i in range(n)]+[(i+n,(i+1)%n+n,2*n) for i in range(n)];mesh('spire',v,f)
-if slug in ['ruins','volcanic']:
+if slug=='ruins':
  # Vault unit, smoothly curved outline with broad radial masonry faces.
  n=24;v=[]
  for z in [-.5,.5]:

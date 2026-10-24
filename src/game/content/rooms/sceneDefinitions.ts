@@ -6,19 +6,26 @@ import frozen from './frozen.scene.json' with {type:'json'};
 import ruins from './ruins.scene.json' with {type:'json'};
 import crystal from './crystal.scene.json' with {type:'json'};
 import fungal from './fungal.scene.json' with {type:'json'};
-import {OLD_MINE_SCENE} from './oldMine.ts';
+import oldMine from './oldMine.scene.json' with {type:'json'};
+import crystalHall from './crystalHall.scene.json' with {type:'json'};
+import ruinsHall from './ruinsHall.scene.json' with {type:'json'};
+import frozenHall from './frozenHall.scene.json' with {type:'json'};
 import type {RoomSceneDefinition} from './authoredRoom.ts';
 
 export const ROOM_SCENES: Readonly<Record<string, RoomSceneDefinition>> = {
   'ruins-station-v1': ruins as RoomSceneDefinition,
   'frozen-station-v1': frozen as RoomSceneDefinition,
-  'volcanic-station-v1': volcanic as RoomSceneDefinition,
   'fossil-station-v1': fossil as RoomSceneDefinition,
   'machinery-station-v1': machinery as RoomSceneDefinition,
   'core-station-v1': core as RoomSceneDefinition,
-  'timber-station-v2': OLD_MINE_SCENE,
   'fungal-station-v1': fungal as RoomSceneDefinition,
   'crystal-station-v1': crystal as RoomSceneDefinition,
+  // World 1's rest layers are authored halls (src/game/content/underground); the later worlds keep the kits above.
+  'old-mine-hall': oldMine as RoomSceneDefinition,
+  'crystal-hall': crystalHall as RoomSceneDefinition,
+  'ruins-hall': ruinsHall as RoomSceneDefinition,
+  'frozen-hall': frozenHall as RoomSceneDefinition,
+  'volcanic-hall': volcanic as RoomSceneDefinition,
 };
 const vector=(v:readonly number[])=>v.length===3&&v.every(Number.isFinite);
 function validateRoomScene(id:string,scene:RoomSceneDefinition){

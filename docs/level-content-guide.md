@@ -57,7 +57,7 @@
 
 - `content/rooms/oldMine.scene.json` 定义参考尺寸、出生/售卖/商店位置、招牌、交互圈、图集采样与局部照明参数。`sceneDefinitions.ts` 只注册轻量元数据，体素 Worker 不导入网格或布景实例。
 - `content/rooms/oldMine.layout.json` 定义材质，以及墙体、支撑、矿口、升降机、售卖台、仓储、轨道、工坊、矿脉九个组的摆放、独立碰撞和照明采样点。
-- `content/rooms/sceneAssets.ts` 单独注册重资源；`assets/rooms/old-mine-v2.json` 仅保存 Blender 网格和小图集像素。
+- `content/rooms/sceneAssets.ts` 单独注册重资源；`assets/rooms/crystal-v1.json 等` 仅保存 Blender 网格和小图集像素。
 - `world/authoredRoomPlan.ts` 按配置展开各组与功能位置，生成实例、碰撞和标识。层号由楼层顺序派生，深度由 Layer 派生；中央 8×8 入口固定，地板按房间边界铺到入口边缘，业务圈保持原触发半径。
 - `presentation/AuthoredRoomView.ts` 仅消费组件数据，按网格/材质实例化；静态照明贴图只影响对应房间材质，释放由场景所有者管理。`roomIllumination.ts` 根据该场景的照明配置生成局部光照数据，不根据灯具模型自动创建真实灯。
 - `content/initialAccess.ts` 配置当前美术测试版本初始开放的层（全部九个地下层，方便逐层检查），正式版与测试版共用，不能根据发布路径改变访问权限；`Exploration` 不因此伪造最大探索深度。

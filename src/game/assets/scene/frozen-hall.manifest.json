@@ -1,0 +1,16 @@
+{
+  "parts": [
+    "frozen-hall.000.part"
+  ],
+  "bytes": 223133,
+  "decodedBytes": 357780,
+  "sha256": "3a211a518bcb1e61e5255d84d90ba06f043ba6f35d5241c297975a491f089616",
+  "sourceSha256": "59371dbcf01061d7b658a31abac9cc8ce444e63d632c2b2483e9111ca2ce7304",
+  "triangles": 15124,
+  "source": "frozen hall: Blender props (surface-game-art/tools/blender/build_frozen.py) and an offline procedural cave shell (surface-game-art/tools/underground/frozenHall.ts on caveKit.ts); baked occlusion per vertex",
+  "materialProfile": "authored-color",
+  "coordinateSpace": "authored",
+  "geometryEdits": false,
+  "textureEncoding": "KTX2 UASTC",
+  "reference": "tools/build-underground.mjs"
+}

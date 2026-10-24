@@ -1,9 +1,6 @@
-/** 蘑菇洞穴 — the rest hall of world 1's second underground layer (800 m), in hall metres: origin at the room's
- *  floor centre, +X east, +Z toward the spawn side. The voxel room it fills is 40 x 40 m and 20 m high; the
- *  16 m mine pit in the middle stays open voxel floor to dig down from. One source for the offline art build
- *  (tools/build-underground.mjs) and the game (placement, lights, colliders). */
+import type { HallDefinition, HallLight } from './hall.ts';
 
-type HallLight = Readonly<{ at: readonly [number, number, number]; color: string; intensity: number; distance: number }>;
+/** 蘑菇洞穴 — the rest hall of world 1's second underground layer (800 m). See hall.ts for the frame. */
 type HallMushroom = Readonly<{ at: readonly [number, number, number]; height: number; cap: number; tint: 'teal' | 'violet'; yaw: number }>;
 
 const mushroom = (x: number, z: number, height: number, cap: number, tint: 'teal' | 'violet', yaw = 0): HallMushroom => ({ at: [x, 0, z], height, cap, tint, yaw });
@@ -48,3 +45,5 @@ export const FUNGAL_HALL = {
   /** The mood: a deep indigo cave. Sky/ground fill, a soft violet top light, and the fog the far walls sink into. */
   look: { sky: '#8a90e0', ground: '#3d3560', ambient: 1.05, key: '#b4c0ff', keyIntensity: .9, fog: '#211f3c' },
 } as const;
+// Checked against the shared frame without its extra theme data (mushrooms, pool) counting as excess.
+FUNGAL_HALL satisfies HallDefinition;
