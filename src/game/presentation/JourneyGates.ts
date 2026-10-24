@@ -7,6 +7,8 @@ import { Planner } from '../world/sceneryKit.ts';
 import { themeById } from '../content/themes.ts';
 import { disposeScenery } from './disposeScenery.ts';
 import { PINEWIND_GATE } from '../content/pinewind/hubLayout.ts';
+import { TECH_BASE } from '../content/world2/techBase.ts';
+import techBaseSolids from '../content/underground/tech-base.json' with { type: 'json' };
 
 /** World 1's authored gate (frame plus two hinged doors) when the hub provides one. */
 function authoredGate(surface?: Object3D) {
@@ -23,8 +25,25 @@ function label(lines:readonly string[],width:number) {
   const texture=new CanvasTexture(canvas);texture.colorSpace=SRGBColorSpace;
   return new Mesh(new PlaneGeometry(width,width/4),new MeshBasicMaterial({map:texture,side:DoubleSide}));
 }
+/** World 2's surface: the authored tech base brings its own ground, kiosks, station and colliders; the plan adds
+ *  the service rings and the signs. */
+function techBasePlan():SceneryPlan {
+  const z=TECH_BASE.worldZ,at=(v:readonly number[],y=v[1]):V3=>[v[0],y,v[2]+z];
+  const rings=(ring:readonly number[],color:string)=>[
+    {type:'ring' as const,at:at(ring,.045),size:[3,.12,3] as V3,color,glow:true,interaction:true},
+    {type:'ring' as const,at:at(ring,.035),size:[3.25,.025,3.25] as V3,color,glow:true,interaction:true}];
+  const sign=(v:readonly number[],title:string,color:string)=>({at:at(v,5.6),width:3.6,title,subtitle:'',color,background:'#16283a'});
+  const {sell,shop}=TECH_BASE.kiosks,st=TECH_BASE.station;
+  return {
+    shapes:[...rings(sell.ring,'#ffd387'),...rings(shop.ring,'#80efd0')],
+    solids:(techBaseSolids.solids as SceneryPlan['solids']).map(s=>({...s,at:[s.at[0],s.at[1],s.at[2]+z] as V3})),
+    signs:[sign([sell.at[0],0,sell.at[2]+1.6],'SELL','#ffe08a'),sign([shop.at[0],0,shop.at[2]+1.6],'UPGRADE','#9ff7e6'),
+      {at:[st.x,7.4,st.z+z],width:4.4,title:'传送站',subtitle:'',color:'#9ff4ff',background:'#16283a',yaw:st.yaw}],
+  };
+}
 export function journeySurfacePlan(z:number):SceneryPlan {
-  const p=new Planner(),theme=themeById(z===224?'ancient_machine':'core_sanctum');
+  if(z===TECH_BASE.worldZ)return techBasePlan();
+  const p=new Planner(),theme=themeById('core_sanctum');
   p.plan.style='plastic';
   p.box([-52,.005,z],[88,.01,200],theme.floor);p.box([56,.005,z],[96,.01,200],theme.floor);
   p.box([0,.005,z-54],[16,.01,92],theme.floor);p.box([0,.005,z+54],[16,.01,92],theme.floor);

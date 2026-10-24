@@ -6,7 +6,7 @@ from fontTools.ttLib import TTFont
 from fontTools.pens.basePen import BasePen
 font=TTFont('/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc',fontNumber=2)
 chars=set(chr(c) for c in range(32,127))
-for p in [Path('src/game/content/themes.ts'),Path('src/game/content/pets.ts'),Path('src/game/content/petAppearance.ts'),Path('src/game/presentation/EggStandLabels.ts'),Path('src/game/content/surfaceSigns.ts'),Path('src/game/content/layers.ts'),Path('src/game/world/SurfaceHub.ts'),Path('src/game/world/SurfaceAssetPlan.ts'),Path('src/game/world/sceneryKit.ts'),Path('src/game/world/scenery.ts'),Path('src/game/presentation/SurfaceHubView.ts'),Path('src/game/presentation/formatNumber.ts'),Path('src/game/content/pinewind/hubLayout.ts')]:
+for p in [Path(f) for f in ['src/game/content/themes.ts','src/game/content/pets.ts','src/game/content/petAppearance.ts','src/game/presentation/EggStandLabels.ts','src/game/content/layers.ts','src/game/world/sceneryKit.ts','src/game/world/scenery.ts','src/game/presentation/formatNumber.ts','src/game/presentation/JourneyGates.ts','src/game/content/pinewind/hubLayout.ts']]:
  chars.update(re.findall(r'[\u4e00-\u9fff]',p.read_text()))
 for p in sorted(Path('src/game/content/rooms').glob('*.scene.json')):
  chars.update(re.findall(r'[\u4e00-\u9fff]',p.read_text()))

@@ -1,5 +1,6 @@
 import type { SparseWorld } from '../terrain/SparseWorld.ts';
 import { JourneyGates, journeySurfacePlan } from '../presentation/JourneyGates.ts';
+import { SceneMotion } from '../presentation/SceneMotion.ts';
 import { FeedbackFixtures } from '../presentation/FeedbackFixtures.ts';
 import { FEEDBACK_COLLISION_SITE } from '../content/feedbackFacilities.ts';
 import { surfaceLightStrengthAtFeet } from '../world/SurfaceLightFade.ts';
@@ -246,11 +247,13 @@ export async function startGame(options: StartGameOptions) {
     const lockedEggs = new LockedEggs(surface.group, content.eggs);
     scope.defer(() => lockedEggs.dispose());
     // Underground halls: their light sources as a fixed pool of point lights, and the helmet lamp.
-    const caveLights = new CaveLights(content.rooms.map(r => ({ id: r.id, x: r.x, z: r.z, depth: r.depth })));
+    const caveLights = new CaveLights(content.worlds.flatMap(w => w.rooms).map(r => ({ id: r.id, x: r.x, z: r.z, depth: r.depth })));
     root.add(caveLights.group); scope.defer(() => caveLights.dispose());
     // Each world's teleport station gets its swirling portal disc.
     const stations = new TeleportStations();
     root.add(stations.group); scope.defer(() => stations.dispose());
+    // Turbine rotors, drill bits and conveyors in the authored scenes.
+    const motion = new SceneMotion(surface.group);
     const updateEggLabels = () => {
       const eggs = session.pets.getSnapshot().eggs, unlocked = (id: string) => eggs.some(egg => egg.id === id && egg.unlocked);
       eggLabels.setUnlocked(unlocked); lockedEggs.setUnlocked(unlocked);
@@ -332,6 +335,7 @@ export async function startGame(options: StartGameOptions) {
       eggLabels,
       lockedEggs,
       stations,
+      motion,
       caveLights,
       petFollowers,
       minerAvatar,

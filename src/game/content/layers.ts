@@ -18,6 +18,7 @@ export const LAYER_TEMPLATES: readonly LayerTemplate[] = Object.freeze([
   {id:'fossil',name:'巨型化石',theme:'fossil_cave',scene:'fossil-station-v1'},
   {id:'machinery',name:'古代机械',theme:'ancient_machine',scene:'machinery-station-v1'},
   {id:'core',name:'地心秘境',theme:'core_sanctum',scene:'core-station-v1'},
+  {id:'automine',name:'自动化矿道',theme:'ancient_machine',scene:'automine-hall'},
 ].map(l => Object.freeze(l)));
 export function validateLayers(layers: readonly Layer[]) {
   const ids = new Set<string>(), bases = new Set<number>();

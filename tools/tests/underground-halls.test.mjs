@@ -9,7 +9,7 @@ const HALLS={old_mine:'old-mine-hall',fungal:'fungal-hall',crystal:'crystal-hall
 
 test('every world 1 rest layer is an authored hall',()=>{
  assert.deepEqual(GAME_CONTENT.rooms.map(r=>r.sceneDefinition.hall),Object.values(HALLS));
- assert.deepEqual(HALL_BY_LAYER,HALLS);
+ assert.deepEqual(HALL_BY_LAYER,{...HALLS,'world2.1':'automine-hall'});
 });
 
 for(const [layer,id] of Object.entries(HALLS))test(`${id}: no kit; its colliders keep the shaft open and the service rings free; rings, board and lights fit the hall`,()=>{
@@ -37,4 +37,21 @@ for(const [layer,id] of Object.entries(HALLS))test(`${id}: no kit; its colliders
  session.attach({cell:()=>64,pending:()=>false,mine:()=>true,cancelMining(){},travelTo(){}});
  session.updatePosition([room.sell.x,room.sell.y,room.sell.z],true);assert.equal(session.getSnapshot().inSellZone,true);
  if(room.shop){session.updatePosition([room.shop.x,room.shop.y,room.shop.z],true);assert.equal(session.getSnapshot().shopId,layer);}
+});
+
+test('world 2: its first layer is the automine hall, lit and placed under the tech base; the base carries its own colliders, rings and signs',async()=>{
+ const room=GAME_CONTENT.worlds[1].rooms[0],{hall}=undergroundHall('automine-hall');
+ assert.equal(room.id,'world2.1');assert.equal(room.sceneDefinition.hall,'automine-hall');assert.equal(room.name,'自动化矿道');
+ assert.equal(room.shop,null);assert.ok(hall.lights.length<=6);
+ assert.deepEqual(GAME_CONTENT.surface.authored.instances.find(i=>i.asset==='automine-hall').at,[room.x,-room.depth,room.z]);
+ assert.deepEqual(GAME_CONTENT.surface.authored.instances.find(i=>i.asset==='tech-base').at,[0,0,224]);
+ const {journeySurfacePlan}=await import('../../src/game/presentation/JourneyGates.ts');
+ const plan=journeySurfacePlan(224);
+ assert.deepEqual(plan.signs.map(s=>s.title),['SELL','UPGRADE','传送站']);
+ // The service rings are the session's zones, clear of every collider; nothing solid in the shaft.
+ for(const [i,zone] of [GAME_CONTENT.session.sales.find(z=>z.z>200),GAME_CONTENT.session.shops.find(s=>s.id==='world2.shop').zone].entries()){
+  assert.deepEqual([plan.shapes[i*2].at[0],plan.shapes[i*2].at[2]],[zone.x,zone.z]);
+  for(const s of plan.solids)assert.ok(Math.abs(zone.x-s.at[0])>s.half[0]+.3||Math.abs(zone.z-s.at[2])>s.half[2]+.3,`ring blocked by ${s.at}`);
+ }
+ for(const s of plan.solids)assert.ok(Math.abs(s.at[0])-s.half[0]>=8-1e-6||Math.abs(s.at[2]-224)-s.half[2]>=8-1e-6,`solid in the shaft at ${s.at}`);
 });

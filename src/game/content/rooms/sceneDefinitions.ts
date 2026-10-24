@@ -10,6 +10,7 @@ import oldMine from './oldMine.scene.json' with {type:'json'};
 import crystalHall from './crystalHall.scene.json' with {type:'json'};
 import ruinsHall from './ruinsHall.scene.json' with {type:'json'};
 import frozenHall from './frozenHall.scene.json' with {type:'json'};
+import automineHall from './automineHall.scene.json' with {type:'json'};
 import type {RoomSceneDefinition} from './authoredRoom.ts';
 
 export const ROOM_SCENES: Readonly<Record<string, RoomSceneDefinition>> = {
@@ -26,6 +27,8 @@ export const ROOM_SCENES: Readonly<Record<string, RoomSceneDefinition>> = {
   'ruins-hall': ruinsHall as RoomSceneDefinition,
   'frozen-hall': frozenHall as RoomSceneDefinition,
   'volcanic-hall': volcanic as RoomSceneDefinition,
+  // World 2 (the tech base) is being rebuilt as authored halls, starting with its first layer.
+  'automine-hall': automineHall as RoomSceneDefinition,
 };
 const vector=(v:readonly number[])=>v.length===3&&v.every(Number.isFinite);
 function validateRoomScene(id:string,scene:RoomSceneDefinition){

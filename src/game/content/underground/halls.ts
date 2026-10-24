@@ -6,18 +6,22 @@ import { CRYSTAL_HALL } from './crystalHall.ts';
 import { RUINS_HALL } from './ruinsHall.ts';
 import { FROZEN_HALL } from './frozenHall.ts';
 import { VOLCANIC_HALL } from './volcanicHall.ts';
+import { AUTOMINE_HALL } from './automineHall.ts';
 import oldMineSolids from './old-mine-hall.json' with { type: 'json' };
 import fungalSolids from './fungal-hall.json' with { type: 'json' };
 import crystalSolids from './crystal-hall.json' with { type: 'json' };
 import ruinsSolids from './ruins-hall.json' with { type: 'json' };
 import frozenSolids from './frozen-hall.json' with { type: 'json' };
 import volcanicSolids from './volcanic-hall.json' with { type: 'json' };
+import automineSolids from './automine-hall.json' with { type: 'json' };
 
 /** Authored underground halls (the surface pipeline taken below ground): their definition and the colliders
- *  the offline build exported, in hall metres (origin at the room's floor centre). World 1's six rest layers. */
+ *  the offline build exported, in hall metres (origin at the room's floor centre). World 1's six rest layers,
+ *  then world 2's (by layer id, world2.N). */
 const HALLS: readonly (readonly [HallDefinition, { solids: unknown[] }])[] = [
   [OLD_MINE_HALL, oldMineSolids], [FUNGAL_HALL, fungalSolids], [CRYSTAL_HALL, crystalSolids],
   [RUINS_HALL, ruinsSolids], [FROZEN_HALL, frozenSolids], [VOLCANIC_HALL, volcanicSolids],
+  [AUTOMINE_HALL, automineSolids],
 ];
 const UNDERGROUND_HALLS: Readonly<Record<string, { hall: HallDefinition; solids: Solid[] }>> =
   Object.fromEntries(HALLS.map(([hall, data]) => [hall.asset, { hall, solids: data.solids as Solid[] }]));

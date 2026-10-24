@@ -1,9 +1,11 @@
-// Offline: build, bake and pack an underground rest hall.
-// Run: node tools/build-underground.mjs <id>   (fungal, old-mine, crystal, ruins, frozen, volcanic; after
+// Offline: build, bake and pack an authored scene: an underground rest hall or a later world's surface base.
+// Run: node tools/build-underground.mjs <id>   (fungal, old-mine, ..., automine, tech-base; after
 // `blender -b --python tools/blender/build_<id>.py` in surface-game-art, which writes <id>-props.glb)
-// The hall comes from surface-game-art/tools/underground/<camelId>Hall.ts (`buildHall`). Output:
-// surface-game-art/public/assets/underground/<id>-hall.glb, the packed runtime asset in src/game/assets/scene
-// (<id>-hall.*), and its colliders in src/game/content/underground/<id>-hall.json.
+// The scene comes from surface-game-art/tools/underground/<camelId>Hall.ts (`buildHall`); a module may export
+// `ASSET` (default <id>-hall) and `SUN = true` (bake the daytime sun's shadows too, for the surface). Nodes
+// named Spin_* / Slide_* stay out of the static batches and move in the game (SceneMotion.ts). Output:
+// surface-game-art/public/assets/underground/<asset>.glb, the packed runtime asset in src/game/assets/scene
+// (<asset>.*), and its colliders in src/game/content/underground/<asset>.json.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
@@ -25,19 +27,28 @@ const hash = b => createHash('sha256').update(b).digest('hex');
 
 const id = process.argv[2];
 if (!/^[a-z]+(-[a-z]+)*$/.test(id ?? '')) throw Error('usage: node tools/build-underground.mjs <hall id>');
-const name = `${id}-hall`, camel = id.replace(/-(\w)/g, (_, c) => c.toUpperCase());
-const { buildHall } = await import(`../surface-game-art/tools/underground/${camel}Hall.ts`);
+const camel = id.replace(/-(\w)/g, (_, c) => c.toUpperCase());
+const { buildHall, ASSET, SUN = false } = await import(`../surface-game-art/tools/underground/${camel}Hall.ts`);
+const name = ASSET ?? `${id}-hall`;
 const art = 'surface-game-art/public/assets/underground', shipped = 'src/game/assets/scene';
 const buffer = readFileSync(`${art}/${id}-props.glb`);
 const props = (await new GLTFLoader().parseAsync(buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.length), '')).scene;
 const built = buildHall(prop => { const node = props.getObjectByName(prop); if (!node) throw Error(`Missing prop ${prop}`); const copy = node.clone(true); copy.position.set(0, 0, 0); copy.rotation.set(0, 0, 0); copy.scale.set(1, 1, 1); return copy; });
 
-// Occlusion: every hall mesh casts; every batched mesh receives one value per vertex.
+// Moving parts keep their own nodes (and their own geometry, since each carries its own bake).
+const dynamic = built.group.children.filter(o => /^(Spin|Slide)_/.test(o.name));
+for (const part of dynamic) part.traverse(o => { if (o.isMesh) { o.userData.keepDynamic = true; o.geometry = o.geometry.clone(); } });
+// Occlusion (and the sun, on the surface): every static mesh casts; every batched or moving mesh receives one
+// value per vertex.
 const casters = [];
 built.group.updateMatrixWorld(true);
-built.group.traverse(o => { if (o.isMesh && !/glow/i.test(o.material.name)) casters.push({ mesh: o, kind: OCCLUDER.solid }); });
+built.group.traverse(o => { if (o.isMesh && !o.userData.keepDynamic && !/glow/i.test(o.material.name)) casters.push({ mesh: o, kind: OCCLUDER.solid }); });
 const batched = batchStatic(built.group);
-const baked = await bakeOcclusion({ casters, vertex: batched.group.children.filter(o => o.isMesh), aoRadius: 4.5, aoSamples: 32 });
+batched.group.add(...dynamic);
+batched.group.updateMatrixWorld(true);
+const receivers = [];
+batched.group.traverse(o => { if (o.isMesh) receivers.push(o); });
+const baked = await bakeOcclusion({ casters, vertex: receivers, aoRadius: SUN ? 6 : 4.5, aoSamples: 32, sun: SUN });
 // The game's material contract: standard materials, matte, baked occlusion per vertex.
 const converted = new Map();
 batched.group.traverse(o => {

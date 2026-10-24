@@ -117,6 +117,7 @@ export function updateGame(
     current.minerAvatar.update(drawnFeet, delta, physics.grounded, !!player.travelling);
     current.feedback.update(delta, interaction.strike, current.minerAvatar.consumeEvents(), drawnFeet);
     current.stations?.update(delta);
+    current.motion?.update(delta);
     current.caveLights.update(drawnFeet, layer.id, lightStrength);
     const selected = interaction.selected;
     if (clock.status <= 0) {

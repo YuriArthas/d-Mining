@@ -12,6 +12,7 @@ import { JOURNEY_RESOURCES } from './journeyResources.ts';
 import { EGG_STAGES } from './progression.ts';
 import { PINEWIND_EGG_DISPLAYS, PINEWIND_SERVICES } from './pinewind/hubLayout.ts';
 import { CREEK_CELLS, pinewindSurface } from './pinewindSurface.ts';
+import { TECH_BASE } from './world2/techBase.ts';
 
 /** World 1's surface: authored art and its collision, signs and service rings around the open mine shaft. */
 export type SurfaceContent = Readonly<{
@@ -35,6 +36,10 @@ const petContent = {
 };
 const eggs: readonly HubEgg[] = PINEWIND_EGG_DISPLAYS.filter(display => petContent.eggs.some(egg => egg.id === display.eggId));
 const [first, ...later] = JOURNEY_WORLDS;
+// Pinewind and every authored hall below any world load together; world 2's surface base too.
+const pinewind = pinewindSurface(JOURNEY_WORLDS.flatMap(w => w.rooms), eggs);
+const surface: SurfaceContent = { ...pinewind, authored: { ...pinewind.authored, instances: [...pinewind.authored.instances,
+  { asset: TECH_BASE.asset, at: [0, 0, TECH_BASE.worldZ], rotation: [0, 0, 0, 1], scale: [1, 1, 1] }] } };
 
 const session: SessionContent = {
   initialCoins: 0,
@@ -76,7 +81,7 @@ export const GAME_CONTENT = {
   worlds: JOURNEY_WORLDS,
   extraSites: later.flatMap(w => w.localRooms.map(r => ({ id: r.id, depth: r.depth, z: w.z, plan: roomPlan(r) }))) as readonly ScenerySite[],
   session,
-  surface: pinewindSurface(first.rooms, eggs),
+  surface,
   eggs,
   returnPoint: worldSpawn(1),
   environment: ENVIRONMENT_CONFIG as import('../presentation/EnvironmentController.ts').EnvironmentConfig,

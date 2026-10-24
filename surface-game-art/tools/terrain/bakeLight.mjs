@@ -264,10 +264,10 @@ export async function bakeLight({ casters, ground, lightmap, vertex, log = conso
   return { groundImage, lightImage, standingImage, vertexBakes, stats };
 }
 
-/** Occlusion only, one value per vertex, for places without a sun (the underground halls): red = how open
- *  each vertex is within `aoRadius`, green fixed at full (no sun to hide). Same tracer and sampling as the
- *  surface props above. */
-export async function bakeOcclusion({ casters, vertex, aoRadius = 4, aoSamples = 32, log = console.log }) {
+/** One value per vertex: red = how open each vertex is within `aoRadius`; green = sun visibility from the
+ *  daytime sun (soft) when `sun` is set (authored scenes on the surface away from the Pinewind bake), else
+ *  full (the underground halls have no sun to hide). Same tracer and sampling as the surface props above. */
+export async function bakeOcclusion({ casters, vertex, aoRadius = 4, aoSamples = 32, sun = false, log = console.log }) {
   const started = performance.now();
   const all = trianglesOf(casters);
   const bvh = shareBvh(buildBvh(all.positions, all.kinds)), bvhs = { all: bvh, solid: bvh, ground: bvh };
@@ -293,13 +293,13 @@ export async function bakeOcclusion({ casters, vertex, aoRadius = 4, aoSamples =
     }
     base += V;
   }
-  await run('evaluate', bvhs, points, seeds, out, settingsFor({ sunMode: 'hard', sunScene: 'all', aoScene: 'all', aoRadius, aoSamples, floorContact: .5, offset: .02 }));
+  await run('evaluate', bvhs, points, seeds, out, settingsFor({ sunMode: sun ? 'soft' : 'hard', sunScene: 'all', aoScene: 'all', aoRadius, aoSamples, floorContact: .5, offset: .02 }));
   const bakes = new Map(); base = 0;
   for (const mesh of vertex) {
     const V = mesh.geometry.attributes.position.count, bake = new Uint8Array(V * 4);
-    for (let i = 0; i < V; i++) { bake[i * 4] = Math.round(Math.min(1, Math.max(0, out[(base + i) * 3])) * 255); bake[i * 4 + 1] = 255; bake[i * 4 + 3] = 255; }
+    for (let i = 0; i < V; i++) { bake[i * 4] = Math.round(Math.min(1, Math.max(0, out[(base + i) * 3])) * 255); bake[i * 4 + 1] = sun ? Math.round(out[(base + i) * 3 + 1] * 255) : 255; bake[i * 4 + 3] = 255; }
     bakes.set(mesh, bake); base += V;
   }
   log(`occlusion bake: ${all.count} caster triangles, ${vertexCount} vertices (${Math.round(performance.now() - started)} ms)`);
-  return { vertexBakes: bakes, stats: { casterTriangles: all.count, vertices: vertexCount, aoRadius, aoSamples } };
+  return { vertexBakes: bakes, stats: { casterTriangles: all.count, vertices: vertexCount, aoRadius, aoSamples, sun } };
 }
