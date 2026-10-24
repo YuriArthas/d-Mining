@@ -11,7 +11,7 @@ import { TipToast } from '../TipsUi.tsx';
 import './hud.css';
 
 type HudActions = {
-  openPets(): void; openShop(): void; openBackpacks(): void; openRewards(): void; openWorlds(): void; openMinerals(): void; openHelp(): void;
+  openPets(): void; openShop(): void; openBackpacks(): void; openRewards(): void; openMinerals(): void; openHelp(): void;
 };
 
 /** Screen-space HUD. Zones mirror the original: resources left, depth top-centre, four
@@ -64,7 +64,6 @@ export function Hud({ session, actions, system, objective, target, prompts, tipH
       <Tile icon="paw" label="宠物" aria-label="打开我的宠物" data-tip-target="pets" badge={teamCanImprove(pets) ? '!' : undefined} onPress={run(actions.openPets)} />
       <Tile icon="chest" label="商店" tone="orange" aria-label="商店" data-kind="upgrade" data-tip-target="shop" onPress={run(actions.openShop)} />
       <Tile icon="gift" label="奖励" tone="pink" aria-label={claimable ? `奖励，${claimable} 个可领取` : '奖励'} badge={claimable || undefined} onPress={run(actions.openRewards)} />
-      <Tile icon="globe" label="世界" aria-label="世界" onPress={run(actions.openWorlds)} />
     </nav>
 
     <div className="hud-bottom">

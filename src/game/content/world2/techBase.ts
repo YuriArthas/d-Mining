@@ -3,7 +3,7 @@ import { STATION_LOCAL } from '../worldJourney.ts';
 /** 第二世界 surface: a near-future mining base on a dusty plateau. Local metres: origin at the mine shaft's centre
  *  (world z 224), +Z toward the spawn plaza (spawn at z 46) and the gate to world 3 (z 69); world 1's gate is at
  *  z -155. One source for the offline art build (surface-game-art/tools/underground/techBaseHall.ts) and the game
- *  (placement, service rings, signs, colliders). The shaft (|x|, |z| < 8) stays open, its lid is JourneyGates'. */
+ *  (placement, service rings, signs, colliders). The shaft (|x|, |z| < 8) stays open, the walls round each world are WorldBorders'. */
 type V3 = readonly [number, number, number];
 const station = { x: STATION_LOCAL.x, z: STATION_LOCAL.z, yaw: Math.atan2(-STATION_LOCAL.x, 46 - STATION_LOCAL.z) };
 

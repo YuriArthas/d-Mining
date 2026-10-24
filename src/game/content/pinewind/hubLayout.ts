@@ -71,6 +71,8 @@ export const PINEWIND_SERVICES = { sale: service('sale'), shop: service('shop'),
 
 /** The gate to the next world stands in the pass of the wooded ridge behind the spawn. */
 export const PINEWIND_GATE = { x: 0, z: 69, opening: 8, height: 9.6, wallTo: 14 } as const;
+/** The gate is world 1's portal to the other worlds; its name hangs over the opening, facing the valley. */
+export const PINEWIND_PORTAL_SIGN: Sign = { at: [PINEWIND_GATE.x, PINEWIND_GATE.height + .9, PINEWIND_GATE.z - 1.3], yaw: Math.PI, width: 5.2, title: '世界传送门', subtitle: '', color: '#ffe7a8', background: '#2a1d46' };
 
 /** The teleport station west of the spawn, facing it (worldJourney.ts owns the spot for every world). Its
  *  pad opens this world's layers; the big word floats over the arch. */

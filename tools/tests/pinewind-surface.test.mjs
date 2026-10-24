@@ -195,7 +195,7 @@ test('布局 v5：出售在东北，镐子店和背包店在西侧，从出生�
  const roots0 = GAME_CONTENT.surface.authored.instances.map(i => i.node);
  for (const gone of ['Challenge_Board', 'Pet_Conservatory']) assert.equal(roots0.includes(gone), false, gone);
  assert.equal(GAME_CONTENT.surface.plan.signs.some(s => s.title === 'PETS'), false, 'no PETS sign');
- assert.deepEqual(GAME_CONTENT.surface.plan.signs.map(s => s.title).sort(), ['BACKPACK', 'PICKAXE', 'SELL', '传送站']);
+ assert.deepEqual(GAME_CONTENT.surface.plan.signs.map(s => s.title).sort(), ['BACKPACK', 'PICKAXE', 'SELL', '世界传送门', '传送站']);
  assert.ok(Math.hypot(CAPSULE_MACHINE_ZONE.x - CAPSULE_MACHINE_AT[0], CAPSULE_MACHINE_ZONE.z - CAPSULE_MACHINE_AT[2]) < 2, 'capsule zone in front of it');
  // The authored gate stands on the gameplay gate line, its doors hinged at the opening's edges.
  assert.equal(PINEWIND_GATE.z, worldGateZ(2));

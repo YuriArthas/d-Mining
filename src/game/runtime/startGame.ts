@@ -1,5 +1,5 @@
 import type { SparseWorld } from '../terrain/SparseWorld.ts';
-import { JourneyGates, journeySurfacePlan } from '../presentation/JourneyGates.ts';
+import { WorldBorders, journeySurfacePlan } from '../presentation/WorldBorders.ts';
 import { SceneMotion } from '../presentation/SceneMotion.ts';
 import { FeedbackFixtures } from '../presentation/FeedbackFixtures.ts';
 import { FEEDBACK_COLLISION_SITE } from '../content/feedbackFacilities.ts';
@@ -274,7 +274,7 @@ export async function startGame(options: StartGameOptions) {
     const facilities = new SceneryView(surface, sites);
     scope.defer(() => facilities.dispose());
     root.add(facilities.group, terrain.group);
-    const gates=new JourneyGates(physics,session,surface.group);root.add(gates.group);scope.defer(()=>gates.dispose());
+    const borders=new WorldBorders(physics,surface.group);root.add(borders.group);scope.defer(()=>borders.dispose());
     const feedbackFixtures = new FeedbackFixtures();
     root.add(feedbackFixtures.group);
     scope.defer(() => feedbackFixtures.dispose());

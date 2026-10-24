@@ -17,6 +17,7 @@ export function HelpSheet({ onClose }: { onClose(): void }) {
     ['chest', '升级', '在商店换更强的镐子和更大的背包'],
     ['paw', '宠物', '去蛋台开蛋，装备宠物增加挖矿力量'],
     ['portal', '深度', '越往下矿越值钱，到达新深度解锁传送和新蛋'],
+    ['globe', '世界', '走到南面山口的世界传送门，用金币和矿物解锁新世界'],
   ];
   return <Sheet title="怎么玩" size="m" onClose={onClose} label="操作帮助" className="help-sheet" footer={<>
     <span className="ui-grow" /><UiButton size="s" tone="orange" onPress={onClose}>知道了</UiButton>

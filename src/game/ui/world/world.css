@@ -25,3 +25,8 @@
 @container game (max-height: 360px) {
   .world-cards .ui-card-tile { min-height: 150px; }
 }
+/* The world portal: the three worlds share the row as large cards. */
+.portal-sheet .world-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.portal-sheet .world-cards .ui-card-tile { min-height: 190px; }
+.portal-sheet .world-cards .ui-card-art { width: 72px; height: 72px; }
+.portal-sheet .world-cards h4 { font-size: 20px; }

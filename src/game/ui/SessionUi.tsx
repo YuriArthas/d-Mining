@@ -18,10 +18,10 @@ import { ShopPanel, showShopCategory } from './ShopPanel.tsx';
 import type { ShopCategory } from '../content/shopCatalog.ts';
 import { MYSTERY_EGG_NAME } from '../content/petAppearance.ts';
 import { TargetHealth } from './TargetHealth.tsx';
-import { StationSheet, WorldSheet, type WorldTab } from './world/WorldSheet.tsx';
+import { PortalSheet, StationSheet } from './world/WorldSheet.tsx';
 
 type Modal =
-  | { kind: 'bag'; tab: BagTab } | { kind: 'world'; tab: WorldTab } | { kind: 'rewards'; tab: RewardsTab }
+  | { kind: 'bag'; tab: BagTab } | { kind: 'rewards'; tab: RewardsTab }
   | { kind: 'egg' } | { kind: 'capsule' } | { kind: 'help' };
 
 export function SessionUi({ shopView, session, input, surface, guideMarker, system, blocked = false }: {
@@ -47,6 +47,11 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
   const [lastStation, setLastStation] = useState(state.atStation);
   if (lastStation !== state.atStation) { setLastStation(state.atStation); setStationDismissed(false); }
   const stationOpen = !!state.atStation && !stationDismissed && !modal;
+  // The world portal works the same way: its world list opens on stepping in front of it.
+  const [portalDismissed, setPortalDismissed] = useState(false);
+  const [lastPortal, setLastPortal] = useState(state.atPortal);
+  if (lastPortal !== state.atPortal) { setLastPortal(state.atPortal); setPortalDismissed(false); }
+  const portalOpen = !!state.atPortal && !portalDismissed && !modal;
   const [dismissedShop, setDismissedShop] = useState<string | null>(null);
   const [lastShop, setLastShop] = useState(state.shopId);
   if (lastShop !== state.shopId) { setLastShop(state.shopId); setDismissedShop(null); }
@@ -61,27 +66,25 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
   const close = () => { input.reset(); session.setAutoHatch(false); setModal(null); surface.current?.focus(); };
   const closeShop = () => { input.reset(); setShopRequest(null); setDismissedShop(state.shopId); shopView.close(); surface.current?.focus(); };
   const openShop = (category: ShopCategory) => { input.reset(); setModal(null); setShopRequest(category); if (shopView.active) showShopCategory(shopView, state, category); };
-  const lockedMine = !!state.atMineEntrance && state.worlds.some(w => w.id === state.atMineEntrance && !w.mineOpen);
   const pets = useSyncExternalStore(session.pets.subscribe, session.pets.getSnapshot);
   const standEgg = state.eggId ? pets.eggs.find(egg => egg.id === state.eggId) : undefined;
   const eggName = state.eggId ? standEgg ? standEgg.unlocked ? standEgg.name : MYSTERY_EGG_NAME : '宠物蛋' : null;
 
   useEffect(() => {
-    if (modal || shopOpen || (!state.eggStation && !state.atMachine && !lockedMine) || blocked || !focused) return;
+    if (modal || shopOpen || (!state.eggStation && !state.atMachine) || blocked || !focused) return;
     const press = (event: KeyboardEvent) => {
       if (event.code !== 'KeyE' || event.repeat || event.ctrlKey || event.metaKey || event.altKey || event.defaultPrevented) return;
-      event.preventDefault(); open(lockedMine ? { kind: 'world', tab: 'progress' } : state.atMachine ? { kind: 'capsule' } : { kind: 'egg' });
+      event.preventDefault(); open(state.atMachine ? { kind: 'capsule' } : { kind: 'egg' });
     };
     window.addEventListener('keydown', press);
     return () => window.removeEventListener('keydown', press);
   });
 
-  const panel = modal?.kind ?? (shopOpen ? 'shop' : stationOpen ? 'station' : 'none');
-  const tipHidden = !!modal || shopOpen || stationOpen || blocked || !focused;
-  useEffect(() => { if (stationOpen) input.reset(); }, [stationOpen, input]);
+  const panel = modal?.kind ?? (shopOpen ? 'shop' : stationOpen ? 'station' : portalOpen ? 'portal' : 'none');
+  const tipHidden = !!modal || shopOpen || stationOpen || portalOpen || blocked || !focused;
+  useEffect(() => { if (stationOpen || portalOpen) input.reset(); }, [stationOpen, portalOpen, input]);
   const objective = !blocked && <DepthGoalCard goal={selectDepthGoal(state.maxDepth, state.destinations)} />;
   const prompts = <>
-    {lockedMine && <GameButton className="ui-btn" data-tone="orange" data-size="m" onPress={() => open({ kind: 'world', tab: 'progress' })}><Icon kind="globe" /><span className="ui-outline"><span className="desktop-hint">E · </span>查看矿区要求</span></GameButton>}
     {state.atMachine && <GameButton className="ui-btn capsule-world-prompt" data-tone="pink" data-size="m" onPress={() => open({ kind: 'capsule' })}><Icon kind="gift" /><span className="ui-outline"><span className="desktop-hint">E · </span>幸运扭蛋</span></GameButton>}
     {state.eggStation && eggName && <GameButton className="ui-btn egg-world-prompt" data-tone="orange" data-size="m" aria-label={`查看${eggName}`} onPress={() => open({ kind: 'egg' })}><Icon kind="paw" /><span className="ui-outline"><span className="desktop-hint">E · </span>查看{eggName}</span></GameButton>}
   </>;
@@ -91,12 +94,12 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
       actions={{
         openPets: () => { session.dismissTip('pets'); open({ kind: 'bag', tab: 'pets' }); }, openMinerals: () => open({ kind: 'bag', tab: 'ores' }),
         openShop: () => { session.dismissTip('shop'); openShop('tools'); }, openBackpacks: () => openShop('backpacks'),
-        openRewards: () => open({ kind: 'rewards', tab: rewardsTabFor(state.rewards) }), openWorlds: () => open({ kind: 'world', tab: 'travel' }), openHelp: () => open({ kind: 'help' }),
+        openRewards: () => open({ kind: 'rewards', tab: rewardsTabFor(state.rewards) }), openHelp: () => open({ kind: 'help' }),
       }} />}
     {!modal && !shopOpen && <Controls input={input} surface={surface} />}
     {modal?.kind === 'bag' && <BagSheet session={session} tab={modal.tab} onTab={tab => setModal({ kind: 'bag', tab })} onClose={close} onShop={openShop} />}
     {stationOpen && <StationSheet session={session} onClose={() => { input.reset(); setStationDismissed(true); surface.current?.focus(); }} />}
-    {modal?.kind === 'world' && <WorldSheet session={session} tab={modal.tab} onTab={tab => setModal({ kind: 'world', tab })} onClose={close} />}
+    {portalOpen && !stationOpen && <PortalSheet session={session} onClose={() => { input.reset(); setPortalDismissed(true); surface.current?.focus(); }} />}
     {modal?.kind === 'rewards' && <RewardsSheet session={session} tab={modal.tab} onTab={tab => setModal({ kind: 'rewards', tab })} onClose={close} />}
     {modal?.kind === 'egg' && state.eggId && <EggSheet key={state.eggStation!.id} session={session} eggId={state.eggId} onOpenPets={() => open({ kind: 'bag', tab: 'pets' })} onClose={close} />}
     {modal?.kind === 'capsule' && <CapsuleSheet session={session} onClose={close} />}

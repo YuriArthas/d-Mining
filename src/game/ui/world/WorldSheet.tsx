@@ -3,14 +3,12 @@ import type { GameSession } from '../../application/GameSession.ts';
 import type { WorldId } from '../../content/worldJourney.ts';
 import { itemDefinition } from '../../application/items.ts';
 import { formatDepth, formatNumber as number } from '../../presentation/formatNumber.ts';
-import { GameButton } from '../GameButton.tsx';
 import { OreIcon } from '../InventoryIcons.tsx';
 import { UiButton } from '../kit/controls.tsx';
 import { Icon } from '../kit/icons.tsx';
-import { Bar, Chip, Sheet, type SheetTab } from '../kit/panel.tsx';
+import { Bar, Sheet } from '../kit/panel.tsx';
 import './world.css';
 
-export type WorldTab = 'travel' | 'progress';
 const LAYER_COLORS: readonly [RegExp, string, string][] = [
   [/老矿/, '#d79a5a', '#9a6332'], [/蘑菇|菇/, '#58c4a4', '#2c8b74'], [/水晶|晶/, '#9b8cf5', '#6551c7'], [/遗迹/, '#cdb58a', '#9a8458'],
   [/冰|雪|霜/, '#7fd3ef', '#3d97c4'], [/熔岩|火|焰/, '#f07a52', '#b8442a'], [/化石|骨/, '#c9a07c', '#94704f'], [/机械|齿轮/, '#5fc0b8', '#2f8a84'], [/地心|核/, '#e9c46a', '#b88a2a'],
@@ -18,32 +16,43 @@ const LAYER_COLORS: readonly [RegExp, string, string][] = [
 const FALLBACK = [['#62a8e8', '#2f6fb4'], ['#9fb85c', '#6b8530'], ['#e88aa8', '#b4536f']] as const;
 const layerColor = (name: string, index: number) => { const hit = LAYER_COLORS.find(([pattern]) => pattern.test(name)); return hit ? [hit[1], hit[2]] : FALLBACK[index % FALLBACK.length]; };
 
-/** Worlds: travel to a world's teleport station, and the long-term gates to the next worlds. Layers are chosen
- *  on the station itself (StationSheet). */
-export function WorldSheet({ session, tab, onTab, onClose }: { session: GameSession; tab: WorldTab; onTab(tab: WorldTab): void; onClose(): void }) {
-  const tabs: SheetTab<WorldTab>[] = [{ id: 'travel', label: '传送', icon: 'portal' }, { id: 'progress', label: '进度', icon: 'globe' }];
-  const common = { title: '世界', tabs, tab, onTab, onClose };
-  if (tab === 'progress') return <ProgressTab session={session} common={common} />;
-  return <WorldsTab session={session} common={common} onClose={onClose} onTab={onTab} />;
-}
-type Common = { title: string; tabs: SheetTab<WorldTab>[]; tab: WorldTab; onTab(tab: WorldTab): void; onClose(): void };
 const WORLD_COLORS = [['#62c96b', '#2f9a3d'], ['#5fc0b8', '#2f8a84'], ['#e9c46a', '#b88a2a']] as const;
 
-function WorldsTab({ session, common, onClose, onTab }: { session: GameSession; common: Common; onClose(): void; onTab(tab: WorldTab): void }) {
+/** The world portal: every world as a card. Open worlds travel; the next one shows its price (minerals from the
+ *  world before it, and coins) and unlocks here; worlds beyond it stay ??? with no name or price. */
+export function PortalSheet({ session, onClose }: { session: GameSession; onClose(): void }) {
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot);
-  const [message, setMessage] = useState('');
-  const go = (id: WorldId) => { const r = session.travelWorld(id); if (r === 'travelling') onClose(); else setMessage(r === 'locked' ? '这个世界还没开放' : '现在无法前往，请稍后再试'); };
-  return <Sheet {...common} footer={<span className="ui-hint" role="status">{message || '前往一个世界会到达它的传送站，站上去选择要去的层。'}</span>}>
+  const [confirm, setConfirm] = useState(false), [message, setMessage] = useState('');
+  const next = state.worlds.find(w => w.known && !w.open);
+  const ready = !!next && next.materials.every(m => m.owned >= m.count) && state.coins >= next.coins;
+  const go = (id: WorldId) => { const r = session.travelWorld(id); if (r === 'travelling') onClose(); else setMessage(r === 'locked' ? '这个世界还没开放' : r === 'away' ? '站到传送门前才能传送' : '现在无法传送，请稍后再试'); };
+  const unlock = () => {
+    if (!next) return;
+    const r = session.unlockWorld(next.id); setConfirm(false);
+    setMessage(r.status === 'opened' ? `${next.name}已开放，可以传送过去了！` : r.status === 'away' ? '站到传送门前才能解锁' : '条件还没满足，没有扣除任何东西');
+  };
+  const footer = confirm && next ? <><span className="ui-hint">确认后扣除下面的矿物和 {number(next.coins)} 金币，{next.name}永久开放。</span><span className="ui-grow" />
+    <UiButton size="s" tone="steel" onPress={() => setConfirm(false)}>取消</UiButton><UiButton size="s" tone="orange" disabled={!ready} onPress={unlock}>确认解锁</UiButton></>
+    : <><span className="ui-hint" role="status">{message || (next ? (ready ? `条件都满足了，可以解锁${next.name}` : `集齐矿物和金币即可解锁${next.name}`) : '所有世界都已开放')}</span><span className="ui-grow" />
+      {next && <UiButton size="s" tone="purple" icon="gem" onPress={() => { session.reserveWorldMaterials(next.id); setMessage('已保留所需矿物，之后挖到的也会自动补足，不会被卖掉'); }}>保留矿物</UiButton>}
+      {next && <UiButton size="s" tone="orange" disabled={!ready} onPress={() => setConfirm(true)}>解锁{next.name}</UiButton>}</>;
+  return <Sheet title="世界传送门" size="m" onClose={onClose} className="portal-sheet" footer={footer}>
     <div className="ui-cards world-cards">{state.worlds.map((world, i) => {
-      const [c, lo] = WORLD_COLORS[i % WORLD_COLORS.length], here = world.id === state.currentWorld;
-      return <div key={world.id} className="ui-card-tile" data-locked={world.areaOpen ? undefined : ''} style={{ '--c': c, '--c-lo': lo } as CSSProperties}>
-        {world.areaOpen ? <Icon kind="globe" className="ui-icon ui-card-art" /> : <span className="ui-card-art world-lock" aria-hidden="true"><LockIcon /></span>}
-        <h4 className="ui-outline">{world.name}</h4>
-        {here ? <>{state.atStation ? <span className="ui-stamp">在传送站</span> : <UiButton size="s" tone="blue" aria-label={`去${world.name}传送站`} onPress={() => go(world.id)}>去传送站</UiButton>}<small>当前所在</small></>
-          : world.areaOpen ? <UiButton size="s" tone="green" icon="portal" aria-label={`前往${world.name}`} onPress={() => go(world.id)}>前往</UiButton>
-          : <UiButton size="s" tone="steel" onPress={() => onTab('progress')}>查看开放条件</UiButton>}
+      const [c, lo] = world.known ? WORLD_COLORS[i % WORLD_COLORS.length] : ['#8a93a3', '#5b6372'], here = world.id === state.currentWorld;
+      return <div key={world.id} className="ui-card-tile" data-locked={world.open ? undefined : ''} style={{ '--c': c, '--c-lo': lo } as CSSProperties}>
+        {world.open ? <Icon kind="globe" className="ui-icon ui-card-art" /> : <span className="ui-card-art world-lock" aria-hidden="true"><LockIcon /></span>}
+        <h4 className="ui-outline">{world.known ? world.name : '???'}</h4>
+        {here ? <span className="ui-stamp">当前所在</span>
+          : world.open ? <UiButton size="s" tone="green" icon="portal" aria-label={`传送到${world.name}`} onPress={() => go(world.id)}>传送</UiButton>
+          : world.known ? <small>解锁条件见下方</small> : <small>先解锁上一个世界</small>}
       </div>;
     })}</div>
+    {next && <div className="ui-well world-mats">
+      <b className="ui-outline">解锁{next.name}需要</b>
+      {next.materials.map(m => <div key={m.itemId} className="world-mat"><OreIcon color={itemDefinition(m.itemId).color} className="world-mat-icon" /><span>{m.name}</span>
+        <Bar value={m.owned} max={m.count} size="s" /><b className="ui-outline">{number(Math.min(m.owned, m.count))}/{number(m.count)}</b></div>)}
+      <div className="world-mat"><Icon kind="coin" className="ui-icon world-mat-icon" /><span>金币</span><Bar value={state.coins} max={next.coins} size="s" tone="gold" /><b className="ui-outline">{number(Math.min(state.coins, next.coins))}/{number(next.coins)}</b></div>
+    </div>}
   </Sheet>;
 }
 
@@ -84,45 +93,6 @@ function LayerCards({ session, onClose }: { session: GameSession; onClose(): voi
     </div>
     {message && <p className="ui-hint" role="status">{message}</p>}
   </>;
-}
-
-function ProgressTab({ session, common }: { session: GameSession; common: Common }) {
-  const state = useSyncExternalStore(session.subscribe, session.getSnapshot);
-  const gates = state.worlds.filter(w => w.id !== 1);
-  const [selected, setSelected] = useState<WorldId>(() => gates.find(w => !w.mineOpen)?.id ?? gates[0]?.id ?? 2);
-  const [confirm, setConfirm] = useState(false), [message, setMessage] = useState('');
-  const world = state.worlds.find(w => w.id === selected) ?? gates[0];
-  if (!world) return <Sheet {...common}><p className="ui-hint">没有更多世界。</p></Sheet>;
-  const ready = world.areaOpen && world.materials.every(m => m.owned >= m.count) && state.coins >= world.coins;
-  const atEntrance = state.atMineEntrance === world.id;
-  const pay = () => {
-    const result = session.unlockWorldMine(world.id); setConfirm(false);
-    setMessage(result.status === 'opened' ? '矿区已永久开放，可以下矿了！' : result.status === 'away' ? `请走到${world.name}的矿口缴纳` : result.status === 'already-open' ? '矿区已经开放' : '条件还没满足，没有扣除任何东西');
-  };
-  const footer = confirm ? <><span className="ui-hint">确认后扣除材料和 {number(world.coins)} 金币，矿区永久开放。</span><span className="ui-grow" />
-    <UiButton size="s" tone="steel" onPress={() => setConfirm(false)}>取消</UiButton><UiButton size="s" tone="orange" disabled={!ready} onPress={pay}>确认缴纳</UiButton></>
-    : <><span className="ui-hint" role="status">{message || (world.mineOpen ? `${world.name}矿区已开放` : !world.areaOpen ? '继续挖矿累计挖掘量，外门会自动打开' : atEntrance ? '材料和金币够了就能缴纳' : `走到${world.name}的矿口缴纳`)}</span><span className="ui-grow" />
-      {!world.mineOpen && <UiButton size="s" tone="purple" icon="gem" onPress={() => { session.reserveWorldMaterials(world.id); setMessage('已保留所需材料，之后挖到的也会自动补足'); }}>保留材料</UiButton>}
-      {world.areaOpen && state.currentWorld !== world.id && <UiButton size="s" tone="blue" icon="portal" onPress={() => { const r = session.travelWorld(world.id); if (r !== 'travelling') setMessage('现在无法前往，请稍后再试'); }}>前往{world.name}</UiButton>}
-      {!world.mineOpen && atEntrance && <UiButton size="s" tone="orange" disabled={!ready} onPress={() => setConfirm(true)}>缴纳并开放</UiButton>}</>;
-  return <Sheet {...common} footer={footer}>
-    <div className="ui-row"><div className="ui-seg" role="group" aria-label="选择世界">{gates.map(w => <GameButton key={w.id} aria-pressed={w.id === world.id} blurAfterPress={false} onPress={() => { setSelected(w.id); setConfirm(false); setMessage(''); }}>{w.name}</GameButton>)}</div>
-      <span className="ui-grow" /><Chip>当前：{state.worlds.find(w => w.id === state.currentWorld)?.name}</Chip></div>
-    <div className="world-gate">
-      <div className="ui-card-tile world-door" style={{ '--c': '#4fc3ff', '--c-lo': '#1a86d8' } as CSSProperties}>
-        <Icon kind="globe" className="ui-icon ui-card-art" /><h4 className="ui-outline">① 打开外门</h4>
-        {world.areaOpen ? <span className="ui-stamp">外门已开</span> : <><Bar value={state.minedVolume} max={world.mined}>{number(state.minedVolume)} / {number(world.mined)}</Bar><small>累计挖掘量，出售不会减少</small></>}
-      </div>
-      <div className="ui-well world-mats">
-        <b className="ui-outline">② 在矿口缴纳，永久开放矿区</b>
-        {world.mineOpen ? <span className="ui-stamp">矿区已开放</span> : <>
-          {world.materials.map(m => <div key={m.itemId} className="world-mat"><OreIcon color={itemDefinition(m.itemId).color} className="world-mat-icon" /><span>{m.name}</span>
-            <Bar value={m.owned} max={m.count} size="s" /><b className="ui-outline">{number(Math.min(m.owned, m.count))}/{number(m.count)}</b></div>)}
-          <div className="world-mat"><Icon kind="coin" className="ui-icon world-mat-icon" /><span>金币</span><Bar value={state.coins} max={world.coins} size="s" tone="gold" /><b className="ui-outline">{number(Math.min(state.coins, world.coins))}/{number(world.coins)}</b></div>
-        </>}
-      </div>
-    </div>
-  </Sheet>;
 }
 
 function LockIcon() {

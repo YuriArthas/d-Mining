@@ -6,7 +6,7 @@ import { roomPlan } from '../world/scenery.ts';
 import { ENTRANCE_WORLD } from '../world/entrance.ts';
 import { ENVIRONMENT_CONFIG } from '../world/environment.ts';
 import { JOURNEY_WORLDS } from './journeyWorlds.ts';
-import { WORLD_REQUIREMENTS, worldSpawn, worldStation } from './worldJourney.ts';
+import { WORLD_REQUIREMENTS, worldPortal, worldSpawn, worldStation } from './worldJourney.ts';
 import { PET_CONTENT } from './pets.ts';
 import { JOURNEY_RESOURCES } from './journeyResources.ts';
 import { EGG_STAGES } from './progression.ts';
@@ -70,6 +70,7 @@ const session: SessionContent = {
   ],
   homes: WORLD_REQUIREMENTS.map(w => ({ worldId: w.id, zone: zone(0, worldSpawn(w.id)[2], 6) })),
   stations: WORLD_REQUIREMENTS.map(w => ({ worldId: w.id, zone: worldStation(w.id).zone })),
+  portals: WORLD_REQUIREMENTS.map(w => ({ worldId: w.id, zone: worldPortal(w.id).zone })),
   sunkenSurface: CREEK_CELLS,
 };
 

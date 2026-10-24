@@ -100,7 +100,7 @@ function OresTab({ session, common, onClose }: Props & { common: Common }) {
     .map(([id, count]) => ({ id, count, item: itemDefinition(id), reservation: state.mineralReservations[id] }))
     .sort((a, b) => b.item.price - a.item.price);
   const selected = rows.find(row => row.id === selectedId) ?? null;
-  const needed = (id: string) => state.worlds.some(w => !w.mineOpen && w.materials.some(m => m.itemId === id));
+  const needed = (id: string) => state.worlds.some(w => w.known && !w.open && w.materials.some(m => m.itemId === id));
   const sale = state.sale.status === 'quoted' ? state.sale : null;
   return <Sheet {...common} footer={<>
     {selected ? <div className="bag-reserve"><b className="ui-outline">{selected.item.name}</b>
@@ -108,7 +108,7 @@ function OresTab({ session, common, onClose }: Props & { common: Common }) {
         {([['none', '不保留'], ...(needed(selected.id) ? [['needed', '保留所需']] : []), ['all', '全部保留']] as [ 'none' | 'needed' | 'all', string][]).map(([mode, label]) =>
           <GameButton key={mode} aria-pressed={selected.reservation?.mode === mode} blurAfterPress={false} onPress={() => session.reserveMineral(selected.id, mode)}>{label}</GameButton>)}
       </div></div>
-      : <span className="ui-hint">点矿物可以设为「保留」：世界矿区需要的材料就不会被卖掉。</span>}
+      : <span className="ui-hint">点矿物可以设为「保留」：解锁下一个世界需要的矿物就不会被卖掉。</span>}
     <span className="ui-grow" />
     {state.inSellZone
       ? <UiButton size="s" tone="green" icon="coin" disabled={!sale?.count} onPress={() => { session.sellAvailable(); }}>出售可售矿物</UiButton>
