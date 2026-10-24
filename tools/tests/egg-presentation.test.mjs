@@ -24,16 +24,22 @@ test('egg labels keep extruded glyphs and front/side colours in one draw, plus o
     let vertexOffset = 0, indexOffset = 0;
     for (const [slot, stand] of PET_DISPLAYS.entries()) {
       const offer = PET_CONTENT.eggs.find(offer => offer.id === stand.eggId), at = labels.diagnostics().labels[slot].at;
-      const source = createWorldText({ at: [0,0,0], width: EGG_LABEL.width, title: offer.name, subtitle: `${formatNumber(offer.price)} 金币`, color: EGG_LABEL.text, background: EGG_LABEL.plate }, { bevel: false });
+      // Each stand carries its named label (variant 1) then its mystery label (variant 2), same price.
+      const named = createWorldText({ at: [0,0,0], width: EGG_LABEL.width, title: offer.name, subtitle: `${formatNumber(offer.price)} 金币`, color: EGG_LABEL.text, background: EGG_LABEL.plate }, { bevel: false });
+      // The mystery label: a narrower "???" line over the named label's own price line.
+      const mystery = createWorldText({ at: [0,0,0], width: EGG_LABEL.mysteryWidth, title: EGG_LABEL.mystery, subtitle: '', color: EGG_LABEL.text, background: EGG_LABEL.plate }, { bevel: false });
+      for (const [variant, lines] of [[1, named.children], [2, [...mystery.children, named.children[1]]]]) {
+      const source = variant === 1 ? named : mystery;
       try {
-        for (const line of source.children) {
+        for (const line of lines) {
           const positions = line.geometry.getAttribute('position');
           for (let i = 0; i < positions.count; i++) {
             // Line offsets live in the billboard plane; every vertex of a label shares its anchor.
             const actual = new Vector3().fromBufferAttribute(geometry.attributes.position, vertexOffset + i);
             assert.ok(actual.distanceTo(new Vector3().fromBufferAttribute(positions, i).add(new Vector3(0, line.position.y, 0))) < 1e-5);
-            assert.ok(new Vector3().fromBufferAttribute(geometry.attributes.labelAnchor, vertexOffset + i).distanceTo(new Vector3(...at)) < 1e-5);
+            assert.ok(Math.hypot(geometry.attributes.labelAnchor.getX(vertexOffset + i) - at[0], geometry.attributes.labelAnchor.getZ(vertexOffset + i) - at[2]) < 1e-5);
             assert.equal(geometry.attributes.labelSlot.getX(vertexOffset + i), slot);
+            assert.equal(geometry.attributes.labelVariant.getX(vertexOffset + i), variant);
           }
           for (const range of line.geometry.groups) for (let i = range.start; i < range.start + range.count; i++) {
             const vertex = line.geometry.index.getX(i);
@@ -43,36 +49,38 @@ test('egg labels keep extruded glyphs and front/side colours in one draw, plus o
           }
           vertexOffset += positions.count; indexOffset += line.geometry.index.count;
         }
-      } finally { disposeScenery(source); }
+      } finally { if (variant === 2) { disposeScenery(named); disposeScenery(mystery); } }
+      }
     }
     assert.equal(geometry.index.count, indexOffset);
     assert.equal(geometry.attributes.position.count, vertexOffset);
   } finally { disposeScenery(labels.group); }
 });
 
-test('each label sits just above its egg on a plate behind the text; locked eggs dim without hiding', () => {
+test('each label sits just above its egg on a plate behind the text; locked eggs read ??? over their price', () => {
   const labels = new EggStandLabels(PET_DISPLAYS, PET_CONTENT.eggs);
   try {
     const plates = labels.group.children[1].geometry, text = labels.group.children[0].geometry;
     const lowest = new Map(), behind = new Map(), front = new Map();
     for (let i = 0; i < plates.attributes.position.count; i++) {
-      const slot = plates.attributes.labelSlot.getX(i), y = plates.attributes.position.getY(i) + plates.attributes.labelAnchor.getY(i);
-      lowest.set(slot, Math.min(lowest.get(slot) ?? Infinity, y)); behind.set(slot, Math.max(behind.get(slot) ?? -Infinity, plates.attributes.position.getZ(i)));
+      const slot = plates.attributes.labelSlot.getX(i), y = plates.attributes.position.getY(i) + plates.attributes.labelAnchor.getY(i), key = slot + ':' + plates.attributes.labelVariant.getX(i);
+      lowest.set(slot, Math.min(lowest.get(slot) ?? Infinity, y)); behind.set(key, Math.max(behind.get(key) ?? -Infinity, plates.attributes.position.getZ(i)));
     }
     for (let i = 0; i < text.attributes.position.count; i++) {
-      const slot = text.attributes.labelSlot.getX(i);
-      front.set(slot, Math.min(front.get(slot) ?? Infinity, text.attributes.position.getZ(i)));
+      const key = text.attributes.labelSlot.getX(i) + ':' + text.attributes.labelVariant.getX(i);
+      front.set(key, Math.min(front.get(key) ?? Infinity, text.attributes.position.getZ(i)));
     }
     for (const [slot, stand] of PET_DISPLAYS.entries()) {
       // The egg's top is 2.91 m above its stand.
       assert.ok(Math.abs(lowest.get(slot) - (stand.y + EGG_LABEL.plateBottom)) < 1e-4, `plate bottom above egg ${stand.eggId}`);
       assert.ok(lowest.get(slot) > stand.y + 2.91);
-      assert.ok(behind.get(slot) < front.get(slot), 'plate lies behind the glyphs');
+      for (const variant of [1, 2]) assert.ok(behind.get(slot + ':' + variant) < front.get(slot + ':' + variant), `plate lies behind the glyphs (${stand.eggId}, variant ${variant})`);
     }
     labels.setUnlocked(id => id === 'meadow-egg');
-    assert.equal(labels.diagnostics().dimmed, PET_DISPLAYS.filter(d => d.eggId !== 'meadow-egg').length);
+    assert.equal(labels.diagnostics().mystery, PET_DISPLAYS.filter(d => d.eggId !== 'meadow-egg').length);
     assert.equal(labels.diagnostics().labelCount, PET_DISPLAYS.length, 'locked eggs keep their labels');
-    labels.setUnlocked(() => true); assert.equal(labels.diagnostics().dimmed, 0);
+    assert.equal(EGG_LABEL.mystery, '???');
+    labels.setUnlocked(() => true); assert.equal(labels.diagnostics().mystery, 0);
   } finally { disposeScenery(labels.group); }
 });
 
@@ -131,4 +139,23 @@ test('the mine label shows only while the mine is in view; off screen the ground
   for (const anchor of [[0, 0, 10], [100, 0, -10], null]) {
     projector.update(camera, anchor, element); assert.equal(element.style.visibility, 'hidden');
   }
+});
+
+test('locked eggs stand as black silhouettes: each stand owns its material, only what lies above the nest goes black', async () => {
+  const { Group, Mesh, BoxGeometry, MeshStandardMaterial, ShaderLib, UniformsUtils } = await import('three');
+  const { LockedEggs, EGG_BODY_FROM } = await import('../../src/game/presentation/LockedEggs.ts');
+  const surface = new Group(), shared = new MeshStandardMaterial(), stands = [{ id: 'stand-a', eggId: 'a', y: 2.6 }, { id: 'stand-b', eggId: 'b', y: .4 }];
+  for (const s of stands) { const root = new Group(); root.name = 'Egg_' + s.id; root.add(new Mesh(new BoxGeometry(), shared)); surface.add(root); }
+  const eggs = new LockedEggs(surface, stands);
+  const mesh = id => surface.getObjectByName('Egg_' + id).children[0];
+  assert.notEqual(mesh('stand-a').material, shared); assert.notEqual(mesh('stand-a').material, mesh('stand-b').material);
+  const shader = { uniforms: UniformsUtils.clone(ShaderLib.standard.uniforms), vertexShader: ShaderLib.standard.vertexShader, fragmentShader: ShaderLib.standard.fragmentShader };
+  mesh('stand-a').material.onBeforeCompile(shader, null);
+  assert.match(shader.fragmentShader, /eggLocked \* step\( eggBodyFrom, vEggWorldY \)/);
+  assert.match(shader.vertexShader, /vEggWorldY = \( modelMatrix/);
+  assert.equal(shader.uniforms.eggBodyFrom.value, 2.6 + EGG_BODY_FROM, 'the cut follows the stand height');
+  eggs.setUnlocked(id => id === 'b');
+  assert.equal(shader.uniforms.eggLocked.value, 1); assert.deepEqual(eggs.diagnostics().locked, ['a']);
+  eggs.setUnlocked(() => true); assert.equal(shader.uniforms.eggLocked.value, 0);
+  eggs.dispose();
 });

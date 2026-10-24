@@ -32,6 +32,7 @@ import { SceneryCollision } from "../presentation/SceneryCollision.ts";
 import { PetFollowers } from "../presentation/PetFollowers.ts";
 import { MinerAvatar } from "../presentation/MinerAvatar.ts";
 import { EggStandLabels } from "../presentation/EggStandLabels.ts";
+import { LockedEggs } from "../presentation/LockedEggs.ts";
 import { disposeScenery } from "../presentation/disposeScenery.ts";
 import { SurfaceHubView } from "../presentation/SurfaceHubView.ts";
 import { prepareShaders } from "../presentation/prepareShaders.ts";
@@ -267,7 +268,13 @@ export async function startGame(options: StartGameOptions) {
     const eggLabels = new EggStandLabels(content.hub.eggs, session.pets.getSnapshot().eggs);
     root.add(eggLabels.group);
     scope.defer(() => disposeScenery(eggLabels.group));
-    const updateEggLabels = () => { const eggs = session.pets.getSnapshot().eggs; eggLabels.setUnlocked(id => eggs.some(egg => egg.id === id && egg.unlocked)); };
+    // Eggs not unlocked yet stand as black silhouettes under a "???" label that keeps their price.
+    const lockedEggs = new LockedEggs(surface.group, content.hub.eggs);
+    scope.defer(() => lockedEggs.dispose());
+    const updateEggLabels = () => {
+      const eggs = session.pets.getSnapshot().eggs, unlocked = (id: string) => eggs.some(egg => egg.id === id && egg.unlocked);
+      eggLabels.setUnlocked(unlocked); lockedEggs.setUnlocked(unlocked);
+    };
     updateEggLabels();
     scope.defer(session.pets.subscribe(updateEggLabels));
     const petFollowers = new PetFollowers(petBody);
@@ -362,6 +369,7 @@ export async function startGame(options: StartGameOptions) {
       cameraView,
       cameraGrade,
       eggLabels,
+      lockedEggs,
       petFollowers,
       minerAvatar,
       feedback,

@@ -6,6 +6,7 @@ import { GameButton } from '../GameButton.tsx';
 import { UiButton } from '../kit/controls.tsx';
 import { Chip, RarityTag, Sheet, Toggle } from '../kit/panel.tsx';
 import { EggArt } from '../pets/EggArt.tsx';
+import { MYSTERY_EGG_NAME } from '../../content/petAppearance.ts';
 import { PetArt } from '../pets/PetArt.tsx';
 import { bonusLabel } from '../pets/petDisplay.ts';
 import './eggs.css';
@@ -31,7 +32,7 @@ export function EggSheet({ session, eggId, onClose, onOpenPets }: { session: Gam
   const lastAuto = state.lastAutoHatch?.eggId === eggId ? pets.pets.find(card => card.pet.id === state.lastAutoHatch?.pet.id) : null;
   const buyLabel = !egg.unlocked ? `到达${egg.unlockName ?? '更深处'}解锁` : egg.canAfford ? `开一个 · ${number(egg.price)}` : `还差 ${number(egg.price - pets.coins)} 金币`;
   return <>
-    <Sheet title={egg.name} subtitle="每只宠物的真实概率" size="m" onClose={onClose} className="egg-sheet" footer={<>
+    <Sheet title={egg.unlocked ? egg.name : MYSTERY_EGG_NAME} subtitle={egg.unlocked ? '每只宠物的真实概率' : '解锁后揭晓里面的宠物'} size="m" onClose={onClose} className="egg-sheet" footer={<>
       <Chip icon="coin"><b>{number(pets.coins)}</b></Chip>
       {autoHatch && <Toggle on={state.autoHatch === eggId} label="自动孵蛋" onPress={() => session.setAutoHatch(state.autoHatch !== eggId)} />}
       <span className="ui-hint egg-status" role="status">{message || (lastAuto ? `刚获得：${lastAuto.name} ${bonusLabel(lastAuto.powerBonusBps)}` : state.autoHatch ? '自动孵蛋中，每次照常付蛋价' : '')}</span>
@@ -39,14 +40,16 @@ export function EggSheet({ session, eggId, onClose, onOpenPets }: { session: Gam
       <UiButton size="m" tone="orange" icon={egg.unlocked && egg.canAfford ? 'coin' : undefined} disabled={!egg.canAfford || !!state.autoHatch} className="egg-buy" onPress={hatch}>{buyLabel}</UiButton>
     </>}>
       <div className="egg-layout">
-        <div className="egg-hero"><EggArt className="egg-hero-art" eggId={egg.id} /><Chip icon="coin"><b>{number(egg.price)}</b></Chip></div>
-        <div className="egg-outcomes" aria-label="可能获得的宠物">{egg.outcomes.map(outcome => <div key={outcome.speciesId} className="egg-outcome" data-rarity={outcome.rarity}>
+        <div className="egg-hero"><EggArt className="egg-hero-art" eggId={egg.id} locked={!egg.unlocked} /><Chip icon="coin"><b>{number(egg.price)}</b></Chip></div>
+        {/* Before it is unlocked nothing tells what the egg holds: only its price and where it unlocks. */}
+        {!egg.unlocked ? <div className="egg-mystery"><strong className="ui-outline">{MYSTERY_EGG_NAME}</strong><span className="ui-outline">到达{egg.unlockName ?? '更深处'}解锁后揭晓</span></div>
+        : <div className="egg-outcomes" aria-label="可能获得的宠物">{egg.outcomes.map(outcome => <div key={outcome.speciesId} className="egg-outcome" data-rarity={outcome.rarity}>
           <div className="ui-cell" data-rarity={outcome.rarity}><PetArt speciesId={outcome.speciesId} rarity={outcome.rarity} />
             <span className="ui-cell-name ui-outline">{outcome.name}</span><span className="ui-cell-stat ui-outline">{bonusLabel(outcome.powerBonusBps)}</span></div>
           <strong className="ui-outline egg-odds">{Number((outcome.probability * 100).toFixed(2))}%</strong>
           <RarityTag rarity={outcome.rarity} />
           {owned(outcome.speciesId) > 0 && <small className="egg-owned">已有 {owned(outcome.speciesId)}</small>}
-        </div>)}</div>
+        </div>)}</div>}
       </div>
     </Sheet>
     {result && <HatchReveal key={result.pet.id} eggId={egg.id} speciesId={result.pet.speciesId} pets={pets} price={egg.price} canAgain={egg.canAfford}

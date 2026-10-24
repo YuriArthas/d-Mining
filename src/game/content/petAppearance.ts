@@ -98,6 +98,8 @@ export function petAppearance(speciesId: string): PetAppearance {
   return appearance;
 }
 // Rows describe physical terraces only, never prices or stat multipliers.
+/** What an egg the player has not unlocked yet is called everywhere (stand label, prompt, egg sheet, bag). */
+export const MYSTERY_EGG_NAME = '???';
 export const EGG_DISPLAY_ROWS = [
   [
     { eggId: 'meadow-egg', asset: 'egg-meadow-blender', color: '#7ecf69' },

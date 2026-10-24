@@ -158,6 +158,7 @@ export function attachGameDebug(
       economy: session.getSnapshot(),
       pets: session.pets.getSnapshot(),
       eggLabels: current.eggLabels.diagnostics(),
+      lockedEggs: current.lockedEggs.diagnostics(),
       petFollowers: current.petFollowers.diagnostics(),
       avatar: current.minerAvatar.diagnostics(),
       feedback: { audio: gameAudio.diagnostics(), effects: current.feedback.effects.diagnostics(), splash: current.feedback.splash.diagnostics(), surface: current.feedback.surface(physics.feet()) },

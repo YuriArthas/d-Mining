@@ -9,6 +9,7 @@ import { UiButton } from '../kit/controls.tsx';
 import { Icon } from '../kit/icons.tsx';
 import { Bar, Chip, RarityTag, Sheet, type SheetTab } from '../kit/panel.tsx';
 import { EggArt } from '../pets/EggArt.tsx';
+import { MYSTERY_EGG_NAME } from '../../content/petAppearance.ts';
 import { PetArt } from '../pets/PetArt.tsx';
 import { bonusLabel } from '../pets/petDisplay.ts';
 import './bag.css';
@@ -48,10 +49,10 @@ function PetsTab({ session, pets, common, onClose }: Props & { pets: PetPanelSna
   const eggOf = (speciesId: string) => pets.eggs.find(egg => egg.outcomes.some(o => o.speciesId === speciesId))?.name;
   if (finding) return <Sheet {...common} footer={<><UiButton size="s" tone="steel" onPress={() => setFinding(false)}>返回宠物</UiButton><span className="ui-hint">点「前往」直接传送到蛋台，靠近后查看概率并开蛋。</span></>}>
     <div className="bag-eggs">{pets.eggs.map(egg => <div key={egg.id} className="ui-card-tile bag-egg" data-locked={egg.unlocked ? undefined : ''}>
-      <EggArt className="bag-egg-art" eggId={egg.id} />
-      <h4 className="ui-outline">{egg.name}</h4>
-      {egg.unlocked ? <><Chip icon="coin"><b>{number(egg.price)}</b></Chip>
-        <UiButton size="s" tone="orange" aria-label={`前往${egg.name}蛋台`} onPress={() => { if (session.goTo({ egg: egg.id }) === 'travelling') onClose(); }}>前往</UiButton></>
+      <EggArt className="bag-egg-art" eggId={egg.id} locked={!egg.unlocked} />
+      <h4 className="ui-outline">{egg.unlocked ? egg.name : MYSTERY_EGG_NAME}</h4>
+      <Chip icon="coin"><b>{number(egg.price)}</b></Chip>
+      {egg.unlocked ? <UiButton size="s" tone="orange" aria-label={`前往${egg.name}蛋台`} onPress={() => { if (session.goTo({ egg: egg.id }) === 'travelling') onClose(); }}>前往</UiButton>
         : <small>到达{egg.unlockName ?? '更深处'}解锁</small>}
     </div>)}</div>
   </Sheet>;

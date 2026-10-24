@@ -3,6 +3,10 @@
 .egg-hero { display: grid; justify-items: center; gap: 4px; }
 .egg-hero-art { width: 116px; height: 132px; }
 .egg-outcomes { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+/* A locked egg keeps its pets secret: one dark panel with a big question mark and where it unlocks. */
+.egg-mystery { display: grid; place-items: center; gap: 6px; min-height: 180px; border-radius: 14px; background: rgba(8, 14, 26, .55); color: #fff; text-align: center; }
+.egg-mystery strong { font-size: 56px; line-height: 1; }
+.egg-mystery span { font-size: 18px; }
 .egg-outcome { display: grid; justify-items: center; gap: 3px; min-width: 0; }
 .egg-outcome .ui-cell { aspect-ratio: 1; height: auto; cursor: default; }
 .egg-odds { font-size: 22px; line-height: 1; }

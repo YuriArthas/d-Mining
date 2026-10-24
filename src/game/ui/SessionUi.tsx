@@ -15,6 +15,7 @@ import { DepthGoalCard, TipMarker } from './TipsUi.tsx';
 import { CapsuleSheet, RewardsSheet, rewardsTabFor, type RewardsTab } from './rewards/RewardsSheet.tsx';
 import { ShopPanel, showShopCategory } from './ShopPanel.tsx';
 import type { ShopCategory } from '../content/shopCatalog.ts';
+import { MYSTERY_EGG_NAME } from '../content/petAppearance.ts';
 import { TargetHealth } from './TargetHealth.tsx';
 import { WorldSheet, type WorldTab } from './world/WorldSheet.tsx';
 
@@ -55,7 +56,8 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
   const openShop = (category: ShopCategory) => { input.reset(); setModal(null); setShopRequest(category); if (shopView.active) showShopCategory(shopView, state, category); };
   const lockedMine = !!state.atMineEntrance && state.worlds.some(w => w.id === state.atMineEntrance && !w.mineOpen);
   const pets = useSyncExternalStore(session.pets.subscribe, session.pets.getSnapshot);
-  const eggName = state.eggId ? pets.eggs.find(egg => egg.id === state.eggId)?.name ?? '宠物蛋' : null;
+  const standEgg = state.eggId ? pets.eggs.find(egg => egg.id === state.eggId) : undefined;
+  const eggName = state.eggId ? standEgg ? standEgg.unlocked ? standEgg.name : MYSTERY_EGG_NAME : '宠物蛋' : null;
 
   useEffect(() => {
     if (modal || shopOpen || (!state.eggStation && !state.atMachine && !lockedMine) || blocked || !focused) return;
