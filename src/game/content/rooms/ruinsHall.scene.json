@@ -45,8 +45,8 @@
       "width": 5.4,
       "title": "{name}",
       "subtitle": "{number} / {depth} \u7c73",
-      "color": "#fff0c8",
-      "background": "#3e3020"
+      "color": "#fff4d8",
+      "background": "#24493d"
     },
     {
       "anchor": "sell",
@@ -59,7 +59,7 @@
       "title": "SELL",
       "subtitle": "",
       "color": "#ffe08a",
-      "background": "#3e3020",
+      "background": "#24493d",
       "yaw": 3.14159
     },
     {
@@ -73,7 +73,7 @@
       "title": "UPGRADE",
       "subtitle": "",
       "color": "#9ff7e6",
-      "background": "#3e3020",
+      "background": "#24493d",
       "yaw": 3.14159
     }
   ],

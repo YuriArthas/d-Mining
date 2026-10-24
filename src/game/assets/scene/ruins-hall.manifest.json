@@ -2,11 +2,11 @@
   "parts": [
     "ruins-hall.000.part"
   ],
-  "bytes": 222899,
-  "decodedBytes": 362836,
-  "sha256": "5c8a60c6768a413ea72986b322791b5a73d76a633e9e755534c56934944e8d59",
-  "sourceSha256": "6b494892c11f39b472d26f4f77bfcdcb3f95f75351b48005b33072804860a826",
-  "triangles": 15468,
+  "bytes": 280437,
+  "decodedBytes": 484200,
+  "sha256": "c4b24a7f3a08940b10593c7df5c4af042462f811dd2496c9badbc2db525a829a",
+  "sourceSha256": "c042ed0b2037c854d225ce98e31c2f1e344324f2c63df8ca0d34a49b5aa3690c",
+  "triangles": 20865,
   "source": "ruins hall: Blender props (surface-game-art/tools/blender/build_ruins.py) and an offline procedural cave shell (surface-game-art/tools/underground/ruinsHall.ts on caveKit.ts); baked occlusion per vertex",
   "materialProfile": "authored-color",
   "coordinateSpace": "authored",
