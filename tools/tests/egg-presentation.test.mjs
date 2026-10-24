@@ -144,16 +144,20 @@ test('the mine label shows only while the mine is in view; off screen the ground
 test('locked eggs stand as black silhouettes: each stand owns its material, only what lies above the nest goes black', async () => {
   const { Group, Mesh, BoxGeometry, MeshStandardMaterial, ShaderLib, UniformsUtils } = await import('three');
   const { LockedEggs, EGG_BODY_FROM } = await import('../../src/game/presentation/LockedEggs.ts');
-  const surface = new Group(), shared = new MeshStandardMaterial(), stands = [{ id: 'stand-a', eggId: 'a', y: 2.6 }, { id: 'stand-b', eggId: 'b', y: .4 }];
+  const surface = new Group(), shared = new MeshStandardMaterial(), stands = [{ id: 'stand-a', eggId: 'a', x: 40, y: 2.6, z: 20 }, { id: 'stand-b', eggId: 'b', x: 28, y: .4, z: 18 }];
   for (const s of stands) { const root = new Group(); root.name = 'Egg_' + s.id; root.add(new Mesh(new BoxGeometry(), shared)); surface.add(root); }
   const eggs = new LockedEggs(surface, stands);
   const mesh = id => surface.getObjectByName('Egg_' + id).children[0];
   assert.notEqual(mesh('stand-a').material, shared); assert.notEqual(mesh('stand-a').material, mesh('stand-b').material);
   const shader = { uniforms: UniformsUtils.clone(ShaderLib.standard.uniforms), vertexShader: ShaderLib.standard.vertexShader, fragmentShader: ShaderLib.standard.fragmentShader };
   mesh('stand-a').material.onBeforeCompile(shader, null);
-  assert.match(shader.fragmentShader, /eggLocked \* step\( eggBodyFrom, vEggWorldY \)/);
-  assert.match(shader.vertexShader, /vEggWorldY = \( modelMatrix/);
+  assert.match(shader.fragmentShader, /eggLocked \* step\( eggBodyFrom, vEggWorld\.y \)/);
+  assert.match(shader.vertexShader, /vEggWorld = \( modelMatrix/);
   assert.equal(shader.uniforms.eggBodyFrom.value, 2.6 + EGG_BODY_FROM, 'the cut follows the stand height');
+  // Glossy obsidian with a rim glow and a sweeping streak measured from the stand's own centre.
+  assert.match(shader.fragmentShader, /roughnessFactor = mix\( roughnessFactor, 0\.2, eggHidden \)/);
+  assert.match(shader.fragmentShader, /eggRim/); assert.match(shader.fragmentShader, /eggGlint/);
+  assert.deepEqual(shader.uniforms.eggCentre.value.toArray(), [40, 20]);
   eggs.setUnlocked(id => id === 'b');
   assert.equal(shader.uniforms.eggLocked.value, 1); assert.deepEqual(eggs.diagnostics().locked, ['a']);
   eggs.setUnlocked(() => true); assert.equal(shader.uniforms.eggLocked.value, 0);
