@@ -1,6 +1,6 @@
 import { Group, type Object3D } from 'three';
 import { RAPIER, type CharacterPhysics } from '../validation/physics.ts';
-import { STATION_LOCAL, WORLD_REQUIREMENTS, worldGateZ, worldPortal, type WorldId } from '../content/worldJourney.ts';
+import { STATION_LOCAL, WORLD_REQUIREMENTS, worldGateZ, worldPortal, worldRequirement, type WorldId } from '../content/worldJourney.ts';
 import type { SceneryPlan, V3 } from '../world/sceneryKit.ts';
 import { Planner } from '../world/sceneryKit.ts';
 import { themeById } from '../content/themes.ts';
@@ -17,21 +17,22 @@ function portalFrame(p:Planner,id:WorldId,z0:number){
   p.box([x,5.75,z],[5.9,.7,1.1],'#24324a',false,[0,pt.yaw,0]);
   p.sign([x,7.5,z],4.6,'世界传送门','',t);
 }
-/** World 2's surface: the authored tech base brings its own ground, kiosks, station and colliders; the plan adds
- *  the service rings and the signs. */
+/** World 2's surface: the authored tech base brings its own ground, buildings, portal frame, station and colliders;
+ *  the plan adds the service rings and the signs on the buildings' facade screens and over the portal and station. */
 function techBasePlan():SceneryPlan {
   const z=TECH_BASE.worldZ,at=(v:readonly number[],y=v[1]):V3=>[v[0],y,v[2]+z];
   const rings=(ring:readonly number[],color:string)=>[
     {type:'ring' as const,at:at(ring,.045),size:[3,.12,3] as V3,color,glow:true,interaction:true},
     {type:'ring' as const,at:at(ring,.035),size:[3.25,.025,3.25] as V3,color,glow:true,interaction:true}];
-  const sign=(v:readonly number[],title:string,color:string)=>({at:at(v,5.6),width:3.6,title,subtitle:'',color,background:'#16283a'});
-  const {sell,shop}=TECH_BASE.kiosks,st=TECH_BASE.station,portal=new Planner();portalFrame(portal,2,z);
-  const shift=<T extends {at:V3}>(v:T)=>({...v,at:[v.at[0],v.at[1],v.at[2]+z] as V3});
+  const {sell,shop}=TECH_BASE.kiosks,st=TECH_BASE.station,pt=TECH_BASE.portal;
+  const sign=(v:readonly number[],yaw:number,width:number,title:string,color:string)=>({at:at(v),width,title,subtitle:'',color,background:'#16283a',yaw});
   return {
-    shapes:[...rings(sell.ring,'#ffd387'),...rings(shop.ring,'#80efd0'),...portal.plan.shapes.map(shift)],
-    solids:[...(techBaseSolids.solids as SceneryPlan['solids']).map(s=>({...s,at:[s.at[0],s.at[1],s.at[2]+z] as V3})),...portal.plan.solids.map(shift)],
-    signs:[...portal.plan.signs.map(shift),sign([sell.at[0],0,sell.at[2]+1.6],'SELL','#ffe08a'),sign([shop.at[0],0,shop.at[2]+1.6],'UPGRADE','#9ff7e6'),
-      {at:[st.x,7.4,st.z+z],width:4.4,title:'传送站',subtitle:'',color:'#9ff4ff',background:'#16283a',yaw:st.yaw}],
+    shapes:[...rings(sell.ring,'#ffd387'),...rings(shop.ring,'#80efd0')],
+    solids:(techBaseSolids.solids as SceneryPlan['solids']).map(s=>({...s,at:[s.at[0],s.at[1],s.at[2]+z] as V3})),
+    signs:[sign(pt.sign,pt.yaw,4.6,'世界传送门','#ffe7a8'),sign(sell.sign,sell.yaw,4.4,'SELL','#ffe08a'),sign(shop.sign,shop.yaw,4.4,'UPGRADE','#9ff7e6'),
+      sign([st.x,7.4,st.z],st.yaw,4.4,'传送站','#9ff4ff'),
+      // The world's name on the gantry beam, facing the spawn.
+      sign([0,TECH_BASE.gantry.height+.55,TECH_BASE.gantry.z+.62],0,6,worldRequirement(2).name,'#9ff4ff')],
   };
 }
 export function journeySurfacePlan(z:number):SceneryPlan {

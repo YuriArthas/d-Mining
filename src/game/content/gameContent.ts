@@ -24,6 +24,9 @@ export type SurfaceContent = Readonly<{
 export type HubEgg = Readonly<{ id: string; eggId: string; tier: number; x: number; y: number; z: number; yaw: number; color: string }>;
 
 const zone = (x: number, z: number, radius = 3): ServiceZone => ({ x, y: 0, z, radius, heightTolerance: .3, hysteresis: .3 });
+// World 2's services stand where its tech base puts them; world 3 keeps plain counters either side of its spawn.
+const serviceZone = (worldZ: number, kind: 'sell' | 'shop') => worldZ === TECH_BASE.worldZ
+  ? zone(TECH_BASE.kiosks[kind].ring[0], worldZ + TECH_BASE.kiosks[kind].ring[2]) : zone(kind === 'sell' ? -16 : 16, worldZ + 44);
 // Eggs of the later worlds wait for those worlds' rooms; prices follow each egg's stage in the journey economy.
 const LATER_EGGS: Readonly<Record<string, string>> = { fossil: 'world2.1', machinery: 'world2.2', core: 'world3.6' };
 const eggStage = (id: string) => { const stage = EGG_STAGES[id][0]; return stage <= 6 ? stage : stage === 7 ? 8 : stage === 8 ? 9 : 20; };
@@ -60,13 +63,13 @@ const session: SessionContent = {
   // Each world's surface services first, then its rooms'. Worlds 2 and 3 keep simple counters by their spawns.
   sales: [
     PINEWIND_SERVICES.sale.trigger, ...first.rooms.map(r => r.sell),
-    ...later.flatMap(w => [zone(-16, w.z + 44), ...w.rooms.map(r => r.sell)]),
+    ...later.flatMap(w => [serviceZone(w.z, 'sell'), ...w.rooms.map(r => r.sell)]),
   ],
   shops: [
     { id: 'surface-upgrade', zone: PINEWIND_SERVICES.shop.trigger, category: 'tools' },
     { id: PINEWIND_SERVICES.bags.id, zone: PINEWIND_SERVICES.bags.trigger, category: 'backpacks' },
     ...first.rooms.filter(r => r.shop).map(r => ({ id: r.id, zone: r.shop! })),
-    ...later.flatMap(w => [{ id: `world${w.id}.shop`, zone: zone(16, w.z + 44) }, ...w.rooms.filter(r => r.shop).map(r => ({ id: r.id, zone: r.shop! }))]),
+    ...later.flatMap(w => [{ id: `world${w.id}.shop`, zone: serviceZone(w.z, 'shop') }, ...w.rooms.filter(r => r.shop).map(r => ({ id: r.id, zone: r.shop! }))]),
   ],
   homes: WORLD_REQUIREMENTS.map(w => ({ worldId: w.id, zone: zone(0, worldSpawn(w.id)[2], 6) })),
   stations: WORLD_REQUIREMENTS.map(w => ({ worldId: w.id, zone: worldStation(w.id).zone })),

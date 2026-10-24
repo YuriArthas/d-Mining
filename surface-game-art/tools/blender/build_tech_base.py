@@ -1,5 +1,5 @@
-"""第二世界 surface base props, "plastic-toy tech": the drill rig and its spinning bit, the service kiosks, the
-teleport station, wind turbines (tower + spinning rotor), solar rows, a habitat dome and module, the ore silo and
+"""第二世界 surface base props, "plastic-toy tech": the drill rig and its spinning bit, the ore buyer and the gear
+workshop, the world portal frame, storage tanks, the teleport station, wind turbines (tower + spinning rotor), solar rows, a habitat dome and module, the ore silo and
 its conveyor (frame, sliding cleats and ore), cargo containers, lamp posts, hazard bollards, an antenna mast and a
 parked mining mech. Chunky chamfered blocks, mid-tone greys, one glow accent per piece, hazard stripes.
 Run: blender -b --python tools/blender/build_tech_base.py
@@ -63,36 +63,96 @@ def slab(name, top, thick, t):
     v = list(top) + [(x, y - thick, z) for x, y, z in top]
     return mesh(name, v, [(0, 1, 2, 3), (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)], t)
 
-# SERVICE KIOSK, front +Z, about 6 x 4.4 m: a back building with a screen and badge, a counter in front under a
-# navy canopy on two front pillars, the accent glowing along the counter and under the canopy.
-def kiosk(name, accent, badge, paint):
+# SERVICE BUILDINGS, front +Z, 11 x 8 m on a plinth: a tall hall with a facade screen (the game's sign floats in
+# front of it), a roll-up door over a raised dock on one side and a counter window under an awning on the other
+# (the service ring stands before the window), roof machinery and a stack. `door` is the door's side (+1 / -1).
+def hall(name, paint, accent, door):
     model(name)
-    cbox('Plinth', (0, .15, 0), (6.4, .3, 4.6), 0)
-    box('PlinthStripe', (0, .33, 2.2), (6.0, .06, .14), 5)
-    cbox('Building', (0, 1.95, -1.05), (5.8, 3.3, 2.3), 6)
-    cbox('BuildingBand', (0, .55, -1.05), (5.9, .5, 2.4), paint)
-    cbox('BuildingTop', (0, 3.68, -1.05), (5.9, .2, 2.4), 2)
-    cbox('Counter', (0, .85, .95), (5.0, 1.1, 1.0), 6)
-    cbox('CounterTop', (0, 1.47, 1.0), (5.3, .14, 1.3), 0)
-    box('CounterGlow', (0, .98, 1.47), (4.6, .16, .06), accent)
-    box('Screen', (0, 2.55, .12), (3.4, 1.2, .14), 14)
-    box('ScreenFrame', (0, 3.2, .14), (3.6, .12, .16), accent)
-    plate = circle(.42, 10, 0, 2.55)
-    prism('Badge', plate, .19, .27, 11 if badge == 'coin' else 12, axis='z')
-    for sx in (-1, 1):
-        cbox('Pillar', (sx * 2.9, 2.0, 1.95), (.42, 3.6, .42), 2)
-        box('PillarGlow', (sx * 2.9, 2.0, 2.17), (.12, 2.4, .04), accent)
-    cbox('Canopy', (0, 3.98, .9), (6.6, .34, 3.0), paint)
-    cbox('CanopyTrim', (0, 4.2, .9), (6.2, .12, 2.6), 6)
-    box('CanopyGlow', (0, 3.79, 2.3), (6.0, .08, .14), accent)
-    cbox('RoofUnit', (1.6, 4.15, -1.3), (1.6, .7, 1.2), 2)
-    box('Vent', (1.6, 4.15, -.68), (1.2, .4, .06), 3)
-    cbox('Antenna', (-2.2, 4.8, -1.4), (.12, 1.6, .12), 0, q=.02)
-    cbox('AntennaTip', (-2.2, 5.65, -1.4), (.24, .16, .24), accent, q=.04)
-    for k, x in enumerate((-1.6, -.6, .4)):
-        cbox('Stock', (x, 1.72, .2 - .9), (.62, .4, .55), 12 if k % 2 else 11)
-kiosk('Kiosk_Sell', 8, 'coin', 16)
-kiosk('Kiosk_Shop', 7, 'pick', 17)
+    cbox('Plinth', (0, .2, 0), (11.6, .4, 8.6), 0)
+    box('PlinthStripe', (0, .42, 4.25), (11.0, .06, .14), 5)
+    cbox('Hall', (0, 3.2, -.6), (10.4, 5.6, 6.6), 6)
+    cbox('HallBand', (0, .95, -.6), (10.6, .9, 6.8), paint)
+    cbox('HallTop', (0, 6.15, -.6), (10.6, .3, 6.8), 2)
+    cbox('Parapet', (0, 6.55, -.6), (10.7, .5, 6.9), 0)
+    box('FacadeScreen', (0, 4.95, 2.75), (6.2, 1.6, .14), 14)
+    for y in (4.05, 5.85): box('FacadeGlow', (0, y, 2.8), (6.4, .14, .12), accent)
+    dx, wx = door * 2.6, -door * 2.8
+    for x in (dx - 1.95, dx + 1.95): box('DoorFrame', (x, 2.1, 2.76), (.3, 3.8, .2), 5)
+    box('DoorHeader', (dx, 4.05, 2.76), (4.2, .3, .2), 5)
+    box('Door', (dx, 2.15, 2.72), (3.6, 3.5, .1), 2)
+    for y in (1.0, 1.7, 2.4, 3.1): box('DoorRib', (dx, y, 2.79), (3.5, .08, .06), 0)
+    cbox('Dock', (dx, .6, 3.95), (5.2, 1.0, 2.6), 2)
+    box('DockEdge', (dx, 1.12, 5.22), (5.2, .06, .12), 5)
+    cbox('DockStep', (dx - door * 3.15, .3, 4.3), (1.1, .6, 1.8), 2)
+    cbox('Cart', (dx + door * .8, 1.6, 3.8), (1.7, .9, 1.1), paint)
+    for k in range(3): cbox('CartOre', (dx + door * (.3 + k * .45), 2.2, 3.8), (.42, .38, .42), 12 if k != 1 else 11, q=.08)
+    cbox('CranePost', (dx + door * 2.4, 3.3, 4.75), (.4, 5.4, .4), 0, q=.06)
+    beam('CraneArm', (dx + door * 2.4, 5.7, 4.75), (dx - door * .4, 5.7, 4.75), .35, .4, paint)
+    box('CraneHook', (dx - door * .2, 4.75, 4.75), (.1, 1.5, .1), 13)
+    cbox('CraneLoad', (dx - door * .2, 3.75, 4.75), (.9, .6, .9), 12, q=.1)
+    box('Window', (wx, 2.25, 2.72), (2.8, 1.5, .08), 14)
+    box('WindowGlow', (wx, 3.08, 2.8), (3.0, .12, .12), accent)
+    for x in (wx - 1.5, wx + 1.5): box('WindowFrame', (x, 2.25, 2.78), (.18, 1.7, .14), 0)
+    cbox('Counter', (wx, .95, 3.35), (3.4, 1.1, 1.1), 6)
+    cbox('CounterTop', (wx, 1.56, 3.4), (3.7, .14, 1.4), 0)
+    box('CounterGlow', (wx, 1.05, 3.92), (3.0, .14, .05), accent)
+    cbox('Awning', (wx, 3.55, 3.45), (3.9, .25, 1.7), paint)
+    box('AwningGlow', (wx, 3.4, 4.28), (3.6, .08, .08), accent)
+    cbox('RoofHopper', (dx, 7.75, -2.0), (3.0, 2.0, 2.6), paint)
+    box('HopperMouth', (dx, 8.76, -2.0), (2.5, .06, 2.1), 15)
+    lathe('Stack', [(6.8, .5), (10.8, .42)], 8, 2, cx=-dx * 1.35, cz=-2.9)
+    lathe('StackBand', [(10.0, .46), (10.4, .46)], 8, 5, cx=-dx * 1.35, cz=-2.9, cap_bottom=False)
+    cbox('RoofUnit', (wx * .3, 7.25, -2.6), (2.4, .9, 1.8), 2)
+    box('Vent', (wx * .3, 7.25, -1.68), (2.0, .5, .06), 3)
+    for x in (-5.25, 5.25): box('CornerGlow', (x, 3.4, 2.74), (.12, 4.4, .06), accent)
+hall('Ore_Buyer', 16, 8, -1)
+# The ore buyer's coin plate on the screen's end, and an ore heap by its dock.
+plate = circle(.55, 12, -4.2, 4.95)
+prism('CoinPlate', plate, 2.82, 2.9, 10, axis='z')
+prism('Coin', circle(.38, 10, -4.2, 4.95), 2.9, 3.0, 11, axis='z')
+for k, (x, z, sz) in enumerate(((-6.4, 4.4, .9), (-6.9, 3.4, .7), (-6.0, 3.6, .6), (-6.6, 5.2, .55), (-7.2, 4.6, .5))):
+    cbox('OreHeap', (x, sz / 2, z), (sz, sz, sz), 12 if k % 2 == 0 else 11, q=sz * .2)
+hall('Gear_Workshop', 17, 7, 1)
+# The workshop's giant pickaxe on its roof, and a workbench with a tool rack by its door.
+prism('PickHead', [(-2.4, 9.6), (-.8, 10.2), (.8, 10.2), (2.4, 9.6), (2.0, 9.25), (0, 9.7), (-2.0, 9.25)], -.8, -.4, 12)
+prism('PickHandle', [(-.2, 6.9), (.2, 6.9), (.2, 9.8), (-.2, 9.8)], -.75, -.45, 16)
+cbox('PickMount', (0, 6.95, -.6), (1.6, .4, .8), 0)
+cbox('Bench', (6.9, .85, 3.8), (1.0, .9, 2.4), 2)
+cbox('BenchTop', (6.9, 1.36, 3.8), (1.2, .12, 2.6), 0)
+cbox('Rack', (7.35, 2.2, 3.8), (.2, 1.6, 2.4), 4)
+for k in range(3):
+    cbox('Tool', (7.22, 2.3, 3.0 + k * .8), (.08, 1.0, .14), 2, q=.02)
+    cbox('ToolHead', (7.2, 2.85, 3.0 + k * .8), (.1, .16, .5), 12 if k != 1 else 11, q=.03)
+prism('PickPlate', circle(.55, 12, 4.2, 4.95), 2.82, 2.9, 10, axis='z')
+prism('PickBadge', [(3.85, 5.1), (4.05, 5.2), (4.35, 5.2), (4.55, 5.1), (4.45, 5.0), (4.2, 5.08), (3.95, 5.0)], 2.9, 3.0, 12, axis='z')
+
+# WORLD PORTAL FRAME, front +Z (placed facing the shaft): a low round base (kept behind the portal's zone, which
+# stays at ground level) with a glowing rim, two navy pillars at
+# +-2.6 with fins, a lintel at 6.5 m and a ring frame round the portal disc (radius 1.85, 2.9 m up).
+model('Portal_Frame')
+lathe('Base', [(0, 2.6), (.2, 2.6), (.26, 2.45)], 14, 0)
+lathe('BaseGlow', [(.26, 2.38), (.28, 2.38), (.29, 2.24)], 28, 8, cap_bottom=False, cap_top=False)
+lathe('BaseTop', [(.27, 2.24), (.29, 2.24)], 28, 4, cap_bottom=False)
+for sx in (-1, 1):
+    cbox('PillarFoot', (sx * 2.6, .7, 0), (1.5, .8, 1.5), 0)
+    cbox('Pillar', (sx * 2.6, 3.4, 0), (1.0, 6.0, 1.1), 4)
+    box('PillarGlow', (sx * 2.6, 3.4, .56), (.16, 4.6, .04), 8)
+    cbox('Fin', (sx * 3.4, 2.7, 0), (.5, 4.2, .8), 2)
+    beam('RingArm', (sx * 2.12, 2.9, 0), (sx * 2.42, 2.9, 0), .36, .36, 0)
+cbox('Lintel', (0, 6.7, 0), (7.0, .9, 1.3), 4)
+box('LintelGlow', (0, 6.7, .66), (6.2, .16, .04), 8)
+for k in range(16):
+    a0, a1 = k * math.pi / 8, (k + 1) * math.pi / 8
+    beam('Ring', (math.cos(a0) * 2.15, 2.9 + math.sin(a0) * 2.15, 0), (math.cos(a1) * 2.15, 2.9 + math.sin(a1) * 2.15, 0), .4, .36, 0)
+    beam('RingGlow', (math.cos(a0) * 1.95, 2.9 + math.sin(a0) * 1.95, 0), (math.cos(a1) * 1.95, 2.9 + math.sin(a1) * 1.95, 0), .12, .4, 8)
+
+# STORAGE TANK (origin at its foot), 5.9 m: a banded cylinder with a dome, a ladder and a glowing gauge.
+model('Storage_Tank')
+lathe('Foot', [(0, 1.9), (.4, 1.9), (.5, 1.75)], 12, 0)
+lathe('Body', [(.5, 1.6), (1.4, 1.6), (1.7, 1.6), (4.0, 1.6), (4.3, 1.6), (4.6, 1.6)], 12, 1, tiles_by_band=[1, 16, 1, 16, 1], cap_bottom=False, cap_top=False)
+lathe('Dome', [(4.6, 1.6), (5.2, 1.35), (5.7, .8), (5.9, .1)], 12, 2)
+box('Ladder', (1.66, 2.9, 0), (.08, 4.8, .5), 0)
+box('Gauge', (0, 3.0, 1.62), (.7, .7, .06), 7)
 
 # DRILL RIG over the shaft (origin at the shaft's centre): four legs at +-10.4 on hazard-striped feet, beams round
 # the sides at 9.6 m (above the mine signs) and a deck frame at 15 m with diagonal braces above head height, a motor housing hanging over

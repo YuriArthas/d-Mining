@@ -6,9 +6,10 @@ import {createSelectionOutline} from '../../src/game/presentation/SelectionOutli
 import {disposeScenery} from '../../src/game/presentation/disposeScenery.ts';
 import {roomPlan} from '../../src/game/world/scenery.ts';
 import {GAME_CONTENT} from '../../src/game/content/gameContent.ts';
+import {journeySurfacePlan} from '../../src/game/presentation/WorldBorders.ts';
 
 test('all world signs are genuine extruded glyphs with fronts, backs and sides',()=>{
- for(const sign of [GAME_CONTENT.surface.plan,...GAME_CONTENT.worlds.flatMap(w=>w.localRooms).map(roomPlan)].flatMap(p=>p.signs)){
+ for(const sign of [GAME_CONTENT.surface.plan,...GAME_CONTENT.worlds.slice(1).map(w=>journeySurfacePlan(w.z)),...GAME_CONTENT.worlds.flatMap(w=>w.localRooms).map(roomPlan)].flatMap(p=>p.signs)){
   const group=createWorldText(sign);
   try{
    assert.ok(group.children.length>0);

@@ -47,7 +47,7 @@ test('world 2: its first layer is the automine hall, lit and placed under the te
  assert.deepEqual(GAME_CONTENT.surface.authored.instances.find(i=>i.asset==='tech-base').at,[0,0,224]);
  const {journeySurfacePlan}=await import('../../src/game/presentation/WorldBorders.ts');
  const plan=journeySurfacePlan(224);
- assert.deepEqual(plan.signs.map(s=>s.title),['世界传送门','SELL','UPGRADE','传送站']);
+ assert.deepEqual(plan.signs.map(s=>s.title),['世界传送门','SELL','UPGRADE','传送站','第二世界']);
  // The service rings are the session's zones, clear of every collider; nothing solid in the shaft.
  for(const [i,zone] of [GAME_CONTENT.session.sales.find(z=>z.z>200),GAME_CONTENT.session.shops.find(s=>s.id==='world2.shop').zone].entries()){
   assert.deepEqual([plan.shapes[i*2].at[0],plan.shapes[i*2].at[2]],[zone.x,zone.z]);
