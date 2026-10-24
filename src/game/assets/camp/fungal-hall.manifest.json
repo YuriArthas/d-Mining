@@ -1,0 +1,16 @@
+{
+  "parts": [
+    "fungal-hall.000.part"
+  ],
+  "bytes": 381621,
+  "decodedBytes": 686280,
+  "sha256": "85edc204c216e19d9432187de533c18a7252b8f0a609c3d3a67f0238bbf56cbb",
+  "sourceSha256": "03091fcff46bdf5c39a171b8168c6ec7d5009851fa087ac84f1ca6322c8b1217",
+  "triangles": 30931,
+  "source": "蘑菇洞穴 rest hall: Blender props (surface-game-art/tools/blender/build_fungal.py) and an offline procedural cave shell (surface-game-art/tools/underground/fungalHall.ts); baked occlusion per vertex",
+  "materialProfile": "authored-color",
+  "coordinateSpace": "authored",
+  "geometryEdits": false,
+  "textureEncoding": "KTX2 UASTC",
+  "reference": "tools/build-underground.mjs"
+}

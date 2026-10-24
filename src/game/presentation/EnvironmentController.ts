@@ -46,6 +46,8 @@ export type EnvironmentFrame = Readonly<{
   sky: string;
   groundLight: string;
   sceneryRevision: number;
+  /** An underground layer's own mood (its hall's look): sky/ground fill, top light and fog. */
+  cave?: Readonly<{ sky: string; ground: string; ambient: number; key: string; keyIntensity: number; fog: string }>;
 }>;
 type Sky = Pick<
   SurfaceEnvironment,
@@ -140,9 +142,12 @@ export class EnvironmentController {
     // deep shaft inherit daylight: reuse the entrance's existing smooth fade.
     const strength = this.surfaceStrength = frame.surface ? Math.max(0, Math.min(1, frame.surfaceLightStrength)) : 0;
     this.daylight = frame.time === 'auto' ? this.cycle.advance(cycleElapsed).daylight : frame.time === 'day' ? 1 : 0;
-    const day = { ...config.surface.day, ...this.look?.day }, night = { ...config.surface.night, ...this.look?.night }, underground = config.underground;
+    const day = { ...config.surface.day, ...this.look?.day }, night = { ...config.surface.night, ...this.look?.night };
+    const cave = frame.surface ? undefined : frame.cave;
+    const underground = cave ? { ...config.underground, skyColor: cave.sky, ambientIntensity: cave.ambient, keyColor: cave.key, keyIntensity: cave.keyIntensity } : config.underground;
+    const groundLight = cave?.ground ?? frame.groundLight;
     const blend = (a: number, b: number) => a + (b - a) * this.daylight;
-    this.target.set(frame.sky);
+    this.target.set(cave?.fog ?? frame.sky);
     // Prewarm is immediate; normal frames retain the existing sky transition history.
     if (delta !== undefined)
       this.blended.lerp(
@@ -168,15 +173,15 @@ export class EnvironmentController {
       ambient.color.set(night.skyColor).lerp(this.colorTarget.set(day.skyColor), this.daylight);
       ambient.color.lerp(this.colorTarget.set(underground.skyColor), 1 - strength);
       ambient.groundColor.set(night.groundColor).lerp(this.colorTarget.set(day.groundColor), this.daylight);
-      ambient.groundColor.lerp(this.colorTarget.set(frame.groundLight), 1 - strength);
+      ambient.groundColor.lerp(this.colorTarget.set(groundLight), 1 - strength);
       ambient.intensity = underground.ambientIntensity + (blend(night.ambientIntensity, day.ambientIntensity) - underground.ambientIntensity) * strength;
     } else {
       ambient.color.set(underground.skyColor);
-      ambient.groundColor.set(frame.groundLight);
+      ambient.groundColor.set(groundLight);
       ambient.intensity = underground.ambientIntensity;
     }
     key.castShadow = false;
-    const stamp = `${strength}:${strength > 0 ? this.daylight : 0}:${frame.depth}:${frame.sceneryRevision}`;
+    const stamp = `${strength}:${strength > 0 ? this.daylight : 0}:${frame.depth}:${frame.sceneryRevision}:${cave ? cave.key + cave.keyIntensity : ''}`;
     if (stamp !== this.lastKey) {
       if (strength > 0) {
         key.position.set(blend(night.moonPosition[0], day.moonPosition[0]), blend(night.moonPosition[1], day.moonPosition[1]), blend(night.moonPosition[2], day.moonPosition[2]));

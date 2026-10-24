@@ -24,21 +24,22 @@ test('one translated and rotated facility descriptor aligns model, collider, lab
  const swapped=deriveFacility({...SURFACE_FACILITIES.sale,model:{...SURFACE_FACILITIES.sale.model,asset:'simulator-upgrade'}});
  assert.deepEqual(swapped.trigger,deriveFacility(SURFACE_FACILITIES.sale).trigger);
 });
+// A kit room (the crystal cave) follows changed dimensions; authored halls keep their own fixed size.
 test('changed depth, theme and room dimensions agree across physics generation, view, unlock and destination',()=>{
- const layers=LAYERS.map(l=>l.id==='fungal'?{...l,from:900,theme:'frozen_cave',room:{centerX:0,centerZ:0,widthCells:24,depthCells:22,heightCells:12}}:l);
- const camp=createCampContent(layers),room=camp.rooms.find(r=>r.id==='fungal');
+ const layers=LAYERS.map(l=>l.id==='crystal'?{...l,from:1300,theme:'frozen_cave',room:{centerX:0,centerZ:0,widthCells:24,depthCells:22,heightCells:12}}:l);
+ const camp=createCampContent(layers),room=camp.rooms.find(r=>r.id==='crystal');
  const generation={...WORLD_GENERATION,layers},world=new SparseWorld(generation),workerWorld=new SparseWorld(structuredClone(generation));
- for(const cell of [[11,-450,0],[11,-439,0],[12,-450,0],[11,-438,0],[11,-451,0]])assert.equal(world.cell(cell),workerWorld.cell(cell));
- assert.equal(world.cell([11,-450,0]),0);assert.equal(world.cell([11,-451,0]),7);assert.notEqual(world.cell([12,-450,0]),0);
- assert.equal(room.spawn[1],-899.9);assert.ok(Math.abs(room.sell.x+14.4)<1e-9);
+ for(const cell of [[11,-650,0],[11,-639,0],[12,-650,0],[11,-638,0],[11,-651,0]])assert.equal(world.cell(cell),workerWorld.cell(cell));
+ assert.equal(world.cell([11,-650,0]),0);assert.equal(world.cell([11,-651,0]),7);assert.notEqual(world.cell([12,-650,0]),0);
+ assert.equal(room.spawn[1],-1299.9);assert.ok(Math.abs(room.sell.x+14.4)<1e-9);
  const plan=roomPlan(room);
  assert.ok(plan.authored.instances.some(p=>!p.fixed&&p.at[0]*plan.authored.scale[0]+plan.authored.origin[0]>20));
  assert.deepEqual(plan.authored.scale,[1.2,1.2,1.1]);
- assert.equal(camp.hub.portals.find(p=>p.id==='fungal').depth,900);
+ assert.equal(camp.hub.portals.find(p=>p.id==='crystal').depth,1300);
  const session=new GameSession(camp.session),travel=[];
  session.attach({cell:()=>1,pending:()=>false,mine:()=>true,cancelMining(){},returnToSurface(){},travelTo:p=>travel.push(p)});
  session.updatePosition([room.x,-room.depth+.027,room.z],true);session.updatePosition([camp.session.home.x,0,camp.session.home.z],true);
- assert.equal(session.travelTo('fungal'),'travelling');assert.deepEqual(travel,[room.spawn]);
+ assert.equal(session.travelTo('crystal'),'travelling');assert.deepEqual(travel,[room.spawn]);
 });
 test('adding a layer requires an explicit station, never a layer-name branch or index-based appearance',()=>{
  // Start with nine layers so the added layer owns the remaining theme block.

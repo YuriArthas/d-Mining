@@ -8,6 +8,7 @@ import type { SurfaceTime } from "../world/SceneLighting.ts";
 import type { ProbeMode } from "../presentation/PerformanceProbe.ts";
 import { stratumAtDepth } from "../terrain/strata.ts";
 import { themeById } from "../content/themes.ts";
+import { HALL_BY_LAYER, undergroundHall } from "../content/underground/halls.ts";
 import { mineralName } from "../terrain/minerals.ts";
 import { generationAtZ } from '../terrain/SparseWorld.ts';
 import { setArchitectureDaylight } from '../presentation/albedoLift.ts';
@@ -81,6 +82,7 @@ export function updateGame(
         sky: theme.sky,
         groundLight: theme.groundLight,
         sceneryRevision: current.facilities.revision,
+        cave: HALL_BY_LAYER[layer.id] ? undergroundHall(HALL_BY_LAYER[layer.id]).hall.look : undefined,
       },
       delta,
       onlineElapsed,
@@ -135,6 +137,7 @@ export function updateGame(
     current.minerAvatar.update(drawnFeet, delta, physics.grounded, !!player.travelling);
     current.feedback.update(delta, interaction.strike, current.minerAvatar.consumeEvents(), drawnFeet);
     current.stations?.update(delta);
+    current.caveLights.update(drawnFeet, layer.id, lightStrength);
     const selected = interaction.selected;
     if (clock.status <= 0) {
       const info = terrain.snapshot();

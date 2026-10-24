@@ -263,3 +263,43 @@ export async function bakeLight({ casters, ground, lightmap, vertex, log = conso
   log(`light bake: ${vertexCount} prop vertices; total ${stats.milliseconds} ms`);
   return { groundImage, lightImage, standingImage, vertexBakes, stats };
 }
+
+/** Occlusion only, one value per vertex, for places without a sun (the underground halls): red = how open
+ *  each vertex is within `aoRadius`, green fixed at full (no sun to hide). Same tracer and sampling as the
+ *  surface props above. */
+export async function bakeOcclusion({ casters, vertex, aoRadius = 4, aoSamples = 32, log = console.log }) {
+  const started = performance.now();
+  const all = trianglesOf(casters);
+  const bvh = shareBvh(buildBvh(all.positions, all.kinds)), bvhs = { all: bvh, solid: bvh, ground: bvh };
+  let vertexCount = 0;
+  for (const mesh of vertex) vertexCount += mesh.geometry.attributes.position.count;
+  const points = shared(Float32Array, vertexCount * 6), seeds = shared(Float32Array, vertexCount), out = shared(Float32Array, vertexCount * 3);
+  let base = 0;
+  for (const mesh of vertex) {
+    mesh.updateWorldMatrix(true, false);
+    const g = mesh.geometry, p = g.attributes.position, nrm = g.attributes.normal, index = g.index, V = p.count, normalMatrix = new THREE.Matrix3().getNormalMatrix(mesh.matrixWorld);
+    const centroid = new Float32Array(V * 3), uses = new Uint32Array(V), v = new THREE.Vector3(), n = new THREE.Vector3();
+    for (let t = 0; t < (index ? index.count : V); t += 3) {
+      const ids = [0, 1, 2].map(k => index ? index.getX(t + k) : t + k);
+      for (const id of ids) for (const other of ids) { centroid[id * 3] += p.getX(other) / 3; centroid[id * 3 + 1] += p.getY(other) / 3; centroid[id * 3 + 2] += p.getZ(other) / 3; }
+      for (const id of ids) uses[id]++;
+    }
+    for (let i = 0; i < V; i++) {
+      const k = uses[i] || 1, inset = uses[i] ? .12 : 0;
+      v.set(p.getX(i) + (centroid[i * 3] / k - p.getX(i)) * inset, p.getY(i) + (centroid[i * 3 + 1] / k - p.getY(i)) * inset, p.getZ(i) + (centroid[i * 3 + 2] / k - p.getZ(i)) * inset).applyMatrix4(mesh.matrixWorld);
+      n.fromBufferAttribute(nrm, i).applyMatrix3(normalMatrix).normalize();
+      points.set([v.x, v.y, v.z, n.x, n.y, n.z], (base + i) * 6);
+      seeds[base + i] = ign((base + i) % 4093, Math.floor((base + i) / 4093));
+    }
+    base += V;
+  }
+  await run('evaluate', bvhs, points, seeds, out, settingsFor({ sunMode: 'hard', sunScene: 'all', aoScene: 'all', aoRadius, aoSamples, floorContact: .5, offset: .02 }));
+  const bakes = new Map(); base = 0;
+  for (const mesh of vertex) {
+    const V = mesh.geometry.attributes.position.count, bake = new Uint8Array(V * 4);
+    for (let i = 0; i < V; i++) { bake[i * 4] = Math.round(Math.min(1, Math.max(0, out[(base + i) * 3])) * 255); bake[i * 4 + 1] = 255; bake[i * 4 + 3] = 255; }
+    bakes.set(mesh, bake); base += V;
+  }
+  log(`occlusion bake: ${all.count} caster triangles, ${vertexCount} vertices (${Math.round(performance.now() - started)} ms)`);
+  return { vertexBakes: bakes, stats: { casterTriangles: all.count, vertices: vertexCount, aoRadius, aoSamples } };
+}

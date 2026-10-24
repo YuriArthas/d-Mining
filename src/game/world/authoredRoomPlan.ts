@@ -1,4 +1,5 @@
 import {roomSceneAsset} from '../content/rooms/sceneAssets.ts';
+import {undergroundHall} from '../content/underground/halls.ts';
 import type {RoomAnchor,RoomSceneAsset} from '../content/rooms/authoredRoom.ts';
 import type {RestRoom} from './rooms.ts';
 import type {SceneryPlan,V3,Solid} from './sceneryKit.ts';
@@ -8,6 +9,7 @@ import {CELL} from '../terrain/grid.ts';
 export function authoredRoomPlan(room:RestRoom,providedAsset?:RoomSceneAsset):SceneryPlan {
   const definition=room.sceneDefinition;
   if(!definition)throw Error(`房间未配置独立场景: ${room.id}`);
+  if(definition.hall&&!providedAsset)return hallPlan(room,definition.hall);
   const {kit,layout}=providedAsset??roomSceneAsset(definition.asset);
   const reference=definition.referenceSize;
   const scale:V3=[room.layout.widthCells*CELL/reference[0],room.layout.heightCells*CELL/reference[1],room.layout.depthCells*CELL/reference[2]];
@@ -68,5 +70,21 @@ export function authoredRoomPlan(room:RestRoom,providedAsset?:RoomSceneAsset):Sc
     solids,
     signs:definition.signs.filter(s=>s.anchor!=='shop'||room.shop).map(s=>({at:at(s.anchor,s.offset),width:s.width,title:text(s.title),subtitle:text(s.subtitle),color:s.color,background:s.background})),
     authored:{kit,materials:layout.materials,render:definition.render,referenceSize:reference,origin,scale,instances,lightSolids,lamps},
+  };
+}
+
+/** A room filled by an authored hall: rings and signs from the scene definition, colliders from the hall build;
+ *  the art itself loads with the authored scene (pinewindSurface.ts). */
+function hallPlan(room:RestRoom,hallId:string):SceneryPlan {
+  const definition=room.sceneDefinition!,{solids}=undergroundHall(hallId);
+  const reference=definition.referenceSize;
+  const scale:V3=[room.layout.widthCells*CELL/reference[0],room.layout.heightCells*CELL/reference[1],room.layout.depthCells*CELL/reference[2]];
+  const anchor=(id:RoomAnchor)=>id==='room'?[0,0,0]:definition.facilities[id]!.at;
+  const at=(id:RoomAnchor,offset:readonly number[]):V3=>anchor(id).map((v,i)=>[room.x,0,room.z][i]+(v+offset[i])*scale[i]) as V3;
+  const text=(value:string)=>value.replace(/\{(name|number|depth)\}/g,(_,key:'name'|'number'|'depth')=>key==='number'?String(room.number).padStart(2,'0'):String(room[key]));
+  return {
+    shapes:definition.rings.filter(r=>r.anchor!=='shop'||room.shop).map(r=>{const zone=r.anchor==='sell'?room.sell:room.shop!;return {type:'ring',at:at(r.anchor,r.offset),size:[zone.radius,r.height,zone.radius],color:r.color,glow:r.glow,interaction:true};}),
+    solids:solids.map(s=>({...s,at:[s.at[0]+room.x,s.at[1],s.at[2]+room.z] as V3})),
+    signs:definition.signs.filter(s=>s.anchor!=='shop'||room.shop).map(s=>({at:at(s.anchor,s.offset),width:s.width,title:text(s.title),subtitle:text(s.subtitle),color:s.color,background:s.background,...(s.yaw===undefined?{}:{yaw:s.yaw})})),
   };
 }

@@ -49,6 +49,8 @@ export function withPinewindSurface(base:CampContent):CampContent {
  }
  for(const p of eggs){const model=instance('Egg_'+p.id);model.at=[p.x,p.y,p.z];model.rotation=rotation(p.yaw);models.push(model);}
  for(const model of models)model.ground=model.node==='Creek_Bridge'||model.node?.startsWith('Terrace')===true;
+ // Underground halls built with the same pipeline load with the authored scene, in their rooms.
+ for(const room of base.rooms){const hall=room.sceneDefinition?.hall;if(hall)models.push({asset:hall,at:[room.x,-room.depth,room.z],rotation:[0,0,0,1],scale:[1,1,1]});}
  models.unshift({asset:'pinewind-landscape',at:[0,0,0],rotation:[0,0,0,1],scale:[1,1,1]});
  const solids:Solid[]=[...authored.solids as Solid[],...PINEWIND_TERRACE_SOLIDS,...services.map(s=>s.solid)];
  for(const p of eggs)solids.push({at:[p.x,p.y+1.5,p.z],half:[.95,1.5,.95],yaw:0});

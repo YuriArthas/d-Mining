@@ -44,6 +44,8 @@ export type ValidationDebug = {
   audioLevel: () => number | null;
   audioStream: () => MediaStream | null;
   look: (yaw: number, pitch: number) => void;
+  /** Clears cells straight through the terrain (no health, no loot): for looking at dug tunnels. */
+  excavate: (coords: readonly Coord[]) => boolean;
   /** Slows the creek splashes (1 = normal) so screenshots can catch them. */
   splashTimeScale: (scale: number) => void;
   canMine: (coord: Coord) => boolean;
@@ -159,6 +161,7 @@ export function attachGameDebug(
       pets: session.pets.getSnapshot(),
       eggLabels: current.eggLabels.diagnostics(),
       lockedEggs: current.lockedEggs.diagnostics(),
+      caveLights: current.caveLights.diagnostics(),
       petFollowers: current.petFollowers.diagnostics(),
       avatar: current.minerAvatar.diagnostics(),
       feedback: { audio: gameAudio.diagnostics(), effects: current.feedback.effects.diagnostics(), splash: current.feedback.splash.diagnostics(), surface: current.feedback.surface(physics.feet()) },
@@ -246,6 +249,7 @@ export function attachGameDebug(
     audioLevel: () => gameAudio.outputLevel(),
     audioStream: () => gameAudio.outputStream(),
     look: (yaw, pitch) => cameraView.look(yaw, pitch),
+    excavate: (coords) => terrain.mineMany(coords),
     splashTimeScale: scale => { current.feedback.splash.timeScale = scale; },
     cell: (coord) => terrain.cell(coord),
     canMine: (coord) => terrain.canMine(coord),

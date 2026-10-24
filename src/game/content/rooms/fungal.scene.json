@@ -18,7 +18,7 @@
       "at": [
         -12,
         0,
-        12
+        11.4
       ],
       "radius": 1.8,
       "heightTolerance": 0.25,
@@ -28,7 +28,7 @@
       "at": [
         12,
         0,
-        12
+        11.4
       ],
       "radius": 1.8,
       "heightTolerance": 0.25,
@@ -40,40 +40,42 @@
       "anchor": "room",
       "offset": [
         0,
-        7.4,
-        -12.9
+        6.05,
+        -17.05
       ],
-      "width": 5,
+      "width": 5.4,
       "title": "{name}",
       "subtitle": "{number} / {depth} 米",
-      "color": "#cdffe9",
-      "background": "#32495a"
+      "color": "#d8fff2",
+      "background": "#2b2546"
     },
     {
       "anchor": "sell",
       "offset": [
         0,
-        4.3,
-        -1.9
+        5.9,
+        1.4
       ],
       "width": 3.2,
       "title": "SELL",
       "subtitle": "",
-      "color": "#ffe5a3",
-      "background": "#374653"
+      "color": "#ffe08a",
+      "background": "#2b2546",
+      "yaw": 3.14159
     },
     {
       "anchor": "shop",
       "offset": [
         0,
-        4.3,
-        -1.9
+        5.9,
+        1.4
       ],
       "width": 3.2,
       "title": "UPGRADE",
       "subtitle": "",
-      "color": "#b8ffe8",
-      "background": "#374653"
+      "color": "#9ff7e6",
+      "background": "#2b2546",
+      "yaw": 3.14159
     }
   ],
   "rings": [
@@ -139,5 +141,6 @@
         "fadeTo": 1.4
       }
     }
-  }
+  },
+  "hall": "fungal-hall"
 }

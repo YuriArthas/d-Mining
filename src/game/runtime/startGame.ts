@@ -34,6 +34,7 @@ import { MinerAvatar } from "../presentation/MinerAvatar.ts";
 import { EggStandLabels } from "../presentation/EggStandLabels.ts";
 import { LockedEggs } from "../presentation/LockedEggs.ts";
 import { TeleportStations } from "../presentation/TeleportStations.ts";
+import { CaveLights } from "../presentation/CaveLights.ts";
 import { disposeScenery } from "../presentation/disposeScenery.ts";
 import { SurfaceHubView } from "../presentation/SurfaceHubView.ts";
 import { prepareShaders } from "../presentation/prepareShaders.ts";
@@ -272,6 +273,9 @@ export async function startGame(options: StartGameOptions) {
     // Eggs not unlocked yet stand as black silhouettes under a "???" label that keeps their price.
     const lockedEggs = new LockedEggs(surface.group, content.hub.eggs);
     scope.defer(() => lockedEggs.dispose());
+    // Underground halls: their light sources as a fixed pool of point lights, and the helmet lamp.
+    const caveLights = new CaveLights(content.rooms.map(r => ({ id: r.id, x: r.x, z: r.z, depth: r.depth })));
+    root.add(caveLights.group); scope.defer(() => caveLights.dispose());
     // Journey worlds: each world's teleport station gets its swirling portal disc.
     const stations = content.worlds ? new TeleportStations() : null;
     if (stations) { root.add(stations.group); scope.defer(() => stations.dispose()); }
@@ -375,6 +379,7 @@ export async function startGame(options: StartGameOptions) {
       eggLabels,
       lockedEggs,
       stations,
+      caveLights,
       petFollowers,
       minerAvatar,
       feedback,

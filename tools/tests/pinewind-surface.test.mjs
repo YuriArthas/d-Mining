@@ -24,7 +24,7 @@ test('the hub owns world-1 surface zones; rules, rooms, worlds and the tutorial 
  assert.deepEqual(art.session.shops.filter(s=>!s.id.startsWith('surface-')),base.session.shops.filter(s=>s.id!=='surface-upgrade'));
  assert.equal(art.session.eggStations.length,PINEWIND_EGG_DISPLAYS.length);
  assert.equal(art.surface.placements.length,0);
- assert.deepEqual([...new Set(art.surface.authored.instances.map(p=>p.asset))].sort(),['pinewind-architecture','pinewind-landscape']);
+ assert.deepEqual([...new Set(art.surface.authored.instances.map(p=>p.asset))].sort(),['fungal-hall','pinewind-architecture','pinewind-landscape']);
  // The live content carries the same zones into the game session.
  assert.deepEqual(PINEWIND_CAMP.session.sales[0],PINEWIND_SERVICES.sale.trigger);
 });
