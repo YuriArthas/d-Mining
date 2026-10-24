@@ -24,7 +24,8 @@ export class AssetPrefetch<I, O> {
   size:(item:I)=>number,
   load:(item:I,signal:AbortSignal)=>Promise<O>,
   signal:AbortSignal,
-  limits = {downloads:4,bytes:4*1024*1024,items:8},
+  // 8 MiB: the valley landscape alone decodes to just over 4 MiB and must fit in one reservation.
+  limits = {downloads:4,bytes:8*1024*1024,items:8},
  ) {
   this.items=items;this.size=size;this.load=load;this.limits=limits;
   for(const n of Object.values(limits))if(!Number.isSafeInteger(n)||n<1)throw new Error('Invalid prefetch limits');

@@ -561,6 +561,51 @@ function buildCliffs(kit: Kit, getNature: NatureFactory) {
   });
   return columns;
 }
+/** Where the creek leaves the valley it runs into woods instead of open sky. In the west gorge the banks are
+ *  lined with big simple trees and, near the ground's edge, a grove stands right across the stream, closing the
+ *  view down the gorge; in the north-east a smaller grove hides where the water starts. Thick trunks and a few
+ *  broad crowns (the shared tree_oak / tree_pine). */
+function creekEnds(kit: Kit, getNature: NatureFactory) {
+  const r = rng(52771);
+  const tAt = (test: (p: THREE.Vector3) => boolean, from: number, step: number) => {
+    for (let t = from; t >= 0 && t <= 1; t += step) if (test(stream.getPoint(t))) return t;
+    return from;
+  };
+  // West: from where the gorge opens (x = -60) to the ground's edge (x = -95); the last stretch is wooded across.
+  const groves = [
+    { t0: tAt(p => p.x > -60, 1, -.002), t1: tAt(p => p.x > -95, 1, -.002), across: tAt(p => p.x > -84, 1, -.002) },
+    // North-east: from the source to the mouth of the gorge (z = -54).
+    { t0: 0, t1: tAt(p => p.z > -56, 0, .002), across: tAt(p => p.z > -64, 0, .002) },
+  ];
+  let planted = 0;
+  for (const g of groves) {
+    const lo = Math.min(g.t0, g.t1), hi = Math.max(g.t0, g.t1), length = stream.getLength() * (hi - lo);
+    for (let d = 0; d < length; d += 3.6 + r() * 1.6) {
+      const t = lo + (hi - lo) * d / length, p = stream.getPoint(t), tangent = stream.getTangent(t), half = riverAt(p.x, p.z).halfWidth;
+      // In the far stretch the grove fills the stream too; elsewhere two staggered rows on each bank.
+      const wooded = g.t0 > g.t1 ? t <= g.across : t >= g.across;
+      const offsets = wooded ? [-12, -7, -2.2, 2.2, 7, 12] : [-(half + 9), -(half + 3.4), half + 3.4, half + 9];
+      for (const o of offsets) {
+        if (r() < .18) continue;
+        const off = o + (r() - .5) * 2.2, x = p.x - tangent.z * off + (r() - .5) * 1.5, z = p.z + tangent.x * off + (r() - .5) * 1.5;
+        const h = 10 + r() * 6;
+        if (placeNature(kit, getNature, r() < .55 ? 'tree_pine' : 'tree_oak', [x, landscapeHeight(x, z), z], [h, h, h], Math.floor(r() * 4) * Math.PI / 2)) planted++;
+      }
+    }
+  }
+  // A closing row right at the far end: oaks shoulder to shoulder with big bushes between their trunks, so no
+  // sky shows under the crowns at the end of either gorge.
+  for (const g of groves) {
+    const p = stream.getPoint(g.t1), tangent = stream.getTangent(g.t1);
+    for (let off = -15; off <= 15; off += 3) {
+      const x = p.x - tangent.z * off, z = p.z + tangent.x * off, h = 11 + r() * 4;
+      if (placeNature(kit, getNature, r() < .7 ? 'tree_oak' : 'tree_pine', [x, landscapeHeight(x, z), z], [h, h, h], Math.floor(r() * 4) * Math.PI / 2)) planted++;
+      const bx = x - tangent.z * 1.5 - tangent.x * 1.2, bz = z + tangent.x * 1.5 - tangent.z * 1.2, s = 2.4 + r() * .8;
+      placeNature(kit, getNature, 'bush', [bx, landscapeHeight(bx, bz), bz], [s, s, s], Math.floor(r() * 4) * Math.PI / 2);
+    }
+  }
+  return planted;
+}
 /** Rounded stones half in the water along both banks, reed clumps on the lips and lily pads in the calm water
  *  near the banks, so the creek reads as a stream rather than a painted band. A separate random sequence
  *  keeps every other placement where it was. Nothing on the bridge's footprint. */
@@ -696,7 +741,7 @@ function buildWater() {
 export function buildLandscape(getNature: NatureFactory): { group: THREE.Group; water: THREE.Mesh[] } {
   random = rng(712044);
   const kit = new Kit(); kit.group.name = 'Pinewind playable valley';
-  buildGround(kit); buildEdging(kit); buildQuarry(kit, getNature); buildPaths(kit); buildBackdrop(kit); buildCliffs(kit, getNature); plantings(kit, getNature); meadowDetails(kit, getNature); creekDressing(kit, getNature);
+  buildGround(kit); buildEdging(kit); buildQuarry(kit, getNature); buildPaths(kit); buildBackdrop(kit); buildCliffs(kit, getNature); plantings(kit, getNature); meadowDetails(kit, getNature); creekDressing(kit, getNature); creekEnds(kit, getNature);
   kit.group.traverse(o=>{if(o instanceof THREE.Mesh && /Flowing meadow|Inset polygon|turf lips|creek banks/.test(o.name)){o.userData.surfaceGround=true;o.castShadow=false;}});
   return { group: kit.group, water: buildWater() };
 }
