@@ -3,7 +3,7 @@
 import type { PetFace, PetLook, PetPattern, PetSparkle } from '../../content/petLooks.ts';
 
 type G = CanvasRenderingContext2D;
-const INK = '#2a1c14', PINK = '#ff8fa8', MUZZLE = '#fff4e2', SHADE = 'rgba(0,0,0,.22)', LIGHT = 'rgba(255,255,255,.75)';
+const INK = '#2a1c14', PINK = '#ff8fa8', MUZZLE = '#fff4e2', SHADE = 'rgba(0,0,0,.22)';
 
 // ---- Faces: authored on a 256 x 256 square that covers the front of the cube. -------------------------
 

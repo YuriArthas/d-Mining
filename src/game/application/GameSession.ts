@@ -190,7 +190,7 @@ export class GameSession {
     this.stations = (content.stations??[]).map(h=>({worldId:h.worldId,detector:new ZoneDetector(h.zone)}));
     this.rewards = data?.rewards === undefined ? new Rewards(petDependencies.rewards) : Rewards.fromData(data.rewards, petDependencies.rewards);
     this.syncRewardEffects();
-    this.wallet = data ? Wallet.fromData(data.wallet) : new Wallet(content.initialCoins ?? 0);
+    this.wallet = data ? Wallet.fromData(data.wallet) : new Wallet(content.initialCoins);
     this.pickaxe = data ? Pickaxe.fromData(data.pickaxe) : new Pickaxe();
     this.inventory = data ? Inventory.fromData(data.inventory, itemVolume) : new Inventory(capacity, itemVolume);
     this.equipment = new EquipmentCollection(this.pickaxe.getSnapshot().level,this.inventory.capacity,data?.equipment);
@@ -200,12 +200,12 @@ export class GameSession {
       const savedExplorations=data?.worldExploration as Record<string,unknown>|undefined;
       if(savedExplorations!==undefined&&(!savedExplorations||typeof savedExplorations!=='object'||Array.isArray(savedExplorations)))throw Error('世界探索记录错误');
       for (const w of WORLD_REQUIREMENTS) {
-        const destinations=content.destinations.filter(d=>(d.worldId??1)===w.id), saved=savedExplorations?.[w.id]??(w.id===1?data?.exploration:undefined);
+        const destinations=content.destinations.filter(d=>d.worldId===w.id), saved=savedExplorations?.[w.id]??(w.id===1?data?.exploration:undefined);
         this.explorations.set(w.id,saved===undefined?new Exploration(destinations):Exploration.fromData(saved,destinations));
       }
     }
     const petService = new PetService({
-      content: content.petContent ?? { pets: [], eggs: [], equipSlots: 3 },
+      content: content.petContent,
       wallet: this.wallet,
       hasDestination: this.hasDestination,
       lucky: () => this.rewardEffects.luck,
@@ -220,10 +220,10 @@ export class GameSession {
       balance: () => this.wallet.getBalance(),
       baseStats: this.baseMiningStats,
       effectiveStats: this.miningAttributes.getSnapshot,
-      commands: this.withHatchFeedback(new PetCommands(petService, () => { this.committed(true); this.publish(); }, () => !this.suspended, id => !this.content.eggStations?.length || this.eggId===id)),
+      commands: this.withHatchFeedback(new PetCommands(petService, () => { this.committed(true); this.publish(); }, () => !this.suspended, id => this.eggId===id)),
       subscribe: this.subscribe,
     });
-    this.eggStations = (content.eggStations ?? []).map(station => {
+    this.eggStations = content.eggStations.map(station => {
       if (!petService.catalog.egg(station.eggId)) throw Error(`蛋台引用未知蛋池: ${station.eggId}`);
       return { station, detector: new ZoneDetector(station.zone) };
     });
@@ -258,7 +258,7 @@ export class GameSession {
   }
   private tipState(): TipState {
     const bag=this.inventory.getSnapshot(), facts=this.onboarding.getSnapshot();
-    const egg=this.content.petContent?.eggs.find(e=>e.id===this.content.onboarding?.eggId);
+    const egg=this.content.petContent.eggs.find(e=>e.id===this.content.onboarding.eggId);
     return {seen:id=>this.onboarding.has(id),location:this.guideLocation,atMine:this.atMine,minedOnce:facts.minedOnce,soldOnce:facts.soldOnce,
       full:bag.isFull,items:bag.totalCount,coins:this.wallet.getBalance(),level:this.equipment.toolLevel,upgradePrice:this.toolOffer().price,
       pets:this.petService.getInventory().count,eggPrice:egg?.price??null};
@@ -301,7 +301,7 @@ export class GameSession {
       mineralReservations:Object.fromEntries(Object.entries(bag.items).map(([id,n])=>[id,{reserved:this.reservations.quantity(id,n),sellable:n-this.reservations.quantity(id,n),mode:this.reservations.mode(id)}])),
       onboarding: this.onboarding.getSnapshot(), tip,
       // The first-dig tip points across the map at the mine until the player gets there.
-      tipAnchor: tip?.anchor==='mine'?this.content.onboarding?.entrance??null:null,
+      tipAnchor: tip?.anchor==='mine'?this.content.onboarding.entrance:null,
       inventory: this.inventory.getSnapshot(),
       backpackLevel: 1 + JOURNEY_BACKPACKS.filter(tier => tier.capacity <= bag.capacity).length,
       maxDepth: this.exploration.maxDepth,
@@ -324,7 +324,7 @@ export class GameSession {
       miningStats: this.miningAttributes.getSnapshot(),
       depth: this.depth,
       location: this.guideLocation,
-      destinations: this.content.destinations.filter(r=>(r.worldId??1)===this.currentWorld).map((r) => ({
+      destinations: this.content.destinations.filter(r=>r.worldId===this.currentWorld).map((r) => ({
         id: r.id,
         name: r.name,
         depth: r.depth,
@@ -451,7 +451,7 @@ export class GameSession {
   }
   private capsuleCoinReward() {
     // The deepest layer reached in the current world sets the prize (other worlds' layers share the same depths).
-    const stage=this.content.destinations.filter(d=>(d.worldId??1)===this.currentWorld&&this.exploration.maxDepth>=d.depth).length;
+    const stage=this.content.destinations.filter(d=>d.worldId===this.currentWorld&&this.exploration.maxDepth>=d.depth).length;
     return stageCoinReward(STAGES[Math.min(stage,STAGES.length-1)].basePrice);
   }
   private finishReward(result: RewardClaimResult) {
@@ -595,11 +595,10 @@ export class GameSession {
     const location=feet[1]>=-.1||feet[1]>=-1.2&&this.onSunkenSurface(feet)?'surface':enteredRooms?.length?'room':'mine';
     const roomId=location==='room'?enteredRooms![0]:null;
     if(roomId!==this.guideRoomId){this.guideRoomId=roomId;changed=true;}
-    const entrance=this.content.onboarding?.entrance;
-    const area=this.content.onboarding?.mineArea;
-    const atMine=!!area&&feet[0]>=area.minX-2&&feet[0]<=area.maxX+2&&feet[2]>=area.minZ-2&&feet[2]<=area.maxZ+4;
+    const {entrance,mineArea:area}=this.content.onboarding;
+    const atMine=feet[0]>=area.minX-2&&feet[0]<=area.maxX+2&&feet[2]>=area.minZ-2&&feet[2]<=area.maxZ+4;
     if(atMine!==this.atMine){this.atMine=atMine;changed=true;}
-    const near=!!entrance&&Math.hypot(feet[0]-entrance[0],feet[2]-entrance[2])<14;
+    const near=Math.hypot(feet[0]-entrance[0],feet[2]-entrance[2])<14;
     if(location!==this.guideLocation||near!==this.nearMine){this.guideLocation=location;this.nearMine=near;changed=true;}
     const added = this.exploration.visit(this.worldProgress.mineOpen(this.currentWorld)?sampledDepth:0);
     if (this.exploration.maxDepth !== oldMaximum || added.length) { changed=true; this.committed(added.length > 0); }
@@ -674,7 +673,7 @@ export class GameSession {
     if (this.suspended) return "unavailable" as const;
     const room = this.content.destinations.find((r) => r.id === id);
     if (!room || !this.exploration.has(id)) return "locked" as const;
-    if((room.worldId??1)!==this.currentWorld||!this.worldProgress.mineOpen(this.currentWorld))return 'locked' as const;
+    if(room.worldId!==this.currentWorld||!this.worldProgress.mineOpen(this.currentWorld))return 'locked' as const;
     if (!this.world?.travelTo) return "unavailable" as const;
     return this.beginTravel(room);
   };
@@ -700,7 +699,7 @@ export class GameSession {
   /** In a sunken stretch of the surface (the creek), where the voxel floor sits no higher than -2 m. */
   private onSunkenSurface(feet: readonly number[]) {
     const cells = this.content.sunkenSurface;
-    if (!cells?.length) return false;
+    if (!cells.length) return false;
     if (!this.sunken) { const keys = new Set<string>(); for (let i = 0; i + 1 < cells.length; i += 2) keys.add(cells[i] + ',' + cells[i + 1]); this.sunken = keys; }
     return this.sunken.has(Math.floor(feet[0] / CELL) + ',' + Math.floor(feet[2] / CELL));
   }
@@ -714,7 +713,7 @@ export class GameSession {
     if (target === 'sale') { const zone = this.content.sales.find(near); return zone ? facingBuilding(zone) : null; }
     if (target === 'capsule') return this.currentWorld === 1 ? facingBuilding(CAPSULE_MACHINE_ZONE) : null;
     if (!this.petService.isUnlocked(target.egg)) return null;
-    const station = this.content.eggStations?.find(s => s.eggId === target.egg);
+    const station = this.content.eggStations.find(s => s.eggId === target.egg);
     return station ? { feet: [station.zone.x, station.zone.y + .1, station.zone.z], look: station.promptAnchor as Coord } : null;
   }
   /** Instant trip to a surface service, the way Roblox simulators offer Sell / Shop buttons. */
@@ -740,7 +739,7 @@ export class GameSession {
   /** The test unlock page: every world and layer with its state. */
   devUnlocks = () => {
     return WORLD_REQUIREMENTS.map(w=>({id:w.id,name:w.name,open:this.worldProgress.mineOpen(w.id),
-      layers:this.content.destinations.filter(d=>(d.worldId??1)===w.id).map(d=>({id:d.id,name:d.name,depth:d.depth,unlocked:!!this.explorations.get(w.id)?.has(d.id)}))}));
+      layers:this.content.destinations.filter(d=>d.worldId===w.id).map(d=>({id:d.id,name:d.name,depth:d.depth,unlocked:!!this.explorations.get(w.id)?.has(d.id)}))}));
   };
   /** Test shortcut: opens a world (and the ones before it) as if its requirements were paid. */
   devUnlockWorld = (id: WorldId) => {
@@ -750,7 +749,7 @@ export class GameSession {
   devUnlockLayer = (id?: string) => {
     const rooms=this.content.destinations.filter(d=>id===undefined||d.id===id);
     for(const room of rooms){
-      const world=(room.worldId??1) as WorldId;
+      const world=room.worldId;
       this.worldProgress.openThrough(world);
       this.explorations.get(world)?.grant(room.id);
     }

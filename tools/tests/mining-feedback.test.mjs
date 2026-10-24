@@ -6,11 +6,11 @@ import { GameSession } from '../../src/game/application/GameSession.ts';
 import { resourceByKind } from '../../src/game/content/resources.ts';
 import { JOURNEY_BACKPACKS } from '../../src/game/content/journeyResources.ts';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
+import { WORLD1_LAYERS as LAYERS } from './fixtures/world.mjs';
+
+import { Color } from 'three';
 const SESSION_CONTENT = GAME_CONTENT.session, SELL_ZONE = SESSION_CONTENT.sales[0];
 
-import { WORLD1_LAYERS as LAYERS } from './fixtures/world.mjs';
-import { itemPrice } from '../../src/game/application/items.ts';
-import { Color } from 'three';
 
 function harness(solid = () => 1) {
   const listeners = { feedback: new Set(), ore: new Set() }, cues = [];

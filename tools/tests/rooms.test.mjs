@@ -1,11 +1,6 @@
-import { generationAtZ as worldAtZ } from '../../src/game/terrain/SparseWorld.ts';
-import { GENERATION as GAME_GENERATION_FIXTURE } from './fixtures/world.mjs';
-const WORLD1 = worldAtZ(GAME_GENERATION_FIXTURE, 0);
+import { WORLD1 } from './fixtures/world.mjs';
 import {resourceByKind} from '../../src/game/content/resources.ts';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
-const SESSION_CONTENT = GAME_CONTENT.session, HOME_ZONE = SESSION_CONTENT.homes[0].zone, SURFACE_SHOP = SESSION_CONTENT.shops[0].zone;
-// Terrain checks use the layer templates on their own; the session uses the game's world 1 rooms.
-const TEMPLATE_ROOMS = roomsFor(LAYERS), ROOMS = GAME_CONTENT.rooms;
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { Exploration } from '../../src/game/logic/Exploration.ts';
@@ -14,6 +9,9 @@ import { WORLD1_LAYERS as LAYERS } from './fixtures/world.mjs';
 import { SparseWorld, CELL, baseXYZ } from '../../src/game/terrain/SparseWorld.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
 import { buildRegion } from '../../src/game/terrain/meshing.ts';
+const SESSION_CONTENT = GAME_CONTENT.session, HOME_ZONE = SESSION_CONTENT.homes[0].zone, SURFACE_SHOP = SESSION_CONTENT.shops[0].zone;
+// Terrain checks use the layer templates on their own; the session uses the game's world 1 rooms.
+const TEMPLATE_ROOMS = roomsFor(LAYERS), ROOMS = GAME_CONTENT.rooms;
 
 test('rooms are local 20 by 20 by 10 cavities with solid perimeter, ceiling and an aligned mineable entrance', () => {
  for (const r of TEMPLATE_ROOMS) {

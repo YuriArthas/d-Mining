@@ -1,18 +1,15 @@
-import {PET_CONTENT} from './fixtures/pets.ts';
+import { PET_CONTENT } from './fixtures/pets.ts';
 import test from "node:test";
 import assert from "node:assert/strict";
 import { GameSession } from "../../src/game/application/GameSession.ts";
-import { PetCommands } from "../../src/game/application/PetCommands.ts";
+
 import { GAME_CONTENT } from "../../src/game/content/gameContent.ts";
-import { SparseWorld, generationAtZ } from "../../src/game/terrain/SparseWorld.ts";
-import { GENERATION } from "./fixtures/world.mjs";
-const WORLD1 = generationAtZ(GENERATION, 0);
+import { SparseWorld } from "../../src/game/terrain/SparseWorld.ts";
+
+import { WORLD1 } from './fixtures/world.mjs';
 import { readRegion } from "../../src/game/terrain/WorldSaveCodec.ts";
 import { SaveCoordinator } from "../../src/game/persistence/SaveCoordinator.ts";
-import {
-  readHead,
-  SaveConflict,
-} from "../../src/game/persistence/saveTypes.ts";
+import { readHead, SaveConflict } from "../../src/game/persistence/saveTypes.ts";
 import { compatibleHead } from "../../src/game/persistence/saveMigrations.ts";
 import { saveNamespace } from "../../src/game/persistence/SaveBootstrap.ts";
 const SESSION_CONTENT = {...GAME_CONTENT.session, initialCoins:200, petContent:PET_CONTENT};

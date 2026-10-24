@@ -1,4 +1,4 @@
-import {Color,Group,Mesh,MeshBasicMaterial,Vector3,type Camera} from 'three';
+import {Color,Group,Mesh,MeshBasicMaterial} from 'three';
 import {mergeGroups} from 'three/addons/utils/BufferGeometryUtils.js';
 import {TextGeometry} from 'three/addons/geometries/TextGeometry.js';
 import {FontLoader} from 'three/addons/loaders/FontLoader.js';
@@ -29,15 +29,3 @@ export function createWorldText(sign:Sign,detail:{bevel?:boolean}={}){
  return group;
 }
 
-/** Keeps a standing label readable from both sides: it turns around while the camera is behind it
- *  (extruded text would otherwise read mirrored). */
-export function readableFromBothSides(label:Group){
- const yaw=label.rotation.y,forward=new Vector3(Math.sin(yaw),0,Math.cos(yaw)),at=new Vector3(),eye=new Vector3();let behind=false;
- const face=(_renderer:unknown,_scene:unknown,camera:Camera)=>{
-  label.getWorldPosition(at);camera.getWorldPosition(eye);
-  const next=forward.dot(eye.sub(at))<0;if(next===behind)return;
-  behind=next;label.rotation.y=yaw+(behind?Math.PI:0);label.updateMatrixWorld(true);
- };
- label.traverse(o=>{if(o instanceof Mesh)o.onBeforeRender=face;});
- return label;
-}

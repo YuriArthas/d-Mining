@@ -31,7 +31,6 @@ export type ValidationDebug = {
   performance: (options: {
     framesInFlight?: 1 | 2;
     submission?: "browser" | "fenced";
-    reflection?: "live" | "frozen" | "off";
   }) => void;
   surfaceHeight: (x: number, z: number) => number | null;
   /** Try other surface light values and exposure live; null restores the game's. */
@@ -142,10 +141,6 @@ export function attachGameDebug(
         cameraFar: (activeCamera as PerspectiveCamera).far,
         surfaceFog: !!scene.fog,
         lightingUpdates: environment?.updates ?? 0,
-        shadowAutoUpdate: gl.shadowMap.autoUpdate,
-        shadowMapSize: 0,
-        shadowFilter: "none",
-        surfaceReflections: scene.environment !== null,
       },
       cracks: interaction.cracks.diagnostics(),
       economy: session.getSnapshot(),
@@ -205,9 +200,6 @@ export function attachGameDebug(
         renderState().submission?.setMode(options.submission);
       if (options.framesInFlight)
         renderState().submission?.setMaxInFlight(options.framesInFlight);
-      const profiler = renderState().profiler;
-      if (options.reflection && profiler)
-        profiler.reflectionMode = options.reflection;
     },
     surfaceHeight: (x, z) => facilities.surfaceHeight(x, z),
     lightingLook: look => {

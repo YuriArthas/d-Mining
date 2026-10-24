@@ -1,9 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { generationAtZ } from '../../src/game/terrain/SparseWorld.ts';
-import { GENERATION, KIND } from './fixtures/world.mjs';
-// World 1's terrain on its own (the game's generation picks it by Z).
-const WORLD1 = generationAtZ(GENERATION, 0);
+
+import { KIND } from './fixtures/world.mjs';
+import { WORLD1 } from './fixtures/world.mjs';
 import { greedyMesh, buildRegion } from '../../src/game/terrain/meshing.ts';
 import { CELL, RENDER_SIZE as CHUNK, regionOf, SparseWorld, sampleXYZ, affectedRegions, LIMITS, mergeRemoved, contains } from '../../src/game/terrain/SparseWorld.ts';
 

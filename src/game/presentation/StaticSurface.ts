@@ -5,10 +5,10 @@ import { liftAlbedo, liftFoliage } from "./albedoLift.ts";
 import { applyCreekWater } from "./creekWater.ts";
 import { applyBakedLight, setBakedGround, setBakedSun } from "./bakedLight.ts";
 import { loadStandingLight, setStandingLight } from "./standingLight.ts";
-import standingLightUrl from "../assets/camp/pinewind-standing-light.png?url";
+import standingLightUrl from "../assets/scene/pinewind-standing-light.png?url";
 import { loadModelAssets, type ModelRequest } from "./ModelAssetLoader.ts";
-const urls = import.meta.glob("../assets/camp/*.part", { eager: true, query: "?url", import: "default" }) as Record<string, string>;
-const manifests = import.meta.glob("../assets/camp/*.manifest.json", { eager: true, import: "default" }) as Record<string, ModelRequest["manifest"]>;
+const urls = import.meta.glob("../assets/scene/*.part", { eager: true, query: "?url", import: "default" }) as Record<string, string>;
+const manifests = import.meta.glob("../assets/scene/*.manifest.json", { eager: true, import: "default" }) as Record<string, ModelRequest["manifest"]>;
 
 /** Loads world 1's authored surface (and the halls that ship with it) with its baked light. */
 export async function loadStaticSurface(
@@ -22,10 +22,10 @@ export async function loadStaticSurface(
   const standing=loadStandingLight(standingLightUrl,light.ground,light.standing.heightStep,signal);
   standing.catch(()=>{});
   const requests:ModelRequest[]=[...new Set(content.authored.instances.map(p=>p.asset))].map(name=>{
-    const manifest=manifests[`../assets/camp/${name}.manifest.json`];
+    const manifest=manifests[`../assets/scene/${name}.manifest.json`];
     if(!manifest)throw Error(`缺少模型清单 ${name}`);
     return {name,manifest,coordinateSpace:'authored',parts:manifest.parts.map(part=>{
-      const url=urls[`../assets/camp/${part}`];if(!url)throw Error(`缺少模型资源 ${part}`);return url;
+      const url=urls[`../assets/scene/${part}`];if(!url)throw Error(`缺少模型资源 ${part}`);return url;
     }),bytes:manifest.bytes,decodedBytes:manifest.decodedBytes,instances:content.authored.instances.filter(p=>p.asset===name).length};
   });
   const assets=await loadModelAssets(renderer,requests,signal,(m,request)=>{

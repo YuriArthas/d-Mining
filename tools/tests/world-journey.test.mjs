@@ -6,7 +6,7 @@ import { GAME_CONTENT, GAME_GENERATION } from '../../src/game/content/gameConten
 import { JOURNEY_WORLDS } from '../../src/game/content/journeyWorlds.ts';
 import { WORLD_REQUIREMENTS, worldRequirement, worldSpawn, worldGateZ, worldAtFeet } from '../../src/game/content/worldJourney.ts';
 import { JOURNEY_CAPACITIES, JOURNEY_TOOL_PRICES, JOURNEY_BACKPACKS } from '../../src/game/content/journeyResources.ts';
-import { resourceById, resourceByKind } from '../../src/game/content/resources.ts';
+import { resourceById } from '../../src/game/content/resources.ts';
 import { SparseWorld, generationAtZ } from '../../src/game/terrain/SparseWorld.ts';
 import { compatibleHead } from '../../src/game/persistence/saveMigrations.ts';
 import { saveNamespace } from '../../src/game/persistence/SaveBootstrap.ts';
@@ -160,7 +160,7 @@ test('the new map uses an explicit separate test save; legacy terrain is never s
 });
 test('the testing unlock page opens worlds and layers, and the result survives a reload', () => {
   const s=new GameSession(content);
-  const deep=content.destinations.filter(d=>(d.worldId??1)===3).at(-1);
+  const deep=content.destinations.filter(d=>d.worldId===3).at(-1);
   s.devUnlockLayer(deep.id);
   const after=s.devUnlocks();
   assert.deepEqual(after.map(w=>w.open),[true,true,true]);

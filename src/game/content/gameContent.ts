@@ -20,7 +20,7 @@ export type SurfaceContent = Readonly<{
   shaft: Readonly<{ minX: number; maxX: number; minZ: number; maxZ: number }>;
 }>;
 /** An egg stand on the surface; eggs face the walkway along `yaw`. */
-export type HubEgg = Readonly<{ id: string; eggId: string; tier: number; x: number; y: number; z: number; yaw: number; asset: string; color: string }>;
+export type HubEgg = Readonly<{ id: string; eggId: string; tier: number; x: number; y: number; z: number; yaw: number; color: string }>;
 
 const zone = (x: number, z: number, radius = 3): ServiceZone => ({ x, y: 0, z, radius, heightTolerance: .3, hysteresis: .3 });
 // Eggs of the later worlds wait for those worlds' rooms; prices follow each egg's stage in the journey economy.

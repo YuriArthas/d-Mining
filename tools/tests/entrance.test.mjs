@@ -1,20 +1,20 @@
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
-const SESSION_CONTENT = GAME_CONTENT.session;
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { SparseWorld, regionOf, sampleXYZ, generationAtZ } from '../../src/game/terrain/SparseWorld.ts';
-import { GENERATION, WORLD1_LAYERS } from './fixtures/world.mjs';
-const WORLD1 = generationAtZ(GENERATION, 0);
-import {initialExcavationDepth} from '../../src/game/world/SurfaceExcavation.ts';
+import { SparseWorld, regionOf, sampleXYZ } from '../../src/game/terrain/SparseWorld.ts';
+import { WORLD1_LAYERS } from './fixtures/world.mjs';
+import { WORLD1 } from './fixtures/world.mjs';
+import { initialExcavationDepth } from '../../src/game/world/SurfaceExcavation.ts';
 import { roomsFor } from '../../src/game/world/rooms.ts';
-const ROOMS = roomsFor(WORLD1_LAYERS);
 import { inEntrance, PROTECTED_FLOOR } from '../../src/game/world/entrance.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
 import { TerrainStream } from '../../src/game/validation/TerrainStream.ts';
 import { CharacterPhysics, initPhysics, PLAYER, STEP } from '../../src/game/validation/physics.ts';
 import { buildRegion } from '../../src/game/terrain/meshing.ts';
+const SESSION_CONTENT = GAME_CONTENT.session;
+const ROOMS = roomsFor(WORLD1_LAYERS);
 
-test('surface excavation and every camp floor retain the same 64 mineable columns',()=>{
+test('surface excavation and every rest-room floor retain the same 64 mineable columns',()=>{
  const w=new SparseWorld(WORLD1);let baseline;
  for(const y of [-1,...ROOMS.map(r=>-r.depth/2-1)]){
   const cells=[];const extent=y===-1?[-48,51]:[-10,9];

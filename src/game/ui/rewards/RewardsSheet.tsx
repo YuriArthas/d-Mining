@@ -11,7 +11,6 @@ import './rewards.css';
 import { claimableRewards, readyOnlineRewards, rewardsTabFor, signin, type RewardsTab } from './rewardState.ts';
 export { claimableRewards, rewardsTabFor, type RewardsTab };
 type Claim = RewardClaimResult | { status: 'clipboard-failed' | 'unavailable' };
-type Snapshot = ReturnType<GameSession['getSnapshot']>;
 const clock = (seconds: number) => { const s = Math.max(0, Math.ceil(seconds)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
 
 function claimText(result: Claim, done: string) {

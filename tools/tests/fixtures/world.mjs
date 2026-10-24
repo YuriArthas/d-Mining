@@ -3,9 +3,12 @@
 import { GAME_GENERATION } from '../../../src/game/content/gameContent.ts';
 import { JOURNEY_WORLDS } from '../../../src/game/content/journeyWorlds.ts';
 import { RAPIER } from '../../../src/game/validation/physics.ts';
+import { generationAtZ } from '../../../src/game/terrain/SparseWorld.ts';
 
 export const GENERATION = GAME_GENERATION;
 export const WORLD1_LAYERS = JOURNEY_WORLDS[0].layers;
+/** World 1's terrain on its own (the game's generation picks it by Z). */
+export const WORLD1 = generationAtZ(GAME_GENERATION, 0);
 /** World 1's blocks: the surface rock (soft), its two ores, and a later layer's rock. */
 export const KIND = { rock: 64, deep: 65, coal: 66, copper: 67, deeperRock: 68 };
 

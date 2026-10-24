@@ -2,9 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { GameSession } from '../../src/game/application/GameSession.ts';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
-const SESSION_CONTENT = GAME_CONTENT.session;
 import { TIP_GAP, TIP_SECONDS, selectDepthGoal } from '../../src/game/application/Tips.ts';
 import { Onboarding, TIP_IDS } from '../../src/game/logic/Onboarding.ts';
+const SESSION_CONTENT = GAME_CONTENT.session;
 
 // One-time tips: a handful of hints, each shown once, never a task chain.
 let now = 0;

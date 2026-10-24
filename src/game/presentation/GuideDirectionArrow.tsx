@@ -22,7 +22,7 @@ export function updateGuideRoute(group: Group, feet: readonly number[], target: 
   const dx=target[0]-feet[0],dz=target[2]-feet[2],distance=Math.hypot(dx,dz);
   if(distance<.001){group.visible=false;return;}
   const start=Math.min(1.25,distance*.25),length=Math.max(.1,distance-start);
-  // Hover above road edging so crossing a curb cannot slice the continuous arrow.
+  // Hover above path edging and steps so they cannot slice the continuous arrow.
   group.position.set(feet[0]+dx/distance*start,feet[1]+.4,feet[2]+dz/distance*start);
   group.rotation.y=Math.atan2(dx,dz);
   const mesh=group.children[0] as Mesh<BufferGeometry,MeshBasicMaterial>;

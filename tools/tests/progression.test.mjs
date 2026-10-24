@@ -4,13 +4,13 @@ import { STAGES, EGG_STAGES } from '../../src/game/content/progression.ts';
 import { RESOURCES, resourceByKind } from '../../src/game/content/resources.ts';
 import { PET_CONTENT } from '../../src/game/content/pets.ts';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
-const SESSION_CONTENT = GAME_CONTENT.session;
 import { GameSession } from '../../src/game/application/GameSession.ts';
 import { SparseWorld, generationAtZ } from '../../src/game/terrain/SparseWorld.ts';
 import { generatedMineral, DEEP_ROCK_AT } from '../../src/game/terrain/strata.ts';
 import { saveNamespace } from '../../src/game/persistence/SaveBootstrap.ts';
 import { WORLD1_LAYERS as LAYERS, GENERATION } from './fixtures/world.mjs';
 import { formatNumber } from '../../src/game/presentation/formatNumber.ts';
+const SESSION_CONTENT = GAME_CONTENT.session;
 function goToEgg(session,eggId) {
  const station=SESSION_CONTENT.eggStations.find(station=>station.eggId===eggId);
  session.updatePosition([station.zone.x,station.zone.y,station.zone.z],true);

@@ -2,7 +2,7 @@ import {resourceByKind} from '../../src/game/content/resources.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {deriveFacility} from '../../src/game/world/deriveFacility.ts';
-import {SURFACE_FACILITIES} from '../../src/game/content/surfaceFacilities.ts';
+import {PINEWIND_FACILITIES} from '../../src/game/content/pinewind/hubLayout.ts';
 import {GAME_CONTENT} from '../../src/game/content/gameContent.ts';
 import {roomsFor} from '../../src/game/world/rooms.ts';
 import { WORLD1_LAYERS as LAYERS } from './fixtures/world.mjs';
@@ -11,8 +11,8 @@ import {SparseWorld,generationAtZ} from '../../src/game/terrain/SparseWorld.ts';
 import {GENERATION} from './fixtures/world.mjs';
 import {roomPlan} from '../../src/game/world/scenery.ts';
 
-test('one translated and rotated facility descriptor aligns model, collider, label and business trigger',()=>{
- const moved=deriveFacility({...SURFACE_FACILITIES.sale,anchor:{x:20,z:30,yaw:Math.PI/2}});
+test('one translated and rotated facility descriptor aligns placement, collider, label and business trigger',()=>{
+ const moved=deriveFacility({...PINEWIND_FACILITIES.sale,anchor:{x:20,z:30,yaw:Math.PI/2}});
  assert.equal(moved.placement.x,20);assert.equal(moved.placement.yaw,Math.PI/2);
  assert.deepEqual(moved.solid.at,[20,3,30]);assert.equal(moved.solid.yaw,Math.PI/2);
  assert.equal(moved.trigger.x,26.7);assert.equal(moved.trigger.z,30);
@@ -22,8 +22,6 @@ test('one translated and rotated facility descriptor aligns model, collider, lab
  assert.equal(session.getSnapshot().inventory.used,0);assert.equal(session.getSnapshot().coins,resourceByKind(71).price);
  session.collected([{kind:71}]);session.updatePosition([26.7,0,30],true);
  assert.equal(session.getSnapshot().coins,resourceByKind(71).price); // no second entry
- const swapped=deriveFacility({...SURFACE_FACILITIES.sale,model:{...SURFACE_FACILITIES.sale.model,asset:'simulator-upgrade'}});
- assert.deepEqual(swapped.trigger,deriveFacility(SURFACE_FACILITIES.sale).trigger);
 });
 // A kit room (the crystal cave) follows changed dimensions; authored halls keep their own fixed size.
 test('changed depth, theme and room dimensions agree across physics generation, view and destination',()=>{

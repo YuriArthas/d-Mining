@@ -36,7 +36,7 @@
 ## 资产记录（第二层）
 
 - 道具：Blender 自制，脚本 `surface-game-art/tools/blender/build_fungal.py`，源文件 `surface-game-art/source-art/fungal.blend`，贴图 `fungal-atlas.png` 256×128。10 件（青/紫巨菇、小菇丛、出售站、升级站、灯柱、名牌架、水晶簇、坑角柱、池边石），共 3214 三角形。glb `ada4c273…231f7`，atlas `0ab66b0e…5a3d`。无 Tripo，无 Decimate。
-- 洞厅：离线 three 程序生成（`surface-game-art/tools/underground/fungalHall.ts`），布局数据 `src/game/content/underground/fungalHall.ts`，构建 `node tools/build-underground.mjs`。30931 三角形、15 个批次、93 个碰撞体，顶点烘焙遮蔽（半径 4.5 米，32 样本）。运行时打包 `src/game/assets/camp/fungal-hall.*`，压缩后 382 KB。glb `03091fcf…1b8217`。
+- 洞厅：离线 three 程序生成（`surface-game-art/tools/underground/fungalHall.ts`），布局数据 `src/game/content/underground/fungalHall.ts`，构建 `node tools/build-underground.mjs`。30931 三角形、15 个批次、93 个碰撞体，顶点烘焙遮蔽（半径 4.5 米，32 样本）。运行时打包 `src/game/assets/scene/fungal-hall.*`，压缩后 382 KB。glb `03091fcf…1b8217`。
 
 ## 经验（后面各层照这个做）
 

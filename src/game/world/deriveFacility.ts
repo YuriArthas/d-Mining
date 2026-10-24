@@ -1,5 +1,15 @@
-import type { SurfaceFacility } from "../content/surfaceFacilities.ts";
 import type { Sign, Solid, Shape } from "./sceneryKit.ts";
+/** A surface service building: where it stands (`anchor`), and in its own frame the ring players step into,
+ *  its collider and its floating word. */
+export type SurfaceFacility = Readonly<{
+  id: string;
+  type: "sell" | "shop";
+  anchor: Readonly<{ x: number; z: number; yaw: number }>;
+  trigger: Readonly<{ x: number; z: number; radius: number; heightTolerance: number; hysteresis: number }>;
+  collider: Readonly<{ x: number; y: number; z: number; half: readonly [number, number, number]; yaw: number }>;
+  sign: Readonly<{ title: string; color: string; background: string; width: number; y: number }>;
+  ringColor: string;
+}>;
 export function deriveFacility(config: SurfaceFacility) {
   const { anchor: a, trigger: t, collider: c, sign: s } = config;
   if (
@@ -24,7 +34,7 @@ export function deriveFacility(config: SurfaceFacility) {
     id: config.id,
     type: config.type,
     trigger,
-    placement: { ...config.model, ...a },
+    placement: { ...a },
     solid: {
       at: [collider.x, c.y, collider.z],
       half: [...c.half],

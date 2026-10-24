@@ -10,7 +10,6 @@ const FLOOR_REACH = 0.8;
 let grid: StandingLightGrid | null = null;
 
 export function setStandingLight(value: StandingLightGrid | null) { grid = value; }
-export function standingLightLoaded() { return grid !== null; }
 
 /** Sun visibility (0–1) for a character standing at (x, y, z). */
 export function standingSun(x: number, y: number, z: number) {

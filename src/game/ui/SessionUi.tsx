@@ -100,7 +100,7 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
     {modal?.kind === 'rewards' && <RewardsSheet session={session} tab={modal.tab} onTab={tab => setModal({ kind: 'rewards', tab })} onClose={close} />}
     {modal?.kind === 'egg' && state.eggId && <EggSheet key={state.eggStation!.id} session={session} eggId={state.eggId} onOpenPets={() => open({ kind: 'bag', tab: 'pets' })} onClose={close} />}
     {modal?.kind === 'capsule' && <CapsuleSheet session={session} onClose={close} />}
-    {modal?.kind === 'help' && <HelpSheet session={session} onClose={close} />}
+    {modal?.kind === 'help' && <HelpSheet onClose={close} />}
     {shopOpen && shop.mode !== 'closed' && <ShopPanel session={session} view={shopView} onClose={closeShop} />}
     {!blocked && <button className="dev-unlock-button" onClick={() => { input.reset(); setDevUnlock(v => !v); }}>解锁</button>}
     {devUnlock && <DevUnlockPage session={session} onClose={() => { setDevUnlock(false); surface.current?.focus(); }} />}

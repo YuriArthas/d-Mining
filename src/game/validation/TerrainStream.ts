@@ -1,5 +1,5 @@
 import { type CharacterPhysics } from './physics.ts';
-import { SparseWorld, type WorldGeneration, CELL, RENDER_SIZE, COLLISION_SIZE, regionOf, chunkKey, validRegion, inBounds, type Coord } from '../terrain/SparseWorld.ts';
+import { SparseWorld, type WorldGeneration, CELL, COLLISION_SIZE, chunkKey, validRegion, inBounds, type Coord } from '../terrain/SparseWorld.ts';
 import { RenderTerrain, CollisionTerrain } from '../terrain/TerrainLayers.ts';
 import { Measurements, type WorkerFactory } from '../terrain/RegionPipeline.ts';
 export type ExcavatedCell = Readonly<{ cell: Coord; kind: number }>;
@@ -70,7 +70,7 @@ export class TerrainStream {
   ready(feet: readonly number[]) {
     // Covers the 10.5 m camera boom, capsule sweep and downward lookahead.
     const side = COLLISION_SIZE * CELL;
-    const min = feet.map((v, i) => Math.floor((v - 12) / side));
+    const min = feet.map(v => Math.floor((v - 12) / side));
     const max = feet.map(v => Math.floor((v + 12) / side));
     for (let z = min[2]; z <= max[2]; z++) for (let y = min[1]; y <= max[1]; y++) for (let x = min[0]; x <= max[0]; x++) {
       const c: Coord = [x, y, z]; if (validRegion(c, COLLISION_SIZE,this.world.generation) && !this.collision.pipeline.has(c)) return false;

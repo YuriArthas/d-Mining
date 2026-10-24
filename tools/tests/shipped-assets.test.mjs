@@ -4,7 +4,7 @@ import {readFileSync,readdirSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {GAME_CONTENT} from '../../src/game/content/gameContent.ts';
 
-const directory=new URL('../../src/game/assets/camp/',import.meta.url);
+const directory=new URL('../../src/game/assets/scene/',import.meta.url);
 test('every shipped scene model is one the game places, transported in exact parts',()=>{
  const files=readdirSync(directory).filter(name=>name.endsWith('.manifest.json'));
  const placed=new Set(GAME_CONTENT.surface.authored.instances.map(p=>p.asset));

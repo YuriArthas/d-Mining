@@ -30,11 +30,6 @@ import type { SurfaceTime } from "../world/SceneLighting.ts";
 import type { GameInput } from "../GameInput.ts";
 import type { GameSession } from "../application/GameSession.ts";
 import { ContactShadow } from "../presentation/ContactShadow.tsx";
-import {
-  compileStableShadow,
-  SHADOW_FILTER_ID,
-} from "../presentation/stableShadow.ts";
-import { GAME_CONFIG } from "../config.ts";
 
 export function ValidationScene({
   content,
@@ -176,13 +171,6 @@ export function ValidationScene({
       new URLSearchParams(location.search).get("gpuTiming") === "1",
     );
     profiler.current = profile;
-    profile.scissorEnabled =
-      new URLSearchParams(location.search).get("reflectionScissor") !== "0";
-    const reflectionMode = new URLSearchParams(location.search).get(
-      "reflection",
-    );
-    if (reflectionMode === "live" || reflectionMode === "frozen")
-      profile.reflectionMode = reflectionMode;
     return () => {
       basic.dispose();
       unlit.current = null;

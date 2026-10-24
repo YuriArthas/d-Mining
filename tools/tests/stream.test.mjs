@@ -1,7 +1,6 @@
-import { installCourse, GENERATION } from './fixtures/world.mjs';
+import { installCourse } from './fixtures/world.mjs';
 import { resourceByKind } from '../../src/game/content/resources.ts';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
-const SESSION_CONTENT = GAME_CONTENT.session;
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { TerrainStream } from '../../src/game/validation/TerrainStream.ts';
@@ -10,8 +9,9 @@ import { buildRegion } from '../../src/game/terrain/meshing.ts';
 import { Inventory } from '../../src/game/logic/Inventory.ts';
 import { Mining } from '../../src/game/application/Mining.ts';
 import { oreDrops } from '../../src/game/application/items.ts';
-import { SparseWorld, chunkKey, regionOf, generationAtZ } from '../../src/game/terrain/SparseWorld.ts';
-const WORLD1 = generationAtZ(GENERATION, 0);
+import { SparseWorld, chunkKey, regionOf } from '../../src/game/terrain/SparseWorld.ts';
+import { WORLD1 } from './fixtures/world.mjs';
+const SESSION_CONTENT = GAME_CONTENT.session;
 await initPhysics();
 class WorkerProbe {
  requests=[];onmessage=null;onerror=null;onmessageerror=null;terminated=false;

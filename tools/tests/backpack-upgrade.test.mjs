@@ -1,12 +1,12 @@
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
-const SESSION_CONTENT = GAME_CONTENT.session, SELL_ZONE = SESSION_CONTENT.sales[0];
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { Inventory } from '../../src/game/logic/Inventory.ts';
-import { Wallet } from '../../src/game/logic/Wallet.ts';
+
 import { JOURNEY_BACKPACKS } from '../../src/game/content/journeyResources.ts';
 import { resourceByKind } from '../../src/game/content/resources.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
+const SESSION_CONTENT = GAME_CONTENT.session, SELL_ZONE = SESSION_CONTENT.sales[0];
 
 const seed=(bag,count)=>bag.add([{itemId:'ore',count}]);
 test('capacity API is independent of upgrades: increasing/decreasing preserves contents and unrestricted add',()=>{

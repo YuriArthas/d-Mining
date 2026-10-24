@@ -35,7 +35,7 @@ export const PINEWIND_TERRACE_SOLIDS:readonly Solid[]=[
  *  rest halls built with the same pipeline, which load with it in their rooms below. */
 export function pinewindSurface(rooms:readonly RestRoom[],eggs:readonly HubEgg[]):SurfaceContent {
  const services=[PINEWIND_SERVICES.sale,PINEWIND_SERVICES.shop,PINEWIND_SERVICES.bags];
- const models=roots.filter(r=>!r.node.startsWith('Portal_')&&!r.node.startsWith('Egg_')).map(r=>instance(r.node));
+ const models=roots.filter(r=>!r.node.startsWith('Egg_')).map(r=>instance(r.node));
  {const p=models.find(r=>r.node==='Teleport_Station');if(!p)throw Error('Missing authored surface node Teleport_Station');p.at=[PINEWIND_STATION.x,0,PINEWIND_STATION.z];p.rotation=rotation(PINEWIND_STATION.yaw);}
  for(const [node,service] of [['Merchant_Store',PINEWIND_SERVICES.sale],['Copper_Forge',PINEWIND_SERVICES.shop],['Pack_Shop',PINEWIND_SERVICES.bags]] as const){
   const p=models.find(r=>r.node===node)!;p.at=[service.placement.x,0,service.placement.z];p.rotation=rotation(service.placement.yaw);

@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { GameAudio } from '../../src/game/audio/GameAudio.ts';
 import { CUE_LENGTH, makeNoise, playCue } from '../../src/game/audio/sfx.ts';
-
 import { FakeContext, seeded, settings as store, withAudioContext } from './fixtures/fakeAudio.mjs';
+
 
 test('声音只在首次手势后开始：之前不建上下文、不出声；关掉后记住选择', () => withAudioContext(() => {
   const settings = store(), audio = new GameAudio(settings);

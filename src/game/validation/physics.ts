@@ -56,7 +56,7 @@ export class CharacterPhysics {
     // skin threshold produces unstable zero-distance normals in Rapier 0.19.3.
     const lift = MOVEMENT.probeLift;
     let rejected: Set<number> | undefined;
-    // A nearby curb can overlap the lifted capsule and be the first hit even
+    // A nearby low ledge (a step, a plinth edge) can overlap the lifted capsule and be the first hit even
     // though its contact plane cannot support these feet. Continue the same
     // short sweep for real ground; never turn a rejected contact into support.
     // Each retry excludes one collider, so queries are bounded by the live set.
@@ -82,7 +82,7 @@ export class CharacterPhysics {
     return null;
   }
   /** Whether lowering the capsule by `drop` would sink it deeper than its skin into one of the `skipped`
-   *  colliders it does not already overlap (a curb the capsule stands against keeps overlapping it). The
+   *  colliders it does not already overlap (a ledge the capsule stands against keeps overlapping it). The
    *  sweep reached the ground past only those, so no other collider lies in the way. */
   private buries(position: RAPIER.Vector, drop: number, skipped: ReadonlySet<number>) {
     const { radius, height } = GAME_CONFIG.player, still = { x: 0, y: 0, z: 0, w: 1 };

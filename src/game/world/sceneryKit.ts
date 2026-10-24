@@ -1,10 +1,10 @@
 import type { Theme } from '../content/themes.ts';
 import type { AuthoredRoom } from '../content/rooms/authoredRoom.ts';
 export type V3 = [number,number,number];
-export type Shape = { type:'box'|'cone'|'rock'|'cylinder'|'ring'|'foliage'|'cap'|'torus'|'crystal'|'gable'|'crown'|'cutRock'|'horizon'|'terrainBackdrop'|'trunk'|'arch'|'awning'|'gem'|'bluff'|'grassTop'|'lathe'|'sweep'|'slab'|'plaque'|'leaf'|'cartShell'|'trail'; at:V3; size:V3; color:string; worldScale?:V3; interaction?:boolean; rotation?:V3; glow?:boolean; bevel?:number; material?:'stone'|'leaves'|'metal'|'water'|'wood'|'canvas'|'trail'|'ground'|'grass'; contour?:[number,number][]; path?:V3[]; radii?:number[] };
+export type Shape = { type:'box'|'rock'|'cylinder'|'ring'|'cap'|'torus'; at:V3; size:V3; color:string; interaction?:boolean; rotation?:V3; glow?:boolean };
 export type Solid = { at:V3; half:V3; yaw:number; hull?:number[]; triangles?:{vertices:number[];indices:number[]} };
 export type Sign = { at:V3; width:number; title:string; subtitle:string; color:string; background:string; style?:'facility'; yaw?:number };
-export type SceneryPlan = { shapes:Shape[]; solids:Solid[]; signs:Sign[]; style?:'smooth'|'plastic'|'sculpted'; authored?:AuthoredRoom };
+export type SceneryPlan = { shapes:Shape[]; solids:Solid[]; signs:Sign[]; style?:'plastic'; authored?:AuthoredRoom };
 export const WOOD='#986b48', DARK='#594536', METAL='#425658', CREAM='#f0ddb0';
 // Pure descriptors shared by visual and physical residency. No Three.js/Rapier dependency.
 export class Planner {
@@ -42,9 +42,6 @@ export class Planner {
     this.shape('cylinder',[x,y+.6,z],[.5,1.2,.5],WOOD);
     this.plan.solids.push({at:[x,y+.6,z],half:[.5,.6,.5],yaw:0});
     for(const dy of [.2,1])this.shape('ring',[x,y+dy,z],[.53,.055,.53],METAL);
-  }
-  crystal(x:number,y:number,z:number,h:number,color:string) {
-    this.shape('crystal',[x,y,z],[h*.23,h,h*.23],color,[0,x*.17,.09*Math.sin(x+z)]);
   }
   booth(x:number,y:number,z:number,t:Theme,shop:boolean,radius=1.7) {
     // The activation circle sits IN FRONT of the counter, never inside its collider.

@@ -14,7 +14,6 @@ export type OfferTier = 'plain' | 'fine' | 'star';
 export type OfferStat = Readonly<{ key: 'power' | 'speed' | 'capacity'; label: string; value: number; current: number; max: number; unit: string }>;
 
 export const offerTier = (item: ShopItem): OfferTier => item.level <= 10 ? 'plain' : item.level <= 20 ? 'fine' : 'star';
-export const TIER_LABEL: Readonly<Record<OfferTier, string>> = { plain: '普通', fine: '精工', star: '星辉' };
 
 /** Where an item stands for the player: worn now, bought before, the next one to buy, or further up. */
 export function offerState(category: ShopCategory, item: ShopItem, s: Snapshot): OfferState {

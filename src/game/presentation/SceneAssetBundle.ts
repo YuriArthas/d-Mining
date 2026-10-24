@@ -2,8 +2,6 @@ import {
   Group,
   Mesh,
   Texture,
-  type BufferGeometry,
-  type Material,
 } from "three";
 import { disposeScenery, type SceneryResources } from "./disposeScenery.ts";
 

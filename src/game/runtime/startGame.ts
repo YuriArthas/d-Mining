@@ -46,7 +46,6 @@ import { MiningFeedback } from "./MiningFeedback.ts";
 import { worldAtFeet } from "../content/worldJourney.ts";
 import { DisposalScope } from "./DisposalScope.ts";
 
-export type StartupStats = ReturnType<typeof createStartupStats>;
 export function createStartupStats() {
   return {
     started: performance.now(),

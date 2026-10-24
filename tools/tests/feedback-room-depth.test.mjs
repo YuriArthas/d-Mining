@@ -1,6 +1,4 @@
-import { generationAtZ as worldAtZ } from '../../src/game/terrain/SparseWorld.ts';
-import { GENERATION as GAME_GENERATION_FIXTURE } from './fixtures/world.mjs';
-const WORLD1 = worldAtZ(GAME_GENERATION_FIXTURE, 0);
+import { WORLD1 } from './fixtures/world.mjs';
 import test from 'node:test';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
 import assert from 'node:assert/strict';

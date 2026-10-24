@@ -97,32 +97,12 @@ export function petAppearance(speciesId: string): PetAppearance {
   if (!appearance) throw Error(`缺少宠物外观: ${speciesId}`);
   return appearance;
 }
-// Rows describe physical terraces only, never prices or stat multipliers.
 /** What an egg the player has not unlocked yet is called everywhere (stand label, prompt, egg sheet, bag). */
 export const MYSTERY_EGG_NAME = '???';
-export const EGG_DISPLAY_ROWS = [
-  [
-    { eggId: 'meadow-egg', asset: 'egg-meadow-blender', color: '#7ecf69' },
-    { eggId: 'pebble-egg', asset: 'egg-core-blender', color: '#ad9b83' },
-    { eggId: 'copper-egg', asset: 'egg-ember-blender', color: '#dd9658' },
-    { eggId: 'amber-egg', asset: 'egg-moon-blender', color: '#eeb74c' },
-    { eggId: 'tide-egg', asset: 'egg-tide-blender', color: '#54c5de' },
-    { eggId: 'fire-egg', asset: 'egg-ember-blender', color: '#fa874b' },
-  ],
-  [
-    { eggId: 'mushroom-egg', asset: 'egg-meadow-blender', color: '#cf7fbd' },
-    { eggId: 'silver-egg', asset: 'egg-moon-blender', color: '#b5c9dd' },
-    { eggId: 'crystal-egg', asset: 'egg-crystal-blender', color: '#a38af2' },
-    { eggId: 'frost-egg', asset: 'egg-tide-blender', color: '#93e0ef' },
-    { eggId: 'jade-egg', asset: 'egg-meadow-blender', color: '#55c995' },
-    { eggId: 'moon-egg', asset: 'egg-moon-blender', color: '#b3a1f2' },
-  ],
-  [
-    { eggId: 'ruin-egg', asset: 'egg-core-blender', color: '#c9b879' },
-    { eggId: 'lava-egg', asset: 'egg-ember-blender', color: '#ef6c52' },
-    { eggId: 'fossil-egg', asset: 'egg-core-blender', color: '#d1b59a' },
-    { eggId: 'gear-egg', asset: 'egg-crystal-blender', color: '#7fb9c5' },
-    { eggId: 'star-egg', asset: 'egg-moon-blender', color: '#9697ee' },
-    { eggId: 'core-egg', asset: 'egg-core-blender', color: '#f1c957' },
-  ],
-] as const;
+/** Each egg's colour: its body and spots on the stand in the world, in the egg art and in the bag. */
+export const EGG_COLORS: Readonly<Record<string, string>> = {
+  'meadow-egg': '#7ecf69', 'pebble-egg': '#ad9b83', 'copper-egg': '#dd9658', 'amber-egg': '#eeb74c',
+  'tide-egg': '#54c5de', 'fire-egg': '#fa874b', 'mushroom-egg': '#cf7fbd', 'silver-egg': '#b5c9dd',
+  'crystal-egg': '#a38af2', 'frost-egg': '#93e0ef', 'ruin-egg': '#c9b879', 'lava-egg': '#ef6c52',
+  'fossil-egg': '#d1b59a', 'gear-egg': '#7fb9c5', 'star-egg': '#9697ee', 'core-egg': '#f1c957',
+};

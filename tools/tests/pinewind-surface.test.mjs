@@ -25,7 +25,6 @@ test('world 1 surface services are the Pinewind buildings; the halls ship with t
 });
 test('one teleport station west of the spawn, its model, pillars and pad where the session expects them',async()=>{
  const {worldStation}=await import('../../src/game/content/worldJourney.ts');
- assert.equal(GAME_CONTENT.surface.authored.instances.some(i=>i.node?.startsWith('Portal_')),false);
  const st=worldStation(1),model=GAME_CONTENT.surface.authored.instances.find(i=>i.node==='Teleport_Station');
  assert.deepEqual(model.at,[st.x,0,st.z]);assert.equal(PINEWIND_STATION.x,st.x);
  assert.deepEqual(GAME_CONTENT.session.stations.map(s=>s.worldId),[1,2,3]);

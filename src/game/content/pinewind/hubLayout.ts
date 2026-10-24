@@ -1,6 +1,5 @@
-import { SURFACE_FACILITIES, type SurfaceFacility } from '../surfaceFacilities.ts';
-import { deriveFacility } from '../../world/deriveFacility.ts';
-import { EGG_DISPLAY_ROWS } from '../petAppearance.ts';
+import { deriveFacility, type SurfaceFacility } from '../../world/deriveFacility.ts';
+import { EGG_COLORS } from '../petAppearance.ts';
 import type { Sign } from '../../world/sceneryKit.ts';
 import { CAPSULE_MACHINE_AT, CAPSULE_MACHINE_YAW } from '../feedbackFacilities.ts';
 import { worldStation } from '../worldJourney.ts';
@@ -19,11 +18,18 @@ export const PINEWIND_PLAZA = { x: 0, z: 20, radius: 15 } as const;
 // south toward the arriving player so a walkway stays open past the terrace stairs to the capsule machine.
 // The two shops stand side by side on the west, each facing the plaza centre: the forge sells pickaxes, the
 // pack shop next to it backpacks. From the spawn the sell house and the shops read either side of the headframe.
+// Every building: its ring 6.7 m in front of the anchor, a 8.6 x 6 x 6.8 m collider, and its word on a dark plate.
+const facility = (id: string, type: 'sell' | 'shop', anchor: SurfaceFacility['anchor'], title: string, color: string, ringColor: string): SurfaceFacility => ({
+  id, type, anchor, ringColor,
+  trigger: { x: 0, z: 6.7, radius: 1.7, heightTolerance: 0.25, hysteresis: 0.25 },
+  collider: { x: 0, y: 3, z: 0, half: [4.3, 3, 3.4], yaw: 0 },
+  sign: { title, color, background: '#18283d', width: 3.6, y: 4.5 },
+});
 export const PINEWIND_FACILITIES = {
-  sale: { ...SURFACE_FACILITIES.sale, anchor: { x: 18.8, z: 9.58, yaw: -44 * DEG } },
-  shop: { ...SURFACE_FACILITIES.shop, anchor: { x: -18.87, z: 10.79, yaw: 64 * DEG }, sign: { ...SURFACE_FACILITIES.shop.sign, title: 'PICKAXE' } },
-  bags: { ...SURFACE_FACILITIES.bags, anchor: { x: -19.18, z: 28.54, yaw: 114 * DEG } },
-} as const satisfies Record<'sale' | 'shop' | 'bags', SurfaceFacility>;
+  sale: facility('surface-sale', 'sell', { x: 18.8, z: 9.58, yaw: -44 * DEG }, 'SELL', '#ffe35c', '#ffe77d'),
+  shop: facility('surface-upgrade', 'shop', { x: -18.87, z: 10.79, yaw: 64 * DEG }, 'PICKAXE', '#40deff', '#44cfff'),
+  bags: facility('surface-bags', 'shop', { x: -19.18, z: 28.54, yaw: 114 * DEG }, 'BACKPACK', '#ffb44a', '#ffbf5e'),
+} as const;
 /** The footbridge over the creek, along the main path (local Z runs along the deck). The deck is one smooth
  *  raised-cosine arch, `rise` metres high in the middle, meeting the path at ground level `halfSpan` metres
  *  either side of the centre; `width` is the boarded deck between its overhanging board ends. */
@@ -63,7 +69,7 @@ function service(kind: keyof typeof PINEWIND_FACILITIES) {
 }
 export const PINEWIND_SERVICES = { sale: service('sale'), shop: service('shop'), bags: service('bags') } as const;
 
-/** The gate to the next world stands in the pass of the wooded ridge behind the portal ring. */
+/** The gate to the next world stands in the pass of the wooded ridge behind the spawn. */
 export const PINEWIND_GATE = { x: 0, z: 69, opening: 8, height: 9.6, wallTo: 14 } as const;
 
 /** The teleport station west of the spawn, facing it (worldJourney.ts owns the spot for every world). Its
@@ -86,13 +92,11 @@ const EGG_ROWS = [
   { tier: 1, z0: 24.5, eggs: ['tide-egg', 'frost-egg', 'fire-egg', 'lava-egg'] },
   { tier: 2, z0: 18.5, eggs: ['amber-egg', 'fossil-egg', 'silver-egg', 'gear-egg', 'star-egg', 'core-egg'] },
 ] as const;
-const EGG_LOOKS = new Map<string, { asset: string; color: string }>(EGG_DISPLAY_ROWS.flat().map(row => [row.eggId, row]));
 export const PINEWIND_EGG_DISPLAYS = EGG_ROWS.flatMap(row => row.eggs.map((eggId, index) => {
-  const tier = PINEWIND_EGG_TIERS[row.tier], look = EGG_LOOKS.get(eggId);
-  if (!look) throw Error(`Missing egg look: ${eggId}`);
-  return { id: `stand-${eggId}`, eggId, tier: row.tier, x: tier.x, y: tier.y, z: row.z0 + index * 4, yaw: -Math.PI / 2, asset: look.asset, color: look.color };
+  const tier = PINEWIND_EGG_TIERS[row.tier], color = EGG_COLORS[eggId];
+  if (!color) throw Error(`Missing egg colour: ${eggId}`);
+  return { id: `stand-${eggId}`, eggId, tier: row.tier, x: tier.x, y: tier.y, z: row.z0 + index * 4, yaw: -Math.PI / 2, color };
 }));
-export type PinewindEggDisplay = (typeof PINEWIND_EGG_DISPLAYS)[number];
 
 /** Side staircases at both terrace ends; each tier's flight rises over its own width. */
 export const PINEWIND_STAIR_STEPS = PINEWIND_EGG_TIERS.flatMap((tier, i) => {

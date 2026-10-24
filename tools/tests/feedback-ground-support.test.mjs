@@ -1,6 +1,4 @@
-import { generationAtZ as worldAtZ } from '../../src/game/terrain/SparseWorld.ts';
-import { GENERATION as GAME_GENERATION_FIXTURE } from './fixtures/world.mjs';
-const WORLD1 = worldAtZ(GAME_GENERATION_FIXTURE, 0);
+import { WORLD1 } from './fixtures/world.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { initPhysics, CharacterPhysics, RAPIER } from '../../src/game/validation/physics.ts';
@@ -16,8 +14,9 @@ import { MOVEMENT } from '../../src/game/movement.ts';
 await initPhysics();
 // Every check runs at the live capsule machine zone, wherever the hub places it.
 const Z = CAPSULE_MACHINE_ZONE, AT = [Z.x, 0, Z.z];
-// A fixed point beside a legacy roadside curb that masks the voxel floor.
-const CURB = [12, 0, 31.8];
+// A low ledge (a 14 cm curb-like step) whose edge overlaps the capsule standing beside it, masking the voxel floor.
+const LEDGE = [12, 0, 31.8];
+const LEDGE_PLAN = { shapes: [], signs: [], solids: [{ at: [12, 0.068, 32], half: [1, 0.068, 0.14], yaw: 0 }] };
 const floorMeshes = [];
 for (let x = -1; x <= 1; x++) for (let z = 0; z <= 3; z++) {
   const coord = [x, -1, z], mesh = buildRegion('collision', coord, COLLISION_SIZE, [], WORLD1).mesh;
@@ -48,7 +47,7 @@ function ticks(physics, count, x = 0, forward = 0) {
   for (let i = 0; i < count; i++) physics.tick(x, forward, 0, false, true);
 }
 
-test('real surface curb cannot mask the voxel floor at the capsule machine, including the failed public float position', () => {
+test('the capsule machine\'s zone stands on the real voxel floor, including the failed public float position', () => {
   const arrivals = [
     AT,
     [Z.x + 0.000136375427246, 0.019701611995696977, Z.z + 0.000216674804688],
@@ -68,7 +67,7 @@ test('real surface curb cannot mask the voxel floor at the capsule machine, incl
   }
 });
 
-test('the existing roadside curb also finds real ground without any new feedback fixture collider', () => {
+test('the machine\'s surroundings find real ground without the machine\'s own collider', () => {
   const scene = setup({ feedback: false });
   try {
     const p = scene.physics;
@@ -78,10 +77,10 @@ test('the existing roadside curb also finds real ground without any new feedback
   } finally { scene.dispose(); }
 });
 
-test('walking over the curb, falling onto it and returning from the spawn all retain stable support', () => {
+test('walking up to the machine, falling onto its zone and returning from the spawn all retain stable support', () => {
   for (const route of ['walk', 'fall', 'return']) {
     // The machine stands in the live hub (north of the egg terraces), so the routes run through its scenery.
-    const scene = setup({ plan: GAME_CONTENT.surface.plan });
+    const scene = setup();
     try {
       const p = scene.physics;
       if (route === 'walk') {
@@ -102,7 +101,7 @@ test('walking over the curb, falling onto it and returning from the spawn all re
   }
 });
 
-test('a rejected curb with no real floor never grants support or an airborne jump', () => {
+test('scenery without the voxel floor under it never grants support or an airborne jump', () => {
   const scene = setup({ floor: false });
   try {
     const p = scene.physics;
@@ -113,7 +112,7 @@ test('a rejected curb with no real floor never grants support or an airborne jum
   } finally { scene.dispose(); }
 });
 
-test('removing the real floor beside a curb immediately removes jump eligibility', () => {
+test('removing the voxel floor immediately removes jump eligibility', () => {
   const scene = setup();
   try {
     const p = scene.physics;
@@ -128,7 +127,7 @@ test('a vertical wall alone never counts as a walkable support plane', () => {
   const p = new CharacterPhysics();
   try {
     p.world.createCollider(RAPIER.ColliderDesc.cuboid(0.2, 10, 10).setTranslation(12.5, 0, 32));
-    p.teleport([12, 0, 31.8]); ticks(p, 60);
+    p.teleport(LEDGE); ticks(p, 60);
     assert.equal(p.grounded, false);
     assert.ok(p.feet()[1] < -1);
     const jumps = p.jumps; p.tick(0, 0, 0, true, true);
@@ -136,7 +135,7 @@ test('a vertical wall alone never counts as a walkable support plane', () => {
   } finally { p.dispose(); }
 });
 
-test('grounded jump from the curb edge rises once and lands normally on actual support', () => {
+test('a grounded jump by the machine rises once and lands normally on actual support', () => {
   const scene = setup();
   try {
     const p = scene.physics;
@@ -152,12 +151,12 @@ test('grounded jump from the curb edge rises once and lands normally on actual s
   } finally { scene.dispose(); }
 });
 
-test('support retries only rejected colliders: one query on a clear floor and two beside the masking curb', () => {
+test('support retries only rejected colliders: one query on a clear floor and two beside a masking ledge', () => {
   for (const scenery of [false, true]) {
-    const scene = setup({ scenery, feedback: false, at: CURB });
+    const scene = setup({ scenery, feedback: false, at: LEDGE, plan: LEDGE_PLAN });
     try {
       const p = scene.physics;
-      p.teleport([CURB[0], 0.02, CURB[2]]);
+      p.teleport([LEDGE[0], 0.02, LEDGE[2]]);
       const original = p.world.castShape.bind(p.world);
       let casts = 0;
       p.world.castShape = (...args) => { casts++; return original(...args); };

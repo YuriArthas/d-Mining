@@ -2,10 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { GameSession } from '../../src/game/application/GameSession.ts';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
-const SESSION_CONTENT = GAME_CONTENT.session, EGG = SESSION_CONTENT.petContent.eggs.find(e => e.id === 'meadow-egg').price;
 import { CAPSULE_MACHINE_ZONE } from '../../src/game/content/feedbackFacilities.ts';
 import { parseInviteCode } from '../../src/game/logic/InviteCode.ts';
 import { initPhysics, CharacterPhysics, RAPIER } from '../../src/game/validation/physics.ts';
+const SESSION_CONTENT = GAME_CONTENT.session, EGG = SESSION_CONTENT.petContent.eggs.find(e => e.id === 'meadow-egg').price;
 
 const DAY = '2026-10-18';
 const origin = new GameSession(SESSION_CONTENT, 50, undefined, { rewards: { day: () => DAY, createInviteId: () => 'review-player-own' } }).exportProgress();

@@ -7,7 +7,7 @@ import type { SurfaceTime } from "../world/SceneLighting.ts";
 import { sceneryGeometryMemory } from "./sceneryGeometryMemory.ts";
 
 // Ordinary scene props use independent visual/physical residency. The voxel floor
-// remains owned by terrain; the meadow apron is visual only and has an open shaft.
+// remains owned by terrain.
 export class SceneryView {
   readonly group = new Group();
   revision = 0;

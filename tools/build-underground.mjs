@@ -1,7 +1,7 @@
 // Offline: build, bake and pack an underground rest hall (today: 蘑菇洞穴, world 1 layer 2).
 // Run: node tools/build-underground.mjs   (after `blender -b --python tools/blender/build_fungal.py` in surface-game-art)
 // Output: surface-game-art/public/assets/underground/fungal-hall.glb, the packed runtime asset in
-// src/game/assets/camp (fungal-hall.*), and its colliders in src/game/content/underground/fungal-hall.json.
+// src/game/assets/scene (fungal-hall.*), and its colliders in src/game/content/underground/fungal-hall.json.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
@@ -22,7 +22,7 @@ globalThis.document = { createElement(name) { if (name !== 'canvas') throw Error
 globalThis.FileReader = class { readAsArrayBuffer(blob) { blob.arrayBuffer().then(b => { this.result = b; this.onloadend?.(); }); } readAsDataURL(blob) { blob.arrayBuffer().then(b => { this.result = 'data:' + blob.type + ';base64,' + Buffer.from(b).toString('base64'); this.onloadend?.(); }); } };
 const hash = b => createHash('sha256').update(b).digest('hex');
 
-const art = 'surface-game-art/public/assets/underground', camp = 'src/game/assets/camp';
+const art = 'surface-game-art/public/assets/underground', shipped = 'src/game/assets/scene';
 const buffer = readFileSync(`${art}/fungal-props.glb`);
 const props = (await new GLTFLoader().parseAsync(buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.length), '')).scene;
 const built = buildFungalHall(name => { const node = props.getObjectByName(name); if (!node) throw Error(`Missing prop ${name}`); const copy = node.clone(true); copy.position.set(0, 0, 0); copy.rotation.set(0, 0, 0); copy.scale.set(1, 1, 1); return copy; });
@@ -59,11 +59,11 @@ execFileSync(process.execPath, [cli, 'uastc', `${art}/fungal-hall.glb`, `${art}/
 execFileSync(process.execPath, [cli, 'meshopt', `${art}/fungal-hall.ktx.glb`, `${art}/fungal-hall.runtime.glb`, '--quantize-position', '16'], { env, stdio: 'inherit' });
 rmSync(`${art}/fungal-hall.ktx.glb`);
 const runtime = readFileSync(`${art}/fungal-hall.runtime.glb`), compressed = gzipSync(runtime, { level: 9 });
-writeFileSync(`${camp}/fungal-hall.000.part`, compressed);
+writeFileSync(`${shipped}/fungal-hall.000.part`, compressed);
 const manifest = { parts: ['fungal-hall.000.part'], bytes: compressed.length, decodedBytes: runtime.length, sha256: hash(compressed), sourceSha256: hash(glb), triangles: batched.stats.triangles,
   source: '蘑菇洞穴 rest hall: Blender props (surface-game-art/tools/blender/build_fungal.py) and an offline procedural cave shell (surface-game-art/tools/underground/fungalHall.ts); baked occlusion per vertex',
   materialProfile: 'authored-color', coordinateSpace: 'authored', geometryEdits: false, textureEncoding: 'KTX2 UASTC', reference: 'tools/build-underground.mjs' };
-writeFileSync(`${camp}/fungal-hall.manifest.json`, JSON.stringify(manifest, null, 2) + '\n');
+writeFileSync(`${shipped}/fungal-hall.manifest.json`, JSON.stringify(manifest, null, 2) + '\n');
 const propsReport = JSON.parse(readFileSync('surface-game-art/artifacts/fungal-props.json'));
 writeFileSync('surface-game-art/artifacts/fungal-hall.json', JSON.stringify({ hall: { triangles: batched.stats.triangles, batches: batched.stats.batches, colliders: built.solids.length, glbSha256: hash(glb), runtimeSha256: hash(runtime) }, props: propsReport, occlusion: baked.stats }, null, 2) + '\n');
 console.log('fungal hall:', batched.stats.triangles, 'triangles,', batched.stats.batches, 'batches,', built.solids.length, 'colliders,', compressed.length, 'bytes packed');

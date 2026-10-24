@@ -1,5 +1,4 @@
 import { useSyncExternalStore } from 'react';
-import type { GameSession } from '../application/GameSession.ts';
 import { UiButton } from './kit/controls.tsx';
 import { Icon, type IconKind } from './kit/icons.tsx';
 import { Sheet } from './kit/panel.tsx';
@@ -9,7 +8,7 @@ const touch = window.matchMedia('(any-pointer: coarse)');
 const subscribeTouch = (notify: () => void) => { touch.addEventListener('change', notify); return () => touch.removeEventListener('change', notify); };
 
 /** How to play, as six picture cards instead of a manual. */
-export function HelpSheet({ session, onClose }: { session: GameSession; onClose(): void }) {
+export function HelpSheet({ onClose }: { onClose(): void }) {
   const coarse = useSyncExternalStore(subscribeTouch, () => touch.matches);
   const tips: [IconKind, string, string][] = [
     ['jump', '移动', coarse ? '左边摇杆走路，右下跳跃，右侧空白处拖动看四周' : 'WASD 走路，空格跳跃，按住右键拖动看四周'],

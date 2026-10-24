@@ -12,8 +12,8 @@ import { TEXTURE_UPLOAD_LIMITS } from '../../src/game/presentation/uploadSurface
 const read = path => readFileSync(new URL('../../' + path, import.meta.url));
 /** The packed runtime GLB of a Pinewind asset (gzipped single part). */
 function runtimeGlb(name) {
-  const manifest = JSON.parse(read(`src/game/assets/camp/${name}.manifest.json`));
-  const glb = gunzipSync(Buffer.concat(manifest.parts.map(part => read(`src/game/assets/camp/${part}`))));
+  const manifest = JSON.parse(read(`src/game/assets/scene/${name}.manifest.json`));
+  const glb = gunzipSync(Buffer.concat(manifest.parts.map(part => read(`src/game/assets/scene/${part}`))));
   const jsonLength = glb.readUInt32LE(12), json = JSON.parse(glb.subarray(20, 20 + jsonLength));
   const bin = glb.subarray(20 + jsonLength + 8);
   const image = index => { const view = json.bufferViews[json.images[index].bufferView]; return bin.subarray(view.byteOffset ?? 0, (view.byteOffset ?? 0) + view.byteLength); };

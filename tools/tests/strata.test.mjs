@@ -2,12 +2,12 @@ import { appearanceKey } from '../../src/game/terrain/minerals.ts';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { stratumAtDepth, generatedMineral, mineralRoll, DEEP_ROCK_AT } from '../../src/game/terrain/strata.ts';
-import { SparseWorld, generationAtZ, regionOf, sampleXYZ } from '../../src/game/terrain/SparseWorld.ts';
+import { SparseWorld, regionOf, sampleXYZ } from '../../src/game/terrain/SparseWorld.ts';
 import { buildRegion, greedyMesh } from '../../src/game/terrain/meshing.ts';
 import { oreChanceAtDepth } from '../../src/game/content/oreDistribution.ts';
-import { GENERATION, WORLD1_LAYERS as LAYERS } from './fixtures/world.mjs';
+import { WORLD1_LAYERS as LAYERS } from './fixtures/world.mjs';
+import { WORLD1 } from './fixtures/world.mjs';
 
-const WORLD1 = generationAtZ(GENERATION, 0);
 const at = depth => stratumAtDepth(depth, LAYERS);
 test('layer boundaries use metres and the top face of each block', () => {
  assert.equal(at(399.999).id,'surface');assert.equal(at(400).id,'old_mine');

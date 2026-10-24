@@ -132,7 +132,6 @@ export function updateGame(
     current.caveLights.update(drawnFeet, layer.id, lightStrength);
     const selected = interaction.selected;
     if (clock.status <= 0) {
-      const info = terrain.snapshot();
       const depth = Math.floor(playerDepthAtFeet(feet, physics.grounded, current.content.session.destinations));
       const currentLayer = stratumAtDepth(environmentDepthAtFeet(feet, physics.grounded, current.content.session.destinations), generationAtZ(terrain.world.generation,feet[2]/2).layers);
       onStatus(

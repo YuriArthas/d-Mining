@@ -1,8 +1,6 @@
 import {resourceByKind} from '../../src/game/content/resources.ts';
 import {pickaxeStats} from '../../src/game/logic/Pickaxe.ts';
-
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
-const SESSION_CONTENT = GAME_CONTENT.session, SELL_ZONE = SESSION_CONTENT.sales[0];
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { Inventory } from '../../src/game/logic/Inventory.ts';
@@ -11,6 +9,8 @@ import { Mining } from '../../src/game/application/Mining.ts';
 import { quoteSale, sellAll } from '../../src/game/application/Sale.ts';
 import { ORE_ITEMS, itemVolume, itemPrice, itemDefinition } from '../../src/game/application/items.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
+
+const SESSION_CONTENT = GAME_CONTENT.session, SELL_ZONE = SESSION_CONTENT.sales[0];
 const batch=(count,itemId='stone')=>[{itemId,count}];
 const volume=id=>{const n={stone:1,gold:10,gem:15,large:80}[id];if(n===undefined)throw Error('unknown item');return n};
 const price=id=>({stone:1,gold:40,gem:80,large:100}[id]);

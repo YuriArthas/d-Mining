@@ -34,7 +34,6 @@ test('descent and ascent scale every night light together without shadows',()=>{
    rig.setSurfaceStrength(strength);
    lights.forEach((l,i)=>{assert.equal(l.intensity,levels[i]*strength);assert.equal(l.castShadow,false);});
    assert.equal(rig.diagnostics().activeLights,strength>0?lights.length:0);
-   assert.equal(rig.diagnostics().activeShadowLights,0);
    assert.equal(rig.setSurfaceStrength(strength),false,'stationary frames skip light updates');
   }
   rig.setSurfaceStrength(.25);rig.setTime('day');

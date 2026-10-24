@@ -1,7 +1,5 @@
 import {resourceByKind} from '../../src/game/content/resources.ts';
-
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
-const SESSION_CONTENT = GAME_CONTENT.session, SELL_ZONE = SESSION_CONTENT.sales[0];
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { Inventory } from '../../src/game/logic/Inventory.ts';
@@ -11,6 +9,8 @@ import { Mining } from '../../src/game/application/Mining.ts';
 import { sellAll } from '../../src/game/application/Sale.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
 import { oreDrops } from '../../src/game/application/items.ts';
+
+const SESSION_CONTENT = GAME_CONTENT.session, SELL_ZONE = SESSION_CONTENT.sales[0];
 const item = (count, itemId='stone') => [{itemId, count}];
 test('inventory accepts batches before, at and beyond capacity; zero capacity is only information',()=>{
  const bag=new Inventory(50);bag.add(item(49));assert.equal(bag.isFull(),false);

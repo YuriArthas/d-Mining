@@ -7,8 +7,8 @@ import { EggStandLabels, EGG_LABEL } from '../../src/game/presentation/EggStandL
 import { disposeScenery } from '../../src/game/presentation/disposeScenery.ts';
 import { PET_CONTENT } from '../../src/game/content/pets.ts';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
-const SESSION_CONTENT = GAME_CONTENT.session, PET_DISPLAYS = GAME_CONTENT.eggs;
 import { GameSession } from '../../src/game/application/GameSession.ts';
+const SESSION_CONTENT = GAME_CONTENT.session, PET_DISPLAYS = GAME_CONTENT.eggs;
 
 test('egg labels keep extruded glyphs and front/side colours in one draw, plus one draw of plates', () => {
   const labels = new EggStandLabels(PET_DISPLAYS, PET_CONTENT.eggs);

@@ -4,7 +4,6 @@ export type WorldRequirement = Readonly<{
   id: WorldId; name: string; z: number; mined: number; coins: number;
   materials: readonly Readonly<{ itemId: string; count: number; layer: number }>[];
 }>;
-export const WORLD_SPACING = 224;
 export const WORLD_REQUIREMENTS: readonly WorldRequirement[] = Object.freeze([
   { id: 1, name: '第一世界', z: 0, mined: 0, coins: 0, materials: [] },
   { id: 2, name: '第二世界', z: 224, mined: 1_000_000, coins: 10_000_000, materials: [

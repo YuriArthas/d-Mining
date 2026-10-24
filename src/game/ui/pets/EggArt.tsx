@@ -1,7 +1,6 @@
-import { EGG_DISPLAY_ROWS, petAppearance } from '../../content/petAppearance.ts';
+import { EGG_COLORS, petAppearance } from '../../content/petAppearance.ts';
 
 const INK = '#13355d';
-const EGG_COLORS = new Map<string, string>(EGG_DISPLAY_ROWS.flat().map(row => [row.eggId, row.color]));
 /** Lighten (f > 0) or darken (f < 0) a hex colour, as the Blender egg atlas does for its body and spots. */
 function shade(hex: string, f: number) {
   return '#' + [1, 3, 5].map(i => { const v = parseInt(hex.slice(i, i + 2), 16); return Math.round(f < 0 ? v * (1 + f) : v + (255 - v) * f).toString(16).padStart(2, '0'); }).join('');
@@ -21,7 +20,7 @@ export function EggArt({ eggId, spotSpecies, locked = false, className = '' }: {
     <path d="M30 70c0-10 3-20 7-27" stroke="#9a96b8" strokeWidth="3" strokeLinecap="round" fill="none" opacity=".25" />
     <text x="60" y="90" textAnchor="middle" fontSize="54" fontWeight="900" fill="#c8c6d8" opacity=".8">?</text>
   </svg>;
-  const color = eggId ? EGG_COLORS.get(eggId) : undefined;
+  const color = eggId ? EGG_COLORS[eggId] : undefined;
   const body = color ? shade(color, .16) : '#fff3d6';
   const spot = color ? shade(color, -.32) : spotSpecies ? petAppearance(spotSpecies).color : '#8fd36e';
   return <svg className={className} viewBox="0 0 120 140" aria-hidden="true" focusable="false">

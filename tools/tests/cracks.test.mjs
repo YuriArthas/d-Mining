@@ -1,12 +1,12 @@
 import {resourceByKind} from '../../src/game/content/resources.ts';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
-const SESSION_CONTENT = GAME_CONTENT.session;
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { BlockHealth } from '../../src/game/logic/BlockHealth.ts';
 import { BlockCracks } from '../../src/game/presentation/BlockCracks.ts';
 import { crackAtlas, crackStage, CRACK_TILE, CRACK_STAGES } from '../../src/game/presentation/cracks.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
+const SESSION_CONTENT = GAME_CONTENT.session;
 
 test('crack stages derive from HP fraction, clamp, and allocate nothing for intact blocks',()=>{
  assert.equal(crackStage(100,100),0);assert.equal(crackStage(90,100),1);assert.equal(crackStage(80,100),2);

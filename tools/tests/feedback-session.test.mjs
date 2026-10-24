@@ -2,10 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { GameSession } from '../../src/game/application/GameSession.ts';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
-const SESSION_CONTENT = GAME_CONTENT.session;
 import { CAPSULE_MACHINE_ZONE } from '../../src/game/content/feedbackFacilities.ts';
 import { createInviteCode } from '../../src/game/logic/InviteCode.ts';
 import { pickaxeStats } from '../../src/game/logic/Pickaxe.ts';
+const SESSION_CONTENT = GAME_CONTENT.session;
 
 const at=(s,z)=>s.updatePosition([z.x,z.y,z.z],true);
 const meadow=SESSION_CONTENT.eggStations.find(s=>s.eggId==='meadow-egg').zone;

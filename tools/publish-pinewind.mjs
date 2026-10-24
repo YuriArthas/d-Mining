@@ -53,7 +53,7 @@ function publishFile(path, target) {
   renameSync(target + '.next', target);
 }
 
-if (!existsSync(join(source, 'index.html'))) throw new Error('Build surface-study first: npm run build');
+if (!existsSync(join(source, 'index.html'))) throw new Error('Build the game first: npx vite build');
 if (!existsSync(join(served, 'index.html'))) throw new Error(`Published launcher is missing: ${served}`);
 if (!existsSync(join(served, 'games'))) throw new Error(`Published games are missing: ${served}/games`);
 

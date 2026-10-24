@@ -5,9 +5,9 @@ import { PetFollowers } from '../../src/game/presentation/PetFollowers.ts';
 import { PET_CONTENT } from '../../src/game/content/pets.ts';
 import { petAppearance } from '../../src/game/content/petAppearance.ts';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
-const PET_DISPLAYS = GAME_CONTENT.eggs;
 import { PetService } from '../../src/game/application/PetService.ts';
 import { Wallet } from '../../src/game/logic/Wallet.ts';
+const PET_DISPLAYS = GAME_CONTENT.eggs;
 
 const pet = (id, slot, speciesId = 'moss-slime') => ({ id, slot, speciesId, level: 1 });
 test('each displayed egg charges its own price and draws only from its own configured pool', () => {

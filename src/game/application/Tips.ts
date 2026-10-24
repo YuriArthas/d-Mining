@@ -53,8 +53,7 @@ export function tipView(id: TipId, s: TipState): Tip {
 
 export type DepthGoal = Readonly<{ id: string; name: string; depth: number; currentDepth: number; remainingDepth: number }>;
 export function selectDepthGoal(maxDepth: number, destinations: readonly { id: string; name: string; depth: number; unlocked: boolean }[]): DepthGoal | null {
-  // Preserve explicitly unlocked legacy destinations and select the nearest
-  // remaining depth, independent of content table ordering or current floor.
+  // The nearest depth not reached yet, independent of content table ordering or the current floor.
   const next = destinations.filter(d => !d.unlocked && d.depth > maxDepth).sort((a, b) => a.depth - b.depth)[0];
   return next ? Object.freeze({ id: next.id, name: next.name, depth: next.depth, currentDepth: maxDepth, remainingDepth: next.depth - maxDepth }) : null;
 }

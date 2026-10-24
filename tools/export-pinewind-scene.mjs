@@ -96,7 +96,7 @@ mkdirSync('surface-game-art/artifacts/light-bake',{recursive:true});
 writeFileSync('surface-game-art/artifacts/light-bake/ground-light.png',await encodePng(baked.groundImage,G.resolution));
 // Characters read this small map on the CPU (sun visibility above the floor, floor height).
 const standingPng=await encodePng(baked.standingImage,LIGHT_BAKE.standing.resolution);
-writeFileSync('src/game/assets/camp/pinewind-standing-light.png',standingPng);
+writeFileSync('src/game/assets/scene/pinewind-standing-light.png',standingPng);
 writeFileSync('surface-game-art/artifacts/light-bake/building-light.png',lightPng);
 
 const roots=architecture.children.map(node=>({node:node.name,at:node.position.toArray(),rotation:node.quaternion.toArray(),scale:node.scale.toArray()}));

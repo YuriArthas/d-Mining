@@ -21,7 +21,6 @@ const layerColor = (name: string, index: number) => { const hit = LAYER_COLORS.f
 /** Worlds: travel to a world's teleport station, and the long-term gates to the next worlds. Layers are chosen
  *  on the station itself (StationSheet). */
 export function WorldSheet({ session, tab, onTab, onClose }: { session: GameSession; tab: WorldTab; onTab(tab: WorldTab): void; onClose(): void }) {
-  const state = useSyncExternalStore(session.subscribe, session.getSnapshot);
   const tabs: SheetTab<WorldTab>[] = [{ id: 'travel', label: '传送', icon: 'portal' }, { id: 'progress', label: '进度', icon: 'globe' }];
   const common = { title: '世界', tabs, tab, onTab, onClose };
   if (tab === 'progress') return <ProgressTab session={session} common={common} />;

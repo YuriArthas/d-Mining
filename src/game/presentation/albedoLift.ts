@@ -1,7 +1,7 @@
 import { Vector3, type MeshStandardMaterial } from 'three';
 
 /** Material-level look for the authored buildings (houses, headframe, bridge, terraces, eggs,
- *  portals) under the strong-sun, weak-fill daylight:
+ *  teleport station) under the strong-sun, weak-fill daylight:
  *  - the atlas colour is made brighter and more saturated before lighting (brightness is a gamma
  *    lift, black and white stay put; saturation pushes away from grey; both in display space);
  *  - by day the buildings take extra warm fill on walls and undersides (`bounce`), like the sunlit

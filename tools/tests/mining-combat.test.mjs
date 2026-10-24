@@ -1,16 +1,16 @@
-import {resourceByKind} from '../../src/game/content/resources.ts';
-
+import { resourceByKind } from '../../src/game/content/resources.ts';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
-const SESSION_CONTENT = GAME_CONTENT.session, SELL_ZONE = SESSION_CONTENT.sales[0];
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { BlockHealth } from '../../src/game/logic/BlockHealth.ts';
 import { MiningCombat } from '../../src/game/application/MiningCombat.ts';
 import { Pickaxe, pickaxeStats } from '../../src/game/logic/Pickaxe.ts';
 import { JOURNEY_TOOL_PRICES } from '../../src/game/content/journeyResources.ts';
-import { Wallet } from '../../src/game/logic/Wallet.ts';
+
 import { GameSession } from '../../src/game/application/GameSession.ts';
 import { ORE_ITEMS } from '../../src/game/application/items.ts';
+
+const SESSION_CONTENT = GAME_CONTENT.session, SELL_ZONE = SESSION_CONTENT.sales[0];
 function setup(maximum=30){
  const pending=new Set(),removed=new Set(),requests=[],axe=new Pickaxe();let full=false,accept=true;
  const combat=new MiningCombat({isFull:()=>full,stats:axe.getSnapshot,read:key=>removed.has(key)?null:{key,maximum},pending:key=>pending.has(key),destroy:key=>{if(!accept)return false;pending.add(key);requests.push(key);return true}});

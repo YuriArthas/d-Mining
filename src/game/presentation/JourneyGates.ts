@@ -1,8 +1,8 @@
-import { BoxGeometry, CanvasTexture, DoubleSide, Group, Mesh, MeshBasicMaterial, MeshStandardMaterial, PlaneGeometry, SRGBColorSpace, type Material, type Object3D } from 'three';
+import { BoxGeometry, CanvasTexture, DoubleSide, Group, Mesh, MeshBasicMaterial, MeshStandardMaterial, PlaneGeometry, SRGBColorSpace, type Object3D } from 'three';
 import { RAPIER, type CharacterPhysics } from '../validation/physics.ts';
 import type { GameSession } from '../application/GameSession.ts';
 import { STATION_LOCAL, WORLD_REQUIREMENTS, worldGateZ } from '../content/worldJourney.ts';
-import type { SceneryPlan, Solid, V3 } from '../world/sceneryKit.ts';
+import type { SceneryPlan, V3 } from '../world/sceneryKit.ts';
 import { Planner } from '../world/sceneryKit.ts';
 import { themeById } from '../content/themes.ts';
 import { disposeScenery } from './disposeScenery.ts';

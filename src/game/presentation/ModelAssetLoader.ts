@@ -17,7 +17,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { disposeScenery } from "./disposeScenery.ts";
 import { pruneInactiveMaps } from "./MaterialPreparation.ts";
-import { stabilizeShadows } from "./stableShadow.ts";
+import { withCompactLights } from "./compactLights.ts";
 import {
   uploadSurfaceTextures,
   TEXTURE_UPLOAD_LIMITS,
@@ -115,7 +115,7 @@ export async function loadModelAssets(
             : [o.material]) as MeshStandardMaterial[]) {
             prepareMaterial(m, lease.item);
             pruneInactiveMaps(m);
-            stabilizeShadows(m);
+            withCompactLights(m);
             for (const v of Object.values(m))
               if (v instanceof Texture) {
                 if (

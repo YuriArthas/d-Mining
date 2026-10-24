@@ -6,10 +6,9 @@ import { layerAtDepth, validateLayers } from '../../src/game/content/layers.ts';
 import { WORLD1_LAYERS as LAYERS } from './fixtures/world.mjs';
 import { roomsFor, roomAir, onRoomFloor } from '../../src/game/world/rooms.ts';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
-const ROOMS=roomsFor(LAYERS),surfacePlan=()=>GAME_CONTENT.surface.plan;
-import { SparseWorld, generationAtZ, sampleXYZ, regionOf } from '../../src/game/terrain/SparseWorld.ts';
-import { GENERATION } from './fixtures/world.mjs';
-const WORLD1 = generationAtZ(GENERATION, 0);
+import { SparseWorld, sampleXYZ, regionOf } from '../../src/game/terrain/SparseWorld.ts';
+
+import { WORLD1 } from './fixtures/world.mjs';
 import { appearanceKey } from '../../src/game/terrain/minerals.ts';
 import { buildRegion } from '../../src/game/terrain/meshing.ts';
 import { roomPlan } from '../../src/game/world/scenery.ts';
@@ -18,6 +17,7 @@ import { Inventory } from '../../src/game/logic/Inventory.ts';
 import { Wallet } from '../../src/game/logic/Wallet.ts';
 import { oreDrops, itemVolume, itemPrice } from '../../src/game/application/items.ts';
 import { sellAll } from '../../src/game/application/Sale.ts';
+const ROOMS=roomsFor(LAYERS),surfacePlan=()=>GAME_CONTENT.surface.plan;
 
 test('eighty-four journey resources, four per layer of every world; fixed floor is not an item',()=>{
  assert.equal(THEMES.length,10);assert.equal(RESOURCES.length,84);assert.equal(RESOURCES.filter(r=>r.base).length,42);
