@@ -4,9 +4,9 @@ type Stand = Readonly<{ id: string; eggId: string; x: number; y: number; z: numb
 
 /** Height above its stand where an egg display's egg begins (plinth, gold lip and nest end at 0.66 m). */
 export const EGG_BODY_FROM = .68;
-/** A locked egg is glossy dark obsidian: a deep indigo body that keeps sun highlights and sky reflections,
- *  a violet glow round its outline, and now and then a streak of light sweeping up it. */
-const LOCKED = { body: 'vec3( 0.035, 0.03, 0.075 )', roughness: '0.2', metalness: '0.35', rim: 'vec3( 0.42, 0.3, 1.0 )', glint: 'vec3( 0.85, 0.8, 1.0 )' } as const;
+/** A locked egg is dark and quietly glossy: a slate-indigo body with a soft sun highlight, a faint cool rim
+ *  so its outline reads, and once in a while a dim streak of light. Never prettier than an unlocked egg. */
+const LOCKED = { body: 'vec3( 0.04, 0.04, 0.06 )', roughness: '0.45', metalness: '0.08', rim: 'vec3( 0.32, 0.3, 0.55 )', rimStrength: '0.18', glint: 'vec3( 0.75, 0.74, 0.85 )', glintStrength: '0.12', glintRate: '0.14' } as const;
 /** Shared clock for the sweeping streak (seconds), set each frame with the creek's. */
 const clock = { value: 0 };
 export function setLockedEggTime(seconds: number) { clock.value = seconds % 4096; }
@@ -43,14 +43,14 @@ export class LockedEggs {
 	if ( eggHidden > 0.5 ) {
 		// Violet rim where the faces turn away from the camera.
 		float eggRim = pow( 1.0 - saturate( dot( normal, normalize( vViewPosition ) ) ), 2.5 );
-		// A slanted streak sweeps up the egg (2.25 m tall) once every four seconds, then rests.
-		float eggSweep = fract( eggTime * 0.25 + eggPhase ) * 2.2 - 0.4;
+		// A slanted streak sweeps up the egg (2.25 m tall) about once every seven seconds, then rests.
+		float eggSweep = fract( eggTime * ${LOCKED.glintRate} + eggPhase ) * 3.2 - 0.4;
 		float eggHeight = ( vEggWorld.y - eggBodyFrom ) / 2.25 + ( vEggWorld.x - eggCentre.x + vEggWorld.z - eggCentre.y ) * 0.18;
 		float eggGlint = pow( 1.0 - smoothstep( 0.0, 0.18, abs( eggHeight - eggSweep ) ), 2.0 );
-		totalEmissiveRadiance = ${LOCKED.rim} * eggRim * 0.55 + ${LOCKED.glint} * eggGlint * 0.45;
+		totalEmissiveRadiance = ${LOCKED.rim} * eggRim * ${LOCKED.rimStrength} + ${LOCKED.glint} * eggGlint * ${LOCKED.glintStrength};
 	}`);
           };
-          m.customProgramCacheKey = () => key + '|locked-egg-v3';
+          m.customProgramCacheKey = () => key + '|locked-egg-v4';
           materials.push(m);
           return m;
         };

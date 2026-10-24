@@ -154,8 +154,8 @@ test('locked eggs stand as black silhouettes: each stand owns its material, only
   assert.match(shader.fragmentShader, /eggLocked \* step\( eggBodyFrom, vEggWorld\.y \)/);
   assert.match(shader.vertexShader, /vEggWorld = \( modelMatrix/);
   assert.equal(shader.uniforms.eggBodyFrom.value, 2.6 + EGG_BODY_FROM, 'the cut follows the stand height');
-  // Glossy obsidian with a rim glow and a sweeping streak measured from the stand's own centre.
-  assert.match(shader.fragmentShader, /roughnessFactor = mix\( roughnessFactor, 0\.2, eggHidden \)/);
+  // Quietly glossy with a faint rim and a sweeping streak measured from the stand's own centre.
+  assert.match(shader.fragmentShader, /roughnessFactor = mix\( roughnessFactor, 0\.45, eggHidden \)/);
   assert.match(shader.fragmentShader, /eggRim/); assert.match(shader.fragmentShader, /eggGlint/);
   assert.deepEqual(shader.uniforms.eggCentre.value.toArray(), [40, 20]);
   eggs.setUnlocked(id => id === 'b');
