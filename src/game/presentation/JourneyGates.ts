@@ -127,7 +127,8 @@ export class JourneyGates {
         const mineSign=label([w.name+'矿区','首次进入：缴纳矿产和金币'],13);mineSign.position.set(0,7,w.z+side*9);mineSign.rotation.y=side<0?Math.PI:0;this.group.add(mineSign);
       }
       // Keep the plaza's title in front of spawn, clear of the rear-gate sightline.
-      const home=label([w.name,'返回此处使用世界与矿层传送'],12);home.position.set(0,5,w.z+34);this.group.add(home);
+      // World 2's authored base has its own station; the floating title stays only where there is none.
+      if(w.z!==TECH_BASE.worldZ){const home=label([w.name,'返回此处使用世界与矿层传送'],12);home.position.set(0,5,w.z+34);this.group.add(home);}
       this.entries.push({world,left,right,barrier,closedSign,cover,lid});
     }
     const update=()=>{for(const entry of this.entries){const world=session.getSnapshot().worlds.find(w=>w.id===entry.world)!;entry.left.rotation.y=world.areaOpen?-Math.PI/2:0;entry.right.rotation.y=world.areaOpen?Math.PI/2:0;entry.barrier.setEnabled(!world.areaOpen);entry.closedSign.visible=!world.areaOpen;entry.cover.visible=!world.mineOpen;entry.lid.setEnabled(!world.mineOpen);}};
