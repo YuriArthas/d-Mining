@@ -22,8 +22,10 @@ test('depth alone unlocks travel and eggs; old depth fills missing unlocks while
   const old=s.exportProgress();old.exploration.maxDepth=800;old.exploration.unlockedDestinationIds=[];
   const restored=GameSession.fromData(old,SESSION_CONTENT);
   assert.deepEqual(restored.getSnapshot().destinations.filter(d=>d.unlocked).map(d=>d.id),['old_mine','fungal']);
-  const rows=restored.getSnapshot().challengeBoard.filter(r=>r.id!=='self');
-  assert.deepEqual(rows,GameSession.fromData(restored.exportProgress(),SESSION_CONTENT).getSnapshot().challengeBoard.filter(r=>r.id!=='self'));
+  // Saves from before the leaderboard was retired still load, and it is not written back.
+  const legacy=GameSession.fromData({...restored.exportProgress(),challengeBoard:{version:1,miners:[{id:'a',name:'铁锹阿林',depth:900}]}},SESSION_CONTENT);
+  assert.equal('challengeBoard' in legacy.exportProgress(),false);
+  assert.equal('challengeBoard' in legacy.getSnapshot(),false);
 });
 test('capsule coins use historical stage and one debit survives reload without re-awarding',()=>{
   const s=fixture();s.updatePosition([80,-800,80],false);at(s,CAPSULE_MACHINE_ZONE);

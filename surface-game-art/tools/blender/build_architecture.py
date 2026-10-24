@@ -64,6 +64,8 @@ def shade(h,f):
     c=rgb(h); return ''.join('%02x'%int(round(v*(1+f) if f<0 else v+(255-v)*f)) for v in c)
 GRASS_TILE=len(recipes)
 recipes.append(('6cc24a',[(3,4,9,3,'7fd15a'),(17,9,8,3,'7fd15a'),(6,21,10,3,'5fb43f'),(20,24,7,3,'5fb43f')])) # terrace grass
+PACK_ROOF=len(recipes)
+recipes.append(('d9483b',[(3,3,26,4,'e8604f'),(4,26,24,2,'c43d31')])) # backpack shop's broad red roof
 # Bridge boards in three close honey tones. Grain sits mid-board: bands along a board's edges read as stair
 # nosings once boards line up along an arch.
 DECK_TILES=[]
@@ -304,40 +306,73 @@ barrel('Shop_Barrel',(-4.60,.10,2.40),1)
 box('Shop_BenchSeat',(2.40,1.15,4.75),(2.40,.24,.70),2)
 for xx in (1.5,3.3): box('Shop_BenchFoot',(xx,.84,4.75),(.27,.60,.56),10)
 
-# PET PAVILION: chamfered toy pavilion with continuous copper-green hips.
-model('Pet_Conservatory',(17,0,3),-.13)
+# BACKPACK SHOP: the chamfered pavilion with continuous red hips, a big backpack badge over the door and
+# packs on show either side of the steps.
+def backpack(name,at,s=1,yaw=0):
+    """A chunky toy rucksack: body, rounded flap, front pocket, gold buckle, side pockets and a bedroll on top.
+    `at` is the middle of its base; it faces +Z turned by `yaw`."""
+    x0,y0,z0=at; c,sn=math.cos(yaw),math.sin(yaw)
+    def part(n,o,size,t):
+        # A box turned by `yaw` about the pack's base: vertices are rotated, the model keeps its own origin.
+        ox,oy,oz=o; hx,hy,hz=[v*s/2 for v in size]
+        verts=[]
+        for dx,dy,dz in ((-1,-1,-1),(1,-1,-1),(1,1,-1),(-1,1,-1),(-1,-1,1),(1,-1,1),(1,1,1),(-1,1,1)):
+            lx,lz=ox*s+dx*hx,oz*s+dz*hz
+            verts.append((x0+lx*c+lz*sn,y0+oy*s+dy*hy,z0-lx*sn+lz*c))
+        mesh(name+'_'+n,verts,[(3,2,1,0),(4,5,6,7),(0,1,5,4),(7,6,2,3),(0,4,7,3),(2,6,5,1)],t)
+    part('Body',(0,.55,0),(.92,1.1,.58),21)
+    part('Flap',(0,1.02,.06),(.98,.3,.66),12)
+    part('FlapLip',(0,.86,.33),(.7,.24,.08),12)
+    part('Pocket',(0,.42,.33),(.62,.46,.14),5)
+    part('Buckle',(0,.82,.39),(.17,.17,.06),8)
+    for side in (-1,1):
+        part('SidePocket',(side*.5,.38,0),(.12,.42,.4),5)
+        part('Strap',(side*.25,.6,-.31),(.12,.9,.06),10)
+    part('Bedroll',(0,1.3,-.02),(1.06,.26,.3),23)
+    part('Handle',(0,1.48,-.1),(.3,.1,.08),10)
+model('Pack_Shop',(17,0,3),-.13)
 foot=stepped_outline(8.2,6.5,.9)
-slab('Pet_Foundation',[(x*1.06,z*1.06) for x,z in foot],.04,.42,19)
-slab('Pet_FoundationCap',[(x*1.08,z*1.08) for x,z in foot],.42,.64,11)
-slab('Pet_Plaster',foot,.64,3.95,4)
+slab('Pack_Foundation',[(x*1.06,z*1.06) for x,z in foot],.04,.42,19)
+slab('Pack_FoundationCap',[(x*1.08,z*1.08) for x,z in foot],.42,.64,11)
+slab('Pack_Plaster',foot,.64,3.95,4)
 for xx in (-3.20,3.20):
-    for zz in (-3.23,3.23): box('Pet_CornerTimber',(xx,2.28,zz),(.44,3.52,.44),10)
+    for zz in (-3.23,3.23): box('Pack_CornerTimber',(xx,2.28,zz),(.44,3.52,.44),10)
 for zz in (-2.32,2.32):
-    for xx in (-4.08,4.08): box('Pet_SideTimber',(xx,2.28,zz),(.44,3.52,.44),10)
-slab('Pet_HeavyEave',[(x*1.26,z*1.26) for x,z in foot],3.98,4.36,0)
-hip_roof('Pet_ContinuousHip',foot,[(1.24,4.32),(.92,5.42),(.60,6.28)],6)
-# Four broad corner ribs are secondary to the large calm teal roof planes.
+    for xx in (-4.08,4.08): box('Pack_SideTimber',(xx,2.28,zz),(.44,3.52,.44),10)
+slab('Pack_HeavyEave',[(x*1.26,z*1.26) for x,z in foot],3.98,4.36,0)
+hip_roof('Pack_ContinuousHip',foot,[(1.24,4.32),(.92,5.42),(.60,6.28)],PACK_ROOF)
 for i in (1,3,5,7):
     x,z=foot[i]
-    beam('Pet_HipRib',(x*1.24,4.38,z*1.24),(x*.60,6.33,z*.60),.17,.14,13)
-# Clean gold cap and a toy roof lantern with a broad bevelled crown.
-slab('Pet_RoofGoldCap',[(x*.60,z*.60) for x,z in foot],6.26,6.44,8)
-box('Pet_LanternGlass',(0,6.88,0),(1.48,.95,1.48),7)
+    beam('Pack_HipRib',(x*1.24,4.38,z*1.24),(x*.60,6.33,z*.60),.17,.14,12)
+slab('Pack_RoofGoldCap',[(x*.60,z*.60) for x,z in foot],6.26,6.44,8)
+box('Pack_LanternGlass',(0,6.88,0),(1.48,.95,1.48),7)
 for xx in (-.76,.76):
-    for zz in (-.76,.76): box('Pet_LanternCorner',(xx,6.90,zz),(.18,1.08,.18),8)
-box('Pet_LanternBase',(0,6.42,0),(1.90,.20,1.90),0)
-hip_roof('Pet_LanternRoof',stepped_outline(2.18,2.18,.30),[(1,7.36),(.68,7.78)],6)
-box('Pet_LanternFinial',(0,7.97,0),(.46,.30,.46),8)
-box('Pet_FrontLedger',(0,3.80,3.34),(6.65,.29,.33),1)
-door('Pet_Door',(0,.65,3.30),1.76,2.74,6)
-for xx in (-2.18,2.18): window('Pet_FrontWindow',(xx,2.52,3.32),1.48,1.60)
-window('Pet_EastWindow',(4.15,2.40,0),2.35,2.25,True)
-box('Pet_FirstStep',(0,.14,4.73),(3.55,.28,.80),3)
-box('Pet_UpperStep',(0,.37,4.02),(3.25,.30,1.0),11)
-lamp('Pet_Lantern',(1.25,3.26,3.72),.80)
-# Egg sign uses chunky white geometric tiers, with atlas spots replacing specks.
-prism('Pet_BadgeBacking',[(x,y+5.10) for x,y in stepped_outline(1.40,1.65,.28)],3.74,3.95,0)
-prism('Pet_BadgeEgg',[(-.26,4.52),(.26,4.52),(.47,4.76),(.46,5.14),(.27,5.47),(.10,5.64),(-.10,5.64),(-.27,5.47),(-.46,5.14),(-.47,4.76)],3.98,4.13,16)
+    for zz in (-.76,.76): box('Pack_LanternCorner',(xx,6.90,zz),(.18,1.08,.18),8)
+box('Pack_LanternBase',(0,6.42,0),(1.90,.20,1.90),0)
+hip_roof('Pack_LanternRoof',stepped_outline(2.18,2.18,.30),[(1,7.36),(.68,7.78)],PACK_ROOF)
+box('Pack_LanternFinial',(0,7.97,0),(.46,.30,.46),8)
+box('Pack_FrontLedger',(0,3.80,3.34),(6.65,.29,.33),1)
+door('Pack_Door',(0,.65,3.30),1.76,2.74,14)
+for xx in (-2.18,2.18): window('Pack_FrontWindow',(xx,2.52,3.32),1.48,1.60)
+window('Pack_EastWindow',(4.15,2.40,0),2.35,2.25,True)
+box('Pack_FirstStep',(0,.14,4.73),(3.55,.28,.80),3)
+box('Pack_UpperStep',(0,.37,4.02),(3.25,.30,1.0),11)
+lamp('Pack_Lantern',(1.25,3.26,3.72),.80)
+# Badge: a big backpack on a navy plate above the door, read from across the plaza.
+prism('Pack_BadgeBacking',[(x,y+5.10) for x,y in stepped_outline(1.55,1.70,.28)],3.74,3.95,0)
+prism('Pack_BadgeBody',[(x,y+4.98) for x,y in stepped_outline(1.02,1.10,.18)],3.96,4.12,21)
+prism('Pack_BadgeFlap',[(x,y+5.40) for x,y in stepped_outline(1.10,.42,.12)],4.13,4.24,12)
+prism('Pack_BadgePocket',[(x,y+4.72) for x,y in stepped_outline(.62,.40,.08)],4.13,4.22,5)
+prism('Pack_BadgeBuckle',[(x,y+5.22) for x,y in stepped_outline(.18,.18,.04)],4.25,4.31,8)
+prism('Pack_BadgeHandle',[(x,y+5.72) for x,y in stepped_outline(.40,.16,.05)],3.96,4.06,10)
+# Packs on show: a crate with a pack each side of the steps, and a row hanging under the east eave.
+for side in (-1,1):
+    crate('Pack_ShowCrate',(side*3.05,.10,4.45),.86)
+    backpack('Pack_ShowPack',(side*3.05,.96,4.45),.92,side*-.25)
+for i,zz in enumerate((-1.75,-.05,1.65)):
+    box('Pack_HangPeg',(4.55,3.05,zz),(.5,.12,.12),10)
+    backpack('Pack_HangPack',(4.62,1.72,zz),.78,math.pi/2)
+crate('Pack_SideCrate',(-4.65,.10,1.7),.9); backpack('Pack_SidePack',(-4.65,1.0,1.7),.8,-math.pi/2)
 
 def egg(name,at,h,t,plain=None):
     # A connected, solid eight-sided egg with four broad faceted bands. Atlas
@@ -365,16 +400,6 @@ def egg(name,at,h,t,plain=None):
             vi=ob.data.loops[li].vertex_index; ring_index=vi//n
             u=0 if vi%n==facet else 1; v=profile[ring_index][0]
             ob.data.uv_layers.active.data[li].uv=((tx+27*u)/SIZE,1-(ty+27*(1-v))/SIZE)
-# Pedestal is intentionally large and simple, the egg remains the focal detail.
-nestx,nestz=-3.40,5.10
-slab('Pet_NestFoot',[(nestx+x,nestz+z) for x,z in stepped_outline(3.45,3.0,.5)],.08,.46,11)
-slab('Pet_NestGold',[(nestx+x,nestz+z) for x,z in stepped_outline(3.1,2.7,.45)],.46,.66,8)
-slab('Pet_NestStraw',[(nestx+x,nestz+z) for x,z in stepped_outline(2.8,2.4,.4)],.66,.83,23)
-egg('Pet_MainEgg',(nestx,.83,nestz),1.96,16)
-egg('Pet_TealEgg',(nestx+.98,.83,nestz+.42),.93,17)
-egg('Pet_LavenderEgg',(nestx-.90,.83,nestz+.57),.86,18)
-barrel('Pet_Barrel',(4.62,.10,1.85),.80)
-
 # FORGE: open bay and oversized masonry make it distinct from the closed shop.
 model('Copper_Forge',(-20,0,-17),.12)
 box('Forge_Foundation',(0,.26,0),(7.0,.52,5.8),19)
@@ -564,12 +589,10 @@ for i,(x,z,yaw) in enumerate(((-9.8,7.4,.1),(8.5,10.3,-.4))):
 
 # Adapt the approved Pinewind authoring method to the real playable mine.
 # No imported legacy meshes, Decimate, or decorative shaft floor.
-for name,service in [('Merchant_Store','sale'),('Copper_Forge','shop')]:
+for name,service in [('Merchant_Store','sale'),('Copper_Forge','shop'),('Pack_Shop','bags')]:
     anchor=layout['services'][service]['anchor']
     MODELS[name].location=P((anchor['x'],0,anchor['z']))
     MODELS[name].rotation_euler[2]=anchor['yaw']
-MODELS['Pet_Conservatory'].location=P((layout['conservatory']['x'],0,layout['conservatory']['z']))
-MODELS['Pet_Conservatory'].rotation_euler[2]=layout['conservatory']['yaw']
 MODELS['Mine_Headframe'].location=P((0,0,0))
 MODELS['Mine_Headframe'].scale=(1.5,1.8,1)
 MODELS['Ore_Cart'].location=P((12,0,-5))
@@ -578,7 +601,7 @@ MODELS['Plaza_Signpost'].location=P((layout['props']['signpost']['x'],0,layout['
 for i,lamp_at in enumerate(layout['props']['lamps']):
     MODELS['Plaza_Lamp_%d'%i].location=P((lamp_at['x'],0,lamp_at['z'])); MODELS['Plaza_Lamp_%d'%i].rotation_euler[2]=lamp_at['yaw']
 for ob in list(bpy.data.objects):
-    if ob.name.startswith(('Mine_Lift','Mine_Access','Mine_DeckLantern','Mine_RearLoading','Pet_Nest','Pet_MainEgg','Pet_TealEgg','Pet_LavenderEgg')):
+    if ob.name.startswith(('Mine_Lift','Mine_Access','Mine_DeckLantern','Mine_RearLoading')):
         bpy.data.objects.remove(ob,do_unlink=True)
 # Each actual pet SKU receives its own solid egg in its own colour, sized for the labels.
 for i,p in enumerate(layout['eggs']):
@@ -611,14 +634,7 @@ for i,p in enumerate(layout['portals']):
     box('Portal_GoldLine',(0,2.94,0),(2.5,.10,.48),8)
     prism('Portal_Crest',[(x,y+2.72) for x,y in stepped_outline(.58,.58,.15)],.36,.50,17)
 
-# Functional furniture: newly authored shells; live canvas data is attached in-game.
-model('Challenge_Board',tuple(layout['feedback']['board']))
-for x in [-1.75,1.75]:
-    box('Board_Post',(x,2.8,0),(.36,5.6,.36),1)
-    box('Board_Foot',(x,.22,0),(.64,.44,.7),19)
-box('Board_Back',(0,4,0),(4.7,5.5,.32),0)
-for x in [-2.29,2.29]:box('Board_FrameSide',(x,4,.19),(.18,5.5,.18),2)
-for y in [1.3,6.7]:box('Board_FrameRail',(0,y,.19),(4.7,.18,.18),8)
+# Functional furniture: a newly authored shell; its live label is attached in-game.
 # A faceted teal toy cabinet with a recessed capsule display and bold roof/collars.
 model('Capsule_Cabinet',tuple(layout['feedback']['capsule']),layout['feedback'].get('capsuleYaw',0))
 slab('Capsule_Base',stepped_outline(2.5,2.2,.22),0,.28,19)
@@ -670,7 +686,7 @@ for side,sx in (('L',-1),('R',1)):
 # is applied to them. Preserve nearest sampling and the authored atlas UVs.
 bevel_count=0
 for ob in [o for o in bpy.data.objects if o.type=='MESH']:
-    prominent=any(key in ob.name for key in ('Shop_CornerTimber','Shop_PorchPost','Forge_FrontPost','Pet_CornerTimber','Pet_SideTimber','Bridge_PostCap','Shop_FoundationCap','Pet_FoundationCap'))
+    prominent=any(key in ob.name for key in ('Shop_CornerTimber','Shop_PorchPost','Forge_FrontPost','Pack_CornerTimber','Pack_SideTimber','Bridge_PostCap','Shop_FoundationCap','Pack_FoundationCap'))
     if not prominent: continue
     bpy.context.view_layer.objects.active=ob
     mod=ob.modifiers.new('BroadSingleChamfer','BEVEL'); mod.width=.055; mod.segments=1

@@ -5,7 +5,6 @@ import { WorldProgress } from '../logic/WorldProgress.ts';
 import { MineralReservation } from '../logic/MineralReservation.ts';
 import { WORLD_REQUIREMENTS, worldRequirement, worldAtZ, worldAtFeet, worldSpawn, type WorldId } from '../content/worldJourney.ts';
 import { JOURNEY_TOOL_PRICES, JOURNEY_BACKPACKS } from '../content/journeyResources.ts';
-import { ChallengeBoard } from '../logic/ChallengeBoard.ts';
 import { Rewards, type RewardOptions, type RewardClaimResult } from '../logic/Rewards.ts';
 import { REWARD_CONFIG, stageCoinReward, type OnlineRewardMinutes } from '../content/rewards.ts';
 import { STAGES } from '../content/progression.ts';
@@ -96,7 +95,6 @@ export class GameSession {
     if(key!==this.baseStatsKey){this.baseStatsKey=key;this.cachedBaseStats=pickaxeStats(level,boosted?1.5:1);}
     return this.cachedBaseStats;
   };
-  private readonly challengeBoard: ChallengeBoard;
   private readonly pickupListeners = new Set<(batch: readonly {itemId:string;count:number}[]) => void>();
   onOreCollected = (listener: (batch: readonly {itemId:string;count:number}[]) => void) => {
     this.pickupListeners.add(listener);
@@ -140,7 +138,7 @@ export class GameSession {
     if (this.petService.getEquipment().slots.some(id=>id!==null)) this.onboarding.record('equippedOnce');
     for (const listener of this.progressListeners) listener({ urgent }); }
   exportProgress(): ProgressDataV1 {
-    return { version: 1 as const, equipment:this.equipment.exportData(), rewards:this.rewards.exportData(), challengeBoard:this.challengeBoard.exportData(), wallet: this.wallet.exportData(), inventory: this.inventory.exportData(),
+    return { version: 1 as const, equipment:this.equipment.exportData(), rewards:this.rewards.exportData(), wallet: this.wallet.exportData(), inventory: this.inventory.exportData(),
       onboarding: this.onboarding.getSnapshot(), pickaxe: this.pickaxe.exportData(), pets: this.petService.exportData(), exploration: this.explorations.get(1)!.exportData(),
       ...(this.content.journey?{worldProgress:this.worldProgress.exportData(),reservations:this.reservations.exportData(),worldExploration:Object.fromEntries([...this.explorations].map(([id,e])=>[id,e.exportData()]))}:{}) };
   }
@@ -194,7 +192,6 @@ export class GameSession {
     this.worldProgress = new WorldProgress(data?.worldProgress);
     this.reservations = new MineralReservation(data?.reservations,id=>ORE_ITEMS.some(r=>r.itemId===id));
     this.homes = (content.homes??[]).map(h=>({worldId:h.worldId,detector:new ZoneDetector(h.zone)}));
-    this.challengeBoard = new ChallengeBoard(Math.random, data?.challengeBoard);
     this.rewards = data?.rewards === undefined ? new Rewards(petDependencies.rewards) : Rewards.fromData(data.rewards, petDependencies.rewards);
     this.syncRewardEffects();
     this.wallet = data ? Wallet.fromData(data.wallet) : new Wallet(content.initialCoins ?? 0);
@@ -317,7 +314,6 @@ export class GameSession {
       inventory: this.inventory.getSnapshot(),
       backpackLevel: 1 + (this.content.journey?JOURNEY_BACKPACKS:BACKPACK_TIERS).filter(tier => tier.capacity <= bag.capacity).length,
       maxDepth: this.exploration.maxDepth,
-      challengeBoard: this.challengeBoard.rows(this.exploration.maxDepth),
       rewards: this.rewards.getSnapshot(),
       capsuleCoins: this.capsuleCoinReward(),
       atMachine: this.atMachine,
@@ -328,6 +324,8 @@ export class GameSession {
       inSellZone: this.inSellZone,
       atHome: this.atHome,
       shopId: this.shopId,
+      /** The page the shop counter the player stands at opens on. */
+      shopCategory: this.content.shops.find(s => s.id === this.shopId)?.category ?? 'tools',
       eggId: this.eggId,
       eggStation: this.eggStation,
       miningStats: this.miningAttributes.getSnapshot(),

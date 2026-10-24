@@ -294,9 +294,6 @@ export async function startGame(options: StartGameOptions) {
     if(content.worlds){const gates=new JourneyGates(physics,session,surface.group);root.add(gates.group);scope.defer(()=>gates.dispose());}
     const feedbackFixtures = new FeedbackFixtures();
     root.add(feedbackFixtures.group);
-    const updateFeedback = () => { const s=session.getSnapshot(); feedbackFixtures.update(s.challengeBoard,s.maxDepth); };
-    updateFeedback();
-    scope.defer(session.subscribe(updateFeedback));
     scope.defer(() => feedbackFixtures.dispose());
     startup.sceneAttachMs = performance.now() - startup.started;
     startup.terrainPendingAtAttach = terrain.snapshot().queue;

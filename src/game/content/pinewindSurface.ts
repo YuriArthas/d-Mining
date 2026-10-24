@@ -7,7 +7,7 @@ import {CatmullRomCurve3,Vector3} from 'three';
 import {CELL} from '../terrain/grid.ts';
 import {
  PINEWIND_SERVICES, PINEWIND_PORTAL_SLOTS, PINEWIND_PORTAL_RADIUS, PINEWIND_EGG_DISPLAYS, PINEWIND_EGG_TIERS,
- PINEWIND_TERRACE, PINEWIND_STAIR_STEPS, PINEWIND_CONSERVATORY, PINEWIND_EGG_SIGN, PINEWIND_CREEK,
+ PINEWIND_TERRACE, PINEWIND_STAIR_STEPS, PINEWIND_CREEK,
 } from './pinewind/hubLayout.ts';
 import type {AuthoredInstance, AuthoredLight} from './authoredSurface.ts';
 
@@ -32,7 +32,7 @@ export const PINEWIND_TERRACE_SOLIDS:readonly Solid[]=[
 ];
 
 /** The Pinewind hub owns world 1's surface: its art, collision and the interaction zones
- *  players use there (sale, shop, portals, egg stands). Rules, saves, rooms and the other
+ *  players use there (sale, the pickaxe and backpack shops, portals, egg stands). Rules, saves, rooms and the other
  *  worlds come unchanged from the base content. */
 export function withPinewindSurface(base:CampContent):CampContent {
  const shaft=base.surface.shaft;
@@ -43,9 +43,9 @@ export function withPinewindSurface(base:CampContent):CampContent {
   const slot=PINEWIND_PORTAL_SLOTS[p.id];if(!slot)throw Error(`Missing Pinewind portal slot: ${p.id}`);
   return {...p,...slot,zone:{...p.zone,x:slot.x,z:slot.z,radius:PINEWIND_PORTAL_RADIUS}};
  });
- const services=[PINEWIND_SERVICES.sale,PINEWIND_SERVICES.shop];
+ const services=[PINEWIND_SERVICES.sale,PINEWIND_SERVICES.shop,PINEWIND_SERVICES.bags];
  const models=roots.filter(r=>!r.node.startsWith('Portal_')&&!r.node.startsWith('Egg_')).map(r=>instance(r.node));
- for(const [node,service] of [['Merchant_Store',PINEWIND_SERVICES.sale],['Copper_Forge',PINEWIND_SERVICES.shop]] as const){
+ for(const [node,service] of [['Merchant_Store',PINEWIND_SERVICES.sale],['Copper_Forge',PINEWIND_SERVICES.shop],['Pack_Shop',PINEWIND_SERVICES.bags]] as const){
   const p=models.find(r=>r.node===node)!;p.at=[service.placement.x,0,service.placement.z];p.rotation=rotation(service.placement.yaw);
  }
  for(const p of eggs){const model=instance('Egg_'+p.id);model.at=[p.x,p.y,p.z];model.rotation=rotation(p.yaw);models.push(model);}
@@ -53,22 +53,22 @@ export function withPinewindSurface(base:CampContent):CampContent {
  for(const p of portals){const model=instance('Portal_'+p.id);model.at=[p.x,0,p.z];model.rotation=rotation(p.yaw);model.portalId=p.id;models.push(model);}
  for(const model of models)model.ground=model.node==='Creek_Bridge'||model.node?.startsWith('Terrace')===true;
  models.unshift({asset:'pinewind-landscape',at:[0,0,0],rotation:[0,0,0,1],scale:[1,1,1]});
- const c=PINEWIND_CONSERVATORY;
- const solids:Solid[]=[...authored.solids as Solid[],...PINEWIND_TERRACE_SOLIDS,...services.map(s=>s.solid),{at:[c.x,c.half[1],c.z],half:[...c.half],yaw:c.yaw}];
+ const solids:Solid[]=[...authored.solids as Solid[],...PINEWIND_TERRACE_SOLIDS,...services.map(s=>s.solid)];
  for(const p of eggs)solids.push({at:[p.x,p.y+1.5,p.z],half:[.95,1.5,.95],yaw:0});
  for(const p of portals)solids.push({at:[p.x,.08,p.z],half:[1.3,.08,1],yaw:p.yaw});
  for(const p of portals)for(const sign of [-1,1])solids.push({at:[p.x+Math.cos(p.yaw)*1.05*sign,1.5,p.z-Math.sin(p.yaw)*1.05*sign],half:[.25,1.5,.25],yaw:p.yaw});
  const surface:SurfaceContent={...base.surface,placements:[],profiles:{},
   authored:{version:'pinewind-plaza-v4',instances:models,groundAssets:['pinewind-landscape'],opensSpawnPassage:true,light:{...authored.light,sun:authored.light.sun as [number,number,number]} satisfies AuthoredLight},
-  plan:{shapes:services.map(s=>s.ring),signs:[...services.map(s=>s.sign),PINEWIND_EGG_SIGN],solids},
+  plan:{shapes:services.map(s=>s.ring),signs:services.map(s=>s.sign),solids},
  };
- // The first entries of sales/shops are world 1's surface services (see sessionContentFor).
+ // The first entries of sales/shops are world 1's surface services (see sessionContentFor); the backpack
+ // shop joins right after the pickaxe shop and opens on its own counter.
  const surfaceShop=base.session.shops.findIndex(s=>s.id==='surface-upgrade');
  if(surfaceShop<0)throw Error('Base content lacks the surface shop');
  const session:SessionContent={...base.session,
   sunkenSurface:CREEK_CELLS,
   sales:[PINEWIND_SERVICES.sale.trigger,...base.session.sales.slice(1)],
-  shops:base.session.shops.map((s,i)=>i===surfaceShop?{...s,zone:PINEWIND_SERVICES.shop.trigger}:s),
+  shops:base.session.shops.flatMap((s,i)=>i===surfaceShop?[{...s,zone:PINEWIND_SERVICES.shop.trigger,category:'tools' as const},{id:PINEWIND_SERVICES.bags.id,zone:PINEWIND_SERVICES.bags.trigger,category:'backpacks' as const}]:[s]),
   portals,
   eggStations:eggs.map(p=>({id:p.id,eggId:p.eggId,promptAnchor:[p.x,p.y+4.85,p.z] as const,
    // Stand in front of the egg (eggs face the plaza along their yaw).

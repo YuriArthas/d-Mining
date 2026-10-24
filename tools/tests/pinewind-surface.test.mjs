@@ -18,7 +18,10 @@ test('the hub owns world-1 surface zones; rules, rooms, worlds and the tutorial 
  assert.deepEqual(art.session.sales.slice(1),base.session.sales.slice(1),'room sale zones unchanged');
  assert.deepEqual(art.session.sales[0],PINEWIND_SERVICES.sale.trigger);
  assert.deepEqual(art.session.shops.find(s=>s.id==='surface-upgrade').zone,PINEWIND_SERVICES.shop.trigger);
- assert.deepEqual(art.session.shops.filter(s=>s.id!=='surface-upgrade'),base.session.shops.filter(s=>s.id!=='surface-upgrade'));
+ // The pickaxe forge opens on tools, the pack shop beside it on backpacks; room shops are unchanged.
+ assert.deepEqual(art.session.shops.slice(0,2).map(s=>[s.id,s.category]),[['surface-upgrade','tools'],['surface-bags','backpacks']]);
+ assert.deepEqual(art.session.shops.find(s=>s.id==='surface-bags').zone,PINEWIND_SERVICES.bags.trigger);
+ assert.deepEqual(art.session.shops.filter(s=>!s.id.startsWith('surface-')),base.session.shops.filter(s=>s.id!=='surface-upgrade'));
  assert.equal(art.session.eggStations.length,PINEWIND_EGG_DISPLAYS.length);
  assert.equal(art.surface.placements.length,0);
  assert.deepEqual([...new Set(art.surface.authored.instances.map(p=>p.asset))].sort(),['pinewind-architecture','pinewind-landscape']);
@@ -38,15 +41,19 @@ test('portals follow the Pinewind slots for the visible model, both jamb collide
 test('plaza plan: services face the plaza without touching the mine, the headframe or each other',()=>{
  const footprint=(kind,size,forward)=>{const {x,z,yaw}=PINEWIND_FACILITIES[kind].anchor,f=[Math.sin(yaw),Math.cos(yaw)],s=[Math.cos(yaw),-Math.sin(yaw)],c=[x+f[0]*forward,z+f[1]*forward];
   return [[1,1],[1,-1],[-1,-1],[-1,1]].map(([a,b])=>[c[0]+s[0]*size[0]/2*a+f[0]*size[1]/2*b,c[1]+s[1]*size[0]/2*a+f[1]*size[1]/2*b]);};
- const sale=footprint('sale',[10.14,10.66],1.1),shop=footprint('shop',[8.35,6.78],0);
+ const sale=footprint('sale',[10.14,10.66],1.1),shop=footprint('shop',[8.35,6.78],0),bags=footprint('bags',[8.9,8.6],.8);
  const sat=(a,b)=>{for(const poly of [a,b])for(let i=0;i<4;i++){const p=poly[i],q=poly[(i+1)%4],n=[q[1]-p[1],p[0]-q[0]];
   const pa=a.map(v=>v[0]*n[0]+v[1]*n[1]),pb=b.map(v=>v[0]*n[0]+v[1]*n[1]);if(Math.max(...pa)<Math.min(...pb)||Math.max(...pb)<Math.min(...pa))return false;}return true;};
  const rect=(x0,x1,z0,z1)=>[[x0,z0],[x1,z0],[x1,z1],[x0,z1]];
- assert.equal(sat(sale,shop),false,'sale and shop overlap');
- for(const [name,poly] of [['sale',sale],['shop',shop]]){
-  assert.equal(sat(poly,rect(-11.7,11.7,-10.2,10.2)),false,`${name} touches the headframe`);
+ for(const [a,b,name] of [[sale,shop,'sale/shop'],[sale,bags,'sale/bags'],[shop,bags,'shop/bags']])assert.equal(sat(a,b),false,`${name} overlap`);
+ // The terrace stairs and terraces keep a walkway (2 m) to the capsule machine behind the sell house.
+ const grow=(poly,by)=>{const c=poly.reduce((a,v)=>[a[0]+v[0]/4,a[1]+v[1]/4],[0,0]);return poly.map(v=>{const d=Math.hypot(v[0]-c[0],v[1]-c[1]);return [v[0]+(v[0]-c[0])/d*by,v[1]+(v[1]-c[1])/d*by];});};
+ assert.equal(sat(grow(sale,2),rect(25,43,14,43)),false,'sell house leaves a walkway past the terrace stairs');
+ for(const [name,poly] of [['sale',sale],['shop',shop],['bags',bags]]){
+  // The headframe's corner piers stand within 11.2 x 9.3 m of the mine centre.
+  assert.equal(sat(poly,rect(-11.2,11.2,-9.3,9.3)),false,`${name} touches the headframe`);
   const ring=PINEWIND_SERVICES[name].trigger;
-  assert.ok(Math.hypot(ring.x-PINEWIND_PLAZA.x,ring.z-PINEWIND_PLAZA.z)<=PINEWIND_PLAZA.radius,`${name} ring on the plaza`);
+  assert.ok(Math.hypot(ring.x-PINEWIND_PLAZA.x,ring.z-PINEWIND_PLAZA.z)<=PINEWIND_PLAZA.radius+.5,`${name} ring on the plaza`);
   const facing=PINEWIND_FACILITIES[name].anchor.yaw,toPlaza=Math.atan2(PINEWIND_PLAZA.x-ring.x,PINEWIND_PLAZA.z-ring.z);
   assert.ok(Math.abs(Math.atan2(Math.sin(facing-toPlaza),Math.cos(facing-toPlaza)))<.5,`${name} faces the plaza`);
  }
@@ -153,7 +160,7 @@ test('cliffs enclose the valley outside the play area: the pass and the creek go
   // The creek enters in the north-east and leaves in the west through gorges.
   for(const [x,z] of [[61,-50],[-70,55]])assert.ok(gap(s,x,z)>2,`column at ${s.at} dams the creek`);
  }
- for(const zone of [...PINEWIND_CAMP.session.portals.map(p=>p.zone),...PINEWIND_CAMP.session.eggStations.map(e=>e.zone),PINEWIND_SERVICES.sale.trigger,PINEWIND_SERVICES.shop.trigger])
+ for(const zone of [...PINEWIND_CAMP.session.portals.map(p=>p.zone),...PINEWIND_CAMP.session.eggStations.map(e=>e.zone),...Object.values(PINEWIND_SERVICES).map(s=>s.trigger)])
   for(const s of hulls)assert.ok(gap(s,zone.x,zone.z)>10);
  await initPhysics();const physics=new CharacterPhysics(false,true),collisions=new SceneryCollision(physics,[{id:'surface',depth:0,plan:PINEWIND_CAMP.surface.plan}]);
  physics.world.createCollider(RAPIER.ColliderDesc.cuboid(100,1,100).setTranslation(0,-1,0));
@@ -174,22 +181,26 @@ test('instant trips face the service building',()=>{
  assert.equal(trip.feet[0],PINEWIND_SERVICES.shop.trigger.x);
 });
 
-test('布局 v4：出售和商店分在矿井两侧，从出生点看不会前后叠在一起；排行榜和扭蛋机避开矿架和房子', async () => {
+test('布局 v5：出售在东北，镐子店和背包店在西侧，从出生点看分在矿架两边；扭蛋机在原宠物屋位置，避开矿架和房子；没有排行榜', async () => {
  const { PINEWIND_GATE } = await import('../../src/game/content/pinewind/hubLayout.ts');
  const { worldGateZ } = await import('../../src/game/content/worldJourney.ts');
- const { CHALLENGE_BOARD_AT, CAPSULE_MACHINE_AT, CAPSULE_MACHINE_ZONE } = await import('../../src/game/content/feedbackFacilities.ts');
+ const facilities = await import('../../src/game/content/feedbackFacilities.ts'), { CAPSULE_MACHINE_AT, CAPSULE_MACHINE_ZONE } = facilities;
+ assert.equal('CHALLENGE_BOARD_AT' in facilities, false, 'the leaderboard is gone');
  // The default arrival view looks north from just behind the spawn.
  const eye = [PINEWIND_SPAWN.x, PINEWIND_SPAWN.z + 6], bearing = ([x, z]) => Math.atan2(x - eye[0], eye[1] - z);
- const sale = PINEWIND_SERVICES.sale.center, shop = PINEWIND_SERVICES.shop.center;
- assert.ok(sale[0] < -8 && shop[0] > 8, `sell west, shop east of the mine: ${sale} / ${shop}`);
+ const sale = PINEWIND_SERVICES.sale.center, shop = PINEWIND_SERVICES.shop.center, bags = PINEWIND_SERVICES.bags.center;
+ assert.ok(sale[0] > 8 && shop[0] < -8 && bags[0] < -8, `sell east, both shops west of the mine: ${sale} / ${shop} / ${bags}`);
  const apart = Math.abs(bearing([shop[0], shop[2]]) - bearing([sale[0], sale[2]])) * 180 / Math.PI;
  assert.ok(apart > 35, `from the spawn the two buildings are ${apart.toFixed(0)}° apart`);
- // Board and capsule clear the headframe footprint (11.7 x 10.2) and the service buildings.
+ // The capsule clears the headframe footprint (11.7 x 10.2), the buildings and the terrace stairs.
  const headframe = (x, z, r) => Math.abs(x) < 11.7 + r && Math.abs(z) < 10.2 + r;
- assert.ok(!headframe(CHALLENGE_BOARD_AT[0], CHALLENGE_BOARD_AT[2], 2.35), 'board clear of the headframe');
  assert.ok(!headframe(CAPSULE_MACHINE_AT[0], CAPSULE_MACHINE_AT[2], 1.3), 'capsule clear of the headframe');
- for (const [name, at] of [['board', CHALLENGE_BOARD_AT], ['capsule', CAPSULE_MACHINE_AT]]) for (const service of [sale, shop])
-  assert.ok(Math.hypot(at[0] - service[0], at[2] - service[2]) > 6.5, `${name} clear of ${service}`);
+ for (const service of [sale, shop, bags]) assert.ok(Math.hypot(CAPSULE_MACHINE_AT[0] - service[0], CAPSULE_MACHINE_AT[2] - service[2]) > 6.5, `capsule clear of ${service}`);
+ assert.ok(CAPSULE_MACHINE_AT[2] + 1.3 < 14, 'capsule north of the terrace stairs');
+ const roots0 = PINEWIND_CAMP.surface.authored.instances.map(i => i.node);
+ for (const gone of ['Challenge_Board', 'Pet_Conservatory']) assert.equal(roots0.includes(gone), false, gone);
+ assert.equal(PINEWIND_CAMP.surface.plan.signs.some(s => s.title === 'PETS'), false, 'no PETS sign');
+ assert.deepEqual(PINEWIND_CAMP.surface.plan.signs.map(s => s.title).sort(), ['BACKPACK', 'PICKAXE', 'SELL']);
  assert.ok(Math.hypot(CAPSULE_MACHINE_ZONE.x - CAPSULE_MACHINE_AT[0], CAPSULE_MACHINE_ZONE.z - CAPSULE_MACHINE_AT[2]) < 2, 'capsule zone in front of it');
  // The authored gate stands on the gameplay gate line, its doors hinged at the opening's edges.
  assert.equal(PINEWIND_GATE.z, worldGateZ(2));

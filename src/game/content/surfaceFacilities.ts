@@ -89,4 +89,32 @@ export const SURFACE_FACILITIES = {
     },
     ringColor: "#44cfff",
   },
+  bags: {
+    id: "surface-bags",
+    type: "shop",
+    anchor: { x: -20, z: 13, yaw: 0 },
+    model: {
+      asset: "simulator-upgrade",
+      width: 9,
+      depth: 8.6,
+      height: 8,
+      y: -0.08,
+    },
+    trigger: {
+      x: 0,
+      z: 6.7,
+      radius: 1.7,
+      heightTolerance: 0.25,
+      hysteresis: 0.25,
+    },
+    collider: { x: 0, y: 3, z: 0, half: [4.3, 3, 3.4], yaw: 0 },
+    sign: {
+      title: "BACKPACK",
+      color: "#ffb44a",
+      background: "#18283d",
+      width: 3.6,
+      y: 4.5,
+    },
+    ringColor: "#ffbf5e",
+  },
 } as const satisfies Record<string, SurfaceFacility>;

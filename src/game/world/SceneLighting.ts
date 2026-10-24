@@ -1,5 +1,5 @@
 import {PINEWIND_SERVICES,PINEWIND_SPAWN,PINEWIND_PLAZA} from '../content/pinewind/hubLayout.ts';
-const {sale:SALE,shop:SHOP}=PINEWIND_SERVICES;
+const {sale:SALE,shop:SHOP,bags:BAGS}=PINEWIND_SERVICES;
 // Night uses broad neutral fill to retain material hues; local warm spots only add accents.
 // Area lighting is authored independently of lamp meshes and their transforms.
 // Decorative lamps can be added, removed or moved without changing this rig.
@@ -29,6 +29,7 @@ export const SURFACE_FILL_LIGHTS=[
  // The portal ring around the spawn.
  ...[[-9,50],[0,57],[9,50]].map(([x,z],i)=>({id:'portal-court-'+i,castShadow:false,position:[PINEWIND_SPAWN.x+x,12,z] as const,target:[PINEWIND_SPAWN.x+x,0,z] as const,color:'#fff0d9',intensity:220,distance:35,angle:1.05,penumbra:1})),
  {id:'mine-facade-area',castShadow:false,position:[0,20,22],target:[0,8,10],color:'#ffe8c9',intensity:320,distance:45,angle:1.05,penumbra:1},
- {id:'shop-area',castShadow:false,position:[SHOP.trigger.x,13,SHOP.trigger.z],target:[SHOP.center[0],1,SHOP.center[2]],color:'#ffe4be',intensity:170,distance:34,angle:1.15,penumbra:1},
+ // One light between the two west shops (the pickaxe forge and the pack shop) covers both fronts.
+ {id:'shop-area',castShadow:false,position:[(SHOP.trigger.x+BAGS.trigger.x)/2,13,(SHOP.trigger.z+BAGS.trigger.z)/2],target:[(SHOP.center[0]+BAGS.center[0])/2,1,(SHOP.center[2]+BAGS.center[2])/2],color:'#ffe4be',intensity:220,distance:38,angle:1.25,penumbra:1},
  {id:'sell-area',castShadow:false,position:[SALE.trigger.x,13,SALE.trigger.z],target:[SALE.center[0],1,SALE.center[2]],color:'#ffe4be',intensity:170,distance:34,angle:1.15,penumbra:1},
 ] as const;

@@ -42,11 +42,12 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
   const [dismissedShop, setDismissedShop] = useState<string | null>(null);
   const [lastShop, setLastShop] = useState(state.shopId);
   if (lastShop !== state.shopId) { setLastShop(state.shopId); setDismissedShop(null); }
-  // The shop opens in place from the HUD (its counter chosen by the button), or on walking into the surface shop.
+  // The shop opens in place from the HUD (its counter chosen by the button), or on walking into a shop: the forge
+  // opens on pickaxes, the pack shop on backpacks.
   const [shopRequest, setShopRequest] = useState<ShopCategory | null>(null);
   const shop = useSyncExternalStore(shopView.subscribe, shopView.getSnapshot);
   const shopOpen = !modal && (shopRequest !== null || (state.shopId !== null && dismissedShop !== state.shopId));
-  useEffect(() => { input.reset(); if (shopOpen) { if (!shopView.active) showShopCategory(shopView, session.getSnapshot(), shopRequest ?? 'tools'); } else shopView.close(); }, [shopOpen, shopRequest, shopView, session, input]);
+  useEffect(() => { input.reset(); if (shopOpen) { if (!shopView.active) showShopCategory(shopView, session.getSnapshot(), shopRequest ?? state.shopCategory); } else shopView.close(); }, [shopOpen, shopRequest, shopView, session, input, state.shopCategory]);
 
   const open = (next: Modal) => { input.reset(); setModal(next); };
   const close = () => { input.reset(); session.setAutoHatch(false); setModal(null); surface.current?.focus(); };

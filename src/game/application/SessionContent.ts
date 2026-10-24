@@ -30,7 +30,8 @@ export type SessionContent = Readonly<{
   initiallyUnlocked?: readonly string[];
   destinations: readonly Destination[];
   sales: readonly ServiceZone[];
-  shops: readonly Readonly<{ id: string; zone: ServiceZone }>[];
+  /** Shop counters; `category` picks the page a counter opens on (tools when absent). */
+  shops: readonly Readonly<{ id: string; zone: ServiceZone; category?: import('../content/shopCatalog.ts').ShopCategory }>[];
   portals: readonly Readonly<{ id: string; zone: ZoneConfig }>[];
   home: ZoneConfig;
 }>;

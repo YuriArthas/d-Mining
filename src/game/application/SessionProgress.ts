@@ -7,7 +7,8 @@ export type ProgressDataV1 = {
   reservations?: import('../logic/MineralReservation.ts').ReservationData;
   worldExploration?: Record<string, ProgressDataV1['exploration']>;
   rewards?: import('../logic/Rewards.ts').RewardData;
-  challengeBoard?: import('../logic/ChallengeBoard.ts').ChallengeBoardData;
+  /** The retired surface leaderboard (saves before 2026-10-23): still accepted, ignored. */
+  challengeBoard?: unknown;
   onboarding?: import('../logic/Onboarding.ts').OnboardingData;
   version: 1;
   wallet: { version: 1; coins: number };
