@@ -47,7 +47,7 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
           const v = q.result, d = v.data;
           d.wallet.balances = { gold: 4800, tech: 2600, star: 0 }; d.onboarding.status = 'skipped';
           d.inventory.items = { 'journey.rock.0': 6, 'journey.copper': 3 };
-          d.pets.inventory.pets = [['a', 'moss-slime'], ['b', 'amber-fox'], ['c', 'pebble-guardian'], ['d', 'copper-friend'], ['e', 'gear-wing']].map(([id, speciesId]) => ({ id, speciesId, level: 1 }));
+          d.pets.inventory.pets = [['a', 'moss-slime'], ['b', 'amber-fox'], ['c', 'pebble-guardian'], ['d', 'copper-friend'], ['e', 'gear-wing'], ['m1', 'quarry-mole'], ['m2', 'quarry-mole'], ['m3', 'quarry-mole'], ['m4', 'quarry-mole'], ['m5', 'quarry-mole']].map(([id, speciesId]) => ({ id, speciesId, level: 1 }));
           d.pets.equipment.slots = ['a', 'b', null];
           d.worldProgress = { version: 2, openWorlds: [1, 2] };
           d.worldExploration['1'] = { version: 1, maxDepth: 150, unlockedDestinationIds: ['old_mine', 'fungal'] };
@@ -78,7 +78,14 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
     const equipped = await page.locator('.bag-pets .ui-cell[data-equipped]').evaluateAll(cells => cells.map(c => c.getAttribute('aria-label')));
     assert.ok(equipped.every(label => /金币/.test(label)), `world 1 best team is all gold pets: ${equipped}`);
     await shot('04-pets-best-gold');
+    // Golden merge: five 矿洞鼹鼠 become one golden one.
+    await tap(page.getByRole('listitem').filter({ hasText: '矿洞鼹鼠' }).first());
+    const merge = page.locator('.bag-merge'); assert.match(await merge.innerText(), /5\/5/); await tap(merge);
+    await page.locator('.ui-cell[data-golden]').waitFor(); await shot('04a-golden');
+    assert.match(await page.locator('.bag-detail').innerText(), /金色矿洞鼹鼠/);
+    assert.match(await page.locator('.bag-pets-main').innerText(), /第 4 格/);
     await tap(button('关闭宠物'));
+    await check('Golden merge: five identical pets merge into one 金色 pet with a gold frame; the locked 4th slot shows where it unlocks.');
     await check('Pet bag: each pet shows its income bonus (currency) and mining speed; the team shows both totals; a world 2 pet is not greyed and says its income bonus counts in world 2; 一键最佳 in world 1 picks gold pets first.');
 
     // Egg stand: price and bonuses in gold.

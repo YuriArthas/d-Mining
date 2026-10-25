@@ -54,3 +54,4 @@
 .ui-cell[data-golden][data-equipped] { box-shadow: inset 0 2px 0 #fff6, 0 0 0 3px #58e04a, 0 0 14px #ffd34acc, 0 3px 0 var(--ui-ink); }
 .bag-buy-slot.ui-btn { min-height: 34px; padding: 0 10px; font-size: 14px; }
 .bag-merge.ui-btn { min-height: 36px; font-size: 14px; }
+.ui-cell[data-golden] .ui-cell-art, .bag-detail[data-golden] .bag-detail-art { filter: sepia(1) saturate(3.2) hue-rotate(-12deg) brightness(1.12) drop-shadow(0 0 6px #ffd34a); }

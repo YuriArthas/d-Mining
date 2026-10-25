@@ -92,7 +92,7 @@ function PetsTab({ session, pets, common, onClose }: Props & { pets: PetPanelSna
       <div className="bag-pets-main"><div className="ui-row"><Chip icon="paw">已装备 <b>{equipped} / {pets.slots.length}</b></Chip><Chip icon={currencyIcon(pets.currency)}>总加成 <b>{bonusLabel(pets.bonus[pets.currency])}</b></Chip><Chip icon="pickaxe">挖矿 <b>{bonusLabel(pets.bonus.mining)}</b></Chip>
         {slot && (slot.unlocked
           ? <UiButton size="s" tone={slot.canAfford ? 'green' : 'steel'} icon={currencyIcon(slot.currency)} className="bag-buy-slot" disabled={!slot.canAfford} aria-label={`购买第 ${slot.slot} 格，${number(slot.price)} ${currencyName(slot.currency)}`} onPress={buySlot}>+1 格 · {number(slot.price)}</UiButton>
-          : <Chip label={`到达${slot.unlockName}解锁第 ${slot.slot} 格`}>第 {slot.slot} 格 · 🔒</Chip>)}<span className="ui-grow" /><Chip>{cards.length} 只</Chip></div>
+          : <Chip label={`到达${slot.unlockName}解锁第 ${slot.slot} 格`}>第 {slot.slot} 格 · 未解锁</Chip>)}<span className="ui-grow" /><Chip>{cards.length} 只</Chip></div>
       <div className="ui-grid" role="list" aria-label="宠物">{cards.map(card => <GameButton key={card.pet.id} role="listitem" className="ui-cell" data-rarity={card.rarity}
         data-equipped={card.equippedSlot !== null ? '' : undefined} data-golden={card.golden ? '' : undefined} aria-pressed={card.pet.id === selected?.pet.id} blurAfterPress={false}
         aria-label={`${card.name}，${bonusLabel(card.bonusPct, card.currency)}，挖矿 ${bonusLabel(card.miningPct)}，${card.equippedSlot === null ? '未装备' : '已装备'}`}
@@ -100,7 +100,7 @@ function PetsTab({ session, pets, common, onClose }: Props & { pets: PetPanelSna
         <PetArt speciesId={card.pet.speciesId} rarity={card.rarity} /><span className="ui-cell-name ui-outline">{card.name}</span>
         <span className="ui-cell-stat ui-outline"><Icon kind={currencyIcon(card.currency)} className="ui-icon ui-cell-currency" />{bonusLabel(card.bonusPct)}</span>{card.equippedSlot !== null && <i className="ui-cell-check">✓</i>}
       </GameButton>)}</div></div>
-      {selected && <aside className="ui-detail bag-detail" data-rarity={selected.rarity} aria-label="宠物详情">
+      {selected && <aside className="ui-detail bag-detail" data-rarity={selected.rarity} data-golden={selected.golden ? '' : undefined} aria-label="宠物详情">
         <RarityTag rarity={selected.rarity} /><PetArt speciesId={selected.pet.speciesId} rarity={selected.rarity} className="bag-detail-art" />
         <h3 className="ui-outline">{selected.name}</h3>
         <div className="ui-stat"><span>{currencyName(selected.currency)}收入</span><b>{bonusLabel(selected.bonusPct)}</b></div>
