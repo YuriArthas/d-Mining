@@ -11,7 +11,7 @@ import { TipToast } from '../TipsUi.tsx';
 import './hud.css';
 
 type HudActions = {
-  openPets(): void; openShop(): void; openBackpacks(): void; openRewards(): void; openMinerals(): void; openHelp(): void;
+  openPets(): void; openShop(): void; openBackpacks(): void; openRewards(): void; openMinerals(): void; openHelp(): void; openRebirth(): void;
 };
 
 /** Screen-space HUD. Zones mirror the original: resources left, depth top-centre, four
@@ -39,7 +39,8 @@ export function Hud({ session, actions, system, objective, target, prompts, tipH
         onPress={run(actions.openMinerals)} pressLabel="查看背包里的矿物" plus={{ label: '升级背包', onPress: run(actions.openBackpacks) }}>
         <span data-testid="bag-count" aria-label={`背包容量 ${number(bag.used)} / ${number(bag.capacity)}`}>{number(bag.used)} / {number(bag.capacity)}</span>
       </Pill>
-      <Pill icon="coin" tone="gold"><span data-testid="coins" aria-label={`金币 ${number(state.coins)}`}>{number(state.coins)}</span></Pill>
+      <Pill icon="coin" tone="gold"><span data-testid="coins" aria-label={`金币 ${number(state.coins)}`}>{number(state.coins)}</span>
+        {state.rebirth.multiplier > 1 && <b className="hud-coin-mult ui-outline" aria-label={`重生金币收益 ${state.rebirth.multiplier} 倍`}>×{state.rebirth.multiplier}</b>}</Pill>
       {(speed > 0 || luck > 0 || sell > 0) && <div className="hud-buffs">
         {speed > 0 && <span className="ui-toast"><Icon kind="bolt" />移速 ×2 · {Math.ceil(speed)} 秒</span>}
         {luck > 0 && <span className="ui-toast"><Icon kind="clover" />稀有率 ×2 · {Math.ceil(luck)} 秒</span>}
@@ -64,6 +65,7 @@ export function Hud({ session, actions, system, objective, target, prompts, tipH
       <Tile icon="paw" label="宠物" aria-label="打开我的宠物" data-tip-target="pets" badge={teamCanImprove(pets) ? '!' : undefined} onPress={run(actions.openPets)} />
       <Tile icon="chest" label="商店" tone="orange" aria-label="商店" data-kind="upgrade" data-tip-target="shop" onPress={run(actions.openShop)} />
       <Tile icon="gift" label="奖励" tone="pink" aria-label={claimable ? `奖励，${claimable} 个可领取` : '奖励'} badge={claimable || undefined} onPress={run(actions.openRewards)} />
+      {state.rebirth.shown && <Tile icon="rebirth" label="重生" tone="green" aria-label={state.rebirth.canAfford ? '重生，可以重生了' : '重生'} badge={state.rebirth.canAfford ? '!' : undefined} onPress={run(actions.openRebirth)} />}
     </nav>
 
     <div className="hud-bottom">

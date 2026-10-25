@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 /** Chunky two-tone vector icons with navy outlines, drawn on a 48 × 48 grid. */
 export type IconKind =
   | 'backpack' | 'coin' | 'paw' | 'chest' | 'gift' | 'grid' | 'globe' | 'portal' | 'gem'
-  | 'question' | 'gear' | 'home' | 'jump' | 'plus' | 'bolt' | 'clover' | 'exit' | 'close' | 'pickaxe' | 'luck';
+  | 'question' | 'gear' | 'home' | 'jump' | 'plus' | 'bolt' | 'clover' | 'exit' | 'close' | 'pickaxe' | 'luck' | 'rebirth';
 
 const INK = '#13355d';
 const line = { stroke: INK, strokeWidth: 3, strokeLinejoin: 'round' as const, strokeLinecap: 'round' as const };
@@ -118,6 +118,16 @@ const ICONS: Record<IconKind, ReactNode> = {
     <path d="m12 41 18-21" stroke="#c98f55" strokeWidth="4.5" strokeLinecap="round" />
     <path d="M8 13C17 4 33 5 41 17c-6-3-12-4-17-3-6 0-11 1-16-1Z" fill="#d7e5ee" {...line} />
     <path d="M14 11c5-2 11-2 16 0" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+  </>,
+  // Rebirth: two green arrows chasing round a gold star.
+  rebirth: <>
+    <path d="M10 24a14 14 0 0 1 24.5-9.3" fill="none" stroke={INK} strokeWidth="9" strokeLinecap="round" />
+    <path d="M38 24a14 14 0 0 1-24.5 9.3" fill="none" stroke={INK} strokeWidth="9" strokeLinecap="round" />
+    <path d="M10 24a14 14 0 0 1 24.5-9.3" fill="none" stroke="#5fd36a" strokeWidth="4.5" strokeLinecap="round" />
+    <path d="M38 24a14 14 0 0 1-24.5 9.3" fill="none" stroke="#5fd36a" strokeWidth="4.5" strokeLinecap="round" />
+    <path d="M30 7.5 39.5 13 30 19.5Z" fill="#5fd36a" {...line} />
+    <path d="M18 40.5 8.5 35 18 28.5Z" fill="#5fd36a" {...line} />
+    <path d="m24 16.5 2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.6-4.8 2.6.9-5.4-3.9-3.8 5.4-.8Z" fill="#ffd24d" {...line} strokeWidth="2" />
   </>,
 };
 

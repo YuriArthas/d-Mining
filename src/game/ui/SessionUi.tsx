@@ -1,4 +1,4 @@
-import { useEffect, useState, type RefObject, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useState, type RefObject, useSyncExternalStore } from 'react';
 import type { GameSession } from '../application/GameSession.ts';
 import { selectDepthGoal } from '../application/Tips.ts';
 import type { GameInput } from '../GameInput.ts';
@@ -19,10 +19,11 @@ import type { ShopCategory } from '../content/shopCatalog.ts';
 import { MYSTERY_EGG_NAME } from '../content/petAppearance.ts';
 import { TargetHealth } from './TargetHealth.tsx';
 import { PortalSheet, StationSheet } from './world/WorldSheet.tsx';
+import { RebirthCelebration, RebirthSheet } from './rebirth/RebirthSheet.tsx';
 
 type Modal =
   | { kind: 'bag'; tab: BagTab } | { kind: 'rewards'; tab: RewardsTab }
-  | { kind: 'egg' } | { kind: 'capsule' } | { kind: 'help' };
+  | { kind: 'egg' } | { kind: 'capsule' } | { kind: 'help' } | { kind: 'rebirth' };
 
 export function SessionUi({ shopView, session, input, surface, guideMarker, system, blocked = false }: {
   shopView: ShopView; system: SystemControls; guideMarker: RefObject<HTMLDivElement | null>; blocked?: boolean;
@@ -58,6 +59,8 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
   // The shop opens in place from the HUD (its counter chosen by the button), or on walking into a shop: the forge
   // opens on pickaxes, the pack shop on backpacks.
   const [shopRequest, setShopRequest] = useState<ShopCategory | null>(null);
+  const [reborn, setReborn] = useState<{ count: number; multiplier: number } | null>(null);
+  const endCelebration = useCallback(() => setReborn(null), []);
   const shop = useSyncExternalStore(shopView.subscribe, shopView.getSnapshot);
   const shopOpen = !modal && (shopRequest !== null || (state.shopId !== null && dismissedShop !== state.shopId));
   useEffect(() => { input.reset(); if (shopOpen) { if (!shopView.active) showShopCategory(shopView, session.getSnapshot(), shopRequest ?? state.shopCategory); } else shopView.close(); }, [shopOpen, shopRequest, shopView, session, input, state.shopCategory]);
@@ -95,6 +98,7 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
         openPets: () => { session.dismissTip('pets'); open({ kind: 'bag', tab: 'pets' }); }, openMinerals: () => open({ kind: 'bag', tab: 'ores' }),
         openShop: () => { session.dismissTip('shop'); openShop('tools'); }, openBackpacks: () => openShop('backpacks'),
         openRewards: () => open({ kind: 'rewards', tab: rewardsTabFor(state.rewards) }), openHelp: () => open({ kind: 'help' }),
+        openRebirth: () => open({ kind: 'rebirth' }),
       }} />}
     {!modal && !shopOpen && <Controls input={input} surface={surface} />}
     {modal?.kind === 'bag' && <BagSheet session={session} tab={modal.tab} onTab={tab => setModal({ kind: 'bag', tab })} onClose={close} onShop={openShop} />}
@@ -104,6 +108,8 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
     {modal?.kind === 'egg' && state.eggId && <EggSheet key={state.eggStation!.id} session={session} eggId={state.eggId} onOpenPets={() => open({ kind: 'bag', tab: 'pets' })} onClose={close} />}
     {modal?.kind === 'capsule' && <CapsuleSheet session={session} onClose={close} />}
     {modal?.kind === 'help' && <HelpSheet onClose={close} />}
+    {modal?.kind === 'rebirth' && <RebirthSheet session={session} onClose={close} onReborn={(count, multiplier) => setReborn({ count, multiplier })} />}
+    {reborn && <RebirthCelebration count={reborn.count} multiplier={reborn.multiplier} onDone={endCelebration} />}
     {shopOpen && shop.mode !== 'closed' && <ShopPanel session={session} view={shopView} onClose={closeShop} />}
     {!blocked && <button className="dev-unlock-button" onClick={() => { input.reset(); setDevUnlock(v => !v); }}>解锁</button>}
     {devUnlock && <DevUnlockPage session={session} onClose={() => { setDevUnlock(false); surface.current?.focus(); }} />}

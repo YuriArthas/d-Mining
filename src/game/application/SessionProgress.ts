@@ -10,6 +10,7 @@ export type ProgressDataV1 = {
   /** The retired surface leaderboard (saves before 2026-10-23): still accepted, ignored. */
   challengeBoard?: unknown;
   onboarding?: import('../logic/Onboarding.ts').OnboardingData;
+  rebirth?: import('../logic/Rebirth.ts').RebirthData;
   version: 1;
   wallet: { version: 1; coins: number };
   inventory: InventoryDataV1;

@@ -164,3 +164,6 @@
   .ui-hud .ore-pickup { animation: hud-ore-still var(--pickup-lifetime) linear forwards; }
   @keyframes hud-ore-still { 0%, 70% { opacity: 1; } 100% { opacity: 0; } }
 }
+
+/* The rebirth coin multiplier rides on the coin pill. */
+.hud-coin-mult { margin-left: 6px; padding: 0 6px; border-radius: 8px; background: #2fae4f; color: #fff; font-size: .8em; --ui-stroke: 3px; }
