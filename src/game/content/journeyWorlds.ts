@@ -5,7 +5,7 @@ import { roomsFor } from '../world/rooms.ts';
 import { WORLD_REQUIREMENTS } from './worldJourney.ts';
 
 export const JOURNEY_WORLDS = WORLD_REQUIREMENTS.map(world => {
-  const T = LAYER_TEMPLATES, templates = world.id===1 ? T.slice(0,7) : world.id===2 ? [T[0],T[10],T[8],T[3],T[4],T[5],T[11]] : [T[0],T[7],T[8],T[3],T[4],T[5],T[9]];
+  const T = LAYER_TEMPLATES, templates = world.id===1 ? T.slice(0,7) : world.id===2 ? [T[0],T[10],T[12],T[13],T[14],T[15],T[11]] : [T[0],T[7],T[8],T[3],T[4],T[5],T[9]];
   const layers: readonly Layer[] = templates.map(({laterScene,...source},local) => {
     const index=(world.id-1)*7+local, base=64+index*4;
     return {...source,scene:world.id===1?source.scene:laterScene??source.scene,id:world.id===1?source.id:`world${world.id}.${local}`,from:local*400,base,deepKind:base+1,

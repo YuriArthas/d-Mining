@@ -1,0 +1,16 @@
+{
+  "parts": [
+    "survey-hall.000.part"
+  ],
+  "bytes": 262949,
+  "decodedBytes": 513192,
+  "sha256": "ab3a7ece9680d0d3811bd5b3f2d5673816c65a0d23a9be0038012aae30971af4",
+  "sourceSha256": "e21a53aaf746c2cf794a07b7b3711313ac089da28f9f693bc1451f2425c71ad6",
+  "triangles": 38439,
+  "source": "world2.4 hall: Blender props (surface-game-art/tools/blender/build_survey.py) and an offline procedural cave shell (surface-game-art/tools/underground/surveyHall.ts on caveKit.ts); baked occlusion per vertex",
+  "materialProfile": "authored-color",
+  "coordinateSpace": "authored",
+  "geometryEdits": false,
+  "textureEncoding": "KTX2 UASTC",
+  "reference": "tools/build-underground.mjs"
+}

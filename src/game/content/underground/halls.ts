@@ -8,6 +8,10 @@ import { FROZEN_HALL } from './frozenHall.ts';
 import { VOLCANIC_HALL } from './volcanicHall.ts';
 import { AUTOMINE_HALL } from './automineHall.ts';
 import { REACTOR_HALL } from './reactorHall.ts';
+import { GEAR_HALL } from './gearHall.ts';
+import { REFINERY_HALL } from './refineryHall.ts';
+import { SURVEY_HALL } from './surveyHall.ts';
+import { CRYO_HALL } from './cryoHall.ts';
 import oldMineSolids from './old-mine-hall.json' with { type: 'json' };
 import fungalSolids from './fungal-hall.json' with { type: 'json' };
 import crystalSolids from './crystal-hall.json' with { type: 'json' };
@@ -16,6 +20,10 @@ import frozenSolids from './frozen-hall.json' with { type: 'json' };
 import volcanicSolids from './volcanic-hall.json' with { type: 'json' };
 import automineSolids from './automine-hall.json' with { type: 'json' };
 import reactorSolids from './reactor-hall.json' with { type: 'json' };
+import gearSolids from './gear-hall.json' with { type: 'json' };
+import refinerySolids from './refinery-hall.json' with { type: 'json' };
+import surveySolids from './survey-hall.json' with { type: 'json' };
+import cryoSolids from './cryo-hall.json' with { type: 'json' };
 
 /** Authored underground halls (the surface pipeline taken below ground): their definition and the colliders
  *  the offline build exported, in hall metres (origin at the room's floor centre). World 1's six rest layers,
@@ -23,7 +31,7 @@ import reactorSolids from './reactor-hall.json' with { type: 'json' };
 const HALLS: readonly (readonly [HallDefinition, { solids: unknown[] }])[] = [
   [OLD_MINE_HALL, oldMineSolids], [FUNGAL_HALL, fungalSolids], [CRYSTAL_HALL, crystalSolids],
   [RUINS_HALL, ruinsSolids], [FROZEN_HALL, frozenSolids], [VOLCANIC_HALL, volcanicSolids],
-  [AUTOMINE_HALL, automineSolids], [REACTOR_HALL, reactorSolids],
+  [AUTOMINE_HALL, automineSolids], [GEAR_HALL, gearSolids], [REFINERY_HALL, refinerySolids], [SURVEY_HALL, surveySolids], [CRYO_HALL, cryoSolids], [REACTOR_HALL, reactorSolids],
 ];
 const UNDERGROUND_HALLS: Readonly<Record<string, { hall: HallDefinition; solids: Solid[] }>> =
   Object.fromEntries(HALLS.map(([hall, data]) => [hall.asset, { hall, solids: data.solids as Solid[] }]));

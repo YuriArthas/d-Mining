@@ -9,6 +9,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { readFileSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
@@ -35,9 +36,26 @@ const buffer = readFileSync(`${art}/${id}-props.glb`);
 const props = (await new GLTFLoader().parseAsync(buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.length), '')).scene;
 const built = buildHall(prop => { const node = props.getObjectByName(prop); if (!node) throw Error(`Missing prop ${prop}`); const copy = node.clone(true); copy.position.set(0, 0, 0); copy.rotation.set(0, 0, 0); copy.scale.set(1, 1, 1); return copy; });
 
-// Moving parts keep their own nodes (and their own geometry, since each carries its own bake).
+// Moving parts keep their own nodes (and their own geometry, since each carries its own bake). A spinning part is
+// merged into one mesh per material in its own frame (a prop's many pieces would each cost a draw call); a
+// sliding part keeps its children, which move one by one.
 const dynamic = built.group.children.filter(o => /^(Spin|Slide)_/.test(o.name));
-for (const part of dynamic) part.traverse(o => { if (o.isMesh) { o.userData.keepDynamic = true; o.geometry = o.geometry.clone(); } });
+for (const part of dynamic) {
+  if (/^Spin_/.test(part.name)) {
+    part.updateMatrixWorld(true);
+    const toPart = part.matrixWorld.clone().invert(), byMaterial = new Map();
+    part.traverse(o => { if (!o.isMesh) return; const g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone(); g.applyMatrix4(new THREE.Matrix4().multiplyMatrices(toPart, o.matrixWorld));
+      for (const name of Object.keys(g.attributes)) if (!['position', 'normal', 'color', 'uv'].includes(name)) g.deleteAttribute(name);
+      if (!o.material.map) g.deleteAttribute('uv');
+      (byMaterial.get(o.material) ?? byMaterial.set(o.material, []).get(o.material)).push(g); });
+    part.clear();
+    for (const [material, geometries] of byMaterial) {
+      const merged = mergeGeometries(geometries); if (!merged) throw Error(`Cannot merge ${part.name}`);
+      const mesh = new THREE.Mesh(merged, material); mesh.name = `${part.name} body`; part.add(mesh);
+    }
+  }
+  part.traverse(o => { if (o.isMesh) { o.userData.keepDynamic = true; o.geometry = o.geometry.clone(); } });
+}
 // Occlusion (and the sun, on the surface): every static mesh casts; every batched or moving mesh receives one
 // value per vertex.
 const casters = [];

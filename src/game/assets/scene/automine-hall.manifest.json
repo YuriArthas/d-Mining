@@ -2,11 +2,11 @@
   "parts": [
     "automine-hall.000.part"
   ],
-  "bytes": 271476,
-  "decodedBytes": 771052,
-  "sha256": "403a90ec9ad92bf9bf9ecd2698f86c829e4513b110a30da9b8366b9bd37b0e9a",
-  "sourceSha256": "9afa313f0edf1b36ff96431e6cb3de9cea0b1438b927aed067933585f7b89c77",
-  "triangles": 40298,
+  "bytes": 246408,
+  "decodedBytes": 498460,
+  "sha256": "cbe030812c9bede2442217d83589a4216717086f0a2ef75ca8fa201293b94cc8",
+  "sourceSha256": "8de736657c8ae886779c57e3ec9c0f688ea5485a8002c897d62423c8746e5153",
+  "triangles": 29994,
   "source": "world2.1 hall: Blender props (surface-game-art/tools/blender/build_automine.py) and an offline procedural cave shell (surface-game-art/tools/underground/automineHall.ts on caveKit.ts); baked occlusion per vertex",
   "materialProfile": "authored-color",
   "coordinateSpace": "authored",

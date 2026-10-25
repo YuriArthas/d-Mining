@@ -6,7 +6,7 @@ import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
 import {HALL_BY_LAYER,undergroundHall} from '../../src/game/content/underground/halls.ts';
 
 const HALLS={old_mine:'old-mine-hall',fungal:'fungal-hall',crystal:'crystal-hall',ruins:'ruins-hall',frozen:'frozen-hall',volcanic:'volcanic-hall'};
-const LATER={'world2.1':'automine-hall','world2.6':'reactor-hall'};
+const LATER={'world2.1':'automine-hall','world2.2':'gear-hall','world2.3':'refinery-hall','world2.4':'survey-hall','world2.5':'cryo-hall','world2.6':'reactor-hall'};
 const allRooms=GAME_CONTENT.worlds.flatMap(w=>w.rooms);
 
 test('every world 1 rest layer is an authored hall',()=>{
@@ -14,7 +14,7 @@ test('every world 1 rest layer is an authored hall',()=>{
  assert.deepEqual(HALL_BY_LAYER,{...HALLS,...LATER});
 });
 
-for(const [layer,id] of Object.entries({...HALLS,'world2.6':'reactor-hall'}))test(`${id}: no kit; its colliders keep the shaft open and the service rings free; rings, board and lights fit the hall`,()=>{
+for(const [layer,id] of Object.entries({...HALLS,...LATER}).filter(([layer])=>layer!=='world2.1'))test(`${id}: no kit; its colliders keep the shaft open and the service rings free; rings, board and lights fit the hall`,()=>{
  const room=allRooms.find(r=>r.id===layer),plan=roomPlan(room),{hall,solids}=undergroundHall(id);
  assert.equal(plan.authored,undefined,'no kit');
  assert.equal(hall.id,layer);assert.equal(hall.depth,room.depth);

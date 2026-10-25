@@ -12,6 +12,10 @@ import ruinsHall from './ruinsHall.scene.json' with {type:'json'};
 import frozenHall from './frozenHall.scene.json' with {type:'json'};
 import automineHall from './automineHall.scene.json' with {type:'json'};
 import reactorHall from './reactorHall.scene.json' with {type:'json'};
+import gearHall from './gearHall.scene.json' with {type:'json'};
+import refineryHall from './refineryHall.scene.json' with {type:'json'};
+import surveyHall from './surveyHall.scene.json' with {type:'json'};
+import cryoHall from './cryoHall.scene.json' with {type:'json'};
 import type {RoomSceneDefinition} from './authoredRoom.ts';
 
 export const ROOM_SCENES: Readonly<Record<string, RoomSceneDefinition>> = {
@@ -31,6 +35,10 @@ export const ROOM_SCENES: Readonly<Record<string, RoomSceneDefinition>> = {
   // World 2 (the tech base) is being rebuilt as authored halls, starting with its first layer.
   'automine-hall': automineHall as RoomSceneDefinition,
   'reactor-hall': reactorHall as RoomSceneDefinition,
+  'gear-hall': gearHall as RoomSceneDefinition,
+  'refinery-hall': refineryHall as RoomSceneDefinition,
+  'survey-hall': surveyHall as RoomSceneDefinition,
+  'cryo-hall': cryoHall as RoomSceneDefinition,
 };
 const vector=(v:readonly number[])=>v.length===3&&v.every(Number.isFinite);
 function validateRoomScene(id:string,scene:RoomSceneDefinition){

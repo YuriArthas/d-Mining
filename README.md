@@ -39,7 +39,11 @@ PINEWIND_RELEASE_RECORD=artifacts/<名字>-release.json node tools/publish-pinew
   KTX_BIN=<ktx 目录> node tools/build-underground.mjs <id>                   # 洞穴外壳（共用 caveKit.ts）、烘焙、打包
   ```
   每层的数据在 `src/game/content/underground/<id>Hall.ts`，离线搭建在 `surface-game-art/tools/underground/<id>Hall.ts`。
-- 第二、三世界的休整层仍用 Blender 场景套件：`tools/blender/build-crystal.py`、`build-chamber.py -- <id>`。
+- 第二世界的六个休整层（automine、gear、refinery、survey、cryo、reactor）同一流程，另共用第二世界基地套件：道具
+  `tools/blender/tech_props.py`（白色亭子、灯柱、名牌、护栏柱、吊灯、货箱），搭建 `tools/underground/techKit.ts`
+  （平滑水泥地面并把灯光池烘进顶点色、黄色走道和箭头、竖井护栏、亭子与灯的光晕）。为手机做的假发光：材质名
+  `Glow halo` 的网格在游戏里叠加绘制（不写深度、不受雾影响），名字带 `gloss` 的材质保留粗糙度。
+- 第三世界的休整层仍用 Blender 场景套件：`tools/blender/build-crystal.py`、`build-chamber.py -- <id>`。
 
 运行时模型在 `src/game/assets/scene/`，测试 `tools/tests/shipped-assets.test.mjs` 保证这里只有游戏实际摆放的模型。
 

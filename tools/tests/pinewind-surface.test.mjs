@@ -21,7 +21,7 @@ test('world 1 surface services are the Pinewind buildings; the halls ship with t
   if(room.shop)assert.ok(session.shops.some(s=>s.id===room.id),room.id);
  }
  assert.equal(session.eggStations.length,PINEWIND_EGG_DISPLAYS.length);
- assert.deepEqual([...new Set(GAME_CONTENT.surface.authored.instances.map(p=>p.asset))].sort(),['automine-hall','crystal-hall','frozen-hall','fungal-hall','old-mine-hall','pinewind-architecture','pinewind-landscape','reactor-hall','ruins-hall','tech-base','volcanic-hall']);
+ assert.deepEqual([...new Set(GAME_CONTENT.surface.authored.instances.map(p=>p.asset))].sort(),['automine-hall','cryo-hall','crystal-hall','frozen-hall','fungal-hall','gear-hall','old-mine-hall','pinewind-architecture','pinewind-landscape','reactor-hall','refinery-hall','ruins-hall','survey-hall','tech-base','volcanic-hall']);
 });
 test('one teleport station west of the spawn, its model, pillars and pad where the session expects them',async()=>{
  const {worldStation}=await import('../../src/game/content/worldJourney.ts');

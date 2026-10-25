@@ -1,8 +1,10 @@
 import type { HallDefinition } from './hall.ts';
 
 type XZ = readonly [number, number];
-/** 自动化矿道 — world 2's first rest hall (400 m): a near-future mining base built into the cave. Metal deck panels
- *  over the floor ring, a drill machine and conveyors feeding a hopper and a crusher, an ore cart on a rail, two
+type Pool = Readonly<{ at: XZ; radius: number; color: string; strength: number }>;
+const pool = (x: number, z: number, radius: number, color: string, strength: number): Pool => ({ at: [x, z], radius, color, strength });
+/** 自动化矿道 — world 2's first rest hall (400 m): a near-future mining base built into the cave. World 2's base kit
+ *  (the poured floor, lanes, pit rail, white kiosks), a drill machine and conveyors feeding a hopper and a crusher, an ore cart on a rail, two
  *  mining robots, bulkheads and fans on the rock, light trusses under the ceiling, a garage bay where the shop
  *  would stand (this layer has none). See hall.ts for the frame. */
 export const AUTOMINE_HALL = {
@@ -31,6 +33,14 @@ export const AUTOMINE_HALL = {
     fans: [{ side: 0, d: 14, y: 10 }, { side: 2, d: -1, y: 9.5 }, { side: 3, d: 9.5, y: 9.5 }, { side: 1, d: 6, y: 10 }],
     trusses: [-13.5, -4.5, 4.5, 13.5],
     lanterns: [[-3.6, 15.2, 0], [3.6, 15.2, Math.PI], [-6.4, -13.6, 0], [6.4, -13.6, Math.PI]] as readonly (readonly [number, number, number])[],
+    /** Lamp light baked into the poured floor: the drill bay, the hopper, both conveyors, the stall, the garage,
+     *  the lamp posts and the light trusses' strips. */
+    pools: [
+      pool(-12, -11, 6, '#ffb070', .6), pool(13, -11, 5.5, '#86ecff', .55), pool(-13, 0, 4.5, '#94eaff', .45), pool(13, 1, 4.5, '#94eaff', .45),
+      pool(-12, 12.6, 5, '#ffe6c8', .6), pool(12, 15, 4.5, '#ffa850', .55),
+      pool(-3.6, 14.6, 3, '#ffd8a8', .4), pool(3.6, 14.6, 3, '#ffd8a8', .4), pool(-6.4, -13, 3, '#ffd8a8', .4), pool(6.4, -13, 3, '#ffd8a8', .4),
+      pool(0, -13.5, 6, '#9ae8ff', .3), pool(0, -4.5, 6, '#9ae8ff', .25), pool(0, 4.5, 6, '#9ae8ff', .25), pool(0, 12, 5, '#fff0e0', .35),
+    ] as readonly Pool[],
   },
   /** Real-time lights: the drill bay (orange), the hopper and both conveyor sides (cyan), the stall, the garage. */
   lights: [

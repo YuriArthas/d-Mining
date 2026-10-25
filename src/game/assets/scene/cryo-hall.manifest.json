@@ -1,0 +1,16 @@
+{
+  "parts": [
+    "cryo-hall.000.part"
+  ],
+  "bytes": 257809,
+  "decodedBytes": 458188,
+  "sha256": "ff94446673d222d69fd18138cdd2e1d5c026e373b3b4b16d8d10e6d53b1af7a1",
+  "sourceSha256": "6b9765796f0ff2c5801d5eddd71f8b66b109eff5f257f1a2dca9f695fc1bc060",
+  "triangles": 32828,
+  "source": "world2.5 hall: Blender props (surface-game-art/tools/blender/build_cryo.py) and an offline procedural cave shell (surface-game-art/tools/underground/cryoHall.ts on caveKit.ts); baked occlusion per vertex",
+  "materialProfile": "authored-color",
+  "coordinateSpace": "authored",
+  "geometryEdits": false,
+  "textureEncoding": "KTX2 UASTC",
+  "reference": "tools/build-underground.mjs"
+}

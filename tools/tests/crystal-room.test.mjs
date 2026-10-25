@@ -6,8 +6,8 @@ import {createScenery,disposeScenery} from '../../src/game/presentation/SceneryM
 import {sceneryGeometryMemory} from '../../src/game/presentation/sceneryGeometryMemory.ts';
 import {GameSession} from '../../src/game/application/GameSession.ts';
 
-test('the later worlds\' crystal kit keeps its floor and ceiling aperture; world 1\'s crystal hall sells and admits travel once reached',()=>{
- const kitRoom=GAME_CONTENT.worlds[1].rooms.find(r=>r.scene==='crystal-station-v1'),plan=roomPlan(kitRoom);
+test('world 3\'s crystal kit keeps its floor and ceiling aperture; world 1\'s crystal hall sells and admits travel once reached',()=>{
+ const kitRoom=GAME_CONTENT.worlds[2].rooms.find(r=>r.scene==='crystal-station-v1'),plan=roomPlan(kitRoom);
  assert.equal(plan.authored.kit.id,'crystal-v1');
  const room=GAME_CONTENT.rooms.find(r=>r.id==='crystal');
  assert.equal(room.sceneDefinition.hall,'crystal-hall');assert.equal(room.shop,null);

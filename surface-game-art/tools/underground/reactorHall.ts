@@ -7,7 +7,7 @@
 // Moving parts are direct children named Spin_* (SceneMotion.ts).
 import * as THREE from 'three';
 import { caveKit, glow, matte, type GetProp } from './caveKit.ts';
-import { techKit, softFrame, glowGrid, glowBall, lightCone, unlit, gloss } from './techKit.ts';
+import { techKit, softFrame, glowGrid, unlit } from './techKit.ts';
 import { rng } from '../terrain/kit.ts';
 import { REACTOR_HALL as HALL } from '../../../src/game/content/underground/reactorHall.ts';
 
@@ -19,25 +19,21 @@ export function buildHall(getProp: GetProp) {
   }, [
     ...L.towers.map(([x, z]) => ({ x, z, radius: 2.8 })),
   ]);
-  const { r, box, add, place, M, HALF, PIT } = kit;
+  const { r, box, add, place, HALF } = kit;
   kit.useProps(getProp);
   const tech = techKit(kit, L.pools);
-  const ember = Object.assign(glow('Cave glow ember', '#c8360c', 1.0), { side: THREE.DoubleSide }), paintM = matte('Base paint'), steel = matte('Base steel');
+  const ember = Object.assign(glow('Cave glow ember', '#c8360c', 1.0), { side: THREE.DoubleSide }), steel = matte('Base steel');
 
   // Rock everywhere but the facade's stretch of the north wall and the ceiling over the core.
   kit.walls((x, z, radius) => z < -13 && Math.abs(x) - radius * .8 < facade.half - 1.5);
   kit.ceiling(34, [ember], .16, (x, z) => z < -10.5 && Math.abs(x) < facade.half + 1);
 
-  // FLOOR: poured, glossy, lit by the pools; the lane loop round the pit, a white lane to the reactor, arrows.
-  tech.pouredFloor('#a4a7ae', gloss('Base floor gloss', .42));
-  const lanes = gloss('Base lane gloss', .5);
-  tech.lane(tech.loopPath(L.loop.half, L.loop.corner), 1.0, '#f2c230', lanes, true);
-  tech.lane([[0, -L.loop.half], [0, -17.6]], 2.2, '#e8e6e0', lanes);
-  tech.hazard([-7.6, -17.9], [7.6, -17.9], .7, paintM);
-  for (const [x, z, yaw] of [[-6, 14.2, Math.PI / 2], [6, 14.2, -Math.PI / 2], [0, -14.6, 0], [-14.6, 0, 0], [14.6, 0, 0]] as const)
-    tech.arrow(x, z, yaw, 3.2, '#f4f2ec', lanes);
-  kit.pitRim();
-  tech.rail('#f2c230', paintM);
+  // THE BASE (techKit): floor, lanes, rail, lamps, services and their glow; a white lane and a hazard band lead
+  // to the reactor.
+  tech.base({ hall: HALL, lanterns: L.lanterns, lamps: L.lamps, loop: L.loop, accent: '#ff7a2c',
+    arrows: [[-6, 14.2, Math.PI / 2], [6, 14.2, -Math.PI / 2], [0, -14.6, 0], [-14.6, 0, 0], [14.6, 0, 0]] });
+  tech.lane([[0, -L.loop.half], [0, -17.6]], 2.2, '#e8e6e0', tech.laneMaterial);
+  tech.hazard([-7.6, -17.9], [7.6, -17.9], .7, tech.paintMaterial);
 
   // REACTOR FACADE on the north wall, the CORE in it: a faceted ball of lava plates and dark crust (unlit, its
   // own light) turning slowly about Z, the ring and its clamps round it, the rotor turning the other way, a halo
@@ -81,62 +77,8 @@ export function buildHall(getProp: GetProp) {
   // Paint the steel pipes: light grey, a little darker underneath.
   kit.group.traverse(o => { if (o instanceof THREE.Mesh && o.name === 'Base pipe') { const g = o.geometry, n = g.getAttribute('normal'), c = new Float32Array(n.count * 3); for (let i = 0; i < n.count; i++) new THREE.Color('#c8ccd2').multiplyScalar(n.getY(i) < -.3 ? .7 : 1).toArray(c, i * 3); g.setAttribute('color', new THREE.BufferAttribute(c, 3)); } });
 
-  // CEILING LAMPS with cones of light and a glow under each.
-  for (const [x, z] of L.lamps) {
-    place('Ceiling_Lamp', [x, 12.6, z], (r() - .5) * .3);
-    tech.glow(lightCone(x, z, .1, 12.3, .75, 3.3, '#ffe2b8', .1), 'Glow halo cone');
-    tech.glow(softFrame(1.5, .8, 0, .9, '#ffd8a0', .45, 3).rotateX(Math.PI / 2).translate(x, 12.28, z), 'Glow halo lamp');
-  }
-
-  // SERVICES: the kiosks, the board, the lamp posts, and their glow: screen halos and floor streaks for the
-  // kiosks, a halo round the board, balls round the lamp heads and the corner bollards' lamps.
-  kit.services(L.lanterns);
-  for (const [stall, tint] of [[HALL.stalls.sell, '#ff9a3c'], [HALL.stalls.shop, '#38d8c8']] as const) {
-    const [x, , z] = stall.at;
-    tech.glow(softFrame(2.9, 1.3, 0, 1.1, tint, .5, 4).translate(x, 4.6, z - 1.12), 'Glow halo screen');
-    tech.glow(glowGrid(3.4, 2.6, 4, 5, tint, (u, v) => .22 * Math.sin(Math.PI * u) * v ** 1.5).rotateX(-Math.PI / 2).translate(x, .075, z - 2.6), 'Glow halo floor');
-  }
-  tech.glow(softFrame(7.5, 2.4, 0, .7, '#ff7a2c', .3, 3).translate(HALL.board[0], 6.0, HALL.board[2] + .14), 'Glow halo board');
-  for (const [x, z, yaw] of L.lanterns) tech.glow(glowBall(.9, '#ffd8a8', .32).translate(x + .55 * Math.cos(yaw), 2.52, z - .55 * Math.sin(yaw)), 'Glow halo lamp');
-  for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) tech.glow(glowBall(.55, '#ff7a2c', .4).translate(sx * (PIT + .5), 1.2, sz * (PIT + .5)), 'Glow halo bollard');
-
-  // RED-HOT SEAMS cracking the rock: ribbons that follow the rock face (one ray per point), each with a soft
-  // glow ribbon over it. Never on the facade.
-  const rocks: THREE.Mesh[] = []; kit.group.updateMatrixWorld(true);
-  kit.group.traverse(o => { if (o instanceof THREE.Mesh && o.material === M.rock) rocks.push(o); });
-  const ray = new THREE.Raycaster();
-  const ribbon = (points: THREE.Vector3[], normals: THREE.Vector3[], width: number, centre: (t: number) => THREE.Color, edge: THREE.Color) => {
-    const position: number[] = [], colours: number[] = [];
-    const across = points.map((p, i) => { const along = points[Math.min(points.length - 1, i + 1)].clone().sub(points[Math.max(0, i - 1)]); return along.cross(normals[i]).normalize().multiplyScalar(width / 2); });
-    for (let i = 0; i + 1 < points.length; i++) {
-      const a = points[i], b = points[i + 1], ca = centre(i / (points.length - 1)), cb = centre((i + 1) / (points.length - 1));
-      const rows = [[a.clone().add(across[i]), edge], [a, ca], [a.clone().sub(across[i]), edge]] as const, next = [[b.clone().add(across[i + 1]), edge], [b, cb], [b.clone().sub(across[i + 1]), edge]] as const;
-      for (let k = 0; k < 2; k++) for (const [p, c] of [rows[k], rows[k + 1], next[k + 1], rows[k], next[k + 1], next[k]]) { position.push(p.x, p.y, p.z); colours.push(c.r, c.g, c.b); }
-    }
-    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(position, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(colours, 3)); g.computeVertexNormals();
-    return g;
-  };
-  for (let i = 0, made = 0; i < 60 && made < 18; i++) {
-    const side = Math.floor(r() * 4), d = (r() - .5) * 32;
-    if (side === 0 && Math.abs(d) < facade.half + 2) continue;
-    const dir = new THREE.Vector3(...([[0, 0, -1], [0, 0, 1], [-1, 0, 0], [1, 0, 0]][side] as [number, number, number]));
-    const points: THREE.Vector3[] = [], normals: THREE.Vector3[] = [];
-    let y = .4 + r() * 2.2, s = d;
-    for (let k = 0; k < 7; k++) {
-      const origin = (side < 2 ? new THREE.Vector3(s, y, 0) : new THREE.Vector3(0, y, s)).addScaledVector(dir, PIT + 1);
-      ray.set(origin, dir); ray.far = 16;
-      const hit = ray.intersectObjects(rocks, false)[0];
-      if (!hit || !hit.face) break;
-      const n = hit.face.normal.clone().transformDirection(hit.object.matrixWorld);
-      points.push(hit.point.clone().addScaledVector(n, .05)); normals.push(n);
-      y += .6 + r() * .7; s += (r() - .5) * 1.1;
-    }
-    if (points.length < 4) continue;
-    made++;
-    const black = new THREE.Color(0, 0, 0);
-    add(new THREE.Mesh(ribbon(points, normals, .16, () => new THREE.Color('#ffffff'), new THREE.Color('#ffffff')), ember), 'Cave ember seam');
-    tech.glow(ribbon(points.map((p, k) => p.clone().addScaledVector(normals[k], .06)), normals, 1.3, t => new THREE.Color('#ff4a14').multiplyScalar(.4 * Math.sin(Math.PI * Math.min(1, t * 1.2 + .1))), black), 'Glow halo seam');
-  }
+  // RED-HOT SEAMS cracking the rock, never on the facade.
+  tech.seams(18, ember, '#ff4a14', (side, d) => side === 0 && Math.abs(d) < facade.half + 2, 'Cave ember seam');
 
   kit.wallFoot(12, () => ({ name: 'Crate_Stack', scale: () => .8 + r() * .3, solid: [.9, .7] }));
   return { group: kit.group, solids: kit.solids, lights: HALL.lights };

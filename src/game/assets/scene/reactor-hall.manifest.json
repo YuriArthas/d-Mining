@@ -2,10 +2,10 @@
   "parts": [
     "reactor-hall.000.part"
   ],
-  "bytes": 245219,
-  "decodedBytes": 508224,
-  "sha256": "4f9e353ac122d7a5f850b64129dfa156640a9c9e9ec1d29de1451d1878959c33",
-  "sourceSha256": "1ad753921f9a6328af6adac4f44fabaa9a0f64bc243a61016878c96855cc35a6",
+  "bytes": 238201,
+  "decodedBytes": 442348,
+  "sha256": "e4040767347eff2353701c75d0ee64a0f810fd9b3c3c83634ab574b6db3c2cae",
+  "sourceSha256": "9ce6bb2a8e5a652e8ada5afe5c6e8e3d3a1110bc6d2359c261c2ca04521f3970",
   "triangles": 30451,
   "source": "world2.6 hall: Blender props (surface-game-art/tools/blender/build_reactor.py) and an offline procedural cave shell (surface-game-art/tools/underground/reactorHall.ts on caveKit.ts); baked occlusion per vertex",
   "materialProfile": "authored-color",

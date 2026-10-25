@@ -5,6 +5,7 @@
 // without depth writes or fog (StaticSurface.ts); every intensity stays within 0-1 (vertex colours are clamped).
 import * as THREE from 'three';
 import { colour, type caveKit } from './caveKit.ts';
+import type { HallDefinition } from '../../../src/game/content/underground/hall.ts';
 
 type Kit = ReturnType<typeof caveKit>;
 type XZ = readonly [number, number];
@@ -72,6 +73,33 @@ export function lightCone(x: number, z: number, y0: number, y1: number, r1: numb
   return paint(g, p => c.clone().multiplyScalar(strength * ((p.y - y0) / (y1 - y0)) ** 1.6));
 }
 
+/** A strip following points on a surface (normals per point): `width` across, its colour `centre(t)` along the
+ *  middle (t: 0..1 from the first point) fading to `edge` at both sides. */
+export function ribbon(points: THREE.Vector3[], normals: THREE.Vector3[], width: number, centre: (t: number) => THREE.Color, edge: THREE.Color) {
+  const position: number[] = [], colours: number[] = [];
+  const across = points.map((_p, i) => { const along = points[Math.min(points.length - 1, i + 1)].clone().sub(points[Math.max(0, i - 1)]); return along.cross(normals[i]).normalize().multiplyScalar(width / 2); });
+  for (let i = 0; i + 1 < points.length; i++) {
+    const a = points[i], b = points[i + 1], ca = centre(i / (points.length - 1)), cb = centre((i + 1) / (points.length - 1));
+    const rows = [[a.clone().add(across[i]), edge], [a, ca], [a.clone().sub(across[i]), edge]] as const, next = [[b.clone().add(across[i + 1]), edge], [b, cb], [b.clone().sub(across[i + 1]), edge]] as const;
+    for (let k = 0; k < 2; k++) for (const [p, c] of [rows[k], rows[k + 1], next[k + 1], rows[k], next[k + 1], next[k]]) { position.push(p.x, p.y, p.z); colours.push(c.r, c.g, c.b); }
+  }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(position, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(colours, 3)); g.computeVertexNormals();
+  return g;
+}
+
+/** What every world 2 hall shares (see techKit().base). */
+export type TechBase = Readonly<{
+  hall: HallDefinition;
+  /** Lamp posts [x, z, yaw] (caveKit.services) and ceiling lamps [x, z] (each with a cone). */
+  lanterns: readonly (readonly [number, number, number])[]; lamps: readonly XZ[];
+  /** The lane loop round the pit: half size and corner radius. */
+  loop: Readonly<{ half: number; corner: number }>;
+  /** The hall's accent glow (board halo, bollard lamps): match its props' accent tile. */
+  accent: string;
+  /** Floor base colour (default light concrete) and big painted arrows [x, z, yaw]. */
+  floor?: string; arrows?: readonly (readonly [number, number, number])[];
+}>;
+
 export function techKit(kit: Kit, pools: readonly Pool[]) {
   const { HALF, PIT, add, box } = kit;
   const glowMaterial = halo();
@@ -83,8 +111,10 @@ export function techKit(kit: Kit, pools: readonly Pool[]) {
   const lit = (tint: THREE.Color, x: number, z: number) => capped(tint.clone().multiplyScalar(.5 + .5 * Math.min(1, light(x, z))));
   const ring = [[-HALF, -PIT, -HALF, HALF], [PIT, HALF, -HALF, HALF], [-PIT, PIT, -HALF, -PIT], [-PIT, PIT, PIT, HALF]] as const;
 
-  return {
-    glowMaterial, light,
+  const paintMaterial = Object.assign(new THREE.MeshLambertMaterial({ vertexColors: true }), { name: 'Base paint' });
+  const laneMaterial = gloss('Base lane gloss', .5);
+  const self = {
+    glowMaterial, light, paintMaterial, laneMaterial,
     /** Add a halo mesh (already in place). */
     glow(g: THREE.BufferGeometry, name = 'Glow halo') { return add(new THREE.Mesh(g, glowMaterial), name); },
 
@@ -165,5 +195,63 @@ export function techKit(kit: Kit, pools: readonly Pool[]) {
         box(pos(mid, (height + .28) / 2), axis === 'x' ? [len / 2, (height - .28) / 2, .08] : [.08, (height - .28) / 2, len / 2]);
       }
     },
+
+    /** THE STANDARD BASE, after the walls and ceiling: the glossy poured floor, the yellow lane loop and white
+     *  arrows, the pit curb and rail, ceiling lamps with cones and glows, then the services (kiosks, board, lamp
+     *  posts) with their glow: screen halos (orange for the sale, teal for the shop) and floor streaks before the
+     *  kiosks, a halo round the board, balls round the lamp heads and the corner bollards' lamps. */
+    base(o: TechBase) {
+      const { hall } = o;
+      self.pouredFloor(o.floor ?? '#a4a7ae', gloss('Base floor gloss', .42));
+      self.lane(self.loopPath(o.loop.half, o.loop.corner), 1.0, '#f2c230', laneMaterial, true);
+      for (const [x, z, yaw] of o.arrows ?? [[-6, 14.2, Math.PI / 2], [6, 14.2, -Math.PI / 2], [-14.6, 0, 0], [14.6, 0, 0]]) self.arrow(x, z, yaw, 3.2, '#f4f2ec', laneMaterial);
+      kit.pitRim();
+      self.rail('#f2c230', paintMaterial);
+      for (const [x, z] of o.lamps) {
+        kit.place('Ceiling_Lamp', [x, 12.6, z], (kit.r() - .5) * .3);
+        self.glow(lightCone(x, z, .1, 12.3, .75, 3.3, '#ffe2b8', .1), 'Glow halo cone');
+        self.glow(softFrame(1.5, .8, 0, .9, '#ffd8a0', .45, 3).rotateX(Math.PI / 2).translate(x, 12.28, z), 'Glow halo lamp');
+      }
+      kit.services(o.lanterns);
+      for (const [stall, tint] of [[hall.stalls.sell, '#ff9a3c'], [hall.stalls.shop, '#38d8c8']] as const) {
+        if (!stall) continue;
+        const [x, , z] = stall.at;
+        self.glow(softFrame(2.9, 1.3, 0, 1.1, tint, .5, 4).translate(x, 4.6, z - 1.12), 'Glow halo screen');
+        self.glow(glowGrid(3.4, 2.6, 4, 5, tint, (u, v) => .22 * Math.sin(Math.PI * u) * v ** 1.5).rotateX(-Math.PI / 2).translate(x, .075, z - 2.6), 'Glow halo floor');
+      }
+      self.glow(softFrame(7.5, 2.4, 0, .7, o.accent, .3, 3).translate(hall.board[0], 6.0, hall.board[2] + .14), 'Glow halo board');
+      for (const [x, z, yaw] of o.lanterns) self.glow(glowBall(.9, '#ffd8a8', .32).translate(x + .55 * Math.cos(yaw), 2.52, z - .55 * Math.sin(yaw)), 'Glow halo lamp');
+      for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) self.glow(glowBall(.55, o.accent, .4).translate(sx * (PIT + .5), 1.2, sz * (PIT + .5)), 'Glow halo bollard');
+    },
+
+    /** SEAMS on the rock (glowing cracks, veins): `count` ribbons climbing the rock face from near the floor, one
+     *  ray per point so they follow it, each `material` (emissive) under a soft halo ribbon of `tint`. `skip`
+     *  rejects a start by wall (0 north, 1 south, 2 west, 3 east) and position along it. */
+    seams(count: number, material: THREE.Material, tint: string, skip: (side: number, d: number) => boolean = () => false, name = 'Cave seam') {
+      const rocks: THREE.Mesh[] = []; kit.group.updateMatrixWorld(true);
+      kit.group.traverse(o => { if (o instanceof THREE.Mesh && o.material === kit.M.rock) rocks.push(o); });
+      const ray = new THREE.Raycaster(), r = kit.r, white = new THREE.Color('#ffffff'), black = new THREE.Color(0, 0, 0);
+      for (let i = 0, made = 0; i < count * 4 && made < count; i++) {
+        const side = Math.floor(r() * 4), d = (r() - .5) * 32;
+        if (skip(side, d)) continue;
+        const dir = new THREE.Vector3(...([[0, 0, -1], [0, 0, 1], [-1, 0, 0], [1, 0, 0]][side] as [number, number, number]));
+        const points: THREE.Vector3[] = [], normals: THREE.Vector3[] = [];
+        let y = .4 + r() * 2.2, s = d;
+        for (let k = 0; k < 7; k++) {
+          const origin = (side < 2 ? new THREE.Vector3(s, y, 0) : new THREE.Vector3(0, y, s)).addScaledVector(dir, PIT + 1);
+          ray.set(origin, dir); ray.far = 16;
+          const hit = ray.intersectObjects(rocks, false)[0];
+          if (!hit || !hit.face) break;
+          const n = hit.face.normal.clone().transformDirection(hit.object.matrixWorld);
+          points.push(hit.point.clone().addScaledVector(n, .05)); normals.push(n);
+          y += .6 + r() * .7; s += (r() - .5) * 1.1;
+        }
+        if (points.length < 4) continue;
+        made++;
+        add(new THREE.Mesh(ribbon(points, normals, .16, () => white, white), material), name);
+        self.glow(ribbon(points.map((p, k) => p.clone().addScaledVector(normals[k], .06)), normals, 1.3, t => new THREE.Color(tint).multiplyScalar(.4 * Math.sin(Math.PI * Math.min(1, t * 1.2 + .1))), black), 'Glow halo seam');
+      }
+    },
   };
+  return self;
 }
