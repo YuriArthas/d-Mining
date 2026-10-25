@@ -30,3 +30,22 @@
 .portal-sheet .world-cards .ui-card-tile { min-height: 190px; }
 .portal-sheet .world-cards .ui-card-art { width: 72px; height: 72px; }
 .portal-sheet .world-cards h4 { font-size: 20px; }
+/* The station: the surface and all six layers on one row, so no layer (or its button) wraps out of view on a
+   landscape phone. Compact cards: smaller art, one-line names. */
+.station-sheet .world-cards { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 6px; }
+.station-sheet .world-cards .ui-card-tile { min-height: 0; padding: 8px 5px; }
+.station-sheet .world-cards .ui-card-art { width: 44px; height: 44px; }
+.station-sheet .world-cards h4 { font-size: 15px; white-space: nowrap; }
+.station-sheet .world-cards small { white-space: nowrap; }
+.station-sheet .world-cards .ui-btn { padding: 0 4px; }
+/* Short screens: the portal's cards give up height so the unlock list below fits without scrolling. */
+@container game (max-height: 440px) {
+  .portal-sheet .world-cards .ui-card-tile { min-height: 0; padding: 6px 8px 8px; }
+  .portal-sheet .world-cards .ui-card-art { width: 46px; height: 46px; }
+  .portal-sheet .world-cards h4 { font-size: 18px; }
+  .portal-sheet .world-mats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px 12px; }
+  .portal-sheet .world-mat { grid-template-columns: 20px auto minmax(24px, 1fr) auto; }
+}
+@container game (max-height: 380px) {
+  .portal-sheet .world-cards .ui-card-art { width: 36px; height: 36px; }
+}
