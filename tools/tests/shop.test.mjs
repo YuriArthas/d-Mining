@@ -39,7 +39,7 @@ test('smaller bag never deletes contents, including protected minerals',()=>{
 });
 test('old saves derive owned tiers; corrupt new collections fail instead of hiding damage',()=>{
  const data=funded().exportProgress();delete data.equipment;data.pickaxe.level=3;data.inventory.capacity=C3;
- const s=GameSession.fromData(data,content);assert.deepEqual(s.getSnapshot().equipment,{version:1,toolLevel:3,backpackCapacity:C3});enter(s);assert.equal(s.useShopItem('tools','tool-1').status,'equipped');assert.equal(s.getSnapshot().coins,10000);
+ const s=GameSession.fromData(data,content);assert.deepEqual(s.getSnapshot().equipment,{version:1,toolLevel:3,backpackCapacity:C3,enhance:0});enter(s);assert.equal(s.useShopItem('tools','tool-1').status,'equipped');assert.equal(s.getSnapshot().coins,10000);
  for(const bad of [null,{}, {version:2}, {version:1,toolLevel:2,backpackCapacity:C3}, {version:1,toolLevel:3,backpackCapacity:C1}])assert.throws(()=>new EquipmentCollection(3,C3,bad));
 });
 const loader=new GLTFLoader().register(()=>({name:'cpu-test-textures',loadTexture:()=>Promise.resolve(new Texture())}));
@@ -63,4 +63,21 @@ test('三十把工具和三十个背包各有自己的名字和一句介绍；�
   assert.equal(tools[0].name,'老木镐');assert.equal(bags[0].name,'麻布袋');
   assert.deepEqual(tools.filter(t=>t.motion==='drill').map(t=>t.level),[7,12,13,20,27]);
   assert.ok(tools.every(t=>t.motion==='drill'||t.motion==='swing'));
+});
+test('the newest pickaxe enhances three times in its own currency: more damage, same gate; the next pickaxe starts at +0',()=>{
+ const s=funded(1e9),tool2=ECONOMY.tools[1];
+ assert.equal(s.getSnapshot().pickaxeEnhance.next.price,ECONOMY.tools[0].enhance[0].price,'even the first pickaxe can be enhanced');
+ s.useShopItem('tools','tool-2');let gold=s.getSnapshot().coins,commits=0;s.onProgressCommitted(()=>commits++);
+ for(const [k,step] of tool2.enhance.entries()){
+  assert.deepEqual(s.enhancePickaxe(2,k),{status:'enhanced',level:2,enhance:k+1,spent:step.price});
+  gold-=step.price;assert.equal(s.getSnapshot().coins,gold);assert.equal(s.getSnapshot().pickaxe.basePower,step.power);assert.equal(s.getSnapshot().miningStats.power,step.power);
+ }
+ assert.equal(commits,3);assert.equal(s.enhancePickaxe(2,2).status,'stale');assert.equal(s.enhancePickaxe(2,3).status,'max');assert.equal(s.getSnapshot().pickaxeEnhance.next,null);
+ // Older pickaxes were never enhanced; wearing the newest again brings its enhancements back; all of it survives a reload.
+ assert.equal(s.useShopItem('tools','tool-1').status,'equipped');assert.equal(s.getSnapshot().pickaxe.basePower,ECONOMY.tools[0].power);
+ s.useShopItem('tools','tool-2');assert.equal(s.getSnapshot().pickaxe.enhance,3);
+ const r=GameSession.fromData(s.exportProgress(),content);assert.equal(r.getSnapshot().pickaxe.basePower,tool2.enhance[2].power);assert.equal(r.getSnapshot().equipment.enhance,3);
+ r.useShopItem('tools','tool-3');assert.equal(r.getSnapshot().pickaxe.enhance,0);assert.equal(r.getSnapshot().pickaxeEnhance.enhance,0);
+ const poor=funded(0);assert.equal(poor.enhancePickaxe(1,0).status,'insufficient');assert.equal(poor.getSnapshot().pickaxe.enhance,0);
+ const bad=s.exportProgress();bad.pickaxe={version:1,level:1,enhance:2};assert.throws(()=>GameSession.fromData(bad,content));
 });

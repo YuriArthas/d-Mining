@@ -37,7 +37,7 @@ test('重生要走完旅程：到达第三世界最后一层并拥有最后一�
   assert.equal(notThere.getSnapshot().rebirth.ready, false);
 });
 
-test('重生：三种货币、镐子、背包、世界和地下层全部重置，回到第一世界；宠物保留；之后每种货币卖矿都乘倍率', () => {
+test('重生：三种货币、镐子（含强化）、背包、世界和地下层全部重置，回到第一世界；宠物保留；之后每种货币卖矿都乘倍率', () => {
   const s = session(finished);
   assert.equal(s.getSnapshot().rebirth.ready, true);
   const pets = JSON.stringify(s.exportProgress().pets);
@@ -47,7 +47,7 @@ test('重生：三种货币、镐子、背包、世界和地下层全部重置�
   const after = s.getSnapshot(), starter = ECONOMY.bags[0].capacity;
   assert.deepEqual(after.balances, { gold: 0, tech: 0, star: 0 });
   assert.equal(after.pickaxe.level, 1); assert.equal(after.inventory.capacity, starter); assert.equal(after.inventory.used, 0);
-  assert.deepEqual(after.equipment, { version: 1, toolLevel: 1, backpackCapacity: starter });
+  assert.deepEqual(after.equipment, { version: 1, toolLevel: 1, backpackCapacity: starter, enhance: 0 });
   assert.deepEqual(after.worlds.map(w => w.open), [true, false, false]);
   assert.equal(after.currentWorld, 1);
   assert.ok(s.devUnlocks().every(w => w.layers.every(l => !l.unlocked)), 'every layer is to be reached again');

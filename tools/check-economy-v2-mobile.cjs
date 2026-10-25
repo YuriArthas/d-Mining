@@ -98,6 +98,13 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
     await page.locator('.shop-showroom, .shop-category').first().waitFor({ timeout: 30000 });
     if (await page.locator('.shop-category[data-category=tools]').isVisible().catch(() => false)) await tap(page.locator('.shop-category[data-category=tools]'));
     await page.locator('.shop-showroom').waitFor(); await page.waitForTimeout(2500);
+    // The worn pickaxe is the newest one: its button enhances it.
+    const enhance = page.getByTestId('shop-enhance'); await enhance.waitFor(); await shot('08a-shop-enhance');
+    assert.match(await enhance.getAttribute('aria-label'), /强化到 \+1/);
+    await tap(enhance); await page.waitForFunction(() => /\+1$/.test(document.querySelector('.shop-name')?.textContent ?? ''));
+    assert.match(await page.getByTestId('shop-enhance').getAttribute('aria-label'), /强化到 \+2/);
+    await shot('08b-shop-enhanced');
+    await check('Shop: the worn newest pickaxe shows 强化 +1 with its gold price; buying it renames the pickaxe +1 and offers +2.');
     await tap(button('下一件商品')); await page.waitForTimeout(1500); await shot('08-shop-next-tool');
     assert.match(await page.getByTestId('shop-buy').getAttribute('aria-label'), /金币/);
     for (let i = 0; i < 7; i++) await tap(button('下一件商品'));

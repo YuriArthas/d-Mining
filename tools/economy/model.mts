@@ -92,7 +92,9 @@ export function build(K:number[]){
         rock:{itemId:items.rock.itemId,hp:b.rock.hp,price:b.rock.v},deep:{itemId:items.deep.itemId,hp:b.deep.hp,price:b.deep.v},
         ores:[b.a,b.b].map((o,j)=>({itemId:items.ores[j].itemId,hp:o.hp,price:o.v,weight:ORE_WEIGHTS[j]}))};}),
     tools:Array.from({length:30},(_,k)=>{const L=k+1;return {level:L,currency:currency(Math.floor(k/10)),price:L===1?0:tool[L],power:toolPower(L),speed:toolSpeed(L),
-      enhance:L<30?ENH.cost.map((cost,e)=>({price:nice(tool[L+1]*cost),power:toolPower(L,e+1)})):[]};}),
+      // enhancements cost a share of the next pickaxe; the last of a world (L10, L20) has its next one in another
+      // currency, so its share is of this one's price grown like a level (×1.5)
+      enhance:L<30?ENH.cost.map((cost,e)=>({price:nice((L%10?tool[L+1]:tool[L]*1.5)*cost),power:toolPower(L,e+1)})):[]};}),
     bags:BAG.map((capacity,t)=>({tier:t+1,currency:currency(Math.floor(t/10)),price:bag[t],capacity})),
     petSlots:SLOT_LAYERS.map((i,k)=>({slot:4+k,currency:currency(world(i)),price:slot[k],world:world(i)+1,layer:local(i)})),
     eggs:SLOTS.map((s,k)=>{const d=eggDefinition(s);return {id:d?.id??null,world:world(s.layer)+1,layer:local(s.layer),premium:s.premium,currency:currency(world(s.layer)),price:egg[k],

@@ -1,11 +1,12 @@
 import type { ShopCategory, ShopItem } from '../content/shopCatalog.ts';
 import type { CurrencyId } from '../content/economy.ts';
+import { pickaxeStats } from '../logic/Pickaxe.ts';
 
 type Snapshot = Readonly<{
   balances: Readonly<Record<CurrencyId, number>>;
   pickaxe: Readonly<{ level: number }>;
   inventory: Readonly<{ capacity: number; used: number }>;
-  equipment: Readonly<{ toolLevel: number; backpackCapacity: number }>;
+  equipment: Readonly<{ toolLevel: number; backpackCapacity: number; enhance?: number }>;
   backpackUpgrade: Readonly<{ next?: Readonly<{ id: string }> | null }>;
 }>;
 
@@ -31,8 +32,10 @@ export function offerStats(category: ShopCategory, item: ShopItem, items: readon
   const last = items[items.length - 1];
   if (category === 'backpacks') return [{ key: 'capacity', label: '容量', value: item.capacity!, current: s.inventory.capacity, max: last.capacity!, unit: '' }];
   const worn = items.find(i => i.level === s.pickaxe.level) ?? items[0];
+  // The newest pickaxe counts with its enhancements (+1..+3); older ones were never enhanced.
+  const power = (i: ShopItem) => i.level === s.equipment.toolLevel && s.equipment.enhance ? pickaxeStats(i.level, 1, s.equipment.enhance).power : i.power!;
   return [
-    { key: 'power', label: '力量', value: item.power!, current: worn.power!, max: last.power!, unit: '' },
+    { key: 'power', label: '力量', value: power(item), current: power(worn), max: last.power!, unit: '' },
     { key: 'speed', label: '攻速', value: item.speed!, current: worn.speed!, max: last.speed!, unit: '/秒' },
   ];
 }

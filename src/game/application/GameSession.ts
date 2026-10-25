@@ -67,6 +67,12 @@ export class GameSession {
     const next=tool?pickaxeStats(level+1):null, price=tool?.price??0, currency=tool?.currency??this.currency;
     return Object.freeze({next,price,currency,canAfford:!!next&&this.wallet.getBalance(currency)>=price});
   }
+  /** The next enhancement of the newest pickaxe (+1..+3): more damage, same model and gate; paid in its currency. */
+  private enhanceOffer() {
+    const level=this.equipment.toolLevel, tool=ECONOMY.tools[level-1], enhance=this.equipment.enhance, step=tool.enhance[enhance];
+    const next=step?Object.freeze({enhance:enhance+1,price:step.price,currency:tool.currency,power:step.power}):null;
+    return Object.freeze({level,enhance,max:tool.enhance.length,next,canAfford:!!next&&this.wallet.getBalance(tool.currency)>=next.price});
+  }
   private bagOffer() {
     const next=this.bagCatalog.find(t=>t.capacity!>this.equipment.backpackCapacity)??null;
     return Object.freeze({next,canAfford:!!next&&this.wallet.getBalance(next.currency)>=next.price});
@@ -109,8 +115,8 @@ export class GameSession {
   private baseMiningStats = () => {
     // The pickaxe, times the capsule's mining boost and the equipped pets' mining bonus (speed to the cap, then damage).
     const level=this.pickaxe.getSnapshot().level, boosted=this.rewardEffects.mining, pets=this.petService?.getBonus().mining ?? 0;
-    const key=`${level}:${boosted}:${pets}`;
-    if(key!==this.baseStatsKey){this.baseStatsKey=key;this.cachedBaseStats=pickaxeStats(level,(boosted?REWARD_CONFIG.miningMultiplier:1)*(1+pets/100));}
+    const enhance=this.pickaxe.getSnapshot().enhance, key=`${level}:${enhance}:${boosted}:${pets}`;
+    if(key!==this.baseStatsKey){this.baseStatsKey=key;this.cachedBaseStats=pickaxeStats(level,(boosted?REWARD_CONFIG.miningMultiplier:1)*(1+pets/100),enhance);}
     return this.cachedBaseStats;
   };
   private readonly pickupListeners = new Set<(batch: readonly {itemId:string;count:number}[]) => void>();
@@ -218,6 +224,8 @@ export class GameSession {
     this.pickaxe = data ? Pickaxe.fromData(data.pickaxe) : new Pickaxe();
     this.inventory = data ? Inventory.fromData(data.inventory, itemVolume) : new Inventory(capacity, itemVolume);
     this.equipment = new EquipmentCollection(this.pickaxe.getSnapshot().level,this.inventory.capacity,data?.equipment);
+    { const worn=this.pickaxe.getSnapshot();
+      if(worn.enhance&&(worn.level!==this.equipment.toolLevel||worn.enhance!==this.equipment.enhance))throw Error('镐子强化与已购记录不一致'); }
     this.toolCatalog = shopTools();
     this.bagCatalog = shopBackpacks();
     {
@@ -371,6 +379,7 @@ export class GameSession {
       hitSerial: this.lastHit,
       pickaxe: this.pickaxe.getSnapshot(),
       pickaxeUpgrade: this.toolOffer(),
+      pickaxeEnhance: this.enhanceOffer(),
       backpackUpgrade: this.bagOffer(),
     });
   }
@@ -570,9 +579,19 @@ export class GameSession {
     const offer=this.toolOffer();
     if(!offer.next)return {status:'limit'} as const;
     if(!this.wallet.debit(offer.currency,offer.price)){this.feedback({type:'denied',reason:'coins'});return {status:'insufficient'} as const;}
-    this.pickaxe.setLevel(offer.next.level);this.equipment.toolLevel=offer.next.level;
+    this.pickaxe.setLevel(offer.next.level);this.equipment.toolLevel=offer.next.level;this.equipment.enhance=0;
     this.committed(true);this.refreshTarget();this.publish();this.feedback({type:'purchased'});
     return {status:'upgraded',level:offer.next.level,spent:offer.price} as const;
+  };
+  /** Enhances the newest pickaxe once (and equips it). `expected*` guard against a stale panel buying twice. */
+  enhancePickaxe = (expectedLevel: number, expectedEnhance: number) => {
+    if(this.suspended||expectedLevel!==this.equipment.toolLevel||expectedEnhance!==this.equipment.enhance)return {status:'stale'} as const;
+    const offer=this.enhanceOffer();
+    if(!offer.next)return {status:'max'} as const;
+    if(!this.wallet.debit(offer.next.currency,offer.next.price)){this.feedback({type:'denied',reason:'coins'});return {status:'insufficient'} as const;}
+    this.equipment.enhance=offer.next.enhance;this.pickaxe.setLevel(offer.level,offer.next.enhance);
+    this.committed(true);this.refreshTarget();this.publish();this.feedback({type:'purchased'});
+    return {status:'enhanced',level:offer.level,enhance:offer.next.enhance,spent:offer.next.price} as const;
   };
   upgradeBackpack = (tierId: string) => {
     if(this.suspended)return {status:'stale'} as const;
@@ -596,7 +615,7 @@ export class GameSession {
     }
     if(category==='tools') {
       if(this.pickaxe.getSnapshot().level===item.level)return {status:'equipped'} as const;
-      this.pickaxe.setLevel(item.level);this.refreshTarget();
+      this.pickaxe.setLevel(item.level,item.level===this.equipment.toolLevel?this.equipment.enhance:0);this.refreshTarget();
     } else {
       if(this.inventory.getSnapshot().used>item.capacity!)return {status:'too-small'} as const;
       if(this.inventory.capacity===item.capacity)return {status:'equipped'} as const;
@@ -773,7 +792,7 @@ export class GameSession {
     this.inventory.remove(Object.entries(this.inventory.getSnapshot().items).map(([itemId,count])=>({itemId,count})));
     const starter=ECONOMY.bags[0].capacity;
     this.inventory.setCapacity(starter);this.equipment.backpackCapacity=starter;
-    this.pickaxe.setLevel(1);this.equipment.toolLevel=1;
+    this.pickaxe.setLevel(1);this.equipment.toolLevel=1;this.equipment.enhance=0;
     this.worldProgress.reset();this.reservations.reset();
     for(const w of WORLD_REQUIREMENTS)this.explorations.set(w.id,new Exploration(this.content.destinations.filter(d=>d.worldId===w.id)));
     this.currentWorld=1;
