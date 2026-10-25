@@ -2,11 +2,12 @@
 // with props from build_refinery.py. Deep indigo rock where the colony harvests giant magenta crystals: a giant
 // crystal in a yellow cradle in each north corner, cut by a white laser rig's beam; white-framed crystal tanks on
 // the west wall and in the south-east (where a shop would stand); crystal clusters growing out of the rock (one ray
-// each, turned to the rock face) and along the wall feet; violet veins in the rock. Glow is faked for phones:
-// additive halos round the crystals, tanks and beams, no post-processing.
+// each, turned to the rock face) and along the wall feet; violet veins in the rock. The hero on the north wall: three
+// refining columns on a deck in the shared facade above the name board, a crystal core turning in each. Glow is
+// faked for phones: additive halos round the crystals, tanks, columns and beams, no post-processing.
 import * as THREE from 'three';
 import { caveKit, glow, type GetProp } from './caveKit.ts';
-import { techKit, glowBall } from './techKit.ts';
+import { techKit, glowBall, softFrame, glowGrid } from './techKit.ts';
 import { REFINERY_HALL as HALL } from '../../../src/game/content/underground/refineryHall.ts';
 
 const MAGENTA = '#d050e8', VIOLET = '#a860f0';
@@ -27,12 +28,40 @@ export function buildHall(getProp: GetProp) {
   const tip = glow('Cave glow crystal', '#a01ca0', 1.1), vein = Object.assign(glow('Cave glow vein', '#7a28c8', 1.0), { side: THREE.DoubleSide });
   const beam = glow('Cave glow beam', '#c020b0', 1.4);
 
-  kit.walls();
-  kit.ceiling(40, [tip], .2);
+  // Rock everywhere but the facade's stretch of the north wall and the ceiling over the columns.
+  const { facade } = L;
+  kit.walls((x, z, radius) => z < -13 && Math.abs(x) - radius * .8 < facade.half - 1.5);
+  kit.ceiling(40, [tip], .2, (x, z) => z < -10.5 && Math.abs(x) < facade.half + 1);
 
   // THE BASE (techKit): floor, lanes, rail, lamps, services and their glow. Arrows point to the sale and along.
   tech.base({ hall: HALL, lanterns: L.lanterns, lamps: L.lamps, loop: L.loop, accent: MAGENTA,
     arrows: [[-6, 14.2, Math.PI / 2], [-14.6, 0, 0], [14.6, 0, 0], [0, -14.6, 0]] });
+
+  // THE REFINERY in the facade: the deck above the name board, three columns on it, each with a core turning in a
+  // tube of soft light; a magenta halo on the wall behind, a white lane and a hazard band up to it, its light on
+  // the floor.
+  tech.lane([[0, -L.loop.half], [0, -17.6]], 2.2, '#e8e6e0', tech.laneMaterial);
+  tech.hazard([-7.6, -17.9], [7.6, -17.9], .7, tech.paintMaterial);
+  place('Refinery_Facade', [0, 0, facade.z], 0);
+  place('Refinery_Deck', [0, 0, facade.z], 0);
+  box([0, 10, facade.z - .1], [facade.half - .8, 10, .4]);
+  for (const s of [-1, 1]) box([s * 8.9, 10, facade.z + .4], [.8, 10, .7]);
+  box([0, .6, facade.z + .55], [8.2, .6, .45]);
+  const deck = 8.4, cz = facade.z + 1.6;
+  for (const c of L.columns) {
+    const glass = c.tall ? 7.0 : 5.4;
+    place(c.tall ? 'Refinery_Column_Tall' : 'Refinery_Column_Short', [c.x, deck, cz], 0);
+    const core = new THREE.Group(); core.name = `Spin_y_${c.spin < 0 ? 'n' : ''}${Math.abs(c.spin)}`;
+    core.position.set(c.x, deck + 1.05 + (glass - 3.4) / 2, cz); core.add(getProp('Refinery_Core')); kit.group.add(core);
+    const tube = new THREE.CylinderGeometry(1.12, 1.12, glass, 12, 1, true).toNonIndexed(); tube.translate(c.x, deck + 1.05 + glass / 2, cz); tube.computeVertexNormals();
+    const tint = new THREE.Color(MAGENTA).multiplyScalar(.3), colours = new Float32Array(tube.getAttribute('position').count * 3);
+    for (let k = 0; k < colours.length; k += 3) tint.toArray(colours, k);
+    tube.setAttribute('color', new THREE.BufferAttribute(colours, 3));
+    tech.glow(tube, 'Glow halo tube');
+    tech.glow(glowBall(2.2, MAGENTA, .3).translate(c.x, deck + 1.05 + glass / 2, cz), 'Glow halo core');
+  }
+  tech.glow(softFrame(0, 0, 0, 7.5, '#b030d0', .4, 6, 8).scale(1.25, 1, 1).translate(0, 13.2, facade.z + .36), 'Glow halo wall');
+  tech.glow(glowGrid(9, 9.6, 6, 12, MAGENTA, (u, v) => .34 * Math.sin(Math.PI * u) ** 1.4 * v ** 1.8).rotateX(-Math.PI / 2).translate(0, .075, -13.2), 'Glow halo floor');
 
   // GIANT CRYSTALS in the north corners, each with a big halo; a LASER RIG beams at each from the side wall: a thin
   // glowing beam inside a soft halo tube, a burst of light where it strikes.
@@ -73,7 +102,7 @@ export function buildHall(getProp: GetProp) {
   const ray = new THREE.Raycaster(), up = new THREE.Vector3(0, 1, 0);
   for (let i = 0, made = 0; i < 90 && made < 14; i++) {
     const side = Math.floor(r() * 4), d = (r() - .5) * 34, y = 3.2 + r() * 5.6;
-    if (side === 0 && Math.abs(d) < 6.5) continue;
+    if (side === 0 && Math.abs(d) < facade.half + 2) continue;
     const dir = new THREE.Vector3(...([[0, 0, -1], [0, 0, 1], [-1, 0, 0], [1, 0, 0]][side] as [number, number, number]));
     ray.set((side < 2 ? new THREE.Vector3(d, y, 0) : new THREE.Vector3(0, y, d)).addScaledVector(dir, PIT + 1), dir); ray.far = 16;
     const hit = ray.intersectObjects(rocks, false)[0];
@@ -90,7 +119,7 @@ export function buildHall(getProp: GetProp) {
   }
 
   // VIOLET VEINS in the rock, and crystals and crates along the wall feet.
-  tech.seams(10, vein, '#a040f0', (side, d) => side === 0 && Math.abs(d) < 6.5, 'Cave crystal vein');
+  tech.seams(10, vein, '#a040f0', (side, d) => side === 0 && Math.abs(d) < facade.half + 2, 'Cave crystal vein');
   kit.wallFoot(16, () => {
     const roll = r();
     return roll < .45 ? { name: 'Crystal_Cluster', scale: () => .7 + r() * .6, solid: [.75, .8] }

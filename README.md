@@ -40,7 +40,7 @@ PINEWIND_RELEASE_RECORD=artifacts/<名字>-release.json node tools/publish-pinew
   ```
   每层的数据在 `src/game/content/underground/<id>Hall.ts`，离线搭建在 `surface-game-art/tools/underground/<id>Hall.ts`。
 - 第二世界的六个休整层（automine、gear、refinery、survey、cryo、reactor）同一流程，另共用第二世界基地套件：道具
-  `tools/blender/tech_props.py`（白色亭子、灯柱、名牌、护栏柱、吊灯、货箱），搭建 `tools/underground/techKit.ts`
+  `tools/blender/tech_props.py`（白色亭子、灯柱、名牌、护栏柱、吊灯、货箱、北墙门面 `tech_facade`），搭建 `tools/underground/techKit.ts`
   （平滑水泥地面并把灯光池烘进顶点色、黄色走道和箭头、竖井护栏、亭子与灯的光晕）。为手机做的假发光：材质名
   `Glow halo` 的网格在游戏里叠加绘制（不写深度、不受雾影响），名字带 `gloss` 的材质保留粗糙度。
 - 第二世界地表（沙漠殖民地）也走这条流程：`build_tech_base.py` + `tools/underground/techBaseHall.ts`，

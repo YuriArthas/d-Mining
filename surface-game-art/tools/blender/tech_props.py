@@ -42,6 +42,27 @@ def bevel_box(name, at, size, t, q=.12):
     """A chamfered box: the chunky toy-tech block (octagonal in plan, edges cut by q)."""
     x, y, z = at; w, h, d = size
     return prism(name, [(x + px, z + pz) for px, pz in stepped(w, d, min(q, w / 3, d / 3))], y - h / 2, y + h / 2, t)
+def tech_facade(name, wall=3, vents=True):
+    """A hall's hero facade on the north wall (front +Z, its back at local z = -.3), 19.2 m wide and 20 m tall: a
+    panelled wall (tile `wall`) between two white pylons with yellow bands and accent glow strips, a white lintel
+    and a hazard plinth. It hides the voxel wall behind the hall's hero piece (caveKit's walls(open) leaves room)."""
+    model(name)
+    box('Wall', (0, 10, 0), (17.4, 20, .6), wall)
+    for side in (-1, 1):
+        x = side * 8.9
+        box('Pylon', (x, 10, .4), (1.6, 20, 1.4), 1)
+        for y in (2.2, 9.0, 15.8): box('PylonBand', (x, y, .4), (1.66, .6, 1.46), 11)
+        box('PylonStrip', (x - side * .82, 10, .9), (.08, 16, .12), 7)
+        bevel_box('PylonFoot', (x, .6, .7), (2.2, 1.2, 2.0), 0, .3)
+    box('Lintel', (0, 19.4, .5), (17.4, 1.2, 1.2), 1)
+    box('LintelBand', (0, 18.75, 1.12), (17.4, .14, .06), 7)
+    box('Plinth', (0, .55, .55), (16.2, 1.1, .9), 5)
+    box('PlinthTop', (0, 1.15, .55), (16.4, .12, 1.0), 0)
+    if vents:
+        for x in (-6, -3, 3, 6):
+            box('Vent', (x, 3.0, .32), (1.6, 1.2, .06), 18)
+            box('VentLight', (x, 3.8, .33), (1.4, .1, .05), 7)
+
 def ring_segments(name, r0, r1, z0, z1, n, t, cy=0, spin=0, gaps=()):
     """A flat ring in the XY plane (facing +Z) from n trapezoid prisms, skipping the segment indices in `gaps`."""
     for k in range(n):

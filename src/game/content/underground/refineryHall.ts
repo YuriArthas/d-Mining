@@ -9,7 +9,9 @@ const MAGENTA = '#d050e8', VIOLET = '#a860f0', WARM = '#ffd8a8';
 /** 水晶精炼厂 — world 2's rest hall at 1200 m, on the world 2 base kit (techKit.ts): deep indigo rock where the
  *  colony harvests giant magenta crystals. Two giant crystals in yellow cradles stand in the north corners, each
  *  cut by a white laser rig's beam; crystal tanks line the west wall and stand where a shop would be in the
- *  south-east; crystal clusters grow out of the rock and along the wall feet. Sale only (no shop). See hall.ts. */
+ *  south-east; crystal clusters grow out of the rock and along the wall feet. The hero: three refining columns
+ *  on a deck in the north wall above the name board, a crystal core turning in each. Sale only (no shop). See
+ *  hall.ts. */
 export const REFINERY_HALL = {
   id: 'world2.3',
   asset: 'refinery-hall',
@@ -22,6 +24,10 @@ export const REFINERY_HALL = {
   },
   board: [0, 7.6, -17.4],
   layout: {
+    /** The facade covers the north wall between x = -half and +half (its rock masses are left out); the deck
+     *  across it carries the refining columns: x, height (tall / short), core spin rate (centi-rad/s). */
+    facade: { z: -19.6, half: 9.6 },
+    columns: [{ x: -5.2, tall: false, spin: 35 }, { x: 0, tall: true, spin: -25 }, { x: 5.2, tall: false, spin: 40 }],
     /** Giant crystals in their cradles (base centre, height scale, yaw). */
     giants: [{ at: [-14.2, -14.2] as XZ, scale: 1.2, yaw: .4 }, { at: [14.4, -13.8] as XZ, scale: 1.08, yaw: 2.1 }],
     /** Laser rigs on the floor; each beams at the giant of the same index. */
@@ -38,7 +44,7 @@ export const REFINERY_HALL = {
       pool(-12, 12.4, 5.2, '#ffe6c8', .6),
       pool(-3.6, 14.6, 3, WARM, .4), pool(3.6, 14.6, 3, WARM, .4), pool(-8.4, -12.4, 3, WARM, .4), pool(8.4, -12.4, 3, WARM, .4),
       pool(-13, -3, 3.6, '#ffe2b8', .5), pool(13, -3, 3.6, '#ffe2b8', .5), pool(-12.5, 5.5, 3.6, '#ffe2b8', .5), pool(12.5, 6.5, 3.6, '#ffe2b8', .5),
-      pool(0, 11, 5.5, '#fff0e0', .35),
+      pool(0, 11, 5.5, '#fff0e0', .35), pool(0, -14, 8, MAGENTA, .55),
     ] as readonly Pool[],
   },
   /** Real-time lights: both giants, the west tanks, the stall, the south-east tanks and a fill over the spawn. */

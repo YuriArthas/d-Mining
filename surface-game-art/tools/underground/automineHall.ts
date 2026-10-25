@@ -2,11 +2,12 @@
 // (caveKit.ts) and world 2's base kit (techKit.ts) with props from build_automine.py. The rock stays; the base is
 // installed into it: the poured floor, lanes and pit rail, bulkheads and fans bolted onto the rock,
 // light trusses under the ceiling, a drill machine with a spinning bit, conveyors carrying ore to a hopper and a
-// crusher, an ore cart on a rail, two mining robots and a garage bay where the shop would stand.
+// crusher, an ore cart on a rail, two mining robots and a garage bay where the shop would stand. The hero: a tunnel
+// boring machine in the north wall's facade above the name board, its cutterhead turning in a white shield.
 // Moving parts are direct children named Spin_* / Slide_* (SceneMotion.ts).
 import * as THREE from 'three';
 import { caveKit, colour, glow, matte, type GetProp } from './caveKit.ts';
-import { techKit } from './techKit.ts';
+import { techKit, softFrame, glowGrid } from './techKit.ts';
 import { AUTOMINE_HALL as HALL } from '../../../src/game/content/underground/automineHall.ts';
 
 type XZ = readonly [number, number];
@@ -34,14 +35,33 @@ export function buildHall(getProp: GetProp) {
     m.position.set(at[0], at[1], at[2]); m.rotation.y = yaw; return m;
   };
 
-  kit.walls();
-  kit.ceiling(22, [cyan], .12);
+  // Rock everywhere but the facade's stretch of the north wall and the ceiling over the boring machine.
+  const { facade, shield } = L;
+  kit.walls((x, z, radius) => z < -13 && Math.abs(x) - radius * .8 < facade.half - 1.5);
+  kit.ceiling(22, [cyan], .12, (x, z) => z < -10.5 && Math.abs(x) < facade.half + 1);
 
   // THE BASE (techKit): the poured floor with the lamps' light baked in, the lane loop and arrows, the pit rail,
   // the kiosks, board and lamp posts with their glow. The trusses below carry the ceiling light here.
   tech.base({ hall: HALL, lanterns: L.lanterns, lamps: [], loop: { half: 10.6, corner: 2.4 }, accent: '#22c4e4',
     arrows: [[-6, 14.2, Math.PI / 2], [6, 14.2, -Math.PI / 2], [-15, 1, 0], [15.8, -2.2, 0]] });
   kit.patches(kit.wallSpots(10), grit, '#565e6a', 'Cave grit');
+  tech.lane([[0, -10.6], [0, -17.6]], 2.2, '#e8e6e0', tech.laneMaterial);
+  tech.hazard([-7.6, -17.9], [7.6, -17.9], .7, tech.paintMaterial);
+
+  // THE BORING MACHINE in the facade: the shield and its rams, the cutterhead turning slowly, a cyan halo behind
+  // and round the shield and a streak of its light down the floor.
+  place('TBM_Facade', [0, 0, facade.z], 0);
+  box([0, 10, facade.z - .1], [facade.half - .8, 10, .4]);
+  for (const s of [-1, 1]) box([s * 8.9, 10, facade.z + .4], [.8, 10, .7]);
+  box([0, .6, facade.z + .55], [8.2, .6, .45]);
+  place('TBM_Shield', [0, shield.y, shield.z], 0);
+  {
+    const cutter = new THREE.Group(); cutter.name = 'Spin_z_n15'; cutter.position.set(0, shield.y, shield.z + .1);
+    cutter.add(getProp('TBM_Cutter')); kit.group.add(cutter);
+  }
+  tech.glow(softFrame(0, 0, 4.6, 11, '#1ab4e0', .5, 6, 8).translate(0, shield.y, facade.z + .36), 'Glow halo shield');
+  tech.glow(softFrame(0, 0, 6.6, 8.2, '#40d8ff', .22, 2, 8).translate(0, shield.y, shield.z + .62), 'Glow halo ring');
+  tech.glow(glowGrid(9, 9.6, 6, 12, '#30c8f0', (u, v) => .36 * Math.sin(Math.PI * u) ** 1.4 * v ** 1.8).rotateX(-Math.PI / 2).translate(0, .075, -13.2), 'Glow halo floor');
 
   // ROCK INSTALLATIONS: rays from the floor ring out to the rock find where bulkheads and fans are bolted on.
   const rocks: THREE.Mesh[] = []; kit.group.updateMatrixWorld(true);

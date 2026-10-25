@@ -1,13 +1,14 @@
 """自动化矿道 hall props (world 2, layer 1): a near-future mining base built into the cave, plastic-toy tech style.
 The world 2 base kit (tech_props.py: kiosks, lamp post, name board, bollard, ceiling lamp, crates) with a cyan
 accent, then chunky mining robots, a drill machine with its spinning bit, wall fans with spinning blades, bulkhead
-wall panels, an ore hopper, a crusher, an ore cart and a hazard-striped garage gate.
+wall panels, an ore hopper, a crusher, an ore cart, a hazard-striped garage gate, and the hero on the north wall: a
+tunnel boring machine's shield in the shared facade, its cutterhead turning.
 Run: blender -b --python tools/blender/build_automine.py
 """
 import sys, math, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from cave_props import finish, model, mesh, box, lathe, prism, stepped, circle
-from tech_props import tech_start, tech_services, bevel_box
+from tech_props import tech_start, tech_services, tech_facade, bevel_box, ring_segments
 
 # The world 2 base kit (tech_props.py) with a deep cyan accent, then this hall's own tiles. Glow tiles are deep and
 # saturated: the atlas emission (x2.2) on top of the lit colour would wash bright ones out.
@@ -136,5 +137,38 @@ box('Door', (0, 3.4, -.1), (4.4, 2.6, .2), 2)
 for y in (2.4, 3.0, 3.6, 4.2): box('DoorRib', (0, y, .02), (4.4, .1, .06), 0)
 box('DoorEdge', (0, 2.12, .02), (4.4, .14, .08), 5)
 for x in (-2.6, 2.6): box('Signal', (x, 4.95, .52), (.3, .3, .1), 8)
+
+# THE NORTH WALL: the shared facade (navy panels), and the tunnel boring machine's SHIELD set in it (origin at its
+# centre, front +Z): a broad white ring with a yellow outer band, a cyan glow lip, dark seams, four hydraulic rams
+# at the diagonals reaching into the rock. Its CUTTERHEAD turns inside (TBM_Cutter, about z, face toward +Z): a
+# dark disc, six yellow spokes and a rim, rows of steel disc cutters, muck slots and a white hub with a cyan cap.
+tech_facade('TBM_Facade', 22)
+model('TBM_Shield')
+ring_segments('Shield', 5.2, 6.4, -.8, .6, 28, 1)
+ring_segments('ShieldBand', 6.4, 6.75, -.6, .4, 28, 11)
+ring_segments('ShieldLip', 5.0, 5.22, -.5, .72, 28, 7)
+for k in range(8):
+    a = k * math.pi / 4 + math.pi / 8; c, s_ = math.cos(a), math.sin(a)
+    prism('Seam', [(c * 5.3 - s_ * .06, s_ * 5.3 + c * .06), (c * 6.3 - s_ * .06, s_ * 6.3 + c * .06), (c * 6.3 + s_ * .06, s_ * 6.3 - c * .06), (c * 5.3 + s_ * .06, s_ * 5.3 - c * .06)], .6, .64, 0, axis='z')
+for k in range(4):
+    a = math.pi / 4 + k * math.pi / 2; c, s_ = math.cos(a), math.sin(a)
+    rot = lambda pts: [(px * c - py * s_, px * s_ + py * c) for px, py in pts]
+    prism('Ram', rot([(6.6, -.32), (8.6, -.32), (8.6, .32), (6.6, .32)]), -.5, .14, 2, axis='z')
+    prism('RamSleeve', rot([(6.5, -.5), (7.4, -.5), (7.4, .5), (6.5, .5)]), -.6, .3, 21, axis='z')
+    prism('RamFoot', rot([(8.4, -.7), (9.0, -.7), (9.0, .7), (8.4, .7)]), -.7, .2, 0, axis='z')
+model('TBM_Cutter')
+prism('Face', circle(5.0, 28), -.4, .1, 10, axis='z')
+ring_segments('Rim', 4.55, 5.0, .1, .5, 28, 21)
+for k in range(6):
+    a = k * math.pi / 3; c, s_ = math.cos(a), math.sin(a)
+    rot = lambda pts: [(px * c - py * s_, px * s_ + py * c) for px, py in pts]
+    prism('Spoke', rot([(.9, -.42), (4.6, -.5), (4.6, .5), (.9, .42)]), .1, .55, 21, axis='z')
+    for rr in (1.9, 3.0, 4.1): prism('Cutter', circle(.26, 8, c * rr, s_ * rr), .55, .78, 2, axis='z')
+    b = a + math.pi / 6; cb, sb = math.cos(b), math.sin(b)
+    for rr in (2.4, 3.6): prism('Cutter', circle(.24, 8, cb * rr, sb * rr), .1, .34, 2, axis='z')
+    prism('MuckSlot', [(cb * 3.9 - sb * .45, sb * 3.9 + cb * .45), (cb * 4.45 - sb * .55, sb * 4.45 + cb * .55), (cb * 4.45 + sb * .55, sb * 4.45 - cb * .55), (cb * 3.9 + sb * .45, sb * 3.9 - cb * .45)], .1, .14, 15, axis='z')
+prism('Hub', circle(1.05, 12), .1, .95, 1, axis='z')
+prism('HubBand', circle(1.12, 12), .45, .6, 11, axis='z')
+prism('HubCap', circle(.5, 10), .95, 1.15, 7, axis='z')
 
 finish(__file__)

@@ -1,13 +1,14 @@
 """水晶精炼厂 hall props (world 2, layer 3): the world 2 base kit (tech_props.py) with a deep magenta accent, round the
 crystals the colony harvests. Faceted glowing crystals (giant, cluster, small) in deep magenta and violet with
 lighter tip facets, a yellow cradle at the giant's foot, a white laser rig, white-framed crystal tanks and a yellow
-crystal cart. The laser beams, the floor, the rail and the glow halos are built by tools/underground/refineryHall.ts.
+crystal cart, and the hero on the north wall: three refining columns on a deck in the shared facade, a crystal core
+turning in each. The laser beams, the floor, the rail and the glow halos are built by tools/underground/refineryHall.ts.
 Run: blender -b --python tools/blender/build_refinery.py
 """
 import sys, math, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from cave_props import finish, model, mesh, box, lathe, prism
-from tech_props import tech_start, tech_services, bevel_box
+from tech_props import tech_start, tech_services, tech_facade, bevel_box
 
 ACCENT = ('8a1a7a', 'a42a92')  # deep magenta
 # Glow tiles stay deep and saturated: the atlas emission (x2.2) washes bright ones out to pink and white.
@@ -104,6 +105,41 @@ bevel_box('Tub', (0, .92, 0), (1.25, .68, 1.9), 11, .16)
 box('TubBand', (0, 1.06, .96), (1.1, .18, .04), 5)
 for (x, z, h, t) in ((-.3, -.5, .8, 20), (.3, -.3, .6, 21), (0, .2, .9, 20), (-.32, .6, .55, 21), (.34, .55, .7, 20)):
     crystal('Chunk', x, z, h, .17, 5, (x * .3, 0), 1.2, .68, x * 5, t)
+
+# THE NORTH WALL: the shared facade (dark panels), a white DECK across it above the name board (local to the
+# facade: y 7.8-8.4, z .3-3.4) with a yellow edge, brackets and the columns' header pipe; the REFINING COLUMNS
+# stand on it (origin at the foot, front +Z): a white base, a glass shaft of glowing rings between four white
+# posts (`glass` m tall), a white cap with a yellow band and a pipe up to the header. A CORE turns in each
+# (Refinery_Core: a big crystal and two shards, origin at its foot).
+tech_facade('Refinery_Facade')
+model('Refinery_Deck')
+bevel_box('Deck', (0, 8.1, 1.85), (16.4, .6, 3.1), 1, .3)
+box('DeckEdge', (0, 8.42, 3.36), (16.0, .06, .14), 11)
+box('DeckStripe', (0, 8.05, 3.42), (15.6, .3, .04), 5)
+for x in (-6.6, -2.4, 2.4, 6.6):
+    mesh('Bracket', [(x - .2, 7.8, .3), (x + .2, 7.8, .3), (x + .2, 7.8, 2.6), (x - .2, 7.8, 2.6), (x - .2, 5.6, .3), (x + .2, 5.6, .3)],
+         [(0, 1, 2, 3), (4, 5, 1, 0), (3, 2, 5, 4), (0, 3, 4), (1, 5, 2)], 0)
+box('Header', (0, 18.0, 1.6), (11.0, .5, .5), 2)
+for x in (-5.2, 5.2): box('HeaderDrop', (x, 17.15, 1.6), (.4, 1.7, .4), 2)
+for x in (-7.6, 7.6): box('HeaderRun', (x * .86, 18.0, 1.6), (2.4, .4, .4), 13)
+def column(name, glass):
+    model(name)
+    lathe('Base', [(0, 1.5), (.85, 1.5), (1.05, 1.28)], 8, 1, spin=math.pi / 8)
+    lathe('BaseBand', [(.3, 1.52), (.55, 1.52)], 8, 11, cap_top=False, cap_bottom=False, spin=math.pi / 8)
+    top = 1.05 + glass
+    for k in range(4):
+        a = math.pi / 4 + k * math.pi / 2
+        box('Post', (math.cos(a) * 1.22, 1.05 + glass / 2, math.sin(a) * 1.22), (.24, glass, .24), 1)
+    for k in range(4): lathe('GlassRing', [(1.1 + k * (glass - .2) / 3, 1.18), (1.22 + k * (glass - .2) / 3, 1.18)], 12, 20, cap_top=False, cap_bottom=False)
+    lathe('Cap', [(top, 1.45), (top + .6, 1.45), (top + .9, .9), (top + 1.1, .4)], 8, 1, spin=math.pi / 8)
+    lathe('CapBand', [(top + .12, 1.47), (top + .36, 1.47)], 8, 11, cap_top=False, cap_bottom=False, spin=math.pi / 8)
+    box('CapLight', (0, top + .45, 1.47), (.5, .16, .04), 7)
+column('Refinery_Column_Tall', 7.0)
+column('Refinery_Column_Short', 5.4)
+model('Refinery_Core')
+crystal('Core', 0, 0, 3.4, .62, 6, (0, 0), 0, .7, .2, 20)
+crystal('CoreShard', .62, .2, 1.8, .3, 5, (.16, .05), .5, .68, .5, 21)
+crystal('CoreShard', -.56, -.24, 1.5, .26, 5, (-.16, -.05), .9, .7, 1.1, 21)
 
 tech_services()
 finish(__file__)

@@ -9,7 +9,7 @@ Run: blender -b --python tools/blender/build_reactor.py
 import sys, math, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from cave_props import finish, model, box, lathe, prism
-from tech_props import tech_start, tech_services, bevel_box, ring_segments
+from tech_props import tech_start, tech_services, tech_facade, bevel_box, ring_segments
 
 ACCENT = ('c2460a', 'd45a12')  # deep orange
 TILES = [
@@ -18,24 +18,8 @@ TILES = [
 tech_start('Reactor', 'reactor', ACCENT, TILES)
 tech_services()
 
-# REACTOR FACADE on the north wall (front +Z, its back at local z = -.3), 19.2 m wide and 20 m tall: a dark
-# panelled wall between two white pylons with yellow bands and orange glow strips, a white lintel and a hazard
-# plinth. It hides the voxel wall behind the core.
-model('Reactor_Facade')
-box('Wall', (0, 10, 0), (17.4, 20, .6), 3)
-for side in (-1, 1):
-    x = side * 8.9
-    box('Pylon', (x, 10, .4), (1.6, 20, 1.4), 1)
-    for y in (2.2, 9.0, 15.8): box('PylonBand', (x, y, .4), (1.66, .6, 1.46), 11)
-    box('PylonStrip', (x - side * .82, 10, .9), (.08, 16, .12), 7)
-    bevel_box('PylonFoot', (x, .6, .7), (2.2, 1.2, 2.0), 0, .3)
-box('Lintel', (0, 19.4, .5), (17.4, 1.2, 1.2), 1)
-box('LintelBand', (0, 18.75, 1.12), (17.4, .14, .06), 7)
-box('Plinth', (0, .55, .55), (16.2, 1.1, .9), 5)
-box('PlinthTop', (0, 1.15, .55), (16.4, .12, 1.0), 0)
-for x in (-6, -3, 3, 6):
-    box('Vent', (x, 3.0, .32), (1.6, 1.2, .06), 18)
-    box('VentLight', (x, 3.8, .33), (1.4, .1, .05), 7)
+# REACTOR FACADE on the north wall (tech_props.tech_facade): it hides the voxel wall behind the core.
+tech_facade('Reactor_Facade')
 
 # REACTOR RING round the core (front +Z, centre at the origin): a broad white ring with a yellow outer band,
 # an orange glow lip on its inner edge and four yellow clamps at the diagonals reaching in to the core.
