@@ -14,7 +14,6 @@ const pool = (x: number, z: number, radius: number, color: string, strength: num
 export const CRYO_HALL = {
   id: 'world2.5',
   asset: 'cryo-hall',
-  depth: 2000,
   size: [40, 20, 40],
   pit: 8,
   spawn: [0, 0, 12],

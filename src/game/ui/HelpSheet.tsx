@@ -15,9 +15,9 @@ export function HelpSheet({ onClose }: { onClose(): void }) {
     ['pickaxe', '挖矿', coarse ? '点一下敲击，按住持续挖，矿石自动进背包' : '鼠标指向方块，按住左键挖，矿石自动进背包'],
     ['coin', '出售', '背包满了点「出售」，或走进金色圆圈自动卖掉'],
     ['chest', '升级', '在商店换更强的镐子和更大的背包'],
-    ['paw', '宠物', '去蛋台开蛋，装备宠物增加挖矿力量'],
-    ['portal', '深度', '越往下矿越值钱，到达新深度解锁传送和新蛋'],
-    ['globe', '世界', '走到南面山口的世界传送门，用金币和矿物解锁新世界'],
+    ['paw', '宠物', '去蛋台开蛋：宠物在自己的世界加卖矿收入，在哪里都加挖矿速度'],
+    ['portal', '深度', '每层要求一定等级的镐子；到达新层解锁传送和新蛋'],
+    ['globe', '世界', '每个世界有自己的货币；在世界传送门用上一世界的货币和矿物解锁新世界'],
   ];
   return <Sheet title="怎么玩" size="m" onClose={onClose} label="操作帮助" className="help-sheet" footer={<>
     <span className="ui-grow" /><UiButton size="s" tone="orange" onPress={onClose}>知道了</UiButton>

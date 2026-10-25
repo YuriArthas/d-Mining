@@ -13,15 +13,21 @@ import { MYSTERY_EGG_NAME } from '../../content/petAppearance.ts';
 import { PetArt } from '../pets/PetArt.tsx';
 import { bonusLabel } from '../pets/petDisplay.ts';
 import './bag.css';
+import { currencyIcon, currencyName } from '../currency.ts';
+import { WORLD_REQUIREMENTS } from '../../content/worldJourney.ts';
+
+const WORLD_NAMES = Object.fromEntries(WORLD_REQUIREMENTS.map(w => [w.currency, w.name]));
 
 export type BagTab = 'pets' | 'ores' | 'gear';
 type Props = { session: GameSession; tab: BagTab; onTab(tab: BagTab): void; onClose(): void; onShop(category: 'tools' | 'backpacks'): void };
 
-/** True when "一键最佳" would change the team: an empty slot can be filled or a stronger pet waits. */
+/** What a pet adds in the current world: its bonus if it belongs to this world's currency, else nothing. */
+const here = (pets: PetPanelSnapshot, card: PetCardView) => card.currency === pets.currency ? card.bonusPct : 0;
+/** True when "一键最佳" would raise the team's bonus in the current world's currency. */
 export function teamCanImprove(pets: PetPanelSnapshot) {
-  const best = [...pets.pets].sort((a, b) => b.powerBonusBps - a.powerBonusBps).slice(0, pets.slots.length);
+  const best = [...pets.pets].sort((a, b) => here(pets, b) - here(pets, a)).slice(0, pets.slots.length);
   const equipped = pets.pets.filter(card => card.equippedSlot !== null);
-  return best.reduce((sum, card) => sum + card.powerBonusBps, 0) > equipped.reduce((sum, card) => sum + card.powerBonusBps, 0);
+  return best.reduce((sum, card) => sum + here(pets, card), 0) > equipped.reduce((sum, card) => sum + here(pets, card), 0);
 }
 
 export function BagSheet(props: Props) {
@@ -43,7 +49,8 @@ function PetsTab({ session, pets, common, onClose }: Props & { pets: PetPanelSna
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [message, setMessage] = useState('');
   const [finding, setFinding] = useState(false);
-  const cards = [...pets.pets].sort((a, b) => Number(b.equippedSlot !== null) - Number(a.equippedSlot !== null) || b.powerBonusBps - a.powerBonusBps);
+  // Equipped first, then the pets that count in this world, strongest first; other worlds' pets after them.
+  const cards = [...pets.pets].sort((a, b) => Number(b.equippedSlot !== null) - Number(a.equippedSlot !== null) || here(pets, b) - here(pets, a) || b.bonusPct - a.bonusPct);
   const selected = cards.find(card => card.pet.id === selectedId) ?? cards[0] ?? null;
   const equipped = pets.slots.filter(id => id !== null).length;
   const eggOf = (speciesId: string) => pets.eggs.find(egg => egg.outcomes.some(o => o.speciesId === speciesId))?.name;
@@ -51,7 +58,7 @@ function PetsTab({ session, pets, common, onClose }: Props & { pets: PetPanelSna
     <div className="bag-eggs">{pets.eggs.map(egg => <div key={egg.id} className="ui-card-tile bag-egg" data-locked={egg.unlocked ? undefined : ''}>
       <EggArt className="bag-egg-art" eggId={egg.id} locked={!egg.unlocked} />
       <h4 className="ui-outline">{egg.unlocked ? egg.name : MYSTERY_EGG_NAME}</h4>
-      <Chip icon="coin"><b>{number(egg.price)}</b></Chip>
+      <Chip icon={currencyIcon(egg.currency)}><b>{number(egg.price)}</b></Chip>
       {egg.unlocked ? <UiButton size="s" tone="orange" aria-label={`前往${egg.name}蛋台`} onPress={() => { if (session.goTo({ egg: egg.id }) === 'travelling') onClose(); }}>前往</UiButton>
         : <small>到达{egg.unlockName ?? '更深处'}解锁</small>}
     </div>)}</div>
@@ -65,7 +72,7 @@ function PetsTab({ session, pets, common, onClose }: Props & { pets: PetPanelSna
   return <Sheet {...common} footer={<>
     <UiButton size="s" tone="green" icon="paw" onPress={() => setFinding(true)}>获取宠物</UiButton>
     {cards.length > 0 && <>
-      <span className="ui-hint bag-message" role="status">{message || '宠物跟着你一起挖矿，装备后增加挖矿力量'}</span>
+      <span className="ui-hint bag-message" role="status">{message || `本世界宠物加${currencyName(pets.currency)}收入，所有宠物加挖矿速度`}</span>
       <span className="ui-grow" />
       {selected && <UiButton size="s" tone={selected.equippedSlot !== null ? 'steel' : 'purple'} className="bag-compact-equip" onPress={() => toggle(selected)}>{selected.equippedSlot !== null ? '卸下' : '装备'}</UiButton>}
       <UiButton size="s" tone="steel" disabled={!equipped} onPress={() => { session.pets.unequipAll(); setMessage('已卸下全部宠物'); }}>全部卸下</UiButton>
@@ -73,18 +80,20 @@ function PetsTab({ session, pets, common, onClose }: Props & { pets: PetPanelSna
     </>}
   </>}>
     {cards.length ? <div className="bag-pets">
-      <div className="bag-pets-main"><div className="ui-row"><Chip icon="paw">已装备 <b>{equipped} / {pets.slots.length}</b></Chip><Chip>总加成 <b>{bonusLabel(pets.bonus.powerBonusBps)}</b></Chip><span className="ui-grow" /><Chip>{cards.length} 只</Chip></div>
+      <div className="bag-pets-main"><div className="ui-row"><Chip icon="paw">已装备 <b>{equipped} / {pets.slots.length}</b></Chip><Chip icon={currencyIcon(pets.currency)}>总加成 <b>{bonusLabel(pets.bonus[pets.currency])}</b></Chip><Chip icon="pickaxe">挖矿 <b>{bonusLabel(pets.bonus.mining)}</b></Chip><span className="ui-grow" /><Chip>{cards.length} 只</Chip></div>
       <div className="ui-grid" role="list" aria-label="宠物">{cards.map(card => <GameButton key={card.pet.id} role="listitem" className="ui-cell" data-rarity={card.rarity}
         data-equipped={card.equippedSlot !== null ? '' : undefined} aria-pressed={card.pet.id === selected?.pet.id} blurAfterPress={false}
-        aria-label={`${card.name}，${bonusLabel(card.powerBonusBps)}，${card.equippedSlot === null ? '未装备' : '已装备'}`}
+        aria-label={`${card.name}，${bonusLabel(card.bonusPct, card.currency)}，挖矿 ${bonusLabel(card.miningPct)}，${card.equippedSlot === null ? '未装备' : '已装备'}`}
         onPress={() => { setSelectedId(card.pet.id); setMessage(''); }}>
         <PetArt speciesId={card.pet.speciesId} rarity={card.rarity} /><span className="ui-cell-name ui-outline">{card.name}</span>
-        <span className="ui-cell-stat ui-outline">{bonusLabel(card.powerBonusBps)}</span>{card.equippedSlot !== null && <i className="ui-cell-check">✓</i>}
+        <span className="ui-cell-stat ui-outline"><Icon kind={currencyIcon(card.currency)} className="ui-icon ui-cell-currency" />{bonusLabel(card.bonusPct)}</span>{card.equippedSlot !== null && <i className="ui-cell-check">✓</i>}
       </GameButton>)}</div></div>
       {selected && <aside className="ui-detail bag-detail" data-rarity={selected.rarity} aria-label="宠物详情">
         <RarityTag rarity={selected.rarity} /><PetArt speciesId={selected.pet.speciesId} rarity={selected.rarity} className="bag-detail-art" />
         <h3 className="ui-outline">{selected.name}</h3>
-        <div className="ui-stat"><span>挖矿力量</span><b>{bonusLabel(selected.powerBonusBps)}</b></div>
+        <div className="ui-stat"><span>{currencyName(selected.currency)}收入</span><b>{bonusLabel(selected.bonusPct)}</b></div>
+        <div className="ui-stat"><span>挖矿速度</span><b>{bonusLabel(selected.miningPct)}</b></div>
+        {selected.currency !== pets.currency && <small className="bag-detail-note">{WORLD_NAMES[selected.currency]}才加收入</small>}
         {eggOf(selected.pet.speciesId) && <div className="ui-stat"><span>来自</span><b>{eggOf(selected.pet.speciesId)}</b></div>}
         <UiButton size="s" tone={selected.equippedSlot !== null ? 'steel' : 'purple'} onPress={() => toggle(selected)}>{selected.equippedSlot !== null ? '卸下' : '装备'}</UiButton>
       </aside>}
@@ -111,11 +120,11 @@ function OresTab({ session, common, onClose }: Props & { common: Common }) {
       : <span className="ui-hint">点矿物可以设为「保留」：解锁下一个世界需要的矿物就不会被卖掉。</span>}
     <span className="ui-grow" />
     {state.inSellZone
-      ? <UiButton size="s" tone="green" icon="coin" disabled={!sale?.count} onPress={() => { session.sellAvailable(); }}>出售可售矿物</UiButton>
-      : <UiButton size="s" tone="green" icon="coin" disabled={!bag.used} onPress={() => { if (session.goTo('sale') === 'travelling') onClose(); }}>传送出售</UiButton>}
+      ? <UiButton size="s" tone="green" icon={currencyIcon(state.currency)} disabled={!sale?.count} onPress={() => { session.sellAvailable(); }}>出售可售矿物</UiButton>
+      : <UiButton size="s" tone="green" icon={currencyIcon(state.currency)} disabled={!bag.used} onPress={() => { if (session.goTo('sale') === 'travelling') onClose(); }}>传送出售</UiButton>}
   </>}>
     <div className="ui-row"><div className="bag-capacity"><Bar value={bag.used} max={bag.capacity} tone={bag.isFull ? 'gold' : undefined}>容量 {number(bag.used)} / {number(bag.capacity)}</Bar></div>
-      <Chip icon="coin">可售 {sale ? number(sale.count) : 0} 件 · 约 <b>{sale ? number(sale.coins) : 0}</b></Chip></div>
+      <Chip icon={currencyIcon(state.currency)}>可售 {sale ? number(sale.count) : 0} 件 · 约 <b>{sale ? number(sale.coins) : 0}</b></Chip></div>
     {rows.length ? <div className="ui-grid bag-ores" role="list" aria-label="矿物">{rows.map(row => <GameButton key={row.id} role="listitem" className="ui-cell" aria-pressed={row.id === selected?.id} blurAfterPress={false}
       aria-label={`${row.item.name} ${row.count} 个，单价 ${row.item.price}`} onPress={() => setSelectedId(row.id === selectedId ? null : row.id)}>
       <span className="ui-cell-name ui-outline">{row.item.name}</span><OreIcon color={row.item.color} className="bag-ore-art" />
@@ -139,7 +148,7 @@ function GearTab({ session, common, onShop }: Props & { common: Common }) {
       <div className="bag-gear-info"><h4 className="ui-outline">{current.name}</h4>
         {kind === 'tools' ? <><div className="ui-stat"><span>力量</span><b>+{number(current.power!)}</b></div><div className="ui-stat"><span>攻速</span><b>{current.speed} 次/秒</b></div></>
           : <><div className="ui-stat"><span>容量</span><b>{number(current.capacity!)}</b></div><div className="ui-stat"><span>已装</span><b>{number(state.inventory.used)}</b></div></>}
-        <div className="ui-well bag-gear-next">{next ? <><small>下一件</small><b className="ui-outline">{next.name} · {kind === 'tools' ? `力量 +${number(next.power!)}` : `容量 ${number(next.capacity!)}`}</b><Chip icon="coin"><b>{number(next.price)}</b></Chip></>
+        <div className="ui-well bag-gear-next">{next ? <><small>下一件</small><b className="ui-outline">{next.name} · {kind === 'tools' ? `力量 +${number(next.power!)}` : `容量 ${number(next.capacity!)}`}</b><Chip icon={currencyIcon(next.currency)}><b>{number(next.price)}</b></Chip></>
           : <b className="ui-outline">已经是最好的了</b>}</div>
       </div>
     </div>;

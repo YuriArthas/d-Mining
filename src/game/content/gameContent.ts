@@ -7,9 +7,7 @@ import { ENTRANCE_WORLD } from '../world/entrance.ts';
 import { ENVIRONMENT_CONFIG } from '../world/environment.ts';
 import { JOURNEY_WORLDS } from './journeyWorlds.ts';
 import { WORLD_REQUIREMENTS, worldPortal, worldSpawn, worldStation } from './worldJourney.ts';
-import { PET_CONTENT } from './pets.ts';
-import { JOURNEY_RESOURCES } from './journeyResources.ts';
-import { EGG_STAGES } from './progression.ts';
+import { PET_CONTENT } from './petContent.ts';
 import { PINEWIND_EGG_DISPLAYS, PINEWIND_SERVICES } from './pinewind/hubLayout.ts';
 import { CREEK_CELLS, pinewindSurface } from './pinewindSurface.ts';
 import { TECH_BASE } from './world2/techBase.ts';
@@ -27,17 +25,9 @@ const zone = (x: number, z: number, radius = 3): ServiceZone => ({ x, y: 0, z, r
 // World 2's services stand where its tech base puts them; world 3 keeps plain counters either side of its spawn.
 const serviceZone = (worldZ: number, kind: 'sell' | 'shop') => worldZ === TECH_BASE.worldZ
   ? zone(TECH_BASE.kiosks[kind].ring[0], worldZ + TECH_BASE.kiosks[kind].ring[2]) : zone(kind === 'sell' ? -16 : 16, worldZ + 44);
-// Eggs of the later worlds wait for those worlds' rooms; prices follow each egg's stage in the journey economy.
-const LATER_EGGS: Readonly<Record<string, string>> = { fossil: 'world2.1', machinery: 'world2.2', core: 'world3.6' };
-const eggStage = (id: string) => { const stage = EGG_STAGES[id][0]; return stage <= 6 ? stage : stage === 7 ? 8 : stage === 8 ? 9 : 20; };
-const petContent = {
-  ...PET_CONTENT,
-  eggs: PET_CONTENT.eggs.map(e => ({
-    ...e, price: JOURNEY_RESOURCES[eggStage(e.id) * 4].price * 100,
-    requiredDestination: e.requiredDestination ? (LATER_EGGS[e.requiredDestination] ?? e.requiredDestination) : undefined,
-  })),
-};
-const eggs: readonly HubEgg[] = PINEWIND_EGG_DISPLAYS.filter(display => petContent.eggs.some(egg => egg.id === display.eggId));
+// Every egg of the three worlds stands on world 1's terrace for now; prices and unlocks come with PET_CONTENT.
+const eggs: readonly HubEgg[] = PINEWIND_EGG_DISPLAYS.filter(display => PET_CONTENT.eggs.some(egg => egg.id === display.eggId));
+const petContent = { ...PET_CONTENT, eggs: PET_CONTENT.eggs.filter(egg => eggs.some(display => display.eggId === egg.id)) };
 const [first, ...later] = JOURNEY_WORLDS;
 // Pinewind with world 1's halls loads at start; world 2's surface base and halls the first time the player goes there.
 const pinewind = pinewindSurface(JOURNEY_WORLDS.flatMap(w => w.rooms), eggs);
@@ -92,5 +82,6 @@ export const GAME_CONTENT = {
 } as const;
 export type GameContent = typeof GAME_CONTENT;
 
-/** Terrain generation: world 1's creek bed is cut out of the voxel floor meshes. The version stays, so saves still fit. */
-export const GAME_GENERATION = Object.freeze({ version: 11, seed: 0, layers: first.layers, worlds: JOURNEY_WORLDS, surfaceCut: CREEK_CELLS });
+/** Terrain generation: world 1's creek bed is cut out of the voxel floor meshes. Version 12: the economy v2 layer depths
+ *  (economy.json); older saves are not read (see saveNamespace). */
+export const GAME_GENERATION = Object.freeze({ version: 12, seed: 0, layers: first.layers, worlds: JOURNEY_WORLDS, surfaceCut: CREEK_CELLS });

@@ -8,7 +8,6 @@ const spire = (x: number, z: number, height: number, yaw = 0): IceSpire => ({ at
 export const FROZEN_HALL = {
   id: 'frozen',
   asset: 'frozen-hall',
-  depth: 2000,
   size: [40, 20, 40],
   pit: 8,
   spawn: [0, 0, 12],

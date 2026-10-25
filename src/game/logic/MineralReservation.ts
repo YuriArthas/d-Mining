@@ -25,6 +25,8 @@ export class MineralReservation {
       this.goals.add(id);
     }
   }
+  /** Rebirth: nothing kept any more. */
+  reset() { this.manual.clear(); this.goals.clear(); this.excluded.clear(); this.needed.clear(); }
   reserveWorld(id: WorldId) { this.goals.add(id); for (const item of worldRequirement(id).materials) this.excluded.delete(item.itemId); }
   finishWorld(id: WorldId) { this.goals.delete(id); for (const item of worldRequirement(id).materials) this.needed.delete(item.itemId); }
   set(id: string, mode: 'none' | 'all' | 'needed') {

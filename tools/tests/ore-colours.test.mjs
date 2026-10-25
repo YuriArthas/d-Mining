@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { JOURNEY_RESOURCES, ORE_LOOKS } from '../../src/game/content/journeyResources.ts';
+import { ORE_LOOKS } from '../../src/game/content/journeyResources.ts';
+import { RESOURCES as JOURNEY_RESOURCES } from '../../src/game/content/resources.ts';
 
 // CIELAB (D65) distance between two sRGB hex colours.
 const lin = c => { c /= 255; return c <= .04045 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4; };

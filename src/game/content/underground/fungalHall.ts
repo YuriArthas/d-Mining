@@ -8,7 +8,6 @@ const mushroom = (x: number, z: number, height: number, cap: number, tint: 'teal
 export const FUNGAL_HALL = {
   id: 'fungal',
   asset: 'fungal-hall',
-  depth: 800,
   size: [40, 20, 40] as const,
   /** Half width of the open mine pit (matches the shaft, ENTRANCE_WORLD). */
   pit: 8,

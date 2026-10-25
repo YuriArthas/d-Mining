@@ -9,6 +9,8 @@ import { Bar, Chip, Sheet, type SheetTab } from '../kit/panel.tsx';
 import './rewards.css';
 
 import { claimableRewards, readyOnlineRewards, rewardsTabFor, signin, type RewardsTab } from './rewardState.ts';
+import { currencyIcon, currencyName } from '../currency.ts';
+import type { CurrencyId } from '../../content/economy.ts';
 export { claimableRewards, rewardsTabFor, type RewardsTab };
 type Claim = RewardClaimResult | { status: 'clipboard-failed' | 'unavailable' };
 const clock = (seconds: number) => { const s = Math.max(0, Math.ceil(seconds)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
@@ -44,7 +46,7 @@ export function RewardsSheet({ session, tab, onTab, onClose }: { session: GameSe
     { id: 'signin', label: '签到', icon: 'luck', badge: day.signedToday ? undefined : 1 },
     { id: 'invite', label: '邀请', icon: 'paw' },
   ];
-  const footer = <><span className="ui-hint" role="status">{message || '幸运币在地表扭蛋机抽奖：金币、加速、永久挖矿加速、双倍出售……'}</span><span className="ui-grow" />
+  const footer = <><span className="ui-hint" role="status">{message || '幸运币在地表扭蛋机抽奖：货币、加速、永久挖矿加速、双倍出售……'}</span><span className="ui-grow" />
     <UiButton size="s" tone="pink" icon="gift" onPress={() => { if (session.goTo('capsule') === 'travelling') onClose(); }}>传送到扭蛋机</UiButton></>;
   return <Sheet title="奖励" tabs={tabs} tab={tab} onTab={onTab} onClose={onClose} footer={footer}>
     <div className="ui-row"><Chip icon="luck">幸运币 <b>{number(rewards.balance)}</b></Chip>
@@ -77,6 +79,7 @@ export function RewardsSheet({ session, tab, onTab, onClose }: { session: GameSe
 }
 
 const PRIZE_ICON: Record<string, IconKind> = { coins: 'coin', speed: 'bolt', mining: 'pickaxe', sell: 'coin', autoHatch: 'paw', luck: 'clover' };
+const prizeIcon = (id: string, currency: CurrencyId) => id === 'coins' || id === 'sell' ? currencyIcon(currency) : PRIZE_ICON[id];
 const PERMANENT = new Set(['mining', 'autoHatch']);
 type Spun = Extract<SpinResult, { status: 'spun' }>;
 
@@ -84,17 +87,18 @@ type Spun = Extract<SpinResult, { status: 'spun' }>;
 export function CapsuleSheet({ session, onClose }: { session: GameSession; onClose(): void }) {
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot), rewards = state.rewards;
   const [result, setResult] = useState<Spun | null>(null), [message, setMessage] = useState('');
-  const note: Record<string, string> = { coins: `${number(state.capsuleCoins)} 金币`, speed: '5 分钟', mining: '永久', sell: '5 分钟', autoHatch: '永久', luck: '5 分钟' };
+  const unit = currencyName(state.capsuleCurrency), minutes = `${REWARD_CONFIG.timedDurationSeconds / 60} 分钟`;
+  const note: Record<string, string> = { coins: `${number(state.capsuleCoins)} ${unit}`, speed: minutes, mining: '永久', sell: minutes, autoHatch: '永久', luck: minutes };
   const spin = () => {
     try {
       const outcome = session.spinCapsule();
       if (outcome.status === 'spun') { setResult(outcome); setMessage(''); return; }
-      setMessage({ away: '先走到扭蛋机旁边', unavailable: '现在无法抽奖', overflow: '金币已达上限，这次没扣幸运币', 'insufficient-currency': '幸运币不够，去奖励里领一些吧' }[outcome.status]);
+      setMessage({ away: '先走到扭蛋机旁边', unavailable: '现在无法抽奖', overflow: `${unit}已达上限，这次没扣幸运币`, 'insufficient-currency': '幸运币不够，去奖励里领一些吧' }[outcome.status]);
     } catch (error) { setMessage(`操作失败：${String(error)}`); }
   };
   const prize = result ? CAPSULE_REWARDS.find(r => r.id === result.reward)! : null;
   return <>
-    <Sheet title="幸运扭蛋机" subtitle="每次抽一项；已拥有的永久权益会换成金币" size="m" className="capsule-sheet" onClose={onClose} footer={<>
+    <Sheet title="幸运扭蛋机" subtitle={`每次抽一项；已拥有的永久权益会换成${unit}`} size="m" className="capsule-sheet" onClose={onClose} footer={<>
       <Chip icon="luck">幸运币 <b>{number(rewards.balance)}</b></Chip>
       <span className="ui-hint" role="status">{message || (!state.atMachine ? '走到扭蛋机旁边才能抽' : rewards.balance < REWARD_CONFIG.spinCost ? '幸运币不够，去奖励里领一些吧' : '')}</span><span className="ui-grow" />
       <UiButton size="m" tone="pink" icon="luck" disabled={!state.atMachine || rewards.balance < REWARD_CONFIG.spinCost} onPress={spin}>抽一次 · {REWARD_CONFIG.spinCost} 幸运币</UiButton>
@@ -104,18 +108,18 @@ export function CapsuleSheet({ session, onClose }: { session: GameSession; onClo
           const owned = PERMANENT.has(reward.id) && rewards.permanent[reward.id as keyof typeof rewards.permanent];
           const timed = reward.id === 'speed' || reward.id === 'luck' || reward.id === 'sell' ? rewards.timed[reward.id] : 0;
           return <div key={reward.id} className="ui-card-tile capsule-prize" data-kind={PERMANENT.has(reward.id) ? 'permanent' : reward.id === 'coins' ? 'coins' : 'timed'}>
-            <Icon kind={PRIZE_ICON[reward.id]} className="ui-icon capsule-prize-art" />
-            <div><b className="ui-outline">{reward.name}</b><strong className="ui-outline">{reward.weight}%</strong><small>{owned ? '已拥有' : timed > 0 ? `剩余 ${clock(timed)}` : note[reward.id]}</small></div>
+            <Icon kind={prizeIcon(reward.id, state.capsuleCurrency)} className="ui-icon capsule-prize-art" />
+            <div><b className="ui-outline">{reward.id === 'coins' ? unit : reward.name}</b><strong className="ui-outline">{reward.weight}%</strong><small>{owned ? '已拥有' : timed > 0 ? `剩余 ${clock(timed)}` : note[reward.id]}</small></div>
           </div>;
         })}</div>
       </div>
     </Sheet>
     {result && prize && <div className="hatch" data-rarity={PERMANENT.has(result.reward) ? 'epic' : result.reward === 'coins' ? 'legendary' : 'rare'} data-done="true" role="dialog" aria-modal="true" aria-label={`抽到：${prize.name}`}>
       <div className="hatch-rays" /><div className="hatch-stage"><div className="hatch-result">
-        <div className="hatch-ribbon ui-outline">{result.duplicate ? '已拥有 · 换成金币' : '抽到啦！'}</div>
-        <Icon kind={PRIZE_ICON[result.reward]} className="ui-icon capsule-reveal-art" />
-        <h2 className="ui-outline">{result.duplicate || result.reward === 'coins' ? `${number(result.coinReward)} 金币` : prize.name}</h2>
-        <span className="ui-hint">{result.duplicate ? `${prize.name}已经拥有，换成了金币` : result.reward === 'coins' ? '金币已到账' : result.durationSeconds > 0 ? `持续时间增加 ${result.durationSeconds / 60} 分钟` : '永久生效'}</span>
+        <div className="hatch-ribbon ui-outline">{result.duplicate ? `已拥有 · 换成${unit}` : '抽到啦！'}</div>
+        <Icon kind={prizeIcon(result.reward, state.capsuleCurrency)} className="ui-icon capsule-reveal-art" />
+        <h2 className="ui-outline">{result.duplicate || result.reward === 'coins' ? `${number(result.coinReward)} ${unit}` : prize.name}</h2>
+        <span className="ui-hint">{result.duplicate ? `${prize.name}已经拥有，换成了${unit}` : result.reward === 'coins' ? `${unit}已到账` : result.durationSeconds > 0 ? `持续时间增加 ${result.durationSeconds / 60} 分钟` : '永久生效'}</span>
         <div className="ui-row hatch-actions"><UiButton size="m" tone="steel" onPress={() => setResult(null)}>好的</UiButton>
           <UiButton size="m" tone="pink" icon="gift" disabled={rewards.balance < REWARD_CONFIG.spinCost} onPress={() => { setResult(null); spin(); }}>再抽一次</UiButton></div>
       </div></div>

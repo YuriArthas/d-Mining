@@ -111,11 +111,11 @@ for (const room of rooms) {
 }
 
 test('airborne room entry and grounded objects above its floor window never grant early progression', () => {
-  const room = destinations.find(destination => destination.id === 'old_mine');
+  const room = destinations.find(destination => destination.id === 'old_mine'), d = room.depth;
   const samples = [
     { feet: room.spawn, grounded: false },
-    { feet: [0, -399.975, 11], grounded: false },
-    { feet: [0, -399.5, 11], grounded: false },
+    { feet: [0, -(d - .025), 11], grounded: false },
+    { feet: [0, -(d - .5), 11], grounded: false },
     { feet: [0, room.spawn[1] + .002, 11], grounded: true },
     { feet: [room.roomBounds.maxX, room.spawn[1], 11], grounded: true },
   ];
@@ -124,21 +124,22 @@ test('airborne room entry and grounded objects above its floor window never gran
     session.updatePosition(feet, grounded);
     assert.equal(session.getSnapshot().destinations.find(destination => destination.id === room.id).unlocked, false);
     assert.ok(session.exportProgress().exploration.maxDepth < room.depth);
-    assert.equal(session.getSnapshot().depth, 399);
+    assert.equal(session.getSnapshot().depth, d - 1);
   }
 });
 
 test('natural descent outside room bounds keeps exact airborne thresholds and the existing grounded contact tolerance', () => {
+  const d = destinations.find(destination => destination.id === 'old_mine').depth;
   for (const { y, grounded, unlocked } of [
-    { y: -399.99, grounded: false, unlocked: false },
-    { y: -400, grounded: false, unlocked: true },
-    { y: -399.975, grounded: true, unlocked: true },
-    { y: -399.9, grounded: true, unlocked: false },
+    { y: -(d - .01), grounded: false, unlocked: false },
+    { y: -d, grounded: false, unlocked: true },
+    { y: -(d - .025), grounded: true, unlocked: true },
+    { y: -(d - .1), grounded: true, unlocked: false },
   ]) {
     const feet = [90, y, 90], session = GameSession.createNew(GAME_CONTENT.session);
     session.updatePosition(feet, grounded);
     assert.equal(session.getSnapshot().destinations.find(destination => destination.id === 'old_mine').unlocked, unlocked);
     assert.equal(session.exportProgress().exploration.maxDepth, -y + (grounded ? .04 : 0));
-    assert.equal(visualFrame(feet, grounded).depth, unlocked ? 400 : 0);
+    assert.equal(visualFrame(feet, grounded).depth, unlocked ? d : 0);
   }
 });

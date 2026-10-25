@@ -1,7 +1,8 @@
 import type { ShopCategory, ShopItem } from '../content/shopCatalog.ts';
+import type { CurrencyId } from '../content/economy.ts';
 
 type Snapshot = Readonly<{
-  coins: number;
+  balances: Readonly<Record<CurrencyId, number>>;
   pickaxe: Readonly<{ level: number }>;
   inventory: Readonly<{ capacity: number; used: number }>;
   equipment: Readonly<{ toolLevel: number; backpackCapacity: number }>;
@@ -39,10 +40,10 @@ export function offerStats(category: ShopCategory, item: ShopItem, items: readon
 /** What the buy button says and whether it works. */
 export function offerAction(category: ShopCategory, item: ShopItem, s: Snapshot, state = offerState(category, item, s)) {
   const tooSmall = category === 'backpacks' && item.capacity! < s.inventory.used;
-  const affordable = s.coins >= item.price;
+  const balance = s.balances[item.currency], affordable = balance >= item.price;
   if (state === 'equipped') return { label: '已装备', enabled: false, buy: false };
   if (state === 'owned') return tooSmall ? { label: '先卖掉矿石', enabled: false, buy: false } : { label: '装备', enabled: true, buy: false };
   if (state === 'locked') return { label: '先买上一件', enabled: false, buy: false };
   // Short of coins: the panel writes the missing amount in the game's number style.
-  return affordable ? { label: '购买', enabled: true, buy: true } : { label: '还差', enabled: false, buy: false, short: item.price - s.coins };
+  return affordable ? { label: '购买', enabled: true, buy: true } : { label: '还差', enabled: false, buy: false, short: item.price - balance };
 }

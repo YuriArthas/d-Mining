@@ -11,7 +11,6 @@ const pool = (x: number, z: number, radius: number, color: string, strength: num
 export const AUTOMINE_HALL = {
   id: 'world2.1',
   asset: 'automine-hall',
-  depth: 400,
   size: [40, 20, 40],
   pit: 8,
   spawn: [0, 0, 12],

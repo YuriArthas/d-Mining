@@ -14,6 +14,7 @@ const SESSION_CONTENT = GAME_CONTENT.session, SELL_ZONE = SESSION_CONTENT.sales[
 const batch=(count,itemId='stone')=>[{itemId,count}];
 const volume=id=>{const n={stone:1,gold:10,gem:15,large:80}[id];if(n===undefined)throw Error('unknown item');return n};
 const price=id=>({stone:1,gold:40,gem:80,large:100}[id]);
+const gold=wallet=>({canCredit:n=>wallet.canCredit('gold',n),credit:n=>wallet.credit('gold',n)});
 
 test('weighted inventory separates units from pieces; full never restricts valid add',()=>{
  const bag=new Inventory(50,volume);bag.add(batch(47));bag.add(batch(1,'gold'));
@@ -43,19 +44,19 @@ test('weighted DTO remains quantity based; restore recalculates fullness using i
  restored.setCapacity(200);assert.equal(restored.isFull(),false);restored.setCapacity(1);assert.equal(restored.getSnapshot().totalCount,5);assert.equal(restored.getSnapshot().used,190);
 });
 test('independent sale quote uses quantity times price, never volume or capacity; quote is read only',()=>{
- const bag=new Inventory(1,volume),wallet=new Wallet(7);bag.add([...batch(2,'gold'),...batch(3,'gem')]);const before=bag.getSnapshot();
+ const bag=new Inventory(1,volume),wallet=new Wallet({gold:7}),till=gold(wallet);bag.add([...batch(2,'gold'),...batch(3,'gem')]);const before=bag.getSnapshot();
  assert.deepEqual(quoteSale(before.items,price),{status:'quoted',count:5,coins:320});assert.equal(bag.getSnapshot(),before);assert.equal(before.used,65);
- assert.deepEqual(sellItems(bag,wallet,price),{status:'sold',count:5,coins:320});assert.equal(wallet.getBalance(),327);assert.equal(bag.getSnapshot().used,0);
- assert.deepEqual(sellItems(bag,wallet,price),{status:'empty'});assert.equal(wallet.getBalance(),327);
+ assert.deepEqual(sellItems(bag,till,price),{status:'sold',count:5,coins:320});assert.equal(wallet.getBalance('gold'),327);assert.equal(bag.getSnapshot().used,0);
+ assert.deepEqual(sellItems(bag,till,price),{status:'empty'});assert.equal(wallet.getBalance('gold'),327);
 });
 test('pricing failure and unsafe proceeds preserve inventory and wallet',()=>{
  for(const pricing of [()=>{throw Error('missing price')},()=>-1,()=>NaN]){
-  const bag=new Inventory(50,volume),wallet=new Wallet(5);bag.add(batch(1,'gold'));const before=bag.getSnapshot();
-  assert.throws(()=>sellItems(bag,wallet,pricing));assert.equal(bag.getSnapshot(),before);assert.equal(wallet.getBalance(),5);
+  const bag=new Inventory(50,volume),wallet=new Wallet({gold:5});bag.add(batch(1,'gold'));const before=bag.getSnapshot();
+  assert.throws(()=>sellItems(bag,gold(wallet),pricing));assert.equal(bag.getSnapshot(),before);assert.equal(wallet.getBalance('gold'),5);
  }
  for(const [count,balance] of [[2,0],[1,1]]){
-  const bag=new Inventory(50),wallet=new Wallet(balance);bag.add(batch(count));const before=bag.getSnapshot();
-  assert.deepEqual(sellItems(bag,wallet,()=>Number.MAX_SAFE_INTEGER),{status:'overflow'});assert.equal(bag.getSnapshot(),before);assert.equal(wallet.getBalance(),balance);
+  const bag=new Inventory(50),wallet=new Wallet({gold:balance});bag.add(batch(count));const before=bag.getSnapshot();
+  assert.deepEqual(sellItems(bag,gold(wallet),()=>Number.MAX_SAFE_INTEGER),{status:'overflow'});assert.equal(bag.getSnapshot(),before);assert.equal(wallet.getBalance('gold'),balance);
  }
 });
 test('mining checks existing occupied volume, accepts oversize yield and never truncates completed batches',()=>{
@@ -68,14 +69,15 @@ test('resource quantities remain stable and definitions are immutable',()=>{
  for(const r of ORE_ITEMS){assert.ok(r.volume>0&&r.maxHp>0&&r.price>0);assert.ok(Object.isFrozen(r));assert.equal(itemVolume(r.itemId),r.volume);assert.equal(itemPrice(r.itemId),r.price);}
  assert.throws(()=>{ORE_ITEMS[0].volume=99});assert.throws(()=>itemDefinition('unknown'));
 });
-test('session shows mixed-unit snapshots and sells completed overflow at independent prices once',()=>{
- let now=0,solid=true;const initial=new GameSession(SESSION_CONTENT).exportProgress(); initial.pickaxe.level=28;delete initial.equipment; /* Legacy active-gear fixture. */ const session=new GameSession(SESSION_CONTENT,50,()=>now,{},initial);
+test('every block takes one place in the bag; a full bag refuses the next block and sells once at each price',()=>{
+ let now=0,solid=true;const initial=new GameSession(SESSION_CONTENT).exportProgress(); initial.pickaxe.level=28;initial.equipment.toolLevel=28;const session=new GameSession(SESSION_CONTENT,50,()=>now,{},initial);
  session.attach({cell:()=>solid?71:0,pending:()=>false,mine:()=>true,cancelMining:()=>{}});
- session.collected(Array.from({length:47},()=>({kind:64})));const cell=[11,-1,-25];session.selectTarget(cell);
- assert.equal(session.getSnapshot().target.volume,resourceByKind(71).volume);assert.equal(session.getSnapshot().target.price,resourceByKind(71).price);
+ assert.ok(ORE_ITEMS.every(r=>r.volume===1));
+ const cap=session.getSnapshot().inventory.capacity;session.collected(Array.from({length:cap-1},()=>({kind:64})));const cell=[11,-1,-25];session.selectTarget(cell);
+ assert.equal(session.getSnapshot().target.price,resourceByKind(71).price);
  const hits=Math.ceil(resourceByKind(71).maxHp/pickaxeStats(28).power); for(let i=0;i<hits;i++){now=i*.5;assert.equal(session.hit(cell).status,i===hits-1?'breaking':'hit')}
- solid=false;session.collected([{cell,kind:71}]);let s=session.getSnapshot();assert.equal(s.inventory.used,47+resourceByKind(71).volume);assert.equal(s.inventory.totalCount,48);assert.deepEqual(s.sale,{status:'quoted',count:48,coins:47+resourceByKind(71).price});
+ solid=false;session.collected([{cell,kind:71}]);let s=session.getSnapshot();assert.equal(s.inventory.used,cap);assert.equal(s.inventory.totalCount,cap);assert.deepEqual(s.sale,{status:'quoted',count:cap,coins:cap-1+resourceByKind(71).price});
  solid=true;now+=.5;assert.equal(session.hit([12,-1,-25]).status,'full');assert.equal(session.blockHealth([12,-1,-25]),resourceByKind(71).maxHp);
- session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);s=session.getSnapshot();assert.equal(s.coins,SESSION_CONTENT.initialCoins+47+resourceByKind(71).price);assert.equal(s.inventory.totalCount,0);assert.match(s.notice,/48 件.*金币/);
- session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);assert.equal(session.getSnapshot().coins,SESSION_CONTENT.initialCoins+47+resourceByKind(71).price);
+ session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);s=session.getSnapshot();assert.equal(s.coins,SESSION_CONTENT.initialCoins+cap-1+resourceByKind(71).price);assert.equal(s.inventory.totalCount,0);assert.match(s.notice,new RegExp(`${cap} 件.*金币`));
+ session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);assert.equal(session.getSnapshot().coins,SESSION_CONTENT.initialCoins+cap-1+resourceByKind(71).price);
 });

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { BoxGeometry, PerspectiveCamera } from 'three';
 import { PetFollowers } from '../../src/game/presentation/PetFollowers.ts';
-import { PET_CONTENT } from '../../src/game/content/pets.ts';
+import { PET_CONTENT } from '../../src/game/content/petContent.ts';
 import { petAppearance } from '../../src/game/content/petAppearance.ts';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
 import { PetService } from '../../src/game/application/PetService.ts';
@@ -12,9 +12,9 @@ const PET_DISPLAYS = GAME_CONTENT.eggs;
 const pet = (id, slot, speciesId = 'moss-slime') => ({ id, slot, speciesId, level: 1 });
 test('each displayed egg charges its own price and draws only from its own configured pool', () => {
   assert.equal(new Set(PET_DISPLAYS.map(p => p.eggId)).size, 16);
-  assert.equal(new Set(PET_CONTENT.eggs.map(e => e.price)).size, 16);
-  const wallet = new Wallet(PET_CONTENT.eggs.reduce((sum,e)=>sum+e.price*5,0)); let serial = 0, roll = 0;
-  const service = new PetService({ content: PET_CONTENT, wallet, hasDestination:()=>true, random: () => roll, createPetId: () => `p${++serial}` });
+  const funds = currency => PET_CONTENT.eggs.filter(e => e.currency === currency).reduce((sum,e)=>sum+e.price*5,0);
+  const wallet = new Wallet({ gold: funds('gold'), tech: funds('tech'), star: funds('star') }); let serial = 0, roll = 0;
+  const service = new PetService({ content: PET_CONTENT, wallet, hasDestination:()=>true, worldOpen:()=>true, random: () => roll, createPetId: () => `p${++serial}` });
   const pools = new Set();
   for (const stand of PET_DISPLAYS) {
     const egg = service.catalog.egg(stand.eggId);
@@ -24,9 +24,10 @@ test('each displayed egg charges its own price and draws only from its own confi
       assert.ok(!pools.has(outcome.speciesId)); pools.add(outcome.speciesId);
       assert.ok(petAppearance(outcome.speciesId));
       roll = (cumulative + outcome.weight / 2) / total;
-      const before = wallet.getBalance(), result = service.hatch(egg.id);
+      const before = wallet.getBalances(), result = service.hatch(egg.id);
       assert.equal(result.status, 'hatched'); assert.equal(result.pet.speciesId, outcome.speciesId);
-      assert.equal(before - wallet.getBalance(), egg.price);
+      assert.equal(before[egg.currency] - wallet.getBalance(egg.currency), egg.price);
+      for (const other of ['gold', 'tech', 'star']) if (other !== egg.currency) assert.equal(wallet.getBalance(other), before[other]);
       cumulative += outcome.weight;
     }
   }

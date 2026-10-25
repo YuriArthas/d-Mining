@@ -14,7 +14,6 @@ const pool = (x: number, z: number, radius: number, color: string, strength: num
 export const REACTOR_HALL = {
   id: 'world2.6',
   asset: 'reactor-hall',
-  depth: 2400,
   size: [40, 20, 40],
   pit: 8,
   spawn: [0, 0, 12],

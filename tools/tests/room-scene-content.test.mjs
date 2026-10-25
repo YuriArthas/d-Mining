@@ -53,7 +53,7 @@ test('another layer can bind the authored kit, custom spawn and shop without har
  definition.rings.push({...definition.rings[0],anchor:'shop'});
  const layers=KIT_LAYERS.map(l=>l.id==='fungal'?{...l,scene:KIT}:l);
  const room=roomsFor(layers,{...ROOM_SCENES,[KIT]:definition})[1],plan=roomPlan(room);
- assert.deepEqual(room.spawn,[2,-799.9,12]);assert.equal(plan.signs[0].subtitle,'03 / 800 米');
+ assert.deepEqual(room.spawn,[2,-room.depth+.1,12]);assert.equal(plan.signs[0].subtitle,`03 / ${room.depth} 米`);
  assert.equal(plan.signs.at(-1).title,'UPGRADE');assert.equal(plan.shapes.at(-1).at[0],13);
  assert.equal(room.shop.radius,1.8);
 });

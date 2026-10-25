@@ -11,6 +11,7 @@
 .egg-outcome .ui-cell { aspect-ratio: 1; height: auto; cursor: default; }
 .egg-odds { font-size: 22px; line-height: 1; }
 .egg-owned { font: 700 11px/1.2 var(--ui-font-body); color: #e3f6ff; text-shadow: 0 1px 0 #0b3d6e; }
+.egg-mining { font: 800 12px/1.1 var(--ui-font); color: #bdf3ff; --ui-stroke: 2px; white-space: nowrap; }
 .egg-status { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .hatch {

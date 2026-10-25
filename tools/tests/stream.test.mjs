@@ -100,7 +100,7 @@ test('combat damage survives streaming; actual removal alone awards and clears H
  session.attach({cell:c=>s.cell(c),pending:c=>s.pending(c),mine:cs=>s.mineMany(cs),cancelMining:()=>s.cancelPending()});
  try{
   drain(s,f.workers);const c=[8,-2,-25],block=resourceByKind(s.cell(c)),hp=block.maxHp,blows=Math.ceil(hp/10);
-  assert.equal(session.blockHealth(c),hp);assert.ok(blows>=3);
+  assert.equal(session.blockHealth(c),hp);assert.ok(blows>=2);
   const before=s.snapshot();assert.equal(session.hit(c).status,'hit');drain(s,f.workers);
   assert.equal(session.blockHealth(c),hp-10);assert.equal(s.snapshot().revision,before.revision);assert.equal(receipts.length,0);
   s.relocate([0,-1999.9,0]);drain(s,f.workers);assert.equal(session.blockHealth(c),hp-10);
@@ -116,7 +116,7 @@ test('combat damage survives streaming; actual removal alone awards and clears H
 });
 test('cancelled lethal strike keeps sparse damage and retries without duplicate rewards',async()=>{
  const {GameSession}=await import('../../src/game/application/GameSession.ts');
- let now=0;const initial=new GameSession(SESSION_CONTENT).exportProgress();initial.pickaxe.level=31;delete initial.equipment; /* Legacy active-gear fixture. */const session=new GameSession(SESSION_CONTENT,50,()=>now,{},initial),receipts=[];
+ let now=0;const initial=new GameSession(SESSION_CONTENT).exportProgress();initial.pickaxe.level=30;delete initial.equipment; /* Legacy active-gear fixture. */const session=new GameSession(SESSION_CONTENT,50,()=>now,{},initial),receipts=[];
  const f=setup(resources=>{receipts.push(resources);session.collected(resources)}),s=f.stream;
  session.attach({cell:c=>s.cell(c),pending:c=>s.pending(c),mine:cs=>s.mineMany(cs),cancelMining:()=>s.cancelPending()});
  try{

@@ -9,7 +9,6 @@ const spire = (x: number, z: number, height: number, tint: Tint, yaw = 0): HallS
 export const CRYSTAL_HALL = {
   id: 'crystal',
   asset: 'crystal-hall',
-  depth: 1200,
   size: [40, 20, 40],
   pit: 8,
   spawn: [0, 0, 12],

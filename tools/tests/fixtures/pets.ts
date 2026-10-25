@@ -1,12 +1,13 @@
 // Legacy-sized values solely for service unit tests. Live balance is tested in progression.test.mjs.
 import type { PetContent, PetDefinition, EggDefinition, PetRarity } from '../../../src/game/logic/pets/types.ts';
 
-// Each offer owns its explicit price and rewards. Display row/height has no gameplay meaning.
-// Tuple: species ID, name, rarity, power bonus in basis points, draw weight.
+// Each offer owns its explicit price and rewards, all in gold. Display row/height has no gameplay meaning.
+// Tuple: species ID, name, rarity, income bonus in hundredths of a percent (1000 = +10 %), draw weight.
 type Reward = readonly [string, string, PetRarity, number, number];
 function egg(id: string, name: string, price: number, rewards: readonly Reward[]) {
-  const pets: PetDefinition[] = rewards.map(([id, name, rarity, powerBonusBps]) => ({ id, name, rarity, powerBonusBps }));
-  const offer: EggDefinition = { id, name, price, outcomes: rewards.map(([speciesId, , , , weight]) => ({ speciesId, weight })) };
+  // Every fixture pet also mines 10 % faster.
+  const pets: PetDefinition[] = rewards.map(([id, name, rarity, bonus]) => ({ id, name, rarity, bonusPct: bonus / 100, currency: 'gold', miningPct: 10 }));
+  const offer: EggDefinition = { id, name, price, currency: 'gold', outcomes: rewards.map(([speciesId, , , , weight]) => ({ speciesId, weight })) };
   return { pets, offer };
 }
 const offers = [

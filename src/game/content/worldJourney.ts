@@ -1,22 +1,13 @@
-// Each world's unlock price, paid at a world portal: coins and minerals from the world before it.
+import { ECONOMY, type CurrencyId, type TicketEconomy } from './economy.ts';
+// Each world's ticket, paid at a world portal: the previous world's currency, a pickaxe level (the new world's
+// first gate) and minerals from earlier worlds (economy.json). `currency` is what the world's own ore sells for.
 export type WorldId = 1 | 2 | 3;
-type WorldRequirement = Readonly<{
-  id: WorldId; name: string; z: number; coins: number;
-  materials: readonly Readonly<{ itemId: string; count: number; layer: number }>[];
-}>;
-export const WORLD_REQUIREMENTS: readonly WorldRequirement[] = Object.freeze([
-  { id: 1, name: '第一世界', z: 0, coins: 0, materials: [] },
-  { id: 2, name: '第二世界', z: 224, coins: 10_000_000, materials: [
-    { itemId: 'journey.emerald', count: 50, layer: 2 }, { itemId: 'journey.amethyst', count: 50, layer: 3 },
-    { itemId: 'journey.ruby', count: 40, layer: 4 }, { itemId: 'journey.diamond', count: 30, layer: 5 },
-    { itemId: 'journey.obsidian', count: 30, layer: 6 },
-  ] },
-  { id: 3, name: '第三世界', z: 448, coins: 10_000_000_000, materials: [
-    { itemId: 'journey.titanium', count: 60, layer: 2 }, { itemId: 'journey.platinum', count: 50, layer: 3 },
-    { itemId: 'journey.tourmaline', count: 40, layer: 4 }, { itemId: 'journey.opal', count: 30, layer: 5 },
-    { itemId: 'journey.energy', count: 30, layer: 6 },
-  ] },
-]);
+type WorldRequirement = Readonly<{ id: WorldId; name: string; z: number; currency: CurrencyId; ticket: TicketEconomy | null;
+  /** The ticket's minerals (none for world 1). */
+  materials: TicketEconomy['materials'] }>;
+const PLACES: Readonly<Record<WorldId, { name: string; z: number }>> = { 1: { name: '第一世界', z: 0 }, 2: { name: '第二世界', z: 224 }, 3: { name: '第三世界', z: 448 } };
+export const WORLD_REQUIREMENTS: readonly WorldRequirement[] = Object.freeze(ECONOMY.worlds.map(w =>
+  Object.freeze({ id: w.id, ...PLACES[w.id], currency: w.currency, ticket: w.ticket, materials: w.ticket?.materials ?? [] })));
 export function worldRequirement(id: WorldId) {
   const world = WORLD_REQUIREMENTS.find(w => w.id === id);
   if (!world) throw Error('未知世界');

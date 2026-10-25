@@ -1,18 +1,20 @@
 import { versionOne } from './data.ts';
 import { integer } from './numbers.ts';
-const PICKAXE_BALANCE = Object.freeze({ basePower: 10, powerPerLevel: 5, baseSpeed: 2, speedEvery: 5, speedMultiplier: 2, maxSpeed: 16 });
+import { ECONOMY } from '../content/economy.ts';
+/** Swing speed never passes 4× the first pickaxe's; speed beyond it (the capsule's mining boost) turns into damage. */
+const SPEED_CAP = 4 * ECONOMY.tools[0].speed;
+/** A pickaxe level's damage and swings per second (economy.json). `speedMultiplier` is everything that mines faster
+ *  (the capsule's permanent boost, the pets): it raises the speed up to the cap and keeps the rest as damage, so
+ *  damage per second always grows by it. */
 export function pickaxeStats(level: number, speedMultiplier = 1) {
-  if (!integer(level, '镐子等级')) throw new Error('镐子等级必须大于 0');
-  const c = PICKAXE_BALANCE;
-  const basePower = integer(c.basePower + (level - 1) * c.powerPerLevel, '基础力量');
-  if (speedMultiplier !== 1 && speedMultiplier !== 1.5) throw Error('无效挖矿速度倍率');
-  const uncappedSpeed = integer(c.baseSpeed * c.speedMultiplier ** Math.floor((level - 1) / c.speedEvery) * speedMultiplier, '理论攻速');
-  const speed = Math.min(c.maxSpeed, uncappedSpeed);
-  // Preserve uncapped damage per second after the attack-rate cap. Round once,
-  // before pet bonuses; use integer arithmetic even for large saved levels.
-  const power = integer(Number(BigInt(basePower) * BigInt(uncappedSpeed) / BigInt(speed)), '力量');
-  return Object.freeze({ level, basePower, power, speed, uncappedSpeed,
-    overflowPower: power - basePower, levelsUntilSpeed: speed >= c.maxSpeed ? null : c.speedEvery - (level - 1) % c.speedEvery });
+  if (!integer(level, '镐子等级') || level > ECONOMY.tools.length) throw new Error('镐子等级无效');
+  if (!Number.isFinite(speedMultiplier) || speedMultiplier < 1) throw Error('无效挖矿速度倍率');
+  const tool = ECONOMY.tools[level - 1], uncappedSpeed = tool.speed * speedMultiplier;
+  const speed = Math.min(SPEED_CAP, uncappedSpeed);
+  const power = integer(Math.round(tool.power * uncappedSpeed / speed), '力量');
+  const faster = ECONOMY.tools.find(t => t.level > level && t.speed > tool.speed);
+  return Object.freeze({ level, basePower: tool.power, power, speed, uncappedSpeed,
+    overflowPower: power - tool.power, levelsUntilSpeed: faster ? faster.level - level : null });
 }
 export class Pickaxe {
   private snapshot;

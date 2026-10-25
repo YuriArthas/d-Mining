@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { GameSession } from '../../src/game/application/GameSession.ts';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
 import { CAPSULE_MACHINE_ZONE } from '../../src/game/content/feedbackFacilities.ts';
+import { ECONOMY } from '../../src/game/content/economy.ts';
 import { parseInviteCode } from '../../src/game/logic/InviteCode.ts';
 import { initPhysics, CharacterPhysics, RAPIER } from '../../src/game/validation/physics.ts';
 const SESSION_CONTENT = GAME_CONTENT.session, EGG = SESSION_CONTENT.petContent.eggs.find(e => e.id === 'meadow-egg').price;
@@ -33,10 +34,11 @@ test('capsule spend and deepest-stage coin award appear in one persisted receipt
   atMachine(session);
   const captures = []; session.onProgressCommitted(({ urgent }) => { if (urgent) captures.push(session.exportProgress()); });
   const award = session.getSnapshot().capsuleCoins, coins = session.getSnapshot().coins;
-  assert.equal(award, 6000);
+  // 800 m reaches world 1's fifth rest layer: the prize is about two minutes of income there, in gold.
+  assert.equal(award, ECONOMY.layers[5].capsuleCoins); assert.equal(session.getSnapshot().capsuleCurrency, 'gold');
   assert.equal(session.spinCapsule().coinReward, award);
   assert.equal(captures.length, 1);
-  assert.equal(captures[0].wallet.coins, coins + award);
+  assert.equal(captures[0].wallet.balances.gold, coins + award);
   assert.equal(captures[0].rewards.balance, 1);
   assert.equal(captures[0].onboarding.soldOnce, false);
   const restored = GameSession.fromData(captures[0], SESSION_CONTENT);
@@ -52,8 +54,7 @@ test('permanent mining win changes real mining stats and retains value at the sp
     const won = session.spinCapsule(), after = session.getSnapshot().miningStats;
     assert.equal(won.reward, 'mining'); assert.equal(won.duplicate, false);
     assert.ok(after.power * after.speed >= before.power * before.speed * 1.49);
-    assert.ok(after.speed <= 16);
-    assert.deepEqual(session.pets.getSnapshot().baseStats.power, after.power);
+    assert.ok(after.speed <= 4 * ECONOMY.tools[0].speed);
     assert.equal(session.spinCapsule().duplicate, true);
     assert.deepEqual(session.getSnapshot().miningStats, after);
     assert.deepEqual(GameSession.fromData(session.exportProgress(), SESSION_CONTENT).getSnapshot().miningStats, after);
@@ -62,7 +63,7 @@ test('permanent mining win changes real mining stats and retains value at the sp
 
 test('lucky probability refresh and actual hatch share the same boundaries, including expiration', () => {
   let rolls = 0, ids = 0;
-  const boosted = sessionWith(data => { data.rewards.timed.luck = 2; data.wallet.coins = 3 * EGG; }, { random: () => { rolls++; return 0.5; }, createPetId: () => `lucky-${++ids}` });
+  const boosted = sessionWith(data => { data.rewards.timed.luck = 2; data.wallet.balances.gold = 3 * EGG; }, { random: () => { rolls++; return 0.5; }, createPetId: () => `lucky-${++ids}` });
   const baseline = sessionWith();
   atEgg(boosted);
   const boostedEgg = boosted.pets.getSnapshot().eggs.find(e => e.id === 'meadow-egg');
@@ -83,7 +84,7 @@ test('lucky probability refresh and actual hatch share the same boundaries, incl
 
 test('auto hatch charges real egg price, commits each pet once and stops when money runs out', () => {
   let id = 0;
-  const session = sessionWith(data => { data.wallet.coins = 2 * EGG; data.rewards.permanent.autoHatch = true; }, { createPetId: () => `auto-${++id}`, random: () => 0 });
+  const session = sessionWith(data => { data.wallet.balances.gold = 2 * EGG; data.rewards.permanent.autoHatch = true; }, { createPetId: () => `auto-${++id}`, random: () => 0 });
   atEgg(session); const captures = [];
   session.onProgressCommitted(({ urgent }) => { if (urgent) captures.push(session.exportProgress()); });
   assert.equal(session.setAutoHatch(true), true);
@@ -92,14 +93,14 @@ test('auto hatch charges real egg price, commits each pet once and stops when mo
   session.advanceOnline(2); assert.equal(session.getSnapshot().coins, 0);
   session.advanceOnline(2); assert.equal(session.getSnapshot().autoHatch, null);
   assert.equal(captures.length, 2);
-  assert.equal(captures[0].pets.inventory.pets.length, 1); assert.equal(captures[0].wallet.coins, EGG);
-  assert.equal(captures[1].pets.inventory.pets.length, 2); assert.equal(captures[1].wallet.coins, 0);
+  assert.equal(captures[0].pets.inventory.pets.length, 1); assert.equal(captures[0].wallet.balances.gold, EGG);
+  assert.equal(captures[1].pets.inventory.pets.length, 2); assert.equal(captures[1].wallet.balances.gold, 0);
   assert.equal(GameSession.fromData(captures[1], SESSION_CONTENT).pets.getSnapshot().pets.length, 2);
 });
 
 test('leaving an egg station, explicit stop, or suspension prevents the next automatic purchase', () => {
   for (const stop of [s => s.updatePosition([0, 0, 40], true), s => s.setAutoHatch(false), s => s.setSuspended(true)]) {
-    const session = sessionWith(data => { data.wallet.coins = 2 * EGG; data.rewards.permanent.autoHatch = true; });
+    const session = sessionWith(data => { data.wallet.balances.gold = 2 * EGG; data.rewards.permanent.autoHatch = true; });
     atEgg(session); assert.equal(session.setAutoHatch(true), true); session.advanceOnline(1);
     stop(session); session.advanceOnline(5);
     assert.equal(session.getSnapshot().coins, 2 * EGG);

@@ -1,9 +1,10 @@
 /* Bag container (宠物 / 矿物 / 装备). */
 .bag-pets { display: grid; grid-template-columns: minmax(0, 1fr) 168px; gap: 10px; align-items: start; min-height: 0; }
 .bag-pets-main { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-.bag-detail { position: sticky; top: 0; gap: 5px; }
-.bag-detail-art { width: 76px; height: 76px; }
+.bag-detail { position: sticky; top: 0; gap: 4px; }
+.bag-detail-art { width: 56px; height: 56px; }
 .bag-detail h3 { font-size: 18px; }
+.bag-detail-note { font-size: 12px; line-height: 1.1; color: #fff3a0; text-align: center; }
 .bag-detail .ui-btn { width: 100%; }
 .bag-compact-equip { display: none; }
 .bag-message { max-width: 280px; }

@@ -4,9 +4,10 @@ import { Box3, Float32BufferAttribute, Group, Mesh, MeshBasicMaterial, Shape, Sh
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { createWorldText } from './WorldText.ts';
 import { disposeScenery } from './disposeScenery.ts';
+import { currencyName, type CurrencyId } from '../content/economy.ts';
 
 type Stand = Readonly<{ id: string; eggId: string; x: number; y: number; z: number }>;
-type Offer = Readonly<{ id: string; name: string; price: number }>;
+type Offer = Readonly<{ id: string; name: string; price: number; currency: CurrencyId }>;
 
 /** Overhead name and price of every egg, always shown: compact, sitting just above the egg (its top is
  *  2.91 m above the stand), on a dark rounded plate so it reads over the trees and the eggs on the tiers
@@ -49,7 +50,7 @@ export class EggStandLabels {
           if (!template) {
             const text = { at: [0, 0, 0] as [number, number, number], color: EGG_LABEL.text, background: EGG_LABEL.plate };
             const group = variant === NAMED
-              ? createWorldText({ ...text, width: EGG_LABEL.width, title: offer.name, subtitle: `${formatNumber(offer.price)} 金币` }, { bevel: false })
+              ? createWorldText({ ...text, width: EGG_LABEL.width, title: offer.name, subtitle: `${formatNumber(offer.price)} ${currencyName(offer.currency)}` }, { bevel: false })
               // "???" fitted to the full width would tower over the price: it gets a narrower line, about as
               // tall as an egg's name, over the very same price line.
               : createWorldText({ ...text, width: EGG_LABEL.mysteryWidth, title: EGG_LABEL.mystery, subtitle: '' }, { bevel: false });

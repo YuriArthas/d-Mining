@@ -30,7 +30,7 @@ test('镜头沿轨道滑动：先加速再减速，到位时只轻微越过一�
 
 test('商店卡片：已装备、已拥有、下一件、未到；数值和当前装备对比；按钮文字', () => {
   const tools = shopTools(true, 1), bags = shopBackpacks(true);
-  const s = { coins: 1000, pickaxe: { level: 3 }, inventory: { capacity: bags[1].capacity, used: 10 }, equipment: { toolLevel: 4, backpackCapacity: bags[1].capacity }, backpackUpgrade: { next: { id: bags[2].id } } };
+  const s = { balances: { gold: 1000, tech: 0, star: 0 }, pickaxe: { level: 3 }, inventory: { capacity: bags[1].capacity, used: 10 }, equipment: { toolLevel: 4, backpackCapacity: bags[1].capacity }, backpackUpgrade: { next: { id: bags[2].id } } };
   assert.deepEqual([1, 3, 4, 5, 6].map(l => offerState('tools', tools[l - 1], s)), ['owned', 'equipped', 'owned', 'next', 'locked']);
   assert.deepEqual(bags.slice(0, 4).map(b => offerState('backpacks', b, s)), ['owned', 'equipped', 'next', 'locked']);
   const [power, speed] = offerStats('tools', tools[4], tools, s);
@@ -40,8 +40,8 @@ test('商店卡片：已装备、已拥有、下一件、未到；数值和当�
   assert.deepEqual(offerAction('tools', tools[2], s), { label: '已装备', enabled: false, buy: false });
   assert.deepEqual(offerAction('tools', tools[0], s), { label: '装备', enabled: true, buy: false });
   assert.equal(offerAction('tools', tools[5], s).label, '先买上一件');
-  const next = offerAction('tools', tools[4], { ...s, coins: 0 });
+  const next = offerAction('tools', tools[4], { ...s, balances: { gold: 0, tech: 0, star: 0 } });
   assert.equal(next.enabled, false); assert.equal(next.short, tools[4].price);
-  assert.equal(offerAction('tools', tools[4], { ...s, coins: tools[4].price }).buy, true);
+  assert.equal(offerAction('tools', tools[4], { ...s, balances: { gold: tools[4].price, tech: 0, star: 0 } }).buy, true);
   assert.deepEqual([tools[0], tools[10], tools[25]].map(offerTier), ['plain', 'fine', 'star']);
 });

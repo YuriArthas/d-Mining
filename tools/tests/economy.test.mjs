@@ -42,10 +42,14 @@ test('DTO accepts over-capacity and non-mineral IDs, independent copies, safe pr
  assert.throws(()=>{restored.getSnapshot().items.gift=100});
  for(const data of [{version:2,capacity:1,items:{}},{version:1,capacity:-1,items:{}},{version:1,capacity:1,items:{gift:0}},{version:1,capacity:1,items:[]}]) assert.throws(()=>Inventory.fromData(data));
 });
-test('wallet is independent and rejects invalid amounts without losing its balance',()=>{
- const wallet=new Wallet(3);assert.equal(wallet.debit(4),false);assert.equal(wallet.getBalance(),3);
- assert.throws(()=>wallet.credit(-1));assert.equal(wallet.debit(3),true);wallet.credit(9);assert.equal(wallet.getBalance(),9);
- assert.equal(wallet.canCredit(Number.MAX_SAFE_INTEGER),false);
+test('wallet keeps one balance per currency and rejects invalid amounts without losing any',()=>{
+ const wallet=new Wallet({gold:3,tech:5});assert.equal(wallet.debit('gold',4),false);assert.equal(wallet.getBalance('gold'),3);
+ assert.throws(()=>wallet.credit('gold',-1));assert.equal(wallet.debit('gold',3),true);wallet.credit('gold',9);assert.equal(wallet.getBalance('gold'),9);
+ assert.equal(wallet.canCredit('gold',Number.MAX_SAFE_INTEGER),false);assert.equal(wallet.getBalance('tech'),5);assert.equal(wallet.getBalance('star'),0);
+ assert.equal(wallet.debit('star',1),false);
+ assert.deepEqual(Wallet.fromData(wallet.exportData()).getBalances(),{gold:9,tech:5,star:0});
+ assert.throws(()=>Wallet.fromData({version:1,coins:9}));
+ wallet.clear();assert.deepEqual(wallet.getBalances(),{gold:0,tech:0,star:0});
 });
 test('mining checks full at request, collected items never check it again',()=>{
  const bag=new Inventory(5),requests=[];bag.add(item(4));
@@ -70,14 +74,21 @@ test('failed world request and empty completion grant nothing',()=>{
  const bag=new Inventory(5),mining=new Mining(bag,()=>false,resources=>resources);
  assert.equal(mining.request(['a']), 'unavailable');mining.collected([]);assert.equal(bag.getSnapshot().used,0);
 });
+const till=(wallet,currency='gold')=>({canCredit:n=>wallet.canCredit(currency,n),credit:n=>wallet.credit(currency,n)});
 test('sale is independent of mining/scene and sells all quantities including overflow at one coin',()=>{
- const bag=new Inventory(1),wallet=new Wallet(7);bag.add([...item(3,'gift'),...item(8,'gem')]);
- assert.deepEqual(sellItems(bag,wallet,()=>1),{status:'sold',count:11,coins:11});assert.equal(wallet.getBalance(),18);assert.equal(bag.getSnapshot().used,0);
- assert.deepEqual(sellItems(bag,wallet,()=>1),{status:'empty'});assert.equal(wallet.getBalance(),18);
+ const bag=new Inventory(1),wallet=new Wallet({gold:7});bag.add([...item(3,'gift'),...item(8,'gem')]);
+ assert.deepEqual(sellItems(bag,till(wallet),()=>1),{status:'sold',count:11,coins:11});assert.equal(wallet.getBalance('gold'),18);assert.equal(bag.getSnapshot().used,0);
+ assert.deepEqual(sellItems(bag,till(wallet),()=>1),{status:'empty'});assert.equal(wallet.getBalance('gold'),18);
+});
+test('the sale multiplier applies to the whole sale, rounded once, into the chosen currency',()=>{
+ const bag=new Inventory(10),wallet=new Wallet();bag.add(item(3,'gem'));
+ assert.deepEqual(sellItems(bag,till(wallet,'tech'),()=>1,undefined,1.5),{status:'sold',count:3,coins:5});
+ assert.deepEqual(wallet.getBalances(),{gold:0,tech:5,star:0});
+ assert.throws(()=>sellItems(bag,till(wallet),()=>1,undefined,.5));
 });
 test('wallet overflow is checked before sale removes inventory',()=>{
- const bag=new Inventory(1),wallet=new Wallet(Number.MAX_SAFE_INTEGER);bag.add(item(2));
- assert.equal(sellItems(bag,wallet,()=>1).status,'overflow');assert.equal(bag.getSnapshot().used,2);assert.equal(wallet.getBalance(),Number.MAX_SAFE_INTEGER);
+ const bag=new Inventory(1),wallet=new Wallet({gold:Number.MAX_SAFE_INTEGER});bag.add(item(2));
+ assert.equal(sellItems(bag,till(wallet),()=>1).status,'overflow');assert.equal(bag.getSnapshot().used,2);assert.equal(wallet.getBalance('gold'),Number.MAX_SAFE_INTEGER);
 });
 test('zone reports only edges, uses grounded/height and radial hysteresis',()=>{
  const zone=new ZoneDetector(SELL_ZONE),c=SELL_ZONE,p=[c.x,c.y,c.z];

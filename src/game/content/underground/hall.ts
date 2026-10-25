@@ -11,7 +11,6 @@ type HallStall = Readonly<{ at: V3; ring: V3 }>;
 export type HallDefinition = Readonly<{
   id: string;
   asset: string;
-  depth: number;
   size: V3;
   /** Half width of the open mine pit (matches the shaft, ENTRANCE_WORLD). */
   pit: number;

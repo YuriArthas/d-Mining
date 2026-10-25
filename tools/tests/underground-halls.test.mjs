@@ -17,7 +17,7 @@ test('every world 1 rest layer is an authored hall',()=>{
 for(const [layer,id] of Object.entries({...HALLS,...LATER}).filter(([layer])=>layer!=='world2.1'))test(`${id}: no kit; its colliders keep the shaft open and the service rings free; rings, board and lights fit the hall`,()=>{
  const room=allRooms.find(r=>r.id===layer),plan=roomPlan(room),{hall,solids}=undergroundHall(id);
  assert.equal(plan.authored,undefined,'no kit');
- assert.equal(hall.id,layer);assert.equal(hall.depth,room.depth);
+ assert.equal(hall.id,layer);
  assert.deepEqual(room.spawn,[room.x,-room.depth+.1,room.z+12]);
  assert.equal(plan.signs[0].subtitle,`${String(room.number).padStart(2,'0')} / ${room.depth} 米`);
  assert.ok(Math.abs(plan.signs[0].at[2]-room.z-hall.board[2])<.5,'the name floats in front of the board');

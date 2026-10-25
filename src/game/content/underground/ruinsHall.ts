@@ -8,7 +8,6 @@ const column = (x: number, z: number, broken: boolean, yaw = 0): HallColumn => (
 export const RUINS_HALL = {
   id: 'ruins',
   asset: 'ruins-hall',
-  depth: 1600,
   size: [40, 20, 40],
   pit: 8,
   spawn: [0, 0, 12],

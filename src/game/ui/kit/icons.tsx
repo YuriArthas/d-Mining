@@ -3,7 +3,8 @@ import type { ReactNode } from 'react';
 /** Chunky two-tone vector icons with navy outlines, drawn on a 48 × 48 grid. */
 export type IconKind =
   | 'backpack' | 'coin' | 'paw' | 'chest' | 'gift' | 'grid' | 'globe' | 'portal' | 'gem'
-  | 'question' | 'gear' | 'home' | 'jump' | 'plus' | 'bolt' | 'clover' | 'exit' | 'close' | 'pickaxe' | 'luck' | 'rebirth';
+  | 'question' | 'gear' | 'home' | 'jump' | 'plus' | 'bolt' | 'clover' | 'exit' | 'close' | 'pickaxe' | 'luck' | 'rebirth'
+  | 'tech' | 'starcoin';
 
 const INK = '#13355d';
 const line = { stroke: INK, strokeWidth: 3, strokeLinejoin: 'round' as const, strokeLinecap: 'round' as const };
@@ -22,6 +23,22 @@ const ICONS: Record<IconKind, ReactNode> = {
     <circle cx="22.5" cy="23" r="11.5" fill="#ffdd66" stroke="#e39a12" strokeWidth="2.5" />
     <path d="m22.5 15 2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8Z" fill="#fff6c4" stroke="#e39a12" strokeWidth="1.6" strokeLinejoin="round" />
     <path d="M12 16a12 12 0 0 1 6-6" stroke="#fff8d8" strokeWidth="3" strokeLinecap="round" fill="none" />
+  </>,
+  // World 2's tech coin: a cyan coin with a cog.
+  tech: <>
+    <circle cx="25.5" cy="26" r="17" fill="#1f7fa8" {...line} />
+    <circle cx="22.5" cy="23" r="17" fill="#45d3f5" {...line} />
+    <circle cx="22.5" cy="23" r="11.5" fill="#8fe9ff" stroke="#1c9cc4" strokeWidth="2.5" />
+    <path d="m20.6 13.5h3.8l.8 3 2.3 1 2.7-1.6 2.7 2.7-1.6 2.7 1 2.3 3 .8v3.8l-3 .8-1 2.3 1.6 2.7-2.7 2.7-2.7-1.6-2.3 1-.8 3h-3.8l-.8-3-2.3-1-2.7 1.6-2.7-2.7 1.6-2.7-1-2.3-3-.8v-3.8l3-.8 1-2.3-1.6-2.7 2.7-2.7 2.7 1.6 2.3-1Z" fill="#effcff" stroke="#1c9cc4" strokeWidth="1.6" strokeLinejoin="round" />
+    <circle cx="22.5" cy="23" r="3.6" fill="#45d3f5" stroke="#1c9cc4" strokeWidth="1.6" />
+    <path d="M12 16a12 12 0 0 1 6-6" stroke="#dcf8ff" strokeWidth="3" strokeLinecap="round" fill="none" />
+  </>,
+  // World 3's star crystal: a violet gem with a star.
+  starcoin: <>
+    <path d="M24 3 41 16 35 41H13L7 16Z" fill="#6b3fc4" {...line} />
+    <path d="M22 5 37 17 32 38H12L7 17Z" fill="#b48cff" {...line} />
+    <path d="m22 12 2.9 6 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9Z" fill="#fff4c2" stroke="#e0a31a" strokeWidth="1.6" strokeLinejoin="round" />
+    <path d="M12 17l5-4" stroke="#ece0ff" strokeWidth="3" strokeLinecap="round" />
   </>,
   // Lucky coin (rewards and the capsule machine): pink with a four-leaf clover, never mistaken for gold.
   luck: <>

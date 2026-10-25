@@ -7,6 +7,7 @@ import { CloseButton, Pill, Tile, UiButton } from './kit/controls.tsx';
 import { Icon } from './kit/icons.tsx';
 import { offerAction, offerState, offerStats, offerTier } from './shopOffer.ts';
 import './shop.css';
+import { currencyIcon, currencyName } from './currency.ts';
 
 /** Opens the showroom on a counter at the item the player has now. */
 export function showShopCategory(view: ShopView, state: ReturnType<GameSession['getSnapshot']>, category: ShopCategory) {
@@ -42,9 +43,10 @@ export function ShopPanel({ session, view, onClose }: { session: GameSession; vi
   const priced = offer === 'next' || offer === 'locked';
   // How the button feels: buy now, short of coins, further up the ladder, owned or worn.
   const mood = offer === 'next' ? (action.enabled ? 'buy' : 'short') : offer === 'locked' ? 'locked' : offer === 'owned' ? (action.enabled ? 'owned' : 'locked') : 'equipped';
+  const unit = currencyName(item.currency);
   const purchase = () => {
     const result = session.useShopItem(category, item.id);
-    setMessage(result.status === 'upgraded' ? '购买成功，已装备！' : result.status === 'equipped' ? '已装备' : result.status === 'insufficient' ? '金币不足' : result.status === 'too-small' ? '背包装不下现有矿石，先去卖掉' : result.status === 'locked' ? '请先购买上一件' : '请重新进入商店');
+    setMessage(result.status === 'upgraded' ? '购买成功，已装备！' : result.status === 'equipped' ? '已装备' : result.status === 'insufficient' ? `${currencyName(item.currency)}不足` : result.status === 'too-small' ? '背包装不下现有矿石，先去卖掉' : result.status === 'locked' ? '请先购买上一件' : '请重新进入商店');
   };
   const lean = (event: PointerEvent<HTMLElement>) => {
     const box = event.currentTarget.getBoundingClientRect();
@@ -53,7 +55,7 @@ export function ShopPanel({ session, view, onClose }: { session: GameSession; vi
   return <section className="shop-showroom" role="dialog" aria-modal="true" aria-label={category === 'tools' ? '工具商店' : '背包商店'} data-category={category} data-item={item.id} onPointerMove={lean}>
     <div className="shop-wallet" aria-label="随身资源">
       <Pill icon="backpack" meter={state.inventory.capacity ? state.inventory.used / state.inventory.capacity : 0}>{number(state.inventory.used)} / {number(state.inventory.capacity)}</Pill>
-      <Pill icon="coin" tone="gold">{number(state.coins)}</Pill>
+      <Pill icon={currencyIcon(item.currency)} tone="gold">{number(state.balances[item.currency])}</Pill>
     </div>
     <nav className="shop-top-actions" aria-label="商店操作">
       <Tile icon={category === 'tools' ? 'backpack' : 'pickaxe'} label={category === 'tools' ? '背包' : '工具'} tone="purple" className="shop-switch" aria-label={category === 'tools' ? '切换到背包商店' : '切换到工具商店'} onPress={() => open(category === 'tools' ? 'backpacks' : 'tools')} />
@@ -74,9 +76,9 @@ export function ShopPanel({ session, view, onClose }: { session: GameSession; vi
           {gain > 0 && <em className="shop-gain ui-outline" key={item.id}>▲{number(gain)}</em>}
         </span>;
       })}</div>
-      <UiButton size="l" tone={mood === 'buy' ? 'green' : mood === 'short' ? 'red' : mood === 'owned' ? 'purple' : mood === 'equipped' ? 'blue' : 'steel'} icon={priced ? 'coin' : undefined}
+      <UiButton size="l" tone={mood === 'buy' ? 'green' : mood === 'short' ? 'red' : mood === 'owned' ? 'purple' : mood === 'equipped' ? 'blue' : 'steel'} icon={priced ? currencyIcon(item.currency) : undefined}
         className="shop-buy" data-mood={mood} data-testid="shop-buy" disabled={blocked} onPress={purchase}
-        aria-label={offer === 'locked' ? `先买上一件，${number(item.price)} 金币` : priced ? (action.enabled ? `购买，${number(item.price)} 金币` : `还差 ${number(action.short ?? item.price)} 金币`) : action.label}>
+        aria-label={offer === 'locked' ? `先买上一件，${number(item.price)} ${unit}` : priced ? (action.enabled ? `购买，${number(item.price)} ${unit}` : `还差 ${number(action.short ?? item.price)} ${unit}`) : action.label}>
         {priced ? number(item.price) : mood === 'equipped' ? '✓ 已装备' : action.label}
       </UiButton>
       <div className="shop-hint ui-outline" data-mood={message ? 'message' : mood} role="status">{message || (mood === 'short' ? `还差 ${number(action.short!)}` : mood === 'locked' ? '先买上一件' : '')}</div>

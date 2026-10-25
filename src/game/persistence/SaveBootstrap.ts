@@ -105,7 +105,8 @@ export async function openSavedGame(
     throw error;
   }
 }
-/** Saves of the three-world journey live apart from every older save (`journey-v1`). */
+/** Saves of the economy v2 (economy.json, three currencies) live apart from every older save; earlier ones
+ *  (`journey-v1`) are simply not read any more. */
 export function saveNamespace(
   location: Pick<Location, "pathname" | "search">,
 ): { name: string } {
@@ -120,6 +121,6 @@ export function saveNamespace(
   return {
     name: testId
       ? `mining:acceptance:${testId}`
-      : `mining:${mode}:journey-v1`,
+      : `mining:${mode}:economy-v2`,
   };
 }

@@ -1,10 +1,10 @@
-import { JOURNEY_CAPACITIES, JOURNEY_TOOL_PRICES } from './journeyResources.ts';
 import { pickaxeStats } from '../logic/Pickaxe.ts';
+import { ECONOMY, type CurrencyId } from './economy.ts';
 
 export type ShopCategory = 'tools' | 'backpacks';
 /** How the miner works a tool: a pick's overhead swing, or a drill held out and shaking. */
 export type ToolMotion = 'swing' | 'drill';
-export type ShopItem = Readonly<{ id: string; category: ShopCategory; level: number; model: string; name: string; description: string; price: number; power?: number; speed?: number; capacity?: number; motion?: ToolMotion }>;
+export type ShopItem = Readonly<{ id: string; category: ShopCategory; level: number; model: string; name: string; description: string; price: number; currency: CurrencyId; power?: number; speed?: number; capacity?: number; motion?: ToolMotion }>;
 type Entry = readonly [name: string, description: string, motion?: ToolMotion];
 // World 1 (levels 1-10): joke items from home and kitchen, level 1 a plain pick so a new player knows what it is;
 // world 2 (11-20): machines; world 3 (21-30): fantasy and space.
@@ -74,20 +74,19 @@ const BAGS: readonly Entry[] = [
 ];
 export const equipmentModel = (kind: ShopCategory, level: number) => `${kind === 'tools' ? 'Tool' : 'Bag'}${String(Math.min(30,level)).padStart(2,'0')}`;
 export const toolMotion = (level: number): ToolMotion => TOOLS[Math.min(30, level) - 1][2] ?? 'swing';
-/** The 30 pickaxes of the journey economy. */
+/** The 30 pickaxes; price, currency, damage and speed from economy.json. */
 export function shopTools(): readonly ShopItem[] {
-  return Array.from({length:30},(_,i) => {
+  return ECONOMY.tools.map((tool,i) => {
     const level=i+1,stats=pickaxeStats(level),[name,description]=TOOLS[i];
     return Object.freeze({id:`tool-${level}`,category:'tools' as const,level,model:equipmentModel('tools',level),name,description,
-      price:level===1?0:JOURNEY_TOOL_PRICES[i],power:stats.power,speed:stats.speed,motion:toolMotion(level)});
+      price:tool.price,currency:tool.currency,power:stats.power,speed:stats.speed,motion:toolMotion(level)});
   });
 }
-/** The backpacks of the journey economy, one per capacity step. */
+/** The 30 backpacks, ten per world, counted in blocks (economy.json). */
 export function shopBackpacks(): readonly ShopItem[] {
-  return JOURNEY_CAPACITIES.map((capacity,i)=>{
+  return ECONOMY.bags.map((bag,i)=>{
     const [name,description]=BAGS[i];
     return Object.freeze({id:i===0?'starter-bag':`journey-bag-${i+1}`,category:'backpacks' as const,
-      level:i+1,model:equipmentModel('backpacks',i+1),name,description,capacity,
-      price:i===0?0:Math.max(50,JOURNEY_TOOL_PRICES[i])});
+      level:i+1,model:equipmentModel('backpacks',i+1),name,description,capacity:bag.capacity,price:bag.price,currency:bag.currency});
   });
 }

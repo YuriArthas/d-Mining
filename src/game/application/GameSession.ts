@@ -4,22 +4,19 @@ import { shopTools, shopBackpacks, type ShopCategory } from '../content/shopCata
 import { WorldProgress } from '../logic/WorldProgress.ts';
 import { MineralReservation } from '../logic/MineralReservation.ts';
 import { WORLD_REQUIREMENTS, worldRequirement, worldAtZ, worldAtFeet, worldSpawn, type WorldId } from '../content/worldJourney.ts';
-import { JOURNEY_TOOL_PRICES, JOURNEY_BACKPACKS } from '../content/journeyResources.ts';
 import { Rewards, type RewardOptions, type RewardClaimResult } from '../logic/Rewards.ts';
-import { RebirthRecord, rebirthCost, rebirthMultiplier } from '../logic/Rebirth.ts';
-import { JOURNEY_CAPACITIES } from '../content/journeyResources.ts';
-import { REWARD_CONFIG, stageCoinReward, type OnlineRewardMinutes } from '../content/rewards.ts';
-import { STAGES } from '../content/progression.ts';
+import { RebirthRecord, rebirthMultiplier } from '../logic/Rebirth.ts';
+import { REWARD_CONFIG, type OnlineRewardMinutes } from '../content/rewards.ts';
+import { ECONOMY, currencyName, layerEconomy, type CurrencyId } from '../content/economy.ts';
 import { CAPSULE_MACHINE_ZONE } from '../content/feedbackFacilities.ts';
 import { CELL } from '../terrain/grid.ts';
 import { TIP_GAP, TIP_SECONDS, nextTip, tipLearned, tipView, type TipState } from './Tips.ts';
 import type { ProgressDataV1 } from './SessionProgress.ts';
-import { versionOne } from '../logic/data.ts';
+import { record } from '../logic/data.ts';
 import { PetCommands } from './PetCommands.ts';
 import type { SessionContent, Destination, EggStation } from "./SessionContent.ts";
 import { PetService } from "./PetService.ts";
 import { PetUiAdapter } from "./PetUiAdapter.ts";
-import { MiningAttributes } from "./MiningAttributes.ts";
 import { Exploration } from "../logic/Exploration.ts";
 import { playerDepthAtFeet } from "../logic/PlayerDepth.ts";
 import { Inventory } from "../logic/Inventory.ts";
@@ -64,15 +61,18 @@ export class GameSession {
   private atStation = false;
   private readonly portals: {worldId:WorldId;detector:ZoneDetector}[];
   private atPortal = false;
+  /** The next pickaxe: its price is in the currency of the world it belongs to (levels 1-10 gold, ...). */
   private toolOffer() {
-    const level=this.equipment.toolLevel, price=JOURNEY_TOOL_PRICES[level] ?? 0;
-    const next=level<30?pickaxeStats(level+1):null;
-    return Object.freeze({next,price,canAfford:!!next&&this.wallet.getBalance()>=price});
+    const level=this.equipment.toolLevel, tool=ECONOMY.tools[level];
+    const next=tool?pickaxeStats(level+1):null, price=tool?.price??0, currency=tool?.currency??this.currency;
+    return Object.freeze({next,price,currency,canAfford:!!next&&this.wallet.getBalance(currency)>=price});
   }
   private bagOffer() {
-    const next=JOURNEY_BACKPACKS.find(t=>t.capacity>this.equipment.backpackCapacity)??null;
-    return Object.freeze({next,canAfford:!!next&&this.wallet.getBalance()>=next.price});
+    const next=this.bagCatalog.find(t=>t.capacity!>this.equipment.backpackCapacity)??null;
+    return Object.freeze({next,canAfford:!!next&&this.wallet.getBalance(next.currency)>=next.price});
   }
+  /** What ore sells for in the current world. */
+  private get currency(): CurrencyId { return worldRequirement(this.currentWorld).currency; }
   private readonly rewards: Rewards;
   private readonly machineZone = new ZoneDetector(CAPSULE_MACHINE_ZONE);
   private atMachine = false;
@@ -85,23 +85,32 @@ export class GameSession {
     const r=this.rewards.getSnapshot();
     this.rewardEffects={mining:r.permanent.mining,autoHatch:r.permanent.autoHatch,speed:r.timed.speed>0,luck:r.timed.luck>0,sell:r.timed.sell>0};
   }
-  /** What one item sells for right now: times the rebirth multiplier, doubled while the capsule's double-sale boost runs. */
-  private salePrice = (itemId: string) => itemPrice(itemId) * rebirthMultiplier(this.rebirthRecord.count) * (this.rewardEffects.sell ? REWARD_CONFIG.sellMultiplier : 1);
+  /** Everything ore sells for right now is multiplied by: the equipped pets' bonus in this world's currency, the
+   *  rebirths, and the capsule's double-sale boost while it runs. */
+  private saleMultiplier() {
+    return (1+this.petService.getBonus()[this.currency]/100)*rebirthMultiplier(this.rebirthRecord.count)*(this.rewardEffects.sell?REWARD_CONFIG.sellMultiplier:1);
+  }
+  /** The current world's slot of the wallet, where sales are paid. */
+  private till() { const c=this.currency; return { canCredit:(n:number)=>this.wallet.canCredit(c,n), credit:(n:number)=>this.wallet.credit(c,n) }; }
   private readonly rebirthRecord: RebirthRecord;
-  /** The rebirth offer: the HUD button shows from the first time the player gets halfway to the price. */
+  /** World 3's last layer, which (with the last pickaxe) completes the journey. */
+  private readonly finalLayer = (() => { const r=ECONOMY.rebirth; return this.content.destinations.filter(d=>d.worldId===r.world)[r.layer-1]?.id ?? null; });
+  /** The rebirth offer: the HUD button shows once world 3 is open; rebirth needs the journey complete. */
   private rebirthView() {
-    const count=this.rebirthRecord.count,cost=rebirthCost(count),coins=this.wallet.getBalance();
-    if(cost!==null&&coins>=cost/2)this.rebirthRecord.offered=true;
-    return Object.freeze({count,multiplier:rebirthMultiplier(count),nextMultiplier:rebirthMultiplier(count+1),cost,
-      canAfford:cost!==null&&coins>=cost,shown:this.rebirthRecord.offered||count>0});
+    const count=this.rebirthRecord.count,r=ECONOMY.rebirth,final=this.finalLayer();
+    const reached=!!final&&this.worldProgress.isOpen(r.world)&&!!this.explorations.get(r.world)?.has(final), level=this.equipment.toolLevel>=r.toolLevel;
+    return Object.freeze({count,multiplier:rebirthMultiplier(count),nextMultiplier:rebirthMultiplier(count+1),
+      toolLevel:r.toolLevel,layerName:this.content.destinations.find(d=>d.id===final)?.name??'',reached,level,
+      ready:reached&&level,shown:this.worldProgress.isOpen(r.world)||count>0});
   }
   getMovementMultiplier = () => this.rewardEffects.speed ? 2 : 1;
   private baseStatsKey = '';
   private cachedBaseStats = pickaxeStats(1);
   private baseMiningStats = () => {
-    const level=this.pickaxe.getSnapshot().level, boosted=this.rewardEffects.mining;
-    const key=`${level}:${boosted}`;
-    if(key!==this.baseStatsKey){this.baseStatsKey=key;this.cachedBaseStats=pickaxeStats(level,boosted?1.5:1);}
+    // The pickaxe, times the capsule's mining boost and the equipped pets' mining bonus (speed to the cap, then damage).
+    const level=this.pickaxe.getSnapshot().level, boosted=this.rewardEffects.mining, pets=this.petService?.getBonus().mining ?? 0;
+    const key=`${level}:${boosted}:${pets}`;
+    if(key!==this.baseStatsKey){this.baseStatsKey=key;this.cachedBaseStats=pickaxeStats(level,(boosted?REWARD_CONFIG.miningMultiplier:1)*(1+pets/100));}
     return this.cachedBaseStats;
   };
   private readonly pickupListeners = new Set<(batch: readonly {itemId:string;count:number}[]) => void>();
@@ -147,14 +156,13 @@ export class GameSession {
     if (this.petService.getEquipment().slots.some(id=>id!==null)) this.onboarding.record('equippedOnce');
     for (const listener of this.progressListeners) listener({ urgent }); }
   exportProgress(): ProgressDataV1 {
-    return { version: 1 as const, equipment:this.equipment.exportData(), rewards:this.rewards.exportData(), wallet: this.wallet.exportData(), inventory: this.inventory.exportData(),
+    return { version: 2 as const, equipment:this.equipment.exportData(), rewards:this.rewards.exportData(), wallet: this.wallet.exportData(), inventory: this.inventory.exportData(),
       onboarding: this.onboarding.getSnapshot(), rebirth: this.rebirthRecord.exportData(), pickaxe: this.pickaxe.exportData(), pets: this.petService.exportData(), exploration: this.explorations.get(1)!.exportData(),
       worldProgress:this.worldProgress.exportData(),reservations:this.reservations.exportData(),worldExploration:Object.fromEntries([...this.explorations].map(([id,e])=>[id,e.exportData()])) };
   }
   static createNew(content: SessionContent) { return new GameSession(content); }
-  static fromData(data: unknown, content: SessionContent) { return new GameSession(content, 50, undefined, {}, versionOne(data)); }
+  static fromData(data: unknown, content: SessionContent) { return new GameSession(content, undefined, undefined, {}, record(data)); }
 
-  private readonly miningAttributes: MiningAttributes;
   private readonly eggStations: { station: EggStation; detector: ZoneDetector }[];
   private eggStation: EggStation | null = null;
   private eggId: string | null = null;
@@ -189,13 +197,15 @@ export class GameSession {
   private snapshot;
   constructor(
     content: SessionContent,
-    capacity = 50,
+    capacity = ECONOMY.bags[0].capacity,
     clock: () => number = () => performance.now() / 1000,
     petDependencies: { random?: () => number; createPetId?: () => string; rewards?: RewardOptions } = {},
     saved?: unknown,
   ) {
     this.content = content;
-    const data = saved === undefined ? null : versionOne(saved);
+    const data = saved === undefined ? null : record(saved);
+    // Saves of the economy before v2 are never read (saveNamespace keeps them apart); this guards test fixtures.
+    if (data && data.version !== 2) throw Error('不支持的进度版本');
     this.worldProgress = new WorldProgress(data?.worldProgress);
     this.reservations = new MineralReservation(data?.reservations,id=>ORE_ITEMS.some(r=>r.itemId===id));
     this.homes = (content.homes??[]).map(h=>({worldId:h.worldId,detector:new ZoneDetector(h.zone)}));
@@ -204,7 +214,7 @@ export class GameSession {
     this.rebirthRecord = new RebirthRecord(data?.rebirth);
     this.rewards = data?.rewards === undefined ? new Rewards(petDependencies.rewards) : Rewards.fromData(data.rewards, petDependencies.rewards);
     this.syncRewardEffects();
-    this.wallet = data ? Wallet.fromData(data.wallet) : new Wallet(content.initialCoins);
+    this.wallet = data ? Wallet.fromData(data.wallet) : new Wallet({ gold: content.initialCoins });
     this.pickaxe = data ? Pickaxe.fromData(data.pickaxe) : new Pickaxe();
     this.inventory = data ? Inventory.fromData(data.inventory, itemVolume) : new Inventory(capacity, itemVolume);
     this.equipment = new EquipmentCollection(this.pickaxe.getSnapshot().level,this.inventory.capacity,data?.equipment);
@@ -222,6 +232,8 @@ export class GameSession {
       content: content.petContent,
       wallet: this.wallet,
       hasDestination: this.hasDestination,
+      worldOpen: world => this.worldProgress.isOpen(world as WorldId),
+      currency: () => this.currency,
       lucky: () => this.rewardEffects.luck,
       random: petDependencies.random ?? Math.random,
       createPetId: petDependencies.createPetId ?? (() => crypto.randomUUID()),
@@ -229,11 +241,9 @@ export class GameSession {
     this.petService = petService;
     if (data) petService.restoreData(data.pets);
     this.onboarding = new Onboarding(data?.onboarding, data !== null, this.learningEvidence());
-    this.miningAttributes = new MiningAttributes(this.baseMiningStats, petService.getBonus);
     this.pets = new PetUiAdapter(petService, {
-      balance: () => this.wallet.getBalance(),
-      baseStats: this.baseMiningStats,
-      effectiveStats: this.miningAttributes.getSnapshot,
+      balances: () => this.wallet.getBalances(),
+      currency: () => this.currency,
       commands: this.withHatchFeedback(new PetCommands(petService, () => { this.committed(true); this.publish(); }, () => !this.suspended, id => this.eggId===id)),
       subscribe: this.subscribe,
     });
@@ -254,7 +264,7 @@ export class GameSession {
     );
     this.combat = new MiningCombat({
       isFull: () => this.inventory.isFull(),
-      stats: this.miningAttributes.getSnapshot,
+      stats: this.baseMiningStats,
       level: () => this.pickaxe.getSnapshot().level,
       read: (cell) => {
         const kind = this.mineableKind(cell);
@@ -274,7 +284,7 @@ export class GameSession {
     const bag=this.inventory.getSnapshot(), facts=this.onboarding.getSnapshot();
     const egg=this.content.petContent.eggs.find(e=>e.id===this.content.onboarding.eggId);
     return {seen:id=>this.onboarding.has(id),location:this.guideLocation,atMine:this.atMine,minedOnce:facts.minedOnce,soldOnce:facts.soldOnce,
-      full:bag.isFull,items:bag.totalCount,coins:this.wallet.getBalance(),level:this.equipment.toolLevel,upgradePrice:this.toolOffer().price,
+      full:bag.isFull,items:bag.totalCount,coins:this.wallet.getBalance(this.currency),level:this.equipment.toolLevel,upgradePrice:this.toolOffer().price,
       pets:this.petService.getInventory().count,eggPrice:egg?.price??null};
   }
   /** At most one tip on screen, each shown once per save. It ends when the player does the thing,
@@ -314,22 +324,28 @@ export class GameSession {
       currentWorld: this.currentWorld,
       // Worlds past the next one to unlock stay unknown: no name, no price (the portal shows ???).
       worlds:WORLD_REQUIREMENTS.map(w=>({...w,open:this.worldProgress.isOpen(w.id),known:this.worldProgress.isOpen(w.id)||this.worldProgress.unlockable(w.id),
+        ticketBalance:w.ticket?this.wallet.getBalance(w.ticket.currency):0,toolLevel:this.equipment.toolLevel,
         materials:w.materials.map(m=>({...m,name:itemDefinition(m.itemId).name,owned:bag.items[m.itemId]??0,reserved:this.reservations.quantity(m.itemId,bag.items[m.itemId]??0)}))})),
       mineralReservations:Object.fromEntries(Object.entries(bag.items).map(([id,n])=>[id,{reserved:this.reservations.quantity(id,n),sellable:n-this.reservations.quantity(id,n),mode:this.reservations.mode(id)}])),
       onboarding: this.onboarding.getSnapshot(), tip,
       // The first-dig tip points across the map at the mine until the player gets there.
       tipAnchor: tip?.anchor==='mine'?this.content.onboarding.entrance:null,
       inventory: this.inventory.getSnapshot(),
-      backpackLevel: 1 + JOURNEY_BACKPACKS.filter(tier => tier.capacity <= bag.capacity).length,
+      backpackLevel: Math.max(1, ECONOMY.bags.filter(tier => tier.capacity <= bag.capacity).length),
       rebirth: this.rebirthView(),
       maxDepth: this.exploration.maxDepth,
       rewards: this.rewards.getSnapshot(),
       capsuleCoins: this.capsuleCoinReward(),
+      capsuleCurrency: worldRequirement(this.capsuleWorld()).currency,
       atMachine: this.atMachine,
       autoHatch: this.autoHatchEgg,
       lastAutoHatch: this.lastAutoHatch,
-      coins: this.wallet.getBalance(),
-      sale: quoteSale(this.reservations.sellable(bag.items), this.salePrice),
+      /** The current world's currency, what its ore sells for, and the balance in it. */
+      currency: this.currency,
+      coins: this.wallet.getBalance(this.currency),
+      balances: this.wallet.getBalances(),
+      saleMultiplier: this.saleMultiplier(),
+      sale: quoteSale(this.reservations.sellable(bag.items), itemPrice, this.saleMultiplier()),
       inSellZone: this.inSellZone,
       atHome: this.atHome,
       /** Standing on the current world's teleport station pad. */
@@ -341,7 +357,7 @@ export class GameSession {
       shopCategory: this.content.shops.find(s => s.id === this.shopId)?.category ?? 'tools',
       eggId: this.eggId,
       eggStation: this.eggStation,
-      miningStats: this.miningAttributes.getSnapshot(),
+      miningStats: this.baseMiningStats(),
       depth: this.depth,
       location: this.guideLocation,
       destinations: this.content.destinations.filter(r=>r.worldId===this.currentWorld).map((r) => ({
@@ -469,10 +485,14 @@ export class GameSession {
       },
     };
   }
+  /** The capsule machine stands in world 1 but pays where the player is heading: the furthest open world. */
+  private capsuleWorld(): WorldId { return [...WORLD_REQUIREMENTS].reverse().find(w=>this.worldProgress.isOpen(w.id))!.id; }
+  /** The capsule's coin prize, in that world's currency: about two minutes of income at the deepest layer reached
+   *  there (economy.json `capsuleCoins`). */
   private capsuleCoinReward() {
-    // The deepest layer reached in the current world sets the prize (other worlds' layers share the same depths).
-    const stage=this.content.destinations.filter(d=>d.worldId===this.currentWorld&&this.exploration.maxDepth>=d.depth).length;
-    return stageCoinReward(STAGES[Math.min(stage,STAGES.length-1)].basePrice);
+    const world=this.capsuleWorld(),explored=this.explorations.get(world)!;
+    const layer=this.content.destinations.filter(d=>d.worldId===world&&explored.has(d.id)).length;
+    return layerEconomy(world,Math.min(layer,6)).capsuleCoins;
   }
   private finishReward(result: RewardClaimResult) {
     if(result.status==='claimed'){this.committed(true);this.publish();this.feedback({type:'reward'});}
@@ -495,11 +515,11 @@ export class GameSession {
   spinCapsule = () => {
     if(this.suspended)return {status:'unavailable' as const};
     if(!this.atMachine)return {status:'away' as const};
-    const amount=this.capsuleCoinReward();
-    if(!this.wallet.canCredit(amount))return {status:'overflow' as const};
+    const amount=this.capsuleCoinReward(),currency=worldRequirement(this.capsuleWorld()).currency;
+    if(!this.wallet.canCredit(currency,amount))return {status:'overflow' as const};
     const result=this.rewards.spin(amount);
     if(result.status==='spun'){
-      if(result.coinReward)this.wallet.credit(result.coinReward);
+      if(result.coinReward)this.wallet.credit(currency,result.coinReward);
       this.syncRewardEffects();this.committed(true);this.publish();this.feedback({type:'reward'});
     }
     return result;
@@ -526,7 +546,7 @@ export class GameSession {
         this.autoHatchElapsed=0;
         const hatched=this.petService.hatch(this.autoHatchEgg);
         if(hatched.status==='hatched'){this.lastAutoHatch=hatched;this.committed(true);this.feedback({type:'hatched',tier:this.petTier(hatched.pet),auto:true});}
-        else {this.stopAutoHatch();this.notice=hatched.status==='insufficient-coins'?'金币不足，自动孵蛋已停止':'蛋台不可用，自动孵蛋已停止';}
+        else {this.stopAutoHatch();this.notice=hatched.status==='insufficient-coins'?'钱不够了，自动孵蛋已停止':'蛋台不可用，自动孵蛋已停止';}
       }
     }
     if(result.changed)this.committed(false);
@@ -549,7 +569,7 @@ export class GameSession {
     if(this.suspended||expectedLevel!==this.equipment.toolLevel)return {status:'stale'} as const;
     const offer=this.toolOffer();
     if(!offer.next)return {status:'limit'} as const;
-    if(!this.wallet.debit(offer.price)){this.feedback({type:'denied',reason:'coins'});return {status:'insufficient'} as const;}
+    if(!this.wallet.debit(offer.currency,offer.price)){this.feedback({type:'denied',reason:'coins'});return {status:'insufficient'} as const;}
     this.pickaxe.setLevel(offer.next.level);this.equipment.toolLevel=offer.next.level;
     this.committed(true);this.refreshTarget();this.publish();this.feedback({type:'purchased'});
     return {status:'upgraded',level:offer.next.level,spent:offer.price} as const;
@@ -559,10 +579,10 @@ export class GameSession {
     const {next}=this.bagOffer();
     if(!next)return {status:'max'} as const;
     if(next.id!==tierId)return {status:'stale'} as const;
-    if(!this.wallet.debit(next.price)){this.feedback({type:'denied',reason:'coins'});return {status:'insufficient'} as const;}
-    this.inventory.setCapacity(next.capacity);this.equipment.backpackCapacity=next.capacity;
+    if(!this.wallet.debit(next.currency,next.price)){this.feedback({type:'denied',reason:'coins'});return {status:'insufficient'} as const;}
+    this.inventory.setCapacity(next.capacity!);this.equipment.backpackCapacity=next.capacity!;
     this.committed(true);this.publish();this.feedback({type:'purchased'});
-    return {status:'upgraded',capacity:next.capacity,spent:next.price} as const;
+    return {status:'upgraded',capacity:next.capacity!,spent:next.price} as const;
   };
   useShopItem = (category:ShopCategory,id:string) => {
     // The shop opens anywhere (HUD button or the surface shop); purchases do not need the shop circle.
@@ -659,10 +679,10 @@ export class GameSession {
       if (result.status === 'sold') { this.onboarding.record('soldOnce'); this.committed(true); this.feedback({ type: 'sold', coins: result.coins, count: result.count }); }
       this.notice =
         result.status === "sold"
-          ? `出售 ${result.count} 件，获得 ${result.coins} 金币`
+          ? `出售 ${result.count} 件，获得 ${result.coins} ${currencyName(this.currency)}`
           : result.status === "empty"
             ? "没有可出售的矿物"
-            : "金币数值超出范围";
+            : "货币数值超出范围";
     }
     if (changed) this.publish();
   }
@@ -742,19 +762,21 @@ export class GameSession {
     this.resetPosition();
     return 'travelling' as const;
   };
-  /** Rebirth: every coin, the tool, the backpack and the ore in it go; pets, open worlds and layers stay. Ore then
-   *  sells for the next multiplier, and the player starts again at world 1's spawn. */
+  /** Rebirth, once the journey is complete: every currency, the tool, the backpack and the ore in it, the worlds
+   *  past the first, every layer reached and the kept minerals go; pets and pet slots stay. Ore then sells for the
+   *  next multiplier, and the player starts again at world 1's spawn. */
   rebirth = (expectedCount: number) => {
     if(this.suspended||expectedCount!==this.rebirthRecord.count)return {status:'stale'} as const;
-    const cost=rebirthCost(this.rebirthRecord.count);
-    if(cost===null)return {status:'max'} as const;
-    if(this.wallet.getBalance()<cost){this.feedback({type:'denied',reason:'coins'});return {status:'insufficient'} as const;}
+    if(!this.rebirthView().ready){this.feedback({type:'denied',reason:'locked'});return {status:'locked'} as const;}
     this.world?.cancelMining();
-    this.wallet.debit(this.wallet.getBalance());
+    this.wallet.clear();
     this.inventory.remove(Object.entries(this.inventory.getSnapshot().items).map(([itemId,count])=>({itemId,count})));
-    const starter=JOURNEY_CAPACITIES[0];
+    const starter=ECONOMY.bags[0].capacity;
     this.inventory.setCapacity(starter);this.equipment.backpackCapacity=starter;
     this.pickaxe.setLevel(1);this.equipment.toolLevel=1;
+    this.worldProgress.reset();this.reservations.reset();
+    for(const w of WORLD_REQUIREMENTS)this.explorations.set(w.id,new Exploration(this.content.destinations.filter(d=>d.worldId===w.id)));
+    this.currentWorld=1;
     this.rebirthRecord.count++;
     this.world?.travelTo?.(worldSpawn(1));this.resetPosition();
     this.refreshTarget();this.committed(true);this.publish();
@@ -777,10 +799,10 @@ export class GameSession {
     return WORLD_REQUIREMENTS.map(w=>({id:w.id,name:w.name,open:this.worldProgress.isOpen(w.id),
       layers:this.content.destinations.filter(d=>d.worldId===w.id).map(d=>({id:d.id,name:d.name,depth:d.depth,unlocked:!!this.explorations.get(w.id)?.has(d.id)}))}));
   };
-  /** Test shortcut: adds coins (debug page only). */
+  /** Test shortcut: adds the current world's currency (debug page only). */
   devGrantCoins = (coins: number) => {
-    if(!this.wallet.canCredit(coins))return false;
-    this.wallet.credit(coins);this.committed(true);this.publish();return true;
+    if(!this.wallet.canCredit(this.currency,coins))return false;
+    this.wallet.credit(this.currency,coins);this.committed(true);this.publish();return true;
   };
   /** Test shortcut: opens a world (and the ones before it) as if its requirements were paid. */
   devUnlockWorld = (id: WorldId) => {
@@ -806,12 +828,12 @@ export class GameSession {
   };
   /** Sells everything except the minerals kept for opening the next worlds. */
   private executeSale() {
-    return sellItems(this.inventory,this.wallet,this.salePrice,this.reservations.sellable(this.inventory.getSnapshot().items));
+    return sellItems(this.inventory,this.till(),itemPrice,this.reservations.sellable(this.inventory.getSnapshot().items),this.saleMultiplier());
   }
   sellAvailable = () => {
     if(this.suspended||!this.inSellZone)return {status:'unavailable'} as const;
     const result=this.executeSale();
-    if(result.status==='sold'){this.onboarding.record('soldOnce');this.committed(true);this.notice=`出售 ${result.count} 件，获得 ${result.coins} 金币`;}else this.notice=result.status==='empty'?'没有可出售的矿产，保留材料仍在背包中':'金币数值超出范围';
+    if(result.status==='sold'){this.onboarding.record('soldOnce');this.committed(true);this.notice=`出售 ${result.count} 件，获得 ${result.coins} ${currencyName(this.currency)}`;}else this.notice=result.status==='empty'?'没有可出售的矿产，保留材料仍在背包中':'货币数值超出范围';
     this.publish();return result;
   };
   /** Pays a world's price at a portal and opens it for good. */
@@ -820,12 +842,13 @@ export class GameSession {
     if(this.worldProgress.isOpen(id))return {status:'already-open'} as const;
     if(!this.worldProgress.unlockable(id))return {status:'previous-locked'} as const;
     if(!this.atPortal)return {status:'away'} as const;
-    const requirement=worldRequirement(id),items=this.inventory.getSnapshot().items;
+    const requirement=worldRequirement(id),ticket=requirement.ticket!,items=this.inventory.getSnapshot().items;
+    if(this.equipment.toolLevel<ticket.toolLevel)return {status:'insufficient-level'} as const;
     if(requirement.materials.some(m=>(items[m.itemId]??0)<m.count))return {status:'insufficient-materials'} as const;
-    if(this.wallet.getBalance()<requirement.coins)return {status:'insufficient-coins'} as const;
+    if(this.wallet.getBalance(ticket.currency)<ticket.price)return {status:'insufficient-coins'} as const;
     // All checks precede this synchronous transfer. Reservations protect selling only.
-    if(!this.inventory.remove(requirement.materials))throw Error('缴纳矿产发生变化');
-    if(!this.wallet.debit(requirement.coins))throw Error('缴纳金币发生变化');
+    if(!this.inventory.remove(requirement.materials.map(m=>({itemId:m.itemId,count:m.count}))))throw Error('缴纳矿产发生变化');
+    if(!this.wallet.debit(ticket.currency,ticket.price))throw Error('缴纳货币发生变化');
     this.worldProgress.unlock(id);this.reservations.finishWorld(id);
     this.notice=`${requirement.name}已开放，可以传送过去了`;
     this.committed(true);this.publish();return {status:'opened'} as const;

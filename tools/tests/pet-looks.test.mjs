@@ -1,8 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { BoxGeometry } from 'three';
-import { PET_CONTENT } from '../../src/game/content/pets.ts';
-import { EGG_STAGES } from '../../src/game/content/progression.ts';
+import { PET_CONTENT } from '../../src/game/content/petContent.ts';
+import { EGG_DEFINITIONS } from '../../src/game/content/pets.ts';
+const stageOf = id => { const egg = EGG_DEFINITIONS.find(e => e.id === id); return (egg.world - 1) * 7 + egg.layer; };
 import { PET_FACES, PET_PATTERNS, petLook, sparkleFrom } from '../../src/game/content/petLooks.ts';
 import { PetModel, PetTextures } from '../../src/game/presentation/pets/PetModel.ts';
 
@@ -22,12 +23,12 @@ test('每只宠物都有方块外观：物种颜色、所在蛋的花纹、表�
   assert.equal(new Set(PET_CONTENT.eggs.map(e => petLook(e.outcomes[0].speciesId).pattern)).size, 16, 'every egg has its own pattern');
 });
 
-test('粒子随蛋的进度下放：前期蛋只有传说，中期从史诗开始，后期从稀有开始；光晕只给传说', () => {
+test('粒子随蛋所在的层下放：第一世界前五层只有传说，之后到第二世界中段从史诗开始，再往后从稀有开始；光晕只给传说', () => {
   assert.equal(sparkleFrom(0), 'legendary'); assert.equal(sparkleFrom(4), 'legendary');
-  assert.equal(sparkleFrom(5), 'epic'); assert.equal(sparkleFrom(7), 'epic');
-  assert.equal(sparkleFrom(8), 'rare'); assert.equal(sparkleFrom(9), 'rare');
+  assert.equal(sparkleFrom(5), 'epic'); assert.equal(sparkleFrom(11), 'epic');
+  assert.equal(sparkleFrom(12), 'rare'); assert.equal(sparkleFrom(20), 'rare');
   for (const egg of PET_CONTENT.eggs) for (const { speciesId } of egg.outcomes) {
-    const look = petLook(speciesId), from = sparkleFrom(EGG_STAGES[egg.id][0]);
+    const look = petLook(speciesId), from = sparkleFrom(stageOf(egg.id));
     assert.equal(look.particles, order[look.rarity] >= order[from], `${speciesId} in ${egg.id}`);
     assert.equal(look.glow, look.rarity === 'legendary');
     if (look.rarity === 'common') assert.equal(look.particles, false, 'commons never sparkle');

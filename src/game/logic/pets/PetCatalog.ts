@@ -1,4 +1,5 @@
 import { integer } from '../numbers.ts';
+import { CURRENCY_IDS } from '../../content/economy.ts';
 import { petId, type PetContent, type PetDefinition, type EggDefinition } from './types.ts';
 
 export class PetCatalog {
@@ -12,13 +13,12 @@ export class PetCatalog {
       petId(pet.id); petId(pet.name);
       if (this.pets.has(pet.id)) throw Error(`重复宠物种类: ${pet.id}`);
       if (!['common', 'rare', 'epic', 'legendary'].includes(pet.rarity)) throw Error(`无效稀有度: ${pet.id}`);
-      integer(pet.powerBonusBps, '宠物力量加成');
+      if (!integer(pet.bonusPct, '宠物加成') || !integer(pet.miningPct, '宠物挖矿加成') || !CURRENCY_IDS.includes(pet.currency)) throw Error(`无效宠物加成: ${pet.id}`);
       this.pets.set(pet.id, Object.freeze({ ...pet }));
     }
-    const largestBonus = Math.max(0, ...content.pets.map(pet => pet.powerBonusBps));
-    integer(Number(BigInt(largestBonus) * BigInt(content.equipSlots)), '满装备宠物加成');
     for (const egg of content.eggs) {
       petId(egg.id); petId(egg.name); integer(egg.price, '蛋价格');
+      if (!CURRENCY_IDS.includes(egg.currency)) throw Error(`蛋的货币无效: ${egg.id}`);
       if (this.eggs.has(egg.id)) throw Error(`重复蛋池: ${egg.id}`);
       if (!egg.outcomes.length) throw Error(`空蛋池: ${egg.id}`);
       let total = 0;

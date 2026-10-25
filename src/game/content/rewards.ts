@@ -1,38 +1,34 @@
-/** First-playtest economy values, not source-game parity or a balanced economy. */
-export const ONLINE_REWARD_MINUTES = [5, 10, 20, 30] as const;
-export type OnlineRewardMinutes = typeof ONLINE_REWARD_MINUTES[number];
-export const SIGNIN_REWARDS = [1, 1, 1, 2, 2, 2, 3] as const;
+import { ECONOMY } from './economy.ts';
+// Lucky coins and the capsule machine; every amount, weight and multiplier is in economy.json.
+const LUCKY = ECONOMY.luckyCoins, CAPSULE = ECONOMY.capsule;
+export const ONLINE_REWARD_MINUTES: readonly number[] = Object.freeze(LUCKY.online.map(o => o.minutes));
+export type OnlineRewardMinutes = number;
+export const SIGNIN_REWARDS: readonly number[] = LUCKY.signin;
 /** Lucky coins for each online tier: longer play is worth more. */
-export const ONLINE_REWARDS: Readonly<Record<OnlineRewardMinutes, number>> = { 5: 1, 10: 1, 20: 2, 30: 3 };
+export const ONLINE_REWARDS: Readonly<Record<number, number>> = Object.freeze(Object.fromEntries(LUCKY.online.map(o => [o.minutes, o.coins])));
 export const REWARD_CONFIG = Object.freeze({
-  spinCost: 1,
-  shareReward: 1,
-  inviteReward: 2,
-  timedDurationSeconds: 300,
-  coinStagePriceMultiplier: 100,
-  movementMultiplier: 2,
-  miningMultiplier: 1.5,
-  luckMultiplier: 2,
-  /** Coins from every sale while the capsule's double-sale boost runs. */
-  sellMultiplier: 2,
+  spinCost: CAPSULE.spinCost,
+  shareReward: LUCKY.share,
+  inviteReward: LUCKY.invite,
+  timedDurationSeconds: CAPSULE.timedSeconds,
+  movementMultiplier: CAPSULE.movementMultiplier,
+  miningMultiplier: CAPSULE.miningSpeedMultiplier,
+  luckMultiplier: CAPSULE.luckMultiplier,
+  /** Every sale while the capsule's double-sale boost runs. */
+  sellMultiplier: CAPSULE.sellMultiplier,
 });
-
-export const CAPSULE_REWARDS = [
-  { id: 'coins', name: '金币', weight: 65 },
-  { id: 'speed', name: '移动速度 ×2', weight: 10 },
-  { id: 'mining', name: '永久挖矿速度 ×1.5', weight: 5 },
+const PRIZE_NAMES = {
+  // The coin prize pays the current world's currency, about two minutes of income at its deepest layer reached.
+  coins: '货币',
+  speed: `移动速度 ×${CAPSULE.movementMultiplier}`,
+  mining: `永久挖矿速度 ×${CAPSULE.miningSpeedMultiplier}`,
   // Was “便携传送” (teleport anywhere), which every player now has; a timed double sale instead.
-  { id: 'sell', name: '出售金币 ×2', weight: 5 },
-  { id: 'autoHatch', name: '自动孵蛋', weight: 5 },
-  { id: 'luck', name: '稀有宠物概率 ×2', weight: 10 },
-] as const;
-export type CapsuleRewardId = typeof CAPSULE_REWARDS[number]['id'];
-
-/** Call with the shallow ore price of the deepest historically reached stage. */
-export function stageCoinReward(stageBasePrice: number) {
-  const result = stageBasePrice * REWARD_CONFIG.coinStagePriceMultiplier;
-  if (!Number.isSafeInteger(stageBasePrice) || stageBasePrice <= 0 || !Number.isSafeInteger(result)) {
-    throw new Error('阶段矿价必须是有效正整数，金币奖励不能溢出');
-  }
-  return result;
-}
+  sell: `出售收入 ×${CAPSULE.sellMultiplier}`,
+  autoHatch: '自动孵蛋',
+  luck: `稀有宠物概率 ×${CAPSULE.luckMultiplier}`,
+} as const;
+export type CapsuleRewardId = keyof typeof PRIZE_NAMES;
+export const CAPSULE_REWARDS: readonly Readonly<{ id: CapsuleRewardId; name: string; weight: number }>[] = Object.freeze(CAPSULE.prizes.map(p => {
+  if (!(p.id in PRIZE_NAMES)) throw Error(`economy.json: 未知扭蛋奖品 ${p.id}`);
+  return Object.freeze({ id: p.id as CapsuleRewardId, name: PRIZE_NAMES[p.id as CapsuleRewardId], weight: p.weight });
+}));

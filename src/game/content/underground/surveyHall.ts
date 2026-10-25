@@ -16,7 +16,6 @@ type Spot = readonly [number, number, number];
 export const SURVEY_HALL = {
   id: 'world2.4',
   asset: 'survey-hall',
-  depth: 1600,
   size: [40, 20, 40],
   pit: 8,
   spawn: [0, 0, 12],

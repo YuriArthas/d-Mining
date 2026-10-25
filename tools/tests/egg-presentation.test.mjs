@@ -1,11 +1,12 @@
 import {formatNumber} from '../../src/game/presentation/formatNumber.ts';
+import { currencyName } from '../../src/game/content/economy.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { PerspectiveCamera, Vector3, Quaternion } from 'three';
 import { createWorldText } from '../../src/game/presentation/WorldText.ts';
 import { EggStandLabels, EGG_LABEL } from '../../src/game/presentation/EggStandLabels.ts';
 import { disposeScenery } from '../../src/game/presentation/disposeScenery.ts';
-import { PET_CONTENT } from '../../src/game/content/pets.ts';
+import { PET_CONTENT } from '../../src/game/content/petContent.ts';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
 const SESSION_CONTENT = GAME_CONTENT.session, PET_DISPLAYS = GAME_CONTENT.eggs;
@@ -25,7 +26,7 @@ test('egg labels keep extruded glyphs and front/side colours in one draw, plus o
     for (const [slot, stand] of PET_DISPLAYS.entries()) {
       const offer = PET_CONTENT.eggs.find(offer => offer.id === stand.eggId), at = labels.diagnostics().labels[slot].at;
       // Each stand carries its named label (variant 1) then its mystery label (variant 2), same price.
-      const named = createWorldText({ at: [0,0,0], width: EGG_LABEL.width, title: offer.name, subtitle: `${formatNumber(offer.price)} 金币`, color: EGG_LABEL.text, background: EGG_LABEL.plate }, { bevel: false });
+      const named = createWorldText({ at: [0,0,0], width: EGG_LABEL.width, title: offer.name, subtitle: `${formatNumber(offer.price)} ${currencyName(offer.currency)}`, color: EGG_LABEL.text, background: EGG_LABEL.plate }, { bevel: false });
       // The mystery label: a narrower "???" line over the named label's own price line.
       const mystery = createWorldText({ at: [0,0,0], width: EGG_LABEL.mysteryWidth, title: EGG_LABEL.mystery, subtitle: '', color: EGG_LABEL.text, background: EGG_LABEL.plate }, { bevel: false });
       for (const [variant, lines] of [[1, named.children], [2, [...mystery.children, named.children[1]]]]) {

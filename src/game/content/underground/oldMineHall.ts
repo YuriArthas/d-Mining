@@ -5,7 +5,6 @@ import type { HallDefinition } from './hall.ts';
 export const OLD_MINE_HALL = {
   id: 'old_mine',
   asset: 'old-mine-hall',
-  depth: 400,
   size: [40, 20, 40],
   pit: 8,
   spawn: [0, 0, 12],

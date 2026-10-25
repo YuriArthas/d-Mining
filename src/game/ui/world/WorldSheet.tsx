@@ -7,6 +7,7 @@ import { OreIcon } from '../InventoryIcons.tsx';
 import { UiButton } from '../kit/controls.tsx';
 import { Icon } from '../kit/icons.tsx';
 import { Bar, Sheet } from '../kit/panel.tsx';
+import { currencyIcon, currencyName } from '../currency.ts';
 import './world.css';
 
 const LAYER_COLORS: readonly [RegExp, string, string][] = [
@@ -18,22 +19,25 @@ const layerColor = (name: string, index: number) => { const hit = LAYER_COLORS.f
 
 const WORLD_COLORS = [['#62c96b', '#2f9a3d'], ['#5fc0b8', '#2f8a84'], ['#e9c46a', '#b88a2a']] as const;
 
-/** The world portal: every world as a card. Open worlds travel; the next one shows its price (minerals from the
- *  world before it, and coins) and unlocks here; worlds beyond it stay ??? with no name or price. */
+/** The world portal: every world as a card. Open worlds travel; the next one shows its ticket (a pickaxe level,
+ *  minerals of earlier worlds and the previous world's currency) and unlocks here; worlds beyond it stay ???. */
 export function PortalSheet({ session, onClose }: { session: GameSession; onClose(): void }) {
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot);
   const [confirm, setConfirm] = useState(false), [message, setMessage] = useState('');
   const next = state.worlds.find(w => w.known && !w.open);
-  const ready = !!next && next.materials.every(m => m.owned >= m.count) && state.coins >= next.coins;
+  const ticket = next?.ticket ?? null, unit = ticket ? currencyName(ticket.currency) : '';
+  const levelOk = !!ticket && next!.toolLevel >= ticket.toolLevel;
+  const ready = !!next && !!ticket && levelOk && next.materials.every(m => m.owned >= m.count) && next.ticketBalance >= ticket.price;
   const go = (id: WorldId) => { const r = session.travelWorld(id); if (r === 'travelling') onClose(); else setMessage(r === 'locked' ? '这个世界还没开放' : r === 'away' ? '站到传送门前才能传送' : '现在无法传送，请稍后再试'); };
   const unlock = () => {
     if (!next) return;
     const r = session.unlockWorld(next.id); setConfirm(false);
-    setMessage(r.status === 'opened' ? `${next.name}已开放，可以传送过去了！` : r.status === 'away' ? '站到传送门前才能解锁' : '条件还没满足，没有扣除任何东西');
+    setMessage(r.status === 'opened' ? `${next.name}已开放，可以传送过去了！` : r.status === 'away' ? '站到传送门前才能解锁'
+      : r.status === 'insufficient-level' ? `需要 Lv.${ticket?.toolLevel} 镐子` : '条件还没满足，没有扣除任何东西');
   };
-  const footer = confirm && next ? <><span className="ui-hint">确认后扣除下面的矿物和 {number(next.coins)} 金币，{next.name}永久开放。</span><span className="ui-grow" />
+  const footer = confirm && next ? <><span className="ui-hint">确认后扣除下面的矿物和 {number(ticket?.price ?? 0)} {unit}，{next.name}永久开放。</span><span className="ui-grow" />
     <UiButton size="s" tone="steel" onPress={() => setConfirm(false)}>取消</UiButton><UiButton size="s" tone="orange" disabled={!ready} onPress={unlock}>确认解锁</UiButton></>
-    : <><span className="ui-hint" role="status">{message || (next ? (ready ? `条件都满足了，可以解锁${next.name}` : `集齐矿物和金币即可解锁${next.name}`) : '所有世界都已开放')}</span><span className="ui-grow" />
+    : <><span className="ui-hint" role="status">{message || (next ? (ready ? `条件都满足了，可以解锁${next.name}` : `镐子达到 Lv.${ticket?.toolLevel}、集齐矿物和${unit}即可解锁${next.name}`) : '所有世界都已开放')}</span><span className="ui-grow" />
       {next && <UiButton size="s" tone="purple" icon="gem" onPress={() => { session.reserveWorldMaterials(next.id); setMessage('已保留所需矿物，之后挖到的也会自动补足，不会被卖掉'); }}>保留矿物</UiButton>}
       {next && <UiButton size="s" tone="orange" disabled={!ready} onPress={() => setConfirm(true)}>解锁{next.name}</UiButton>}</>;
   return <Sheet title="世界传送门" size="m" onClose={onClose} className="portal-sheet" footer={footer}>
@@ -51,7 +55,10 @@ export function PortalSheet({ session, onClose }: { session: GameSession; onClos
       <b className="ui-outline">解锁{next.name}需要</b>
       {next.materials.map(m => <div key={m.itemId} className="world-mat"><OreIcon color={itemDefinition(m.itemId).color} className="world-mat-icon" /><span>{m.name}</span>
         <Bar value={m.owned} max={m.count} size="s" /><b className="ui-outline">{number(Math.min(m.owned, m.count))}/{number(m.count)}</b></div>)}
-      <div className="world-mat"><Icon kind="coin" className="ui-icon world-mat-icon" /><span>金币</span><Bar value={state.coins} max={next.coins} size="s" tone="gold" /><b className="ui-outline">{number(Math.min(state.coins, next.coins))}/{number(next.coins)}</b></div>
+      {ticket && <div className="world-mat"><Icon kind="pickaxe" className="ui-icon world-mat-icon" /><span>镐子等级</span>
+        <Bar value={Math.min(next.toolLevel, ticket.toolLevel)} max={ticket.toolLevel} size="s" /><b className="ui-outline">Lv.{next.toolLevel}/{ticket.toolLevel}</b></div>}
+      {ticket && <div className="world-mat"><Icon kind={currencyIcon(ticket.currency)} className="ui-icon world-mat-icon" /><span>{unit}</span>
+        <Bar value={next.ticketBalance} max={ticket.price} size="s" tone="gold" /><b className="ui-outline">{number(Math.min(next.ticketBalance, ticket.price))}/{number(ticket.price)}</b></div>}
     </div>}
   </Sheet>;
 }

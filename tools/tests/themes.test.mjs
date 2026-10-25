@@ -28,30 +28,31 @@ test('eighty-four journey resources, four per layer of every world; fixed floor 
  assert.throws(()=>validateLayers(LAYERS.map((l,i)=>i===2?{...l,theme:'missing'}:l)));
 });
 test('moving a layer in one configuration moves its floor, unlock and landing while keeping identity and theme',()=>{
- const layers=LAYERS.map(l=>l.id==='fungal'?{...l,from:900}:l);validateLayers(layers);
+ const old=ROOMS[1].depth,moved=200,layers=LAYERS.map(l=>l.id==='fungal'?{...l,from:moved}:l);validateLayers(layers);
  const room=roomsFor(layers).find(r=>r.id==='fungal'),world=new SparseWorld({...WORLD1,layers});
- assert.equal(room.depth,900);assert.equal(room.theme,ROOMS[1].theme);assert.equal(room.spawn[1],-899.9);
- assert.equal(layerAtDepth(899,layers).id,'old_mine');assert.equal(layerAtDepth(900,layers).id,'fungal');
- assert.equal(roomAir(0,-400,0,layers),false);assert.equal(roomAir(0,-450,0,layers),true);
- assert.equal(onRoomFloor(5,-401,5,layers),false);assert.equal(onRoomFloor(5,-451,5,layers),true);
- assert.equal(world.cell([5,-451,5]),7);assert.equal(world.cell([0,-450,0]),0);assert.ok(world.canMine([0,-451,0]));
- const progress=new Exploration(roomsFor(layers));progress.visit(899);assert.equal(progress.has(room.id),false);progress.visit(900);assert.equal(progress.has(room.id),true);
- const c=[5,-451,5];for(const size of [8,16])assert.equal(sampleXYZ(...c,new Map(world.snapshot(regionOf(c,size),size)),world.generation),7);
- const original=new SparseWorld(WORLD1);assert.equal(original.cell([5,-401,5]),7); // No mutation of the active layout.
+ assert.equal(room.depth,moved);assert.equal(room.theme,ROOMS[1].theme);assert.equal(room.spawn[1],-moved+.1);
+ assert.equal(layerAtDepth(moved-1,layers).id,'old_mine');assert.equal(layerAtDepth(moved,layers).id,'fungal');
+ assert.equal(roomAir(0,-old/2,0,layers),false);assert.equal(roomAir(0,-moved/2,0,layers),true);
+ assert.equal(onRoomFloor(5,-old/2-1,5,layers),false);assert.equal(onRoomFloor(5,-moved/2-1,5,layers),true);
+ assert.equal(world.cell([5,-moved/2-1,5]),7);assert.equal(world.cell([0,-moved/2,0]),0);assert.ok(world.canMine([0,-moved/2-1,0]));
+ const progress=new Exploration(roomsFor(layers));progress.visit(moved-1);assert.equal(progress.has(room.id),false);progress.visit(moved);assert.equal(progress.has(room.id),true);
+ const c=[5,-moved/2-1,5];for(const size of [8,16])assert.equal(sampleXYZ(...c,new Map(world.snapshot(regionOf(c,size),size)),world.generation),7);
+ const original=new SparseWorld(WORLD1);assert.equal(original.cell([5,-old/2-1,5]),7); // No mutation of the active layout.
 });
 test('visual floor themes split independently while collision remains identical',()=>{
- const a=buildRegion('collision',[0,-26,0],8,[],WORLD1).mesh;
+ // The 8-cell region holding the old mine's room floor.
+ const floor=-ROOMS[0].depth/2-1,region=[0,Math.floor(floor/8),0],a=buildRegion('collision',region,8,[],WORLD1).mesh;
  const layers=LAYERS.map(l=>l.id==='old_mine'?{...l,theme:'frozen_cave'}:l),g={...WORLD1,layers};
- const b=buildRegion('collision',[0,-26,0],8,[],g).mesh;assert.deepEqual(a,b);
- assert.notEqual(appearanceKey(7,-201,LAYERS),appearanceKey(7,-201,layers));
- const r1=buildRegion('render',[0,-26,0],8,[],WORLD1).mesh,r2=buildRegion('render',[0,-26,0],8,[],g).mesh;
+ const b=buildRegion('collision',region,8,[],g).mesh;assert.deepEqual(a,b);
+ assert.notEqual(appearanceKey(7,floor,LAYERS),appearanceKey(7,floor,layers));
+ const r1=buildRegion('render',region,8,[],WORLD1).mesh,r2=buildRegion('render',region,8,[],g).mesh;
  assert.deepEqual(r1.positions,r2.positions);assert.notDeepEqual(r1.tiles,r2.tiles);
  assert.equal(appearanceKey(71,-201,LAYERS),appearanceKey(71,-401,LAYERS));
 });
 test('every resource flows through the same unrestricted inventory and sale APIs',()=>{
- const bag=new Inventory(1,itemVolume),wallet=new Wallet();
+ const bag=new Inventory(1,itemVolume),wallet=new Wallet(),till={canCredit:n=>wallet.canCredit('gold',n),credit:n=>wallet.credit('gold',n)};
  bag.add(oreDrops(RESOURCES));assert.equal(bag.getSnapshot().totalCount,RESOURCES.length);assert.ok(bag.isFull());
- const expected=RESOURCES.reduce((n,r)=>n+r.price,0);assert.equal(sellItems(bag,wallet,itemPrice).coins,expected);assert.equal(wallet.getBalance(),expected);assert.equal(bag.getSnapshot().used,0);
+ const expected=RESOURCES.reduce((n,r)=>n+r.price,0);assert.equal(sellItems(bag,till,itemPrice).coins,expected);assert.equal(wallet.getBalance('gold'),expected);assert.equal(bag.getSnapshot().used,0);
 });
 test('scene plans have finite geometry and keep landing and service centers out of ordinary solids',()=>{
  const plans=[surfacePlan(),...ROOMS.map(roomPlan)];

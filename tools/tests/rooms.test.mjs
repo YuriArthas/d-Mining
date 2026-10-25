@@ -31,12 +31,12 @@ test('room boundary has separately merged render and collision surfaces', () => 
  assert.equal(collision.tiles.length,0);assert.equal(new SparseWorld(WORLD1).stats().editBytes,0);
 });
 test('depth milestones unlock independently of rooms and retain progress on ascent', () => {
- const p=new Exploration(TEMPLATE_ROOMS);
- assert.deepEqual(p.visit(399.999),[]);assert.deepEqual(p.visit(400),['old_mine']);
+ const p=new Exploration(TEMPLATE_ROOMS),[first,second]=TEMPLATE_ROOMS.map(r=>r.depth);
+ assert.deepEqual(p.visit(first-.001),[]);assert.deepEqual(p.visit(first),['old_mine']);
  assert.deepEqual(p.visit(0),[]);assert.equal(p.has('old_mine'),true);
- assert.deepEqual(p.visit(801),['fungal']);assert.equal(p.maxDepth,801);
+ assert.deepEqual(p.visit(second+1),['fungal']);assert.equal(p.maxDepth,second+1);
  for(const d of [NaN,Infinity,-3])assert.deepEqual(p.visit(d),[]);
- assert.equal(p.maxDepth,801);assert.equal(new Exploration(TEMPLATE_ROOMS).has('old_mine'),false);
+ assert.equal(p.maxDepth,second+1);assert.equal(new Exploration(TEMPLATE_ROOMS).has('old_mine'),false);
 });
 function setup() {
  const s=new GameSession(SESSION_CONTENT),calls=[];
@@ -44,8 +44,8 @@ function setup() {
  return {s,calls};
 }
 test('reaching depth outside a room unlocks travel, which works from anywhere, even right there in the mine', () => {
- const {s,calls}=setup();s.updatePosition([90,-399.999,90],false);
- assert.equal(s.getSnapshot().destinations[0].unlocked,false); s.updatePosition([90,-400,90],false);
+ const {s,calls}=setup(),d=ROOMS[0].depth;s.updatePosition([90,-(d-.001),90],false);
+ assert.equal(s.getSnapshot().destinations[0].unlocked,false); s.updatePosition([90,-d,90],false);
  assert.equal(s.getSnapshot().destinations[0].unlocked,true);assert.equal(s.getSnapshot().destinations[1].unlocked,false);
  assert.equal(s.travelTo('fungal'),'locked');assert.equal(s.travelTo('unknown'),'locked');
  assert.equal(s.travelTo('old_mine'),'travelling');assert.deepEqual(calls,[ROOMS[0].spawn]);
@@ -54,8 +54,8 @@ test('reaching depth outside a room unlocks travel, which works from anywhere, e
  s.resetPosition();assert.equal(s.getSnapshot().destinations[0].unlocked,true);
 });
 test('standing at milestone contact height unlocks without requiring room entry or exact floor depth', () => {
- const {s}=setup();s.updatePosition([90,-399.973,90],false);assert.equal(s.getSnapshot().destinations[0].unlocked,false);
- s.updatePosition([90,-399.973,90],true);assert.equal(s.getSnapshot().destinations[0].unlocked,true);
+ const {s}=setup(),y=-(ROOMS[0].depth-.027);s.updatePosition([90,y,90],false);assert.equal(s.getSnapshot().destinations[0].unlocked,false);
+ s.updatePosition([90,y,90],true);assert.equal(s.getSnapshot().destinations[0].unlocked,true);
 });
 test('each underground sale zone sells once per entry; shops exit independently', () => {
  const {s}=setup();

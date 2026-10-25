@@ -17,9 +17,9 @@ for (let i = 0; i < GAME_GENERATION.surfaceCut.length; i += 2) cells.add(GAME_GE
 const cellAt = (x, z) => Math.floor(x / CELL) + ',' + Math.floor(z / CELL);
 const line = new CatmullRomCurve3(PINEWIND_CREEK.points.map(([x, z]) => new Vector3(x, 0, z))).getPoints(220);
 
-test('the voxel floor is cut under the whole sunken creek and nowhere near the plaza, spawn or mine; the generation version is kept for saves', () => {
+test('the voxel floor is cut under the whole sunken creek and nowhere near the plaza, spawn or mine', () => {
   assert.deepEqual(creekFloorCells(), [...GAME_GENERATION.surfaceCut]);
-  assert.equal(GAME_GENERATION.version, 11, 'saves keep loading');
+  assert.equal(GAME_GENERATION.version, 12, 'the economy v2 depths (older saves are not read)');
   const reach = PINEWIND_CREEK.width.base - PINEWIND_CREEK.width.wave + PINEWIND_CREEK.bank;
   // Every point of the corridor (centre line out to the bank tops) inside the authored ground lies in a cut cell.
   for (let i = 0; i < line.length - 1; i++) {

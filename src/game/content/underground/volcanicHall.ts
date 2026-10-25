@@ -11,7 +11,6 @@ const columns = (x: number, z: number, height: number, yaw = 0): HallColumns => 
 export const VOLCANIC_HALL = {
   id: 'volcanic',
   asset: 'volcanic-hall',
-  depth: 2400,
   size: [40, 20, 40],
   pit: 8,
   spawn: [0, 0, 12],

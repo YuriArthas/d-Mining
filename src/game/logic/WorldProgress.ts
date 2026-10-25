@@ -23,6 +23,8 @@ export class WorldProgress {
     if (!this.unlockable(id)) throw Error('尚未满足世界开放条件');
     this.open.add(id);
   }
+  /** Rebirth: back to world 1 alone. */
+  reset() { this.open.clear(); this.open.add(1); }
   /** Testing shortcut: opens world `id` and every one before it. */
   openThrough(id: WorldId) { for (const w of WORLD_REQUIREMENTS) if (w.id <= id) this.open.add(w.id); }
   exportData(): WorldProgressData { return { version: 2, openWorlds: WORLD_REQUIREMENTS.filter(w => this.open.has(w.id)).map(w => w.id) }; }

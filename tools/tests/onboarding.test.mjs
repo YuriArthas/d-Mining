@@ -64,7 +64,7 @@ test('镐子和宠物提示各一次、一次只显示一个、中间留出安�
   const upgrade = new GameSession(SESSION_CONTENT).getSnapshot().pickaxeUpgrade.price;
   const egg = SESSION_CONTENT.petContent.eggs.find(e => e.id === 'meadow-egg').price;
   now = 0;
-  const s = restore(learnedSave(data => { data.wallet.coins = Math.max(upgrade, egg) + 10; }));
+  const s = restore(learnedSave(data => { data.wallet.balances.gold = Math.max(upgrade, egg) + 10; }));
   s.updatePosition(farFromMine, true);
   assert.equal(tip(s)?.id, 'shop', 'the pickaxe comes before pets');
   s.dismissTip('pets');
@@ -84,7 +84,7 @@ test('镐子和宠物提示各一次、一次只显示一个、中间留出安�
 
 test('玩家已经做过的事不再提示：先升级了镐子或已有宠物，就直接记为已提示', () => {
   now = 0;
-  const s = restore(learnedSave(data => { data.wallet.coins = 1e6; data.pickaxe.level = 3; delete data.equipment; }));
+  const s = restore(learnedSave(data => { data.wallet.balances.gold = 1e6; data.pickaxe.level = 3; delete data.equipment; }));
   s.updatePosition(farFromMine, true);
   assert.equal(tip(s)?.id, 'pets');
   assert.ok(s.getSnapshot().onboarding.seen.includes('shop'));

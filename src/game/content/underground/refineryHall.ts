@@ -15,7 +15,6 @@ const MAGENTA = '#d050e8', VIOLET = '#a860f0', WARM = '#ffd8a8';
 export const REFINERY_HALL = {
   id: 'world2.3',
   asset: 'refinery-hall',
-  depth: 1200,
   size: [40, 20, 40],
   pit: 8,
   spawn: [0, 0, 12],

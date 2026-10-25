@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Rewards, localRewardDay } from '../../src/game/logic/Rewards.ts';
 import { createInviteCode, parseInviteCode } from '../../src/game/logic/InviteCode.ts';
-import { stageCoinReward } from '../../src/game/content/rewards.ts';
+import { ECONOMY } from '../../src/game/content/economy.ts';
 
 const DAY = '2026-10-18';
 const make = (options = {}) => new Rewards({ day: () => DAY, createInviteId: () => 'own-invite-001', ...options });
@@ -232,9 +232,12 @@ test('balance and timed overflow fail without committing a claim, spend or entit
   assert.throws(() => long.spin(100)); assert.deepEqual(long.exportData(), data);
 });
 
-test('stage coins use the configured base-price multiplier and reject unsafe inputs', () => {
-  assert.equal(stageCoinReward(1), 100); assert.equal(stageCoinReward(18), 1800);
-  for (const bad of [0, -1, 0.1, NaN, Infinity, Number.MAX_SAFE_INTEGER]) assert.throws(() => stageCoinReward(bad));
+test('the capsule coin prize grows layer by layer within each world and restarts small in the next world\'s currency', () => {
+  for (const w of [1, 2, 3]) {
+    const prizes = ECONOMY.layers.filter(l => l.world === w).map(l => l.capsuleCoins);
+    for (let i = 1; i < prizes.length; i++) assert.ok(prizes[i] > prizes[i - 1]);
+    if (w > 1) assert.ok(prizes[0] < ECONOMY.layers[(w - 1) * 7 - 1].capsuleCoins);
+  }
 });
 
 test('the double-sale boost is a timed prize: five minutes per win, counted down, and older saves load without it', () => {

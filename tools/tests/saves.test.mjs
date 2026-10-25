@@ -21,7 +21,7 @@ const head = () => ({
   formatVersion: 1,
   revision: 1,
   savedAt: 1,
-  world: { generationVersion: 11, seed: 0, regionEncoding: 1 },
+  world: { generationVersion: 12, seed: 0, regionEncoding: 1 },
   regionCount: 0,
 });
 const deferred = () => {
@@ -32,10 +32,11 @@ const deferred = () => {
   });
   return { promise, resolve, reject };
 };
+// Rock 100 m down, between world 1's first two rest rooms.
 const cells = [
-  [-10, -30, -10],
-  [-9, -30, -10],
-  [-8, -30, -10],
+  [-10, -50, -10],
+  [-9, -50, -10],
+  [-8, -50, -10],
 ];
 function fixture(commit = async () => {}, minedBefore = false) {
   const data = GameSession.createNew(SESSION_CONTENT).exportProgress();
@@ -101,8 +102,9 @@ test("restore rejects missing/unknown/partial data, never creates a new player",
     undefined,
     null,
     {},
-    { ...good, version: 2 },
-    { ...good, wallet: { version: 1, coins: -1 } },
+    { ...good, version: 1 },
+    { ...good, wallet: { version: 2, balances: { gold: -1 } } },
+    { ...good, wallet: { version: 1, coins: 5 } },
     { ...good, pets: undefined },
     {
       ...good,
@@ -150,7 +152,7 @@ test("pet commands settle first, notify once, and rejected commands do not dirty
   assert.equal(states.length, 0);
   const r = s.pets.hatch("meadow-egg");
   assert.equal(states.length, 1);
-  assert.equal(states[0].wallet.coins, 190);
+  assert.equal(states[0].wallet.balances.gold, 190);
   assert.equal(states[0].pets.inventory.pets.length, 1);
   s.pets.equip(r.pet.id);
   s.pets.equip(r.pet.id);
@@ -169,9 +171,9 @@ test("world captures independent sparse data and restores negative coordinates",
   for (const cell of cells) assert.equal(restored.cell(cell), 0);
   assert.equal(restored.removed, 3);
   assert.equal(restored.saveChanges.pending, false);
-  const baseline = restored.cell([-7, -30, -10]);
+  const baseline = restored.cell([-7, -50, -10]);
   capture.regions[0].removed.fill(0);
-  assert.equal(restored.cell([-7, -30, -10]), baseline);
+  assert.equal(restored.cell([-7, -50, -10]), baseline);
 });
 test("world capture acknowledgment does not clear a later edit in the same region", () => {
   const w = new SparseWorld(WORLD1);
@@ -315,12 +317,12 @@ test("idle flush performs no write, and unrelated pet save does not rewrite ackn
 test("database namespaces are stable and separate production, preview and acceptance worlds", () => {
   assert.equal(
     saveNamespace({ pathname: "/games/mining/index.html", search: "" }).name,
-    "mining:production:journey-v1",
+    "mining:production:economy-v2",
   );
   assert.equal(
     saveNamespace({ pathname: "/games/mining-surface-play/index.html", search: "" })
       .name,
-    "mining:test:journey-v1",
+    "mining:test:economy-v2",
   );
   assert.equal(
     saveNamespace({
@@ -374,7 +376,7 @@ test("urgent request shortens a normal save deadline", async (t) => {
     f.session.pets.hatch("meadow-egg");
     t.mock.timers.tick(0);
     assert.equal(f.batches.length, 1);
-    assert.equal(f.batches[0].progress.wallet.coins, 190);
+    assert.equal(f.batches[0].progress.wallet.balances.gold, 190);
     await f.saves.flush();
   } finally {
     await f.dispose();

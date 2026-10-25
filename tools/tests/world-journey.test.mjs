@@ -5,15 +5,17 @@ import { GameSession } from '../../src/game/application/GameSession.ts';
 import { GAME_CONTENT, GAME_GENERATION } from '../../src/game/content/gameContent.ts';
 import { JOURNEY_WORLDS } from '../../src/game/content/journeyWorlds.ts';
 import { WORLD_REQUIREMENTS, worldRequirement, worldSpawn, worldGateZ, worldAtFeet, worldPortal } from '../../src/game/content/worldJourney.ts';
-import { JOURNEY_CAPACITIES, JOURNEY_TOOL_PRICES, JOURNEY_BACKPACKS } from '../../src/game/content/journeyResources.ts';
+import { ECONOMY } from '../../src/game/content/economy.ts';
 import { resourceById } from '../../src/game/content/resources.ts';
 import { SparseWorld, generationAtZ } from '../../src/game/terrain/SparseWorld.ts';
 import { compatibleHead } from '../../src/game/persistence/saveMigrations.ts';
 import { saveNamespace } from '../../src/game/persistence/SaveBootstrap.ts';
 const content=GAME_CONTENT.session;
-function prepared(id=2,{coins=worldRequirement(id).coins,materials=true}={}) {
-  const data=new GameSession(content).exportProgress();
-  data.onboarding={...data.onboarding,status:'skipped'};data.wallet.coins=coins;
+/** A player at the portal of world `id`'s predecessor, with the ticket's price, pickaxe and minerals (unless told otherwise). */
+function prepared(id=2,{price=worldRequirement(id).ticket.price,level=worldRequirement(id).ticket.toolLevel,materials=true}={}) {
+  const data=new GameSession(content).exportProgress(),ticket=worldRequirement(id).ticket;
+  data.onboarding={...data.onboarding,status:'skipped'};data.wallet.balances[ticket.currency]=price;
+  data.pickaxe={version:1,level};data.equipment={...data.equipment,toolLevel:level};
   data.worldProgress={version:2,openWorlds:id===3?[1,2]:[1]};
   if(materials)for(const m of worldRequirement(id).materials)data.inventory.items[m.itemId]=m.count;
   return GameSession.fromData(data,content);
@@ -28,10 +30,12 @@ test('worlds unlock in order; a version 1 save keeps its paid mines as open worl
   assert.deepEqual(new WorldProgress({version:1,minedVolume:5,openMines:[1,2]}).exportData().openWorlds,[1,2]);
   assert.throws(()=>new WorldProgress({version:2,openWorlds:[1,3]}));
 });
-test('equipment costs and backpack capacities continue increasing through both world boundaries',()=>{
-  for(const values of [JOURNEY_TOOL_PRICES,JOURNEY_CAPACITIES,JOURNEY_BACKPACKS.map(b=>b.price)]){
-    for(let i=1;i<values.length;i++)assert.ok(values[i]>values[i-1],`tier ${i+1} must cost or hold more than tier ${i}`);
+test('each world prices its ten tools and bags in its own currency, rising tier by tier; bags always hold more',()=>{
+  for(const items of [ECONOMY.tools,ECONOMY.bags])for(let i=1;i<items.length;i++){
+    assert.equal(items[i].currency,ECONOMY.worlds[Math.floor(i/10)].currency);
+    if(i%10)assert.ok(items[i].price>items[i-1].price,`tier ${i+1} must cost more than tier ${i}`);
   }
+  for(let i=1;i<ECONOMY.bags.length;i++)assert.ok(ECONOMY.bags[i].capacity>ECONOMY.bags[i-1].capacity);
 });
 test('the portal sheet knows only the next world: its name and price; the one after stays unknown',()=>{
   const s=new GameSession(content),worlds=()=>s.getSnapshot().worlds.map(w=>[w.open,w.known]);
@@ -45,19 +49,20 @@ test('world borders: walking into a world that is not open sends the player back
   const s=new GameSession(content),travels=commands(s);
   s.updatePosition(worldSpawn(2),true);assert.deepEqual(travels.at(-1),worldSpawn(1));assert.equal(s.getSnapshot().currentWorld,1);
 });
-test('unlocking needs the portal, the price and the world before; nothing is taken on a refusal',()=>{
-  for(const variant of [{coins:9_999_999},{materials:false}]){
+test('unlocking needs the portal, the price, the pickaxe and the world before; nothing is taken on a refusal',()=>{
+  const ticket=worldRequirement(2).ticket;
+  for(const variant of [{price:ticket.price-1},{materials:false},{level:ticket.toolLevel-1}]){
     const s=prepared(2,variant),before=s.exportProgress();atPortal(s);
     assert.notEqual(s.unlockWorld(2).status,'opened');assert.deepEqual(s.exportProgress().wallet,before.wallet);assert.deepEqual(s.exportProgress().inventory,before.inventory);
   }
   const away=prepared(),before=away.exportProgress();assert.equal(away.unlockWorld(2).status,'away');assert.deepEqual(away.exportProgress(),before);
   const early=new GameSession(content);atPortal(early);assert.equal(early.unlockWorld(3).status,'previous-locked');
 });
-test('World 2 costs exactly the listed minerals and coins, keeps the surplus, is idempotent and survives a reload',()=>{
-  const base=prepared().exportProgress();base.wallet.coins+=123;base.inventory.items['journey.diamond']+=50;
+test('World 2 costs exactly the listed minerals and gold, keeps the surplus, is idempotent and survives a reload',()=>{
+  const ore=worldRequirement(2).materials[0].itemId,base=prepared().exportProgress();base.wallet.balances.gold+=123;base.inventory.items[ore]+=50;
   const s=GameSession.fromData(base,content);s.reserveWorldMaterials(2);atPortal(s);
-  assert.equal(s.unlockWorld(2).status,'opened');assert.equal(s.getSnapshot().coins,123);assert.equal(s.getSnapshot().inventory.items['journey.diamond'],50);
-  assert.equal(s.getSnapshot().mineralReservations['journey.diamond'].reserved,0);
+  assert.equal(s.unlockWorld(2).status,'opened');assert.equal(s.getSnapshot().coins,123);assert.equal(s.getSnapshot().inventory.items[ore],50);
+  assert.equal(s.getSnapshot().mineralReservations[ore].reserved,0);
   const paid=s.exportProgress();assert.equal(s.unlockWorld(2).status,'already-open');assert.deepEqual(s.exportProgress(),paid);
   const restored=GameSession.fromData(paid,content);assert.equal(restored.getSnapshot().worlds[1].open,true);
 });
@@ -71,27 +76,27 @@ test('travel between worlds only from a portal, only to open worlds, arriving at
 });
 test('world reservation protects required quantities, fills later shortfall, and surplus alone is sold',()=>{
   const s=new GameSession(content);s.reserveWorldMaterials(2);
-  const diamond=resourceById('journey.diamond');s.collected(Array.from({length:10},()=>({kind:diamond.kind})));assert.equal(s.getSnapshot().mineralReservations[diamond.itemId].reserved,10);
-  s.collected(Array.from({length:70},()=>({kind:diamond.kind})));assert.equal(s.getSnapshot().mineralReservations[diamond.itemId].sellable,50);
+  const need=worldRequirement(2).materials[0],ore=resourceById(need.itemId);s.collected(Array.from({length:need.count-1},()=>({kind:ore.kind})));assert.equal(s.getSnapshot().mineralReservations[ore.itemId].reserved,need.count-1);
+  s.collected(Array.from({length:51},()=>({kind:ore.kind})));assert.equal(s.getSnapshot().mineralReservations[ore.itemId].sellable,50);
   const sale=content.sales[0];s.updatePosition([sale.x,sale.y,sale.z],true);
-  assert.equal(s.getSnapshot().inventory.items[diamond.itemId],30);assert.equal(s.getSnapshot().coins,50*diamond.price);
-  s.reserveMineral(diamond.itemId,'none');assert.equal(s.getSnapshot().inventory.items[diamond.itemId],30);
-  s.updatePosition([sale.x,sale.y,sale.z],true);assert.equal(s.getSnapshot().inventory.items[diamond.itemId],30);
+  assert.equal(s.getSnapshot().inventory.items[ore.itemId],need.count);assert.equal(s.getSnapshot().coins,50*ore.price);
+  s.reserveMineral(ore.itemId,'none');assert.equal(s.getSnapshot().inventory.items[ore.itemId],need.count);
+  s.updatePosition([sale.x,sale.y,sale.z],true);assert.equal(s.getSnapshot().inventory.items[ore.itemId],need.count);
   assert.equal(s.sellAvailable().status,'sold');assert.equal(s.getSnapshot().inventory.totalCount,0);
 });
 test('manual protect-all survives world preparation, payment, and save restoration',()=>{
-  const data=prepared().exportProgress();data.inventory.items['journey.diamond']=80;
-  const s=GameSession.fromData(data,content);s.reserveMineral('journey.diamond','all');s.reserveWorldMaterials(2);assert.equal(s.getSnapshot().mineralReservations['journey.diamond'].reserved,80);
-  atPortal(s);s.unlockWorld(2);const restored=GameSession.fromData(s.exportProgress(),content);assert.equal(restored.getSnapshot().mineralReservations['journey.diamond'].reserved,50);
+  const need=worldRequirement(2).materials[0],data=prepared().exportProgress();data.inventory.items[need.itemId]=80;
+  const s=GameSession.fromData(data,content);s.reserveMineral(need.itemId,'all');s.reserveWorldMaterials(2);assert.equal(s.getSnapshot().mineralReservations[need.itemId].reserved,80);
+  atPortal(s);s.unlockWorld(2);const restored=GameSession.fromData(s.exportProgress(),content);assert.equal(restored.getSnapshot().mineralReservations[need.itemId].reserved,80-need.count);
 });
 test('reserving one mineral does not change other minerals and persists until its world is unlocked',()=>{
-  const data=prepared().exportProgress();data.inventory.items['journey.diamond']=80;
-  const s=GameSession.fromData(data,content);s.reserveMineral('journey.diamond','needed');
+  const need=worldRequirement(2).materials[0],data=prepared().exportProgress();data.inventory.items[need.itemId]=80;data.inventory.items['journey.coal']=5;
+  const s=GameSession.fromData(data,content);s.reserveMineral(need.itemId,'needed');
   const restored=GameSession.fromData(s.exportProgress(),content);
-  assert.equal(restored.getSnapshot().mineralReservations['journey.diamond'].reserved,30);
-  assert.equal(restored.getSnapshot().mineralReservations['journey.emerald'].reserved,0);
+  assert.equal(restored.getSnapshot().mineralReservations[need.itemId].reserved,need.count);
+  assert.equal(restored.getSnapshot().mineralReservations['journey.coal'].reserved,0);
   atPortal(restored);restored.unlockWorld(2);
-  assert.equal(restored.getSnapshot().mineralReservations['journey.diamond'].reserved,0);
+  assert.equal(restored.getSnapshot().mineralReservations[need.itemId].reserved,0);
 });
 test('exploration and return destinations are scoped to the current world',()=>{
   const s=prepared(3),data=s.exportProgress();data.worldProgress.openWorlds=[1,2,3];const live=GameSession.fromData(data,content),travels=commands(live);
@@ -111,9 +116,11 @@ test('three separate mines have 6 layers each, distinct resources and stable ind
 test('each entry material really occurs in its listed source layer and complete payment fits that world’s best bag',()=>{
   for(const w of WORLD_REQUIREMENTS.slice(1)){
     let volume=0;
-    for(const m of w.materials){const layer=JOURNEY_WORLDS[w.id-2].layers[m.layer],resource=resourceById(m.itemId);assert.ok(layer.ores.some(o=>o.kind===resource.kind));volume+=resource.volume*m.count;}
-    assert.ok(volume<JOURNEY_CAPACITIES[(w.id-1)*10-1]);
+    for(const m of w.materials){const layer=JOURNEY_WORLDS[m.world-1].layers[m.layer],resource=resourceById(m.itemId);assert.ok(m.world<w.id);assert.ok(layer.ores.some(o=>o.kind===resource.kind));volume+=resource.volume*m.count;}
+    assert.ok(volume<ECONOMY.bags[(w.id-1)*10-1].capacity);
   }
+  // World 3 asks for minerals of both earlier worlds.
+  assert.deepEqual([...new Set(worldRequirement(3).materials.map(m=>m.world))],[1,2]);
 });
 test('v11 mine holes keep their original saved coordinates after moving the later worlds behind spawn',()=>{
   const oldRegions=[
@@ -136,7 +143,7 @@ test('v11 mine holes keep their original saved coordinates after moving the late
   for(const z of [112,224])for(const x of [0,1])assert.equal(restored.cell([x,-10,z]),0);
 });
 test('the new map uses an explicit separate test save; legacy terrain is never silently reinterpreted',()=>{
-  assert.equal(saveNamespace({pathname:'/games/mining-surface-play/index.html',search:''}).name,'mining:test:journey-v1');
+  assert.equal(saveNamespace({pathname:'/games/mining-surface-play/index.html',search:''}).name,'mining:test:economy-v2');
   assert.throws(()=>compatibleHead({formatVersion:1,revision:1,savedAt:0,world:{generationVersion:9,seed:0,regionEncoding:1},regionCount:0},GAME_GENERATION),/不兼容/);
 });
 test('the testing unlock page opens worlds and layers, and the result survives a reload', () => {

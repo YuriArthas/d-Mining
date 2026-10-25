@@ -4,7 +4,8 @@ import { MiningFeedback, hitMaterial, pickupTier } from '../../src/game/runtime/
 import { HitEffects } from '../../src/game/presentation/HitEffects.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
 import { resourceByKind } from '../../src/game/content/resources.ts';
-import { JOURNEY_BACKPACKS } from '../../src/game/content/journeyResources.ts';
+import { shopBackpacks } from '../../src/game/content/shopCatalog.ts';
+const JOURNEY_BACKPACKS = shopBackpacks().slice(1);
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
 import { WORLD1_LAYERS as LAYERS } from './fixtures/world.mjs';
 

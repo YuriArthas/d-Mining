@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { KIND } from './fixtures/world.mjs';
-import { WORLD1 } from './fixtures/world.mjs';
+import { WORLD1, WORLD1_LAYERS } from './fixtures/world.mjs';
 import { greedyMesh, buildRegion } from '../../src/game/terrain/meshing.ts';
 import { CELL, RENDER_SIZE as CHUNK, regionOf, SparseWorld, sampleXYZ, affectedRegions, LIMITS, mergeRemoved, contains } from '../../src/game/terrain/SparseWorld.ts';
 
@@ -48,21 +48,22 @@ test('chunk boundaries never emit internal faces or geometry owned by neighbors'
 
 test('20M logical cells allocate no dense region data; sparse edits survive rebuilding',()=>{
  assert.equal((LIMITS.maxX-LIMITS.minX+1)*(LIMITS.maxY-LIMITS.minY+1)*(LIMITS.maxZ-LIMITS.minZ+1),20_000_000);
- const world=new SparseWorld(WORLD1),c=[0,-1001,0],coord=regionOf(c,16);
+ // Just under the floor of world 1's deepest rest room (air above it, rock in it).
+ const floor=WORLD1_LAYERS[6].from/2,world=new SparseWorld(WORLD1),c=[0,-floor-1,0],coord=regionOf(c,16);
  assert.equal(world.stats().editedRegions,0);assert.ok(world.cell(c));world.remove([c,c]);
  assert.equal(world.removed,1);assert.equal(world.stats().editBytes,4);assert.equal(world.cell(c),0);
  const snapshot=world.snapshot(coord,16);assert.equal(sampleXYZ(...c,new Map(snapshot),WORLD1),0);
  const a=buildRegion('render',coord,16,snapshot,WORLD1),b=buildRegion('render',coord,16,world.snapshot(coord,16),WORLD1);
  assert.deepEqual(a.mesh,b.mesh);assert.equal('cells' in a,false);
- assert.equal(world.cell([0,-1000,0]),0);assert.equal(world.cell([0,-2001,0]),0);
+ assert.equal(world.cell([0,-floor,0]),0);assert.equal(world.cell([0,-2001,0]),0);
 });
 test('sparse runs merge consecutive changes and full-air regions collapse to a marker',()=>{
  let runs=mergeRemoved(undefined,[7,3,5,4,7]);assert.deepEqual([...runs],[3,5,7,7]);
  runs=mergeRemoved(runs,[6]);assert.deepEqual([...runs],[3,7]);assert.ok(contains(runs,4));assert.equal(contains(runs,8),false);
  assert.equal(mergeRemoved(runs,Array.from({length:4096},(_,i)=>i)),null);
- // A whole region of ordinary rock 130-160 m down.
- const w=new SparseWorld(WORLD1),cells=[];for(let z=0;z<16;z++)for(let y=-80;y<-64;y++)for(let x=0;x<16;x++)cells.push([x,y,z]);w.remove(cells);
- assert.equal(w.stats().fullAirRegions,1);assert.equal(w.stats().editBytes,0);assert.equal(w.cell([5,-72,5]),0);
+ // A whole region of rock 354-384 m down, between world 1's rest rooms at 260 and 420 m.
+ const w=new SparseWorld(WORLD1),cells=[];for(let z=0;z<16;z++)for(let y=-192;y<-176;y++)for(let x=0;x<16;x++)cells.push([x,y,z]);w.remove(cells);
+ assert.equal(w.stats().fullAirRegions,1);assert.equal(w.stats().editBytes,0);assert.equal(w.cell([5,-184,5]),0);
 });
 test('independent region boundaries invalidate only face neighbors; staged edits never mutate source',()=>{
  assert.equal(affectedRegions([3,-7,4],16).length,1);assert.equal(affectedRegions([0,-16,0],16).length,4);

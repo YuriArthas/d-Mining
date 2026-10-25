@@ -3,14 +3,12 @@ import assert from 'node:assert/strict';
 import { PetCatalog } from '../../src/game/logic/pets/PetCatalog.ts';
 import { PetInventory } from '../../src/game/logic/pets/PetInventory.ts';
 import { PetEquipment } from '../../src/game/logic/pets/PetEquipment.ts';
-import { calculateMiningStats, calculatePetBonus, drawEgg, selectBestPets } from '../../src/game/logic/pets/petRules.ts';
+import { calculatePetBonus, drawEgg, petBonusIn, selectBestPets } from '../../src/game/logic/pets/petRules.ts';
 import { PetService } from '../../src/game/application/PetService.ts';
-import { MiningAttributes } from '../../src/game/application/MiningAttributes.ts';
 import { PetCommands } from '../../src/game/application/PetCommands.ts';
 import { PetUiAdapter } from '../../src/game/application/PetUiAdapter.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
 import { Wallet } from '../../src/game/logic/Wallet.ts';
-import { Pickaxe } from '../../src/game/logic/Pickaxe.ts';
 import { PET_CONTENT } from './fixtures/pets.ts';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
 const LIVE_SESSION_CONTENT = GAME_CONTENT.session;
@@ -22,7 +20,7 @@ function goToEgg(session,eggId='meadow-egg') {
 }
 const pet = (id, speciesId = 'moss-slime') => ({ id, speciesId, level: 1 });
 const setup = (coins = 100, overrides = {}) => {
-  const wallet = new Wallet(coins); let serial = 0;
+  const wallet = new Wallet({ gold: coins }); let serial = 0;
   const service = new PetService({ content: PET_CONTENT, wallet, random: () => 0, createPetId: () => `pet-${++serial}`, ...overrides });
   return { wallet, service };
 };
@@ -40,7 +38,9 @@ test('pet catalog validates references and owns immutable copies of content', ()
     c => { c.pets.push(c.pets[0]); },
     c => { c.equipSlots = 0; },
     c => { c.eggs[0].price = -1; },
-    c => { c.pets[0].powerBonusBps = Number.MAX_SAFE_INTEGER; },
+    c => { c.pets[0].bonusPct = -1; },
+    c => { c.pets[0].currency = 'coin'; },
+    c => { c.eggs[0].currency = undefined; },
   ]) { const c = structuredClone(PET_CONTENT); mutate(c); assert.throws(() => new PetCatalog(c)); }
 });
 
@@ -90,7 +90,7 @@ test('hatch settles once per explicit call, permits duplicates and does not auto
   const first = service.hatch('meadow-egg'), second = service.hatch('meadow-egg');
   assert.equal(first.status, 'hatched'); assert.equal(second.status, 'hatched');
   assert.notEqual(first.pet.id, second.pet.id); assert.equal(first.pet.speciesId, second.pet.speciesId);
-  assert.equal(wallet.getBalance(), 0); assert.equal(service.getInventory().count, 2);
+  assert.equal(wallet.getBalance('gold'), 0); assert.equal(service.getInventory().count, 2);
   assert.deepEqual(service.getEquipment().slots, [null, null, null]);
   assert.equal(service.hatch('meadow-egg').status, 'insufficient-coins');
 });
@@ -100,14 +100,14 @@ test('insufficient funds and unknown eggs do not consume randomness; bad IDs do 
   const { service, wallet } = setup(9, { random: () => { draws++; return 0; } });
   assert.equal(service.hatch('missing').status, 'unknown-egg');
   assert.equal(service.hatch('meadow-egg').status, 'insufficient-coins');
-  assert.equal(draws, 0); assert.equal(wallet.getBalance(), 9);
+  assert.equal(draws, 0); assert.equal(wallet.getBalance('gold'), 9);
   for (const createPetId of [() => '', () => 'same']) {
     const s = setup(20, { createPetId }); s.service.grant([pet('same')]);
     assert.throws(() => s.service.hatch('meadow-egg'));
-    assert.equal(s.wallet.getBalance(), 20); assert.equal(s.service.getInventory().count, 1);
+    assert.equal(s.wallet.getBalance('gold'), 20); assert.equal(s.service.getInventory().count, 1);
   }
   const invalid = setup(20, { random: () => 1 });
-  assert.throws(() => invalid.service.hatch('meadow-egg')); assert.equal(invalid.wallet.getBalance(), 20);
+  assert.throws(() => invalid.service.hatch('meadow-egg')); assert.equal(invalid.wallet.getBalance('gold'), 20);
 });
 
 test('debit refusal is respected and does not grant a pet', () => {
@@ -121,10 +121,10 @@ test('ownership rules stay at service boundary; full equipment never prevents ea
   for (const id of ['a', 'b', 'c']) assert.equal(service.equip(id).status, 'equipped');
   assert.equal(service.equip('d').status, 'full');
   service.grant([pet('earned')]); assert.equal(service.hatch('meadow-egg').status, 'hatched');
-  assert.equal(service.getInventory().count, 6); assert.equal(service.getBonus().powerBonusBps, 3000);
+  assert.equal(service.getInventory().count, 6); assert.deepEqual(service.getBonus(), { gold: 30, tech: 0, star: 0, mining: 30 });
   assert.equal(service.remove(['a', 'missing']), false); assert.equal(service.getEquipment().slots[0], 'a');
   assert.equal(service.remove(['a', 'b']), true); assert.deepEqual(service.getEquipment().slots, [null, null, 'c']);
-  assert.equal(service.getBonus().powerBonusBps, 1000);
+  assert.equal(service.getBonus().gold, 10);
   const before = service.getInventory();
   assert.throws(() => service.grant([pet('valid'), pet('bad', 'unknown')])); assert.equal(service.getInventory(), before);
 });
@@ -132,27 +132,28 @@ test('ownership rules stay at service boundary; full equipment never prevents ea
 test('best equipment is deterministic, including ties, duplicates and small inventories', () => {
   const catalog = new PetCatalog(PET_CONTENT), read = id => catalog.pet(id);
   const owned = [pet('b'), pet('a'), pet('x', 'moon-dragon'), pet('y', 'amber-fox')];
-  assert.deepEqual(selectBestPets(owned, read, 3), ['x', 'y', 'a']);
-  assert.deepEqual(selectBestPets([...owned].reverse(), read, 3), ['x', 'y', 'a']);
+  assert.deepEqual(selectBestPets(owned, read, 3, 'gold'), ['x', 'y', 'a']);
+  assert.deepEqual(selectBestPets([...owned].reverse(), read, 3, 'gold'), ['x', 'y', 'a']);
+  // In another currency's world that currency's pets come first, however strong the others are; the slots left go
+  // to the strongest miners (every pet mines faster everywhere).
+  const mixed = id => id === 'amber-fox' ? { ...catalog.pet(id), currency: 'tech' } : id === 'moon-dragon' ? { ...catalog.pet(id), miningPct: 50 } : catalog.pet(id);
+  assert.deepEqual(selectBestPets(owned, mixed, 2, 'tech'), ['y', 'x']);
+  assert.deepEqual(selectBestPets(owned, mixed, 3, 'star'), ['x', 'a', 'b']);
   const { service } = setup(); service.grant([pet('a')]); service.equipBest();
   assert.deepEqual(service.getEquipment().slots, ['a', null, null]); assert.equal(service.equipBest(), false);
   service.remove(['a']); assert.equal(service.equipBest(), false);
 });
 
-test('bonuses sum before rounding once; base stats and speed stay unchanged', () => {
-  const base = Object.freeze({ power: 15, speed: 4 });
-  assert.deepEqual(calculateMiningStats(base, { powerBonusBps: 3000 }), { power: 19, speed: 4 });
-  assert.equal(base.power, 15);
-  assert.equal(calculateMiningStats({ power: Number.MAX_SAFE_INTEGER, speed: 1 }, { powerBonusBps: 0 }).power, Number.MAX_SAFE_INTEGER);
-  assert.throws(() => calculateMiningStats({ power: Number.MAX_SAFE_INTEGER, speed: 1 }, { powerBonusBps: 1 }));
-  const catalog = new PetCatalog(PET_CONTENT);
-  assert.equal(calculatePetBonus([pet('a'), pet('b')], id => catalog.pet(id)).powerBonusBps, 2000);
+test('team bonuses add up per currency; a pet counts only in its own currency', () => {
+  const catalog = new PetCatalog(PET_CONTENT), read = id => id === 'moon-dragon' ? { ...catalog.pet(id), currency: 'star' } : catalog.pet(id);
+  assert.deepEqual(calculatePetBonus([pet('a'), pet('b'), pet('c', 'moon-dragon')], read), { gold: 20, tech: 0, star: 75, mining: 30 });
+  assert.equal(petBonusIn(read('moon-dragon'), 'star'), 75); assert.equal(petBonusIn(read('moon-dragon'), 'gold'), 0);
 });
 
 test('restoring pets validates the whole candidate before replacing live state', () => {
   const { service } = setup(); service.grant([pet('a'), pet('b', 'moon-dragon')]); service.equip('b');
   const saved = service.exportData(), restored = setup().service; restored.restoreData(saved);
-  assert.deepEqual(restored.exportData(), saved); assert.equal(restored.getBonus().powerBonusBps, 7500);
+  assert.deepEqual(restored.exportData(), saved); assert.equal(restored.getBonus().gold, 75);
   for (const mutate of [
     d => { d.version = 2; }, d => { d.inventory.pets.push(d.inventory.pets[0]); },
     d => { d.inventory.pets[0].speciesId = 'missing'; }, d => { d.inventory.pets[0].level = 2; },
@@ -165,40 +166,45 @@ test('restoring pets validates the whole candidate before replacing live state',
 });
 
 test('UI adapter publishes coherent snapshots, filters unrelated frames, releases subscriptions', () => {
-  const { service, wallet } = setup(30), pickaxe = new Pickaxe(), listeners = new Set();
-  let emissions = 0;
+  const { service, wallet } = setup(30), listeners = new Set();
+  let emissions = 0, currency = 'gold';
   const publish = () => { for (const listener of listeners) listener(); };
-  const attributes = new MiningAttributes(pickaxe.getSnapshot, service.getBonus);
-  const adapter = new PetUiAdapter(service, { effectiveStats: attributes.getSnapshot, balance: () => wallet.getBalance(), baseStats: pickaxe.getSnapshot, commands: new PetCommands(service, publish), subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener); } });
-  const unsubscribe = adapter.subscribe(() => { emissions++; assert.equal(adapter.getSnapshot().coins, wallet.getBalance()); });
+  const adapter = new PetUiAdapter(service, { balances: () => wallet.getBalances(), currency: () => currency, commands: new PetCommands(service, publish), subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener); } });
+  const unsubscribe = adapter.subscribe(() => { emissions++; assert.equal(adapter.getSnapshot().balances.gold, wallet.getBalance('gold')); });
   const first = adapter.getSnapshot(); publish(); assert.equal(emissions, 0); assert.equal(adapter.getSnapshot(), first);
   const result = adapter.hatch('meadow-egg'); assert.equal(emissions, 1);
-  assert.equal(adapter.getSnapshot().pets.length, 1); assert.equal(adapter.getSnapshot().coins, 20);
-  adapter.equip(result.pet.id); assert.equal(attributes.getSnapshot().power, 11); assert.equal(emissions, 2);
+  assert.equal(adapter.getSnapshot().pets.length, 1); assert.equal(adapter.getSnapshot().balances.gold, 20);
+  adapter.equip(result.pet.id); assert.equal(adapter.getSnapshot().bonus.gold, 10); assert.equal(emissions, 2);
   adapter.equip(result.pet.id); assert.equal(emissions, 2);
-  const cards = adapter.getSnapshot().pets; wallet.debit(20); publish();
+  const cards = adapter.getSnapshot().pets; wallet.debit('gold', 20); publish();
   assert.equal(adapter.getSnapshot().eggs[0].canAfford, false); assert.equal(adapter.getSnapshot().pets, cards);
-  wallet.credit(10); publish(); assert.equal(adapter.getSnapshot().eggs[0].canAfford, true);
-  pickaxe.setLevel(2); publish(); assert.equal(attributes.getSnapshot().power, 16);
-  adapter.unequipAll(); assert.equal(attributes.getSnapshot().power, 15);
+  wallet.credit('tech', 10); publish(); assert.equal(adapter.getSnapshot().eggs[0].canAfford, false, 'other currencies do not buy a gold egg');
+  wallet.credit('gold', 10); publish(); assert.equal(adapter.getSnapshot().eggs[0].canAfford, true);
+  currency = 'tech'; publish(); assert.equal(adapter.getSnapshot().currency, 'tech'); assert.equal(emissions, 6);
+  adapter.unequipAll(); assert.equal(adapter.getSnapshot().bonus.gold, 0);
   unsubscribe(); assert.equal(listeners.size, 0);
 });
 
-test('session uses pet power for real combat without resetting damage or cooldown', () => {
+test('equipped pets raise what ore sells for in their currency and mine faster in every world', () => {
   let now = 0, serial = 0;
   const session = new GameSession(SESSION_CONTENT, 50, () => now, { random: () => 0, createPetId: () => `p${++serial}` });
   session.attach({ cell: () => 65, pending: () => false, mine: () => true, cancelMining() {} });
-  session.collected(Array.from({ length: 30 }, () => ({ kind: 64 })));
-  const sale = SESSION_CONTENT.sales[0]; session.updatePosition([sale.x, sale.y, sale.z], true); session.resetPosition();
-  const target = [0, -1, 0]; assert.equal(session.hit(target).damage, 10);
-  const cooldown = session.combatDebug().nextAttackAt;
   goToEgg(session);
-  const acquired = session.pets.hatch('meadow-egg'); assert.equal(acquired.status, 'hatched');
-  session.pets.equip(acquired.pet.id);
-  assert.equal(session.combatDebug().nextAttackAt, cooldown); assert.equal(session.hit(target).status, 'cooldown');
-  assert.equal(session.getSnapshot().pickaxe.power, 10); assert.equal(session.getSnapshot().miningStats.power, 11);
-  now = 1; assert.equal(session.hit([1, -1, 0]).damage, 11);
-  session.pets.unequipAll(); now = 2; assert.equal(session.hit([2, -1, 0]).damage, 10);
+  const acquired = session.pets.hatch('meadow-egg'); assert.equal(acquired.status, 'hatched'); assert.equal(session.getSnapshot().coins, 190);
+  session.pets.equip(acquired.pet.id); assert.equal(session.getSnapshot().saleMultiplier, 1.1);
+  // +10 % mining: below the speed cap it is swing speed; the damage per hit stays the pickaxe's.
+  assert.equal(session.getSnapshot().miningStats.speed, 2.2); assert.equal(session.getSnapshot().miningStats.power, session.getSnapshot().pickaxe.power);
+  session.resetPosition(); assert.equal(session.hit([0, -1, 0]).damage, session.getSnapshot().pickaxe.power);
+  assert.ok(Math.abs(session.combatDebug().nextAttackAt - 1 / 2.2) < 1e-9);
+  session.collected(Array.from({ length: 20 }, () => ({ kind: 64 })));
+  assert.deepEqual(session.getSnapshot().sale, { status: 'quoted', count: 20, coins: 22 });
+  const sale = SESSION_CONTENT.sales[0]; session.updatePosition([sale.x, sale.y, sale.z], true);
+  assert.equal(session.getSnapshot().coins, 212);
+  session.pets.unequipAll(); assert.equal(session.getSnapshot().saleMultiplier, 1); assert.equal(session.getSnapshot().miningStats.speed, 2);
+  // At the speed cap the pets' mining bonus becomes damage.
+  const capped = session.exportProgress(); capped.pickaxe.level = capped.equipment.toolLevel = 12; capped.pets.equipment.slots = [acquired.pet.id, null, null];
+  const strong = GameSession.fromData(capped, SESSION_CONTENT).getSnapshot();
+  assert.equal(strong.miningStats.speed, 8); assert.equal(strong.miningStats.power, Math.round(strong.pickaxe.power * 1.1));
 });
 
 test('egg proximity derives from display configuration and clears on leaving or travel', () => {

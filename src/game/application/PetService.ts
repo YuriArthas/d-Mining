@@ -4,9 +4,10 @@ import { PetEquipment } from '../logic/pets/PetEquipment.ts';
 import { calculatePetBonus, drawEgg, selectBestPets } from '../logic/pets/petRules.ts';
 import { petId, petRecord, readPet, type EquipResult, type PetBonus, type PetContent, type PetInstance, type PetStateDataV1 } from '../logic/pets/types.ts';
 import type { Wallet } from '../logic/Wallet.ts';
+import type { CurrencyId } from '../content/economy.ts';
 
 export type HatchResult =
-  | Readonly<{ status: 'hatched'; eggId: string; pet: PetInstance; spent: number }>
+  | Readonly<{ status: 'hatched'; eggId: string; pet: PetInstance; spent: number; currency: CurrencyId }>
   | Readonly<{ status: 'unknown-egg' | 'insufficient-coins' | 'locked' | 'unavailable' }>;
 export type EquipOwnedResult = EquipResult | Readonly<{ status: 'not-owned' }>;
 type PetServiceDependencies = {
@@ -15,6 +16,10 @@ type PetServiceDependencies = {
   random: () => number;
   createPetId: () => string;
   hasDestination?: (id: string) => boolean;
+  /** Whether a world is open (an egg of a later world waits for it). */
+  worldOpen?: (world: number) => boolean;
+  /** The current world's currency: "equip best" picks for it. */
+  currency?: () => CurrencyId;
   lucky?: () => boolean;
 };
 
@@ -24,7 +29,7 @@ export class PetService {
   private inventory = new PetInventory();
   private equipment: PetEquipment;
   private readonly deps: PetServiceDependencies;
-  private bonus: PetBonus = Object.freeze({ powerBonusBps: 0 });
+  private bonus: PetBonus = Object.freeze({ gold: 0, tech: 0, star: 0, mining: 0 });
 
   constructor(deps: PetServiceDependencies) {
     this.deps = { ...deps };
@@ -36,7 +41,8 @@ export class PetService {
   getBonus = () => this.bonus;
   isUnlocked = (eggId: string) => {
     const egg = this.catalog.egg(eggId);
-    return !!egg && (!egg.requiredDestination || this.deps.hasDestination?.(egg.requiredDestination) === true);
+    return !!egg && (!egg.requiredWorld || egg.requiredWorld === 1 || this.deps.worldOpen?.(egg.requiredWorld) === true)
+      && (!egg.requiredDestination || this.deps.hasDestination?.(egg.requiredDestination) === true);
   };
   effectiveEgg = (eggId: string) => {
     const egg = this.catalog.egg(eggId);
@@ -52,14 +58,14 @@ export class PetService {
     const egg = this.effectiveEgg(eggId);
     if (!egg) return { status: 'unknown-egg' };
     if (!this.isUnlocked(eggId)) return { status: 'locked' };
-    if (this.deps.wallet.getBalance() < egg.price) return { status: 'insufficient-coins' };
+    if (this.deps.wallet.getBalance(egg.currency) < egg.price) return { status: 'insufficient-coins' };
     const speciesId = drawEgg(egg, this.deps.random());
     const id = petId(this.deps.createPetId());
     if (this.inventory.has(id)) throw Error(`重复宠物实例: ${id}`);
     const pet = readPet({ id, speciesId, level: 1 });
-    if (!this.deps.wallet.debit(egg.price)) return { status: 'insufficient-coins' };
+    if (!this.deps.wallet.debit(egg.currency, egg.price)) return { status: 'insufficient-coins' };
     this.inventory.add([pet]);
-    return Object.freeze({ status: 'hatched', eggId, pet, spent: egg.price });
+    return Object.freeze({ status: 'hatched', eggId, pet, spent: egg.price, currency: egg.currency });
   }
   grant(pets: readonly PetInstance[]): void {
     for (const pet of pets) this.catalog.pet(pet.speciesId);
@@ -77,7 +83,7 @@ export class PetService {
     return changed;
   }
   equipBest(): boolean {
-    const ids = selectBestPets(this.getInventory().pets, id => this.catalog.pet(id), this.catalog.content.equipSlots);
+    const ids = selectBestPets(this.getInventory().pets, id => this.catalog.pet(id), this.catalog.content.equipSlots, this.deps.currency?.() ?? 'gold');
     const changed = this.equipment.replace(Array.from({ length: this.catalog.content.equipSlots }, (_, index) => ids[index] ?? null));
     if (changed) this.refreshBonus();
     return changed;

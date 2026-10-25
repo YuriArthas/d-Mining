@@ -15,7 +15,6 @@ type Gear = Readonly<{ at: readonly [number, number, number]; radius: number; te
 export const GEAR_HALL = {
   id: 'world2.2',
   asset: 'gear-hall',
-  depth: 800,
   size: [40, 20, 40],
   pit: 8,
   spawn: [0, 0, 12],

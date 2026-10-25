@@ -5,22 +5,23 @@ import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
 import { CAPSULE_MACHINE_ZONE } from '../../src/game/content/feedbackFacilities.ts';
 import { createInviteCode } from '../../src/game/logic/InviteCode.ts';
 import { pickaxeStats } from '../../src/game/logic/Pickaxe.ts';
+import { ECONOMY } from '../../src/game/content/economy.ts';
 const SESSION_CONTENT = GAME_CONTENT.session;
 
 const at=(s,z)=>s.updatePosition([z.x,z.y,z.z],true);
 const meadow=SESSION_CONTENT.eggStations.find(s=>s.eggId==='meadow-egg').zone;
 function fixture(roll=0,change=()=>{}){
   const base=GameSession.createNew(SESSION_CONTENT).exportProgress();
-  base.wallet.coins=10000;base.rewards.balance=10;change(base);
+  base.wallet.balances.gold=10000;base.rewards.balance=10;change(base);
   let ids=0;
   const s=new GameSession(SESSION_CONTENT,50,undefined,{random:()=>.5,createPetId:()=>`feedback-${++ids}`,rewards:{random:()=>roll}},base);
   return s;
 }
 test('depth alone unlocks travel and eggs; old depth fills missing unlocks while preserving prior grants',()=>{
-  const s=fixture();s.updatePosition([90,-400,90],false);
+  const s=fixture();s.updatePosition([90,-100,90],false);
   assert.equal(s.getSnapshot().destinations[0].unlocked,true);
   assert.equal(s.pets.getSnapshot().eggs.find(e=>e.id==='pebble-egg').unlocked,true);
-  const old=s.exportProgress();old.worldExploration[1]={...old.worldExploration[1],maxDepth:800,unlockedDestinationIds:[]};
+  const old=s.exportProgress();old.worldExploration[1]={...old.worldExploration[1],maxDepth:200,unlockedDestinationIds:[]};
   const restored=GameSession.fromData(old,SESSION_CONTENT);
   assert.deepEqual(restored.getSnapshot().destinations.filter(d=>d.unlocked).map(d=>d.id),['old_mine','fungal']);
   // Saves from before the leaderboard was retired still load, and it is not written back.
@@ -31,7 +32,7 @@ test('depth alone unlocks travel and eggs; old depth fills missing unlocks while
 test('capsule coins use historical stage and one debit survives reload without re-awarding',()=>{
   const s=fixture();s.updatePosition([80,-800,80],false);at(s,CAPSULE_MACHINE_ZONE);
   const before=s.getSnapshot(),result=s.spinCapsule();assert.equal(result.status,'spun');
-  assert.equal(result.coinReward,6000);assert.equal(s.getSnapshot().coins,before.coins+6000);
+  const prize=ECONOMY.layers[5].capsuleCoins;assert.equal(result.coinReward,prize);assert.equal(s.getSnapshot().coins,before.coins+prize);
   assert.equal(s.getSnapshot().rewards.balance,9);
   const restored=GameSession.fromData(s.exportProgress(),SESSION_CONTENT);
   assert.equal(restored.getSnapshot().coins,s.getSnapshot().coins);
@@ -45,7 +46,7 @@ test('permanent mining applies real speed and overflow power, duplicates only gr
   assert.equal(s.spinCapsule().duplicate,true);assert.equal(s.getSnapshot().miningStats.speed,3);
   const save=s.exportProgress();save.pickaxe.level=16;delete save.equipment; /* Legacy active-gear fixture. */
   const high=GameSession.fromData(save,SESSION_CONTENT).getSnapshot().miningStats;
-  assert.equal(high.speed,16);assert.equal(high.power,pickaxeStats(16,1.5).power);assert.ok(high.power>pickaxeStats(16).power);
+  assert.equal(high.speed,8);assert.equal(high.power,pickaxeStats(16,1.5).power);assert.ok(high.power>pickaxeStats(16).power);
 });
 test('lucky displayed probability is used by actual egg draw and expires; remote buying rejects',()=>{
   const s=fixture(0,p=>{p.rewards.timed.luck=1;});
@@ -67,7 +68,7 @@ test('teleporting from a mine never bypasses a locked layer; movement reward act
   const s=fixture(.81,p=>{p.rewards.timed.speed=2;});
   assert.equal(s.getMovementMultiplier(),2);s.advanceOnline(2);assert.equal(s.getMovementMultiplier(),1);
   at(s,CAPSULE_MACHINE_ZONE);assert.equal(s.spinCapsule().reward,'sell');
-  s.updatePosition([90,-400,90],false);s.updatePosition([0,-20,0],false);
+  s.updatePosition([90,-100,90],false);s.updatePosition([0,-20,0],false);
   const calls=[];s.attach({cell:()=>64,pending:()=>false,mine:()=>true,cancelMining:()=>{},travelTo:p=>calls.push(p)});
   assert.equal(s.travelTo('fungal'),'locked');assert.equal(s.travelTo('old_mine'),'travelling');assert.equal(calls.length,1);
 });
@@ -87,7 +88,7 @@ test('failed copy awards nothing; successful platform copies share one reward; i
 test('the double-sale boost doubles the quote and the coins of a sale while it runs, and only then',()=>{
   const sell=SESSION_CONTENT.sales[0];
   const sale=boost=>{
-    const s=fixture(0,p=>{p.wallet.coins=0;p.rewards.timed.sell=boost;});
+    const s=fixture(0,p=>{p.wallet.balances.gold=0;p.rewards.timed.sell=boost;});
     s.collected(Array.from({length:4},()=>({kind:64})));
     const quoted=s.getSnapshot().sale;at(s,sell);
     return {quoted:quoted.coins,coins:s.getSnapshot().coins};

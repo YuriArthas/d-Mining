@@ -1,7 +1,9 @@
 import {ROOM_LAYOUT,type RoomLayout} from './roomLayout.ts';
 import { resourceByKind } from './resources.ts';
 import { themeById } from './themes.ts';
-export type Layer = Readonly<{ id: string; name: string; from: number; theme: string; scene?:string; base: number; deepKind?: number; ores: readonly Readonly<{kind:number;weight:number}>[]; shop: boolean; room?:RoomLayout }>;
+/** `deepAt`: metres below `from` where the rock turns dense (`deepKind`); `oreChance`: the share of cells that are ore. */
+export type Layer = Readonly<{ id: string; name: string; from: number; theme: string; scene?:string; base: number; deepKind?: number; deepAt?: number | null;
+  oreChance: number; ores: readonly Readonly<{kind:number;weight:number}>[]; shop: boolean; room?:RoomLayout }>;
 export const WORLD_DEPTH = 4000;
 /** The ten layer looks the worlds are built from: name, theme and rest-room scene. Each world picks seven
  *  (surface plus six rest layers) and gives them their own depths, blocks and ores (journeyWorlds.ts). */
@@ -43,7 +45,7 @@ export function validateLayers(layers: readonly Layer[]) {
     bases.add(l.base);
     const kinds=new Set([l.base]); let sum=0;
     for(const ore of l.ores) { if(resourceByKind(ore.kind).base)throw new Error(`矿物池不能包含主题方块: ${l.id}`); if(kinds.has(ore.kind)||!Number.isFinite(ore.weight)||ore.weight<=0)throw new Error(`无效矿物分布 ${l.id}`); kinds.add(ore.kind);sum+=ore.weight; }
-    if(!Number.isFinite(sum))throw new Error(`矿物权重总和无效 ${l.id}`);
+    if(!Number.isFinite(sum)||!(l.oreChance>=0&&l.oreChance<1))throw new Error(`矿物权重或概率无效 ${l.id}`);
   }
   if(!layers.length)throw new Error('楼层配置为空');
 }

@@ -25,12 +25,12 @@ test('one translated and rotated facility descriptor aligns placement, collider,
 });
 // A kit room (the crystal cave) follows changed dimensions; authored halls keep their own fixed size.
 test('changed depth, theme and room dimensions agree across physics generation, view and destination',()=>{
- const layers=LAYERS.map(l=>l.id==='crystal'?{...l,scene:'crystal-station-v1',from:1300,theme:'frozen_cave',room:{centerX:0,centerZ:0,widthCells:24,depthCells:22,heightCells:12}}:l);
+ const layers=LAYERS.map(l=>l.id==='crystal'?{...l,scene:'crystal-station-v1',from:340,theme:'frozen_cave',room:{centerX:0,centerZ:0,widthCells:24,depthCells:22,heightCells:12}}:l);
  const room=roomsFor(layers).find(r=>r.id==='crystal');
  const generation={...generationAtZ(GENERATION,0),layers},world=new SparseWorld(generation),workerWorld=new SparseWorld(structuredClone(generation));
- for(const cell of [[11,-650,0],[11,-639,0],[12,-650,0],[11,-638,0],[11,-651,0]])assert.equal(world.cell(cell),workerWorld.cell(cell));
- assert.equal(world.cell([11,-650,0]),0);assert.equal(world.cell([11,-651,0]),7);assert.notEqual(world.cell([12,-650,0]),0);
- assert.equal(room.spawn[1],-1299.9);assert.ok(Math.abs(room.sell.x+14.4)<1e-9);
+ for(const cell of [[11,-170,0],[11,-159,0],[12,-170,0],[11,-158,0],[11,-171,0]])assert.equal(world.cell(cell),workerWorld.cell(cell));
+ assert.equal(world.cell([11,-170,0]),0);assert.equal(world.cell([11,-171,0]),7);assert.notEqual(world.cell([12,-170,0]),0);
+ assert.equal(room.spawn[1],-339.9);assert.ok(Math.abs(room.sell.x+14.4)<1e-9);
  const plan=roomPlan(room);
  assert.ok(plan.authored.instances.some(p=>!p.fixed&&p.at[0]*plan.authored.scale[0]+plan.authored.origin[0]>20));
  assert.deepEqual(plan.authored.scale,[1.2,1.2,1.1]);

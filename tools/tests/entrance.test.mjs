@@ -27,14 +27,15 @@ test('surface excavation and every rest-room floor retain the same 64 mineable c
  for(const r of ROOMS){assert.equal(r.x,0);assert.equal(r.z,0);assert.equal(inEntrance(Math.floor(r.spawn[0]/2),Math.floor(r.spawn[2]/2)),false);}
 });
 test('one-cell floor protection allows sideways excavation immediately below it',()=>{
- const w=new SparseWorld(WORLD1);
- for(const y of [-1,-201,-401])for(const x of [-5,4]){
+ // The surface floor and the floors of world 1's first two rest rooms.
+ const w=new SparseWorld(WORLD1),[a,b]=WORLD1_LAYERS.slice(1,3).map(l=>-l.from/2-1);
+ for(const y of [-1,a,b])for(const x of [-5,4]){
   const floor=[x,y,0],below=[x,y-1,0];assert.equal(w.canMine(floor),false);assert.equal(w.canMine(below),true);
   assert.deepEqual(w.remove([floor,below]),[below]);assert.equal(w.cell(floor),PROTECTED_FLOOR);assert.equal(w.cell(below),0);
   for(const size of [8,16]){const staged=w.snapshot(regionOf(floor,size),size,[floor]);assert.equal(sampleXYZ(...floor,new Map(staged),WORLD1),PROTECTED_FLOOR);}
  }
  // Room floors do not introduce an invisible full-width barrier outside the room.
- assert.ok(w.canMine([30,-201,30]));assert.ok(w.canMine([30,-401,30]));
+ assert.ok(w.canMine([30,a,30]));assert.ok(w.canMine([30,b,30]));
 });
 test('protected floor is not a combat resource and consumes no HP, cooldown or capacity',()=>{
  const w=new SparseWorld(WORLD1),s=new GameSession(SESSION_CONTENT);

@@ -7,12 +7,10 @@ export type ProgressDataV1 = {
   reservations?: import('../logic/MineralReservation.ts').ReservationData;
   worldExploration?: Record<string, ProgressDataV1['exploration']>;
   rewards?: import('../logic/Rewards.ts').RewardData;
-  /** The retired surface leaderboard (saves before 2026-10-23): still accepted, ignored. */
-  challengeBoard?: unknown;
   onboarding?: import('../logic/Onboarding.ts').OnboardingData;
   rebirth?: import('../logic/Rebirth.ts').RebirthData;
-  version: 1;
-  wallet: { version: 1; coins: number };
+  version: 2;
+  wallet: import('../logic/Wallet.ts').WalletData;
   inventory: InventoryDataV1;
   pickaxe: { version: 1; level: number };
   pets: PetStateDataV1;

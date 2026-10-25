@@ -2,8 +2,7 @@
 // a cute face that says which animal it is, and sparkles for the higher tiers. Logic never imports this.
 import type { PetRarity } from '../logic/pets/types.ts';
 import { petAppearance } from './petAppearance.ts';
-import { PET_CONTENT } from './pets.ts';
-import { EGG_STAGES } from './progression.ts';
+import { EGG_DEFINITIONS } from './pets.ts';
 
 export const PET_FACES = ['slime', 'mole', 'rabbit', 'fox', 'cat', 'owl', 'bird', 'phoenix', 'bug', 'bee', 'butterfly', 'deer',
   'bear', 'turtle', 'whale', 'fish', 'crab', 'frog', 'lion', 'bull', 'bat', 'lizard', 'beast', 'dragon'] as const;
@@ -48,18 +47,19 @@ const DEFAULT_THEME = { pattern: 'stone', sparkle: 'sparkle', tint: '#fff3d6' } 
 
 const RARITY_ORDER: Readonly<Record<PetRarity, number>> = { common: 0, rare: 1, epic: 2, legendary: 3 };
 const SIZE: Readonly<Record<PetRarity, number>> = { common: 0.7, rare: 0.76, epic: 0.84, legendary: 0.95 };
-/** Early eggs keep sparkles for legendaries; mid eggs share them from epic; the last eggs from rare. */
-export function sparkleFrom(stage: number): PetRarity { return stage <= 4 ? 'legendary' : stage <= 7 ? 'epic' : 'rare'; }
+/** Early eggs keep sparkles for legendaries; mid eggs share them from epic; the last eggs from rare. `stage` is
+ *  the egg's layer across the three worlds (0-20). */
+export function sparkleFrom(stage: number): PetRarity { return stage <= 4 ? 'legendary' : stage <= 11 ? 'epic' : 'rare'; }
 
-const EGG_OF = new Map(PET_CONTENT.eggs.flatMap(egg => egg.outcomes.map(o => [o.speciesId, egg.id] as const)));
-const RARITY_OF = new Map(PET_CONTENT.pets.map(p => [p.id, p.rarity] as const));
+const EGG_OF = new Map(EGG_DEFINITIONS.flatMap(egg => egg.pets.map(([id]) => [id, egg] as const)));
+const RARITY_OF = new Map(EGG_DEFINITIONS.flatMap(egg => egg.pets.map(([id, , rarity]) => [id, rarity] as const)));
 const looks = new Map<string, PetLook>();
 
 export function petLook(speciesId: string, rarityHint?: PetRarity): PetLook {
   const cached = looks.get(speciesId);
   if (cached) return cached;
-  const appearance = petAppearance(speciesId), eggId = EGG_OF.get(speciesId) ?? null;
-  const theme = (eggId && EGG_THEMES[eggId]) || DEFAULT_THEME, stage = eggId ? EGG_STAGES[eggId]?.[0] ?? 0 : 0;
+  const appearance = petAppearance(speciesId), egg = EGG_OF.get(speciesId), eggId = egg?.id ?? null;
+  const theme = (eggId && EGG_THEMES[eggId]) || DEFAULT_THEME, stage = egg ? (egg.world - 1) * 7 + egg.layer : 0;
   const rarity = RARITY_OF.get(speciesId) ?? rarityHint ?? 'common';
   const look: PetLook = Object.freeze({
     speciesId, color: appearance.color, face: petFace(appearance.label), pattern: theme.pattern, sparkle: theme.sparkle, sparkleColor: theme.tint,

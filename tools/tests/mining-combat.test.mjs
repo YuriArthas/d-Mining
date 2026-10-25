@@ -5,7 +5,7 @@ import test from 'node:test';
 import { BlockHealth } from '../../src/game/logic/BlockHealth.ts';
 import { MiningCombat } from '../../src/game/application/MiningCombat.ts';
 import { Pickaxe, pickaxeStats } from '../../src/game/logic/Pickaxe.ts';
-import { JOURNEY_TOOL_PRICES } from '../../src/game/content/journeyResources.ts';
+import { ECONOMY } from '../../src/game/content/economy.ts';
 
 import { GameSession } from '../../src/game/application/GameSession.ts';
 import { ORE_ITEMS } from '../../src/game/application/items.ts';
@@ -22,19 +22,20 @@ test('health queries allocate nothing; only touched cells retain their own damag
  assert.equal(h.damage('a',100,1000),0);h.forget('a');assert.equal(h.size,1);assert.equal(h.get('b',20),13);
  assert.throws(()=>h.damage('bad',0,10));assert.throws(()=>h.damage('bad',10,-1));assert.equal(h.size,1);
 });
-test('speed doubles every five levels; overflow becomes power above 16 attacks per second',()=>{
- for(const [level,power,speed] of [[1,10,2],[2,15,2],[5,30,2],[6,35,4],[10,55,4],[11,60,8],[15,80,8],[16,85,16],[20,105,16],[21,220,16],[26,540,16],[61,158720,16],[100,33095680,16]]){
-  const s=pickaxeStats(level);assert.equal(s.power,power);assert.equal(s.speed,speed);
+test('damage and swing speed come from the table: speed climbs to 4× the first pickaxe and stops, damage keeps rising',()=>{
+ for(const tool of ECONOMY.tools){const s=pickaxeStats(tool.level);assert.equal(s.power,tool.power);assert.equal(s.speed,tool.speed);assert.equal(s.overflowPower,0);}
+ assert.deepEqual([1,2,9,10,30].map(l=>pickaxeStats(l).speed),[2,2.5,8,8,8]);
+ for(let l=2;l<=30;l++){const ratio=pickaxeStats(l).power/pickaxeStats(l-1).power;assert.ok(ratio>1.35&&ratio<1.65,`L${l} damage ×${ratio}`);}
+ assert.equal(pickaxeStats(8).levelsUntilSpeed,1);assert.equal(pickaxeStats(9).levelsUntilSpeed,null);
+ // The capsule's speed boost: faster below the cap, the rest as damage, damage per second kept within rounding.
+ assert.deepEqual([pickaxeStats(1,1.5).speed,pickaxeStats(1,1.5).power],[3,10]);
+ assert.equal(pickaxeStats(9,1.5).speed,8);assert.equal(pickaxeStats(9,1.5).overflowPower,Math.round(pickaxeStats(9).power*.5));
+ for(let level=1;level<=30;level++){
+  const s=pickaxeStats(level,1.5),difference=s.basePower*s.uncappedSpeed-s.power*s.speed;
+  assert.ok(Math.abs(difference)<=s.speed/2+1e-9);
  }
- assert.equal(pickaxeStats(15).levelsUntilSpeed,1);assert.equal(pickaxeStats(16).levelsUntilSpeed,null);
- assert.equal(pickaxeStats(20).overflowPower,0);assert.equal(pickaxeStats(21).overflowPower,110);
- // The cap preserves theoretical DPS to within one rounded damage point per hit.
- for(let level=1;level<=230;level++){
-  const s=pickaxeStats(level),difference=s.basePower*s.uncappedSpeed-s.power*s.speed;
-  assert.ok(difference>=0&&difference<s.speed);
- }
- assert.throws(()=>pickaxeStats(0));assert.throws(()=>pickaxeStats(Number.MAX_SAFE_INTEGER));
- assert.equal(Pickaxe.fromData({version:1,level:26}).getSnapshot().power,540);
+ assert.throws(()=>pickaxeStats(0));assert.throws(()=>pickaxeStats(31));assert.throws(()=>pickaxeStats(2,.5));assert.throws(()=>pickaxeStats(2,NaN));
+ assert.equal(Pickaxe.fromData({version:1,level:26}).getSnapshot().power,ECONOMY.tools[25].power);
 });
 test('first strike immediate; switching targets, tapping again and waiting do not grant burst hits',()=>{
  const f=setup(),c=f.combat;assert.equal(c.hit('a',0).remaining,20);
@@ -47,13 +48,13 @@ test('full bag prevents damage or destruction and consumes no attack cooldown',(
  f.full(false);assert.equal(c.hit('a',1).remaining,10);f.full(true);assert.equal(c.hit('a',2).status,'full');assert.equal(f.requests.length,0);
 });
 test('upgrade keeps previous cooldown; next hit uses new power then new interval',()=>{
- const f=setup(100),c=f.combat;f.axe.setLevel(5);assert.equal(c.hit('a',0).remaining,70);
- f.axe.setLevel(6);assert.equal(c.hit('a',.499).status,'cooldown');assert.equal(c.hit('a',.5).remaining,35);assert.equal(c.cooldown.nextAt,.5+1/4);
- assert.equal(c.hit('a',.749).status,'cooldown');
+ const f=setup(1000),c=f.combat,[five,six]=[5,6].map(l=>pickaxeStats(l));f.axe.setLevel(5);assert.equal(c.hit('a',0).remaining,1000-five.power);
+ f.axe.setLevel(6);assert.equal(c.hit('a',1/five.speed-.001).status,'cooldown');assert.equal(c.hit('a',1/five.speed).remaining,1000-five.power-six.power);assert.equal(c.cooldown.nextAt,1/five.speed+1/six.speed);
+ assert.equal(c.hit('a',1/five.speed+1/six.speed-.001).status,'cooldown');
 });
 test('real damage follows configured attack rate at 30, 60 and 120 FPS without cumulative rounding loss',()=>{
- for(const fps of [30,60,120])for(const level of [1,6,11,16,21,26]){
-  const f=setup(1000000);f.axe.setLevel(level);
+ for(const fps of [30,60,120])for(const level of [1,2,5,7,9,21,30]){
+  const f=setup(1e9);f.axe.setLevel(level);
   const stats=f.axe.getSnapshot();let hits=0;
   for(let frame=0;frame<fps*10;frame++){
    const now=frame/fps,result=f.combat.hit('a',now);
@@ -64,15 +65,15 @@ test('real damage follows configured attack rate at 30, 60 and 120 FPS without c
    }
   }
   assert.equal(hits,stats.speed*10,`level ${level} at ${fps} FPS`);
-  assert.equal(f.combat.health.get('a',1000000),1000000-hits*stats.power);
+  assert.equal(f.combat.health.get('a',1e9),1e9-hits*stats.power);
  }
 });
 test('long stalls discard missed attacks and begin a fresh cooldown',()=>{
- const f=setup(1000000);f.axe.setLevel(16);
- assert.equal(f.combat.hit('a',.01).status,'hit');assert.equal(f.combat.cooldown.nextAt,.01+1/16);
- assert.equal(f.combat.hit('a',30).status,'hit');assert.equal(f.combat.cooldown.nextAt,30+1/16);
+ const f=setup(1000000);f.axe.setLevel(16);const {speed,power}=pickaxeStats(16);
+ assert.equal(f.combat.hit('a',.01).status,'hit');assert.equal(f.combat.cooldown.nextAt,.01+1/speed);
+ assert.equal(f.combat.hit('a',30).status,'hit');assert.equal(f.combat.cooldown.nextAt,30+1/speed);
  for(let i=0;i<100;i++)assert.equal(f.combat.hit('b',30).status,'cooldown');
- assert.equal(f.combat.health.get('a',1000000),1000000-170);
+ assert.equal(f.combat.health.get('a',1000000),1000000-2*power);
 });
 test('lethal hit queues destruction once; pending cells cannot take more damage',()=>{
  const f=setup(20),c=f.combat;assert.equal(c.hit('a',0).status,'hit');assert.equal(f.requests.length,0);
@@ -91,11 +92,11 @@ test('cancelled zero-HP block retains damage and can retry without generating an
  assert.equal(c.hit('a',2).status,'pending');assert.equal(c.health.size,1);
 });
 test('damage never spreads to another cell; huge power still queues a single target',()=>{
- const f=setup(30);f.axe.setLevel(100);assert.equal(f.combat.hit('a',0).damage,30);
+ const f=setup(30);f.axe.setLevel(30);assert.equal(f.combat.hit('a',0).damage,30);
  assert.deepEqual(f.requests,['a']);assert.equal(f.combat.health.get('b',30),30);
 });
 test('all configured minerals take exactly ceil(HP / power) blows',()=>{
- for(const ore of ORE_ITEMS){const f=setup(ore.maxHp); let level=1; while(pickaxeStats(level).power < ore.maxHp/40) level++; f.axe.setLevel(level); const stats=pickaxeStats(level), hits=Math.ceil(ore.maxHp/stats.power);
+ for(const ore of ORE_ITEMS){const f=setup(ore.maxHp); let level=1; while(level<30&&pickaxeStats(level).power < ore.maxHp/40) level++; f.axe.setLevel(level); const stats=pickaxeStats(level), hits=Math.ceil(ore.maxHp/stats.power);
  for(let i=0;i<hits;i++){assert.equal(f.combat.hit('a',i/stats.speed).status,i===hits-1?'breaking':'hit')}
  assert.equal(f.requests.length,1);
  }
@@ -116,9 +117,9 @@ test('session accepts only one target and credits destroyed results even when al
  s.collected([{kind:64}]);solid=false;s.collected([{cell:a,kind:66}]);assert.equal(s.getSnapshot().inventory.used,1+resourceByKind(66).volume);assert.equal(s.combatDebug().damagedCells,0);
 });
 test('session pickaxe purchase publishes consistent level/coins without changing running cooldown',()=>{
- let now=0;const s=new GameSession({...SESSION_CONTENT,initialCoins:JOURNEY_TOOL_PRICES[1]}, 50,()=>now);s.attach({cell:()=>70,pending:()=>false,mine:()=>true,cancelMining:()=>{}});
+ let now=0;const s=new GameSession({...SESSION_CONTENT,initialCoins:ECONOMY.tools[1].price}, 50,()=>now);s.attach({cell:()=>67,pending:()=>false,mine:()=>true,cancelMining:()=>{}});
  s.collected(Array.from({length:5},()=>({kind:64})));s.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);s.resetPosition();
  const a=[14,-1,-25];s.hit(a);const snapshots=[];s.subscribe(()=>snapshots.push(s.getSnapshot()));
  assert.equal(s.upgradePickaxe(1).status,'upgraded');assert.equal(snapshots.length,1);assert.equal(snapshots[0].coins,5*resourceByKind(64).price);assert.equal(snapshots[0].pickaxe.power,15);
- now=.1;assert.equal(s.hit(a).status,'cooldown');now=.5;assert.equal(s.hit(a).remaining,resourceByKind(70).maxHp-25);
+ now=.1;assert.equal(s.hit(a).status,'cooldown');now=.5;assert.equal(s.hit(a).remaining,resourceByKind(67).maxHp-25);
 });

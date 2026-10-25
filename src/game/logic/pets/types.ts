@@ -1,3 +1,4 @@
+import type { CurrencyId } from '../../content/economy.ts';
 type PetId = string;
 type PetSpeciesId = string;
 type EggId = string;
@@ -6,12 +7,19 @@ export type PetDefinition = Readonly<{
   id: PetSpeciesId;
   name: string;
   rarity: PetRarity;
-  powerBonusBps: number;
+  /** Extra income in `currency` (the currency of the world its egg comes from), in percent: 50 = +50 %. */
+  bonusPct: number;
+  currency: CurrencyId;
+  /** Faster mining in every world, in percent: swing speed up to the cap, the rest as damage. */
+  miningPct: number;
 }>;
 export type EggDefinition = Readonly<{
   id: EggId;
   name: string;
   price: number;
+  currency: CurrencyId;
+  /** The egg's world must be open, and (below its surface) its layer's rest room reached. */
+  requiredWorld?: number;
   requiredDestination?: string;
   unlockName?: string;
   outcomes: readonly Readonly<{ speciesId: PetSpeciesId; weight: number }>[];
@@ -24,7 +32,8 @@ export type PetContent = Readonly<{
 export type PetInstance = Readonly<{ id: PetId; speciesId: PetSpeciesId; level: 1 }>;
 export type PetInventorySnapshot = Readonly<{ pets: readonly PetInstance[]; count: number }>;
 export type PetEquipmentSnapshot = Readonly<{ slots: readonly (PetId | null)[] }>;
-export type PetBonus = Readonly<{ powerBonusBps: number }>;
+/** The equipped team's totals, in percent: income per currency, and mining (every world). */
+export type PetBonus = Readonly<Record<CurrencyId, number> & { mining: number }>;
 export type MiningStats = Readonly<{ power: number; speed: number }>;
 export type PetInventoryDataV1 = { version: 1; pets: Array<{ id: string; speciesId: string; level: 1 }> };
 export type PetEquipmentDataV1 = { version: 1; slots: Array<string | null> };
