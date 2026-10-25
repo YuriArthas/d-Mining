@@ -125,7 +125,7 @@ export class ShopView {
       product.children.find(o=>o.name.startsWith('Hold'))?.quaternion.identity();
       if(category==='tools')product.rotation.y=Math.PI/2-.5;
       product.updateMatrixWorld(true);const bounds=new Box3().setFromObject(product),size=bounds.getSize(new Vector3()),center=bounds.getCenter(new Vector3());
-      const scale=(category==='tools'?2.20:2.0)/Math.max(size.y,size.x);
+      const scale=(category==='tools'?1.9:2.0)/Math.max(size.y,size.x);
       // A pivot keeps the product's centre on its turntable axis.
       const pivot=new Group();pivot.name='turntable';pivot.position.y=2.15+size.y*scale/2;
       product.scale.setScalar(scale);product.position.copy(center).multiplyScalar(-scale);

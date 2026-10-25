@@ -13,8 +13,9 @@ import { crossed, footContacts } from './minerSteps.ts';
 
 const MODEL_URL = new URL('../assets/character/miner-a.glb', import.meta.url).href;
 const LANDING_SECONDS = .32;
-/** A drill's shake: two fast wobbles (Hz) on the arms, degrees at full weight; its whisks or bit turn this fast (rad/s). */
-const DRILL_SHAKE = { rates: [23, 31], arm: 1.8, torso: .5, spin: 38 } as const;
+/** A drill's shake: two fast wobbles (Hz) on the arms, degrees at full weight. A working tool's moving parts (whisks,
+ *  bit, gear, clock hands) turn `spin` rad/s; a backpack's (a portal's swirl) turn `idle` rad/s all the time. */
+const DRILL_SHAKE = { rates: [23, 31], arm: 1.8, torso: .5, spin: 38, idle: 2.5 } as const;
 
 type Layer = { lower: AnimationAction; upper: AnimationAction };
 /** Lower and upper body play separately so the swing can own the arms while the legs keep moving. */
@@ -35,6 +36,7 @@ export class MinerAvatar {
   private motion: ToolMotion = 'swing';
   /** The equipped tool's parts that turn while it works, and the backpack's load that grows as it fills. */
   private spinners: Object3D[] = [];
+  private bagSpinners: Object3D[] = [];
   private load: Object3D | null = null;
   private fill = 0;
   private fillTarget = 0;
@@ -185,6 +187,7 @@ export class MinerAvatar {
       const bag=requiredModel(this.equipment,equipmentModel('backpacks',bagLevel)).clone(true);
       this.backpack.clear();this.backpack.add(bag);
       this.equippedBag=bagLevel;this.load=bag.getObjectsByProperty('type','Object3D').find(o=>o.name.startsWith('BagFill'))??null;
+      this.bagSpinners=[];bag.traverse(o=>{if(o.name.startsWith('Spin'))this.bagSpinners.push(o);});
       this.showLoad();
     }
   }
@@ -246,11 +249,12 @@ export class MinerAvatar {
     if(this.mining.consumeContact())this.contact=this.pickTip()?.toArray() as [number,number,number]??[this.miningTarget.x,this.miningTarget.y,this.miningTarget.z];
   }
 
-  /** A drill shakes the arms that hold it and turns its whisks while it works. */
+  /** A working tool turns its moving parts; a drill also shakes the arms that hold it. */
   private workTool(delta: number) {
+    for(const spinner of this.spinners)spinner.rotateY(DRILL_SHAKE.spin*this.mining.weight*delta);
+    for(const spinner of this.bagSpinners)spinner.rotateY(DRILL_SHAKE.idle*delta);
     const w=this.motion==='drill'?this.mining.weight:0;
     this.shakeTime=w>0?this.shakeTime+delta:0;
-    for(const spinner of this.spinners)spinner.rotateY(DRILL_SHAKE.spin*w*delta);
     if(w<=0)return;
     const t=this.shakeTime*2*Math.PI,[a,b]=DRILL_SHAKE.rates,deg=Math.PI/180;
     const wobble=(amount:number,phase:number)=>this.shake.setFromEuler(this.shakeEuler.set(

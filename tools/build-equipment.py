@@ -1,16 +1,17 @@
 """The 30 tools and 30 backpacks the miner carries and the shop shows: Blender-authored, no Decimate.
-Levels 1-10 (world 1) are joke items from home and kitchen; 11-30 are still the old pick and bag series until their
-worlds get their own sets.
+Levels 1-10 (world 1) are joke items from home and kitchen, 11-20 (world 2) machines, 21-30 (world 3) fantasy and
+space.
 
 Model conventions (Blender, Z up; glTF turns Z into Y):
 - ToolNN: the fist holds the grip at the origin, the handle runs up +Z and the striking end points +Y (a pick's
   point). Everything sits under a 'Hold' empty; clubs tilt it toward +Y so their end lands where a pick's point
   would (the shop resets it to stand them upright). 'PickaxeTip' marks where the hit lands. Empties named 'Spin*'
-  turn about their local Z (glTF Y) while the tool works (a mixer's whisks).
+  turn about their local Z (glTF Y) while the tool works (a mixer's whisks, a drill bit, a gear); a backpack's turn
+  all the time (a portal's swirl).
 - BagNN: the face against the miner's back is at y = +.15 and the bag grows toward -Y (away from the miner).
   'BagFill' is an empty at the bottom of the visible load; the game scales it on Z (glTF Y) with how full the
-  backpack is. Window and dome parts use the 'EquipGlass' material.
-Each model is one atlas mesh ('Body') plus its glass, spinning and fill parts, so it draws in a few calls.
+  backpack is. Window and dome parts use 'EquipGlass' (tinted by the atlas, see-through), lit-up parts 'EquipGlow'.
+Each model is one atlas mesh ('Body') plus its glass, glow, spinning and fill parts, so it draws in a few calls.
 Usage: blender -b --python tools/build-equipment.py
 """
 import bpy, bmesh, math, json, hashlib, random
@@ -21,9 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / 'assets-source/shop-showroom'; OUT = ROOT / 'src/game/assets/shop'
 bpy.ops.wm.read_factory_settings(use_empty=True)
 
-# The atlas: 16 x 8 flat colour cells of 16 px. 0-31 are the old series' colours (levels 11-30 still use them).
-LEGACY = ['936039','d49b59','40362f','adc4cd','617681','273d50','da8544','59b8ad','efcf6b','9178ca','8bb4eb','d65b45','7bc657','ede0b5','a1d4e0','cf53a7',
-          'b77445','935034','dca36c','f2c28f','27374a','6d8191','b1c8d0','e1edf0','8a633e','bd8f60','5d4740','f0bb55','50859b','d7e6df','726a71','b58c57']
+# The atlas: 16 x 16 flat colour cells of 16 px, one per named colour.
 NAMED = dict(
     wood='c98a4b', wood_dark='8a5a2e', steel='b9c3cc', iron='5a6470', black='2b2d33', crust='d8913a', crumb='f6d58e',
     fish='6f8fa8', belly='eef3f5', red='e2403a', deep_red='c9302c', white='f6f4ee', pink='ff7fb8', yellow='ffd23f',
@@ -34,14 +33,25 @@ NAMED = dict(
     emerald='4ad66d', burlap='c79a4a', burlap_dark='9b7a45', coral='ff5d8f', cream='fff3c4', chest_dark='5d3a1e',
     chest='8b5a2b', leaf='46b04a', coin='ffe066', pan='3d4048', rubber='d8342e', candy_blue='5bc8ff', tape='e8c87a',
     gum_red='e8333a', plant='3cb85a', sand='e9cf8f', ore_rock='6e5a4a', ore_dark='4a3d33',
+    terracotta='c8643c', cactus='4cae4c', cactus_dark='2f7f3a', flower='ff6fb5',
+    hazard='f2c230', orange_paint='f08a24', navy='233a5e', neon_cyan='3ff0ff', neon_pink='ff3fa4', laser='59f5ff',
+    flame='ff9a2a', flame_core='ffe36b', plasma='9a5bff', plasma_dark='4a2a8a', robot_white='eef1f4', screen='1c2333',
+    battery='5df27a', toolbox='d83a32', oil_blue='2a7fd1', microwave='e3e7ea', dish='e3e7ec', container='e8742c',
+    container_dark='b5561c', glass_tint='cdeeff', glass_green='b9ffd0',
+    ice_pink='ffb3d1', mint_cream='b8f2d0', choco='7a4a2e', cone='e0a25a', cone_dark='b97a36', octo='ff7fae',
+    octo_spot='ffd2e3', star='fff27a', lightning='ffe14d', dragon_purple='5b2a86', lavender='c8a8ff', clock_face='fffaf0',
+    unicorn='fff4fb', galaxy='2a1a6e', galaxy2='5b3fd1', void_black='140b22', void='c27bff',
+    cloud_shade='dfe9f5', pumpkin='ff8c1a', pumpkin_dark='e06a00', candle='ffd34d', honey='ffb627', honey_dark='d98a0b',
+    jelly='e3c4ff', jelly_glow='f0a8ff', planet='ff7b54', planet_band='ffb38a', ring_c='ffe2b0', egg_red='e85d75',
+    egg_spot='6c3fd1', book='a32f45', page='fff7e0', sand_gold='f2c14e', portal='b06cff', portal_rim='6b5f7a',
 )
-HEX = LEGACY + list(NAMED.values())
-C = {name: 32 + i for i, name in enumerate(NAMED)}
-assert len(HEX) <= 128
-W, H, CELL = 256, 128, 16
+HEX = list(NAMED.values())
+C = {name: i for i, name in enumerate(NAMED)}
+assert len(HEX) <= 256
+W, H, CELL = 256, 256, 16
 img = bpy.data.images.new('EquipAtlas', width=W, height=H)
 px = [0.0] * (W * H * 4)
-for i, h in enumerate(HEX + ['ff00ff'] * (128 - len(HEX))):
+for i, h in enumerate(HEX + ['ff00ff'] * (256 - len(HEX))):
     rgb = [int(h[k:k + 2], 16) / 255 for k in (0, 2, 4)]
     cx, cy = (i % 16) * CELL, (i // 16) * CELL
     for y in range(cy, cy + CELL):
@@ -54,10 +64,16 @@ atlas = bpy.data.materials.new('EquipAtlas'); atlas.use_nodes = True
 bsdf = atlas.node_tree.nodes['Principled BSDF']; bsdf.inputs['Roughness'].default_value = .86
 tex = atlas.node_tree.nodes.new('ShaderNodeTexImage'); tex.image = img; tex.interpolation = 'Closest'
 atlas.node_tree.links.new(tex.outputs['Color'], bsdf.inputs['Base Color'])
+# Glass takes its tint from the atlas, see-through; glow parts light themselves with the atlas colour.
 glass = bpy.data.materials.new('EquipGlass'); glass.use_nodes = True
-g = glass.node_tree.nodes['Principled BSDF']
-g.inputs['Base Color'].default_value = (.78, .93, 1, 1); g.inputs['Alpha'].default_value = .32; g.inputs['Roughness'].default_value = .2
+g = glass.node_tree.nodes['Principled BSDF']; g.inputs['Alpha'].default_value = .34; g.inputs['Roughness'].default_value = .2
+t = glass.node_tree.nodes.new('ShaderNodeTexImage'); t.image = img; t.interpolation = 'Closest'
+glass.node_tree.links.new(t.outputs['Color'], g.inputs['Base Color'])
 glass.surface_render_method = 'BLENDED'
+glow = bpy.data.materials.new('EquipGlow'); glow.use_nodes = True
+e = glow.node_tree.nodes['Principled BSDF']; e.inputs['Emission Strength'].default_value = 1.0
+t = glow.node_tree.nodes.new('ShaderNodeTexImage'); t.image = img; t.interpolation = 'Closest'
+glow.node_tree.links.new(t.outputs['Color'], e.inputs['Base Color']); glow.node_tree.links.new(t.outputs['Color'], e.inputs['Emission Color'])
 
 def cell_uv(c):
     return ((c % 16) * CELL + CELL / 2) / W, ((c // 16) * CELL + CELL / 2) / H
@@ -70,7 +86,7 @@ def finish(o, color, slot='body', smooth=False, bevel=0, angle=40):
         m = o.modifiers.new('Bevel', 'BEVEL'); m.width = bevel; m.segments = 1; m.limit_method = 'ANGLE'
         bpy.context.view_layer.objects.active = o; bpy.ops.object.modifier_apply(modifier=m.name)
     bpy.context.view_layer.update()
-    me = o.data; me.materials.clear(); me.materials.append(glass if slot == 'glass' else atlas)
+    me = o.data; me.materials.clear(); me.materials.append(glass if slot == 'glass' else glow if slot.endswith('glow') else atlas)
     uv = me.uv_layers.active or me.uv_layers.new(name='UVMap')
     mw = o.matrix_world
     for poly in me.polygons:
@@ -149,15 +165,32 @@ def tube(points, r, c, slot='body', cyclic=False, sides=0):
     o.select_set(True); bpy.ops.object.convert(target='MESH')
     return finish(o, c, slot, smooth=True)
 
-def crescent(cz, r, a0, a1, w, thick, c, cy=0, steps=10, tip_w=.006):
+def segment(p0, p1, r0, r1, c, n=8, slot='body', smooth=True):
+    """A tapered cylinder from p0 (radius r0) to p1 (radius r1)."""
+    a, b = Vector(p0), Vector(p1); d = b - a
+    bpy.ops.mesh.primitive_cone_add(vertices=n, radius1=r0, radius2=r1, depth=d.length, location=(a + b) / 2)
+    o = bpy.context.object; o.rotation_mode = 'QUATERNION'; o.rotation_quaternion = d.to_track_quat('Z', 'Y')
+    return finish(apply(o), c, slot, smooth=smooth)
+
+def star(outer, inner, points=5, spin=90):
+    """A star outline [(u, v)] around the origin."""
+    return [((outer if k % 2 == 0 else inner) * math.cos(math.radians(spin + 180 * k / points)),
+             (outer if k % 2 == 0 else inner) * math.sin(math.radians(spin + 180 * k / points))) for k in range(2 * points)]
+
+def helix(y0, y1, r0, r1, turns, cz, steps=24, x=0):
+    """Points winding round a line along +Y at height cz."""
+    return [(x + (r0 + (r1 - r0) * t) * math.cos(2 * math.pi * turns * t), y0 + (y1 - y0) * t,
+             cz + (r0 + (r1 - r0) * t) * math.sin(2 * math.pi * turns * t)) for t in (i / steps for i in range(steps + 1))]
+
+def crescent(cz, r, a0, a1, w, thick, c, cy=0, steps=10, tip_w=.006, taper=True, slot='body'):
     """A pick head: an arc of radius r about (y=cy, z=cz) in the YZ plane from angle a0 to a1 (degrees, 0 = +Y),
     `w` thick at the middle and pointed at both ends. Returns the a0 end (the point)."""
     outer, inner = [], []
     for i in range(steps + 1):
-        t = i / steps; a = math.radians(a0 + (a1 - a0) * t); half = tip_w + w / 2 * math.sin(math.pi * t) ** .7
+        t = i / steps; a = math.radians(a0 + (a1 - a0) * t); half = tip_w + w / 2 * math.sin(math.pi * t) ** .7 if taper else w / 2
         outer.append((cy + math.cos(a) * (r + half), cz + math.sin(a) * (r + half)))
         inner.append((cy + math.cos(a) * (r - half), cz + math.sin(a) * (r - half)))
-    slab(outer + inner[::-1], thick, c)
+    slab(outer + inner[::-1], thick, c, slot=slot)
     a = math.radians(a0); return (0, cy + math.cos(a) * r, cz + math.sin(a) * r)
 
 def chunks(center, rx, ry, height, colours, n, seed, size=.07, shape='cube', slot='fill'):
@@ -195,9 +228,11 @@ def grow(k):
         for o in objs: o.location = o.location * k; o.scale = (k, k, k); apply(o)
 
 roots, report = [], []
+AXES = {'X': (0, math.pi / 2, 0), 'Y': (-math.pi / 2, 0, 0), 'Z': (0, 0, 0)}
 def model(name, tilt=0, tip=None, spins=(), fill=None):
-    """Join the collected parts into model `name`. spins: [(slot, point, axis 'Y'|'Z')]; fill: bottom point of
-    the load. Clubs tilt `tilt` degrees toward +Y under 'Hold'."""
+    """Join the collected parts into model `name`. spins: [(slot, point, axis 'X'|'Y'|'Z' or an Euler rotation whose
+    Z is the axis)]; a slot's glowing parts are '<slot>_glow'. fill: bottom point of the load ('fill', 'fill_glow').
+    Clubs tilt `tilt` degrees toward +Y under 'Hold'."""
     root = empty(name); holder = empty('Hold', rot=(-math.radians(tilt), 0, 0)) if name.startswith('Tool') else root
     if holder is not root: holder.parent = root
     bpy.context.view_layer.update()
@@ -207,12 +242,16 @@ def model(name, tilt=0, tip=None, spins=(), fill=None):
         tris += sum(len(p.vertices) - 2 for p in obj.data.polygons); attach(obj, parent, inverse)
     place(join(parts.pop('body'), 'Body'), holder)
     if 'glass' in parts: place(join(parts.pop('glass'), 'Glass'), holder)
+    if 'glow' in parts: place(join(parts.pop('glow'), 'Glow'), holder)
+    def hang(pivot, slot, label):
+        for key, suffix in ((slot, ''), (slot + '_glow', 'Glow')):
+            if key in parts: place(join(parts.pop(key), label + suffix), pivot, pivot.matrix_basis.copy())
     for slot, point, axis in spins:
-        pivot = empty('Spin' + slot.title(), point, (-math.pi / 2, 0, 0) if axis == 'Y' else (0, 0, 0)); attach(pivot, holder)
-        place(join(parts.pop(slot), slot.title()), pivot, pivot.matrix_basis.copy())
+        pivot = empty('Spin' + slot.title(), point, AXES.get(axis, axis)); attach(pivot, holder)
+        hang(pivot, slot, slot.title())
     if fill is not None:
         pivot = empty('BagFill', fill); attach(pivot, holder)
-        place(join(parts.pop('fill'), 'Load'), pivot, pivot.matrix_basis.copy())
+        hang(pivot, 'fill', 'Load')
     if tip is not None:
         marker = empty('PickaxeTip', tip); attach(marker, holder)
     assert not parts, f'{name}: unplaced parts {list(parts)}'
@@ -233,17 +272,21 @@ box((0, 0, .66), (.17, .2, .22), C['iron'], .03)
 for z in (.6, .72): box((0, 0, z), (.18, .21, .035), C['wood_dark'], .008)
 model('Tool01', tip=tip)
 
-# 2 不粘锅: a frying pan with an egg still in it; its bottom slaps the rock.
-cyl((0, 0, .1), .042, .64, C['black'], 10)
-cyl((0, 0, -.06), .056, .3, C['wood'], 10)
-cyl((0, 0, -.23), .062, .05, C['wood_dark'], 10)
-box((0, 0, .44), (.1, .07, .1), C['black'], .02)
-cyl((0, .02, .74), .34, .06, C['black'], 20, rot=(math.pi / 2, 0, 0))     # base, facing +Y
-cyl((0, -.03, .74), .3, .03, C['pan'], 20, rot=(math.pi / 2, 0, 0))       # cooking face, toward -Y
-ring((0, -.05, .74), .33, .035, C['black'], rot=(math.pi / 2, 0, 0), major=20)
-ball((.05, -.06, .72), (.15, .03, .12), C['white'], 10, 6)
-ball((.07, -.08, .74), (.055, .03, .055), C['yellow'], 8, 6)
-model('Tool02', tilt=38, tip=(0, .06, .74))
+# 2 扎手仙人掌: a potted cactus held by its pot, a pink flower on top.
+lathe([(.07, -.27), (.085, -.26), (.1, -.05), (.115, -.04), (.115, .02), (.1, .03)], C['terracotta'], 10)
+cyl((0, 0, .025), .1, .01, C['ore_dark'], 10, smooth=False)
+lathe([(.07, .02), (.11, .1), (.12, .3), (.11, .6), (.08, .74), (.02, .79)], C['cactus'], 8, smooth=False)
+for s in (-1, 1):
+    segment((s * .1, 0, .36 + s * .06), (s * .2, 0, .4 + s * .06), .05, .045, C['cactus'], 8, smooth=False)
+    segment((s * .2, 0, .38 + s * .06), (s * .21, 0, .56 + s * .06), .045, .035, C['cactus'], 8, smooth=False)
+for k in range(10):
+    a = k * 2.4; z = .12 + k * .06
+    box((math.cos(a) * .12, math.sin(a) * .12, z), (.03, .008, .008), C['white'], 0, rot=(0, 0, a))
+for k in range(5):
+    a = k * 2 * math.pi / 5
+    ball((math.cos(a) * .045, math.sin(a) * .045, .8), (.04, .04, .02), C['flower'], 8, 4)
+ball((0, 0, .81), (.025, .025, .02), C['yellow'], 6, 4)
+model('Tool02', tilt=34, tip=(0, 0, .82))
 
 # 3 硬法棍: a three-day-old baguette for a head, harder than the rock.
 wood_handle(.66)
@@ -349,23 +392,255 @@ for z in (.25, .5): ring((0, 0, z), .055, .012, C['bone_shade'], major=10, minor
 box((.05, .05, .9), (.01, .08, .05), C['bone_shade'], 0, rot=(.5, 0, .3))
 model('Tool10', tilt=34, tip=(0, .08, .9))
 
-# ---------------------------------------------------------------- TOOLS, levels 11-30: the old series for now
-for level in range(11, 31):
-    k = (level - 1) % 10; era = (level - 1) // 10; metal = [3, 4, 6, 3, 7, 14, 9, 8, 11, 5][k]; accent = [8, 10, 15][era]
-    cyl((0, 0, .24), .043 + .003 * (k % 3), .90, 5, 10, smooth=False)
-    cyl((0, 0, -.02), .052, .21, 2, 10, smooth=False)
-    for z in [-.12, .09, .56]: cyl((0, 0, z), .057, .025, accent, 10, smooth=False)
-    width = .7 + .045 * k; height = .67 + .015 * (k % 3)
-    pts = [(-width * .45, height - .08), (-width * .45, height + .04), (-.09, height + .12), (.12, height + .10), (width * .32, height),
-           (width * .6, height - .24), (width * .45, height - .20), (.12, height - .035), (-.08, height - .015)]
-    slab(pts, .12 + .01 * (k % 3), metal, bevel=.015)
-    cyl((0, 0, .61), .077, .16, 5, 10, smooth=False)
-    if k >= 3: box((0, -.07, height), (.17, .19, .14), metal, .025)
-    if k in [4, 6, 8, 9]:
-        for sign in [-1, 1]: ball((sign * .087, 0, height), (.047, .065, .09), accent, 6, 4, smooth=False)
-    if k in [5, 7, 9]: slab([(-.14, height + .04), (-width * .6, height - .17), (-width * .36, height + .12), (-.1, height + .17)], .10, metal)
-    for z in [.18, .35, .45]: cyl((0, 0, z), .052, .025, accent, 10, smooth=False)
-    model(f'Tool{level:02d}', tip=(0, width * .6, height - .24))
+# ---------------------------------------------------------------- TOOLS, world 2: machines
+def handle(top=.72, c='steel', grip='black', r=.045, n=10):
+    cyl((0, 0, (top - .22) / 2), r, top + .22, C[c], n)
+    cyl((0, 0, -.05), r + .012, .26, C[grip], n)
+    cyl((0, 0, -.235), r + .02, .05, C[grip], n)
+
+# 11 大扳手: a giant open-ended spanner with a nut caught in its jaw.
+box((0, 0, .2), (.1, .055, .86), C['chrome'], .02)
+box((0, 0, -.06), (.12, .075, .3), C['orange_paint'], .025)
+box((0, 0, .62), (.13, .06, .1), C['chrome'], .015)
+cz, R = .8, .2
+jaw = [(R * math.cos(math.radians(a)), cz + R * math.sin(math.radians(a))) for a in [115 + i * 310 / 16 for i in range(17)]]
+slab(jaw + [(.06, cz + .03), (-.06, cz + .03)], .07, C['chrome'], plane='XZ')
+cyl((0, 0, cz + .085), .05, .08, C['gold'], 6, rot=(math.pi / 2, 0, 0), smooth=False)
+model('Tool11', tilt=30, tip=(0, 0, 1.0))
+
+# 12 冲击电钻: a yellow cordless drill; its bit spins.
+box((0, 0, -.02), (.11, .13, .3), C['hazard'], .03)
+box((0, 0, -.2), (.16, .2, .1), C['black'], .02)
+box((0, .07, .1), (.04, .05, .06), C['black'], .01)
+box((0, .08, .22), (.17, .4, .2), C['hazard'], .05)
+box((0, -.1, .22), (.175, .06, .21), C['black'], .02)
+for y in (.02, .08, .14): box((0, y, .325), (.13, .02, .012), C['black'], 0)
+cyl((0, .33, .22), .06, .1, C['black'], 12, rot=(math.pi / 2, 0, 0))
+cyl((0, .39, .22), .045, .04, C['chrome'], 12, rot=(math.pi / 2, 0, 0))
+cyl((0, .6, .22), .02, .42, C['steel'], 8, rot=(math.pi / 2, 0, 0), slot='a')
+tube(helix(.42, .78, .024, .024, 3, .22), .011, C['chrome'], slot='a')
+cyl((0, .835, .22), .022, .05, C['steel'], 8, r2=0, rot=(-math.pi / 2, 0, 0), slot='a')
+grow(1.35); S = 1.35
+model('Tool12', tip=(0, .86 * S, .22 * S), spins=[('a', (0, .6 * S, .22 * S), 'Y')])
+
+# 13 链锯: an orange chainsaw held by its rear grip; the bar points at the rock.
+box((0, 0, -.02), (.1, .12, .28), C['orange_paint'], .03)
+box((0, 0, .15), (.12, .14, .08), C['orange_paint'], .02)
+box((0, .16, .24), (.24, .36, .24), C['orange_paint'], .05)
+box((0, .16, .37), (.18, .3, .03), C['black'], .01)
+for y in (.08, .16, .24): box((.121, y, .24), (.01, .03, .14), C['black'], 0)
+tube([(-.13, .12, .3), (-.13, .12, .44), (0, .14, .5), (.13, .12, .44), (.13, .12, .3)], .018, C['black'], sides=1)
+slab([(.3, .18), (.95, .18), (1.0, .2), (1.02, .24), (1.0, .28), (.95, .3), (.3, .3)], .025, C['steel'])
+for y in [.34 + .06 * i for i in range(11)]:
+    for z in (.305, .175): box((0, y, z), (.035, .035, .025), C['black'], 0)
+box((0, .32, .24), (.05, .05, .16), C['black'], .01)
+grow(1.3); S = 1.3
+model('Tool13', tip=(0, 1.02 * S, .24 * S))
+
+# 14 马蹄磁铁: a horseshoe magnet with ore stuck to its poles.
+handle(.45, 'steel', 'red')
+R, cz = .2, .62
+u = [(-R, 0, .95), (-R, 0, cz)] + [(R * math.cos(math.radians(a)), 0, cz + R * math.sin(math.radians(a))) for a in range(180, 361, 30)] + [(R, 0, cz), (R, 0, .95)]
+tube(u, .07, C['red'], sides=1)
+for x in (-R, R): cyl((x, 0, .93), .075, .1, C['chrome'], 8)
+box((.25, .03, 1.0), (.07, .06, .06), C['purple'], 0, rot=(.4, .3, .2))
+box((-.23, -.02, 1.02), (.06, .06, .05), C['gold'], 0, rot=(.2, .5, .1))
+box((.17, -.03, 1.03), (.05, .05, .04), C['emerald'], 0, rot=(.6, .1, .3))
+model('Tool14', tilt=30, tip=(0, 0, 1.0))
+
+# 15 机械爪: a robot claw that has caught a gem.
+handle(.62, 'iron', 'blue')
+box((0, 0, .7), (.16, .2, .18), C['hazard'], .03)
+box((0, .2, .7), (.08, .28, .08), C['iron'], .01)
+box((0, -.14, .7), (.12, .1, .12), C['iron'], .02)
+cyl((0, .36, .7), .07, .06, C['chrome'], 10, rot=(math.pi / 2, 0, 0))
+box((0, 0, .795), (.06, .06, .02), C['neon_cyan'], 0, slot='glow')
+for k in range(3):
+    a = math.radians(90 + 120 * k); c, sn = math.cos(a), math.sin(a)
+    segment((c * .05, .38, .7 + sn * .05), (c * .13, .48, .7 + sn * .13), .025, .022, C['chrome'], 6)
+    segment((c * .13, .48, .7 + sn * .13), (c * .07, .6, .7 + sn * .07), .022, .012, C['chrome'], 6)
+    ball((c * .13, .48, .7 + sn * .13), (.03, .03, .03), C['iron'], 6, 4)
+ball((0, .52, .7), (.07, .07, .07), C['purple'], 6, 4, smooth=False)
+model('Tool15', tip=(0, .6, .7))
+
+# 16 霓虹路牌: a construction sign with a glowing arrow and rim.
+cyl((0, 0, .25), .035, .94, C['steel'], 8)
+cyl((0, 0, -.06), .05, .28, C['black'], 8)
+box((0, 0, .82), (.5, .06, .3), C['navy'], .02)
+for at, size in (((0, 0, .97), (.52, .07, .025)), ((0, 0, .67), (.52, .07, .025)), ((.25, 0, .82), (.025, .07, .32)), ((-.25, 0, .82), (.025, .07, .32))):
+    box(at, size, C['neon_cyan'], 0, slot='glow')
+slab([(-.17, -.03), (.05, -.03), (.05, -.09), (.18, 0), (.05, .09), (.05, .03), (-.17, .03)], .075, C['neon_pink'], at=(0, 0, .82), plane='XZ', slot='glow')
+model('Tool16', tilt=30, tip=(0, 0, .97))
+
+# 17 激光剑: a glowing blade on a chrome hilt.
+cyl((0, 0, -.02), .045, .36, C['chrome'], 12)
+for z in (-.12, -.06, 0, .06): ring((0, 0, z), .047, .01, C['black'], major=12, minor=4)
+cyl((0, 0, .19), .055, .06, C['black'], 12)
+box((0, 0, .19), (.16, .03, .03), C['chrome'], .005)
+box((0, -.045, .05), (.02, .02, .03), C['red'], 0)
+cyl((0, 0, .66), .04, .9, C['laser'], 10, slot='glow')
+ball((0, 0, 1.11), (.04, .04, .03), C['laser'], 8, 4, slot='glow')
+model('Tool17', tilt=34, tip=(0, 0, 1.1))
+
+# 18 火箭锤: a hammer whose head is a rocket, nose first, flame out the back.
+handle(.6, 'steel', 'red')
+box((0, 0, .64), (.1, .1, .1), C['iron'], .015)
+lathe([(.01, -.36), (.1, -.34), (.13, -.2), (.13, .18), (.1, .28), (.05, .36), (.01, .4)],
+      lambda p, n: C['red'] if p.y > .25 else C['blue'] if abs(p.y) < .04 else C['white'], 12, at=(0, 0, .74), axis='Y')
+for s in (-1, 1):
+    box((s * .15, -.28, .74), (.1, .14, .02), C['red'], .005)
+    box((0, -.28, .74 + s * .15), (.02, .14, .1), C['red'], .005)
+    cyl((s * .128, .06, .74), .045, .02, C['sky'], 10, rot=(0, math.pi / 2, 0))
+cyl((0, -.38, .74), .07, .06, C['iron'], 10, rot=(math.pi / 2, 0, 0))
+cyl((0, -.5, .74), .08, .2, C['flame'], 10, r2=0, rot=(math.pi / 2, 0, 0), slot='glow')
+cyl((0, -.46, .74), .045, .14, C['flame_core'], 8, r2=0, rot=(math.pi / 2, 0, 0), slot='glow')
+model('Tool18', tip=(0, .4, .74))
+
+# 19 齿轮战斧: an axe blade in front, a gear behind that spins as it swings.
+handle(.66, 'wood_dark', 'black')
+box((0, 0, .72), (.12, .16, .24), C['iron'], .02)
+slab([(.06, .6), (.2, .54), (.4, .44), (.47, .6), (.47, .84), (.4, 1.0), (.2, .9), (.06, .84)], .07, C['steel'])
+slab([(.4, .45), (.46, .44), (.5, .62), (.5, .84), (.44, 1.01), (.39, .99), (.46, .84), (.46, .6)], .075, C['chrome'])
+cyl((0, -.26, .72), .16, .06, C['orange_paint'], 16, rot=(0, math.pi / 2, 0), slot='a', smooth=False)
+for k in range(10):
+    a = 2 * math.pi * k / 10
+    box((0, -.26 + math.cos(a) * .19, .72 + math.sin(a) * .19), (.06, .06, .05), C['orange_paint'], 0, rot=(a, 0, 0), slot='a')
+cyl((0, -.26, .72), .05, .08, C['iron'], 8, rot=(0, math.pi / 2, 0), slot='a')
+model('Tool19', tip=(0, .48, .72), spins=[('a', (0, -.26, .72), 'X')])
+
+# 20 等离子钻: a white sci-fi drill with purple glow; its cone bit spins.
+box((0, 0, -.02), (.11, .13, .3), C['robot_white'], .035)
+box((0, -.005, -.02), (.115, .07, .22), C['navy'], .02)
+box((0, .1, .24), (.2, .46, .22), C['robot_white'], .06)
+box((0, .1, .24), (.205, .3, .05), C['navy'], .01)
+for s in (-1, 1): box((s * .104, .1, .24), (.01, .26, .02), C['plasma'], 0, slot='glow')
+box((0, -.14, .24), (.15, .03, .15), C['plasma'], .01, slot='glow')
+cyl((0, .36, .24), .08, .06, C['navy'], 14, rot=(math.pi / 2, 0, 0))
+ring((0, .36, .24), .09, .022, C['plasma'], rot=(math.pi / 2, 0, 0), major=14, slot='glow')
+cyl((0, .56, .24), .085, .36, C['plasma_dark'], 12, r2=0, rot=(-math.pi / 2, 0, 0), slot='a', smooth=False)
+tube(helix(.4, .72, .085, .012, 2.5, .24), .012, C['chrome'], slot='a')
+grow(1.35); S = 1.35
+model('Tool20', tip=(0, .75 * S, .24 * S), spins=[('a', (0, .56 * S, .24 * S), 'Y')])
+
+# ---------------------------------------------------------------- TOOLS, world 3: fantasy and space
+# 21 冰淇淋甜筒: held by the waffle cone, three scoops and a cherry.
+lathe([(.02, -.26), (.06, -.1), (.1, .08), (.14, .28), (.155, .34), (.15, .36)],
+      lambda p, n: C['cone_dark'] if (int((p.z + .3) / .07) + int((math.atan2(p.y, p.x) + 3.2) / .52)) % 2 else C['cone'], 12)
+ball((0, 0, .44), (.17, .17, .14), C['ice_pink'], 12, 8)
+ball((.1, -.08, .36), (.04, .04, .07), C['ice_pink'], 8, 5)
+ball((0, 0, .64), (.155, .155, .13), C['mint_cream'], 12, 8)
+ball((0, 0, .82), (.13, .13, .11), C['choco'], 12, 8)
+ball((0, 0, .95), (.045, .045, .045), C['red'], 8, 6)
+tube([(0, 0, .99), (.02, .01, 1.06)], .006, C['green'])
+for k in range(8):
+    a = k * .8
+    box((math.cos(a) * .1, math.sin(a) * .1, .86 + (k % 2) * .03), (.04, .012, .012), [C['yellow'], C['sky'], C['pink'], C['lime']][k % 4], 0, rot=(0, .3, a))
+model('Tool21', tilt=30, tip=(0, 0, 1.0))
+
+# 22 彩虹镐: a rainbow arc for a head, a cloud on each end.
+handle(.66, 'white', 'purple')
+for i, c in enumerate(['red', 'orange', 'yellow', 'lime', 'sky', 'purple']):
+    crescent(.2, .54 - i * .036, 30, 150, .037, .12, C[c], steps=12, taper=False)
+for a in (30, 150):
+    x, z = .455 * math.cos(math.radians(a)), .2 + .455 * math.sin(math.radians(a))
+    for dx, dz, r in ((0, 0, .08), (.06, .03, .06), (-.06, .02, .06), (0, -.05, .06)):
+        ball((0, x + dx, z + dz), (r * 1.1, r, r), C['white'], 8, 5)
+model('Tool22', tip=(0, .45, .43))
+
+# 23 章鱼触手: a curling pink tentacle with suckers.
+cyl((0, 0, -.08), .055, .3, C['leather'], 10)
+pts = [(0, 0, .05), (0, .02, .25), (0, 0, .45), (0, .05, .62), (0, .14, .76), (0, .26, .82), (0, .36, .78), (0, .4, .68), (0, .36, .6), (0, .3, .62)]
+rad = [.1, .095, .088, .08, .07, .06, .05, .04, .03, .022]
+for i in range(len(pts) - 1): segment(pts[i], pts[i + 1], rad[i], rad[i + 1], C['octo'], 10)
+for p, r in zip(pts, rad):
+    ball(p, (r, r, r), C['octo'], 8, 5)
+for p, r in list(zip(pts, rad))[1:8]: ball((p[0] + r * .85, p[1], p[2]), (.012, r * .4, r * .4), C['octo_spot'], 6, 4)
+model('Tool23', tilt=25, tip=pts[5])
+
+# 24 星星魔杖: a glowing star on a white and gold stick.
+cyl((0, 0, .2), .03, .84, C['white'], 8)
+tube([(.032 * math.cos(t * 8 * math.pi), .032 * math.sin(t * 8 * math.pi), -.15 + .75 * t) for t in (i / 30 for i in range(31))], .01, C['gold'])
+cyl((0, 0, -.08), .042, .22, C['purple'], 8)
+slab(star(.26, .11), .09, C['star'], at=(0, 0, .84), plane='XZ', slot='glow')
+for s in (-1, 1):
+    for x in (-.05, .05): box((x, s * .047, .86), (.025, .01, .04), C['ink'], 0)
+for at in ((.22, 0, 1.02), (.27, 0, .7), (-.24, 0, 1.06)): ball(at, (.025, .025, .025), C['star'], 6, 4, slot='glow')
+model('Tool24', tilt=30, tip=(0, 0, 1.1))
+
+# 25 闪电三叉戟: a gold trident wrapped in lightning.
+cyl((0, 0, .25), .032, .98, C['gold'], 8)
+cyl((0, 0, -.08), .045, .24, C['blue'], 8)
+box((0, 0, .78), (.36, .06, .05), C['gold'], .01)
+cyl((0, 0, .95), .03, .3, C['gold'], 8); cyl((0, 0, 1.14), .045, .1, C['chrome'], 8, r2=0)
+for x in (-.16, .16):
+    cyl((x, 0, .89), .025, .2, C['gold'], 8); cyl((x, 0, 1.03), .04, .09, C['chrome'], 8, r2=0)
+bolt = [(-.02, .26), (.06, .26), (.02, .13), (.07, .13), (-.04, -.04), (0, .09), (-.05, .09)]
+slab(bolt, .03, C['lightning'], at=(.2, 0, .45), plane='XZ', slot='glow')
+slab([(-u, v) for u, v in bolt][::-1], .03, C['lightning'], at=(-.21, 0, .6), plane='XZ', slot='glow')
+model('Tool25', tilt=28, tip=(0, 0, 1.19))
+
+# 26 龙骨镰: a scythe of dragon bone with a purple fang for a blade.
+cyl((0, 0, .22), .045, .9, C['bone'], 8)
+for z in (-.1, .12, .32, .52): ball((0, 0, z), (.062, .062, .035), C['bone_shade'], 8, 4)
+cyl((0, 0, -.05), .056, .2, C['leather'], 8)
+tip = crescent(.24, .52, 14, 96, .22, .08, C['dragon_purple'], steps=12)
+crescent(.24, .43, 18, 92, .045, .085, C['lavender'], steps=10)
+ball((0, 0, .73), (.1, .11, .09), C['bone'], 10, 6)
+for s in (-1, 1): ball((s * .075, .03, .75), (.022, .022, .022), C['plasma'], 6, 4, slot='glow')
+for k in range(3): segment((0, -.06, .66 + k * .07), (0, -.2, .74 + k * .09), .035, .004, C['bone_shade'], 6)
+model('Tool26', tip=tip)
+
+# 27 独角兽角钻: a unicorn head held like a drill; its spiral horn spins.
+box((0, 0, -.02), (.11, .13, .3), C['ice_pink'], .035)
+box((0, .06, .24), (.18, .34, .22), C['unicorn'], .07)
+for i, (y, c) in enumerate(((-.07, 'pink'), (.0, 'purple'), (.07, 'sky'), (.14, 'lime'))): ball((0, y, .36), (.05, .05, .045), C[c], 8, 5)
+for s in (-1, 1):
+    ball((s * .092, .14, .28), (.012, .03, .035), C['ink'], 6, 4)
+    ball((s * .092, .19, .22), (.01, .03, .02), C['ice_pink'], 6, 4)
+    cyl((s * .06, -.04, .37), .03, .08, C['unicorn'], 6, r2=0)
+ring((0, .24, .24), .08, .02, C['gold'], rot=(math.pi / 2, 0, 0), major=14)
+cyl((0, .49, .24), .075, .46, C['unicorn'], 10, r2=0, rot=(-math.pi / 2, 0, 0), slot='a', smooth=False)
+tube(helix(.27, .7, .075, .008, 3, .24), .011, C['gold'], slot='a')
+grow(1.3); S = 1.3
+model('Tool27', tip=(0, .72 * S, .24 * S), spins=[('a', (0, .49 * S, .24 * S), 'Y')])
+
+# 28 怀表镐: a giant pocket watch for a hammer head; its hands race while it works.
+handle(.58, 'gold', 'leather')
+cyl((0, 0, .76), .22, .08, C['gold'], 20, rot=(math.pi / 2, 0, 0))
+cyl((0, 0, .76), .19, .086, C['clock_face'], 20, rot=(math.pi / 2, 0, 0), smooth=False)
+for s in (-1, 1):
+    for k in range(4):
+        a = k * math.pi / 2; box((math.cos(a) * .15, s * .044, .76 + math.sin(a) * .15), (.025, .006, .025), C['ink'], 0)
+    box((0, s * .05, .82), (.018, .008, .12), C['ink'], 0, slot='a')
+    box((.04, s * .05, .76), (.09, .008, .016), C['ink'], 0, slot='a')
+cyl((0, 0, .76), .015, .11, C['gold'], 8, rot=(math.pi / 2, 0, 0), slot='a')
+cyl((0, 0, 1.0), .035, .05, C['gold'], 8)
+ring((0, 0, 1.06), .045, .012, C['gold'], rot=(math.pi / 2, 0, 0), major=12, minor=4)
+model('Tool28', tip=(0, .045, .76), spins=[('a', (0, 0, .76), 'Y')])
+
+# 29 黑洞锤: a black sphere ringed by a glowing disk that turns while it works.
+handle(.6, 'iron', 'purple')
+box((0, 0, .62), (.08, .08, .1), C['iron'], .01)
+ball((0, 0, .78), (.17, .17, .17), C['void_black'], 14, 9)
+ring((0, 0, .78), .28, .03, C['void'], rot=(0, .4, 0), major=24, minor=4, slot='a_glow')
+ring((0, 0, .78), .21, .02, C['jelly_glow'], rot=(0, .4, 0), major=20, minor=4, slot='a_glow')
+for k in range(5):
+    a = k * 2 * math.pi / 5; v = Matrix.Rotation(.4, 3, 'Y') @ Vector((math.cos(a) * .245, math.sin(a) * .245, 0))
+    ball((v.x, v.y, .78 + v.z), (.018, .018, .018), C['star'], 6, 4, slot='a_glow')
+model('Tool29', tip=(0, .17, .78), spins=[('a', (0, 0, .78), (0, .4, 0))])
+
+# 30 银河之镐: a pick of deep space, full of stars, a glowing core.
+handle(.7, 'navy', 'gold')
+for z in (-.17, .3, .62): cyl((0, 0, z), .06, .03, C['gold'], 10)
+tip = crescent(.2, .48, 28, 152, .18, .14, C['galaxy'])
+crescent(.2, .48, 34, 146, .07, .145, C['galaxy2'], steps=8)
+box((0, 0, .66), (.18, .2, .2), C['gold'], .03)
+ball((0, 0, .66), (.07, .11, .09), C['void'], 6, 4, smooth=False, slot='glow')
+for a in range(40, 141, 20):
+    for s in (-1, 1):
+        r = .48 + (.04 if a % 40 else -.04)
+        ball((s * .072, r * math.cos(math.radians(a)), .2 + r * math.sin(math.radians(a))), (.016, .016, .016), C['star'], 6, 4, slot='glow')
+model('Tool30', tip=tip)
 
 # ---------------------------------------------------------------- BACKPACKS, world 1
 def straps(c, top=.22, bottom=-.22):
@@ -519,32 +794,260 @@ finish(apply(lid), C['chest'])
 chunks((0, -.1, .04), .24, .16, .16, [C['gold'], C['coin'], C['gold'], C['red'], C['sky'], C['emerald']], 14, 7, size=.06, shape='coin')
 model('Bag10', fill=(0, -.1, .04))
 
-# ---------------------------------------------------------------- BACKPACKS, levels 11-30: the old series for now
-for level in range(11, 31):
-    k = (level - 1) % 10; era = (level - 1) // 10; color = [0, 7, 6, 9, 0, 4, 3, 7, 9, 5][k]; trim = [8, 10, 15][era]
-    w = .50 + .025 * (k % 4); h = .64 + .025 * (k % 3)
-    if k < 4:
-        box((0, 0, 0), (w, .29, h), color, .06)
-        box((0, -.15, .22), (w * 1.04, .065, .18), color, .025)
-        box((0, -.19, -.14), (w * .72, .13, .22), trim, .035)
-        for x in [-w * .35, w * .35]: box((x, -.198, .12), (.045, .025, .09), 5, .008)
-    elif k in [4, 5]:
-        cyl((0, 0, 0), .29, h, 0, 12, smooth=False)
-        for z in [-h * .36, h * .36]: cyl((0, 0, z), .305, .07, trim, 12, smooth=False)
-        cyl((0, 0, h * .5), .30, .035, 4, 12, smooth=False)
-    elif k in [7, 8]:
-        cyl((0, 0, 0), .26, h, color, 10, smooth=False)
-        for z in [-h * .48, h * .48]: cyl((0, 0, z), .29, .09, 5, 10, smooth=False)
-        box((0, -.255, 0), (.23, .03, .31), trim, .035)
-    else:
-        box((0, 0, 0), (w, .36, h), 5, .04)
-        box((0, -.205, 0), (w * .84, .065, h * .83), color, .04)
-        cyl((0, -.255, 0), .11, .05, trim, 8, rot=(math.pi / 2, 0, 0), smooth=False)
-        for x in [-w * .36, w * .36]: box((x, -.25, 0), (.05, .035, h * .72), trim, .01)
-    for x in [-.17, .17]: box((x, .17, .02), (.065, .065, .58), 2, .018)
-    box((0, 0, h * .5 + .045), (.21, .07, .06), 5, .02)
-    for x in [-w * .45, w * .45]: ball((x, -.05, .05), (.06, .14, .19), trim, 6, 4, smooth=False)
-    model(f'Bag{level:02d}')
+# ---------------------------------------------------------------- BACKPACKS, world 2: machines
+def cut(body, at, size, rot=(0, 0, 0), shape='box'):
+    """Hollow a recess out of `body` (already finished) and repaint it."""
+    if shape == 'box': bpy.ops.mesh.primitive_cube_add(size=1, location=at); tool = bpy.context.object; tool.scale = size
+    else: bpy.ops.mesh.primitive_cylinder_add(vertices=20, radius=size[0], depth=size[1], location=at, rotation=rot); tool = bpy.context.object
+    m = body.modifiers.new('Cut', 'BOOLEAN'); m.object = tool; m.operation = 'DIFFERENCE'; m.solver = 'EXACT'
+    bpy.context.view_layer.objects.active = body; bpy.ops.object.modifier_apply(modifier=m.name); bpy.data.objects.remove(tool)
+
+# 11 工具箱: an open red tool tote, a screwdriver and spanner poking out of the ore.
+straps('iron')
+box((0, -.1, -.12), (.58, .42, .36), C['toolbox'], .02)
+box((0, -.1, .07), (.6, .44, .03), C['deep_red'], .005)
+for x in (-.25, .25): box((x, -.1, .17), (.03, .03, .2), C['iron'], .005)
+box((0, -.1, .27), (.53, .04, .04), C['iron'], .01)
+for x in (-.18, .18): box((x, -.316, -.0), (.06, .02, .05), C['chrome'], .005)
+box((0, -.312, -.15), (.2, .006, .08), C['hazard'], 0)
+segment((.12, -.05, .12), (.16, -.02, .3), .025, .025, C['hazard'], 8); segment((.16, -.02, .3), (.18, -.01, .42), .008, .008, C['chrome'], 6)
+box((-.13, -.14, .26), (.04, .015, .3), C['chrome'], .005, rot=(0, -.35, 0))
+chunks((0, -.1, .08), .22, .15, .14, ORE, 9, 11)
+model('Bag11', fill=(0, -.1, .08))
+
+# 12 油桶: a blue oil drum, green ooze spilling over its lid.
+straps('blue')
+cyl((0, -.13, 0), .27, .7, C['oil_blue'], 16)
+for z in (-.35, -.12, .12, .35): ring((0, -.13, z), .272, .018, C['blue'], major=16, minor=4)
+cyl((0, -.13, .356), .25, .01, C['iron'], 16, smooth=False)
+cyl((.12, -.13, .37), .035, .03, C['chrome'], 8)
+box((0, -.397, 0), (.18, .01, .18), C['hazard'], 0)
+box((0, -.403, 0), (.06, .004, .1), C['ink'], 0); box((0, -.403, -.06), (.03, .004, .025), C['ink'], 0)
+ball((-.08, -.2, .365), (.11, .1, .02), C['battery'], 10, 4)
+ball((-.17, -.36, .3), (.035, .025, .08), C['battery'], 8, 5); ball((-.19, -.37, .2), (.025, .02, .03), C['battery'], 6, 4)
+model('Bag12')
+
+# 13 喷气背包: twin chrome tanks with flames out of their nozzles.
+straps('iron')
+box((0, -.06, 0), (.2, .18, .5), C['orange_paint'], .04)
+cyl((0, -.155, .14), .04, .01, C['white'], 12, rot=(math.pi / 2, 0, 0), smooth=False)
+box((.012, -.16, .15), (.025, .004, .006), C['red'], 0, rot=(0, .6, 0))
+for x in (-.16, .16):
+    cyl((x, -.13, .02), .11, .6, C['chrome'], 12)
+    ball((x, -.13, .32), (.11, .11, .07), C['chrome'], 12, 6)
+    for z in (.15, -.12): ring((x, -.13, z), .112, .012, C['red'], major=12, minor=4)
+    cyl((x, -.13, -.33), .07, .08, C['iron'], 10, r2=.09)
+    cyl((x, -.13, -.47), .001, .2, C['flame'], 10, r2=.075, slot='glow')
+    cyl((x, -.13, -.44), .001, .12, C['flame_core'], 8, r2=.045, slot='glow')
+model('Bag13')
+
+# 14 微波炉: a microwave; the ore turns on its plate behind the door glass.
+straps('iron')
+body = box((0, -.08, 0), (.6, .42, .42), C['microwave'], .03)
+cut(body, (-.075, -.3, 0), (.36, .2, .31)); finish(body, C['microwave']); parts['body'].pop()
+box((-.075, -.198, 0), (.34, .01, .29), C['drum'], 0)
+cyl((-.075, -.24, -.135), .12, .015, C['white'], 14, smooth=False)
+box((-.075, -.293, 0), (.34, .01, .29), C['glass_tint'], 0, slot='glass')
+box((.2, -.292, 0), (.14, .006, .34), C['iron'], 0)
+box((.2, -.297, .11), (.1, .004, .05), C['battery'], 0, slot='glow')
+for i in range(6): box((.17 + (i % 2) * .06, -.297, .02 - (i // 2) * .05), (.04, .006, .03), C['steel'], 0)
+box((.115, -.31, 0), (.02, .03, .24), C['chrome'], .005)
+chunks((-.075, -.24, -.128), .11, .05, .2, ORE, 8, 12, size=.055)
+model('Bag14', fill=(-.075, -.24, -.128))
+
+# 15 电池组: a see-through battery; its glowing green bars are the load.
+straps('black')
+for z in (-.31, .31): box((0, -.1, z), (.46, .4, .08), C['black'], .02)
+for x in (-.21, .21):
+    for y in (-.28, .08): box((x, y, 0), (.04, .04, .58), C['black'], .005)
+box((0, -.1, 0), (.42, .36, .56), C['glass_green'], 0, slot='glass')
+for i in range(5): box((0, -.1, -.24 + i * .105), (.34, .28, .085), C['battery'], .01, slot='fill_glow')
+cyl((-.12, -.1, .37), .04, .05, C['red'], 10); cyl((.12, -.1, .37), .04, .05, C['iron'], 10)
+slab([(-.02, .26), (.06, .26), (.02, .13), (.07, .13), (-.04, -.04), (0, .09), (-.05, .09)], .01, C['lightning'], at=(-.01, -.31, -.38), plane='XZ', slot='glow')
+model('Bag15', fill=(0, -.1, -.285))
+
+# 16 机器人背包: a little robot, screen face, antenna light.
+straps('iron')
+box((0, -.1, -.08), (.5, .4, .44), C['robot_white'], .06)
+box((0, -.1, .27), (.4, .34, .26), C['robot_white'], .06)
+box((0, -.1, .15), (.16, .2, .04), C['iron'], .01)
+box((0, -.272, .27), (.32, .01, .18), C['screen'], .01)
+for x in (-.08, .08): box((x, -.279, .29), (.06, .006, .07), C['laser'], .01, slot='glow')
+box((0, -.279, .22), (.08, .006, .015), C['laser'], 0, slot='glow')
+cyl((0, -.1, .46), .01, .1, C['iron'], 6); ball((0, -.1, .53), (.035, .035, .035), C['red'], 8, 5, slot='glow')
+for s in (-1, 1):
+    cyl((s * .205, -.1, .27), .05, .04, C['orange_paint'], 10, rot=(0, math.pi / 2, 0))
+    cyl((s * .27, -.1, -.06), .04, .24, C['iron'], 8); ball((s * .27, -.1, -.2), (.05, .05, .05), C['orange_paint'], 8, 5)
+box((0, -.302, -.08), (.24, .006, .16), C['navy'], 0)
+for i, c in enumerate(('battery', 'red', 'hazard')): box((-.07 + i * .07, -.307, -.08), (.04, .006, .04), C[c], 0, slot='glow' if c == 'battery' else 'body')
+model('Bag16')
+
+# 17 卫星锅: a backpack with a satellite dish aimed at the sky.
+straps('iron')
+box((0, -.08, -.1), (.46, .36, .5), C['dish'], .04)
+box((0, -.262, -.1), (.4, .006, .08), C['navy'], 0)
+box((.15, -.262, .05), (.06, .006, .03), C['battery'], 0, slot='glow')
+cyl((0, -.1, .2), .04, .12, C['iron'], 8)
+dish = lathe([(0, 0), (.1, .012), (.18, .045), (.24, .09), (.25, .1)], C['dish'], 16, at=(0, -.12, .28), cap=False)
+dish.rotation_euler = (-.7, 0, 0); apply(dish)
+segment((0, -.12, .29), (0, -.28, .48), .012, .012, C['iron'], 6)
+ball((0, -.28, .48), (.035, .035, .035), C['red'], 8, 5, slot='glow')
+model('Bag17')
+
+# 18 迷你集装箱: an orange shipping container, doors and lock bars facing back.
+straps('container_dark')
+box((0, -.1, 0), (.48, .42, .7), C['container'], .015)
+for y in [-.28 + .07 * i for i in range(6)]:
+    for x in (-.245, .245): box((x, y, 0), (.012, .03, .66), C['container_dark'], 0)
+box((0, -.315, 0), (.008, .008, .66), C['container_dark'], 0)
+for x in (-.15, -.05, .05, .15): cyl((x, -.322, 0), .01, .64, C['iron'], 6, smooth=False); box((x + .02, -.33, -.05), (.04, .012, .02), C['iron'], 0)
+for z in (-.355, .355): box((0, -.1, z), (.5, .44, .03), C['container_dark'], .005)
+box((-.12, -.317, .22), (.12, .004, .06), C['white'], 0)
+model('Bag18')
+
+# 19 反应堆舱: a glass reactor tube; the glowing fluid inside is the load.
+straps('iron')
+for z in (-.3, .3): cyl((0, -.06, z), .2, .12, C['iron'], 14)
+for z in (-.37, .37): cyl((0, -.06, z), .205, .03, C['hazard'], 14, smooth=False)
+cyl((0, -.06, 0), .16, .5, C['glass_green'], 14, slot='glass')
+cyl((0, -.06, 0), .14, .48, C['battery'], 14, slot='fill_glow')
+for k in range(4): ball((math.cos(k * 1.7) * .07, -.06 + math.sin(k * 1.7) * .07, -.15 + k * .1), (.02, .02, .02), C['white'], 6, 4, slot='fill')
+for k in range(3):
+    a = math.radians(-90 + 120 * k); cyl((math.cos(a) * .19, -.06 + math.sin(a) * .19, 0), .018, .5, C['chrome'], 6)
+tube([(.12, -.06, .36), (.22, -.06, .42), (.28, -.06, .3), (.28, -.06, -.1)], .025, C['chrome'], sides=1)
+box((0, -.262, .3), (.08, .006, .06), C['hazard'], 0)
+model('Bag19', fill=(0, -.06, -.24))
+
+# 20 火箭: a white rocket with fins, a porthole and a flame below.
+straps('iron')
+lathe([(.01, -.36), (.17, -.33), (.2, -.1), (.2, .12), (.16, .28), (.08, .38), (.01, .42)],
+      lambda p, n: C['red'] if p.z > .25 else C['blue'] if -.06 < p.z < 0 else C['robot_white'], 14, at=(0, -.08, 0))
+cyl((0, -.275, .1), .075, .02, C['glass_tint'], 12, rot=(math.pi / 2, 0, 0), slot='glass', smooth=False)
+ring((0, -.28, .1), .08, .015, C['chrome'], rot=(math.pi / 2, 0, 0), major=14, minor=4)
+for s in (-1, 1): slab([(s * .17, -.05), (s * .32, -.25), (s * .32, -.36), (s * .17, -.3)][::s], .03, C['red'], at=(0, -.08, 0), plane='XZ')
+slab([(-.17, -.05), (-.32, -.25), (-.32, -.36), (-.17, -.3)], .03, C['red'], at=(0, -.08, 0), plane='YZ')
+cyl((0, -.08, -.39), .1, .08, C['iron'], 12, r2=.07)
+cyl((0, -.08, -.53), .001, .2, C['flame'], 12, r2=.085, slot='glow')
+cyl((0, -.08, -.5), .001, .12, C['flame_core'], 8, r2=.05, slot='glow')
+model('Bag20')
+
+# ---------------------------------------------------------------- BACKPACKS, world 3: fantasy and space
+# 21 云朵: a smiling cloud dripping a little rain.
+straps('cloud_shade', .1, -.1)
+puff = lambda p, n: C['cloud_shade'] if p.z < -.08 else C['white']
+for at, sc in (((0, -.12, .05), (.22, .2, .2)), ((-.2, -.12, -.02), (.17, .16, .16)), ((.2, -.12, -.03), (.18, .16, .16)),
+               ((-.08, -.12, .18), (.16, .15, .15)), ((.1, -.12, .17), (.15, .14, .14)), ((0, -.12, -.1), (.25, .17, .12))):
+    ball(at, sc, puff, 12, 8)
+for x in (-.07, .07): ball((x, -.315, .07), (.022, .01, .03), C['ink'], 6, 4)
+for x in (-.13, .13): ball((x, -.3, .01), (.035, .01, .02), C['pink'], 6, 4)
+box((0, -.318, .0), (.06, .008, .012), C['ink'], 0)
+for x, z in ((-.12, -.3), (.05, -.33), (.17, -.28)): ball((x, -.12, z), (.03, .03, .045), C['sky'], 8, 5)
+model('Bag21')
+
+# 22 南瓜灯: a jack-o'-lantern whose carved face glows.
+straps('green', .14, -.18)
+lathe([(.01, -.26), (.2, -.24), (.3, -.1), (.31, .03), (.27, .16), (.15, .24), (.01, .25)],
+      lambda p, n: C['pumpkin_dark'] if int((math.atan2(p.y + .12, p.x) + math.pi) / (2 * math.pi) * 16) % 2 else C['pumpkin'], 16, at=(0, -.12, 0), scale=(1, .85, 1))
+cyl((0, -.12, .28), .03, .1, C['green'], 6, r2=.02)
+slab([(0, 0), (.08, .06), (.16, .04), (.09, -.02)], .015, C['leaf'], at=(0, -.12, .3), plane='XZ')
+for x in (-.1, .1): slab([(-.045, 0), (.045, 0), (0, .07)], .03, C['candle'], at=(x, -.37, .05), plane='XZ', slot='glow')
+slab([(-.025, 0), (.025, 0), (0, .04)], .03, C['candle'], at=(0, -.385, -.01), plane='XZ', slot='glow')
+slab([(-.14, 0), (-.12, -.04), (-.07, -.07), (-.02, -.03), (.03, -.07), (.07, -.03), (.12, -.06), (.14, 0)], .03, C['candle'], at=(0, -.375, -.06), plane='XZ', slot='glow')
+model('Bag22')
+
+# 23 蜂巢: a straw beehive with honey dripping and two bees.
+straps('honey_dark')
+lathe([(.01, -.3), (.24, -.3), (.27, -.15), (.26, 0), (.21, .15), (.12, .26), (.01, .3)],
+      lambda p, n: C['honey_dark'] if int((p.z + .3) / .06) % 2 else C['honey'], 14, at=(0, -.12, 0))
+cyl((0, -.37, -.2), .06, .03, C['ink'], 12, rot=(math.pi / 2, 0, 0), smooth=False)
+ball((.12, -.34, .05), (.05, .03, .04), C['honey'], 8, 5); ball((.13, -.35, -.02), (.025, .02, .04), C['honey'], 6, 4)
+for at in ((-.24, -.3, .22), (.26, -.25, .3)):
+    x, y, z = at
+    ball(at, (.05, .04, .04), C['duck'], 8, 5)
+    box((x, y, z), (.02, .085, .085), C['ink'], 0)
+    for s in (-1, 1): ball((x + s * .03, y + .01, z + .05), (.035, .01, .025), C['glass_tint'], 6, 4, slot='glass')
+model('Bag23')
+
+# 24 水母: a jellyfish; the ore floats inside its see-through bell, glowing tentacles below.
+straps('jelly', .14, -.06)
+lathe([(.28, -.06), (.3, .04), (.27, .17), (.18, .27), (.01, .31)], C['jelly'], 16, at=(0, -.12, 0), cap=False, slot='glass')
+cyl((0, -.12, -.06), .27, .01, C['jelly'], 16, slot='glass', smooth=False)
+ring((0, -.12, -.06), .28, .03, C['jelly_glow'], major=20, minor=4, slot='glow')
+for x in (-.08, .08): ball((x, -.39, .12), (.02, .012, .025), C['ink'], 6, 4)
+for k in range(6):
+    a = k * 2 * math.pi / 6 + .3; x0, y0 = math.cos(a) * .19, -.12 + math.sin(a) * .19
+    tube([(x0 + .03 * math.sin(i * 1.4 + k), y0, -.07 - i * .07) for i in range(6)], .016, C['jelly_glow'], slot='glow', sides=1)
+chunks((0, -.12, -.05), .2, .18, .24, ORE, 10, 14, size=.055)
+model('Bag24', fill=(0, -.12, -.05))
+
+# 25 带环星球: a striped planet with a ring and a little moon.
+straps('planet', .12, -.12)
+ball((0, -.12, 0), (.25, .25, .25), lambda p, n: C['planet_band'] if int((p.z + .3) / .08) % 2 else C['planet'], 16, 10)
+o = ring((0, -.12, 0), .38, .045, C['ring_c'], rot=(math.pi / 2 - .4, 0, .3), major=28, minor=4)
+for x in (-.08, .08): ball((x, -.36, .05), (.022, .012, .03), C['ink'], 6, 4)
+ball((.34, -.2, .3), (.05, .05, .05), C['stone_light'], 8, 5)
+for at in ((-.32, -.22, .3), (.3, -.25, -.28)): ball(at, (.02, .02, .02), C['star'], 6, 4, slot='glow')
+model('Bag25')
+
+# 26 龙蛋: a red dragon egg, a crack near the top with eyes peeking out.
+straps('egg_spot')
+lathe([(.01, -.32), (.16, -.29), (.25, -.17), (.27, 0), (.24, .16), (.16, .29), (.01, .36)],
+      lambda p, n: C['egg_spot'] if math.sin(p.x * 23) + math.sin(p.z * 19 + 1) + math.sin(p.y * 17) > 1.4 else C['egg_red'], 14, at=(0, -.12, 0))
+ball((0, -.35, .15), (.1, .03, .05), C['ink'], 10, 5)
+for x in (-.035, .035): ball((x, -.375, .155), (.015, .01, .015), C['flame_core'], 6, 4, slot='glow')
+for x in (-.05, .05): cyl((x, -.12, .37), .025, .07, C['bone'], 6, r2=0)
+ring((0, -.12, -.28), .2, .05, C['wicker'], major=16, minor=4)
+model('Bag26')
+
+# 27 魔法书: a big spell book, a glowing gem on its cover.
+straps('book')
+box((0, -.02, 0), (.5, .04, .62), C['book'], .01)
+box((.01, -.1, 0), (.47, .14, .58), C['page'], .005)
+box((-.25, -.1, 0), (.04, .2, .62), C['book'], .01)
+box((0, -.19, 0), (.5, .04, .62), C['book'], .01)
+for x in (-.22, .22):
+    for z in (-.28, .28): box((x, -.212, z), (.07, .01, .07), C['gold'], .003)
+ball((0, -.215, .03), (.07, .03, .09), C['void'], 6, 4, slot='glow', smooth=False)
+ring((0, -.212, .03), .1, .012, C['gold'], rot=(math.pi / 2, 0, 0), major=16, minor=4)
+box((.255, -.1, 0), (.03, .22, .08), C['leather'], .005)
+box((.1, -.1, -.34), (.03, .02, .1), C['red'], 0)
+for at in ((.3, -.25, .3), (-.32, -.2, .2), (.28, -.22, -.25)): ball(at, (.02, .02, .02), C['star'], 6, 4, slot='glow')
+model('Bag27')
+
+# 28 沙漏: an hourglass; the sand heaping in its lower bulb is the load.
+straps('wood_dark')
+for z in (-.33, .33): cyl((0, -.12, z), .22, .05, C['wood_dark'], 12)
+for k in range(3):
+    a = math.radians(90 + 120 * k); cyl((math.cos(a) * .19, -.12 + math.sin(a) * .19, 0), .02, .62, C['gold'], 6)
+lathe([(.03, 0), (.1, .04), (.17, .12), (.18, .2), (.14, .28), (.02, .3)], C['glass_tint'], 14, at=(0, -.12, 0), cap=False, slot='glass')
+lathe([(.02, -.3), (.14, -.28), (.18, -.2), (.17, -.12), (.1, -.04), (.03, 0)], C['glass_tint'], 14, at=(0, -.12, 0), cap=False, slot='glass')
+lathe([(.02, .05), (.13, .16), (.15, .19), (.0, .19)], C['sand_gold'], 12, at=(0, -.12, 0))
+cyl((0, -.12, -.14), .008, .28, C['sand_gold'], 6)
+lathe([(.16, 0), (.15, .05), (.09, .12), (.01, .16)], C['sand_gold'], 12, at=(0, -.12, -.29), slot='fill')
+for k in range(4): box((math.cos(k * 1.6) * .08, -.12 + math.sin(k * 1.6) * .08, -.27 + .02 * k), (.03, .03, .03), ORE[k], 0, rot=(k, k * .5, 0), slot='fill')
+model('Bag28', fill=(0, -.12, -.29))
+
+# 29 迷你传送门: a stone ring around a swirling portal.
+straps('portal_rim', .14, -.2)
+ring((0, -.12, .02), .27, .07, C['portal_rim'], rot=(math.pi / 2, 0, 0), major=20, minor=6)
+for k in range(6):
+    a = k * math.pi / 3; box((math.cos(a) * .27, -.195, .02 + math.sin(a) * .27), (.05, .02, .05), C['void'], 0, rot=(0, -a, 0), slot='glow')
+box((0, -.12, -.33), (.3, .2, .06), C['stone'], .01)
+cyl((0, -.12, .02), .22, .02, C['portal'], 20, rot=(math.pi / 2, 0, 0), slot='a_glow', smooth=False)
+for y in (-.135, -.105):
+    tube([(math.cos(t * 6) * (.02 + .18 * t), y, .02 + math.sin(t * 6) * (.02 + .18 * t)) for t in (i / 20 for i in range(21))], .012, C['jelly_glow'], slot='a_glow')
+model('Bag29', spins=[('a', (0, -.12, .02), 'Y')])
+
+# 30 黑洞罐: a black hole in a jar; the ore it has caught settles on the bottom.
+straps('gold', .1, -.24)
+lathe([(.2, -.3), (.23, -.25), (.24, .15), (.2, .24), (.16, .27), (.16, .3)], C['glass_tint'], 16, at=(0, -.1, 0), slot='glass')
+cyl((0, -.1, .33), .18, .06, C['gold'], 14); ball((0, -.1, .37), (.04, .04, .025), C['gold'], 8, 4)
+box((0, -.315, .22), (.14, .006, .05), C['page'], 0)
+ball((0, -.1, .08), (.08, .08, .08), C['void_black'], 10, 6)
+ring((0, -.1, .08), .14, .02, C['void'], rot=(.5, 0, 0), major=18, minor=4, slot='a_glow')
+ring((0, -.1, .08), .105, .012, C['jelly_glow'], rot=(.5, 0, 0), major=16, minor=4, slot='a_glow')
+chunks((0, -.1, -.29), .2, .18, .2, ORE, 10, 13, size=.05)
+model('Bag30', fill=(0, -.1, -.29), spins=[('a', (0, -.1, .08), (.5, 0, 0))])
 
 for s in bpy.context.selected_objects: s.select_set(False)
 for i, r in enumerate(roots):
@@ -558,4 +1061,4 @@ manifest = {'maker': 'Blender', 'script': 'tools/build-equipment.py', 'source': 
 for path in [OUT / 'equipment.glb', SRC / 'equipment-atlas.png', SRC / 'equipment.blend', Path(__file__)]:
     manifest['files'].append({'file': str(path.relative_to(ROOT)), 'bytes': path.stat().st_size, 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()})
 (OUT / 'equipment-manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n')
-print(json.dumps({'models': len(report), 'world1': report[:10] + report[30:40]}, ensure_ascii=False))
+print(json.dumps({'models': len(report), 'triangles': {r['node']: r['triangles'] for r in report}}, ensure_ascii=False))

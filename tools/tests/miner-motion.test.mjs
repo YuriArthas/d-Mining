@@ -180,3 +180,19 @@ test('背包装载：有开口或窗户的背包，矿堆随装满程度长高�
     assert.ok(glass.material.userData.opacity<.5&&glass.renderOrder>0);
   }finally{a.dispose();}
 });
+
+test('会动的部件：齿轮战斧挥动时齿轮转，停手就停；传送门背包的漩涡一直慢慢转',async()=>{
+  const a=await avatar();
+  try{
+    a.setEquipment(19,29);
+    const find=(root,prefix)=>{let hit;a.group.getObjectByName(root).traverse(o=>{if(!hit&&o.name.startsWith(prefix))hit=o;});return hit;};
+    const gear=find('equipped-pickaxe','Spin'),swirl=find('equipped-backpack','Spin');
+    assert.equal(a.diagnostics().pickaxe.motion,'swing');
+    const g0=gear.quaternion.clone(),s0=swirl.quaternion.clone();
+    for(let i=0;i<60;i++)a.update([0,0,0],1/60,true,false);
+    assert.ok(gear.quaternion.angleTo(g0)<1e-6,'the gear rests while idle');
+    assert.ok(swirl.quaternion.angleTo(s0)>.5,'the portal swirls on its own');
+    a.strike([0,1,-2],2);for(let i=0;i<20;i++)a.update([0,0,0],1/60,true,false);
+    assert.ok(gear.quaternion.angleTo(g0)>.5,'the gear turns while swinging');
+  }finally{a.dispose();}
+});

@@ -50,13 +50,13 @@ test('all 60 catalog models exist, real prices/capacities match game progression
  const a=Reflect.construct(MinerAvatar,[character,library]);try{a.setEquipment(12,23);const d=a.diagnostics();assert.equal(d.pickaxe.model,'Tool12');assert.equal(d.backpack.model,'Bag23');assert.equal(d.backpack.attachedTo,'UpperTorso');assert.equal(d.bones,16);assert.equal(d.triangles,11678);assert.ok(d.pickaxe.tip.every(Number.isFinite));}finally{a.dispose();}
 });
 
-test('世界 1 的十把工具和十个背包各有自己的名字和一句介绍；打蛋器是电钻类，其他是镐类',()=>{
+test('三十把工具和三十个背包各有自己的名字和一句介绍；电钻类是打蛋器、冲击电钻、链锯、等离子钻和独角兽角钻',()=>{
   const tools=shopTools(),bags=shopBackpacks();
   for(const list of [tools,bags]){
     assert.equal(new Set(list.map(i=>i.name)).size,list.length,'every name is different');
-    assert.equal(new Set(list.slice(0,10).map(i=>i.description)).size,10,'world 1 items each have their own line');
+    assert.equal(new Set(list.map(i=>i.description)).size,list.length,'every item has its own line');
   }
   assert.equal(tools[0].name,'老木镐');assert.equal(bags[0].name,'麻布袋');
-  assert.deepEqual(tools.filter(t=>t.motion==='drill').map(t=>t.level),[7]);
+  assert.deepEqual(tools.filter(t=>t.motion==='drill').map(t=>t.level),[7,12,13,20,27]);
   assert.ok(tools.every(t=>t.motion==='drill'||t.motion==='swing'));
 });

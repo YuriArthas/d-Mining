@@ -9,7 +9,7 @@ type Snapshot = Readonly<{
 }>;
 
 type OfferState = 'equipped' | 'owned' | 'next' | 'locked';
-/** The step of the tier ladder an item sits on: 1-10 plain, 11-20 精工, 21-30 星辉. */
+/** The world an item belongs to, which colours its name: 1-10 plain, 11-20 cyan, 21-30 gold. */
 type OfferTier = 'plain' | 'fine' | 'star';
 type OfferStat = Readonly<{ key: 'power' | 'speed' | 'capacity'; label: string; value: number; current: number; max: number; unit: string }>;
 

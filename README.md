@@ -48,10 +48,12 @@ PINEWIND_RELEASE_RECORD=artifacts/<名字>-release.json node tools/publish-pinew
   背对太阳的正面（传送门、传送站、矿石收购站）用两块"背光"贴图格（暗白、暗黄、自发光），看起来和朝阳面一样亮。
   第二世界的场景（地表和六个休整层，`AuthoredInstance.world = 2`）开局不下载，玩家第一次前往时才载入，传送等它载完再到达。
 - 工具和背包：`blender -b --python tools/build-equipment.py`，输出 `src/game/assets/shop/equipment.glb` 和
-  `equipment-manifest.json`（名字、介绍、动作类型在 `src/game/content/shopCatalog.ts`）。1–10 级是世界 1 的整活套装
-  （平底锅、咸鱼、打蛋器……；纸箱、鱼缸、扭蛋机……），11–30 级暂时还是旧的镐和背包。工具的握点在原点、打击方向 +Y；
-  棍棒类在 `Hold` 节点里朝前倾，商店里摆正。`Spin*` 节点在工作时转动；动作类型 `drill` 的工具平端前顶并抖动，
-  其他是挥镐。背包的 `BagFill` 节点按装满程度长高，`EquipGlass` 材质是透明窗。展厅场景单独由 `tools/build-shop-showroom.py` 生成。
+  `equipment-manifest.json`（名字、介绍、动作类型在 `src/game/content/shopCatalog.ts`）。三个世界各一套：世界 1 家里的东西
+  （仙人掌、咸鱼、打蛋器……；纸箱、鱼缸、扭蛋机……），世界 2 机械（电钻、链锯、激光剑……；电池组、反应堆舱、火箭……），
+  世界 3 奇幻和宇宙（彩虹、章鱼触手、黑洞锤……；水母、沙漏、传送门……）。工具的握点在原点、打击方向 +Y；棍棒类在
+  `Hold` 节点里朝前倾，商店里摆正。`Spin*` 节点：工具的在工作时转，背包的一直慢慢转；动作类型 `drill` 的工具平端前顶并
+  抖动，其他是挥镐。背包的 `BagFill` 节点按装满程度长高。材质：`EquipAtlas` 平涂色块，`EquipGlass` 按色块着色的透明件，
+  `EquipGlow` 自发光件。展厅场景单独由 `tools/build-shop-showroom.py` 生成。
 - 第三世界的休整层仍用 Blender 场景套件：`tools/blender/build-crystal.py`、`build-chamber.py -- <id>`。
 
 运行时模型在 `src/game/assets/scene/`，测试 `tools/tests/shipped-assets.test.mjs` 保证这里只有游戏实际摆放的模型。
