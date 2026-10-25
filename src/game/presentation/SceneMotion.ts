@@ -11,7 +11,9 @@ export class SceneMotion {
   private readonly spins: Spin[] = [];
   private readonly slides: Slide[] = [];
   private time = 0;
-  constructor(root: Object3D) {
+  constructor(root: Object3D) { this.add(root); }
+  /** Picks up the moving parts under `root` (a scene added later). */
+  add(root: Object3D) {
     const value = (text: string) => (text.startsWith('n') ? -1 : 1) * Number(text.replace(/^n/, '')) / 100;
     root.traverse(node => {
       const spin = /^Spin_([xyz])_(n?\d+)/.exec(node.name);

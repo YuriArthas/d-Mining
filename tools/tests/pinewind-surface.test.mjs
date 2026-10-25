@@ -22,6 +22,11 @@ test('world 1 surface services are the Pinewind buildings; the halls ship with t
  }
  assert.equal(session.eggStations.length,PINEWIND_EGG_DISPLAYS.length);
  assert.deepEqual([...new Set(GAME_CONTENT.surface.authored.instances.map(p=>p.asset))].sort(),['automine-hall','cryo-hall','crystal-hall','frozen-hall','fungal-hall','gear-hall','old-mine-hall','pinewind-architecture','pinewind-landscape','reactor-hall','refinery-hall','ruins-hall','survey-hall','tech-base','volcanic-hall']);
+ // World 2's surface base and halls load the first time the player goes there; everything else at start.
+ const byWorld=w=>[...new Set(GAME_CONTENT.surface.authored.instances.filter(p=>(p.world??1)===w).map(p=>p.asset))].sort();
+ assert.deepEqual(byWorld(2),['automine-hall','cryo-hall','gear-hall','reactor-hall','refinery-hall','survey-hall','tech-base']);
+ assert.deepEqual(byWorld(3),[]);
+ assert.ok(!byWorld(1).some(a=>byWorld(2).includes(a)));
 });
 test('one teleport station west of the spawn, its model, pillars and pad where the session expects them',async()=>{
  const {worldStation}=await import('../../src/game/content/worldJourney.ts');

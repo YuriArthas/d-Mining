@@ -285,6 +285,10 @@ export class GameSession {
     this.tip=null; this.tipQuietUntil=now+TIP_GAP;
     return changed;
   }
+  /** A transient notice from the runtime (e.g. a world's scene still loading on the way there). */
+  announce = (text: string) => {
+    if (this.notice !== text) { this.notice = text; this.publish(); }
+  };
   /** The player tapped the tip away, or used the control it points at. */
   dismissTip = (id?: TipId) => {
     if (!this.tip || (id && id !== this.tip)) return;

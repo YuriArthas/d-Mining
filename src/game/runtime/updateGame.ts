@@ -10,6 +10,7 @@ import { themeById } from "../content/themes.ts";
 import { HALL_BY_LAYER, undergroundHall } from "../content/underground/halls.ts";
 import { mineralName } from "../terrain/minerals.ts";
 import { generationAtZ } from '../terrain/SparseWorld.ts';
+import { worldAtFeet, worldRequirement } from '../content/worldJourney.ts';
 import { Vector3 } from "three";
 import { bakedLightState, bakedSunAlignment, bakedSunDirection, setStandingSun } from '../presentation/bakedLight.ts';
 import { standingSun } from '../presentation/standingLight.ts';
@@ -125,7 +126,9 @@ export function updateGame(
       const currentLayer = stratumAtDepth(environmentDepthAtFeet(feet, physics.grounded, current.content.session.destinations), generationAtZ(terrain.world.generation,feet[2]/2).layers);
       onStatus(
         terrain.error ??
-          (player.travelling || !terrain.ready(feet)
+          (player.travelling && !player.sceneReady(player.travelling)
+            ? `正在载入${worldRequirement(worldAtFeet(player.travelling)).name}`
+            : player.travelling || !terrain.ready(feet)
             ? "正在准备附近地形"
             : `${current.content.worlds?`世界 ${current.session.getSnapshot().currentWorld} · `:''}深度 ${depth} 米 · ${currentLayer.name}${selected ? " · " + mineralName(terrain.cell(selected) ?? 0) : ""}`),
       );

@@ -39,10 +39,10 @@ const petContent = {
 };
 const eggs: readonly HubEgg[] = PINEWIND_EGG_DISPLAYS.filter(display => petContent.eggs.some(egg => egg.id === display.eggId));
 const [first, ...later] = JOURNEY_WORLDS;
-// Pinewind and every authored hall below any world load together; world 2's surface base too.
+// Pinewind with world 1's halls loads at start; world 2's surface base and halls the first time the player goes there.
 const pinewind = pinewindSurface(JOURNEY_WORLDS.flatMap(w => w.rooms), eggs);
 const surface: SurfaceContent = { ...pinewind, authored: { ...pinewind.authored, instances: [...pinewind.authored.instances,
-  { asset: TECH_BASE.asset, at: [0, 0, TECH_BASE.worldZ], rotation: [0, 0, 0, 1], scale: [1, 1, 1] }] } };
+  { asset: TECH_BASE.asset, at: [0, 0, TECH_BASE.worldZ], rotation: [0, 0, 0, 1], scale: [1, 1, 1], world: 2 }] } };
 
 const session: SessionContent = {
   initialCoins: 0,

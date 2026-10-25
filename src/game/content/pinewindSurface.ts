@@ -10,6 +10,7 @@ import {
  PINEWIND_TERRACE, PINEWIND_STAIR_STEPS, PINEWIND_CREEK,
 } from './pinewind/hubLayout.ts';
 import type {AuthoredInstance, AuthoredLight} from './authoredSurface.ts';
+import {worldAtZ} from './worldJourney.ts';
 
 type Root = {node:string;at:V3;rotation:[number,number,number,number];scale:V3};
 const roots=authored.roots as Root[];
@@ -24,7 +25,8 @@ const PINEWIND_TERRACE_SOLIDS:readonly Solid[]=[
 ];
 
 /** World 1's surface: the authored Pinewind valley (its art, collision, signs and service rings) and the
- *  rest halls built with the same pipeline, which load with it in their rooms below. */
+ *  rest halls built with the same pipeline in their rooms below (world 1's load with it, the later worlds' when
+ *  the player first goes there). */
 export function pinewindSurface(rooms:readonly RestRoom[],eggs:readonly HubEgg[]):SurfaceContent {
  const services=[PINEWIND_SERVICES.sale,PINEWIND_SERVICES.shop,PINEWIND_SERVICES.bags];
  const models=roots.filter(r=>!r.node.startsWith('Egg_')).map(r=>instance(r.node));
@@ -34,7 +36,7 @@ export function pinewindSurface(rooms:readonly RestRoom[],eggs:readonly HubEgg[]
  }
  for(const p of eggs){const model=instance('Egg_'+p.id);model.at=[p.x,p.y,p.z];model.rotation=rotation(p.yaw);models.push(model);}
  for(const model of models)model.ground=model.node==='Creek_Bridge'||model.node?.startsWith('Terrace')===true;
- for(const room of rooms){const hall=room.sceneDefinition?.hall;if(hall)models.push({asset:hall,at:[room.x,-room.depth,room.z],rotation:[0,0,0,1],scale:[1,1,1]});}
+ for(const room of rooms){const hall=room.sceneDefinition?.hall;if(hall)models.push({asset:hall,at:[room.x,-room.depth,room.z],rotation:[0,0,0,1],scale:[1,1,1],world:worldAtZ(room.z)});}
  models.unshift({asset:'pinewind-landscape',at:[0,0,0],rotation:[0,0,0,1],scale:[1,1,1]});
  const solids:Solid[]=[...authored.solids as Solid[],...PINEWIND_TERRACE_SOLIDS,...services.map(s=>s.solid)];
  for(const p of eggs)solids.push({at:[p.x,p.y+1.5,p.z],half:[.95,1.5,.95],yaw:0});

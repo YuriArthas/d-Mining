@@ -41,7 +41,7 @@ import { PlayerController } from "./PlayerController.ts";
 import { CameraView } from "./CameraView.ts";
 import { MiningInteraction } from "./MiningInteraction.ts";
 import { MiningFeedback } from "./MiningFeedback.ts";
-import { worldAtFeet } from "../content/worldJourney.ts";
+import { worldAtFeet, worldAtZ, worldRequirement, type WorldId } from "../content/worldJourney.ts";
 import { DisposalScope } from "./DisposalScope.ts";
 
 function createStartupStats() {
@@ -174,6 +174,8 @@ export async function startGame(options: StartGameOptions) {
       );
       return { physics, terrain };
     });
+    // World 1's scene loads now (and a previewed layer's world); the others the first time the player goes there.
+    const previewRoom = options.previewLayer ? content.rooms.find((r) => r.id === options.previewLayer) : undefined;
     const surfaceTask = loadStaticSurface(
       renderer,
       content.surface,
@@ -184,6 +186,7 @@ export async function startGame(options: StartGameOptions) {
         assetTotal = total;
         if (terrainDone) onStatus(`正在载入矿场场景 ${done}/${total}`);
       },
+      new Set<WorldId>([1, previewRoom ? worldAtZ(previewRoom.z) : 1]),
     ).then((surface) => {
       scope.defer(surface.dispose);
       check();
@@ -211,7 +214,25 @@ export async function startGame(options: StartGameOptions) {
     avatar.add(minerAvatar.group);
     onStatus("正在准备画面");
     const cameraView = new CameraView(),
-      player = new PlayerController(physics, terrain, input, session);
+      player = new PlayerController(physics, terrain, input, session, (feet) => {
+        // A later world's scene starts loading when the player sets off for it; the arrival waits for it. If it
+        // fails, the player arrives anyway (its colliders are in place) and the next trip there tries again.
+        const world = worldAtFeet(feet);
+        if (surface.worldReady?.(world) ?? true) return true;
+        if (failed.delete(world)) return true;
+        if (!requested.has(world)) {
+          requested.add(world);
+          // The count keeps the notice up (it hides a few seconds after its text last changed).
+          const going = `正在前往${worldRequirement(world).name}…`;
+          session.announce(going);
+          surface.loadWorld!(world, (done, total) => { if (done < total) session.announce(`${going} ${done}/${total}`); }).then(
+            (part) => { if (part) motion.add(part); },
+            (error) => { requested.delete(world); failed.add(world); console.error(error); },
+          );
+        }
+        return false;
+      });
+    const requested = new Set<WorldId>(), failed = new Set<WorldId>();
     const feedback = new MiningFeedback(session, {
       cell: (cell) => terrain.cell(cell),
       layers: (cell) => generationAtZ(terrain.world.generation, cell[2]).layers,

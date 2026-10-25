@@ -14,16 +14,20 @@ export class PlayerController {
   private readonly terrain: TerrainStream;
   private readonly input: GameInput;
   private readonly session: GameSession;
+  /** Whether the scene at these feet is in place (asking starts loading it); travel waits for it. */
+  readonly sceneReady: (feet: readonly number[]) => boolean;
   constructor(
     physics: CharacterPhysics,
     terrain: TerrainStream,
     input: GameInput,
     session: GameSession,
+    sceneReady: (feet: readonly number[]) => boolean = () => true,
   ) {
     this.physics = physics;
     this.terrain = terrain;
     this.input = input;
     this.session = session;
+    this.sceneReady = sceneReady;
   }
   travelTo = (feet: readonly number[]) => {
     this.input.reset();
@@ -43,7 +47,7 @@ export class PlayerController {
         processedTerrain = true;
       }
       if (this.travelling) {
-        if (!this.terrain.ready(this.travelling)) return;
+        if (!this.terrain.ready(this.travelling) || !this.sceneReady(this.travelling)) return;
         this.physics.teleport(this.travelling);
         this.travelling = null;
         onArrived();

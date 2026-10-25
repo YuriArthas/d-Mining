@@ -46,6 +46,7 @@ PINEWIND_RELEASE_RECORD=artifacts/<名字>-release.json node tools/publish-pinew
 - 第二世界地表（沙漠殖民地）也走这条流程：`build_tech_base.py` + `tools/underground/techBaseHall.ts`，
   `node tools/build-underground.mjs tech-base`，布局数据在 `src/game/content/world2/techBase.ts`；它烘的是白天太阳。
   背对太阳的正面（传送门、传送站、矿石收购站）用两块"背光"贴图格（暗白、暗黄、自发光），看起来和朝阳面一样亮。
+  第二世界的场景（地表和六个休整层，`AuthoredInstance.world = 2`）开局不下载，玩家第一次前往时才载入，传送等它载完再到达。
 - 第三世界的休整层仍用 Blender 场景套件：`tools/blender/build-crystal.py`、`build-chamber.py -- <id>`。
 
 运行时模型在 `src/game/assets/scene/`，测试 `tools/tests/shipped-assets.test.mjs` 保证这里只有游戏实际摆放的模型。
