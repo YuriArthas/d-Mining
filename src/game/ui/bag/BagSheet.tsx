@@ -46,6 +46,7 @@ export function BagSheet(props: Props) {
 type Common = { title: string; tabs: SheetTab<BagTab>[]; tab: BagTab; onTab(tab: BagTab): void; onClose(): void };
 
 function PetsTab({ session, pets, common, onClose }: Props & { pets: PetPanelSnapshot; common: Common }) {
+  const state = useSyncExternalStore(session.subscribe, session.getSnapshot), slot = state.petSlot;
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [message, setMessage] = useState('');
   const [finding, setFinding] = useState(false);
@@ -53,7 +54,6 @@ function PetsTab({ session, pets, common, onClose }: Props & { pets: PetPanelSna
   const cards = [...pets.pets].sort((a, b) => Number(b.equippedSlot !== null) - Number(a.equippedSlot !== null) || here(pets, b) - here(pets, a) || b.bonusPct - a.bonusPct);
   const selected = cards.find(card => card.pet.id === selectedId) ?? cards[0] ?? null;
   const equipped = pets.slots.filter(id => id !== null).length;
-  const eggOf = (speciesId: string) => pets.eggs.find(egg => egg.outcomes.some(o => o.speciesId === speciesId))?.name;
   if (finding) return <Sheet {...common} footer={<><UiButton size="s" tone="steel" onPress={() => setFinding(false)}>返回宠物</UiButton><span className="ui-hint">点「前往」直接传送到蛋台，靠近后查看概率并开蛋。</span></>}>
     <div className="bag-eggs">{pets.eggs.map(egg => <div key={egg.id} className="ui-card-tile bag-egg" data-locked={egg.unlocked ? undefined : ''}>
       <EggArt className="bag-egg-art" eggId={egg.id} locked={!egg.unlocked} />
@@ -63,6 +63,15 @@ function PetsTab({ session, pets, common, onClose }: Props & { pets: PetPanelSna
         : <small>到达{egg.unlockName ?? '更深处'}解锁</small>}
     </div>)}</div>
   </Sheet>;
+  const buySlot = () => {
+    const result = session.buyPetSlot(pets.slots.length);
+    setMessage(result.status === 'bought' ? `第 ${result.slots} 格开放了，可以多带一只宠物` : result.status === 'insufficient' ? '钱还不够' : result.status === 'locked' ? `到达${slot?.unlockName}后才能买` : '请稍后再试');
+  };
+  const merge = (card: PetCardView) => {
+    const result = session.pets.mergeGolden(card.pet.speciesId);
+    if (result.status === 'merged') { setSelectedId(result.pet.id); setMessage(`${pets.goldenNeed} 只${card.name}合成了金色${card.name}！`); }
+    else setMessage(`需要 ${pets.goldenNeed} 只一样的普通${card.name}`);
+  };
   const toggle = (card: PetCardView) => {
     if (card.equippedSlot !== null) { session.pets.unequip(card.pet.id); setMessage(`已卸下 ${card.name}`); return; }
     const result = session.pets.equip(card.pet.id);
@@ -80,9 +89,12 @@ function PetsTab({ session, pets, common, onClose }: Props & { pets: PetPanelSna
     </>}
   </>}>
     {cards.length ? <div className="bag-pets">
-      <div className="bag-pets-main"><div className="ui-row"><Chip icon="paw">已装备 <b>{equipped} / {pets.slots.length}</b></Chip><Chip icon={currencyIcon(pets.currency)}>总加成 <b>{bonusLabel(pets.bonus[pets.currency])}</b></Chip><Chip icon="pickaxe">挖矿 <b>{bonusLabel(pets.bonus.mining)}</b></Chip><span className="ui-grow" /><Chip>{cards.length} 只</Chip></div>
+      <div className="bag-pets-main"><div className="ui-row"><Chip icon="paw">已装备 <b>{equipped} / {pets.slots.length}</b></Chip><Chip icon={currencyIcon(pets.currency)}>总加成 <b>{bonusLabel(pets.bonus[pets.currency])}</b></Chip><Chip icon="pickaxe">挖矿 <b>{bonusLabel(pets.bonus.mining)}</b></Chip>
+        {slot && (slot.unlocked
+          ? <UiButton size="s" tone={slot.canAfford ? 'green' : 'steel'} icon={currencyIcon(slot.currency)} className="bag-buy-slot" disabled={!slot.canAfford} aria-label={`购买第 ${slot.slot} 格，${number(slot.price)} ${currencyName(slot.currency)}`} onPress={buySlot}>+1 格 · {number(slot.price)}</UiButton>
+          : <Chip label={`到达${slot.unlockName}解锁第 ${slot.slot} 格`}>第 {slot.slot} 格 · 🔒</Chip>)}<span className="ui-grow" /><Chip>{cards.length} 只</Chip></div>
       <div className="ui-grid" role="list" aria-label="宠物">{cards.map(card => <GameButton key={card.pet.id} role="listitem" className="ui-cell" data-rarity={card.rarity}
-        data-equipped={card.equippedSlot !== null ? '' : undefined} aria-pressed={card.pet.id === selected?.pet.id} blurAfterPress={false}
+        data-equipped={card.equippedSlot !== null ? '' : undefined} data-golden={card.golden ? '' : undefined} aria-pressed={card.pet.id === selected?.pet.id} blurAfterPress={false}
         aria-label={`${card.name}，${bonusLabel(card.bonusPct, card.currency)}，挖矿 ${bonusLabel(card.miningPct)}，${card.equippedSlot === null ? '未装备' : '已装备'}`}
         onPress={() => { setSelectedId(card.pet.id); setMessage(''); }}>
         <PetArt speciesId={card.pet.speciesId} rarity={card.rarity} /><span className="ui-cell-name ui-outline">{card.name}</span>
@@ -94,7 +106,8 @@ function PetsTab({ session, pets, common, onClose }: Props & { pets: PetPanelSna
         <div className="ui-stat"><span>{currencyName(selected.currency)}收入</span><b>{bonusLabel(selected.bonusPct)}</b></div>
         <div className="ui-stat"><span>挖矿速度</span><b>{bonusLabel(selected.miningPct)}</b></div>
         {selected.currency !== pets.currency && <small className="bag-detail-note">{WORLD_NAMES[selected.currency]}才加收入</small>}
-        {eggOf(selected.pet.speciesId) && <div className="ui-stat"><span>来自</span><b>{eggOf(selected.pet.speciesId)}</b></div>}
+        {!selected.golden && <UiButton size="s" tone={selected.mergeable >= pets.goldenNeed ? 'orange' : 'steel'} className="bag-merge" disabled={selected.mergeable < pets.goldenNeed}
+          aria-label={`合成金色${selected.name}，已有 ${selected.mergeable} / ${pets.goldenNeed}`} onPress={() => merge(selected)}>金色合成 {Math.min(selected.mergeable, pets.goldenNeed)}/{pets.goldenNeed}</UiButton>}
         <UiButton size="s" tone={selected.equippedSlot !== null ? 'steel' : 'purple'} onPress={() => toggle(selected)}>{selected.equippedSlot !== null ? '卸下' : '装备'}</UiButton>
       </aside>}
     </div> : <div className="bag-empty ui-well"><PetArt speciesId="moss-slime" className="bag-empty-art" /><b className="ui-outline">还没有宠物</b><span className="ui-hint">点「获取宠物」去蛋台开蛋，装备后一起挖矿</span></div>}

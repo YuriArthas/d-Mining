@@ -234,3 +234,32 @@ test('explicit fixture starting coins are granted once, independent from UI subs
   goToEgg(custom);
   assert.equal(custom.pets.hatch('meadow-egg').status,'insufficient-coins');
 });
+
+test('five identical ordinary pets merge into one golden pet with both bonuses ×2.5, unequipped ones first', () => {
+  const { service } = setup(); service.grant(['a', 'b', 'c', 'd', 'e', 'f'].map(id => pet(id)));
+  service.equip('a'); service.equip('f');
+  assert.equal(service.mergeable('moss-slime'), 6);
+  const merged = service.mergeGolden('moss-slime');
+  assert.equal(merged.status, 'merged'); assert.equal(merged.pet.golden, true);
+  // b-e (unequipped) and one equipped pet went; the golden pet took that pet's slot.
+  assert.equal(service.getInventory().count, 2); assert.equal(service.mergeable('moss-slime'), 1);
+  const slots = service.getEquipment().slots; assert.ok(slots.includes(merged.pet.id)); assert.equal(slots.filter(Boolean).length, 2);
+  const read = id => new PetCatalog(PET_CONTENT).pet(id), base = read('moss-slime');
+  assert.equal(service.getBonus().gold, Math.round(base.bonusPct * 2.5) + base.bonusPct);
+  assert.equal(service.getBonus().mining, Math.round(base.miningPct * 2.5) + base.miningPct);
+  assert.equal(service.mergeGolden('moss-slime').status, 'not-enough'); assert.equal(service.mergeGolden('missing').status, 'unknown');
+  // Golden pets save and load; a golden flag other than true is rejected.
+  const saved = service.exportData(), restored = setup().service; restored.restoreData(saved); assert.deepEqual(restored.exportData(), saved);
+  const bad = structuredClone(saved); bad.inventory.pets[0].golden = 'yes'; assert.throws(() => setup().service.restoreData(bad));
+});
+
+test('bought pet slots widen the team up to the most, survive a reload and are filled by equip best', () => {
+  const content = { ...PET_CONTENT, maxEquipSlots: 5 }, wallet = new Wallet({ gold: 100 }); let serial = 0;
+  const service = new PetService({ content, wallet, random: () => 0, createPetId: () => `w-${++serial}` });
+  service.grant(['a', 'b', 'c', 'd', 'e', 'f'].map(id => pet(id)));
+  assert.equal(service.addSlot(), true); assert.equal(service.addSlot(), true); assert.equal(service.addSlot(), false);
+  service.equipBest(); assert.equal(service.getEquipment().slots.filter(Boolean).length, 5);
+  const restored = new PetService({ content, wallet, random: () => 0, createPetId: () => 'x' }); restored.restoreData(service.exportData());
+  assert.equal(restored.getEquipment().slots.length, 5);
+  const tooMany = service.exportData(); tooMany.equipment.slots.push(null); assert.throws(() => restored.restoreData(tooMany));
+});

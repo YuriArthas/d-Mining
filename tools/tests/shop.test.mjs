@@ -81,3 +81,16 @@ test('the newest pickaxe enhances three times in its own currency: more damage, 
  const poor=funded(0);assert.equal(poor.enhancePickaxe(1,0).status,'insufficient');assert.equal(poor.getSnapshot().pickaxe.enhance,0);
  const bad=s.exportProgress();bad.pickaxe={version:1,level:1,enhance:2};assert.throws(()=>GameSession.fromData(bad,content));
 });
+test('the 4th and 5th pet slots are bought in worlds 2 and 3 once their layer is reached; rebirth keeps them',()=>{
+ const [fourth,fifth]=ECONOMY.petSlots,data=new GameSession(content).exportProgress();
+ data.wallet.balances={gold:0,tech:fourth.price,star:fifth.price};data.worldProgress={version:2,openWorlds:[1,2,3]};
+ const s=GameSession.fromData(data,content);
+ assert.deepEqual([s.getSnapshot().petSlot.slot,s.getSnapshot().petSlot.unlocked],[4,false]);assert.equal(s.buyPetSlot(3).status,'locked');
+ const room=w=>content.destinations.filter(d=>d.worldId===w)[fourth.layer-1];
+ s.devUnlockLayer(room(2).id);assert.equal(s.getSnapshot().petSlot.canAfford,true);
+ assert.equal(s.buyPetSlot(4).status,'stale');assert.deepEqual(s.buyPetSlot(3),{status:'bought',slots:4});
+ assert.equal(s.getSnapshot().balances.tech,0);assert.equal(s.pets.getSnapshot().slots.length,4);
+ assert.equal(s.getSnapshot().petSlot.slot,5);assert.equal(s.getSnapshot().petSlot.currency,'star');
+ s.devUnlockLayer(room(3).id);assert.equal(s.buyPetSlot(4).status,'bought');assert.equal(s.getSnapshot().petSlot,null);assert.equal(s.buyPetSlot(5).status,'max');
+ assert.equal(GameSession.fromData(s.exportProgress(),content).pets.getSnapshot().slots.length,5);
+});

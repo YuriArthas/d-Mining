@@ -31,7 +31,8 @@ test('each displayed egg charges its own price and draws only from its own confi
       cumulative += outcome.weight;
     }
   }
-  assert.equal(pools.size, PET_CONTENT.pets.length);
+  // Every pet of every egg on a stand (the new eggs of worlds 2 and 3 get their stands in P3).
+  assert.equal(pools.size, PET_CONTENT.eggs.filter(e => PET_DISPLAYS.some(d => d.eggId === e.id)).reduce((n, e) => n + e.outcomes.length, 0));
 });
 
 const body = () => new BoxGeometry(1, 1, 1).translate(0, .5, 0);

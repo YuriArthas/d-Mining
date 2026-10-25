@@ -2080,7 +2080,7 @@
    ]
   },
   {
-   "id": null,
+   "id": "probe-egg",
    "world": 2,
    "layer": 4,
    "premium": true,
@@ -2088,31 +2088,31 @@
    "price": 110000,
    "pets": [
     {
-     "id": null,
+     "id": "probe-blob",
      "weight": 40,
      "bonusPct": 3900,
      "miningPct": 21
     },
     {
-     "id": null,
+     "id": "probe-scout",
      "weight": 30,
      "bonusPct": 4700,
      "miningPct": 25
     },
     {
-     "id": null,
+     "id": "probe-friend",
      "weight": 20,
      "bonusPct": 6300,
      "miningPct": 33
     },
     {
-     "id": null,
+     "id": "probe-wing",
      "weight": 8,
      "bonusPct": 9000,
      "miningPct": 48
     },
     {
-     "id": null,
+     "id": "probe-guardian",
      "weight": 2,
      "bonusPct": 14000,
      "miningPct": 73
@@ -2120,7 +2120,7 @@
    ]
   },
   {
-   "id": null,
+   "id": "cryo-egg",
    "world": 2,
    "layer": 5,
    "premium": false,
@@ -2128,31 +2128,31 @@
    "price": 100000,
    "pets": [
     {
-     "id": null,
+     "id": "cryo-blob",
      "weight": 40,
      "bonusPct": 4900,
      "miningPct": 16
     },
     {
-     "id": null,
+     "id": "cryo-scout",
      "weight": 30,
      "bonusPct": 5900,
      "miningPct": 19
     },
     {
-     "id": null,
+     "id": "cryo-friend",
      "weight": 20,
      "bonusPct": 7800,
      "miningPct": 25
     },
     {
-     "id": null,
+     "id": "cryo-wing",
      "weight": 8,
      "bonusPct": 11000,
      "miningPct": 36
     },
     {
-     "id": null,
+     "id": "cryo-guardian",
      "weight": 2,
      "bonusPct": 17000,
      "miningPct": 55
@@ -2160,7 +2160,7 @@
    ]
   },
   {
-   "id": null,
+   "id": "nitro-egg",
    "world": 2,
    "layer": 5,
    "premium": true,
@@ -2168,31 +2168,31 @@
    "price": 420000,
    "pets": [
     {
-     "id": null,
+     "id": "nitro-blob",
      "weight": 40,
      "bonusPct": 9800,
      "miningPct": 23
     },
     {
-     "id": null,
+     "id": "nitro-scout",
      "weight": 30,
      "bonusPct": 12000,
      "miningPct": 28
     },
     {
-     "id": null,
+     "id": "nitro-friend",
      "weight": 20,
      "bonusPct": 16000,
      "miningPct": 37
     },
     {
-     "id": null,
+     "id": "nitro-wing",
      "weight": 8,
      "bonusPct": 22000,
      "miningPct": 54
     },
     {
-     "id": null,
+     "id": "nitro-guardian",
      "weight": 2,
      "bonusPct": 34000,
      "miningPct": 82
@@ -2240,7 +2240,7 @@
    ]
   },
   {
-   "id": null,
+   "id": "fusion-egg",
    "world": 2,
    "layer": 6,
    "premium": true,
@@ -2248,31 +2248,31 @@
    "price": 1600000,
    "pets": [
     {
-     "id": null,
+     "id": "fusion-blob",
      "weight": 40,
      "bonusPct": 24000,
      "miningPct": 26
     },
     {
-     "id": null,
+     "id": "fusion-scout",
      "weight": 30,
      "bonusPct": 29000,
      "miningPct": 31
     },
     {
-     "id": null,
+     "id": "fusion-friend",
      "weight": 20,
      "bonusPct": 39000,
      "miningPct": 42
     },
     {
-     "id": null,
+     "id": "fusion-wing",
      "weight": 8,
      "bonusPct": 56000,
      "miningPct": 60
     },
     {
-     "id": null,
+     "id": "fusion-guardian",
      "weight": 2,
      "bonusPct": 85000,
      "miningPct": 92
@@ -2360,7 +2360,7 @@
    ]
   },
   {
-   "id": null,
+   "id": "orbit-egg",
    "world": 3,
    "layer": 2,
    "premium": false,
@@ -2368,31 +2368,31 @@
    "price": 1900,
    "pets": [
     {
-     "id": null,
+     "id": "orbit-blob",
      "weight": 40,
      "bonusPct": 310,
      "miningPct": 25
     },
     {
-     "id": null,
+     "id": "orbit-scout",
      "weight": 30,
      "bonusPct": 380,
      "miningPct": 29
     },
     {
-     "id": null,
+     "id": "orbit-friend",
      "weight": 20,
      "bonusPct": 500,
      "miningPct": 39
     },
     {
-     "id": null,
+     "id": "orbit-wing",
      "weight": 8,
      "bonusPct": 720,
      "miningPct": 56
     },
     {
-     "id": null,
+     "id": "orbit-guardian",
      "weight": 2,
      "bonusPct": 1100,
      "miningPct": 86
@@ -2400,7 +2400,7 @@
    ]
   },
   {
-   "id": null,
+   "id": "meteor-egg",
    "world": 3,
    "layer": 2,
    "premium": true,
@@ -2408,31 +2408,31 @@
    "price": 7700,
    "pets": [
     {
-     "id": null,
+     "id": "meteor-blob",
      "weight": 40,
      "bonusPct": 630,
      "miningPct": 37
     },
     {
-     "id": null,
+     "id": "meteor-scout",
      "weight": 30,
      "bonusPct": 750,
      "miningPct": 44
     },
     {
-     "id": null,
+     "id": "meteor-friend",
      "weight": 20,
      "bonusPct": 1000,
      "miningPct": 59
     },
     {
-     "id": null,
+     "id": "meteor-wing",
      "weight": 8,
      "bonusPct": 1400,
      "miningPct": 85
     },
     {
-     "id": null,
+     "id": "meteor-guardian",
      "weight": 2,
      "bonusPct": 2200,
      "miningPct": 130
@@ -2440,7 +2440,7 @@
    ]
   },
   {
-   "id": null,
+   "id": "geode-egg",
    "world": 3,
    "layer": 3,
    "premium": false,
@@ -2448,31 +2448,31 @@
    "price": 6400,
    "pets": [
     {
-     "id": null,
+     "id": "geode-blob",
      "weight": 40,
      "bonusPct": 780,
      "miningPct": 27
     },
     {
-     "id": null,
+     "id": "geode-scout",
      "weight": 30,
      "bonusPct": 940,
      "miningPct": 33
     },
     {
-     "id": null,
+     "id": "geode-friend",
      "weight": 20,
      "bonusPct": 1300,
      "miningPct": 44
     },
     {
-     "id": null,
+     "id": "geode-wing",
      "weight": 8,
      "bonusPct": 1800,
      "miningPct": 63
     },
     {
-     "id": null,
+     "id": "geode-guardian",
      "weight": 2,
      "bonusPct": 2700,
      "miningPct": 96
@@ -2480,7 +2480,7 @@
    ]
   },
   {
-   "id": null,
+   "id": "aurora-egg",
    "world": 3,
    "layer": 3,
    "premium": true,
@@ -2488,31 +2488,31 @@
    "price": 25000,
    "pets": [
     {
-     "id": null,
+     "id": "aurora-blob",
      "weight": 40,
      "bonusPct": 1600,
      "miningPct": 41
     },
     {
-     "id": null,
+     "id": "aurora-scout",
      "weight": 30,
      "bonusPct": 1900,
      "miningPct": 49
     },
     {
-     "id": null,
+     "id": "aurora-friend",
      "weight": 20,
      "bonusPct": 2500,
      "miningPct": 66
     },
     {
-     "id": null,
+     "id": "aurora-wing",
      "weight": 8,
      "bonusPct": 3600,
      "miningPct": 95
     },
     {
-     "id": null,
+     "id": "aurora-guardian",
      "weight": 2,
      "bonusPct": 5500,
      "miningPct": 140
@@ -2520,7 +2520,7 @@
    ]
   },
   {
-   "id": null,
+   "id": "rune-egg",
    "world": 3,
    "layer": 4,
    "premium": false,
@@ -2528,31 +2528,31 @@
    "price": 27000,
    "pets": [
     {
-     "id": null,
+     "id": "rune-blob",
      "weight": 40,
      "bonusPct": 2000,
      "miningPct": 31
     },
     {
-     "id": null,
+     "id": "rune-scout",
      "weight": 30,
      "bonusPct": 2300,
      "miningPct": 37
     },
     {
-     "id": null,
+     "id": "rune-friend",
      "weight": 20,
      "bonusPct": 3100,
      "miningPct": 49
     },
     {
-     "id": null,
+     "id": "rune-wing",
      "weight": 8,
      "bonusPct": 4500,
      "miningPct": 71
     },
     {
-     "id": null,
+     "id": "rune-guardian",
      "weight": 2,
      "bonusPct": 6800,
      "miningPct": 110
@@ -2560,7 +2560,7 @@
    ]
   },
   {
-   "id": null,
+   "id": "nebula-egg",
    "world": 3,
    "layer": 4,
    "premium": true,
@@ -2568,31 +2568,31 @@
    "price": 110000,
    "pets": [
     {
-     "id": null,
+     "id": "nebula-blob",
      "weight": 40,
      "bonusPct": 3900,
      "miningPct": 46
     },
     {
-     "id": null,
+     "id": "nebula-scout",
      "weight": 30,
      "bonusPct": 4700,
      "miningPct": 55
     },
     {
-     "id": null,
+     "id": "nebula-friend",
      "weight": 20,
      "bonusPct": 6300,
      "miningPct": 74
     },
     {
-     "id": null,
+     "id": "nebula-wing",
      "weight": 8,
      "bonusPct": 9000,
      "miningPct": 110
     },
     {
-     "id": null,
+     "id": "nebula-guardian",
      "weight": 2,
      "bonusPct": 14000,
      "miningPct": 160
@@ -2600,7 +2600,7 @@
    ]
   },
   {
-   "id": null,
+   "id": "comet-egg",
    "world": 3,
    "layer": 5,
    "premium": false,
@@ -2608,31 +2608,31 @@
    "price": 94000,
    "pets": [
     {
-     "id": null,
+     "id": "comet-blob",
      "weight": 40,
      "bonusPct": 4900,
      "miningPct": 34
     },
     {
-     "id": null,
+     "id": "comet-scout",
      "weight": 30,
      "bonusPct": 5900,
      "miningPct": 41
     },
     {
-     "id": null,
+     "id": "comet-friend",
      "weight": 20,
      "bonusPct": 7800,
      "miningPct": 55
     },
     {
-     "id": null,
+     "id": "comet-wing",
      "weight": 8,
      "bonusPct": 11000,
      "miningPct": 79
     },
     {
-     "id": null,
+     "id": "comet-guardian",
      "weight": 2,
      "bonusPct": 17000,
      "miningPct": 120
@@ -2640,7 +2640,7 @@
    ]
   },
   {
-   "id": null,
+   "id": "galaxy-egg",
    "world": 3,
    "layer": 5,
    "premium": true,
@@ -2648,31 +2648,31 @@
    "price": 380000,
    "pets": [
     {
-     "id": null,
+     "id": "galaxy-blob",
      "weight": 40,
      "bonusPct": 9800,
      "miningPct": 52
     },
     {
-     "id": null,
+     "id": "galaxy-scout",
      "weight": 30,
      "bonusPct": 12000,
      "miningPct": 62
     },
     {
-     "id": null,
+     "id": "galaxy-friend",
      "weight": 20,
      "bonusPct": 16000,
      "miningPct": 83
     },
     {
-     "id": null,
+     "id": "galaxy-wing",
      "weight": 8,
      "bonusPct": 22000,
      "miningPct": 120
     },
     {
-     "id": null,
+     "id": "galaxy-guardian",
      "weight": 2,
      "bonusPct": 34000,
      "miningPct": 180
@@ -2720,7 +2720,7 @@
    ]
   },
   {
-   "id": null,
+   "id": "void-egg",
    "world": 3,
    "layer": 6,
    "premium": true,
@@ -2728,31 +2728,31 @@
    "price": 1600000,
    "pets": [
     {
-     "id": null,
+     "id": "void-blob",
      "weight": 40,
      "bonusPct": 24000,
      "miningPct": 58
     },
     {
-     "id": null,
+     "id": "void-scout",
      "weight": 30,
      "bonusPct": 29000,
      "miningPct": 69
     },
     {
-     "id": null,
+     "id": "void-friend",
      "weight": 20,
      "bonusPct": 39000,
      "miningPct": 93
     },
     {
-     "id": null,
+     "id": "void-wing",
      "weight": 8,
      "bonusPct": 56000,
      "miningPct": 130
     },
     {
-     "id": null,
+     "id": "void-guardian",
      "weight": 2,
      "bonusPct": 85000,
      "miningPct": 200

@@ -53,6 +53,12 @@ export class PetModel {
   private readonly random: () => number;
   private time: number;
   private nextBlink: number;
+  /** A golden pet: the body turns polished gold over its own pattern. */
+  gild() {
+    const m = this.body.material;
+    m.color.lerp(new Color('#ffd34a'), .7); m.metalness = .55; m.roughness = Math.min(m.roughness, .32);
+    m.emissive.set('#ffb000'); m.emissiveIntensity = .14; m.needsUpdate = true;
+  }
   private blinkUntil = -1;
 
   constructor(look: PetLook, geometry: BufferGeometry, textures: PetTextures, random: () => number = Math.random) {

@@ -27,15 +27,20 @@ export type EggDefinition = Readonly<{
 export type PetContent = Readonly<{
   pets: readonly PetDefinition[];
   eggs: readonly EggDefinition[];
+  /** Slots every player has; up to `maxEquipSlots` with bought ones. */
   equipSlots: number;
+  maxEquipSlots?: number;
+  /** How many identical pets merge into one golden pet. */
+  goldenNeed?: number;
 }>;
-export type PetInstance = Readonly<{ id: PetId; speciesId: PetSpeciesId; level: 1 }>;
+/** `golden`: merged from several identical pets; both bonuses multiplied (economy.json `golden`). */
+export type PetInstance = Readonly<{ id: PetId; speciesId: PetSpeciesId; level: 1; golden?: true }>;
 export type PetInventorySnapshot = Readonly<{ pets: readonly PetInstance[]; count: number }>;
 export type PetEquipmentSnapshot = Readonly<{ slots: readonly (PetId | null)[] }>;
 /** The equipped team's totals, in percent: income per currency, and mining (every world). */
 export type PetBonus = Readonly<Record<CurrencyId, number> & { mining: number }>;
 export type MiningStats = Readonly<{ power: number; speed: number }>;
-export type PetInventoryDataV1 = { version: 1; pets: Array<{ id: string; speciesId: string; level: 1 }> };
+export type PetInventoryDataV1 = { version: 1; pets: Array<{ id: string; speciesId: string; level: 1; golden?: true }> };
 export type PetEquipmentDataV1 = { version: 1; slots: Array<string | null> };
 export type PetStateDataV1 = { version: 1; inventory: PetInventoryDataV1; equipment: PetEquipmentDataV1 };
 export type EquipResult =
@@ -53,5 +58,6 @@ export function petRecord(value: unknown): Record<string, unknown> {
 export function readPet(value: unknown): PetInstance {
   const data = petRecord(value);
   if (data.level !== 1) throw Error('当前宠物仅支持 Lv.1');
-  return Object.freeze({ id: petId(data.id), speciesId: petId(data.speciesId), level: 1 });
+  if (data.golden !== undefined && data.golden !== true) throw Error('无效金色宠物标记');
+  return Object.freeze({ id: petId(data.id), speciesId: petId(data.speciesId), level: 1, ...(data.golden ? { golden: true as const } : {}) });
 }

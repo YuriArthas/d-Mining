@@ -73,6 +73,26 @@ export class GameSession {
     const next=step?Object.freeze({enhance:enhance+1,price:step.price,currency:tool.currency,power:step.power}):null;
     return Object.freeze({level,enhance,max:tool.enhance.length,next,canAfford:!!next&&this.wallet.getBalance(tool.currency)>=next.price});
   }
+  /** The next pet slot to buy (4th in world 2, 5th in world 3): its price in that world's currency, once the player
+   *  has reached the layer where it unlocks. */
+  private petSlotOffer() {
+    const slots=this.petService.getEquipment().slots.length, slot=ECONOMY.petSlots[slots-ECONOMY.start.petSlots];
+    if(!slot)return null;
+    const room=this.content.destinations.filter(d=>d.worldId===slot.world)[slot.layer-1];
+    const unlocked=!!room&&this.worldProgress.isOpen(slot.world as WorldId)&&!!this.explorations.get(slot.world as WorldId)?.has(room.id);
+    return Object.freeze({slot:slot.slot,price:slot.price,currency:slot.currency,unlocked,unlockName:`${worldRequirement(slot.world as WorldId).name}的${room?.name??''}`,
+      canAfford:unlocked&&this.wallet.getBalance(slot.currency)>=slot.price});
+  }
+  /** Buys the next pet slot; `expectedSlots` guards against a stale panel. */
+  buyPetSlot = (expectedSlots: number) => {
+    if(this.suspended||expectedSlots!==this.petService.getEquipment().slots.length)return {status:'stale'} as const;
+    const offer=this.petSlotOffer();
+    if(!offer)return {status:'max'} as const;
+    if(!offer.unlocked)return {status:'locked'} as const;
+    if(!this.wallet.debit(offer.currency,offer.price)){this.feedback({type:'denied',reason:'coins'});return {status:'insufficient'} as const;}
+    this.petService.addSlot();this.committed(true);this.publish();this.feedback({type:'purchased'});
+    return {status:'bought',slots:this.petService.getEquipment().slots.length} as const;
+  };
   private bagOffer() {
     const next=this.bagCatalog.find(t=>t.capacity!>this.equipment.backpackCapacity)??null;
     return Object.freeze({next,canAfford:!!next&&this.wallet.getBalance(next.currency)>=next.price});
@@ -380,6 +400,7 @@ export class GameSession {
       pickaxe: this.pickaxe.getSnapshot(),
       pickaxeUpgrade: this.toolOffer(),
       pickaxeEnhance: this.enhanceOffer(),
+      petSlot: this.petSlotOffer(),
       backpackUpgrade: this.bagOffer(),
     });
   }
@@ -486,6 +507,11 @@ export class GameSession {
   private withHatchFeedback(commands: PetCommands) {
     return {
       equip: commands.equip, unequip: commands.unequip, equipBest: commands.equipBest, unequipAll: commands.unequipAll,
+      mergeGolden: (speciesId: string) => {
+        const result = commands.mergeGolden(speciesId);
+        if (result.status === 'merged') this.feedback({ type: 'hatched', tier: 3, auto: false });
+        return result;
+      },
       hatch: (id: string) => {
         const result = commands.hatch(id);
         if (result.status === 'hatched') this.feedback({ type: 'hatched', tier: this.petTier(result.pet), auto: false });

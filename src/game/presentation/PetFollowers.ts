@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { petLook } from '../content/petLooks.ts';
 import { PetModel, PetTextures } from './pets/PetModel.ts';
 
-type FollowerPet = Readonly<{ id: string; speciesId: string; level: number; slot: number }>;
+type FollowerPet = Readonly<{ id: string; speciesId: string; level: number; slot: number; golden?: boolean }>;
 type Follower = {
   pet: FollowerPet; model: PetModel; placed: boolean;
   from: Vector3; to: Vector3; hop: number; hopping: boolean; hopSeconds: number; hopHeight: number;
@@ -53,6 +53,7 @@ export class PetFollowers {
       }
       if (follower) { follower.pet = pet; continue; }
       const model = new PetModel(petLook(pet.speciesId), this.geometry, this.textures, this.random);
+      if (pet.golden) model.gild();
       model.group.visible = false; this.group.add(model.group);
       this.followers.set(pet.id, {
         pet, model, placed: false, from: new Vector3(), to: new Vector3(), hop: 0, hopping: false, hopSeconds: HOP_SECONDS,

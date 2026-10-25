@@ -1,11 +1,14 @@
 import type { PetInstance, PetRarity, PetBonus } from '../logic/pets/types.ts';
-import type { PetService, HatchResult, EquipOwnedResult } from './PetService.ts';
+import type { PetService, HatchResult, EquipOwnedResult, MergeResult } from './PetService.ts';
+import { petStats } from '../logic/pets/petRules.ts';
 import type { CurrencyId } from '../content/economy.ts';
 
 /** A pet's bonuses: extra income in its own currency (`bonusPct`, only in that world) and faster mining
  *  (`miningPct`, every world), both in percent. */
 export type PetCardView = Readonly<{
   pet: PetInstance; name: string; rarity: PetRarity; bonusPct: number; currency: CurrencyId; miningPct: number; equippedSlot: number | null;
+  /** A golden pet; for an ordinary one, how many identical ordinary pets are owned towards merging. */
+  golden: boolean; mergeable: number;
 }>;
 type EggOfferView = Readonly<{
   id: string; name: string; price: number; currency: CurrencyId; canAfford: boolean; unlocked: boolean; unlockName?: string;
@@ -19,6 +22,8 @@ export type PetPanelSnapshot = Readonly<{
   slots: readonly (string | null)[];
   bonus: PetBonus;
   eggs: readonly EggOfferView[];
+  /** Identical ordinary pets that merge into one golden pet. */
+  goldenNeed: number;
 }>;
 interface PetUiApi {
   getSnapshot(): PetPanelSnapshot;
@@ -28,11 +33,12 @@ interface PetUiApi {
   unequip(id: string): boolean;
   equipBest(): boolean;
   unequipAll(): boolean;
+  mergeGolden(speciesId: string): MergeResult;
 }
 type PetUiPorts = {
   balances(): Readonly<Record<CurrencyId, number>>;
   currency(): CurrencyId;
-  commands: Pick<PetUiApi, 'hatch' | 'equip' | 'unequip' | 'equipBest' | 'unequipAll'>;
+  commands: Pick<PetUiApi, 'hatch' | 'equip' | 'unequip' | 'equipBest' | 'unequipAll' | 'mergeGolden'>;
   subscribe(listener: () => void): () => void;
 };
 
@@ -57,8 +63,10 @@ export class PetUiAdapter implements PetUiApi {
     const catalog = this.service.catalog;
     const equippedSlots = new Map(equipment.slots.map((id, slot) => [id, slot]));
     const pets = previous && inventory === this.inventory && equipment === this.equipment ? previous.pets : Object.freeze(inventory.pets.map(pet => {
-      const definition = catalog.pet(pet.speciesId);
-      return Object.freeze({ pet, name: definition.name, rarity: definition.rarity, bonusPct: definition.bonusPct, currency: definition.currency, miningPct: definition.miningPct, equippedSlot: equippedSlots.get(pet.id) ?? null });
+      const definition = petStats(pet, id => catalog.pet(id));
+      return Object.freeze({ pet, name: (pet.golden ? '金色' : '') + definition.name, rarity: definition.rarity, bonusPct: definition.bonusPct, currency: definition.currency,
+        miningPct: definition.miningPct, equippedSlot: equippedSlots.get(pet.id) ?? null, golden: !!pet.golden,
+        mergeable: pet.golden ? 0 : inventory.pets.filter(p => p.speciesId === pet.speciesId && !p.golden).length });
     }));
     const eggs = previous && sameMoney && this.accessKey === accessKey ? previous.eggs : Object.freeze(catalog.content.eggs.map(original => {
       const egg = this.service.effectiveEgg(original.id)!;
@@ -74,7 +82,7 @@ export class PetUiAdapter implements PetUiApi {
     }));
     this.accessKey = accessKey;
     this.inventory = inventory; this.equipment = equipment;
-    return this.snapshot = Object.freeze({ currency, balances, pets, slots: equipment.slots, bonus: this.service.getBonus(), eggs });
+    return this.snapshot = Object.freeze({ currency, balances, pets, slots: equipment.slots, bonus: this.service.getBonus(), eggs, goldenNeed: catalog.content.goldenNeed ?? 5 });
   };
   // Each subscriber owns exactly one session subscription, released on UI unmount.
   subscribe = (listener: () => void) => {
@@ -89,4 +97,5 @@ export class PetUiAdapter implements PetUiApi {
   unequip = (id: string) => this.ports.commands.unequip(id);
   equipBest = () => this.ports.commands.equipBest();
   unequipAll = () => this.ports.commands.unequipAll();
+  mergeGolden = (speciesId: string) => this.ports.commands.mergeGolden(speciesId);
 }

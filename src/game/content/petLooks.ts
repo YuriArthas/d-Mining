@@ -42,6 +42,19 @@ const EGG_THEMES: Readonly<Record<string, Readonly<{ pattern: PetPattern; sparkl
   'silver-egg': { pattern: 'sheen', sparkle: 'star', tint: '#ffffff' },
   'star-egg': { pattern: 'stars', sparkle: 'star', tint: '#fff5ad' },
   'core-egg': { pattern: 'core', sparkle: 'star', tint: '#ffe38e' },
+  'cryo-egg': { pattern: 'frost', sparkle: 'snow', tint: '#e8fbff' },
+  'probe-egg': { pattern: 'rivets', sparkle: 'sparkle', tint: '#ffd99a' },
+  'nitro-egg': { pattern: 'waves', sparkle: 'snow', tint: '#dff8ff' },
+  'fusion-egg': { pattern: 'core', sparkle: 'ember', tint: '#c6ff9a' },
+  'orbit-egg': { pattern: 'rivets', sparkle: 'star', tint: '#cdd5ff' },
+  'geode-egg': { pattern: 'facets', sparkle: 'sparkle', tint: '#efdcff' },
+  'rune-egg': { pattern: 'runes', sparkle: 'star', tint: '#fff0b0' },
+  'comet-egg': { pattern: 'frost', sparkle: 'star', tint: '#d8f6ff' },
+  'meteor-egg': { pattern: 'embers', sparkle: 'ember', tint: '#ffc2a0' },
+  'aurora-egg': { pattern: 'waves', sparkle: 'star', tint: '#bfffe9' },
+  'nebula-egg': { pattern: 'stars', sparkle: 'star', tint: '#f1d4ff' },
+  'galaxy-egg': { pattern: 'stars', sparkle: 'sparkle', tint: '#c8ccff' },
+  'void-egg': { pattern: 'cracks', sparkle: 'star', tint: '#d6c6ff' },
 };
 const DEFAULT_THEME = { pattern: 'stone', sparkle: 'sparkle', tint: '#fff3d6' } as const;
 

@@ -33,10 +33,14 @@ export class PetEquipment {
     return true;
   }
   exportData(): PetEquipmentDataV1 { return { version: 1, slots: [...this.snapshot.slots] }; }
-  static fromData(value: unknown, slotCount: number): PetEquipment {
+  /** One more empty slot (a bought pet slot). */
+  widen(): PetEquipment { const wider = new PetEquipment(this.snapshot.slots.length + 1); wider.replace([...this.snapshot.slots, null]); return wider; }
+  /** `slotCount`: the base slots; a save may hold up to `maxSlots` (bought ones). */
+  static fromData(value: unknown, slotCount: number, maxSlots = slotCount): PetEquipment {
     const data = petRecord(value);
     if (data.version !== 1 || !Array.isArray(data.slots)) throw Error('无效宠物装备版本或数据');
-    const equipment = new PetEquipment(slotCount);
+    if (data.slots.length < slotCount || data.slots.length > maxSlots) throw Error('宠物装备槽数不匹配');
+    const equipment = new PetEquipment(data.slots.length);
     equipment.replace(data.slots);
     return equipment;
   }

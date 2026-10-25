@@ -40,6 +40,12 @@ export class PetCommands {
     this.check();
     return this.changed(this.service.equipBest());
   };
+  mergeGolden = (speciesId: string) => {
+    this.check();
+    const r = this.service.mergeGolden(speciesId);
+    if (r.status === "merged") this.completed();
+    return r;
+  };
   unequipAll = () => {
     this.check();
     return this.changed(this.service.unequipAll());

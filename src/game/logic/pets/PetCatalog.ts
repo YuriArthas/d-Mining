@@ -34,6 +34,8 @@ export class PetCatalog {
     }
     this.content = Object.freeze({
       equipSlots: content.equipSlots,
+      maxEquipSlots: Math.max(content.equipSlots, content.maxEquipSlots ?? content.equipSlots),
+      goldenNeed: content.goldenNeed ?? 5,
       pets: Object.freeze([...this.pets.values()]),
       eggs: Object.freeze([...this.eggs.values()]),
     });

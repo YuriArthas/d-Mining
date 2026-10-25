@@ -48,3 +48,9 @@
   .bag-gear { padding: 8px; }
   .bag-gear-info h4 { font-size: 17px; }
 }
+
+/* Golden pets: a gold frame and glow; the slot purchase sits with the team chips. */
+.ui-cell[data-golden] { --r: #ffd34a; --r-lo: #d8901a; box-shadow: inset 0 2px 0 #fff6, 0 0 0 3px #ffe48a, 0 0 14px #ffd34acc, 0 3px 0 var(--ui-ink); }
+.ui-cell[data-golden][data-equipped] { box-shadow: inset 0 2px 0 #fff6, 0 0 0 3px #58e04a, 0 0 14px #ffd34acc, 0 3px 0 var(--ui-ink); }
+.bag-buy-slot.ui-btn { min-height: 34px; padding: 0 10px; font-size: 14px; }
+.bag-merge.ui-btn { min-height: 36px; font-size: 14px; }

@@ -27,6 +27,8 @@ const entries = ECONOMY.eggs.flatMap(numbers => {
 });
 export const PET_CONTENT: PetContent = Object.freeze({
   equipSlots: ECONOMY.start.petSlots,
+  maxEquipSlots: ECONOMY.start.petSlots + ECONOMY.petSlots.length,
+  goldenNeed: ECONOMY.golden.need,
   pets: Object.freeze(entries.flatMap(e => e.pets)),
   eggs: Object.freeze(entries.map(e => e.offer)),
 });
