@@ -49,7 +49,7 @@ batched.group.updateMatrixWorld(true);
 const receivers = [];
 batched.group.traverse(o => { if (o.isMesh) receivers.push(o); });
 const baked = await bakeOcclusion({ casters, vertex: receivers, aoRadius: SUN ? 6 : 4.5, aoSamples: 32, sun: SUN });
-// The game's material contract: standard materials, matte, baked occlusion per vertex.
+// The game's material contract: standard materials, matte unless named gloss, baked occlusion per vertex.
 const converted = new Map();
 batched.group.traverse(o => {
   if (!o.isMesh) return;
@@ -58,7 +58,8 @@ batched.group.traverse(o => {
   if (!out) {
     const m = o.material;
     out = m.isMeshLambertMaterial ? new THREE.MeshStandardMaterial({ color: m.color, map: m.map, vertexColors: m.vertexColors, roughness: 1, metalness: 0 }) : m.clone();
-    out.name = m.name; out.userData.bakedLight = 'vertex'; converted.set(o.material, out);
+    // Unlit materials (halos, the molten core) are their own light: no bake.
+    out.name = m.name; if (out.isMeshStandardMaterial) out.userData.bakedLight = 'vertex'; converted.set(o.material, out);
   }
   o.material = out;
 });

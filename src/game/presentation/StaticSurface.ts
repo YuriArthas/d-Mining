@@ -1,5 +1,5 @@
 import { assembleAuthoredSurface } from "./assembleAuthoredSurface.ts";
-import { Mesh, NearestFilter, NearestMipmapNearestFilter, type MeshStandardMaterial, type WebGLRenderer } from "three";
+import { AdditiveBlending, Mesh, NearestFilter, NearestMipmapNearestFilter, type MeshStandardMaterial, type WebGLRenderer } from "three";
 import type { SurfaceContent } from "../content/gameContent.ts";
 import { liftAlbedo, liftFoliage } from "./albedoLift.ts";
 import { applyCreekWater } from "./creekWater.ts";
@@ -29,7 +29,9 @@ export async function loadStaticSurface(
     }),bytes:manifest.bytes,decodedBytes:manifest.decodedBytes,instances:content.authored.instances.filter(p=>p.asset===name).length};
   });
   const assets=await loadModelAssets(renderer,requests,signal,(m,request)=>{
-    m.roughness=1;m.metalness=0;m.envMapIntensity=0;
+    // Matte, except the halls' glossy floors (their lamps' highlights slide over them); halos add light.
+    if(!/gloss/i.test(m.name))m.roughness=1;m.metalness=0;m.envMapIntensity=0;
+    if(m.name.startsWith('Glow halo')){m.blending=AdditiveBlending;m.depthWrite=false;m.fog=false;m.transparent=true;}
     if(m.map){m.map.magFilter=NearestFilter;m.map.minFilter=NearestMipmapNearestFilter;}
     if(request.name==='pinewind-architecture')liftAlbedo(m);
     // Woods, rocks and the cliff walls: lit all round like the original's valley, not near black in shade.

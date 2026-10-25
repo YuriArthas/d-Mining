@@ -119,8 +119,9 @@ export function caveKit(hall: HallDefinition, seed: number, palette: CavePalette
 
     /** WALLS: two tiers of masses along every wall, their backs beyond the voxel wall. The lower tier is chunky
      *  and shrinks back where it would crowd a stall, the board or a landmark; the upper tier leans further in,
-     *  under the ceiling. Then one big mass per corner. */
-    walls() {
+     *  under the ceiling. Then one big mass per corner. `open` leaves out the masses (of either tier) it accepts by
+     *  centre and radius, for a facade the hall builds there instead. */
+    walls(open: (x: number, z: number, radius: number) => boolean = () => false) {
       const rockTint: Tint = f => lerp(palette.rock[0], palette.rock[1], smooth(.1, .9, f));
       const upperTint: Tint = f => lerp(palette.upper[0], palette.upper[1], smooth(.2, 1, f));
       for (const [wall, along] of [['n', 1], ['s', 1], ['w', 0], ['e', 0]] as const) {
@@ -132,14 +133,14 @@ export function caveKit(hall: HallDefinition, seed: number, palette: CavePalette
           for (let tries = 0; tries < 4 && !clearOf(face()[0], face()[1], .4); tries++) { radius *= .78; inset = -radius * .25; [x, z] = wallX(d, inset); }
           const lowTop = 6 + r() * 7;
           const low = rockMass(r, x, z, radius, -.6, lowTop, [[0, .96], [.32, 1], [.66, .9], [1, .62]], rockTint);
-          add(new THREE.Mesh(low.geometry, M.rock), 'Cave wall mass'); hull(low.points);
+          if (!open(x, z, radius)) { add(new THREE.Mesh(low.geometry, M.rock), 'Cave wall mass'); hull(low.points); }
           const upRadius = 2.8 + r() * 1.6, upAt = d + (r() - .5) * 1.8;
           let upInset = upRadius * (.35 + r() * .3);
           // Over the name board it stays behind the board's face.
           if (wall === 'n' && Math.abs(upAt - hall.board[0]) < 4.4 + upRadius) upInset = Math.min(upInset, HALF + hall.board[2] - upRadius * 1.1);
           const [ux, uz] = wallX(upAt, upInset);
           const up = rockMass(r, ux, uz, upRadius, lowTop - 1.5, TOP + 1, [[0, .7], [.3, 1], [.75, 1.05], [1, 1]], upperTint);
-          add(new THREE.Mesh(up.geometry, M.rock), 'Cave wall upper mass');
+          if (!open(ux, uz, upRadius)) add(new THREE.Mesh(up.geometry, M.rock), 'Cave wall upper mass');
         }
       }
       for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
@@ -149,19 +150,20 @@ export function caveKit(hall: HallDefinition, seed: number, palette: CavePalette
     },
 
     /** CEILING: broad slabs a little under the voxel ceiling, then stalactites over the floor ring; a share of
-     *  their tips get a glint in one of `tips` (picked evenly). */
-    ceiling(stalactites = 70, tips: readonly THREE.Material[] = [], tipChance = .22) {
+     *  their tips get a glint in one of `tips` (picked evenly). `open` leaves out slabs and stalactites by centre. */
+    ceiling(stalactites = 70, tips: readonly THREE.Material[] = [], tipChance = .22, open: (x: number, z: number) => boolean = () => false) {
       const ceilingTint: Tint = f => lerp(palette.ceiling[0], palette.ceiling[1], f);
       for (let x = -HALF; x < HALF; x += 6.5) for (let z = -HALF; z < HALF; z += 6.5) {
         const cx = x + 3.25 + (r() - .5) * 2, cz = z + 3.25 + (r() - .5) * 2, base = TOP - 2.6 - r() * 2.2;
         const slab = rockMass(r, cx, cz, 4.6 + r() * 1.2, base, TOP + .8, [[0, .62], [.4, 1], [1, 1]], ceilingTint);
-        add(new THREE.Mesh(slab.geometry, M.ceiling), 'Cave ceiling slab');
+        if (!open(cx, cz)) add(new THREE.Mesh(slab.geometry, M.ceiling), 'Cave ceiling slab');
       }
       const stalTint = new THREE.Color(palette.stalactite[0]);
       for (let i = 0; i < stalactites; i++) {
         const a = r() * Math.PI * 2, d = 6 + r() * 12.5, x = Math.cos(a) * d * 1.08, z = Math.sin(a) * d * 1.08;
         if (Math.abs(x) > HALF - 1.5 || Math.abs(z) > HALF - 1.5) continue;
         const length = 1.6 + r() * 4.2, radius = .45 + r() * .7, top = TOP - 1.4 - r() * 1.6;
+        if (open(x, z)) continue;
         const g = new THREE.ConeGeometry(radius, length, 6, 1).rotateX(Math.PI).toNonIndexed(); g.computeVertexNormals();
         g.translate(x, top - length / 2, z);
         colour(g, (y) => stalTint.clone().lerp(new THREE.Color(palette.stalactite[1]), smooth(top, top - length, y)));

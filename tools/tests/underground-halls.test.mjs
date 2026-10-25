@@ -6,26 +6,28 @@ import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
 import {HALL_BY_LAYER,undergroundHall} from '../../src/game/content/underground/halls.ts';
 
 const HALLS={old_mine:'old-mine-hall',fungal:'fungal-hall',crystal:'crystal-hall',ruins:'ruins-hall',frozen:'frozen-hall',volcanic:'volcanic-hall'};
+const LATER={'world2.1':'automine-hall','world2.6':'reactor-hall'};
+const allRooms=GAME_CONTENT.worlds.flatMap(w=>w.rooms);
 
 test('every world 1 rest layer is an authored hall',()=>{
  assert.deepEqual(GAME_CONTENT.rooms.map(r=>r.sceneDefinition.hall),Object.values(HALLS));
- assert.deepEqual(HALL_BY_LAYER,{...HALLS,'world2.1':'automine-hall'});
+ assert.deepEqual(HALL_BY_LAYER,{...HALLS,...LATER});
 });
 
-for(const [layer,id] of Object.entries(HALLS))test(`${id}: no kit; its colliders keep the shaft open and the service rings free; rings, board and lights fit the hall`,()=>{
- const room=GAME_CONTENT.rooms.find(r=>r.id===layer),plan=roomPlan(room),{hall,solids}=undergroundHall(id);
+for(const [layer,id] of Object.entries({...HALLS,'world2.6':'reactor-hall'}))test(`${id}: no kit; its colliders keep the shaft open and the service rings free; rings, board and lights fit the hall`,()=>{
+ const room=allRooms.find(r=>r.id===layer),plan=roomPlan(room),{hall,solids}=undergroundHall(id);
  assert.equal(plan.authored,undefined,'no kit');
  assert.equal(hall.id,layer);assert.equal(hall.depth,room.depth);
- assert.deepEqual(room.spawn,[0,-room.depth+.1,12]);
+ assert.deepEqual(room.spawn,[room.x,-room.depth+.1,room.z+12]);
  assert.equal(plan.signs[0].subtitle,`${String(room.number).padStart(2,'0')} / ${room.depth} 米`);
- assert.ok(Math.abs(plan.signs[0].at[2]-hall.board[2])<.5,'the name floats in front of the board');
+ assert.ok(Math.abs(plan.signs[0].at[2]-room.z-hall.board[2])<.5,'the name floats in front of the board');
  assert.equal(!!room.shop,!!hall.stalls.shop,'a stall for each service');
  assert.equal(plan.shapes.length,room.shop?2:1);
- assert.deepEqual([room.sell.x,room.sell.z],[hall.stalls.sell.ring[0],hall.stalls.sell.ring[2]]);
- if(room.shop)assert.deepEqual([room.shop.x,room.shop.z],[hall.stalls.shop.ring[0],hall.stalls.shop.ring[2]]);
+ assert.deepEqual([room.sell.x-room.x,room.sell.z-room.z].map(v=>+v.toFixed(6)),[hall.stalls.sell.ring[0],hall.stalls.sell.ring[2]]);
+ if(room.shop)assert.deepEqual([room.shop.x-room.x,room.shop.z-room.z].map(v=>+v.toFixed(6)),[hall.stalls.shop.ring[0],hall.stalls.shop.ring[2]]);
  assert.ok(solids.length>40);
  // Nothing solid stands in the 16 m pit, except the floor ring's stones which stop at its edge.
- for(const s of plan.solids)assert.ok(s.at[0]+s.half[0]<=-8+1e-6||s.at[0]-s.half[0]>=8-1e-6||s.at[2]+s.half[2]<=-8+1e-6||s.at[2]-s.half[2]>=8-1e-6,`solid in the pit at ${s.at}`);
+ for(const s of plan.solids){const x=s.at[0]-room.x,z=s.at[2]-room.z;assert.ok(x+s.half[0]<=-8+1e-6||x-s.half[0]>=8-1e-6||z+s.half[2]<=-8+1e-6||z-s.half[2]>=8-1e-6,`solid in the pit at ${s.at}`);}
  // The rings and the spawn stand clear of every collider taller than the floor.
  for(const p of [room.sell,room.shop,{x:room.spawn[0],z:room.spawn[2]}].filter(Boolean))for(const s of plan.solids.filter(s=>s.half[1]>.1&&!s.hull))
   assert.ok(Math.abs(p.x-s.at[0])>s.half[0]+.3||Math.abs(p.z-s.at[2])>s.half[2]+.3,`${p.x},${p.z} blocked by ${s.at}`);
@@ -35,6 +37,8 @@ for(const [layer,id] of Object.entries(HALLS))test(`${id}: no kit; its colliders
  assert.deepEqual(instance.at,[room.x,-room.depth,room.z]);
  const session=new GameSession(GAME_CONTENT.session);
  session.attach({cell:()=>64,pending:()=>false,mine:()=>true,cancelMining(){},travelTo(){}});
+ // A later world's hall is only reachable once that world is open.
+ session.worldProgress.openThrough(room.worldId);
  session.updatePosition([room.sell.x,room.sell.y,room.sell.z],true);assert.equal(session.getSnapshot().inSellZone,true);
  if(room.shop){session.updatePosition([room.shop.x,room.shop.y,room.shop.z],true);assert.equal(session.getSnapshot().shopId,layer);}
 });
