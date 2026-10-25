@@ -1,4 +1,5 @@
-"""New Blender-authored shop, 30 tools and 30 backpacks. No reused scenery/Decimate."""
+"""The shop showroom: the stage and the mine cart each item stands on. Blender-authored, no reused scenery/Decimate.
+The tools and backpacks themselves are built by tools/build-equipment.py."""
 import bpy,math,json,hashlib,random
 from pathlib import Path
 from mathutils import Vector
@@ -46,61 +47,7 @@ def select(root):
  bpy.ops.object.select_all(action='DESELECT');root.select_set(True)
  for o in root.children_recursive:o.select_set(True)
  bpy.context.view_layer.objects.active=root
-roots=[]
-for level in range(1,31):
- k=(level-1)%10;era=(level-1)//10;metal=[3,4,6,3,7,14,9,8,11,5][k];accent=[8,10,15][era]
- cyl('Handle',(0,0,.24),.043+.003*(k%3),.90,0 if era==0 else 5)
- cyl('Grip',(0,0,-.02),.052,.21,2)
- for z in [-.12,.09,.56]:cyl('GripBand',(0,0,z),.057,.025,accent)
- width=.7+.045*k;height=.67+.015*(k%3)
- pts=[(-width*.45,height-.08),(-width*.45,height+.04),(-.09,height+.12),(.12,height+.10),(width*.32,height), (width*.6,height-.24),(width*.45,height-.20),(.12,height-.035),(-.08,height-.015)]
- profile('PickHead',pts,.12+.01*(k%3),metal)
- cyl('Collar',(0,0,.61),.077,.16,5)
- if k>=3:box('ReinforcedHead',(0,-.07,height),(.17,.19,.14),metal,.025)
- if k in [4,6,8,9]:
-  for sign in [-1,1]:gem('InsetCrystal',(sign*.087,0,height),(.047,.065,.09),accent)
- if k in [5,7,9]:profile('RearSpike',[(-.14,height+.04),(-width*.6,height-.17),(-width*.36,height+.12),(-.1,height+.17)],.10,metal)
- if era:
-  for z in [.18,.35,.45]:cyl('EngravedBand',(0,0,z),.052,.025,accent)
- tip=bpy.data.objects.new('PickaxeTip',None);bpy.context.collection.objects.link(tip);tip.location=(0,width*.6,height-.24);parts.append(tip)
- roots.append(group(f'Tool{level:02d}'))
-for level in range(1,31):
- k=(level-1)%10;era=(level-1)//10;color=[0,7,6,9,0,4,3,7,9,5][k];trim=[8,10,15][era]
- w=.50+.025*(k%4);h=.64+.025*(k%3)
- # Back of the miner faces +Z in glTF; bag front faces Blender -Y.
- if k<4:
-  box('BagBody',(0,0,0),(w,.29,h),color,.06)
-  box('Flap',(0,-.15,.22),(w*1.04,.065,.18),color,.025)
-  box('Pocket',(0,-.19,-.14),(w*.72,.13,.22),trim,.035)
-  for x in [-w*.35,w*.35]:box('Buckle',(x,-.198,.12),(.045,.025,.09),5,.008)
- elif k in [4,5]:
-  cyl('BarrelBody',(0,0,0),.29,h,0,12)
-  for z in [-h*.36,h*.36]:cyl('BarrelBand',(0,0,z),.305,.07,trim,12)
-  cyl('BarrelLid',(0,0,h*.5),.30,.035,4,12)
- elif k in [7,8]:
-  cyl('StorageCanister',(0,0,0),.26,h,color,10)
-  for z in [-h*.48,h*.48]:cyl('CanisterCap',(0,0,z),.29,.09,5,10)
-  box('ViewingWindow',(0,-.255,0),(.23,.03,.31),trim,.035)
- else:
-  box('VaultCase',(0,0,0),(w,.36,h),5,.04)
-  box('VaultDoor',(0,-.205,0),(w*.84,.065,h*.83),color,.04)
-  cyl('DoorDial',(0,-.255,0),.11,.05,trim,8,'Y')
-  for x in [-w*.36,w*.36]:box('ReinforcedEdge',(x,-.25,0),(.05,.035,h*.72),trim,.01)
- for x in [-.17,.17]:box('ShoulderStrap',(x,.17,.02),(.065,.065,.58),2,.018)
- box('TopHandle',(0,0,h*.5+.045),(.21,.07,.06),5,.02)
- if era:
-  for x in [-w*.45,w*.45]:gem('SideInlay',(x,-.05,.05),(.06,.14,.19),trim)
- roots.append(group(f'Bag{level:02d}'))
-select(roots[0])
-for r in roots:
- r.select_set(True)
- for o in r.children_recursive:o.select_set(True)
-bpy.ops.wm.save_as_mainfile(filepath=str(SRC/'shop-equipment.blend'))
-bpy.ops.export_scene.gltf(filepath=str(OUT/'equipment.glb'),export_format='GLB',use_selection=True,export_animations=False)
-report=[]
-for r in roots:report.append({'node':r.name,'triangles':sum(sum(len(p.vertices)-2 for p in o.data.polygons) for o in r.children_recursive if o.type=='MESH')})
-# Separate new showroom scenery, with a reusable cart node. All dimensions authored here.
-bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
+# The showroom scenery, with a reusable cart node. All dimensions authored here.
 box('Floor',(0,0,-.2),(48,26,.4),21,.02)
 for y in [-1.05,1.05]:box('Rail',(0,y,.14),(48,.13,.20),3,.02)
 for x in range(-23,24):box('Sleeper',(x,0,.025),(.28,2.9,.12),24,.015)
@@ -133,7 +80,7 @@ select(stage);cart.select_set(True)
 for o in cart.children_recursive:o.select_set(True)
 bpy.ops.wm.save_as_mainfile(filepath=str(SRC/'shop-showroom.blend'))
 bpy.ops.export_scene.gltf(filepath=str(OUT/'showroom.glb'),export_format='GLB',use_selection=True,export_animations=False)
-manifest={'maker':'Blender','script':'tools/build-shop-showroom.py','source':['assets-source/shop-showroom/shop-equipment.blend','assets-source/shop-showroom/shop-showroom.blend'],'texture':[128,128],'models':report,'showroomTriangles':sum(sum(len(p.vertices)-2 for p in o.data.polygons) for r in [stage,cart] for o in r.children_recursive if o.type=='MESH'),'files':[]}
-for path in [OUT/'equipment.glb',OUT/'showroom.glb',SRC/'shop-palette.png',SRC/'shop-equipment.blend',SRC/'shop-showroom.blend',Path(__file__)]:
+manifest={'maker':'Blender','script':'tools/build-shop-showroom.py','source':['assets-source/shop-showroom/shop-showroom.blend'],'texture':[128,128],'showroomTriangles':sum(sum(len(p.vertices)-2 for p in o.data.polygons) for r in [stage,cart] for o in r.children_recursive if o.type=='MESH'),'files':[]}
+for path in [OUT/'showroom.glb',SRC/'shop-palette.png',SRC/'shop-showroom.blend',Path(__file__)]:
  manifest['files'].append({'file':str(path.relative_to(ROOT)),'bytes':path.stat().st_size,'sha256':hashlib.sha256(path.read_bytes()).hexdigest()})
-(OUT/'manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n');print(json.dumps({'models':len(report),'triangles':sum(r['triangles'] for r in report),'showroom':manifest['showroomTriangles'],'files':manifest['files']},ensure_ascii=False))
+(OUT/'manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n');print(json.dumps({'showroom':manifest['showroomTriangles'],'files':manifest['files']},ensure_ascii=False))

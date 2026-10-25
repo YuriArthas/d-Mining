@@ -8,6 +8,7 @@ import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
 import { JOURNEY_CAPACITIES, JOURNEY_TOOL_PRICES } from '../../src/game/content/journeyResources.ts';
 import { EquipmentCollection } from '../../src/game/logic/EquipmentCollection.ts';
 import { MinerAvatar } from '../../src/game/presentation/MinerAvatar.ts';
+import { shopBackpacks, shopTools } from '../../src/game/content/shopCatalog.ts';
 const content=GAME_CONTENT.session;
 function funded(coins=1000) { const data=new GameSession(content).exportProgress();data.wallet.coins=coins;return GameSession.fromData(data,content); }
 function enter(s) { const {zone}=content.shops[0];s.updatePosition([zone.x,zone.y,zone.z],true);assert.ok(s.getSnapshot().shopId); }
@@ -47,4 +48,15 @@ test('all 60 catalog models exist, real prices/capacities match game progression
  for(const [i,item] of catalog.backpacks.entries()){assert.ok(library.scene.getObjectByName(item.model));assert.equal(item.capacity,JOURNEY_CAPACITIES[i]);}
  assert.ok(stage.scene.getObjectByName('ShowCart'));assert.ok(stage.scene.getObjectByName('ShowroomStage'));
  const a=Reflect.construct(MinerAvatar,[character,library]);try{a.setEquipment(12,23);const d=a.diagnostics();assert.equal(d.pickaxe.model,'Tool12');assert.equal(d.backpack.model,'Bag23');assert.equal(d.backpack.attachedTo,'UpperTorso');assert.equal(d.bones,16);assert.equal(d.triangles,11678);assert.ok(d.pickaxe.tip.every(Number.isFinite));}finally{a.dispose();}
+});
+
+test('世界 1 的十把工具和十个背包各有自己的名字和一句介绍；打蛋器是电钻类，其他是镐类',()=>{
+  const tools=shopTools(),bags=shopBackpacks();
+  for(const list of [tools,bags]){
+    assert.equal(new Set(list.map(i=>i.name)).size,list.length,'every name is different');
+    assert.equal(new Set(list.slice(0,10).map(i=>i.description)).size,10,'world 1 items each have their own line');
+  }
+  assert.equal(tools[0].name,'老木镐');assert.equal(bags[0].name,'麻布袋');
+  assert.deepEqual(tools.filter(t=>t.motion==='drill').map(t=>t.level),[7]);
+  assert.ok(tools.every(t=>t.motion==='drill'||t.motion==='swing'));
 });

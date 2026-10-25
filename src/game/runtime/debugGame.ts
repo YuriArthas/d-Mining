@@ -41,6 +41,8 @@ type ValidationDebug = {
   audioLevel: () => number | null;
   audioStream: () => MediaStream | null;
   look: (yaw: number, pitch: number) => void;
+  /** Camera boom length in metres for close looks; null restores the game's. */
+  cameraDistance: (metres: number | null) => void;
   /** Clears cells straight through the terrain (no health, no loot): for looking at dug tunnels. */
   excavate: (coords: readonly Coord[]) => boolean;
   /** Slows the creek splashes (1 = normal) so screenshots can catch them. */
@@ -52,6 +54,8 @@ type ValidationDebug = {
   hit: GameSession["hit"];
   health: GameSession["blockHealth"];
   wireframe: (enabled: boolean) => void;
+  /** Shows the miner wearing this tool and backpack with this load (0..1), without touching the save; null ends it. */
+  previewGear: (gear: { tool: number; bag: number; fill: number } | null) => void;
   teleport: (
     location:
       | "surface"
@@ -226,11 +230,13 @@ export function attachGameDebug(
     audioLevel: () => gameAudio.outputLevel(),
     audioStream: () => gameAudio.outputStream(),
     look: (yaw, pitch) => cameraView.look(yaw, pitch),
+    cameraDistance: (metres) => { cameraView.rig.boom = metres; },
     excavate: (coords) => terrain.mineMany(coords),
     splashTimeScale: scale => { current.feedback.splash.timeScale = scale; },
     cell: (coord) => terrain.cell(coord),
     canMine: (coord) => terrain.canMine(coord),
     hit: session.hit,
+    previewGear: (gear) => current.minerAvatar.previewGear(gear),
     health: session.blockHealth,
     mine: (coord) => session.requestMine([coord]),
     mineMany: (coords) => session.requestMine(coords),

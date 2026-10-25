@@ -60,6 +60,7 @@ export function ShopPanel({ session, view, onClose }: { session: GameSession; vi
       <CloseButton label="关闭商店" onPress={onClose} />
     </nav>
     <h1 className="shop-name ui-outline" data-tier={offerTier(item)} key={item.id}>{item.name}</h1>
+    <p className="shop-blurb ui-outline" key={`${item.id}-blurb`}>{item.description}</p>
     <UiButton className="shop-arrow shop-prev" aria-label="上一件商品" disabled={display.index === 0} onPress={() => view.select(display.index - 1)}>◀</UiButton>
     <UiButton className="shop-arrow shop-next" aria-label="下一件商品" disabled={display.index === items.length - 1} onPress={() => view.select(display.index + 1)}>▶</UiButton>
     {!display.ready && !display.error && <div className="shop-loading ui-card" role="status">正在布置展厅…</div>}

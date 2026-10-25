@@ -261,6 +261,7 @@ export function ValidationScene({
     if (!game || !avatar.current) return;
     const gear = session.getSnapshot();
     game.minerAvatar.setEquipment(gear.pickaxe.level, gear.backpackLevel);
+    game.minerAvatar.setBagFill(gear.inventory.capacity > 0 ? gear.inventory.used / gear.inventory.capacity : 0);
     if (shopView.active) {
       input.reset(); game.minerAvatar.cancelMining();
       if (guideArrow.current) guideArrow.current.visible = false;

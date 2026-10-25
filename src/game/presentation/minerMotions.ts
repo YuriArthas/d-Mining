@@ -58,6 +58,22 @@ const SWING: readonly Key[] = [
   { at: 1, pose: READY, ease: easeInOut },
 ];
 
+// A drill (the mixer) is held out level at chest height in the right fist, the left hand steadying its body, and
+// shoved a little further in on each hit. The clip starts and ends on the hold so back-to-back hits never drop the
+// arms; the shaking on top is procedural (MinerAvatar), at a fixed rate whatever the attack speed.
+const DRILL_HOLD: Pose = {
+  UpperTorso: [-4, -8, 0], Head: [4, 8, 0],
+  RightUpperArm: [50, 37, -55], RightLowerArm: [13, 0, 0], RightHand: [32, 31, 39],
+  LeftUpperArm: [38, -80, -26], LeftLowerArm: [52, 0, 0], LeftHand: [0, 0, 0],
+};
+const DRILL_PUSH: Pose = { ...DRILL_HOLD, UpperTorso: [-10, -9, 0], Head: [10, 9, 0], RightUpperArm: [56, 37, -55], LeftUpperArm: [44, -80, -26] };
+const DRILL: readonly Key[] = [
+  { at: 0, pose: DRILL_HOLD },
+  { at: SWING_IMPACT, pose: DRILL_PUSH, ease: easeOut },
+  { at: 0.55, pose: DRILL_HOLD, ease: easeInOut },
+  { at: 1, pose: DRILL_HOLD },
+];
+
 // Air poses: knee tucked on the way up, arms thrown out on the way down, a short crouch on landing.
 const RISE: Pose = {
   LowerTorso: [6, 0, 0], UpperTorso: [-6, 0, 0], Head: [6, 0, 0],
@@ -148,6 +164,7 @@ export function createMinerMotions(rig: Object3D) {
   const toQuaternions = (pose: Pose) => Object.fromEntries(Object.entries(pose).map(([b, r]) => [b, quaternion(r)]));
   return {
     swing: keyedClip('Swing', SWING),
+    drill: keyedClip('Drill', DRILL),
     rise: staticClip('Rise', toQuaternions(RISE)),
     fall: staticClip('Fall', toQuaternions(FALL)),
     land: staticClip('Land', landingPose(rig), [new VectorKeyframeTrack('Root.position', [0, 1], [root.x, root.y - LAND.drop, root.z, root.x, root.y - LAND.drop, root.z])]),

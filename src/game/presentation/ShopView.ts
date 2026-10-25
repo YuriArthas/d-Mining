@@ -1,4 +1,4 @@
-import { Box3, Color, DirectionalLight, Group, HemisphereLight, Mesh, MeshStandardMaterial, PerspectiveCamera, Scene, SpotLight, Vector2, Vector3, type WebGLRenderer } from 'three';
+import { Box3, Color, DirectionalLight, Group, HemisphereLight, Mesh, MeshStandardMaterial, PerspectiveCamera, Scene, SpotLight, Vector2, Vector3, type Object3D, type WebGLRenderer } from 'three';
 import type { ShopCategory, ShopItem } from '../content/shopCatalog.ts';
 import { EQUIPMENT_URL, SHOWROOM_URL, loadShopAsset, requiredModel } from './EquipmentModels.ts';
 import { disposeScenery } from './disposeScenery.ts';
@@ -120,14 +120,18 @@ export class ShopView {
       const station=new Group();station.position.x=index*SHOWROOM.spacing;
       const cart=requiredModel(this.sources[1],'ShowCart').clone(true);station.add(cart);
       const product=requiredModel(this.sources[0],item.model).clone(true);product.name='product';
-      if(category==='tools')product.rotation.y=Math.PI/2;
+      // Clubs lean in the hand ('Hold'); on the cart every tool stands upright, turned three-quarters to the camera.
+      // Node names repeat between models, so the loader numbers them (Hold, Hold001, ...).
+      product.children.find(o=>o.name.startsWith('Hold'))?.quaternion.identity();
+      if(category==='tools')product.rotation.y=Math.PI/2-.5;
       product.updateMatrixWorld(true);const bounds=new Box3().setFromObject(product),size=bounds.getSize(new Vector3()),center=bounds.getCenter(new Vector3());
       const scale=(category==='tools'?2.20:2.0)/Math.max(size.y,size.x);
       // A pivot keeps the product's centre on its turntable axis.
       const pivot=new Group();pivot.name='turntable';pivot.position.y=2.15+size.y*scale/2;
       product.scale.setScalar(scale);product.position.copy(center).multiplyScalar(-scale);
       pivot.add(product);station.add(pivot);
-      station.userData={item:item.id,model:item.model,focus:index===this.state.index?1:0,spin:0,baseY:pivot.position.y,scale:1};
+      const spinners:Object3D[]=[];product.traverse(o=>{if(o.name.startsWith('Spin'))spinners.push(o);});
+      station.userData={item:item.id,model:item.model,focus:index===this.state.index?1:0,spin:0,baseY:pivot.position.y,scale:1,spinners};
       this.strip.add(station);
     }
     // Open on the current item with a short dolly-in.
@@ -152,7 +156,8 @@ export class ShopView {
     const spotX=rig.x;this.spot.position.set(spotX,10,6);this.spot.target.position.set(spotX,2.6,0);this.spot.target.updateMatrixWorld();
     this.spot.intensity=damp(this.spot.intensity,5,4,dt);
     for(const [index,station] of this.strip.children.entries()){
-      const data=station.userData as {focus:number;spin:number;baseY:number},pivot=station.getObjectByName('turntable');
+      const data=station.userData as {focus:number;spin:number;baseY:number;spinners:Object3D[]},pivot=station.getObjectByName('turntable');
+      for(const spinner of data.spinners)spinner.rotateY(dt*8);
       if(!pivot)continue;
       data.focus=damp(data.focus,index===this.state.index?1:0,6,dt);
       // The selected item rises and turns on its turntable; the others rest, swaying gently.

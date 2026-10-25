@@ -1,8 +1,8 @@
 import { EQUIPMENT_URL, requiredModel } from './EquipmentModels.ts';
-import { equipmentModel } from '../content/shopCatalog.ts';
+import { equipmentModel, toolMotion, type ToolMotion } from '../content/shopCatalog.ts';
 import {
-  AnimationClip, AnimationMixer, Group, MathUtils, Mesh, MeshStandardMaterial, Quaternion, SkinnedMesh, Vector3,
-  type AnimationAction, type Bone, type Texture,
+  AnimationClip, AnimationMixer, Euler, Group, MathUtils, Mesh, MeshStandardMaterial, Quaternion, SkinnedMesh, Vector3,
+  type AnimationAction, type Bone, type Object3D, type Texture,
 } from 'three';
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { applyStandingLight } from './bakedLight.ts';
@@ -13,6 +13,8 @@ import { crossed, footContacts } from './minerSteps.ts';
 
 const MODEL_URL = new URL('../assets/character/miner-a.glb', import.meta.url).href;
 const LANDING_SECONDS = .32;
+/** A drill's shake: two fast wobbles (Hz) on the arms, degrees at full weight; its whisks or bit turn this fast (rad/s). */
+const DRILL_SHAKE = { rates: [23, 31], arm: 1.8, torso: .5, spin: 38 } as const;
 
 type Layer = { lower: AnimationAction; upper: AnimationAction };
 /** Lower and upper body play separately so the swing can own the arms while the legs keep moving. */
@@ -29,6 +31,21 @@ export class MinerAvatar {
   private readonly locomotion: Layer[];
   private readonly air: Layer[];
   private readonly swing: AnimationAction;
+  private readonly drill: AnimationAction;
+  private motion: ToolMotion = 'swing';
+  /** The equipped tool's parts that turn while it works, and the backpack's load that grows as it fills. */
+  private spinners: Object3D[] = [];
+  private load: Object3D | null = null;
+  private fill = 0;
+  private fillTarget = 0;
+  private shakeTime = 0;
+  private preview: { tool: number; bag: number; fill: number } | null = null;
+  private readonly shake = new Quaternion();
+  private readonly shakeEuler = new Euler();
+  /** The bones a drill shakes: how far (degrees) and the phase of each one's wobble. */
+  private readonly shaken: (readonly [Object3D, number, number])[] = [];
+  private readonly shakes: Quaternion[] = [];
+  private readonly undo = new Quaternion();
   private readonly mining = new MinerMiningLayer();
   private readonly pickaxe = new Group();
   private readonly backpack = new Group();
@@ -94,13 +111,16 @@ export class MinerAvatar {
     this.pickaxe.rotation.set(-Math.PI/2,0,0);
     hand.add(this.pickaxe);
     this.backpack.name='equipped-backpack';
-    this.backpack.scale.setScalar(.62);
+    this.backpack.scale.setScalar(.7);
     this.backpack.position.set(0,-.02,.26);
     this.upperTorso.add(this.backpack);
     this.equipment.traverse(object=>{
       if (!(object instanceof Mesh)) return;
       object.receiveShadow=true;
+      // Windows and domes draw after what they hold; their own see-through level survives the camera fade.
+      if(object.name.startsWith('Glass'))object.renderOrder=1;
       for(const material of Array.isArray(object.material)?object.material:[object.material]) {
+        material.userData.opacity=material.opacity;
         material.transparent=true;
         if(material instanceof MeshStandardMaterial){material.roughness=.9;material.metalness=0;applyStandingLight(material);}
       }
@@ -137,19 +157,45 @@ export class MinerAvatar {
     this.air=[motions.rise,motions.fall,motions.land].map(clip=>layer(this.mixer,clip));
     this.swing=this.mixer.clipAction(motions.swing).play();
     this.swing.paused=true;
+    this.drill=this.mixer.clipAction(motions.drill).play();
+    this.drill.paused=true;
+    for(const [name,amount,phase] of [['RightUpperArm',DRILL_SHAKE.arm,0],['LeftUpperArm',DRILL_SHAKE.arm,1.7],['UpperTorso',DRILL_SHAKE.torso,.6]] as const){
+      this.shaken.push([this.group.getObjectByName(name)!,amount,phase]);this.shakes.push(new Quaternion());
+    }
     this.blend(0,0,0,0);
     this.mixer.update(0);
   }
 
-  setEquipment(toolLevel:number,bagLevel:number) {
+  setEquipment(toolLevel:number,bagLevel:number) { if(!this.preview)this.wear(toolLevel,bagLevel); }
+
+  /** Debug only: wear this gear and show this load whatever the save says, until cleared with null. */
+  previewGear(gear:{tool:number;bag:number;fill:number}|null) {
+    this.preview=gear;
+    if(gear){this.wear(gear.tool,gear.bag);this.fillTarget=MathUtils.clamp(gear.fill,0,1);}
+  }
+
+  private wear(toolLevel:number,bagLevel:number) {
     if(this.equippedTool!==toolLevel) {
-      this.pickaxe.clear();this.pickaxe.add(requiredModel(this.equipment,equipmentModel('tools',toolLevel)).clone(true));
-      this.equippedTool=toolLevel;
+      const tool=requiredModel(this.equipment,equipmentModel('tools',toolLevel)).clone(true);
+      this.pickaxe.clear();this.pickaxe.add(tool);
+      this.equippedTool=toolLevel;this.motion=toolMotion(toolLevel);
+      this.spinners=[];tool.traverse(o=>{if(o.name.startsWith('Spin'))this.spinners.push(o);});
     }
     if(this.equippedBag!==bagLevel) {
-      this.backpack.clear();this.backpack.add(requiredModel(this.equipment,equipmentModel('backpacks',bagLevel)).clone(true));
-      this.equippedBag=bagLevel;
+      const bag=requiredModel(this.equipment,equipmentModel('backpacks',bagLevel)).clone(true);
+      this.backpack.clear();this.backpack.add(bag);
+      this.equippedBag=bagLevel;this.load=bag.getObjectsByProperty('type','Object3D').find(o=>o.name.startsWith('BagFill'))??null;
+      this.showLoad();
     }
+  }
+
+  /** How full the backpack is, 0..1: bags with an open top or a window show their load heaping up. */
+  setBagFill(fraction:number) { if(!this.preview)this.fillTarget=MathUtils.clamp(Number.isFinite(fraction)?fraction:0,0,1); }
+
+  private showLoad() {
+    if(!this.load)return;
+    this.load.visible=this.fill>.01;
+    this.load.scale.y=Math.max(.01,this.fill);
   }
 
   strike(target: readonly number[], speed: number) {
@@ -179,8 +225,13 @@ export class MinerAvatar {
     const rise = this.jumped ? MathUtils.smoothstep(this.verticalSpeed, -2.5, 1.5) : 0;
     const land = this.landAge < LANDING_SECONDS ? this.landStrength * landingEnvelope(this.landAge) : 0;
     this.mining.update(delta);
+    this.restorePose();
     this.blend(this.airborne * rise, this.airborne * (1 - rise), land, this.mining.weight);
     this.mixer.update(delta);
+    this.workTool(delta);
+    this.fill=MathUtils.damp(this.fill,this.fillTarget,5,delta);
+    if(Math.abs(this.fill-this.fillTarget)<1e-3)this.fill=this.fillTarget;
+    this.showLoad();
     this.detectStep(discontinuity);
     const dx=this.miningTarget.x-feet[0],dz=this.miningTarget.z-feet[2];
     const elevation=Math.atan2(this.miningTarget.y-feet[1]-1.05,Math.max(.15,Math.hypot(dx,dz)));
@@ -193,6 +244,26 @@ export class MinerAvatar {
     this.group.updateMatrixWorld(true);
     // Where the pick actually lands this frame: effects start at the struck spot the camera can see.
     if(this.mining.consumeContact())this.contact=this.pickTip()?.toArray() as [number,number,number]??[this.miningTarget.x,this.miningTarget.y,this.miningTarget.z];
+  }
+
+  /** A drill shakes the arms that hold it and turns its whisks while it works. */
+  private workTool(delta: number) {
+    const w=this.motion==='drill'?this.mining.weight:0;
+    this.shakeTime=w>0?this.shakeTime+delta:0;
+    for(const spinner of this.spinners)spinner.rotateY(DRILL_SHAKE.spin*w*delta);
+    if(w<=0)return;
+    const t=this.shakeTime*2*Math.PI,[a,b]=DRILL_SHAKE.rates,deg=Math.PI/180;
+    const wobble=(amount:number,phase:number)=>this.shake.setFromEuler(this.shakeEuler.set(
+      amount*w*deg*Math.sin(a*t+phase),amount*w*deg*.7*Math.sin(b*t+phase*2),amount*w*deg*.5*Math.sin((a+b)*.5*t+phase)));
+    this.shaken.forEach(([bone,amount,phase],i)=>{this.shakes[i].copy(wobble(amount,phase));bone.quaternion.multiply(this.shakes[i]);});
+  }
+
+  /** Take back last frame's aim and shake. The mixer only rewrites a bone whose animated value changed, so on a
+   *  held pose (the drill's hold) they would otherwise pile up frame after frame. */
+  private restorePose() {
+    this.upperTorso.quaternion.premultiply(this.undo.copy(this.aimRotation).invert());
+    this.aimRotation.identity();
+    this.shaken.forEach(([bone],i)=>{bone.quaternion.multiply(this.undo.copy(this.shakes[i]).invert());this.shakes[i].identity();});
   }
 
   /** A footstep when the leading locomotion clip passes a foot plant while walking on the ground. */
@@ -248,8 +319,9 @@ export class MinerAvatar {
       l.upper.setEffectiveTimeScale(l.lower.getEffectiveTimeScale());
     });
     this.air.forEach((l,i)=>{l.lower.setEffectiveWeight(air[i]);l.upper.setEffectiveWeight(air[i]*(1-swing));});
-    this.swing.time=this.mining.phase*this.swing.getClip().duration;
-    this.swing.setEffectiveWeight(swing);
+    const [active,idle]=this.motion==='drill'?[this.drill,this.swing]:[this.swing,this.drill];
+    active.time=this.mining.phase*active.getClip().duration;
+    active.setEffectiveWeight(swing);idle.setEffectiveWeight(0);
   }
 
   diagnostics() {
@@ -268,8 +340,8 @@ export class MinerAvatar {
       speed: this.speed, grounded: this.grounded, steps: { count: this.stepCount, contacts: this.steps.slice(1) },
       air:{airborne:this.airborne,jumped:this.jumped,verticalSpeed:this.verticalSpeed,landing:this.landAge<LANDING_SECONDS},
       mining:this.mining.diagnostics(),
-      pickaxe:{attachedTo:this.pickaxe.parent?.name,visible:this.pickaxe.visible,level:this.equippedTool,model:equipmentModel('tools',this.equippedTool),tip:this.pickTip()?.toArray()},
-      backpack:{attachedTo:this.backpack.parent?.name,level:this.equippedBag,model:equipmentModel('backpacks',this.equippedBag)},
+      pickaxe:{attachedTo:this.pickaxe.parent?.name,visible:this.pickaxe.visible,level:this.equippedTool,model:equipmentModel('tools',this.equippedTool),motion:this.motion,spinners:this.spinners.length,tip:this.pickTip()?.toArray()},
+      backpack:{attachedTo:this.backpack.parent?.name,level:this.equippedBag,model:equipmentModel('backpacks',this.equippedBag),fill:this.fill,load:this.load?{visible:this.load.visible,scale:this.load.scale.y}:null},
       clips: this.locomotion.map(({lower:a}) => ({name:a.getClip().name.split(':')[0],time:a.time,weight:a.getEffectiveWeight(),speed:a.getEffectiveTimeScale()})),
       joints: Object.fromEntries(bones.filter(b => important.includes(b.name)).map((b: Bone) => [b.name,b.quaternion.toArray()])),
     };

@@ -71,9 +71,11 @@ export class CameraView {
     avatar.traverse((object) => {
       if (!(object instanceof Mesh)) return;
       const material = object.material as Material;
-      material.opacity = this.rig.avatarOpacity;
+      // Glass keeps its own see-through level (userData.opacity) under the fade and never hides what is behind it.
+      const own = material.userData.opacity ?? 1;
+      material.opacity = this.rig.avatarOpacity * own;
       material.depthWrite =
-        object !== contactShadow && !object.userData.decal && this.rig.avatarOpacity >= 1;
+        object !== contactShadow && !object.userData.decal && this.rig.avatarOpacity >= 1 && own >= 1;
     });
   }
 }

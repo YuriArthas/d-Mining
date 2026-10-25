@@ -13,6 +13,8 @@
   font-size: 40px; line-height: 1.1; color: #fff; --ui-stroke: 6px; animation: shop-name-in .3s cubic-bezier(.2, .9, .25, 1.2); }
 .shop-name[data-tier=fine] { color: #7fe6ff; }
 .shop-name[data-tier=star] { color: #ffd84d; }
+.shop-blurb { position: absolute; top: calc(9% + var(--safe-top) + 52px); left: 50%; transform: translateX(-50%); margin: 0; white-space: nowrap; pointer-events: none;
+  font-size: 17px; color: #fff1c2; --ui-stroke: 4px; animation: shop-name-in .3s .05s cubic-bezier(.2, .9, .25, 1.2) backwards; }
 @keyframes shop-name-in { from { opacity: 0; transform: translate(-50%, 8px) scale(.96); } }
 
 .shop-arrow { position: absolute; top: 42%; width: 60px; min-width: 60px; height: 60px; padding: 0; font-size: 26px; }
@@ -62,6 +64,7 @@
 .session-ui[data-panel=shop] .ui-hud, .game-shell:has(.session-ui[data-panel=shop]) .game-header { display: none; }
 @container game (max-height: 560px) {
   .shop-name { font-size: 28px; }
+  .shop-blurb { top: calc(9% + var(--safe-top) + 36px); font-size: 14px; --ui-stroke: 3px; }
   .shop-stat { height: 38px; padding: 0 14px 0 44px; }
   .shop-stat-icon { width: 46px; height: 46px; }
   .shop-stat-icon .ui-icon { width: 28px; height: 28px; }

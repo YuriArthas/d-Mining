@@ -1,0 +1,273 @@
+{
+  "maker": "Blender",
+  "script": "tools/build-equipment.py",
+  "source": "assets-source/shop-showroom/equipment.blend",
+  "texture": [
+    256,
+    128
+  ],
+  "models": [
+    {
+      "node": "Tool01",
+      "triangles": 656
+    },
+    {
+      "node": "Tool02",
+      "triangles": 724
+    },
+    {
+      "node": "Tool03",
+      "triangles": 720
+    },
+    {
+      "node": "Tool04",
+      "triangles": 764
+    },
+    {
+      "node": "Tool05",
+      "triangles": 460
+    },
+    {
+      "node": "Tool06",
+      "triangles": 984
+    },
+    {
+      "node": "Tool07",
+      "triangles": 1108
+    },
+    {
+      "node": "Tool08",
+      "triangles": 452
+    },
+    {
+      "node": "Tool09",
+      "triangles": 948
+    },
+    {
+      "node": "Tool10",
+      "triangles": 704
+    },
+    {
+      "node": "Tool11",
+      "triangles": 412
+    },
+    {
+      "node": "Tool12",
+      "triangles": 412
+    },
+    {
+      "node": "Tool13",
+      "triangles": 408
+    },
+    {
+      "node": "Tool14",
+      "triangles": 448
+    },
+    {
+      "node": "Tool15",
+      "triangles": 520
+    },
+    {
+      "node": "Tool16",
+      "triangles": 492
+    },
+    {
+      "node": "Tool17",
+      "triangles": 520
+    },
+    {
+      "node": "Tool18",
+      "triangles": 492
+    },
+    {
+      "node": "Tool19",
+      "triangles": 520
+    },
+    {
+      "node": "Tool20",
+      "triangles": 564
+    },
+    {
+      "node": "Tool21",
+      "triangles": 412
+    },
+    {
+      "node": "Tool22",
+      "triangles": 412
+    },
+    {
+      "node": "Tool23",
+      "triangles": 408
+    },
+    {
+      "node": "Tool24",
+      "triangles": 448
+    },
+    {
+      "node": "Tool25",
+      "triangles": 520
+    },
+    {
+      "node": "Tool26",
+      "triangles": 492
+    },
+    {
+      "node": "Tool27",
+      "triangles": 520
+    },
+    {
+      "node": "Tool28",
+      "triangles": 492
+    },
+    {
+      "node": "Tool29",
+      "triangles": 520
+    },
+    {
+      "node": "Tool30",
+      "triangles": 564
+    },
+    {
+      "node": "Bag01",
+      "triangles": 660
+    },
+    {
+      "node": "Bag02",
+      "triangles": 456
+    },
+    {
+      "node": "Bag03",
+      "triangles": 804
+    },
+    {
+      "node": "Bag04",
+      "triangles": 1016
+    },
+    {
+      "node": "Bag05",
+      "triangles": 532
+    },
+    {
+      "node": "Bag06",
+      "triangles": 656
+    },
+    {
+      "node": "Bag07",
+      "triangles": 464
+    },
+    {
+      "node": "Bag08",
+      "triangles": 952
+    },
+    {
+      "node": "Bag09",
+      "triangles": 1430
+    },
+    {
+      "node": "Bag10",
+      "triangles": 970
+    },
+    {
+      "node": "Bag11",
+      "triangles": 424
+    },
+    {
+      "node": "Bag12",
+      "triangles": 424
+    },
+    {
+      "node": "Bag13",
+      "triangles": 424
+    },
+    {
+      "node": "Bag14",
+      "triangles": 424
+    },
+    {
+      "node": "Bag15",
+      "triangles": 380
+    },
+    {
+      "node": "Bag16",
+      "triangles": 380
+    },
+    {
+      "node": "Bag17",
+      "triangles": 408
+    },
+    {
+      "node": "Bag18",
+      "triangles": 356
+    },
+    {
+      "node": "Bag19",
+      "triangles": 356
+    },
+    {
+      "node": "Bag20",
+      "triangles": 408
+    },
+    {
+      "node": "Bag21",
+      "triangles": 424
+    },
+    {
+      "node": "Bag22",
+      "triangles": 424
+    },
+    {
+      "node": "Bag23",
+      "triangles": 424
+    },
+    {
+      "node": "Bag24",
+      "triangles": 424
+    },
+    {
+      "node": "Bag25",
+      "triangles": 380
+    },
+    {
+      "node": "Bag26",
+      "triangles": 380
+    },
+    {
+      "node": "Bag27",
+      "triangles": 408
+    },
+    {
+      "node": "Bag28",
+      "triangles": 356
+    },
+    {
+      "node": "Bag29",
+      "triangles": 356
+    },
+    {
+      "node": "Bag30",
+      "triangles": 408
+    }
+  ],
+  "files": [
+    {
+      "file": "src/game/assets/shop/equipment.glb",
+      "bytes": 1951804,
+      "sha256": "e2e8cf024501e72123bcf4a85ac834370cdc14fb4823c09c1986e96f229b5a61"
+    },
+    {
+      "file": "assets-source/shop-showroom/equipment-atlas.png",
+      "bytes": 1612,
+      "sha256": "a74637099980e191b343aa438f58bc09c79d1af2bc7f08f34347826269411b17"
+    },
+    {
+      "file": "assets-source/shop-showroom/equipment.blend",
+      "bytes": 326888,
+      "sha256": "5f624498c12004b9dba27542f6a702fcf9461eaa85c681eac09343ab6c850e0c"
+    },
+    {
+      "file": "tools/build-equipment.py",
+      "bytes": 34580,
+      "sha256": "92c15faad29c87e66e4c389ca5e56e2d7c22e32e000c0b1e05de9d75d4d61ac3"
+    }
+  ]
+}

@@ -134,3 +134,49 @@ test('落地下蹲姿势把两脚留在原地：只降低骨盆、弯曲膝盖',
   assert.ok(restRoot.y-rig.getObjectByName('Root').getWorldPosition(new Vector3()).y>.1,'pelvis lowered');
   for(const side of ['Left','Right'])assert.ok(rig.getObjectByName(`${side}LowerLeg`).rotation.x<-.5,`${side} knee bends backward`);
 });
+
+test('电钻类工具（打蛋器）：平端在胸前往前顶，手臂抖动、搅头转动；不像镐那样举过头顶',async()=>{
+  const a=await avatar();
+  try{
+    a.setEquipment(7,1);
+    assert.equal(a.diagnostics().pickaxe.motion,'drill');assert.equal(a.diagnostics().pickaxe.spinners,2);
+    for(let i=0;i<30;i++)a.update([0,0,0],1/60,true,false);
+    let spinner;a.group.getObjectByName('equipped-pickaxe').traverse(o=>{if(!spinner&&o.name.startsWith('Spin'))spinner=o;});const before=spinner.quaternion.clone();
+    const dt=1/240,arm=bone(a,'RightUpperArm'),tips=[],turns=[];
+    for(let frame=0;frame<360;frame++){
+      if(frame%120===0)a.strike([0,1,-2],2);
+      a.update([0,0,0],dt,true,false);
+      if(frame>24){tips.push(tip(a));turns.push(arm.quaternion.clone());}
+    }
+    const high=Math.max(...tips.map(p=>p[1])),low=Math.min(...tips.map(p=>p[1]));
+    assert.ok(high<1.6&&low>.8,`held level at chest height, never raised overhead: ${low.toFixed(2)}..${high.toFixed(2)}`);
+    assert.ok(tips.every(p=>p[2]<-1.1),'the whisks stay pointed at the block in front');
+    // The shake: the arm's rotation keeps changing frame to frame while the hold stays put.
+    const wobble=Math.max(...turns.slice(1).map((q,i)=>q.angleTo(turns[i])));
+    assert.ok(wobble>.002&&wobble<.06,`arms shake a little: ${wobble}`);
+    assert.ok(spinner.quaternion.angleTo(before)>.1,'the whisks turn while drilling');
+    // Back on a pick: the overhead swing again and nothing spins.
+    a.setEquipment(1,1);assert.equal(a.diagnostics().pickaxe.motion,'swing');assert.equal(a.diagnostics().pickaxe.spinners,0);
+    a.strike([0,1,-2],2);let top=-Infinity;
+    for(let t=0;t<.5;t+=dt){a.update([0,0,0],dt,true,false);top=Math.max(top,tip(a)[1]);}
+    assert.ok(top>1.9,`the pick swings overhead: ${top}`);
+  }finally{a.dispose();}
+});
+
+test('背包装载：有开口或窗户的背包，矿堆随装满程度长高，空了就不显示',async()=>{
+  const a=await avatar();
+  try{
+    a.setEquipment(1,4);
+    const settle=f=>{a.setBagFill(f);for(let i=0;i<120;i++)a.update([0,0,0],1/60,true,false);return a.diagnostics().backpack;};
+    assert.equal(settle(0).load.visible,false);
+    const half=settle(.5);assert.ok(Math.abs(half.load.scale-.5)<.01&&half.load.visible,`half full: ${JSON.stringify(half)}`);
+    assert.ok(Math.abs(settle(1).load.scale-1)<.01);
+    // Swapping bags keeps the load; closed bags (the watermelon) have none.
+    a.setEquipment(1,9);assert.ok(Math.abs(a.diagnostics().backpack.load.scale-1)<.01);
+    a.setEquipment(1,5);assert.equal(a.diagnostics().backpack.load,null);
+    // The fish tank's glass stays see-through and draws after its contents.
+    a.setEquipment(1,4);
+    let glass;a.group.getObjectByName('equipped-backpack').traverse(o=>{if(!glass&&o.name.startsWith('Glass'))glass=o;});
+    assert.ok(glass.material.userData.opacity<.5&&glass.renderOrder>0);
+  }finally{a.dispose();}
+});

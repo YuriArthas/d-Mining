@@ -25,6 +25,8 @@ export class ThirdPersonCamera {
   radius = 0;
   near = Number(GAME_CONFIG.camera.near);
   avatarOpacity = 1;
+  /** Debug only: a closer (or farther) boom for looking at the miner's gear. */
+  boom: number | null = null;
   private initialized = false;
   private targetY = 0;
   private readonly bodyCenter = new Vector3();
@@ -32,7 +34,7 @@ export class ThirdPersonCamera {
 
   reset() { this.initialized = false; }
   update(world: RAPIER.World, player: RAPIER.Collider, feet: readonly number[], yaw: number, pitch: number, delta: number, aspect: number) {
-    const c = GAME_CONFIG.camera, dt = clamp(delta, 0, 0.1);
+    const c = { ...GAME_CONFIG.camera, distance: this.boom ?? GAME_CONFIG.camera.distance }, dt = clamp(delta, 0, 0.1);
     const clearance = cameraClearance(aspect, c.fov);
     this.radius = clearance.radius; this.near = clearance.near;
     const ball = new RAPIER.Ball(this.radius);
