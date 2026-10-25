@@ -56,6 +56,10 @@ type ValidationDebug = {
   wireframe: (enabled: boolean) => void;
   /** Shows the miner wearing this tool and backpack with this load (0..1), without touching the save; null ends it. */
   previewGear: (gear: { tool: number; bag: number; fill: number } | null) => void;
+  /** Adds coins to the test save. */
+  grantCoins: (coins: number) => boolean;
+  /** Puts a handful of ore sparkles at a point (to check how they draw). */
+  sparkleBurst: (at: readonly [number, number, number], color: string) => void;
   teleport: (
     location:
       | "surface"
@@ -150,6 +154,7 @@ export function attachGameDebug(
       caveLights: current.caveLights.diagnostics(),
       petFollowers: current.petFollowers.diagnostics(),
       avatar: current.minerAvatar.diagnostics(),
+      sparkles: { live: current.feedback.sparkles.count, spawned: current.feedback.sparkles.spawned, halfHeight: current.feedback.sparkles.points.material.uniforms.uHalfHeight.value, drawn: current.feedback.sparkles.points.geometry.drawRange.count, visible: current.feedback.sparkles.points.visible, parent: current.feedback.sparkles.points.parent?.name ?? null },
       feedback: { audio: gameAudio.diagnostics(), effects: current.feedback.effects.diagnostics(), splash: current.feedback.splash.diagnostics(), surface: current.feedback.surface(physics.feet()) },
       combat: session.combatDebug(),
       sellZone: current.content.session.sales[0],
@@ -237,6 +242,8 @@ export function attachGameDebug(
     canMine: (coord) => terrain.canMine(coord),
     hit: session.hit,
     previewGear: (gear) => current.minerAvatar.previewGear(gear),
+    grantCoins: (coins) => session.devGrantCoins(coins),
+    sparkleBurst: (at, color) => current.feedback.sparkles.burst(at, new Color(color)),
     health: session.blockHealth,
     mine: (coord) => session.requestMine([coord]),
     mineMany: (coords) => session.requestMine(coords),

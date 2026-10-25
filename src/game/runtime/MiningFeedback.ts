@@ -9,6 +9,8 @@ import { resourceByKind } from '../content/resources.ts';
 import { PINEWIND_CREEK } from '../content/pinewind/hubLayout.ts';
 import { HitEffects, type BlockColors } from '../presentation/HitEffects.ts';
 import { WaterSplash } from '../presentation/WaterSplash.ts';
+import { OreSparkles, type SparkleOre } from '../presentation/OreSparkles.ts';
+import { MINERAL_TIME } from '../terrain/mineralMaterial.ts';
 import { CELL, type Coord } from '../terrain/SparseWorld.ts';
 import { footSurface } from './footSurface.ts';
 
@@ -28,6 +30,20 @@ type Ports = Readonly<{
 const SAND = new Color('#d6bf92');
 const STONE = new Color('#8d948c');
 const GLASSY = new Set(['gem']);
+const SPARKLE_WHITE = new Color('#ffffff');
+const sparkleLooks = new Map<number, SparkleOre>();
+/** Which blocks give off sparkles: gems often, metals sometimes, veins rarely, rock never. Dark ores glint lighter. */
+function sparkleOre(kind: number): SparkleOre {
+  if (sparkleLooks.has(kind)) return sparkleLooks.get(kind)!;
+  const found = resource(kind);
+  let look: SparkleOre = null;
+  if (found && !found.base) {
+    const color = new Color(found.color), light = color.r * .3 + color.g * .59 + color.b * .11;
+    if (light < .35) color.lerp(SPARKLE_WHITE, .45);
+    look = { color, strength: found.pattern === 'gem' ? 1 : found.pattern === 'metal' ? .6 : light < .2 ? 0 : .25 };
+  }
+  sparkleLooks.set(kind, look); return look;
+}
 // Feedback must never break a frame: unknown kinds fall back to plain rock.
 const resource = (kind: number) => { try { return resourceByKind(kind); } catch { return null; } };
 
@@ -50,6 +66,7 @@ export function pickupTier(itemId: string) {
 export class MiningFeedback {
   readonly effects = new HitEffects();
   readonly splash = new WaterSplash();
+  readonly sparkles: OreSparkles;
   private wading = false;
   private readonly soundscape = new Soundscape();
   private theme = 'meadow_mine';
@@ -60,6 +77,7 @@ export class MiningFeedback {
 
   constructor(session: Pick<GameSession, 'onFeedback' | 'onOreCollected'>, ports: Ports, audio: GameAudio = gameAudio) {
     this.ports = ports; this.audio = audio;
+    this.sparkles = new OreSparkles(c => ports.cell(c), sparkleOre);
     this.detach = [session.onFeedback(this.onSession), session.onOreCollected(this.onPickup)];
   }
 
@@ -97,9 +115,11 @@ export class MiningFeedback {
     this.wading = wading;
     this.effects.update(delta);
     this.splash.update(delta);
+    this.sparkles.update(delta, chest);
+    MINERAL_TIME.value = (MINERAL_TIME.value + delta) % 3600;
   }
 
-  travel() { this.pending = null; this.audio.play({ type: 'travel' }); }
+  travel() { this.pending = null; this.sparkles.clear(); this.audio.play({ type: 'travel' }); }
 
   /** Call every frame with the place around the feet. */
   place(place: PlaceSound) {
@@ -111,7 +131,7 @@ export class MiningFeedback {
     return footSurface(feet, { cell: c => this.ports.cell(c), theme: () => this.theme, hub: f => this.ports.hub?.(f) ?? false });
   }
 
-  dispose() { for (const detach of this.detach) detach(); this.effects.dispose(); this.splash.dispose(); this.audio.setScene(QUIET_SCENE); }
+  dispose() { for (const detach of this.detach) detach(); this.effects.dispose(); this.splash.dispose(); this.sparkles.dispose(); this.audio.setScene(QUIET_SCENE); }
 
   private readonly onSession = (event: SessionFeedback) => {
     switch (event.type) {
@@ -119,7 +139,7 @@ export class MiningFeedback {
       case 'purchased': this.audio.play({ type: 'purchase' }); break;
       case 'reward': this.audio.play({ type: 'reward' }); break;
       case 'hatched': this.audio.play({ type: 'hatch', tier: event.tier, auto: event.auto }); break;
-      case 'unlocked': this.audio.play({ type: 'unlock' }); break;
+      case 'unlocked': case 'reborn': this.audio.play({ type: 'unlock' }); break;
       case 'denied': this.audio.play({ type: 'denied' }); break;
     }
   };

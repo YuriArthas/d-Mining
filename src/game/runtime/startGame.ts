@@ -240,7 +240,7 @@ export async function startGame(options: StartGameOptions) {
       hub: (feet) => feet[1] > -1.3 && worldAtFeet(feet) === 1,
     });
     scope.defer(() => feedback.dispose());
-    root.add(feedback.effects.group, feedback.splash.group);
+    root.add(feedback.effects.group, feedback.splash.group, feedback.sparkles.points);
     scope.defer(
       session.attach({
         cell: (cell) => terrain.cell(cell),
