@@ -44,7 +44,7 @@ export class TeleportStations {
       gl_FragColor = vec4(vec3(.85, .55, 1.0) * (1.0 - r) * pulse, (1.0 - r) * pulse);`);
     for (const world of WORLD_REQUIREMENTS) {
       const pt = worldPortal(world.id), portal = new Group();
-      portal.position.set(pt.x, 0, pt.z); portal.rotation.y = pt.yaw;
+      portal.position.set(pt.x, pt.y, pt.z); portal.rotation.y = pt.yaw;
       const g = PINEWIND_GATE, face = world.id === 1
         ? new Mesh(new PlaneGeometry(g.opening - .3, g.height - 1.9), sheet) : new Mesh(new CircleGeometry(1.85, 48), sheet);
       face.position.y = world.id === 1 ? (g.height - 1.9) / 2 + .05 : 2.9; face.renderOrder = 2;

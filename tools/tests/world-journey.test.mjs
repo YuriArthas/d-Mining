@@ -18,7 +18,7 @@ function prepared(id=2,{coins=worldRequirement(id).coins,materials=true}={}) {
   if(materials)for(const m of worldRequirement(id).materials)data.inventory.items[m.itemId]=m.count;
   return GameSession.fromData(data,content);
 }
-const atPortal=(s,world=1)=>{const z=worldPortal(world).zone;s.updatePosition([z.x,0,z.z],true);};
+const atPortal=(s,world=1)=>{const z=worldPortal(world).zone;s.updatePosition([z.x,z.y,z.z],true);};
 function commands(s){const travels=[];s.attach({cell:()=>64,pending:()=>false,mine:()=>true,cancelMining(){},travelTo:p=>travels.push(p)});return travels;}
 
 test('worlds unlock in order; a version 1 save keeps its paid mines as open worlds',()=>{

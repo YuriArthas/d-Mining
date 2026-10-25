@@ -17,8 +17,9 @@ function portalFrame(p:Planner,id:WorldId,z0:number){
   p.box([x,5.75,z],[5.9,.7,1.1],'#24324a',false,[0,pt.yaw,0]);
   p.sign([x,7.5,z],4.6,'世界传送门','',t);
 }
-/** World 2's surface: the authored tech base brings its own ground, buildings, portal frame, station and colliders;
- *  the plan adds the service rings and the signs on the buildings' facade screens and over the portal and station. */
+/** World 2's surface: the authored desert colony brings its own ground, buildings, portal dais and frame, station
+ *  and colliders; the plan adds the service rings and the signs on the domes' boards, over the portal and the
+ *  station, and the world's name on the drill tower's screen. */
 function techBasePlan():SceneryPlan {
   const z=TECH_BASE.worldZ,at=(v:readonly number[],y=v[1]):V3=>[v[0],y,v[2]+z];
   const rings=(ring:readonly number[],color:string)=>[
@@ -31,8 +32,7 @@ function techBasePlan():SceneryPlan {
     solids:(techBaseSolids.solids as SceneryPlan['solids']).map(s=>({...s,at:[s.at[0],s.at[1],s.at[2]+z] as V3})),
     signs:[sign(pt.sign,pt.yaw,4.6,'世界传送门','#ffe7a8'),sign(sell.sign,sell.yaw,4.4,'SELL','#ffe08a'),sign(shop.sign,shop.yaw,4.4,'UPGRADE','#9ff7e6'),
       sign([st.x,7.4,st.z],st.yaw,4.4,'传送站','#9ff4ff'),
-      // The world's name on the gantry beam, facing the spawn.
-      sign([0,TECH_BASE.gantry.height+.55,TECH_BASE.gantry.z+.62],0,6,worldRequirement(2).name,'#9ff4ff')],
+      sign(TECH_BASE.rig.sign,0,4.4,worldRequirement(2).name,'#ffe7a8')],
   };
 }
 export function journeySurfacePlan(z:number):SceneryPlan {

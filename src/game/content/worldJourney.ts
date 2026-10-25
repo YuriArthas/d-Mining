@@ -42,10 +42,12 @@ export function worldStation(id: WorldId) {
   return { x, z, yaw, zone: { ...pad, y: 0, radius: 1.8, heightTolerance: .3, hysteresis: .3, lookAt: [x, 2.2, z] as const } };
 }
 /** Each world's portal to the other worlds: world 1's stands in the gate of its south ridge; the later worlds' at
- *  the far end of the plaza behind their spawn, facing it and the mine beyond. Stepping into the zone in front opens the world list (unlock and travel). */
+ *  the far end of the plaza behind their spawn, facing it and the mine beyond (world 2's up on a dais, `y` its
+ *  floor). Stepping into the zone in front opens the world list (unlock and travel). */
+const PORTAL_FLOOR: Partial<Record<WorldId, number>> = { 2: .9 };
 export function worldPortal(id: WorldId) {
   const z0 = worldRequirement(id).z;
-  if (id === 1) { const z = worldGateZ(2); return { x: 0, z, yaw: Math.PI, zone: { x: 0, z: z - 3.2, y: 0, radius: 2.2, heightTolerance: .3, hysteresis: .3, lookAt: [0, 4, z] as const } }; }
-  const x = 0, z = z0 + 62, spawn = worldSpawn(id), yaw = Math.atan2(spawn[0] - x, spawn[2] - z);
-  return { x, z, yaw, zone: { x: x + Math.sin(yaw) * 2.8, z: z + Math.cos(yaw) * 2.8, y: 0, radius: 1.8, heightTolerance: .3, hysteresis: .3, lookAt: [x, 2.6, z] as const } };
+  if (id === 1) { const z = worldGateZ(2); return { x: 0, y: 0, z, yaw: Math.PI, zone: { x: 0, z: z - 3.2, y: 0, radius: 2.2, heightTolerance: .3, hysteresis: .3, lookAt: [0, 4, z] as const } }; }
+  const x = 0, y = PORTAL_FLOOR[id] ?? 0, z = z0 + 62, spawn = worldSpawn(id), yaw = Math.atan2(spawn[0] - x, spawn[2] - z);
+  return { x, y, z, yaw, zone: { x: x + Math.sin(yaw) * 2.8, z: z + Math.cos(yaw) * 2.8, y, radius: 1.8, heightTolerance: .3, hysteresis: .3, lookAt: [x, y + 2.6, z] as const } };
 }
