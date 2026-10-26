@@ -11,16 +11,24 @@ const LOCKED = { body: 'vec3( 0.04, 0.04, 0.06 )', roughness: '0.45', metalness:
 const clock = { value: 0 };
 export function setLockedEggTime(seconds: number) { clock.value = seconds % 4096; }
 
-/** World 1's egg stands show eggs the player has not unlocked yet as dark glossy silhouettes: the player knows a
+/** The egg stands show eggs the player has not unlocked yet as dark glossy silhouettes: the player knows a
  *  stand holds something, and its price (EggStandLabels), but not what it looks like. Each stand is one
- *  authored mesh (plinth and egg together), so a per-stand material copy blacks out what lies above the
- *  nest in the shader and leaves the plinth as it is; one uniform per stand switches it. */
+ *  authored node (plinth and egg together), so a per-stand material copy blacks out what lies above the
+ *  nest in the shader and leaves the plinth as it is; one uniform per stand switches it. A later world's stands
+ *  come with its scene (`attach` once it has loaded). */
 export class LockedEggs {
-  private readonly stands: { eggId: string; locked: { value: number }; materials: Material[] }[] = [];
+  private readonly stands: { id: string; eggId: string; locked: { value: number }; materials: Material[] }[] = [];
+  private unlocked: (eggId: string) => boolean = () => true;
 
-  constructor(surface: Object3D, stands: readonly Stand[]) {
-    for (const stand of stands) {
-      const root = surface.getObjectByName('Egg_' + stand.id);
+  private readonly all: readonly Stand[];
+
+  constructor(surface: Object3D, stands: readonly Stand[]) { this.all = stands; this.attach(surface); }
+
+  /** Takes over the stands found under `scene` (once each), locked or not as last set. */
+  attach(scene: Object3D) {
+    for (const stand of this.all) {
+      if (this.stands.some(s => s.id === stand.id)) continue;
+      const root = scene.getObjectByName('Egg_' + stand.id);
       if (!root) continue;
       // Each stand's streak runs on its own beat, so the row never flashes in step.
       const locked = { value: 0 }, cut = { value: stand.y + EGG_BODY_FROM }, phase = { value: (this.stands.length * .37) % 1 }, centre = { value: new Vector2(stand.x, stand.z) }, materials: Material[] = [];
@@ -56,11 +64,13 @@ export class LockedEggs {
         };
         o.material = Array.isArray(o.material) ? o.material.map(m => own(m as MeshStandardMaterial)) : own(o.material as MeshStandardMaterial);
       });
-      this.stands.push({ eggId: stand.eggId, locked, materials });
+      this.stands.push({ id: stand.id, eggId: stand.eggId, locked, materials });
     }
+    this.setUnlocked(this.unlocked);
   }
 
   setUnlocked(unlocked: (eggId: string) => boolean) {
+    this.unlocked = unlocked;
     for (const stand of this.stands) stand.locked.value = unlocked(stand.eggId) ? 0 : 1;
   }
 

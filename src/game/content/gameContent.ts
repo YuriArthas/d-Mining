@@ -11,6 +11,8 @@ import { PET_CONTENT } from './petContent.ts';
 import { PINEWIND_EGG_DISPLAYS, PINEWIND_SERVICES } from './pinewind/hubLayout.ts';
 import { CREEK_CELLS, pinewindSurface } from './pinewindSurface.ts';
 import { TECH_BASE } from './world2/techBase.ts';
+import { STAR_BASE } from './world3/starBase.ts';
+import type { EggStand } from './eggStands.ts';
 
 /** World 1's surface: authored art and its collision, signs and service rings around the open mine shaft. */
 export type SurfaceContent = Readonly<{
@@ -22,17 +24,21 @@ export type SurfaceContent = Readonly<{
 export type HubEgg = Readonly<{ id: string; eggId: string; tier: number; x: number; y: number; z: number; yaw: number; color: string }>;
 
 const zone = (x: number, z: number, radius = 3): ServiceZone => ({ x, y: 0, z, radius, heightTolerance: .3, hysteresis: .3 });
-// World 2's services stand where its tech base puts them; world 3 keeps plain counters either side of its spawn.
+// World 2's services stand where its tech base puts them; world 3 keeps plain booths either side of its path.
 const serviceZone = (worldZ: number, kind: 'sell' | 'shop') => worldZ === TECH_BASE.worldZ
-  ? zone(TECH_BASE.kiosks[kind].ring[0], worldZ + TECH_BASE.kiosks[kind].ring[2]) : zone(kind === 'sell' ? -16 : 16, worldZ + 44);
-// Every egg of the three worlds stands on world 1's terrace for now; prices and unlocks come with PET_CONTENT.
-const eggs: readonly HubEgg[] = PINEWIND_EGG_DISPLAYS.filter(display => PET_CONTENT.eggs.some(egg => egg.id === display.eggId));
-const petContent = { ...PET_CONTENT, eggs: PET_CONTENT.eggs.filter(egg => eggs.some(display => display.eggId === egg.id)) };
+  ? zone(TECH_BASE.kiosks[kind].ring[0], worldZ + TECH_BASE.kiosks[kind].ring[2])
+  : zone(kind === 'sell' ? -STAR_BASE.booths.x : STAR_BASE.booths.x, worldZ + STAR_BASE.booths.z);
+// Each world's eggs stand in it: world 1's on Pinewind's terrace, the later worlds' in their bases' hatcheries.
+const inBase = (stands: readonly EggStand[], worldZ: number): HubEgg[] => stands.map(s => ({ ...s, tier: 0, y: 0, z: s.z + worldZ }));
+const eggs: readonly HubEgg[] = [...PINEWIND_EGG_DISPLAYS, ...inBase(TECH_BASE.stands, TECH_BASE.worldZ), ...inBase(STAR_BASE.stands, STAR_BASE.worldZ)];
+for (const egg of PET_CONTENT.eggs) if (eggs.filter(display => display.eggId === egg.id).length !== 1) throw Error(`蛋没有唯一的蛋台: ${egg.id}`);
+const petContent = PET_CONTENT;
 const [first, ...later] = JOURNEY_WORLDS;
-// Pinewind with world 1's halls loads at start; world 2's surface base and halls the first time the player goes there.
-const pinewind = pinewindSurface(JOURNEY_WORLDS.flatMap(w => w.rooms), eggs);
+// Pinewind with world 1's halls loads at start; the later worlds' bases and halls the first time the player goes there.
+const pinewind = pinewindSurface(JOURNEY_WORLDS.flatMap(w => w.rooms), PINEWIND_EGG_DISPLAYS);
+const base = (asset: string, worldZ: number, world: 2 | 3) => ({ asset, at: [0, 0, worldZ] as [number, number, number], rotation: [0, 0, 0, 1] as [number, number, number, number], scale: [1, 1, 1] as [number, number, number], world });
 const surface: SurfaceContent = { ...pinewind, authored: { ...pinewind.authored, instances: [...pinewind.authored.instances,
-  { asset: TECH_BASE.asset, at: [0, 0, TECH_BASE.worldZ], rotation: [0, 0, 0, 1], scale: [1, 1, 1], world: 2 }] } };
+  base(TECH_BASE.asset, TECH_BASE.worldZ, 2), base(STAR_BASE.asset, STAR_BASE.worldZ, 3)] } };
 
 const session: SessionContent = {
   initialCoins: 0,

@@ -1,5 +1,5 @@
 import { deriveFacility, type SurfaceFacility } from '../../world/deriveFacility.ts';
-import { EGG_COLORS } from '../petAppearance.ts';
+import { eggColor, eggsOfWorld } from '../eggStands.ts';
 import type { Sign } from '../../world/sceneryKit.ts';
 import { CAPSULE_MACHINE_AT, CAPSULE_MACHINE_YAW } from '../feedbackFacilities.ts';
 import { worldStation } from '../worldJourney.ts';
@@ -80,24 +80,22 @@ const station = worldStation(1);
 export const PINEWIND_STATION = { x: station.x, z: station.z, yaw: round(station.yaw), pad: { x: round(station.zone.x), z: round(station.zone.z) } } as const;
 export const PINEWIND_STATION_SIGN: Sign = { at: [station.x, 7.6, station.z], yaw: round(station.yaw), width: 4.4, title: '传送站', subtitle: '', color: '#9ff3ff', background: '#18283d' };
 
-/** Three egg terraces facing the plaza. Rows step up 2.2 m and alternate by half a bay,
- *  so the always-on name/price labels never stack. Progression runs north to south and low to high:
- *  front row = early first-world eggs, middle row = late first-world eggs, top row = later worlds. */
+/** Two egg terraces facing the plaza: world 1's seven eggs (the later worlds' stand in their own bases). Rows
+ *  step up 2.2 m and alternate by half a bay, so the always-on name/price labels never stack. Progression runs
+ *  north to south and low to high: the front row holds the first four eggs, the upper row the last three. */
 export const PINEWIND_EGG_TIERS = [
   { tier: 0, x: 28, y: 0.4 },
   { tier: 1, x: 34, y: 2.6 },
-  { tier: 2, x: 40, y: 4.8 },
 ] as const;
 export const PINEWIND_TERRACE = { minZ: 17, maxZ: 43, width: 6, stairs: [15.5, 44.5], stairDepth: 3, maxRiser: 0.3 } as const;
+const WORLD1_EGGS = eggsOfWorld(1);
 const EGG_ROWS = [
-  { tier: 0, z0: 18.5, eggs: ['meadow-egg', 'pebble-egg', 'mushroom-egg', 'crystal-egg', 'copper-egg', 'ruin-egg'] },
-  { tier: 1, z0: 24.5, eggs: ['tide-egg', 'frost-egg', 'fire-egg', 'lava-egg'] },
-  { tier: 2, z0: 18.5, eggs: ['amber-egg', 'fossil-egg', 'silver-egg', 'gear-egg', 'star-egg', 'core-egg'] },
+  { tier: 0, z0: 22.5, eggs: WORLD1_EGGS.slice(0, 4) },
+  { tier: 1, z0: 25, eggs: WORLD1_EGGS.slice(4) },
 ] as const;
 export const PINEWIND_EGG_DISPLAYS = EGG_ROWS.flatMap(row => row.eggs.map((eggId, index) => {
-  const tier = PINEWIND_EGG_TIERS[row.tier], color = EGG_COLORS[eggId];
-  if (!color) throw Error(`Missing egg colour: ${eggId}`);
-  return { id: `stand-${eggId}`, eggId, tier: row.tier, x: tier.x, y: tier.y, z: row.z0 + index * 4, yaw: -Math.PI / 2, color };
+  const tier = PINEWIND_EGG_TIERS[row.tier];
+  return { id: `stand-${eggId}`, eggId, tier: row.tier, x: tier.x, y: tier.y, z: row.z0 + index * 5, yaw: -Math.PI / 2, color: eggColor(eggId) };
 }));
 
 /** Side staircases at both terrace ends; each tier's flight rises over its own width. */
@@ -138,7 +136,7 @@ export const PINEWIND_GROUNDS = {
   pads: [[0, 16], ...Object.values(PINEWIND_SERVICES).map(s => [s.trigger.x, s.trigger.z] as const), [22, 29], [0, 47]],
   keepClear: [
     { kind: 'rect', minX: -10, maxX: 10, minZ: -10, maxZ: 10 },
-    { kind: 'rect', minX: 20, maxX: 46, minZ: 12, maxZ: 48 },
+    { kind: 'rect', minX: 20, maxX: 40, minZ: 12, maxZ: 48 },
     { kind: 'rect', minX: -7, maxX: 7, minZ: 30, maxZ: 104 },
     { kind: 'circle', x: PINEWIND_PLAZA.x, z: PINEWIND_PLAZA.z, radius: PINEWIND_PLAZA.radius + .5 },
     { kind: 'circle', x: PINEWIND_SPAWN.x, z: PINEWIND_SPAWN.z, radius: 15.5 },

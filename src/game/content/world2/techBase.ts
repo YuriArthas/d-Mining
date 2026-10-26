@@ -1,10 +1,12 @@
 import { STATION_LOCAL, worldPortal } from '../worldJourney.ts';
+import { eggsOfWorld, hatcheryStands, type Hatchery } from '../eggStands.ts';
 
 /** 第二世界 surface: a desert mining colony on warm sand in a basin ringed by red mesas. Local metres: origin at the
  *  mine shaft's centre (world z 224), +Z toward the spawn (z 46, facing the shaft) and the world portal up on its
  *  dais at the far end (z 62); world 3's border wall stands at z 69. Yellow lanes lead from the dais past the spawn
  *  and round the shaft, where the drill tower stands; the ore buyer and the gear shop, white domes with a yellow
- *  and a teal front, face the lanes from either side. One source for the offline art build
+ *  and a teal front, face the lanes from either side; world 2's eggs stand in an arc on a round pad east of the
+ *  spawn. One source for the offline art build
  *  (surface-game-art/tools/underground/techBaseHall.ts) and the game (placement, service rings, signs, colliders).
  *  The shaft (|x|, |z| < 8) stays open; the walls round each world are WorldBorders'. */
 type V3 = readonly [number, number, number];
@@ -18,6 +20,8 @@ const local = (at: V3, yaw: number, scale: number, [x, y, z]: V3): V3 =>
  *  counter, the sign on the navy board over the opening. */
 const hall = (at: V3, yaw: number, scale: number) => ({ at, yaw, scale, ring: local(at, yaw, scale, [0, 0, 7.4]), sign: local(at, yaw, scale, [0, 5.6, 2.46]) });
 const portal = worldPortal(2), portalYaw = Math.PI;
+/** World 2's ten eggs east of the spawn, the arc opening toward it (stands from build_egg_stands.py). */
+const hatchery: Hatchery = { centre: [19, 50], radius: 11, span: 200 * Math.PI / 180, pad: 12.4 };
 
 export const TECH_BASE = {
   asset: 'tech-base',
@@ -34,6 +38,8 @@ export const TECH_BASE = {
   /** World 2's portal (worldPortal(2): x 0, z 62, facing the shaft) on a dais `floor` high, steps toward the
    *  spawn; its sign over the lintel. */
   portal: { at: [0, 0, 62] as V3, yaw: portalYaw, floor: portal.y, sign: [0, portal.y + 7.7, 62] as V3 },
+  hatchery,
+  stands: hatcheryStands(hatchery, eggsOfWorld(2)),
   /** Painted lanes (centre lines, width in metres): the trunk from the dais steps to the spawn, two curves from
    *  the spawn round either side to the loop round the shaft (half size, corner radius). */
   lanes: {
@@ -57,20 +63,19 @@ export const TECH_BASE = {
   beacon: [-29, 1, -6] as V3,
   /** Cargo containers: [x, y, z, yaw, colour]. */
   containers: [[-28, 1, -9.5, 1.57, 'Orange'], [-28, 3.5, -9.5, 1.6, 'Teal'], [-22.5, 1, -4, .05, 'Teal'],
-    [27.5, 0, 60, .08, 'Orange'], [27.5, 2.5, 60, .04, 'Teal'], [21, 0, 63, 1.5, 'Navy'], [-27.5, 0, 62, -.06, 'Navy'],
+    [29.5, 0, 64.5, .08, 'Orange'], [29.5, 2.5, 64.5, .04, 'Teal'], [-27.5, 0, 62, -.06, 'Navy'],
     [29, 0, 9.5, 1.57, 'Teal'], [-29.5, 0, 12, 1.5, 'Orange']] as readonly (readonly [number, number, number, number, string])[],
-  /** Habitat domes and a module round the plaza: [x, z, radius scale, yaw]. */
-  domes: [[-24, 50, 1, Math.PI / 2], [-17.5, 62, .62, Math.PI * .6], [15.5, 57, .7, -Math.PI * .4]] as readonly (readonly [number, number, number, number])[],
-  module: { at: [25.5, 0, 46] as V3, yaw: -Math.PI / 2 },
+  /** Habitat domes round the plaza: [x, z, radius scale, yaw]. */
+  domes: [[-24, 50, 1, Math.PI / 2], [-17.5, 62, .62, Math.PI * .6]] as readonly (readonly [number, number, number, number])[],
   mech: { at: [-22, 0, 8.5] as V3, yaw: 1.2 },
   solar: { x: 22, rows: [-17, -12.5] as readonly number[] },
   /** Lamp posts along the lanes and round the plaza: [x, z, yaw]. */
   lamps: [[-6.4, 41, 0], [6.4, 41, Math.PI], [-17.5, 30.5, 0], [17.5, 30.5, Math.PI], [-16, 13, 0], [16, 13, Math.PI],
     [-16, -13, 0], [16, -13, Math.PI], [-6, 50.5, 0], [6, 50.5, Math.PI]] as readonly (readonly [number, number, number])[],
   /** Palms (thick trunks, a few broad fronds), cacti and boulders on the sand: [x, z, scale, yaw]. */
-  palms: [[-9.5, 47, 1, 0], [9.5, 47.5, .9, 2.1], [-8.5, 64, 1.1, 1], [8.5, 64.5, 1, 4], [-31, 35, 1.15, 3], [31, 34.5, 1.05, 5],
-    [-17, 38, .85, 2.4], [17.5, 37, .95, .6], [-31, -1, 1, 1.4], [30.5, 19.5, .9, 2.7]] as readonly (readonly [number, number, number, number])[],
-  cacti: [[-27, 40, 1, 0], [30, 40, 1.1, 2], [-14.5, 49, .8, 1], [12, 52, .9, 3], [-31.5, 22, 1.2, 4], [31, 3, 1, 5],
+  palms: [[-9.5, 47, 1, 0], [-8.5, 64, 1.1, 1], [8.5, 64.5, 1, 4], [-31, 35, 1.15, 3], [31, 34.5, 1.05, 5],
+    [-17, 38, .85, 2.4], [21, 35.5, .95, .6], [-31, -1, 1, 1.4], [30.5, 19.5, .9, 2.7]] as readonly (readonly [number, number, number, number])[],
+  cacti: [[-27, 40, 1, 0], [30, 40, 1.1, 2], [-14.5, 49, .8, 1], [-31.5, 22, 1.2, 4], [31, 3, 1, 5],
     [-14, -21.5, .9, 2], [15, -22, 1.1, 1], [-31, -21, 1, 0], [31.5, -20, .85, 3]] as readonly (readonly [number, number, number, number])[],
   /** Crates of ore by the buyer, barrels by the shop: [x, z, yaw, kind]. */
   crates: [[-15.5, 15.5, .3, 'red'], [-16.8, 16.6, .1, 'blue'], [-14.4, 16.6, .5, 'red'], [-17.4, 33.2, .2, 'blue'], [-18.2, 34.6, .7, 'red'],

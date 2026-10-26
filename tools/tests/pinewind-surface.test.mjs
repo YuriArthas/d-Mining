@@ -20,12 +20,14 @@ test('world 1 surface services are the Pinewind buildings; the halls ship with t
   assert.ok(session.sales.some(z=>z.x===room.sell.x&&z.z===room.sell.z&&z.y===room.sell.y),room.id);
   if(room.shop)assert.ok(session.shops.some(s=>s.id===room.id),room.id);
  }
- assert.equal(session.eggStations.length,PINEWIND_EGG_DISPLAYS.length);
- assert.deepEqual([...new Set(GAME_CONTENT.surface.authored.instances.map(p=>p.asset))].sort(),['automine-hall','cryo-hall','crystal-hall','frozen-hall','fungal-hall','gear-hall','old-mine-hall','pinewind-architecture','pinewind-landscape','reactor-hall','refinery-hall','ruins-hall','survey-hall','tech-base','volcanic-hall']);
- // World 2's surface base and halls load the first time the player goes there; everything else at start.
+ // World 1's seven eggs on the terrace, every other egg in its own world's hatchery: one stand per egg.
+ assert.equal(PINEWIND_EGG_DISPLAYS.length,7);
+ assert.deepEqual(session.eggStations.map(s=>s.eggId).sort(),GAME_CONTENT.session.petContent.eggs.map(e=>e.id).sort());
+ assert.deepEqual([...new Set(GAME_CONTENT.surface.authored.instances.map(p=>p.asset))].sort(),['automine-hall','cryo-hall','crystal-hall','frozen-hall','fungal-hall','gear-hall','old-mine-hall','pinewind-architecture','pinewind-landscape','reactor-hall','refinery-hall','ruins-hall','star-base','survey-hall','tech-base','volcanic-hall']);
+ // A later world's surface base and halls load the first time the player goes there; everything else at start.
  const byWorld=w=>[...new Set(GAME_CONTENT.surface.authored.instances.filter(p=>(p.world??1)===w).map(p=>p.asset))].sort();
  assert.deepEqual(byWorld(2),['automine-hall','cryo-hall','gear-hall','reactor-hall','refinery-hall','survey-hall','tech-base']);
- assert.deepEqual(byWorld(3),[]);
+ assert.deepEqual(byWorld(3),['star-base']);
  assert.ok(!byWorld(1).some(a=>byWorld(2).includes(a)));
 });
 test('one teleport station west of the spawn, its model, pillars and pad where the session expects them',async()=>{
@@ -66,9 +68,8 @@ test('egg rows step up and alternate by half a bay, so overhead labels never sta
   for(const a of byTier[i])for(const b of byTier[i-1])assert.ok(Math.abs(a.z-b.z)>=1.9,`${a.eggId} sits between ${b.eggId}`);
  }
  for(const e of PINEWIND_EGG_DISPLAYS)assert.ok(e.z-1.23>=PINEWIND_TERRACE.minZ&&e.z+1.23<=PINEWIND_TERRACE.maxZ,`${e.eggId} on its terrace`);
- // Progression: the first-world eggs fill the two lower rows; cheapest first.
- assert.deepEqual(byTier[0].map(e=>e.eggId).slice(0,2),['meadow-egg','pebble-egg']);
- assert.ok(byTier[2].every(e=>['amber-egg','fossil-egg','silver-egg','gear-egg','star-egg','core-egg'].includes(e.eggId)));
+ // Progression: world 1's eggs only, cheapest first: four in front, the last three above.
+ assert.deepEqual(byTier.map(row=>row.map(e=>e.eggId)),[['meadow-egg','pebble-egg','mushroom-egg','crystal-egg'],['ruin-egg','frost-egg','fire-egg']]);
 });
 function fake(){
  const template=new Group(),node=new Group(),geometry=new BoxGeometry(),map=new Texture(),material=new MeshStandardMaterial({map});node.name='test';node.add(new Mesh(geometry,material));template.add(node);
@@ -88,7 +89,7 @@ test('assembly rejects missing named nodes and releases already-loaded resources
  const f=fake();f.content.authored.instances[0].node='missing';let disposed=0;f.resources[0].addEventListener('dispose',()=>disposed++);
  assert.throws(()=>assembleAuthoredSurface(f.assets,f.content),/Missing surface node/);assert.equal(disposed,1);
 });
-test('actual character collision: bridge, both services, the teleport station, the first egg and the top terrace without a jump',async()=>{
+test('actual character collision: bridge, both services, the teleport station, the first egg and the upper terrace without a jump',async()=>{
  await initPhysics();const physics=new CharacterPhysics(),collisions=new SceneryCollision(physics,[{id:'surface',depth:0,plan:GAME_CONTENT.surface.plan}]);
  // The production voxel floor outside the mine is at y=0.
  physics.world.createCollider(RAPIER.ColliderDesc.cuboid(100,1,100).setTranslation(0,-1,0));
@@ -109,8 +110,9 @@ test('actual character collision: bridge, both services, the teleport station, t
   physics.teleport([PINEWIND_PLAZA.x+6,.1,PINEWIND_PLAZA.z]);
   assert.ok(walkTo(first.zone.x,first.zone.z,first.zone.radius*.6),`first egg blocked at ${physics.feet()}`);
   assert.ok(Math.abs(physics.feet()[1]-first.zone.y)<first.zone.heightTolerance,'stands on the egg terrace');
-  physics.teleport([23,.1,15.5]);for(let i=0;i<600&&physics.feet()[0]<42.6;i++){collisions.sync(physics.feet());physics.tick(0,1,-Math.PI/2,false,true);}
-  assert.ok(physics.feet()[0]>42.6,`stairs blocked at ${physics.feet()}`);assert.ok(physics.feet()[1]>PINEWIND_EGG_TIERS[2].y-.1);
+  const top=PINEWIND_EGG_TIERS.at(-1),end=top.x+PINEWIND_TERRACE.width/2-.4;
+  physics.teleport([23,.1,15.5]);for(let i=0;i<600&&physics.feet()[0]<end;i++){collisions.sync(physics.feet());physics.tick(0,1,-Math.PI/2,false,true);}
+  assert.ok(physics.feet()[0]>end,`stairs blocked at ${physics.feet()}`);assert.ok(physics.feet()[1]>top.y-.1);
  }finally{collisions.dispose();physics.dispose();}
 });
 test('the bridge deck leaves the path at ground level and arches gently; the feet stay on the boards on every lane, both ways',async()=>{

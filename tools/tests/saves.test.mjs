@@ -12,7 +12,8 @@ import { SaveCoordinator } from "../../src/game/persistence/SaveCoordinator.ts";
 import { readHead, SaveConflict } from "../../src/game/persistence/saveTypes.ts";
 import { compatibleHead } from "../../src/game/persistence/saveMigrations.ts";
 import { saveNamespace } from "../../src/game/persistence/SaveBootstrap.ts";
-const SESSION_CONTENT = {...GAME_CONTENT.session, initialCoins:200, petContent:PET_CONTENT};
+// The fixture sells a few of the eggs: only their stands.
+const SESSION_CONTENT = {...GAME_CONTENT.session, initialCoins:200, petContent:PET_CONTENT, eggStations:GAME_CONTENT.session.eggStations.filter(s=>PET_CONTENT.eggs.some(e=>e.id===s.eggId))};
 function goToEgg(session) {
   const station=SESSION_CONTENT.eggStations.find(station=>station.eggId==='meadow-egg');
   session.updatePosition([station.zone.x,station.zone.y,station.zone.z],true);

@@ -3,23 +3,25 @@
 // shaft (world z 224). Sand everywhere, a concrete apron and a yellow rail round the shaft, painted yellow lanes
 // with white arrows from the portal dais past the spawn and round the shaft; the drill tower over the shaft, the
 // ore buyer and the gear shop facing the lanes, the world portal on its dais at the far end; palms, cacti, crates,
-// a yard with tanks and containers, the silo and its conveyor. The drill bit, the turbine rotors on the mesa tops
+// a yard with tanks and containers, the silo and its conveyor; world 2's eggs on their pad east of the spawn. The drill bit, the turbine rotors on the mesa tops
 // and the conveyor's cleats move in the game (Spin_* / Slide_* nodes). Baked with the daytime sun, so large flat
 // surfaces are subdivided.
 import * as THREE from 'three';
 import { colour, matte, rockMass, type GetProp, type HallSolid } from './caveKit.ts';
 import { rng } from '../terrain/kit.ts';
 import { TECH_BASE as BASE } from '../../../src/game/content/world2/techBase.ts';
+import { buildHatchery } from './hatchery.ts';
 
 export const ASSET = BASE.asset;
 export const SUN = true;
+export const PROPS = ['tech-base', 'egg-stands'];
 
 const SHAFT = 8;
 
 /** Split every triangle until no edge is longer than `max` metres (all attributes interpolated). The sun bake
  *  stores one value per vertex; a big face with only its corners, two of them buried in the plinth it stands on,
  *  would go dark all over instead of just at its foot. */
-function tessellate(source: THREE.BufferGeometry, max: number) {
+export function tessellate(source: THREE.BufferGeometry, max: number) {
   const g = source.index ? source.toNonIndexed() : source.clone();
   const names = Object.keys(g.attributes), src = names.map(n => g.getAttribute(n));
   const out: number[][] = names.map(() => []);
@@ -281,13 +283,15 @@ export function buildHall(getProp: GetProp) {
   group.add(slide);
   for (const z of BASE.solar.rows) { place('Solar_Row', [BASE.solar.x, 0, z]); box([BASE.solar.x, 1.1, z], [6.1, 1.1, 1.1]); }
 
+  // THE HATCHERY: white concrete, a teal rim, a yellow ring at its centre.
+  buildHatchery(BASE.hatchery, BASE.stands, { pad: '#e6e2d8', rim: '#1fb0b8', mark: '#f5c02a' },
+    { place: (name, at, yaw) => place(name, at, yaw), paint: (g, hex, name, max) => paint(g, hex, name, M.paint, max), box });
+
   // HABITATS round the plaza, CONTAINERS, THE MECH, LAMPS.
   for (const [x, z, k, yaw] of BASE.domes) {
     place('Habitat_Dome', [x, 0, z], yaw, group, k);
     for (const turn of [0, Math.PI / 4]) box([x, 3.6 * k, z], [6.1 * k, 3.6 * k, 6.1 * k], turn);
   }
-  place('Habitat_Module', BASE.module.at, BASE.module.yaw);
-  box([BASE.module.at[0], 2.1, BASE.module.at[2]], [4.3, 2.1, 2.2], BASE.module.yaw);
   for (const [x, y, z, yaw, colour] of BASE.containers) { place(`Container_${colour}`, [x, y, z], yaw); box([x, y + 1.25, z], [3, 1.25, 1.25], yaw); }
   place('Mining_Mech', BASE.mech.at, BASE.mech.yaw);
   solidAt(BASE.mech.at, BASE.mech.yaw, [0, 2.5, .3], [1.9, 2.5, 1.5]);

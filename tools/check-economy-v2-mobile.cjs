@@ -139,6 +139,32 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
     const ticket = await page.locator('.world-mats').innerText();
     assert.match(ticket, /镐子等级/); assert.match(ticket, /科技币/); assert.match(ticket, /Lv\.3\/20/);
     await check('World 2: HUD switches to 科技币 (2600); the portal shows the world 3 ticket.');
+
+    // Each world's eggs stand in it: world 1's seven on Pinewind's two terraces, world 2's ten in the tech base's
+    // hatchery, world 3's twelve in its own. Each later world's stands go dark until unlocked, once its scene loads.
+    // A later world's scene loads on the first trip there; the arrival waits for it, so teleport until there.
+    const look = async (feet, at, name) => {
+      await page.evaluate(feet => window.__miningValidation.teleport(feet), feet);
+      await page.waitForFunction(feet => { const p = window.__miningValidation.snapshot().position; return Math.abs(p[2] - feet[2]) < 1; }, feet, { timeout: 120000, polling: 500 });
+      await page.evaluate(([feet, at]) => window.__miningValidation.look(Math.atan2(feet[0] - at[0], feet[2] - at[2]), .2), [feet, at]);
+      await settle(); await shot(name);
+    };
+    await page.keyboard.press('Escape').catch(() => {});
+    // World 3 is not open in this save (a player there would be sent home): open it from the test unlock page.
+    await tap(page.locator('.dev-unlock-button'));
+    await page.locator('.dev-unlock h3', { hasText: '第三世界' }).getByRole('button', { name: '解锁世界' }).click();
+    await page.locator('.dev-unlock').getByRole('button', { name: '关闭' }).click();
+    await look([0, .1, 268], [19, 0, 274], '20-world2-hatchery-from-spawn');
+    await look([19, .1, 274], [30, 0, 274], '21-world2-hatchery-centre');
+    const w2 = await page.evaluate(() => window.__miningValidation.snapshot().lockedEggs);
+    await look([0, .1, 492], [20, 0, 498], '22-world3-hatchery-from-spawn');
+    await look([20, .1, 498], [33, 0, 498], '23-world3-hatchery-centre');
+    await look([16, .1, 26], [34, 2, 30], '24-world1-terrace');
+    const eggs = await page.evaluate(() => { const s = window.__miningValidation.snapshot(); return { locked: s.lockedEggs, labels: s.eggLabels.labelCount }; });
+    assert.equal(eggs.labels, 29); assert.equal(eggs.locked.stands, 29, `stands found: ${JSON.stringify(eggs.locked)}`);
+    assert.ok(w2.stands >= 17, 'world 2 stands attach when its scene loads');
+    assert.ok(eggs.locked.locked.includes('void-egg') && !eggs.locked.locked.includes('meadow-egg'));
+    await check(`Egg stands: 29 labels; ${eggs.locked.stands} stands (world 1 seven, world 2 ten, world 3 twelve), ${eggs.locked.locked.length} still locked.`);
   } catch (error) {
     report.errors.push(String(error.stack ?? error)); console.error(error);
     await page.screenshot({ path: path.join(dir, 'failure.png') }).catch(() => {});

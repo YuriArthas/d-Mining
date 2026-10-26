@@ -11,7 +11,7 @@ const PET_DISPLAYS = GAME_CONTENT.eggs;
 
 const pet = (id, slot, speciesId = 'moss-slime') => ({ id, slot, speciesId, level: 1 });
 test('each displayed egg charges its own price and draws only from its own configured pool', () => {
-  assert.equal(new Set(PET_DISPLAYS.map(p => p.eggId)).size, 16);
+  assert.equal(new Set(PET_DISPLAYS.map(p => p.eggId)).size, PET_CONTENT.eggs.length);
   const funds = currency => PET_CONTENT.eggs.filter(e => e.currency === currency).reduce((sum,e)=>sum+e.price*5,0);
   const wallet = new Wallet({ gold: funds('gold'), tech: funds('tech'), star: funds('star') }); let serial = 0, roll = 0;
   const service = new PetService({ content: PET_CONTENT, wallet, hasDestination:()=>true, worldOpen:()=>true, random: () => roll, createPetId: () => `p${++serial}` });
@@ -31,8 +31,8 @@ test('each displayed egg charges its own price and draws only from its own confi
       cumulative += outcome.weight;
     }
   }
-  // Every pet of every egg on a stand (the new eggs of worlds 2 and 3 get their stands in P3).
-  assert.equal(pools.size, PET_CONTENT.eggs.filter(e => PET_DISPLAYS.some(d => d.eggId === e.id)).reduce((n, e) => n + e.outcomes.length, 0));
+  // Every pet of every egg, each egg on its stand.
+  assert.equal(pools.size, PET_CONTENT.pets.length);
 });
 
 const body = () => new BoxGeometry(1, 1, 1).translate(0, .5, 0);

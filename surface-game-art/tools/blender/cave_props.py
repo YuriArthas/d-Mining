@@ -3,7 +3,7 @@ mesh primitives authored in three's (x, y, z), and the props every hall shares w
 stall frame, the lantern post, the name board, the pit post), so tools/underground/caveKit.ts can give them the
 same colliders. No imported geometry, no Decimate.
 
-Atlas: 32-pixel tiles, 8 x 4 (256 x 128). Tiles 0-15 have fixed roles that the shared props use; 16-31 are free:
+Atlas: 32-pixel tiles, 8 x 4 (256 x 128; `start(..., rows=8)` for 8 x 8, 256 x 256). Tiles 0-15 have fixed roles that the shared props use; 16-31 are free:
   0 dark frame  1 counter  2 stone  3 ground accent  4 roof A  5 roof B  6 pale  7 glow A  8 glow B  9 glow warm
   10 iron  11 gold  12 ore  13 rope  14 board  15 shadow
 Usage: start('OldMine', 'old-mine', TILES, glowing={7, 8, 9, ...}); model(...); box(...); ...; finish(__file__)
@@ -27,9 +27,12 @@ def tile(i, base, marks):
     rect(ox, oy, 32, 32, base)
     for x, y, w, h, c in marks: rect(ox + x, oy + y, w, h, c)
 
-def start(name, slug, tiles, glowing, emission=2.2):
+def start(name, slug, tiles, glowing, emission=2.2, rows=4):
     """Clear the scene, paint the atlas from `tiles` [(base, [(x, y, w, h, colour), ...]), ...] and make the two
     atlas materials (the glow one emits the atlas colour)."""
+    global H
+    H = rows * 32
+    assert len(tiles) <= rows * 8, 'atlas full'
     OUT.mkdir(parents=True, exist_ok=True); (ROOT / 'source-art').mkdir(exist_ok=True); (ROOT / 'artifacts').mkdir(exist_ok=True)
     bpy.ops.object.select_all(action='SELECT'); bpy.ops.object.delete(use_global=False)
     for block in list(bpy.data.materials): bpy.data.materials.remove(block)
@@ -48,7 +51,7 @@ def start(name, slug, tiles, glowing, emission=2.2):
     def chunk(k, d): return struct.pack('>I', len(d)) + k + d + struct.pack('>I', zlib.crc32(k + d) & 0xffffffff)
     S['atlas'] = atlas = OUT / f'{slug}-atlas.png'
     atlas.write_bytes(b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', W, H, 8, 6, 0, 0, 0)) + chunk(b'IDAT', zlib.compress(raw, 9)) + chunk(b'IEND', b''))
-    image = bpy.data.images.load(str(atlas)); image.name = f'{name}_256x128_Pixels'; image.pack()
+    image = bpy.data.images.load(str(atlas)); image.name = f'{name}_{W}x{H}_Pixels'; image.pack()
     def material(label, glow):
         m = bpy.data.materials.new(label); m.use_nodes = True
         bsdf = m.node_tree.nodes.get('Principled BSDF')

@@ -38,7 +38,8 @@ test('egg labels keep extruded glyphs and front/side colours in one draw, plus o
             // Line offsets live in the billboard plane; every vertex of a label shares its anchor.
             const actual = new Vector3().fromBufferAttribute(geometry.attributes.position, vertexOffset + i);
             assert.ok(actual.distanceTo(new Vector3().fromBufferAttribute(positions, i).add(new Vector3(0, line.position.y, 0))) < 1e-5);
-            assert.ok(Math.hypot(geometry.attributes.labelAnchor.getX(vertexOffset + i) - at[0], geometry.attributes.labelAnchor.getZ(vertexOffset + i) - at[2]) < 1e-5);
+            // Anchors are 32-bit floats: the later worlds' stands lie a few hundred metres down the valley.
+            assert.ok(Math.hypot(geometry.attributes.labelAnchor.getX(vertexOffset + i) - at[0], geometry.attributes.labelAnchor.getZ(vertexOffset + i) - at[2]) < 1e-4);
             assert.equal(geometry.attributes.labelSlot.getX(vertexOffset + i), slot);
             assert.equal(geometry.attributes.labelVariant.getX(vertexOffset + i), variant);
           }
@@ -105,7 +106,7 @@ test('GPU billboards retain world anchors, camera orientation and conservative b
       }
       assert.deepEqual(Object.values(geometry.attributes).map(attribute => attribute.version), versions);
     }
-    assert.equal(labels.diagnostics().labelCount, 16);
+    assert.equal(labels.diagnostics().labelCount, PET_CONTENT.eggs.length);
     assert.equal(labels.diagnostics().draws, 2);
   } finally { disposeScenery(labels.group); }
 });

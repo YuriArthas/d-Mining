@@ -1,0 +1,136 @@
+{
+  "eggs": [
+    {
+      "id": "stand-copper-egg",
+      "eggId": "copper-egg",
+      "world": 2,
+      "color": "#dd9658"
+    },
+    {
+      "id": "stand-gear-egg",
+      "eggId": "gear-egg",
+      "world": 2,
+      "color": "#7fb9c5"
+    },
+    {
+      "id": "stand-silver-egg",
+      "eggId": "silver-egg",
+      "world": 2,
+      "color": "#b5c9dd"
+    },
+    {
+      "id": "stand-tide-egg",
+      "eggId": "tide-egg",
+      "world": 2,
+      "color": "#54c5de"
+    },
+    {
+      "id": "stand-amber-egg",
+      "eggId": "amber-egg",
+      "world": 2,
+      "color": "#eeb74c"
+    },
+    {
+      "id": "stand-probe-egg",
+      "eggId": "probe-egg",
+      "world": 2,
+      "color": "#f0b04a"
+    },
+    {
+      "id": "stand-cryo-egg",
+      "eggId": "cryo-egg",
+      "world": 2,
+      "color": "#9fd8f0"
+    },
+    {
+      "id": "stand-nitro-egg",
+      "eggId": "nitro-egg",
+      "world": 2,
+      "color": "#c8f2ff"
+    },
+    {
+      "id": "stand-lava-egg",
+      "eggId": "lava-egg",
+      "world": 2,
+      "color": "#ef6c52"
+    },
+    {
+      "id": "stand-fusion-egg",
+      "eggId": "fusion-egg",
+      "world": 2,
+      "color": "#7cf06a"
+    },
+    {
+      "id": "stand-star-egg",
+      "eggId": "star-egg",
+      "world": 3,
+      "color": "#9697ee"
+    },
+    {
+      "id": "stand-fossil-egg",
+      "eggId": "fossil-egg",
+      "world": 3,
+      "color": "#d1b59a"
+    },
+    {
+      "id": "stand-orbit-egg",
+      "eggId": "orbit-egg",
+      "world": 3,
+      "color": "#8fa0ff"
+    },
+    {
+      "id": "stand-meteor-egg",
+      "eggId": "meteor-egg",
+      "world": 3,
+      "color": "#ff8a5c"
+    },
+    {
+      "id": "stand-geode-egg",
+      "eggId": "geode-egg",
+      "world": 3,
+      "color": "#c49bff"
+    },
+    {
+      "id": "stand-aurora-egg",
+      "eggId": "aurora-egg",
+      "world": 3,
+      "color": "#6fffd0"
+    },
+    {
+      "id": "stand-rune-egg",
+      "eggId": "rune-egg",
+      "world": 3,
+      "color": "#e8c56a"
+    },
+    {
+      "id": "stand-nebula-egg",
+      "eggId": "nebula-egg",
+      "world": 3,
+      "color": "#d48cff"
+    },
+    {
+      "id": "stand-comet-egg",
+      "eggId": "comet-egg",
+      "world": 3,
+      "color": "#a8e6ff"
+    },
+    {
+      "id": "stand-galaxy-egg",
+      "eggId": "galaxy-egg",
+      "world": 3,
+      "color": "#6f7cff"
+    },
+    {
+      "id": "stand-core-egg",
+      "eggId": "core-egg",
+      "world": 3,
+      "color": "#f1c957"
+    },
+    {
+      "id": "stand-void-egg",
+      "eggId": "void-egg",
+      "world": 3,
+      "color": "#4b3a7a"
+    }
+  ]
+}

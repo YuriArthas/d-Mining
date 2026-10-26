@@ -2,8 +2,10 @@
 // Run: node tools/build-underground.mjs <id>   (fungal, old-mine, ..., automine, tech-base; after
 // `blender -b --python tools/blender/build_<id>.py` in surface-game-art, which writes <id>-props.glb)
 // The scene comes from surface-game-art/tools/underground/<camelId>Hall.ts (`buildHall`); a module may export
-// `ASSET` (default <id>-hall) and `SUN = true` (bake the daytime sun's shadows too, for the surface). Nodes
-// named Spin_* / Slide_* stay out of the static batches and move in the game (SceneMotion.ts). Output:
+// `ASSET` (default <id>-hall), `SUN = true` (bake the daytime sun's shadows too, for the surface) and `PROPS` (the
+// prop kits it places, default [<id>]: <kit>-props.glb each). Nodes named Spin_* / Slide_* stay out of the static
+// batches and move in the game (SceneMotion.ts); Egg_* (egg stands) keep their own node too, so the game can find
+// each stand by name (LockedEggs.ts), and cast their shadows like the static scene. Output:
 // surface-game-art/public/assets/underground/<asset>.glb, the packed runtime asset in src/game/assets/scene
 // (<asset>.*), and its colliders in src/game/content/underground/<asset>.json.
 import * as THREE from 'three';
@@ -29,19 +31,19 @@ const hash = b => createHash('sha256').update(b).digest('hex');
 const id = process.argv[2];
 if (!/^[a-z]+(-[a-z]+)*$/.test(id ?? '')) throw Error('usage: node tools/build-underground.mjs <hall id>');
 const camel = id.replace(/-(\w)/g, (_, c) => c.toUpperCase());
-const { buildHall, ASSET, SUN = false } = await import(`../surface-game-art/tools/underground/${camel}Hall.ts`);
+const { buildHall, ASSET, SUN = false, PROPS = [id] } = await import(`../surface-game-art/tools/underground/${camel}Hall.ts`);
 const name = ASSET ?? `${id}-hall`;
 const art = 'surface-game-art/public/assets/underground', shipped = 'src/game/assets/scene';
-const buffer = readFileSync(`${art}/${id}-props.glb`);
-const props = (await new GLTFLoader().parseAsync(buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.length), '')).scene;
-const built = buildHall(prop => { const node = props.getObjectByName(prop); if (!node) throw Error(`Missing prop ${prop}`); const copy = node.clone(true); copy.position.set(0, 0, 0); copy.rotation.set(0, 0, 0); copy.scale.set(1, 1, 1); return copy; });
+const kits = await Promise.all(PROPS.map(kit => { const buffer = readFileSync(`${art}/${kit}-props.glb`);
+  return new GLTFLoader().parseAsync(buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.length), '').then(g => g.scene); }));
+const built = buildHall(prop => { const node = kits.map(kit => kit.getObjectByName(prop)).find(Boolean); if (!node) throw Error(`Missing prop ${prop}`); const copy = node.clone(true); copy.position.set(0, 0, 0); copy.rotation.set(0, 0, 0); copy.scale.set(1, 1, 1); return copy; });
 
-// Moving parts keep their own nodes (and their own geometry, since each carries its own bake). A spinning part is
-// merged into one mesh per material in its own frame (a prop's many pieces would each cost a draw call); a
-// sliding part keeps its children, which move one by one.
-const dynamic = built.group.children.filter(o => /^(Spin|Slide)_/.test(o.name));
+// Moving parts and egg stands keep their own nodes (and their own geometry, since each carries its own bake). A
+// spinning part or a stand is merged into one mesh per material in its own frame (a prop's many pieces would each
+// cost a draw call); a sliding part keeps its children, which move one by one.
+const dynamic = built.group.children.filter(o => /^(Spin|Slide|Egg)_/.test(o.name));
 for (const part of dynamic) {
-  if (/^Spin_/.test(part.name)) {
+  if (/^(Spin|Egg)_/.test(part.name)) {
     part.updateMatrixWorld(true);
     const toPart = part.matrixWorld.clone().invert(), byMaterial = new Map();
     part.traverse(o => { if (!o.isMesh) return; const g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone(); g.applyMatrix4(new THREE.Matrix4().multiplyMatrices(toPart, o.matrixWorld));
@@ -54,13 +56,14 @@ for (const part of dynamic) {
       const mesh = new THREE.Mesh(merged, material); mesh.name = `${part.name} body`; part.add(mesh);
     }
   }
-  part.traverse(o => { if (o.isMesh) { o.userData.keepDynamic = true; o.geometry = o.geometry.clone(); } });
+  const stand = /^Egg_/.test(part.name);
+  part.traverse(o => { if (o.isMesh) { o.userData.keepDynamic = true; o.userData.casts = stand; o.geometry = o.geometry.clone(); } });
 }
 // Occlusion (and the sun, on the surface): every static mesh casts; every batched or moving mesh receives one
 // value per vertex.
 const casters = [];
 built.group.updateMatrixWorld(true);
-built.group.traverse(o => { if (o.isMesh && !o.userData.keepDynamic && !/glow/i.test(o.material.name)) casters.push({ mesh: o, kind: OCCLUDER.solid }); });
+built.group.traverse(o => { if (o.isMesh && (!o.userData.keepDynamic || o.userData.casts) && !/glow/i.test(o.material.name)) casters.push({ mesh: o, kind: OCCLUDER.solid }); });
 const batched = batchStatic(built.group);
 batched.group.add(...dynamic);
 batched.group.updateMatrixWorld(true);
@@ -96,9 +99,10 @@ rmSync(`${art}/${name}.ktx.glb`);
 const runtime = readFileSync(`${art}/${name}.runtime.glb`), compressed = gzipSync(runtime, { level: 9 });
 writeFileSync(`${shipped}/${name}.000.part`, compressed);
 const manifest = { parts: [`${name}.000.part`], bytes: compressed.length, decodedBytes: runtime.length, sha256: hash(compressed), sourceSha256: hash(glb), triangles: batched.stats.triangles,
-  source: `${built.group.name}: Blender props (surface-game-art/tools/blender/build_${id.replace(/-/g, '_')}.py) and an offline procedural cave shell (surface-game-art/tools/underground/${camel}Hall.ts on caveKit.ts); baked occlusion per vertex`,
+  source: `${built.group.name}: Blender props (${PROPS.map(kit => `surface-game-art/tools/blender/build_${kit.replace(/-/g, '_')}.py`).join(', ')}) and an offline procedural cave shell (surface-game-art/tools/underground/${camel}Hall.ts on caveKit.ts); baked occlusion per vertex`,
   materialProfile: 'authored-color', coordinateSpace: 'authored', geometryEdits: false, textureEncoding: 'KTX2 UASTC', reference: 'tools/build-underground.mjs' };
 writeFileSync(`${shipped}/${name}.manifest.json`, JSON.stringify(manifest, null, 2) + '\n');
-const propsReport = JSON.parse(readFileSync(`surface-game-art/artifacts/${id}-props.json`));
-writeFileSync(`surface-game-art/artifacts/${name}.json`, JSON.stringify({ hall: { triangles: batched.stats.triangles, batches: batched.stats.batches, colliders: built.solids.length, glbSha256: hash(glb), runtimeSha256: hash(runtime) }, props: propsReport, occlusion: baked.stats }, null, 2) + '\n');
+const propsReport = Object.fromEntries(PROPS.map(kit => [kit, JSON.parse(readFileSync(`surface-game-art/artifacts/${kit}-props.json`))]));
+const singleKit = PROPS.length === 1 ? propsReport[PROPS[0]] : propsReport;
+writeFileSync(`surface-game-art/artifacts/${name}.json`, JSON.stringify({ hall: { triangles: batched.stats.triangles, batches: batched.stats.batches, colliders: built.solids.length, glbSha256: hash(glb), runtimeSha256: hash(runtime) }, props: singleKit, occlusion: baked.stats }, null, 2) + '\n');
 console.log(`${name}:`, batched.stats.triangles, 'triangles,', batched.stats.batches, 'batches,', built.solids.length, 'colliders,', compressed.length, 'bytes packed');

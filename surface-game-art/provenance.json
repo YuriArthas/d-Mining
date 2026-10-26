@@ -23,7 +23,7 @@
     },
     {
       "file": "tools/terrain/bakeLight.mjs",
-      "sha256": "ae890b8da1ec82a87b990ac27d629b3f56e302aa8ef01b337b6b01d0b00db38f"
+      "sha256": "17eecc0ed76b6eedbcb24b239d79b1c6cfb86799016f3a64afe6a3810d81045f"
     },
     {
       "file": "tools/terrain/bakeLightWorker.mjs",
@@ -35,7 +35,7 @@
     },
     {
       "file": "source-art/architecture.blend",
-      "sha256": "5a62a1174d7965dd50c9a1bd9e09c3daefc60bbd467b6b31c267fcbe775707ba"
+      "sha256": "6693ec9f540c67626ea9c38be2dc72ea481f046e3e53acd0b6a2d318e3e52b7a"
     },
     {
       "file": "source-art/nature.blend",
@@ -43,7 +43,7 @@
     },
     {
       "file": "layout.json",
-      "sha256": "26c8f22cbbce3ecc5c508799e3f0c1c57e8be1f1710b1f036010c628a1f9c365"
+      "sha256": "f964c84173ab9d09970f9ac16b22b728f9d6cfe331d85ae93fba9426b63d6221"
     },
     {
       "file": "package.json",
@@ -59,19 +59,19 @@
     },
     {
       "file": "../tools/export-pinewind-scene.mjs",
-      "sha256": "d960e963039c96e47cb604220cac5b77598c0e1c12e7e8a8c99f19f2ac90d66f"
+      "sha256": "25227becdb1ebc38803c05fcd447f99cf27cd120e04d45228c3953a0cbce89c7"
     },
     {
       "file": "../tools/pack-pinewind.mjs",
-      "sha256": "629b2eb7c1d3d7ec63780842661daaa55c39ed9b9eebd6c44e609b66f7b506f1"
+      "sha256": "a4184a9628e2133e80a4781ec04ba2e2b79a58d58dae196932141005ea2efc43"
     },
     {
       "file": "../src/game/content/pinewind/authored.json",
-      "sha256": "4a83f07d4ade45ca069fed28a6d6b460cd0150c362909dde108e9e28d1c88206"
+      "sha256": "6002c088f4db1fdbbeafcd0f7ab66ba58c7635ad9cee0931c8d0ceb9c5676a48"
     },
     {
       "file": "public/assets/pinewind/architecture-atlas.png",
-      "sha256": "933711b4d91e1bd7d3d8604f3a6a293824a11fe6acb5a1dcb6b44a2bb027dace"
+      "sha256": "53b1bb0d521fafbbc946360081d591eb7f7ce3f91bf6fac57f2a7f0ad4772a31"
     },
     {
       "file": "public/assets/pinewind/nature-atlas.png",
@@ -79,7 +79,7 @@
     },
     {
       "file": "artifacts/architecture-asset.json",
-      "sha256": "f7c81109e3cf0590b847cca33f25d4116a462794607fd774b2fddc0e2fbe139b"
+      "sha256": "4219eded2b2780c630bb7cb271c4499ee745e2c86e6f9c323160b1bc88ba3f66"
     },
     {
       "file": "artifacts/nature-asset.json",
@@ -87,15 +87,15 @@
     },
     {
       "file": "artifacts/landscape-asset.json",
-      "sha256": "a3c111a1ab42128f40cad0751430f3c582afa51ffba197875e12232b4c453851"
+      "sha256": "4d71cdf5334767db5e00b06bcda272ab45ee1fc6efab46864f8cd10b3a17bb18"
     },
     {
       "file": "artifacts/light-bake.json",
-      "sha256": "5f404284607874dcec6f9d8bed477605d071928b77d8c05bd2225d1f17aaf473"
+      "sha256": "08f7d9b96fadd63273e459675b9f3dfe47a2341069fede0ee97937c2b8653f54"
     },
     {
-      "file": "../src/game/assets/camp/pinewind-standing-light.png",
-      "sha256": "5b6f6f38ac2cc3118087b0328f237ecdee9ab3a6015ac260972e971361d63306"
+      "file": "../src/game/assets/scene/pinewind-standing-light.png",
+      "sha256": "f3bf06009cd9274e1e23a32bb254642bed7ed243f527fb3e55a9b862e3331ba2"
     }
   ],
   "runtimeAssets": [
@@ -103,11 +103,11 @@
       "parts": [
         "pinewind-architecture.000.part"
       ],
-      "bytes": 2119161,
-      "decodedBytes": 2435692,
-      "sha256": "a13c569495e90d546a67a9c0d2fe861153bcec5f95c944d3d501cfbc1a22a60b",
-      "sourceSha256": "b924ded57cc9b7d7df38de35bc5b7b755b50e3c4e13061ef6b201eeee6b30286",
-      "triangles": 18296,
+      "bytes": 2065798,
+      "decodedBytes": 2341368,
+      "sha256": "6f5664553b7a7c4b51844837432acc41e9ce31687981c60cf74f5e40cf159371",
+      "sourceSha256": "0f9efe7bbc878b9ab7f8d7c3234019b90ffcf1c13546d44cd914e888fe812297",
+      "triangles": 16628,
       "source": "Authored Pinewind; Blender architecture and offline procedural landscape; offline baked sun visibility and sky occlusion",
       "materialProfile": "authored-color",
       "coordinateSpace": "authored",
@@ -119,11 +119,11 @@
       "parts": [
         "pinewind-landscape.000.part"
       ],
-      "bytes": 2599801,
-      "decodedBytes": 4281264,
-      "sha256": "2d47eaab5b06b8af7ee9754bfe8d823871b2f7f2d63d33a18e02eabc3ca278fc",
-      "sourceSha256": "185c8734bfbbbdc67ca68386eb6530158144ca95ff5ad0cea77d8f00b654001b",
-      "triangles": 166247,
+      "bytes": 2596014,
+      "decodedBytes": 4278604,
+      "sha256": "2f7bf7ec5a54abda8956e23e9c14ac1281b2830f7151be5046b3f62c367ba37f",
+      "sourceSha256": "75eb433bb85bf6b99f6f15bc5b024c157355929193ac03f19df1c19c5fc18bc6",
+      "triangles": 166307,
       "source": "Authored Pinewind; Blender architecture and offline procedural landscape; offline baked sun visibility and sky occlusion",
       "materialProfile": "authored-color",
       "coordinateSpace": "authored",

@@ -2,12 +2,12 @@
   "parts": [
     "tech-base.000.part"
   ],
-  "bytes": 713330,
-  "decodedBytes": 1342032,
-  "sha256": "9f461d006aa38c8d621a58e228d62a4e00bf3525833fb6c40a13af0f3f49603b",
-  "sourceSha256": "e6c92e268346582fef6adcf55fcbf3ea6979a4ceeeb9a1e22158e06d5ce547ab",
-  "triangles": 101409,
-  "source": "tech base: Blender props (surface-game-art/tools/blender/build_tech_base.py) and an offline procedural cave shell (surface-game-art/tools/underground/techBaseHall.ts on caveKit.ts); baked occlusion per vertex",
+  "bytes": 736264,
+  "decodedBytes": 1392232,
+  "sha256": "43f1ff404cd673aa57cd4414948cee221bf20e5a69738927f174479f27f80547",
+  "sourceSha256": "9e4d2f34bb6d86b7acfa62282076ac40e50f02da63b2f8e2ef1ef8090242dbec",
+  "triangles": 105937,
+  "source": "tech base: Blender props (surface-game-art/tools/blender/build_tech_base.py, surface-game-art/tools/blender/build_egg_stands.py) and an offline procedural cave shell (surface-game-art/tools/underground/techBaseHall.ts on caveKit.ts); baked occlusion per vertex",
   "materialProfile": "authored-color",
   "coordinateSpace": "authored",
   "geometryEdits": false,

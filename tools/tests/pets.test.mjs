@@ -13,7 +13,8 @@ import { PET_CONTENT } from './fixtures/pets.ts';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
 const LIVE_SESSION_CONTENT = GAME_CONTENT.session;
 
-const SESSION_CONTENT = {...LIVE_SESSION_CONTENT, initialCoins:200, petContent:PET_CONTENT};
+// The fixture sells a few of the eggs: only their stands.
+const SESSION_CONTENT = {...LIVE_SESSION_CONTENT, initialCoins:200, petContent:PET_CONTENT, eggStations:LIVE_SESSION_CONTENT.eggStations.filter(s=>PET_CONTENT.eggs.some(e=>e.id===s.eggId))};
 function goToEgg(session,eggId='meadow-egg') {
   const station=SESSION_CONTENT.eggStations.find(station=>station.eggId===eggId);
   session.updatePosition([station.zone.x,station.zone.y,station.zone.z],true);

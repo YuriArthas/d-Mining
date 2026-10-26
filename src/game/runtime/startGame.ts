@@ -226,7 +226,7 @@ export async function startGame(options: StartGameOptions) {
           const going = `正在前往${worldRequirement(world).name}…`;
           session.announce(going);
           surface.loadWorld!(world, (done, total) => { if (done < total) session.announce(`${going} ${done}/${total}`); }).then(
-            (part) => { if (part) motion.add(part); },
+            (part) => { if (part) { motion.add(part); lockedEggs.attach(part); } },
             (error) => { requested.delete(world); failed.add(world); console.error(error); },
           );
         }

@@ -7,6 +7,8 @@ import { themeById } from '../content/themes.ts';
 import { PINEWIND_GATE } from '../content/pinewind/hubLayout.ts';
 import { TECH_BASE } from '../content/world2/techBase.ts';
 import techBaseSolids from '../content/underground/tech-base.json' with { type: 'json' };
+import { STAR_BASE } from '../content/world3/starBase.ts';
+import starBaseSolids from '../content/underground/star-base.json' with { type: 'json' };
 
 /** A later world's portal frame (until its surface authors one): a platform, two pillars and a lintel round the
  *  portal disc TeleportStations draws 2.9 m up. */
@@ -43,11 +45,12 @@ export function journeySurfacePlan(z:number):SceneryPlan {
   p.box([0,.005,z-54],[16,.01,92],theme.floor);p.box([0,.005,z+54],[16,.01,92],theme.floor);
   // Broad paths connect the outer gate, facilities and the mine without covering its opening.
   p.box([0,.02,z+54],[10,.02,92],'#b6a994');p.box([0,.02,z-54],[10,.02,92],'#b6a994');
-  p.box([0,.025,z+44],[40,.02,9],'#b6a994');
+  const booths=STAR_BASE.booths;
+  p.box([0,.025,z+booths.z],[2*booths.x+8,.02,9],'#b6a994');
   // Arriving from the preceding world, walk around the mine to the plaza.
   for(const x of [-13,13])p.box([x,.025,z],[8,.02,32],'#b6a994');
   for(const offset of [-14,14])p.box([0,.025,z+offset],[34,.02,8],'#b6a994');
-  const local=new Planner();local.booth(-16,0,44,theme,false,3);local.booth(16,0,44,theme,true,3);local.rim(theme);portalFrame(local,3,z);
+  const local=new Planner();local.booth(-booths.x,0,booths.z,theme,false,3);local.booth(booths.x,0,booths.z,theme,true,3);local.rim(theme);portalFrame(local,3,z);
   // The world's teleport station west of the spawn (its pad opens this world's layers): a round platform, two
   // pillars, a lintel and a ring around the portal disc (TeleportStations draws the disc).
   {const st=STATION_LOCAL,yaw=Math.atan2(-st.x,46-st.z),across=(d:number,y:number):V3=>[st.x+Math.cos(yaw)*d,y,st.z-Math.sin(yaw)*d];
@@ -58,6 +61,8 @@ export function journeySurfacePlan(z:number):SceneryPlan {
    local.sign([st.x,7.4,st.z],4.4,'传送站','',theme);}
   for(const shape of local.plan.shapes)p.plan.shapes.push({...shape,at:[shape.at[0],shape.at[1],shape.at[2]+z]});
   for(const solid of local.plan.solids)p.plan.solids.push({...solid,at:[solid.at[0],solid.at[1],solid.at[2]+z]});
+  // The authored hatchery (star-base): its egg stands' colliders.
+  for(const solid of starBaseSolids.solids as SceneryPlan['solids'])p.plan.solids.push({...solid,at:[solid.at[0],solid.at[1],solid.at[2]+z]});
   for(const sign of local.plan.signs)p.plan.signs.push({...sign,at:[sign.at[0],sign.at[1],sign.at[2]+z]});
   return p.plan;
 }
