@@ -19,9 +19,13 @@
 
 .bag-capacity { flex: 1; min-width: 160px; }
 .bag-ores .bag-ore-art { position: absolute; left: 25%; top: 24%; width: 50%; height: 50%; color: var(--ui-ink); }
-.bag-kept { position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--ui-purple); }
-.bag-reserve { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.bag-reserve > b { font-size: 15px; white-space: nowrap; }
+/* 材料仓: one compact line of the ticket minerals, each stored / needed; a full one turns green. */
+.bag-store { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 5px 10px; }
+.bag-store > b { font-size: 14px; }
+.bag-store-item { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; white-space: nowrap; }
+.bag-store-item > b { font-size: 13px; }
+.bag-store-item[data-done] > b { color: var(--ui-green, #6fe07a); }
+.bag-store-icon { width: 20px; height: 20px; color: var(--ui-ink); }
 
 /* Two cards sized to their content (they used to stretch to the sheet's full height). */
 .bag-gears { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-content: start; }

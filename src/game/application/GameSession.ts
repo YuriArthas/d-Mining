@@ -2,7 +2,7 @@ import { TIP_IDS, type TipId, Onboarding } from '../logic/Onboarding.ts';
 import { EquipmentCollection } from '../logic/EquipmentCollection.ts';
 import { shopTools, shopBackpacks, type ShopCategory } from '../content/shopCatalog.ts';
 import { WorldProgress } from '../logic/WorldProgress.ts';
-import { MineralReservation } from '../logic/MineralReservation.ts';
+import { MaterialStore } from '../logic/MaterialStore.ts';
 import { WORLD_REQUIREMENTS, worldRequirement, worldAtZ, worldAtFeet, worldSpawn, type WorldId } from '../content/worldJourney.ts';
 import { Rewards, type RewardOptions, type RewardClaimResult } from '../logic/Rewards.ts';
 import { RebirthRecord, rebirthMultiplier } from '../logic/Rebirth.ts';
@@ -26,7 +26,7 @@ import { Mining } from "./Mining.ts";
 import { quoteSale, sellItems } from "./Sale.ts";
 import { Pickaxe, pickaxeStats } from "../logic/Pickaxe.ts";
 import { MiningCombat } from "./MiningCombat.ts";
-import { oreDrops, oreDefinition, itemDefinition, ORE_ITEMS, itemVolume, itemPrice } from "./items.ts";
+import { oreDrops, oreDefinition, itemDefinition, itemVolume, itemPrice } from "./items.ts";
 import type { Coord } from "../terrain/SparseWorld.ts";
 type WorldCommands = {
   cell(target: Coord): number | null;
@@ -34,6 +34,8 @@ type WorldCommands = {
   pending(target: Coord): boolean;
   mine(targets: readonly Coord[]): boolean;
   cancelMining(): void;
+  /** Blocks broken but not collected yet (their ore is on its way to the bag). */
+  pendingCount?(): number;
   /** Teleport; `lookAt` turns the camera toward what the player came to use. */
   travelTo?(feet: Coord, lookAt?: Coord): void;
 };
@@ -51,7 +53,9 @@ export class GameSession {
   private readonly bagCatalog;
   private readonly toolCatalog;
   private readonly worldProgress: WorldProgress;
-  private readonly reservations: MineralReservation;
+  private readonly materials: MaterialStore;
+  /** What the last collection put into the material store (for its notice). */
+  private stored: readonly { itemId: string; count: number }[] = [];
   private currentWorld: WorldId = 1;
   private readonly explorations = new Map<WorldId, Exploration>();
   private get exploration() { return this.explorations.get(this.currentWorld)!; }
@@ -184,7 +188,7 @@ export class GameSession {
   exportProgress(): ProgressDataV1 {
     return { version: 2 as const, equipment:this.equipment.exportData(), rewards:this.rewards.exportData(), wallet: this.wallet.exportData(), inventory: this.inventory.exportData(),
       onboarding: this.onboarding.getSnapshot(), rebirth: this.rebirthRecord.exportData(), pickaxe: this.pickaxe.exportData(), pets: this.petService.exportData(), exploration: this.explorations.get(1)!.exportData(),
-      worldProgress:this.worldProgress.exportData(),reservations:this.reservations.exportData(),worldExploration:Object.fromEntries([...this.explorations].map(([id,e])=>[id,e.exportData()])) };
+      worldProgress:this.worldProgress.exportData(),materials:this.materials.exportData(),worldExploration:Object.fromEntries([...this.explorations].map(([id,e])=>[id,e.exportData()])) };
   }
   static createNew(content: SessionContent) { return new GameSession(content); }
   static fromData(data: unknown, content: SessionContent) { return new GameSession(content, undefined, undefined, {}, record(data)); }
@@ -233,7 +237,7 @@ export class GameSession {
     // Saves of the economy before v2 are never read (saveNamespace keeps them apart); this guards test fixtures.
     if (data && data.version !== 2) throw Error('不支持的进度版本');
     this.worldProgress = new WorldProgress(data?.worldProgress);
-    this.reservations = new MineralReservation(data?.reservations,id=>ORE_ITEMS.some(r=>r.itemId===id));
+    this.materials = data?.materials === undefined ? new MaterialStore() : MaterialStore.fromData(data.materials);
     this.homes = (content.homes??[]).map(h=>({worldId:h.worldId,detector:new ZoneDetector(h.zone)}));
     this.stations = (content.stations??[]).map(h=>({worldId:h.worldId,detector:new ZoneDetector(h.zone)}));
     this.portals = (content.portals??[]).map(h=>({worldId:h.worldId,detector:new ZoneDetector(h.zone)}));
@@ -285,13 +289,14 @@ export class GameSession {
       detector: new ZoneDetector(p.zone),
     }));
     this.clock = clock;
+    // Ore a ticket still lacks goes to the material store; the rest to the bag.
     this.mining = new Mining(
-      this.inventory,
+      { isFull: () => this.bagFull(), add: batch => { const { stored, rest } = this.materials.take(batch, id => this.ticketNeed(id)); this.inventory.add(rest); this.stored = stored; } },
       (targets) => this.world?.mine(targets) ?? false,
       oreDrops,
     );
     this.combat = new MiningCombat({
-      isFull: () => this.inventory.isFull(),
+      isFull: () => this.bagFull(),
       stats: this.baseMiningStats,
       level: () => this.pickaxe.getSnapshot().level,
       read: (cell) => {
@@ -353,8 +358,9 @@ export class GameSession {
       // Worlds past the next one to unlock stay unknown: no name, no price (the portal shows ???).
       worlds:WORLD_REQUIREMENTS.map(w=>({...w,open:this.worldProgress.isOpen(w.id),known:this.worldProgress.isOpen(w.id)||this.worldProgress.unlockable(w.id),
         ticketBalance:w.ticket?this.wallet.getBalance(w.ticket.currency):0,toolLevel:this.equipment.toolLevel,
-        materials:w.materials.map(m=>({...m,name:itemDefinition(m.itemId).name,owned:bag.items[m.itemId]??0,reserved:this.reservations.quantity(m.itemId,bag.items[m.itemId]??0)}))})),
-      mineralReservations:Object.fromEntries(Object.entries(bag.items).map(([id,n])=>[id,{reserved:this.reservations.quantity(id,n),sellable:n-this.reservations.quantity(id,n),mode:this.reservations.mode(id)}])),
+        materials:w.materials.map(m=>({...m,name:itemDefinition(m.itemId).name,owned:this.materials.count(m.itemId)}))})),
+      /** 材料仓: what the tickets of the worlds not open yet ask for, and how much of it is stored. */
+      materials:this.storeView(),
       onboarding: this.onboarding.getSnapshot(), tip,
       // The first-dig tip points across the map at the mine until the player gets there.
       tipAnchor: tip?.anchor==='mine'?this.content.onboarding.entrance:null,
@@ -373,7 +379,7 @@ export class GameSession {
       coins: this.wallet.getBalance(this.currency),
       balances: this.wallet.getBalances(),
       saleMultiplier: this.saleMultiplier(),
-      sale: quoteSale(this.reservations.sellable(bag.items), itemPrice, this.saleMultiplier()),
+      sale: quoteSale(bag.items, itemPrice, this.saleMultiplier()),
       inSellZone: this.inSellZone,
       atHome: this.atHome,
       /** Standing on the current world's teleport station pad. */
@@ -587,15 +593,36 @@ export class GameSession {
     if(result.changed)this.committed(false);
     this.publish();
   };
+  /** Full: the bag, counting the blocks already broken whose ore is still on its way, so a block broken just as
+   *  the bag fills never pushes it past its size. */
+  private bagFull() {
+    const bag=this.inventory.getSnapshot();
+    return bag.used+(this.world?.pendingCount?.()??0)>=bag.capacity;
+  }
+  /** How many of a mineral the tickets of the worlds not open yet ask for. */
+  private ticketNeed(itemId: string) {
+    return WORLD_REQUIREMENTS.filter(w=>!this.worldProgress.isOpen(w.id)).flatMap(w=>w.materials).filter(m=>m.itemId===itemId).reduce((n,m)=>n+m.count,0);
+  }
+  private storeView() {
+    // The next world's minerals, and any other ticket's once some of it is stored (a later world stays unnamed).
+    const closed=WORLD_REQUIREMENTS.filter(w=>!this.worldProgress.isOpen(w.id));
+    const ids=[...new Set(closed.flatMap(w=>w.materials.map(m=>m.itemId)))]
+      .filter(id=>this.materials.count(id)>0||closed.some(w=>this.worldProgress.unlockable(w.id)&&w.materials.some(m=>m.itemId===id)));
+    return ids.map(itemId=>({itemId,name:itemDefinition(itemId).name,stored:this.materials.count(itemId),needed:this.ticketNeed(itemId)}));
+  }
   // Called once, after terrain has actually removed these cells. Never checks isFull.
   collected = (resources: readonly { kind: number; cell?: Coord }[]) => {
     const wasFull=this.inventory.isFull();
+    this.stored=[];
     this.mining.collected(resources);
     if (resources.length) { const first=!this.onboarding.getSnapshot().minedOnce; this.onboarding.recordCollected(resources.length); this.committed(first); }
     for (const resource of resources)
       if (resource.cell) this.combat.destroyed(resource.cell.join(","));
     this.refreshTarget();
     this.notice = this.inventory.isFull() ? "背包已满，前往售卖点出售" : "";
+    // Ticket ore says where it went: the store, and how much of it the tickets still lack.
+    const kept=this.stored.at(-1);
+    if (kept) this.notice = `材料仓 +${this.stored.reduce((n,s)=>n+s.count,0)}：${itemDefinition(kept.itemId).name} ${this.materials.count(kept.itemId)}/${this.ticketNeed(kept.itemId)}`;
     this.publish();
     if (resources.length) for (const listener of this.pickupListeners) listener(oreDrops(resources));
     if (!wasFull && this.inventory.isFull()) this.refuse('full');
@@ -819,7 +846,7 @@ export class GameSession {
     const starter=ECONOMY.bags[0].capacity;
     this.inventory.setCapacity(starter);this.equipment.backpackCapacity=starter;
     this.pickaxe.setLevel(1);this.equipment.toolLevel=1;this.equipment.enhance=0;
-    this.worldProgress.reset();this.reservations.reset();
+    this.worldProgress.reset();this.materials.clear();
     for(const w of WORLD_REQUIREMENTS)this.explorations.set(w.id,new Exploration(this.content.destinations.filter(d=>d.worldId===w.id)));
     this.currentWorld=1;
     this.rebirthRecord.count++;
@@ -863,22 +890,14 @@ export class GameSession {
     }
     this.committed(true);this.publish();
   };
-  reserveWorldMaterials = (id: WorldId) => {
-    if(this.suspended||this.worldProgress.isOpen(id))return false;
-    this.reservations.reserveWorld(id);this.committed(true);this.publish();return true;
-  };
-  reserveMineral = (id: string, mode: 'none'|'all'|'needed') => {
-    if(this.suspended)return;
-    this.reservations.set(id,mode);this.committed(true);this.publish();
-  };
-  /** Sells everything except the minerals kept for opening the next worlds. */
+  /** Sells the whole bag (ticket minerals wait in the material store, never in the bag). */
   private executeSale() {
-    return sellItems(this.inventory,this.till(),itemPrice,this.reservations.sellable(this.inventory.getSnapshot().items),this.saleMultiplier());
+    return sellItems(this.inventory,this.till(),itemPrice,this.inventory.getSnapshot().items,this.saleMultiplier());
   }
   sellAvailable = () => {
     if(this.suspended||!this.inSellZone)return {status:'unavailable'} as const;
     const result=this.executeSale();
-    if(result.status==='sold'){this.onboarding.record('soldOnce');this.committed(true);this.notice=`出售 ${result.count} 件，获得 ${result.coins} ${currencyName(this.currency)}`;}else this.notice=result.status==='empty'?'没有可出售的矿产，保留材料仍在背包中':'货币数值超出范围';
+    if(result.status==='sold'){this.onboarding.record('soldOnce');this.committed(true);this.notice=`出售 ${result.count} 件，获得 ${result.coins} ${currencyName(this.currency)}`;}else this.notice=result.status==='empty'?'没有可出售的矿产':'货币数值超出范围';
     this.publish();return result;
   };
   /** Pays a world's price at a portal and opens it for good. */
@@ -887,14 +906,14 @@ export class GameSession {
     if(this.worldProgress.isOpen(id))return {status:'already-open'} as const;
     if(!this.worldProgress.unlockable(id))return {status:'previous-locked'} as const;
     if(!this.atPortal)return {status:'away'} as const;
-    const requirement=worldRequirement(id),ticket=requirement.ticket!,items=this.inventory.getSnapshot().items;
+    const requirement=worldRequirement(id),ticket=requirement.ticket!;
     if(this.equipment.toolLevel<ticket.toolLevel)return {status:'insufficient-level'} as const;
-    if(requirement.materials.some(m=>(items[m.itemId]??0)<m.count))return {status:'insufficient-materials'} as const;
+    if(requirement.materials.some(m=>this.materials.count(m.itemId)<m.count))return {status:'insufficient-materials'} as const;
     if(this.wallet.getBalance(ticket.currency)<ticket.price)return {status:'insufficient-coins'} as const;
-    // All checks precede this synchronous transfer. Reservations protect selling only.
-    if(!this.inventory.remove(requirement.materials.map(m=>({itemId:m.itemId,count:m.count}))))throw Error('缴纳矿产发生变化');
+    // All checks precede this synchronous transfer: the minerals come out of the material store.
+    if(!this.materials.pay(requirement.materials))throw Error('缴纳矿产发生变化');
     if(!this.wallet.debit(ticket.currency,ticket.price))throw Error('缴纳货币发生变化');
-    this.worldProgress.unlock(id);this.reservations.finishWorld(id);
+    this.worldProgress.unlock(id);
     this.notice=`${requirement.name}已开放，可以传送过去了`;
     this.committed(true);this.publish();return {status:'opened'} as const;
   };

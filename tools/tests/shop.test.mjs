@@ -33,8 +33,8 @@ test('equipping old gear is free, persists, and preserves highest purchase and n
  const r=GameSession.fromData(s.exportProgress(),content);enter(r);assert.equal(r.getSnapshot().equipment.toolLevel,3);assert.equal(r.getSnapshot().pickaxeUpgrade.price,T4);assert.equal(r.getSnapshot().backpackUpgrade.next.capacity,C3);
  r.useShopItem('tools','tool-3');r.useShopItem('backpacks','journey-bag-2');assert.equal(r.getSnapshot().coins,left);assert.equal(r.getSnapshot().pickaxe.level,3);assert.equal(r.getSnapshot().inventory.capacity,C2);
 });
-test('smaller bag never deletes contents, including protected minerals',()=>{
- const s=funded();enter(s);s.useShopItem('backpacks','journey-bag-2');s.collected(Array.from({length:C1+1},()=>({kind:64})));s.reserveMineral('journey.rock.0','all');
+test('smaller bag never deletes contents',()=>{
+ const s=funded();enter(s);s.useShopItem('backpacks','journey-bag-2');s.collected(Array.from({length:C1+1},()=>({kind:64})));
  const before=s.exportProgress();assert.equal(s.useShopItem('backpacks','starter-bag').status,'too-small');assert.deepEqual(s.exportProgress(),before);
 });
 test('old saves derive owned tiers; corrupt new collections fail instead of hiding damage',()=>{

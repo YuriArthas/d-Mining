@@ -4,7 +4,7 @@ import type { PetStateDataV1 } from "../logic/pets/types.ts";
 export type ProgressDataV1 = {
   equipment?: import('../logic/EquipmentCollection.ts').EquipmentData;
   worldProgress?: import('../logic/WorldProgress.ts').WorldProgressData;
-  reservations?: import('../logic/MineralReservation.ts').ReservationData;
+  materials?: import('../logic/MaterialStore.ts').MaterialStoreData;
   worldExploration?: Record<string, ProgressDataV1['exploration']>;
   rewards?: import('../logic/Rewards.ts').RewardData;
   onboarding?: import('../logic/Onboarding.ts').OnboardingData;

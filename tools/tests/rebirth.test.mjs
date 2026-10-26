@@ -15,6 +15,7 @@ function finished(d) {
   d.inventory.items = { 'journey.coal': 5 }; d.worldProgress = { version: 2, openWorlds: [1, 2, 3] };
   d.worldExploration = { ...d.worldExploration, 3: { version: 1, maxDepth: final.depth, unlockedDestinationIds: world3.map(r => r.id) } };
   d.pets.inventory.pets = [{ id: 'kept', speciesId: 'moss-slime', level: 1 }];
+  d.materials = { version: 1, items: { 'journey.coal': 2 } };
 }
 
 test('重生倍率每次 +0.5：×1 → ×1.5 → ×2 → ×2.5；只读第二版记录', () => {
@@ -37,7 +38,7 @@ test('重生要走完旅程：到达第三世界最后一层并拥有最后一�
   assert.equal(notThere.getSnapshot().rebirth.ready, false);
 });
 
-test('重生：三种货币、镐子（含强化）、背包、世界和地下层全部重置，回到第一世界；宠物保留；之后每种货币卖矿都乘倍率', () => {
+test('重生：三种货币、镐子（含强化）、背包、材料仓、世界和地下层全部重置，回到第一世界；宠物保留；之后每种货币卖矿都乘倍率', () => {
   const s = session(finished);
   assert.equal(s.getSnapshot().rebirth.ready, true);
   const pets = JSON.stringify(s.exportProgress().pets);
@@ -53,6 +54,7 @@ test('重生：三种货币、镐子（含强化）、背包、世界和地下�
   assert.ok(s.devUnlocks().every(w => w.layers.every(l => !l.unlocked)), 'every layer is to be reached again');
   assert.equal(after.rebirth.count, 1); assert.equal(after.rebirth.ready, false); assert.equal(after.rebirth.shown, true);
   assert.equal(JSON.stringify(s.exportProgress().pets), pets, 'pets stay');
+  assert.deepEqual(s.exportProgress().materials.items, {}, 'the material store empties');
   assert.equal(commits, 1); assert.deepEqual(events, ['reborn']);
   // The multiplier applies to every sale, and survives a reload.
   const saved = s.exportProgress(); saved.inventory.items = { 'journey.coal': 4 };

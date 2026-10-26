@@ -38,7 +38,6 @@ export function PortalSheet({ session, onClose }: { session: GameSession; onClos
   const footer = confirm && next ? <><span className="ui-hint">确认后扣除下面的矿物和 {number(ticket?.price ?? 0)} {unit}，{next.name}永久开放。</span><span className="ui-grow" />
     <UiButton size="s" tone="steel" onPress={() => setConfirm(false)}>取消</UiButton><UiButton size="s" tone="orange" disabled={!ready} onPress={unlock}>确认解锁</UiButton></>
     : <><span className="ui-hint" role="status">{message || (next ? (ready ? `条件都满足了，可以解锁${next.name}` : `镐子达到 Lv.${ticket?.toolLevel}、集齐矿物和${unit}即可解锁${next.name}`) : '所有世界都已开放')}</span><span className="ui-grow" />
-      {next && <UiButton size="s" tone="purple" icon="gem" onPress={() => { session.reserveWorldMaterials(next.id); setMessage('已保留所需矿物，之后挖到的也会自动补足，不会被卖掉'); }}>保留矿物</UiButton>}
       {next && <UiButton size="s" tone="orange" disabled={!ready} onPress={() => setConfirm(true)}>解锁{next.name}</UiButton>}</>;
   return <Sheet title="世界传送门" size="m" onClose={onClose} className="portal-sheet" footer={footer}>
     <div className="ui-cards world-cards">{state.worlds.map((world, i) => {
@@ -52,7 +51,7 @@ export function PortalSheet({ session, onClose }: { session: GameSession; onClos
       </div>;
     })}</div>
     {next && <div className="ui-well world-mats">
-      <b className="ui-outline">解锁{next.name}需要</b>
+      <b className="ui-outline">解锁{next.name}需要<small>（矿物挖到后自动进材料仓）</small></b>
       {next.materials.map(m => <div key={m.itemId} className="world-mat"><OreIcon color={itemDefinition(m.itemId).color} className="world-mat-icon" /><span>{m.name}</span>
         <Bar value={m.owned} max={m.count} size="s" /><b className="ui-outline">{number(Math.min(m.owned, m.count))}/{number(m.count)}</b></div>)}
       {ticket && <div className="world-mat"><Icon kind="pickaxe" className="ui-icon world-mat-icon" /><span>镐子等级</span>

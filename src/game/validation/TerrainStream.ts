@@ -77,6 +77,8 @@ export class TerrainStream {
     }
     return !this.error;
   }
+  /** Cells accepted for mining and not removed yet. */
+  pendingCount() { return this.waiting.size + (this.transaction?.cells.length ?? 0); }
   pending(cell: Coord) { return this.waiting.has(chunkKey(cell)) || !!this.transaction?.cells.some(c => chunkKey(c) === chunkKey(cell)); }
   mine(cell: Coord) {
     return this.mineMany([cell]);

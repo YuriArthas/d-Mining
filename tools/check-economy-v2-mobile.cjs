@@ -52,6 +52,7 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
           d.worldProgress = { version: 2, openWorlds: [1, 2] };
           d.worldExploration['1'] = { version: 1, maxDepth: 150, unlockedDestinationIds: ['old_mine', 'fungal'] };
           d.pickaxe.level = 3; d.equipment.toolLevel = 3;
+          d.materials = { version: 1, items: { 'journey.sulfur': 12 } };
           s.put(v, 'main');
         };
         t.oncomplete = resolve; t.onabort = () => reject(t.error);
@@ -87,6 +88,14 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
     await tap(button('关闭宠物'));
     await check('Golden merge: five identical pets merge into one 金色 pet with a gold frame; the locked 4th slot shows where it unlocks.');
     await check('Pet bag: each pet shows its income bonus (currency) and mining speed; the team shows both totals; a world 2 pet is not greyed and says its income bonus counts in world 2; 一键最佳 in world 1 picks gold pets first.');
+
+    // The ores tab: the bag sells whole; the world 3 ticket's minerals wait in the material store.
+    await tap(button('打开我的宠物')); await tap(page.getByRole('tab', { name: '矿物' }));
+    await page.locator('.bag-store').waitFor(); await shot('04b-ores-store');
+    const store = await page.locator('.bag-store').innerText();
+    assert.match(store, /材料仓/); assert.match(store, /12\/30/); assert.match(store, /0\/20/); assert.match(store, /0\/15/);
+    await tap(button('关闭矿物'));
+    await check(`Material store in the ores tab: ${store.replace(/\s+/g, ' ')}.`);
 
     // Egg stand: price and bonuses in gold.
     await tap(button('打开我的宠物')); await tap(button('获取宠物')); await shot('05-egg-list');

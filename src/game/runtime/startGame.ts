@@ -246,6 +246,7 @@ export async function startGame(options: StartGameOptions) {
         cell: (cell) => terrain.cell(cell),
         canMine: (cell) => terrain.canMine(cell),
         pending: (cell) => terrain.pending(cell),
+        pendingCount: () => terrain.pendingCount(),
         mine: (targets) => terrain.mineMany(targets),
         cancelMining: () => terrain.cancelPending(),
         travelTo: (feet, lookAt) => {

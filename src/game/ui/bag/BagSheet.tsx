@@ -116,34 +116,29 @@ function PetsTab({ session, pets, common, onClose }: Props & { pets: PetPanelSna
 
 function OresTab({ session, common, onClose }: Props & { common: Common }) {
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const bag = state.inventory;
   const rows = Object.entries(bag.items).filter(([, count]) => count > 0)
-    .map(([id, count]) => ({ id, count, item: itemDefinition(id), reservation: state.mineralReservations[id] }))
+    .map(([id, count]) => ({ id, count, item: itemDefinition(id) }))
     .sort((a, b) => b.item.price - a.item.price);
-  const selected = rows.find(row => row.id === selectedId) ?? null;
-  const needed = (id: string) => state.worlds.some(w => w.known && !w.open && w.materials.some(m => m.itemId === id));
   const sale = state.sale.status === 'quoted' ? state.sale : null;
   return <Sheet {...common} footer={<>
-    {selected ? <div className="bag-reserve"><b className="ui-outline">{selected.item.name}</b>
-      <div className="ui-seg" role="group" aria-label={`${selected.item.name}保留方式`}>
-        {([['none', '不保留'], ...(needed(selected.id) ? [['needed', '保留所需']] : []), ['all', '全部保留']] as [ 'none' | 'needed' | 'all', string][]).map(([mode, label]) =>
-          <GameButton key={mode} aria-pressed={selected.reservation?.mode === mode} blurAfterPress={false} onPress={() => session.reserveMineral(selected.id, mode)}>{label}</GameButton>)}
-      </div></div>
-      : <span className="ui-hint">点矿物可以设为「保留」：解锁下一个世界需要的矿物就不会被卖掉。</span>}
+    <span className="ui-hint">世界门票要的矿挖到后自动进材料仓：不占背包，也不会被卖掉。</span>
     <span className="ui-grow" />
     {state.inSellZone
-      ? <UiButton size="s" tone="green" icon={currencyIcon(state.currency)} disabled={!sale?.count} onPress={() => { session.sellAvailable(); }}>出售可售矿物</UiButton>
+      ? <UiButton size="s" tone="green" icon={currencyIcon(state.currency)} disabled={!sale?.count} onPress={() => { session.sellAvailable(); }}>全部出售</UiButton>
       : <UiButton size="s" tone="green" icon={currencyIcon(state.currency)} disabled={!bag.used} onPress={() => { if (session.goTo('sale') === 'travelling') onClose(); }}>传送出售</UiButton>}
   </>}>
     <div className="ui-row"><div className="bag-capacity"><Bar value={bag.used} max={bag.capacity} tone={bag.isFull ? 'gold' : undefined}>容量 {number(bag.used)} / {number(bag.capacity)}</Bar></div>
       <Chip icon={currencyIcon(state.currency)}>可售 {sale ? number(sale.count) : 0} 件 · 约 <b>{sale ? number(sale.coins) : 0}</b></Chip></div>
-    {rows.length ? <div className="ui-grid bag-ores" role="list" aria-label="矿物">{rows.map(row => <GameButton key={row.id} role="listitem" className="ui-cell" aria-pressed={row.id === selected?.id} blurAfterPress={false}
-      aria-label={`${row.item.name} ${row.count} 个，单价 ${row.item.price}`} onPress={() => setSelectedId(row.id === selectedId ? null : row.id)}>
+    {state.materials.length > 0 && <div className="ui-well bag-store" role="list" aria-label="材料仓"><b className="ui-outline">材料仓</b>
+      {state.materials.map(m => <span key={m.itemId} role="listitem" className="bag-store-item" data-done={m.stored >= m.needed ? '' : undefined} aria-label={`${m.name} ${m.stored} / ${m.needed}`}>
+        <OreIcon color={itemDefinition(m.itemId).color} className="bag-store-icon" /><span>{m.name}</span><b className="ui-outline">{number(m.stored)}/{number(m.needed)}</b></span>)}
+    </div>}
+    {rows.length ? <div className="ui-grid bag-ores" role="list" aria-label="矿物">{rows.map(row => <div key={row.id} role="listitem" className="ui-cell"
+      aria-label={`${row.item.name} ${row.count} 个，单价 ${row.item.price}`}>
       <span className="ui-cell-name ui-outline">{row.item.name}</span><OreIcon color={row.item.color} className="bag-ore-art" />
       <span className="ui-cell-stat ui-outline">×{number(row.count)}</span><span className="ui-cell-note ui-outline">{number(row.item.price)}</span>
-      {!!row.reservation?.reserved && <span className="ui-stamp bag-kept">保留 {number(row.reservation.reserved)}</span>}
-    </GameButton>)}</div> : <div className="bag-empty ui-well"><Icon kind="pickaxe" className="ui-icon bag-empty-art" /><b className="ui-outline">背包是空的</b><span className="ui-hint">下矿井挖矿，矿石会自动装进来</span></div>}
+    </div>)}</div> : <div className="bag-empty ui-well"><Icon kind="pickaxe" className="ui-icon bag-empty-art" /><b className="ui-outline">背包是空的</b><span className="ui-hint">下矿井挖矿，矿石会自动装进来</span></div>}
   </Sheet>;
 }
 

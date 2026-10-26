@@ -81,3 +81,14 @@ test('every block takes one place in the bag; a full bag refuses the next block 
  session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);s=session.getSnapshot();assert.equal(s.coins,SESSION_CONTENT.initialCoins+cap-1+resourceByKind(71).price);assert.equal(s.inventory.totalCount,0);assert.match(s.notice,new RegExp(`${cap} 件.*金币`));
  session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);assert.equal(session.getSnapshot().coins,SESSION_CONTENT.initialCoins+cap-1+resourceByKind(71).price);
 });
+test('a block broken as the bag fills counts as already in it: the next block is refused, nothing goes past the size',()=>{
+ let now=0,pending=0;const initial=new GameSession(SESSION_CONTENT).exportProgress();initial.pickaxe.level=28;initial.equipment.toolLevel=28;
+ const session=new GameSession(SESSION_CONTENT,50,()=>now,{},initial);
+ session.attach({cell:()=>71,pending:()=>false,mine:()=>{pending++;return true;},pendingCount:()=>pending,cancelMining:()=>{pending=0;}});
+ const cap=session.getSnapshot().inventory.capacity;session.collected(Array.from({length:cap-1},()=>({kind:64})));
+ const hits=Math.ceil(resourceByKind(71).maxHp/pickaxeStats(28).power),a=[11,-1,-25],b=[12,-1,-25];
+ for(let i=0;i<hits;i++){now+=.5;session.hit(a);}
+ assert.equal(pending,1,'the last free place is taken by the block on its way');
+ now+=.5;assert.equal(session.hit(b).status,'full');assert.equal(session.blockHealth(b),resourceByKind(71).maxHp);
+ pending=0;session.collected([{cell:a,kind:71}]);assert.equal(session.getSnapshot().inventory.used,cap);
+});
