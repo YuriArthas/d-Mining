@@ -42,7 +42,8 @@ export function Hud({ session, actions, system, prompts, tipHidden = false }: {
     <section className="hud-left" aria-label="资源">
       <div className="hud-wallet">
         <Pill icon={currencyIcon(state.currency)} className="hud-coins">
-          <span data-testid="coins" aria-label={`${currencyName(state.currency)} ${number(state.coins)}`}><CountUp value={state.coins} format={number} /></span>
+          {/* Keyed by currency: a new world's money appears at once instead of rolling from the last world's. */}
+          <span data-testid="coins" aria-label={`${currencyName(state.currency)} ${number(state.coins)}`}><CountUp key={state.currency} value={state.coins} format={number} /></span>
           {state.rebirth.multiplier > 1 && <b className="hud-coin-mult" aria-label={`重生收益 ${state.rebirth.multiplier} 倍`}>×{state.rebirth.multiplier}</b>}
         </Pill>
         <Pill icon="backpack" className="hud-bag" meter={bag.capacity > 0 ? bag.used / bag.capacity : 0} state={bag.isFull ? 'full' : undefined}

@@ -1,61 +1,142 @@
-/* Bag container (宠物 / 矿物 / 装备). */
-.bag-pets { display: grid; grid-template-columns: minmax(0, 1fr) 168px; gap: 10px; align-items: start; min-height: 0; }
-.bag-pets-main { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-.bag-detail { position: sticky; top: 0; gap: 4px; }
-.bag-detail-art { width: 56px; height: 56px; }
-.bag-detail h3 { font-size: 18px; }
-.bag-detail-note { font-size: 12px; line-height: 1.1; color: var(--ui-ink-soft); text-align: center; }
-.bag-detail .ui-btn { width: 100%; }
-.bag-compact-equip { display: none; }
-.bag-message { max-width: 280px; }
+/* The bag (docs/draft-ui-v2.md, U4): pets, ores and gear. Style A: white cards on the light sheet, no footer bar;
+   short messages pop up as a toast over the bottom of the sheet. Each tab has its own strip colour. */
+.ui-sheet.bag-tab-pets { --sheet-tone: var(--ui-orange); }
+.ui-sheet.bag-tab-ores { --sheet-tone: var(--ui-blue); }
+.ui-sheet.bag-tab-gear { --sheet-tone: var(--ui-green); }
+/* The pet grid and the egg list scroll inside; the team bar and the pet card stay put. */
+.bag-tab-pets .ui-sheet-body { overflow: hidden; }
+.bag-sheet .ui-sheet-body { position: relative; padding-bottom: 12px; }
+.bag-toast { position: absolute; z-index: 5; left: 50%; bottom: 14px; translate: -50% 0; max-width: 80%; white-space: normal; text-align: center; }
+
+/* Pets: the team on top (slots show who is out, totals, best), the grid and the chosen pet's card below. */
+.bag-team { display: flex; align-items: center; gap: 10px; flex: none; min-height: 60px; padding: 5px 8px; border: 3px solid var(--ui-line); border-radius: 14px; background: var(--ui-paper); }
+.bag-slots { display: flex; align-items: center; gap: 6px; }
+.bag-slot { position: relative; display: grid; place-items: center; width: 48px; height: 48px; padding: 0; border: 3px solid var(--r, var(--ui-ink)); border-radius: 12px; background: var(--ui-sheet);
+  cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.bag-slot > .ui-icon { width: 22px; height: 22px; }
+.bag-slot[data-empty] { border: 3px dashed var(--ui-mute); }
+.bag-slot[data-empty] > .ui-icon { opacity: .5; }
+.bag-slot[data-locked] { border-color: var(--ui-mute); background: #dfe5ef; }
+.bag-slot-art { width: 40px; height: 40px; }
+.bag-buy-slot.ui-btn { min-height: 44px; }
+.bag-totals { display: grid; gap: 2px; padding-left: 4px; }
+.bag-totals span { display: flex; align-items: center; gap: 4px; font-size: 14px; white-space: nowrap; }
+.bag-totals .ui-icon { width: 20px; height: 20px; }
+.bag-equip-best[data-better] { animation: bag-better 1.2s ease-in-out infinite; }
+@keyframes bag-better { 50% { transform: scale(1.06); } }
+
+.bag-pets { display: grid; grid-template-columns: minmax(0, 1fr) 196px; grid-template-rows: minmax(0, 1fr); gap: 10px; flex: 1; min-height: 0; }
+/* Columns stretch to the width; rows keep the cell height. */
+.bag-pet-grid { --cell: 80px; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); align-content: start; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; min-height: 0; padding: 4px; }
+.bag-merge-ready { position: absolute; z-index: 2; left: 3px; top: 18px; padding: 0 5px; border: 2px solid var(--ui-ink); border-radius: 8px; background: var(--ui-gold);
+  font: 900 10px/1.4 var(--ui-font); font-style: normal; color: var(--ui-ink); }
+.ui-cell.bag-get { border: 3px dashed var(--ui-mute); background: var(--ui-sheet); }
+.bag-get-art { position: absolute; left: 26%; top: 18%; width: 48%; height: 56%; }
+.bag-get .ui-cell-name { top: auto; bottom: 4px; color: var(--ui-ink); }
+.bag-get-plus { position: absolute; right: 4px; top: 4px; width: 20px !important; height: 20px !important; }
+.ui-cell[data-golden] { --r: var(--ui-gold); background: #fff3c4; }
+.ui-cell[data-golden] .ui-cell-art, .bag-detail[data-golden] .bag-detail-art { filter: sepia(1) saturate(3.2) hue-rotate(-12deg) brightness(1.12); }
+
+/* The chosen pet: portrait and name side by side, then its numbers; the main button stays at the bottom and, on a
+   short screen, the card scrolls under it instead of pushing it out of the sheet. */
+.bag-detail { min-height: 0; overflow-y: auto; overscroll-behavior: contain; justify-content: flex-start; gap: 4px; padding: 6px 8px 0; }
+.bag-detail-head { display: flex; align-items: center; gap: 6px; width: 100%; }
+.bag-detail-head > div { display: grid; justify-items: start; gap: 2px; min-width: 0; }
+.bag-detail-art { width: 54px; height: 54px; flex: none; }
+.bag-detail h3 { font-size: 16px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.bag-detail-empty { justify-content: center; }
+.bag-detail-empty h3 { text-align: center; }
+.bag-detail .ui-stat { padding: 2px 8px; }
+.bag-detail .ui-stat > span { display: flex; align-items: center; gap: 4px; }
+.bag-detail .ui-stat .ui-icon { width: 16px; height: 16px; }
+.bag-detail-note { font-size: 11px; line-height: 1.2; color: var(--ui-ink-soft); text-align: center; }
+.bag-golden { width: 100%; }
+.bag-golden .ui-bar { height: 18px; }
+.bag-merge.ui-btn { width: 100%; min-height: 36px; }
+.bag-equip.ui-btn { position: sticky; bottom: 0; width: 100%; margin-top: auto; flex: none; }
+/* The paper under the sticky button, so text scrolling behind it never shows through. */
+.bag-detail::after { content: ""; flex: none; height: 8px; width: 100%; }
+
+/* Where to get pets: one world's eggs at a time, on one screen. */
+.bag-finder-bar { display: flex; align-items: center; gap: 10px; flex: none; }
+/* Rows take the cards' full height (the cards clip their corners, so a squeezed row would cut their bottom band). */
+.bag-eggs { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); grid-auto-rows: max-content; gap: 8px; align-content: start; overflow-y: auto; min-height: 0; padding: 2px; }
+.bag-egg { position: relative; display: flex; flex-direction: column; align-items: center; gap: 0; min-width: 0; padding: 5px 4px 0; overflow: hidden;
+  border: 3px solid var(--ui-ink); border-radius: 14px; background: var(--ui-paper); color: var(--ui-ink); font: inherit;
+  cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; transition: transform 90ms ease; }
+.bag-egg:active { transform: scale(.95); }
+.bag-egg[data-locked] { cursor: default; border-color: var(--ui-mute); background: var(--ui-sheet); }
+.bag-egg-art { flex: none; width: 34px; height: 40px; }
+.bag-egg-name { font-size: 14px; white-space: nowrap; }
+.bag-egg-price { display: inline-flex; align-items: center; gap: 3px; font-size: 13px; }
+.bag-egg-price .ui-icon { width: 17px; height: 17px; }
+.bag-egg-go { align-self: stretch; margin: 2px -4px 0; padding: 1px 4px 2px; background: var(--ui-green); color: #fff; font-size: 14px; text-align: center;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; -webkit-text-stroke: 3px var(--ui-ink); paint-order: stroke fill; }
+.bag-egg[data-locked] .bag-egg-go { background: var(--ui-mute); font-size: 11px; -webkit-text-stroke-width: 2.5px; }
+
+/* Ores: what the bag holds and sells for, the material store as a ticket card, the ores with their unit price. */
+.bag-sell { display: flex; align-items: center; gap: 12px; flex: none; }
+.bag-capacity { flex: 1; min-width: 140px; }
+.bag-sell-value { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; white-space: nowrap; }
+.bag-sell-value .ui-icon { width: 22px; height: 22px; }
+.bag-sell-value b { font-size: 17px; }
+.bag-ticket { flex: none; padding: 6px 10px 8px; border: 3px solid var(--ui-ink); border-radius: 14px; background: var(--ui-paper); }
+.bag-ticket header { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; font-size: 13px; }
+.bag-ticket header .ui-icon { width: 22px; height: 22px; }
+.bag-ticket header b { font-size: 15px; }
+.bag-ticket header span { color: var(--ui-ink-soft); font-size: 11px; }
+.bag-ticket-items { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px 14px; }
+.bag-ticket-item { position: relative; display: grid; grid-template-columns: 22px auto minmax(40px, 1fr); align-items: center; gap: 5px; font-size: 12px; white-space: nowrap; }
+.bag-ticket-item .bag-ticket-icon { width: 22px; height: 22px; color: var(--ui-ink); }
+.bag-ticket-item .ui-bar { height: 18px; }
+.bag-ticket-item[data-done] .ui-bar > i { background: var(--ui-green); }
+.bag-ticket-item .ui-cell-check { position: absolute; right: -8px; top: -6px; left: auto; }
+.bag-ores { --cell: 76px; grid-auto-rows: 88px; }
+.bag-ores .bag-ore-art { position: absolute; left: 32%; top: 18px; width: 36%; height: 30px; color: var(--ui-ink); }
+.bag-ore-price { position: absolute; left: 0; right: 0; bottom: 23px; display: flex; align-items: center; justify-content: center; gap: 2px; font-size: 11px; color: var(--ui-ink-soft); }
+.bag-ore-price .ui-icon { width: 13px; height: 13px; }
 .bag-empty { display: grid; justify-items: center; gap: 6px; padding: 18px; text-align: center; }
-.bag-empty-art { width: 86px; height: 86px; }
-.bag-empty b { font-size: 20px; }
+.bag-empty-art { width: 64px; height: 64px; }
+.bag-empty b { font-size: 18px; }
 
-.bag-eggs { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 8px; }
-.bag-egg { --c: #2f8be0; --c-lo: #1d6cc7; }
-.bag-egg-art { width: 62px; height: 72px; }
-.bag-egg h4 { font-size: 16px; }
-
-.bag-capacity { flex: 1; min-width: 160px; }
-.bag-ores .bag-ore-art { position: absolute; left: 25%; top: 24%; width: 50%; height: 50%; color: var(--ui-ink); }
-/* 材料仓: one compact line of the ticket minerals, each stored / needed; a full one turns green. */
-.bag-store { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 5px 10px; }
-.bag-store > b { font-size: 14px; }
-.bag-store-item { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; white-space: nowrap; }
-.bag-store-item > b { font-size: 13px; }
-.bag-store-item[data-done] > b { color: var(--ui-green, #6fe07a); }
-.bag-store-icon { width: 20px; height: 20px; color: var(--ui-ink); }
-
-/* Two cards sized to their content (they used to stretch to the sheet's full height). */
+/* Gear: the pickaxe and the bag, each with its next step in the shop. */
 .bag-gears { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-content: start; }
-.bag-gear { flex-direction: row; align-items: stretch; gap: 10px; padding: 10px; --c: #ffb84a; --c-lo: #d9761a; }
-.bag-gear[data-kind=backpacks] { --c: #c58cf0; --c-lo: #8b55cf; }
-.bag-gear-art { width: 104px; display: grid; justify-items: center; align-content: center; gap: 6px; flex: none; }
-.bag-gear-art > .ui-icon { width: 88px; height: 88px; }
-.bag-gear-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
-.bag-gear-info h4 { font-size: 20px; text-align: left; }
-.bag-gear-next { display: grid; justify-items: start; gap: 3px; margin-top: 4px; padding: 6px 8px; }
-.bag-gear-next small { text-align: left; }
-.bag-gear-next b { font-size: 14px; }
+.bag-gear { --c: var(--ui-orange); flex-direction: row; align-items: stretch; gap: 10px; padding: 14px 10px 10px; }
+.bag-gear[data-kind=backpacks] { --c: var(--ui-purple); }
+.bag-gear-art { width: 92px; display: grid; justify-items: center; align-content: center; gap: 4px; flex: none; }
+.bag-gear-art > .ui-icon { width: 76px; height: 76px; }
+.bag-gear-level { font-size: 16px; }
+.bag-gear-level small { font-size: 11px; color: var(--ui-ink-soft); }
+.bag-gear-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.bag-gear-info h4 { font-size: 18px; text-align: left; }
+.bag-gear-next { display: grid; gap: 5px; margin-top: auto; }
+.bag-gear-next small { text-align: left; font-size: 11px; color: var(--ui-ink-soft); }
+.bag-gear-next small b { color: var(--ui-ink); }
+.bag-gear-next .ui-btn { width: 100%; }
+.bag-gear .ui-stamp { align-self: flex-start; margin-top: auto; }
 
 @container game (max-width: 760px) {
-  .bag-pets { grid-template-columns: minmax(0, 1fr); }
-  .bag-detail { display: none; }
-  .bag-compact-equip { display: inline-flex; }
-  .bag-message { display: none; }
-  .bag-gear-art { width: 78px; }
-  .bag-gear-art > .ui-icon { width: 64px; height: 64px; }
+  .bag-pets { grid-template-columns: minmax(0, 1fr) 164px; }
+  .bag-totals span { font-size: 12px; }
+  .bag-ticket-items { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .bag-gear-art { width: 70px; }
+  .bag-gear-art > .ui-icon { width: 58px; height: 58px; }
 }
 @container game (max-height: 360px) {
-  .bag-gears { gap: 8px; }
-  .bag-gear { padding: 8px; }
-  .bag-gear-info h4 { font-size: 17px; }
+  .bag-team { min-height: 52px; padding: 3px 6px; }
+  .bag-slot { width: 42px; height: 42px; }
+  .bag-slot-art { width: 34px; height: 34px; }
+  .bag-ores { --cell: 68px; }
+  .bag-pet-grid { --cell: 72px; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); }
+  .bag-detail-art { width: 44px; height: 44px; }
 }
-
-/* Golden pets: a gold frame and glow; the slot purchase sits with the team chips. */
-.ui-cell[data-golden] { --r: #ffc61a; --r-lo: #e0a400; background: #fff3c4; }
-.ui-cell[data-golden][data-equipped] { }
-.bag-buy-slot.ui-btn { min-height: 34px; padding: 0 10px; font-size: 14px; }
-.bag-merge.ui-btn { min-height: 36px; font-size: 14px; }
-.ui-cell[data-golden] .ui-cell-art, .bag-detail[data-golden] .bag-detail-art { filter: sepia(1) saturate(3.2) hue-rotate(-12deg) brightness(1.12); }
+@container game (min-width: 1000px) and (min-height: 620px) {
+  .bag-pets { grid-template-columns: minmax(0, 1fr) 220px; }
+  .bag-ores { --cell: 96px; grid-auto-rows: 108px; }
+  .bag-pet-grid { --cell: 100px; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); }
+  .bag-slot { width: 58px; height: 58px; }
+  .bag-slot-art { width: 50px; height: 50px; }
+  .bag-detail-art { width: 84px; height: 84px; }
+  .bag-eggs { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) { .bag-equip-best[data-better] { animation: none; } }

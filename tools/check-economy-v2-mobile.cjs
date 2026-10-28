@@ -70,11 +70,11 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
 
     // Pets: income bonuses per currency; world 2 pets marked as counting elsewhere.
     await tap(button('打开我的宠物')); await page.getByRole('dialog').first().waitFor();
-    const total = await page.locator('.bag-pets-main .ui-chip').nth(1).innerText();
-    assert.match(total, /总加成/); await shot('02-pets-gold');
+    const total = await page.locator('.bag-totals').innerText();
+    assert.match(total, /\+\d+%/); await shot('02-pets-gold');
     await tap(page.getByRole('listitem').filter({ hasText: '赤铜狐' })); await shot('03-pet-elsewhere');
     assert.match(await page.locator('.bag-detail').innerText(), /科技币收入/); assert.match(await page.locator('.bag-detail').innerText(), /挖矿速度/);
-    assert.match(await page.locator('.bag-pets-main').innerText(), /挖矿\s*\+/);
+    assert.match(await page.locator('.bag-totals').innerText(), /挖矿\s*\+/);
     await tap(page.locator('.bag-equip-best'));
     const equipped = await page.locator('.bag-pets .ui-cell[data-equipped]').evaluateAll(cells => cells.map(c => c.getAttribute('aria-label')));
     assert.ok(equipped.every(label => /金币/.test(label)), `world 1 best team is all gold pets: ${equipped}`);
@@ -84,15 +84,15 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
     const merge = page.locator('.bag-merge'); assert.match(await merge.innerText(), /5\/5/); await tap(merge);
     await page.locator('.ui-cell[data-golden]').waitFor(); await shot('04a-golden');
     assert.match(await page.locator('.bag-detail').innerText(), /金色矿洞鼹鼠/);
-    assert.match(await page.locator('.bag-pets-main').innerText(), /第 4 格/);
+    assert.match(await page.locator('.bag-slots [data-locked]').getAttribute('aria-label'), /第 4 格/);
     await tap(button('关闭宠物'));
     await check('Golden merge: five identical pets merge into one 金色 pet with a gold frame; the locked 4th slot shows where it unlocks.');
     await check('Pet bag: each pet shows its income bonus (currency) and mining speed; the team shows both totals; a world 2 pet is not greyed and says its income bonus counts in world 2; 一键最佳 in world 1 picks gold pets first.');
 
     // The ores tab: the bag sells whole; the world 3 ticket's minerals wait in the material store.
     await tap(button('打开我的宠物')); await tap(page.getByRole('tab', { name: '矿物' }));
-    await page.locator('.bag-store').waitFor(); await shot('04b-ores-store');
-    const store = await page.locator('.bag-store').innerText();
+    await page.locator('.bag-ticket').waitFor(); await shot('04b-ores-store');
+    const store = await page.locator('.bag-ticket').innerText();
     assert.match(store, /材料仓/); assert.match(store, /12\/30/); assert.match(store, /0\/20/); assert.match(store, /0\/15/);
     await tap(button('关闭矿物'));
     await check(`Material store in the ores tab: ${store.replace(/\s+/g, ' ')}.`);
