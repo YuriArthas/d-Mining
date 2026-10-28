@@ -143,7 +143,7 @@ function PetsTab({ session, pets, common, onClose }: Props & { pets: PetPanelSna
         {selected.currency !== pets.currency && <small className="bag-detail-note">{tr('在{world}加收入', { world: WORLD_OF[selected.currency].name })}</small>}
         {!selected.golden && (selected.mergeable >= pets.goldenNeed
           ? <UiButton size="s" tone="gold" className="bag-merge" aria-label={tr('合成金色{name}，已有 {mergeable} / {goldenNeed}', { name: selected.name, mergeable: selected.mergeable, goldenNeed: pets.goldenNeed })} onPress={() => merge(selected)}>{tr('合成金色 {n}/{n}', { n: pets.goldenNeed })}</UiButton>
-          : <div className="bag-golden" aria-label={tr('金色合成 {mergeable} / {goldenNeed}', { mergeable: selected.mergeable, goldenNeed: pets.goldenNeed })}><Bar value={selected.mergeable} max={pets.goldenNeed} tone="gold" size="s">{tr('金色 {have}/{need}', { have: selected.mergeable, need: pets.goldenNeed })}</Bar></div>)}
+          : <div className="bag-golden" aria-label={tr('金色 {have}/{need}', { have: selected.mergeable, need: pets.goldenNeed })}><Bar value={selected.mergeable} max={pets.goldenNeed} tone="gold" size="s">{tr('金色 {have}/{need}', { have: selected.mergeable, need: pets.goldenNeed })}</Bar></div>)}
         <UiButton size="s" tone={selected.equippedSlot !== null ? 'white' : 'green'} className="bag-equip" onPress={() => toggle(selected)}>{selected.equippedSlot !== null ? tr('卸下') : tr('装备')}</UiButton>
       </aside> : <aside className="ui-detail bag-detail bag-detail-empty" aria-label={tr('宠物详情')}>
         <PetArt speciesId="moss-slime" className="bag-detail-art" /><h3 className="ui-outline">{tr('还没有宠物')}</h3>

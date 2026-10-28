@@ -107,7 +107,7 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
     await page.waitForFunction(() => document.querySelector('.hatch')?.dataset.done === 'true', null, { timeout: 5000 }); await page.waitForTimeout(400); await shot('07-hatch-result');
     assert.match(await page.locator('.hatch-tags').innerText(), /金币收入/); assert.match(await page.locator('.hatch-tags').innerText(), /挖矿/);
     await tap(button('完成')); await tap(button('关闭卵石蛋'));
-    await check('Pebble egg: price in gold, outcomes with +% bonuses, hatch result says 金币收益.');
+    await check('Pebble egg: price in gold, outcomes with +% bonuses, hatch result says 金币收入.');
 
     // Shop: next tool in gold; a world 2 tool in tech coins.
     await tap(button('商店'));

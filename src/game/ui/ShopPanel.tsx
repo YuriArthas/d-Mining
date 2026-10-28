@@ -56,7 +56,7 @@ export function ShopPanel({ session, view, onClose }: { session: GameSession; vi
   };
   const purchase = () => {
     const result = session.useShopItem(category, item.id);
-    setMessage(result.status === 'upgraded' ? tr('购买成功，已装备！') : result.status === 'equipped' ? tr('已装备') : result.status === 'insufficient' ? '' : result.status === 'too-small' ? tr('背包装不下现有矿石，先去卖掉') : result.status === 'locked' ? tr('请先购买上一件') : tr('请重新进入商店'));
+    setMessage(result.status === 'upgraded' ? tr('购买成功，已装备！') : result.status === 'equipped' ? tr('已装备') : result.status === 'insufficient' ? '' : result.status === 'too-small' ? tr('背包装不下现有矿石，先去卖掉') : result.status === 'locked' ? tr('先买上一件') : tr('请重新进入商店'));
   };
   const lean = (event: PointerEvent<HTMLElement>) => {
     const box = event.currentTarget.getBoundingClientRect();

@@ -89,7 +89,7 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
   const tipHidden = !!modal || shopOpen || stationOpen || portalOpen || blocked || !focused;
   useEffect(() => { if (stationOpen || portalOpen) input.reset(); }, [stationOpen, portalOpen, input]);
   const prompts = <>
-    {state.atMachine && <GameButton className="ui-btn capsule-world-prompt" data-tone="purple" data-size="m" onPress={() => open({ kind: 'capsule' })}><Icon kind="gift" /><span className="ui-outline"><span className="desktop-hint">E · </span>{tr('幸运扭蛋')}</span></GameButton>}
+    {state.atMachine && <GameButton className="ui-btn capsule-world-prompt" data-tone="purple" data-size="m" onPress={() => open({ kind: 'capsule' })}><Icon kind="gift" /><span className="ui-outline"><span className="desktop-hint">E · </span>{tr('幸运扭蛋机')}</span></GameButton>}
     {state.eggStation && eggName && <GameButton className="ui-btn egg-world-prompt" data-tone="orange" data-size="m" aria-label={tr('查看{eggName}', { eggName: eggName })} onPress={() => open({ kind: 'egg' })}><Icon kind="paw" /><span className="ui-outline"><span className="desktop-hint">E · </span>查看{eggName}</span></GameButton>}
   </>;
   return <div className="session-ui" data-panel={panel}>

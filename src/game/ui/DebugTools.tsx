@@ -7,6 +7,7 @@ import { GAME_CONTENT } from '../content/gameContent.ts';
 import { MINERALS } from '../terrain/minerals.ts';
 import { PerformanceProbeUi } from './PerformanceProbeUi.tsx';
 
+import './debugTools.css';
 /** The ?debug=1 panel: stage, live performance, the probe, the input monitor and the validation panel. Developer
  *  text only (not translated). */
 export function DebugTools({ status, performanceStats, renderRate, shadowsEnabled, changeProbeMode, input }: {

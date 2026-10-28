@@ -53,7 +53,7 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
 
   try {
     // 1. Brand-new player: one tip, pointing at the mine.
-    const url = `${base}?debug=1&submission=fenced&framesInFlight=1&saveTest=tips-${Date.now()}`;
+    const url = `${base}?lang=zh&debug=1&submission=fenced&framesInFlight=1&saveTest=tips-${Date.now()}`;
     await page.goto(url, { waitUntil: 'domcontentloaded' }); await ready();
     await page.evaluate(() => { window.__miningValidation.teleport([0, .1, 46]); window.__miningValidation.look(0, .3); });
     await page.waitForFunction(() => window.__miningValidation.snapshot().economy.tip?.anchor === 'mine', null, { timeout: 30000 });
@@ -108,12 +108,14 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
     assert.notEqual((await tip())?.id, 'sell');
     await check('The first full bag shows one short line under the depth and pulses 出售; selling ends it.');
 
-    // 4. Affordable pickaxe: one line, 商店 pulses; tapping 商店 ends it.
+    // 4. Affordable pickaxe: one line, 商店 pulses; tapping 商店 ends it. (Economy v2: one bag of dirt does not pay for
+    // the next pickaxe any more, so top the wallet up to its price.)
+    await page.evaluate(() => window.__miningValidation.grantCoins(1000));
     await waitTip('shop', 30000);
     assert.match(await page.locator('.ui-tip').innerText(), /商店/);
     await shot('05-shop-tip', 'first affordable pickaxe');
     await tap(page.getByRole('button', { name: '商店', exact: true }));
-    await page.getByRole('dialog', { name: '商店分类' }).waitFor({ timeout: 30000 });
+    await page.locator('.shop-showroom').waitFor({ timeout: 30000 });
     await tap(page.getByRole('button', { name: /^关闭商店/ })); await page.waitForTimeout(500);
     assert.notEqual((await tip())?.id, 'shop');
     await check('With enough coins for a pickaxe the 商店 tip appears once; opening the shop ends it.');

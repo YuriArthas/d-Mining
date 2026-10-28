@@ -2,6 +2,10 @@
    (--tile, --pill-h); tones map to the token palette. Flat: an ink outline around a colour block, a soft
    white gloss band on the top of chunky buttons, and a press that squashes instead of dropping a shadow. */
 .ui-icon { display: block; width: 100%; height: 100%; flex: none; overflow: visible; }
+/* Ore icons (InventoryIcons.tsx, the mining overlay) take the ink colour for their outline. */
+.ore-icon { width: 32px; height: 32px; flex: none; color: var(--ui-ink); }
+/* Any game button reached by keyboard. */
+.game-shell--roblox-hud button:focus-visible { outline: 3px solid var(--ui-gold); outline-offset: 3px; }
 
 [data-tone] { --tone: var(--ui-blue); --tone-lo: var(--ui-blue-lo); }
 [data-tone=orange] { --tone: var(--ui-orange); --tone-lo: var(--ui-orange-lo); }
@@ -148,16 +152,14 @@
 }
 .ui-panel-title { margin: 0; text-align: center; font-size: 24px; line-height: 1.1; }
 
-/* Motion: a panel pops in, a gain bounces. */
+/* Motion: a panel or toast pops in. */
 .ui-pop { animation: ui-pop .22s cubic-bezier(.2, 1.4, .4, 1); }
-.ui-bounce { animation: ui-bounce .5s cubic-bezier(.2, 1.6, .4, 1); }
 @keyframes ui-pop { from { opacity: 0; transform: scale(.9); } }
-@keyframes ui-bounce { 0% { transform: scale(1); } 30% { transform: scale(1.22); } 100% { transform: scale(1); } }
 
 @media (hover: hover) {
   .ui-tile:not(:disabled):hover, .ui-btn:not(:disabled):hover, .ui-close:hover { filter: brightness(1.06); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .ui-pill[data-state=full], .ui-pop, .ui-bounce { animation: none; }
+  .ui-pill[data-state=full], .ui-pop { animation: none; }
   .ui-tile, .ui-btn, .ui-close, .ui-pill-plus-face, .ui-pill-meter::before { transition: none; }
 }

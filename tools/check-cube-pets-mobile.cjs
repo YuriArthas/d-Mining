@@ -73,7 +73,7 @@ const PETS = [['p-dragon', 'moon-dragon'], ['p-core', 'core-friend'], ['p-fox', 
 
   try {
     // Isolated save: three equipped pets that cover the sparkle rule, plus a few in the bag.
-    const url = `${base}?debug=1&submission=fenced&framesInFlight=1&saveTest=cube-pets-${Date.now()}`;
+    const url = `${base}?lang=zh&debug=1&submission=fenced&framesInFlight=1&saveTest=cube-pets-${Date.now()}`;
     await page.goto(url, { waitUntil: 'domcontentloaded' }); await ready();
     await page.evaluate(() => window.__miningSave.flush());
     const namespace = await page.evaluate(() => window.__miningSave.namespace); assert.match(namespace, /acceptance/);

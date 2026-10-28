@@ -23,7 +23,7 @@ const dir=path.resolve(process.env.ARTIFACT_DIR||'artifacts/shop-mobile');
  };
  const open=async kind=>{await p.locator(`.shop-category[data-category=${kind}]`).tap();await p.waitForFunction(()=>{const s=window.__mining.getShop();return s.ready&&s.frames>0;});await draw();};
  try{
-  const testUrl=url+'?debug=1&submission=fenced&framesInFlight=1&saveTest=shop-'+Date.now();
+  const testUrl=url+'?lang=zh&debug=1&submission=fenced&framesInFlight=1&saveTest=shop-'+Date.now();
   await p.goto(testUrl,{waitUntil:'domcontentloaded'});await ready();
   await p.locator('.hud-action[data-kind=upgrade]').tap();assert.equal(await p.getByRole('dialog').count(),0);assert.equal((await snapshot()).economy.requestedShop,true);await shot('01-phone-shop-guide');
   await enter();assert.equal(await p.locator('.shop-category').count(),3);assert.equal(await p.locator('[data-category=rebirth]').isDisabled(),true);

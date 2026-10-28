@@ -24,7 +24,6 @@ import {UiButton} from './game/ui/kit/controls.tsx';
 import {Sheet} from './game/ui/kit/panel.tsx';
 import './game/ui/kit/fonts.css';
 import './game/ui/kit/tokens.css';
-import './game/ui/legacy.css';
 
 import { LANG, saveLanguage, tr } from './game/i18n/i18n.ts';
 declare global {

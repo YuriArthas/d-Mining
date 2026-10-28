@@ -1,29 +1,28 @@
-/* One-time tips. The first-dig tip is drawn in the world; HUD tips are a single line under the depth
-   while the control they name pulses. Nothing here blocks play. */
-.guide-kicker { display: block; color: #f8d273; font-size: 12px; letter-spacing: 2px; margin-bottom: 3px; }
-
-/* Label over the mine while it is in view (the ground arrow leads the way otherwise). */
-.guide-marker { position: absolute; z-index: 2; transform: translate(-50%,-100%); pointer-events: none; color: #fff4cb; }
-.guide-marker b { display: block; white-space: nowrap; padding: 4px 10px; border: 1px solid #ffcf59; border-radius: 9px; background: #3e3526ed; font-size: 13px; }
-
-/* Glowing ring on the first block to dig. */
-.guide-dig-marker { position: absolute; z-index: 2; pointer-events: none; transform: translate(-50%,-50%); }
-.guide-dig-ring { display: block; width: 34px; height: 34px; border: 3px solid #fff4a3; border-radius: 50%; animation: tip-blink 1s ease-in-out infinite; }
-.guide-dig-caption { position: absolute; bottom: 52px; left: 50%; transform: translateX(-50%); padding: 8px 12px; border: 2px solid #ffdf6f; border-radius: 10px; color: #fff8d4; background: #193a36f2; font-size: 14px; white-space: nowrap; }
+/* One-time tips (style A, flat). The first-dig tip is drawn in the world (a white label over the mine, a gold ring on
+   the first block with its caption); HUD tips are a single gold line under the depth while the control they name
+   pulses. Nothing here blocks play. */
+.guide-marker { position: absolute; z-index: 2; transform: translate(-50%, -100%); pointer-events: none; }
+.guide-marker b, .guide-dig-caption {
+  display: block; white-space: nowrap; padding: 4px 12px; border: 3px solid var(--ui-ink); border-radius: 12px; background: var(--ui-paper);
+  color: var(--ui-ink); font: 900 15px/1.3 var(--ui-font);
+}
+.guide-dig-marker { position: absolute; z-index: 2; pointer-events: none; transform: translate(-50%, -50%); }
+.guide-dig-ring { display: block; width: 34px; height: 34px; border: 4px solid var(--ui-gold); border-radius: 50%; outline: 2px solid var(--ui-ink); animation: tip-blink 1s ease-in-out infinite; }
+.guide-dig-caption { position: absolute; bottom: 52px; left: 50%; transform: translateX(-50%); }
 .guide-dig-marker[data-has-target=false] .guide-dig-ring { display: none; }
+@media (any-pointer: coarse) { .guide-marker b, .guide-dig-caption { font-size: 14px; } }
 
 /* HUD tip line in the top-centre stack. */
 .ui-hud .ui-tip {
   pointer-events: auto; display: flex; align-items: center; gap: 8px; width: 100%; min-height: 44px; padding: 6px 12px;
-  border: var(--ui-edge) solid var(--ui-ink); border-radius: 12px; background: linear-gradient(180deg, #ffe58a, #f6c343);
-  color: var(--ui-ink); font: 800 13px/1.3 var(--ui-font-body); text-align: left; text-wrap: balance;
+  border: var(--ui-edge) solid var(--ui-ink); border-radius: 12px; background: var(--ui-gold);
+  color: var(--ui-ink); font: 800 13px/1.3 var(--ui-font); text-align: left; text-wrap: balance;
   animation: tip-in .25s ease-out;
 }
 .ui-hud .ui-tip .ui-icon { width: 24px; height: 24px; flex: none; }
 .ui-hud[data-tip=sell] .hud-sell,
 .ui-hud[data-tip=shop] [data-tip-target=shop],
-.ui-hud[data-tip=pets] [data-tip-target=pets] { outline: 3px solid #ffe386; outline-offset: 3px; animation: tip-pulse .9s ease-in-out infinite; }
-
+.ui-hud[data-tip=pets] [data-tip-target=pets] { outline: 3px solid var(--ui-gold); outline-offset: 3px; animation: tip-pulse .9s ease-in-out infinite; }
 
 @keyframes tip-blink { 50% { opacity: .45; } }
 @keyframes tip-pulse { 50% { outline-offset: 6px; } }

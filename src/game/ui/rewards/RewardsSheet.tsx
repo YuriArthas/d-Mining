@@ -92,7 +92,7 @@ type Spun = Extract<SpinResult, { status: 'spun' }>;
 export function CapsuleSheet({ session, onClose }: { session: GameSession; onClose(): void }) {
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot), rewards = state.rewards;
   const [result, setResult] = useState<Spun | null>(null), [message, setMessage] = useState('');
-  const unit = currencyName(state.capsuleCurrency), minutes = tr('{timedDurationSeconds} 分钟', { timedDurationSeconds: REWARD_CONFIG.timedDurationSeconds / 60 });
+  const unit = currencyName(state.capsuleCurrency), minutes = tr('{n} 分钟', { n: REWARD_CONFIG.timedDurationSeconds / 60 });
   const note: Record<string, string> = { coins: `${number(state.capsuleCoins)} ${unit}`, speed: minutes, mining: tr('永久'), sell: minutes, autoHatch: tr('永久'), luck: minutes };
   const spin = () => {
     try {

@@ -45,7 +45,7 @@ export function Hud({ session, actions, system, prompts, tipHidden = false }: {
         <Pill icon={currencyIcon(state.currency)} className="hud-coins">
           {/* Keyed by currency: a new world's money appears at once instead of rolling from the last world's. */}
           <span data-testid="coins" aria-label={`${currencyName(state.currency)} ${number(state.coins)}`}><CountUp key={state.currency} value={state.coins} format={number} /></span>
-          {state.rebirth.multiplier > 1 && <b className="hud-coin-mult" aria-label={tr('重生收益 {multiplier} 倍', { multiplier: state.rebirth.multiplier })}>×{state.rebirth.multiplier}</b>}
+          {state.rebirth.multiplier > 1 && <b className="hud-coin-mult" aria-label={tr('重生卖矿收入 ×{multiplier}', { multiplier: state.rebirth.multiplier })}>×{state.rebirth.multiplier}</b>}
         </Pill>
         <Pill icon="backpack" className="hud-bag" meter={bag.capacity > 0 ? bag.used / bag.capacity : 0} state={bag.isFull ? 'full' : undefined}
           onPress={run(actions.openMinerals)} pressLabel={tr('查看背包里的矿物')} plus={{ label: tr('升级背包'), onPress: run(actions.openBackpacks) }}>
@@ -102,7 +102,7 @@ function Whereabouts({ session, title, kicker, surface }: { session: GameSession
     {surface
       ? <div className="hud-place"><small>{kicker}</small><b>{title}</b></div>
       : <div className="hud-depth"><small>{layer?.name ?? title}</small><b className="ui-num" data-testid="depth">{metres}<u>{tr('米')}</u></b></div>}
-    {goal && <div className="hud-goal" data-testid="journey-goals" role="progressbar" aria-label={tr('下一层 {name}', { name: goal.name })} aria-valuemin={0} aria-valuemax={goal.depth} aria-valuenow={Math.floor(goal.currentDepth)}
+    {goal && <div className="hud-goal" data-testid="journey-goals" role="progressbar" aria-label={tr('下一层 {layer}', { layer: goal.name })} aria-valuemin={0} aria-valuemax={goal.depth} aria-valuenow={Math.floor(goal.currentDepth)}
       style={{ '--v': `${Math.min(100, goal.currentDepth / goal.depth * 100).toFixed(1)}%` } as CSSProperties}>
       <i /><span>{tr('下一层 {layer}', { layer: goal.name })}<em className="ui-num">{tr('{now} / {depth} 米', { now: Math.floor(goal.currentDepth), depth: goal.depth })}</em></span>
     </div>}

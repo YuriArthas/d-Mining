@@ -77,8 +77,6 @@ button { font: inherit; touch-action: manipulation; }
 .mineral-legend span { display: inline-flex; align-items: center; gap: 3px; }
 .mineral-legend i { width: 8px; height: 8px; border: 1px solid #ffffff70; }
 
-.hit-flash { animation: mining-hit .2s ease-out; }
-@keyframes mining-hit { from { background: #fff; } to { background: #edc775; } }
 /* Debug tools leave the selected mineral readout clear. */
 
 

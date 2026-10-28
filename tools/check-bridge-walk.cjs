@@ -22,7 +22,7 @@ const LANES = JSON.parse(process.env.LANES || '[-1.8,-0.9,0,0.9,1.8]');
   page.on('console', m => { if (m.type() === 'error') report.errors.push(m.text()); });
   const snap = () => page.evaluate(() => { const s = window.__miningValidation.snapshot(); return { feet: s.position, grounded: s.grounded }; });
   try {
-    await page.goto(`${base}?debug=1&submission=fenced&framesInFlight=1&saveTest=bridge-${Date.now()}`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${base}?lang=zh&debug=1&submission=fenced&framesInFlight=1&saveTest=bridge-${Date.now()}`, { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => (window.__miningValidation?.snapshot().ready && !document.querySelector('.loading-screen')) || document.body.innerText.includes('暂时没能进入矿场'), null, { timeout: 300000 });
     const failed = await page.evaluate(() => document.body.innerText.includes('暂时没能进入矿场') ? document.body.innerText.slice(0, 300) : null);
     if (failed) throw new Error('load failed: ' + failed);

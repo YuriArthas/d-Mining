@@ -61,7 +61,7 @@ const dir = path.resolve(process.env.ARTIFACT_DIR || 'artifacts/pinewind-mobile-
     await page.waitForFunction(({selector,start})=>document.querySelector(selector).scrollTop>start+20,{selector,start});
   };
   try {
-    await page.goto(url+'?debug=1&submission=fenced&framesInFlight=1&saveTest=phone-'+Date.now(),{waitUntil:'domcontentloaded'});await ready();
+    await page.goto(url+'?lang=zh&debug=1&submission=fenced&framesInFlight=1&saveTest=phone-'+Date.now(),{waitUntil:'domcontentloaded'});await ready();
     report.loadedScripts=await page.evaluate(()=>[...document.scripts].map(s=>s.src).filter(Boolean));
     for(const [width,height] of [[844,390],[667,375],[640,320],[932,430]]){
       await page.setViewportSize({width,height});await layout(`${width}x${height}`);await shot(`01-landscape-${width}x${height}`);

@@ -589,7 +589,7 @@ export class GameSession {
         this.autoHatchElapsed=0;
         const hatched=this.petService.hatch(this.autoHatchEgg);
         if(hatched.status==='hatched'){this.lastAutoHatch=hatched;this.committed(true);this.feedback({type:'hatched',tier:this.petTier(hatched.pet),auto:true});}
-        else {this.stopAutoHatch();this.notice=tr('自动孵蛋已停止');}
+        else {this.stopAutoHatch();this.notice=tr('自动开蛋已停止');}
       }
     }
     if(result.changed)this.committed(false);
@@ -621,7 +621,7 @@ export class GameSession {
     for (const resource of resources)
       if (resource.cell) this.combat.destroyed(resource.cell.join(","));
     this.refreshTarget();
-    this.notice = this.inventory.isFull() ? tr('背包已满，前往售卖点出售') : "";
+    this.notice = this.inventory.isFull() ? tr('背包满了，去出售') : "";
     // Ticket ore says where it went: the store, and how much of it the tickets still lack.
     const kept=this.stored.at(-1);
     if (kept) this.notice = tr('材料仓 +{count}：{name} {itemId}/{itemId2}', { count: this.stored.reduce((n,s)=>n+s.count,0), name: itemDefinition(kept.itemId).name, itemId: this.materials.count(kept.itemId), itemId2: this.ticketNeed(kept.itemId) });
@@ -899,7 +899,7 @@ export class GameSession {
   sellAvailable = () => {
     if(this.suspended||!this.inSellZone)return {status:'unavailable'} as const;
     const result=this.executeSale();
-    if(result.status==='sold'){this.onboarding.record('soldOnce');this.committed(true);this.notice=tr('出售 {count} 件，获得 {coins} {currency}', { count: result.count, coins: result.coins, currency: currencyName(this.currency) });}else this.notice=result.status==='empty'?tr('没有可出售的矿产'):tr('货币数值超出范围');
+    if(result.status==='sold'){this.onboarding.record('soldOnce');this.committed(true);this.notice=tr('出售 {count} 件，获得 {coins} {currency}', { count: result.count, coins: result.coins, currency: currencyName(this.currency) });}else this.notice=result.status==='empty'?tr('没有可出售的矿物'):tr('货币数值超出范围');
     this.publish();return result;
   };
   /** Pays a world's price at a portal and opens it for good. */
@@ -916,7 +916,7 @@ export class GameSession {
     if(!this.materials.pay(requirement.materials))throw Error('缴纳矿产发生变化');
     if(!this.wallet.debit(ticket.currency,ticket.price))throw Error('缴纳货币发生变化');
     this.worldProgress.unlock(id);
-    this.notice=tr('{name}已开放，可以传送过去了', { name: requirement.name });
+    this.notice=tr('{name}已开放，可以传送过去了！', { name: requirement.name });
     this.committed(true);this.publish();return {status:'opened'} as const;
   };
 }

@@ -106,7 +106,6 @@ html:not([lang^=zh]) .ui-cell-name { font-size: 11px; }
 .ui-cell-stat { position: absolute; left: 0; right: 0; bottom: 0; height: 21px; display: flex; align-items: center; justify-content: center; gap: 2px;
   background: var(--r, var(--ui-blue)); font-size: 13px; color: #fff; --ui-stroke: 3px; }
 .ui-cell-currency { width: 15px; height: 15px; flex: none; }
-.ui-cell-note { position: absolute; left: 6px; bottom: 24px; font-size: 11px; color: var(--ui-ink-soft); -webkit-text-stroke: 0; }
 .ui-cell[data-equipped] { outline: 3px solid var(--ui-green); outline-offset: -1px; }
 .ui-cell-check { position: absolute; right: 3px; bottom: 24px; width: 20px; height: 20px; border-radius: 50%; border: 2.5px solid var(--ui-ink); background: var(--ui-green); display: grid; place-items: center; font: 900 13px/1 var(--ui-font); color: #fff; }
 .ui-cell[aria-pressed=true] { outline: 4px solid var(--ui-ink); outline-offset: 1px; }

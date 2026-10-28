@@ -1,19 +1,4 @@
-/* Rules that predate the UI kit and still serve live elements: world guidance
-   labels, debug tools and inline ore icons. */
-.game-shell--roblox-hud button:focus-visible { outline: 3px solid #fff294; outline-offset: 5px; }
-
-/* World guidance labels */
-.game-shell--roblox-hud .guide-marker b,
-.game-shell--roblox-hud .guide-dig-caption {
-  background: none; border: 0; color: #fff2a3;
-  font-family: var(--ui-font); font-size: 16px; font-weight: 900; -webkit-text-stroke: 3px var(--ui-ink); paint-order: stroke fill;
-}
-@media (any-pointer: coarse) {
-  .game-shell--roblox-hud .guide-marker b,
-  .game-shell--roblox-hud .guide-dig-caption { font-size: 14px; }
-}
-
-/* Debug tools (debug=1 only) */
+/* The ?debug=1 panel (DebugTools.tsx): developer only, deliberately plain. */
 .game-shell--roblox-hud .game-header { padding: 0; }
 .hud-debug-tools { position: absolute; left: 50%; transform: translateX(-50%); top: calc(64px + var(--safe-top)); pointer-events: auto; font-size: 12px; }
 .hud-debug-tools > summary { min-height: 44px; display: grid; place-items: center; padding: 0 10px; cursor: pointer; }
@@ -21,5 +6,3 @@
 .hud-debug-content .input-monitor, .hud-debug-content .validation-panel { position: static; padding: 8px; margin-top: 8px; color: white; }
 .hud-debug-content .performance-expanded { position: static; padding: 10px 0; width: 100%; }
 .hud-debug-content .performance-hud { flex-wrap: wrap; }
-
-.ore-icon { width: 32px; height: 32px; flex: none; color: var(--ui-ink, #13355d); }

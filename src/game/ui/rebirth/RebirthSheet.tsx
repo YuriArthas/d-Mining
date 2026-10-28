@@ -21,8 +21,8 @@ export function RebirthSheet({ session, onClose, onReborn }: { session: GameSess
   };
   return <Sheet title={tr('重生')} subtitle={offer.count ? tr('已重生 {count} 次', { count: offer.count }) : undefined} onClose={onClose} className="rebirth-sheet">
     <div className="rebirth-layout">
-      <section className="rebirth-boost" aria-label={tr('卖矿收益')}>
-        <span className="rebirth-boost-label">{tr('卖矿收益')}</span>
+      <section className="rebirth-boost" aria-label={tr('卖矿收入')}>
+        <span className="rebirth-boost-label">{tr('卖矿收入')}</span>
         <div className="rebirth-mults">
           <b className="rebirth-mult ui-outline ui-num" data-now="">×{offer.multiplier}</b>
           <svg className="rebirth-arrow" viewBox="0 0 40 28" aria-hidden="true"><path d="M3 10h20V3l14 11-14 11v-7H3Z" fill="#ffc61a" stroke="#1b2340" strokeWidth="3" strokeLinejoin="round" /></svg>
@@ -59,6 +59,6 @@ export function RebirthCelebration({ count, multiplier, onDone }: { count: numbe
     <div className="rebirth-rays" aria-hidden="true" />
     <Icon kind="rebirth" className="ui-icon rebirth-celebration-icon" />
     <strong className="ui-outline">{tr('第 {n} 次重生！', { n: count })}</strong>
-    <span className="rebirth-celebration-mult">{tr('卖矿收益')} <b className="ui-outline ui-num">×{multiplier}</b></span>
+    <span className="rebirth-celebration-mult">{tr('卖矿收入')} <b className="ui-outline ui-num">×{multiplier}</b></span>
   </div>;
 }

@@ -60,7 +60,7 @@ export function PortalSheet({ session, onClose }: { session: GameSession; onClos
           <b>{world.known ? world.title : '???'}</b>
           {world.known && <span className="portal-currency"><Icon kind={currencyIcon(world.currency)} />{currencyName(world.currency)}</span>}
         </header>
-        {here ? <><Icon kind="globe" className="ui-icon portal-art" /><span className="ui-stamp portal-here">{tr('当前所在')}</span></>
+        {here ? <><Icon kind="globe" className="ui-icon portal-art" /><span className="ui-stamp portal-here">{tr('当前位置')}</span></>
           : world.open ? <><Icon kind="globe" className="ui-icon portal-art" />
             <UiButton size="m" tone="green" icon="portal" className="portal-go" aria-label={tr('传送到{name}', { name: world.name })} onPress={() => go(world.id)}>{tr('传送')}</UiButton></>
           : isNext && ticket ? <>

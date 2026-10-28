@@ -57,7 +57,7 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
   };
 
   try {
-    const url = `${base}?debug=1&submission=fenced&framesInFlight=1&saveTest=audio-${Date.now()}`;
+    const url = `${base}?lang=zh&debug=1&submission=fenced&framesInFlight=1&saveTest=audio-${Date.now()}`;
     await page.goto(url, { waitUntil: 'domcontentloaded' }); await ready();
 
     // 1. Nothing plays before the first touch; the first touch starts the valley music and ambience.

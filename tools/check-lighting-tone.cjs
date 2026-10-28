@@ -42,7 +42,7 @@ const VIEWS = JSON.parse(process.env.VIEWS || 'null') ?? [
   const press = (x, y) => MOBILE ? page.touchscreen.tap(x, y) : page.mouse.click(x, y);
   const tap = async locator => { await locator.scrollIntoViewIfNeeded(); const r = await locator.boundingBox(); assert.ok(r, 'tap target visible'); await press(r.x + r.width / 2, r.y + r.height / 2); await page.waitForTimeout(400); };
   try {
-    await page.goto(`${base}?debug=1&submission=fenced&framesInFlight=1&saveTest=tone-${Date.now()}`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${base}?lang=zh&debug=1&submission=fenced&framesInFlight=1&saveTest=tone-${Date.now()}`, { waitUntil: 'domcontentloaded' });
     // A failed load shows the retry screen: stop at once with its message instead of waiting it out.
     await page.waitForFunction(() => (window.__miningValidation?.snapshot().ready && !document.querySelector('.loading-screen')) || document.body.innerText.includes('暂时没能进入矿场'), null, { timeout: 300000 });
     const failed = await page.evaluate(() => document.body.innerText.includes('暂时没能进入矿场') ? document.body.innerText.slice(0, 300) : null);

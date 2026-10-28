@@ -25,7 +25,7 @@ const PRIZE_NAMES = {
   mining: tr('永久挖矿速度 ×{x}', { x: CAPSULE.miningSpeedMultiplier }),
   // Was “便携传送” (teleport anywhere), which every player now has; a timed double sale instead.
   sell: tr('出售收入 ×{x}', { x: CAPSULE.sellMultiplier }),
-  autoHatch: tr('自动孵蛋'),
+  autoHatch: tr('自动开蛋'),
   luck: tr('稀有宠物概率 ×{x}', { x: CAPSULE.luckMultiplier }),
 } as const;
 export type CapsuleRewardId = keyof typeof PRIZE_NAMES;

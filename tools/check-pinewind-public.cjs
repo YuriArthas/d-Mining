@@ -33,7 +33,7 @@ const dir=path.resolve(process.env.ARTIFACT_DIR||'artifacts/pinewind-public');
  };
  const check=text=>{report.checks.push(text);console.log('PASS',text)};
  try {
-  await page.goto(url+'?debug=1&submission=fenced&framesInFlight=1&saveTest=pinewind-'+Date.now(),{waitUntil:'domcontentloaded'});await ready();
+  await page.goto(url+'?lang=zh&debug=1&submission=fenced&framesInFlight=1&saveTest=pinewind-'+Date.now(),{waitUntil:'domcontentloaded'});await ready();
   await page.waitForFunction(()=>window.__miningValidation.snapshot().grounded,null,{timeout:120000});
   const initial=await snap();report.initial={position:initial.position,facilities:initial.facilities.surfaceShading,lighting:initial.lighting,eggLabels:initial.eggLabels};await shot('01-spawn');
   assert.equal(report.initial.facilities.version,'pinewind-master-v2');

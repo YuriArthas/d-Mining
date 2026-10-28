@@ -87,7 +87,7 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
 
   try {
     // Isolated save: first layer unlocked, onboarding skipped.
-    const url = `${base}?debug=1&submission=fenced&framesInFlight=1&saveTest=feel-${Date.now()}`;
+    const url = `${base}?lang=zh&debug=1&submission=fenced&framesInFlight=1&saveTest=feel-${Date.now()}`;
     await page.goto(url, { waitUntil: 'domcontentloaded' }); await ready();
     await page.evaluate(() => window.__miningSave.flush());
     const namespace = await page.evaluate(() => window.__miningSave.namespace); assert.match(namespace, /acceptance/);
