@@ -401,6 +401,7 @@ export class GameSession {
         name: r.name,
         depth: r.depth,
         theme: r.theme,
+        hasShop: !!r.shop,
         unlocked: this.exploration.has(r.id),
       })),
       notice: this.notice,

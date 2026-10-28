@@ -1,56 +1,79 @@
-/* World container (传送 / 进度). */
-/* Every layer card in view: they share the width and wrap on narrow screens instead of running off the edge. */
-.world-cards { display: grid; grid-auto-flow: row; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); overflow: visible; }
-.world-cards .ui-card-tile { min-height: 168px; }
-.world-cards .ui-card-tile > .ui-btn, .world-cards .ui-card-tile > .ui-stamp, .world-cards .ui-card-tile > .ui-bar { margin-top: auto; }
-.world-cards .ui-bar { width: 100%; }
-.world-lock { display: grid; place-items: center; }
-.world-lock .ui-icon { width: 46px; height: 46px; }
-.world-gate { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 10px; }
-.world-door { justify-content: center; }
-.world-door .ui-bar { width: 100%; }
-.world-mats { display: grid; gap: 4px 14px; padding: 6px 10px; align-content: start; }
-.world-mats > b { font-size: 14px; }
-.world-mat { display: grid; grid-template-columns: 22px 64px minmax(0, 1fr) auto; align-items: center; gap: 6px; min-height: 24px; font-size: 12px; }
-.world-mat-icon { width: 22px; height: 22px; color: var(--ui-ink); }
-.world-mat > b { font-size: 13px; text-align: right; white-space: nowrap; }
-@container game (max-width: 760px) {
-  .world-gate { grid-template-columns: 160px minmax(0, 1fr); }
-}
-@container game (max-height: 440px) {
-  .world-mats { grid-template-columns: 1fr 1fr; }
-  .world-mats > b, .world-mats > .ui-stamp { grid-column: 1 / -1; }
-  .world-mat { grid-template-columns: 20px 52px minmax(0, 1fr) auto; }
-}
-@container game (max-height: 360px) {
-  .world-cards .ui-card-tile { min-height: 150px; }
-}
-/* The world portal: the three worlds share the row as large cards. */
-.portal-sheet .world-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.portal-sheet .world-cards .ui-card-tile { min-height: 190px; }
-.portal-sheet .world-cards .ui-card-art { width: 72px; height: 72px; }
-.portal-sheet .world-cards h4 { font-size: 20px; }
-/* The station: the surface and all six layers on one row, so no layer (or its button) wraps out of view on a
-   landscape phone. Compact cards: smaller art, one-line names. */
-.station-sheet .world-cards { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 6px; }
-.station-sheet .world-cards .ui-card-tile { min-height: 0; padding: 8px 5px; }
-.station-sheet .world-cards .ui-card-art { width: 44px; height: 44px; }
-.station-sheet .world-cards h4 { font-size: 15px; line-height: 1.1; overflow-wrap: anywhere; }
-.station-sheet .world-cards small { line-height: 1.15; }
-/* Longer names in the Latin-script languages: smaller, on up to two lines. */
-html:not([lang^=zh]) .station-sheet .world-cards h4 { font-size: 13px; }
-html:not([lang^=zh]) .world-cards small { font-size: 10px; }
-.station-sheet .world-cards .ui-btn { padding: 0 4px; }
-/* Short screens: the portal's cards give up height so the unlock list below fits without scrolling. */
-@container game (max-height: 440px) {
-  .portal-sheet .world-cards .ui-card-tile { min-height: 0; padding: 6px 8px 8px; }
-  .portal-sheet .world-cards .ui-card-art { width: 46px; height: 46px; }
-  .portal-sheet .world-cards h4 { font-size: 18px; }
-  .portal-sheet .world-mats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px 12px; }
-  .portal-sheet .world-mat { grid-template-columns: 20px auto minmax(24px, 1fr) auto; }
-}
-@container game (max-height: 380px) {
-  .portal-sheet .world-cards .ui-card-art { width: 36px; height: 36px; }
-}
-/* Card buttons in the Latin-script languages: a size down so a long verb stays inside. */
+/* World portal and teleport station (docs/draft-ui-v2.md, U7). Style A: white cards with a coloured top band in
+   their world's or layer's colour; the next thing to reach is framed in gold. */
+.ui-sheet.portal-sheet { --sheet-tone: var(--ui-purple); }
+.ui-sheet.station-sheet { --sheet-tone: var(--ui-blue); height: auto; max-height: 100%; }
+.portal-sheet .ui-sheet-body, .station-sheet .ui-sheet-body { position: relative; }
+.world-toast { position: absolute; z-index: 5; left: 50%; bottom: 12px; translate: -50% 0; max-width: 80%; white-space: normal; text-align: center; }
+
+/* Portal: three world cards; the next world, carrying its ticket, takes the most room. */
+.portal-worlds { display: grid; grid-template-columns: 1fr 1fr 1.7fr; gap: 10px; flex: 1; min-height: 0; }
+.portal-worlds:has(.portal-world[data-state=next]:nth-child(2)) { grid-template-columns: 1fr 1.7fr 1fr; }
+.portal-worlds:not(:has(.portal-world[data-state=next])) { grid-template-columns: 1fr 1fr 1fr; }
+.portal-world { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; min-height: 0; padding: 0 10px 10px; overflow: hidden;
+  border: 3px solid var(--ui-ink); border-radius: 16px; background: var(--ui-paper); color: var(--ui-ink); }
+.portal-world header { align-self: stretch; display: grid; justify-items: center; gap: 1px; margin: 0 -10px; padding: 5px 8px 7px; background: var(--c); border-bottom: 3px solid var(--ui-ink); color: #fff; }
+.portal-world header small { font-size: 11px; -webkit-text-stroke: 3px var(--ui-ink); paint-order: stroke fill; }
+.portal-world header b { font-size: 20px; line-height: 1.1; text-align: center; -webkit-text-stroke: 4.5px var(--ui-ink); paint-order: stroke fill; }
+.portal-currency { display: inline-flex; align-items: center; gap: 3px; margin-top: 2px; padding: 0 8px 0 3px; border: 2px solid var(--ui-ink); border-radius: 999px; background: var(--ui-paper);
+  color: var(--ui-ink); font-size: 12px; line-height: 1.5; }
+.portal-currency .ui-icon { width: 16px; height: 16px; }
+.portal-art { width: 64px; height: 64px; margin-top: auto; }
+.portal-go.ui-btn, .portal-unlock.ui-btn { align-self: stretch; margin-top: auto; }
+.portal-here { margin-top: auto; margin-bottom: 8px; }
+.portal-world[data-state=next] { border-color: var(--ui-gold-lo); outline: 3px solid var(--ui-gold); outline-offset: -1px; }
+.portal-world[data-state=unknown] { background: var(--ui-sheet); border-color: var(--ui-mute); }
+.portal-world[data-state=unknown] header { border-bottom-color: var(--ui-mute); }
+.portal-note { font-size: 11px; color: var(--ui-ink-soft); text-align: center; }
+.portal-ticket { list-style: none; margin: 2px 0 0; padding: 0; align-self: stretch; display: grid; gap: 4px; }
+.portal-need { position: relative; display: grid; grid-template-columns: 20px minmax(0, 1fr) minmax(64px, 1fr); align-items: center; gap: 6px; font-size: 12px; line-height: 1.1; }
+.portal-need-icon { width: 20px; height: 20px; display: grid; }
+.portal-need-icon .ui-icon, .portal-need-icon .ore-icon { width: 20px; height: 20px; color: var(--ui-ink); }
+.portal-need-label { overflow-wrap: anywhere; }
+.portal-need .ui-bar { height: 17px; }
+.portal-need[data-done] .ui-bar > i { background: var(--ui-green); }
+.portal-tick { position: absolute; right: -6px; top: -5px; width: 16px; height: 16px; display: grid; place-items: center; border: 2px solid var(--ui-ink); border-radius: 50%;
+  background: var(--ui-green); color: #fff; font: 900 9px/1 var(--ui-font); font-style: normal; }
+.portal-confirm { align-self: stretch; display: flex; align-items: center; gap: 6px; margin-top: auto; padding: 4px 6px 4px 10px; border: 2.5px solid var(--ui-orange); border-radius: 12px;
+  background: #fff4e0; font-size: 12px; line-height: 1.2; }
+.portal-confirm > span { flex: 1; min-width: 0; }
+.portal-confirm > .ui-btn { flex: none; padding: 0 10px; }
+
+/* Station: the surface and six layers in one row. */
+.station-layers { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 7px; }
+.station-layer { position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 0; min-height: 168px; padding: 0 5px 7px; overflow: hidden;
+  border: 3px solid var(--ui-ink); border-radius: 14px; background: var(--ui-paper); color: var(--ui-ink); text-align: center; }
+.station-num { display: grid; place-items: center; align-self: stretch; height: 34px; margin: 0 -5px 3px; background: var(--c); border-bottom: 3px solid var(--ui-ink);
+  color: #fff; font: 900 20px/1 var(--ui-font); -webkit-text-stroke: 4px var(--ui-ink); paint-order: stroke fill; }
+.station-num .ui-icon { width: 26px; height: 26px; }
+.station-name { font-size: 14px; line-height: 1.1; overflow-wrap: anywhere; }
+.station-layer small { font-size: 11px; color: var(--ui-ink-soft); }
+.station-has { display: flex; gap: 2px; }
+.station-has .ui-icon { width: 18px; height: 18px; }
+.station-go.ui-btn, .station-layer > .ui-stamp, .station-next, .station-lock { margin-top: auto; }
+.station-go.ui-btn { align-self: stretch; min-height: 38px; padding: 0 4px; }
+.station-layer[data-state=here] { outline: 3px solid var(--ui-green); outline-offset: -1px; }
+.station-layer[data-state=next] { outline: 3px solid var(--ui-gold); outline-offset: -1px; }
+.station-next { align-self: stretch; display: grid; gap: 3px; }
+.station-next em { font-style: normal; font-size: 11px; color: var(--ui-orange-lo); }
+.station-next .ui-bar { height: 17px; }
+.station-next .ui-bar > span { font-size: 10px; }
+.station-layer[data-state=locked] { background: var(--ui-sheet); border-color: var(--ui-mute); }
+.station-layer[data-state=locked] .station-num { background: #c7d0df; border-bottom-color: var(--ui-mute); -webkit-text-stroke-color: var(--ui-mute); }
+.station-layer[data-state=locked] .station-name, .station-layer[data-state=locked] small { color: var(--ui-mute); }
+.station-lock { width: 30px; height: 30px; opacity: .55; }
+.station-hint { margin: 2px 0 0; text-align: center; }
+
+/* Longer names in the Latin-script languages: a size down. */
+html:not([lang^=zh]) .station-name { font-size: 12px; }
+html:not([lang^=zh]) .portal-world header b { font-size: 17px; }
 html:not([lang^=zh]) .ui-card-tile .ui-btn { font-size: 13px; padding: 0 4px; }
+@container game (max-height: 360px) {
+  .station-layer { min-height: 150px; }
+  .portal-art { width: 48px; height: 48px; }
+}
+@container game (min-width: 1000px) and (min-height: 620px) {
+  .station-layer { min-height: 210px; }
+  .station-name { font-size: 17px; }
+  .portal-world header b { font-size: 26px; }
+  .portal-art { width: 88px; height: 88px; }
+}

@@ -124,6 +124,9 @@ export function attachGameDebug(
         })),
         /** Where to stand to use each egg (checks walk up to a locked one). */
         eggStations: current.content.session.eggStations.map((s) => ({ eggId: s.eggId, zone: s.zone })),
+        /** Where to stand for each world's portal and teleport station. */
+        portals: (current.content.session.portals ?? []).map((p) => ({ worldId: p.worldId, zone: p.zone })),
+        stations: (current.content.session.stations ?? []).map((p) => ({ worldId: p.worldId, zone: p.zone })),
       },
       player: {
         height: GAME_CONFIG.player.height,

@@ -16,6 +16,8 @@ export type Destination = Readonly<{
   depth: number;
   /** The layer's look (themes.ts), which also colours its card. */
   theme?: string;
+  /** The hall's upgrade counter (every other layer), if it has one. */
+  shop?: object | null;
   spawn: Coord;
   roomBounds?: Readonly<{ minX: number; maxX: number; minZ: number; maxZ: number; floor: number; ceiling: number }>;
 }>;
