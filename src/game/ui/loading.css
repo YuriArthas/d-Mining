@@ -1,42 +1,46 @@
-/* Loading screen, shared by the static boot markup in index.html and LoadingScreen.tsx.
-   Inlined before the app bundle, so it hard-codes the kit palette instead of using tokens. */
+/* Loading screen (docs/draft-ui-v2.md, U8), shared by the static boot markup in index.html and LoadingScreen.tsx.
+   Inlined before the app bundle, so it hard-codes the style A palette instead of using tokens: a flat sky blue,
+   white plates with an ink outline, a gold progress bar. Exit is a small plain link in the corner, not a button that
+   competes with the loading. */
 .loading-screen {
   position: absolute; inset: 0; z-index: 20; display: flex; flex-direction: column; overflow: hidden; color: #fff;
   background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'%3E%3Cpath d='M22 13l6 9-6 9-6-9z' fill='%23fff' fill-opacity='.09'/%3E%3C/svg%3E") center / 44px repeat,
-    radial-gradient(ellipse at 50% 40%, #4fd0ff 0%, #13a2f4 45%, #0a6fc4 100%);
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect x='18' y='18' width='12' height='12' rx='2' fill='%23fff' fill-opacity='.10'/%3E%3C/svg%3E") center / 48px repeat,
+    #2fb4ff;
   font-family: "Mining Display Noto", "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Microsoft YaHei", system-ui, sans-serif;
 }
-.loading-screen .ol, .loading-screen h1, .loading-screen h2, .loading-eyebrow, .loading-detail, .loading-steps li, .loading-topline > span {
-  -webkit-text-stroke: 3px #13355d; paint-order: stroke fill; }
+html[lang=vi] .loading-screen { font-family: "Mining Display Vi", system-ui, sans-serif; }
+.loading-screen i { font-style: normal; }
+.loading-screen h1, .loading-screen h2, .loading-eyebrow, .loading-topline > span { -webkit-text-stroke: 4px #1b2340; paint-order: stroke fill; }
 .loading-topline, .loading-bottom { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
-.loading-topline { padding: calc(14px + var(--safe-top)) calc(18px + var(--safe-right)) 0 calc(18px + var(--safe-left)); font-size: 15px; font-weight: 900; letter-spacing: .06em; }
-.loading-topline b { color: #ffd84d; padding: 0 6px; }
+.loading-topline { padding: calc(12px + var(--safe-top)) calc(16px + var(--safe-right)) 0 calc(16px + var(--safe-left)); font-size: 15px; font-weight: 900; letter-spacing: .06em; }
+.loading-topline b { color: #ffd23a; padding: 0 6px; }
+/* Exit: small and quiet; still a 44px touch target. */
 .loading-topline button, .boot-exit {
-  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px; border: 3px solid #13355d; border-radius: 12px; cursor: pointer;
-  background: linear-gradient(180deg, #ffffff59 0, #ffffff1a 38%, transparent 39%), linear-gradient(180deg, #6f8aac, #415a7c);
-  color: #fff; font: 900 15px/1 inherit; text-decoration: none; -webkit-text-stroke: 2px #13355d; paint-order: stroke fill;
+  display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 10px; border: 0; background: none; cursor: pointer;
+  color: #ffffffcc; font: 800 13px/1 inherit; text-decoration: underline; text-underline-offset: 3px; -webkit-text-stroke: 0;
 }
-.loading-topline button span, .boot-exit span { margin: 0; color: #ffd84d; }
+.loading-topline button span, .boot-exit span { margin: 0; }
 .loading-content { position: relative; z-index: 1; width: min(460px, 70%); margin: auto; text-align: center; }
-.loading-emblem { display: block; width: 168px; height: 121px; margin: 0 auto 2px;  }
-.loading-eyebrow { color: #ffd84d; font-size: 15px; font-weight: 900; letter-spacing: .12em; }
-.loading-content h1 { margin: 2px 0 12px; font-size: clamp(44px, 7vw, 72px); line-height: 1; font-weight: 900; letter-spacing: .06em; -webkit-text-stroke-width: 8px; }
+.loading-emblem { display: block; width: 168px; height: 121px; margin: 0 auto 2px; }
+.loading-eyebrow { color: #ffd23a; font-size: 15px; font-weight: 900; letter-spacing: .12em; }
+.loading-content h1 { margin: 2px 0 12px; font-size: clamp(44px, 7vw, 72px); line-height: 1; font-weight: 900; letter-spacing: .06em; -webkit-text-stroke-width: 9px; }
 .loading-status h2 { margin: 0 0 10px; font-size: 17px; font-weight: 900; }
-.loading-track { height: 30px; padding: 3px; border: 3px solid #13355d; border-radius: 999px; background: #0a3d74; overflow: hidden; }
-.loading-track > span { display: block; height: 100%; border-radius: 999px; background: linear-gradient(180deg, #ffe98a, #ffb32e); transition: width .18s linear; }
-.loading-detail { display: flex; justify-content: space-between; margin-top: 8px; font-size: 14px; font-weight: 900; font-variant-numeric: tabular-nums; }
+.loading-track { height: 26px; border: 3px solid #1b2340; border-radius: 999px; background: #fff; overflow: hidden; }
+.loading-track > span { display: block; height: 100%; background: #ffc61a; transition: width .18s linear; }
+.loading-detail { display: flex; justify-content: space-between; margin-top: 8px; font-size: 14px; font-weight: 900; font-variant-numeric: tabular-nums; -webkit-text-stroke: 3px #1b2340; paint-order: stroke fill; }
 .loading-steps { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px; margin: 12px 0 0; padding: 0; list-style: none; }
-.loading-steps li { display: inline-flex; align-items: center; gap: 5px; height: 30px; padding: 0 10px 0 4px; border: 2px solid #13355d; border-radius: 999px; background: #0b4f94; font-size: 13px; font-weight: 900; -webkit-text-stroke-width: 2px; }
-.loading-steps li > span { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #13355d; color: #cfe9ff; font: 900 11px/1 ui-monospace, monospace; -webkit-text-stroke: 0; }
-.loading-steps [data-active="true"] { background: linear-gradient(180deg, #ffe066, #ffb22e); }
-.loading-steps [data-complete="true"] > span { background: #52d23d; color: #fff; }
+.loading-steps li { display: inline-flex; align-items: center; gap: 5px; height: 30px; padding: 0 11px 0 4px; border: 2.5px solid #1b2340; border-radius: 999px; background: #fff; color: #1b2340; font-size: 13px; font-weight: 900; }
+.loading-steps li > span { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #e3eaf5; color: #56648a; font: 900 11px/1 ui-monospace, monospace; }
+.loading-steps [data-active="true"] { background: #ffc61a; }
+.loading-steps [data-active="true"] > span { background: #fff; color: #1b2340; }
+.loading-steps [data-complete="true"] > span { background: #3fc93a; color: #fff; }
 .loading-bottom { justify-content: center; padding: 10px calc(18px + var(--safe-right)) calc(14px + var(--safe-bottom)) calc(18px + var(--safe-left)); }
 .loading-bottom > span:last-child { display: none; }
-.loading-tip { max-width: 520px; padding: 8px 14px; border: 3px solid #13355d; border-radius: 12px; background: linear-gradient(180deg, #123d6ae6, #0c2a4ce6); font: 700 13px/1.4 "PingFang SC", "Noto Sans CJK SC", system-ui, sans-serif; color: #dcf3ff; }
-.loading-error { margin: 0 0 8px; max-height: 100px; overflow: auto; overflow-wrap: anywhere; font: 700 13px/1.5 system-ui, sans-serif; color: #fff1b0; }
-.loading-retry { min-height: 48px; padding: 0 26px; border: 3px solid #13355d; border-radius: 12px; cursor: pointer; background: linear-gradient(180deg, #ffffff59 0, #ffffff1a 38%, transparent 39%), linear-gradient(180deg, #ffa53c, #c96a17); color: #fff; font: 900 17px/1 inherit; -webkit-text-stroke: 2px #13355d; paint-order: stroke fill; }
-.loading-screen button:focus-visible, .boot-exit:focus-visible { outline: 3px solid #fff3a0; outline-offset: 3px; }
+.loading-tip { max-width: 520px; padding: 7px 14px; border: 3px solid #1b2340; border-radius: 12px; background: #fff; color: #1b2340; font: 800 13px/1.4 inherit; }
+.loading-error { margin: 0 0 8px; max-height: 100px; overflow: auto; overflow-wrap: anywhere; font: 700 13px/1.5 inherit; color: #fff; -webkit-text-stroke: 3px #1b2340; paint-order: stroke fill; }
+.loading-retry { min-height: 48px; padding: 0 26px; border: 3px solid #1b2340; border-radius: 12px; cursor: pointer; background: #ff9f1a; color: #fff; font: 900 17px/1 inherit; -webkit-text-stroke: 4px #1b2340; paint-order: stroke fill; }
+.loading-screen button:focus-visible, .boot-exit:focus-visible { outline: 3px solid #ffd23a; outline-offset: 3px; }
 @media (max-height: 420px) and (orientation: landscape), (max-width: 420px) and (orientation: portrait) {
   .loading-emblem { width: 110px; height: 80px; }
   .loading-content h1 { font-size: 44px; margin-bottom: 8px; }
@@ -44,4 +48,3 @@
   .loading-bottom { padding-top: 4px; }
 }
 @media (prefers-reduced-motion: reduce) { .loading-track > span { transition: none; animation: none !important; } }
-.loading-screen i { font-style: normal; }

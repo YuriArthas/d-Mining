@@ -1,26 +1,48 @@
-/* Rewards container and capsule machine. */
-.rewards-cards { --card: 150px; }
-.rewards-cards .ui-card-tile, .rewards-days .ui-card-tile { min-height: 150px; }
-.rewards-cards .ui-card-tile > :last-child, .rewards-days .ui-card-tile > :last-child { margin-top: auto; }
-.rewards-cards .ui-bar { width: 100%; }
+/* Rewards and the capsule machine (docs/draft-ui-v2.md, U8). Style A: white reward cards with a purple top band; the one
+   ready to collect framed in gold with a green button, the collected ones grey with a tick; a capsule strip at the
+   bottom of the rewards sheet; short messages as a toast. */
+.ui-sheet.rewards-sheet, .ui-sheet.capsule-sheet { --sheet-tone: var(--ui-purple); }
+.rewards-sheet .ui-sheet-body { position: relative; }
+.rewards-head { flex: none; }
+.rewards-toast { position: absolute; z-index: 5; left: 50%; bottom: 70px; translate: -50% 0; max-width: 80%; white-space: normal; text-align: center; }
+
+.reward-card { --c: var(--ui-purple); gap: 4px; padding: 13px 6px 8px; min-height: 150px; }
+.reward-card h4 { font-size: 15px; }
+.reward-card .ui-card-art { width: 44px; height: 44px; }
+.reward-card > b { font-size: 22px; color: var(--ui-gold); --ui-stroke: 4.5px; }
+.reward-card > :last-child { margin-top: auto; }
+.reward-card .ui-bar { width: 100%; }
+.reward-card[data-state=ready] { --c: var(--ui-gold); outline: 3px solid var(--ui-gold); outline-offset: 2px; animation: ui-ready 1.2s ease-in-out infinite; }
+.reward-card[data-state=claimed] { background: var(--ui-sheet); border-color: var(--ui-mute); --c: var(--ui-mute); }
+.reward-card[data-state=claimed] > :not(.ui-stamp) { opacity: .55; }
+.reward-card[data-last] { --c: var(--ui-orange); }
+.reward-card[data-last] .ui-card-art { width: 54px; height: 54px; }
+.reward-later { font-size: 11px; color: var(--ui-ink-soft); }
+.rewards-cards { --card: 132px; }
 .rewards-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
-.rewards-days .ui-card-tile { padding: 6px 4px 8px; min-height: 140px; }
-.rewards-days h4 { font-size: 14px; }
-.rewards-days .ui-card-art { width: 40px; height: 40px; }
-.rewards-days b, .rewards-cards b { font-size: 16px; color: var(--ui-text-gold); }
+.rewards-days .reward-card { padding: 13px 4px 8px; }
+.rewards-days h4 { font-size: 13px; }
 .rewards-invite { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.rewards-share { display: grid; gap: 8px; padding: 10px; align-content: start; }
-.rewards-share > b { font-size: 16px; }
+.rewards-share { display: grid; gap: 6px; padding: 8px 10px; align-content: start; }
+.rewards-share .ui-row { gap: 6px; min-height: 0; }
+.rewards-share .ui-input { min-height: 44px; }
+.rewards-share > b { font-size: 16px; color: var(--ui-ink); -webkit-text-stroke: 0; }
+
+/* The capsule machine strip, filling the bottom of the rewards sheet. */
+.rewards-capsule { display: flex; align-items: center; gap: 10px; margin-top: auto; padding: 4px 10px 4px 6px; border: 3px solid var(--ui-ink); border-radius: 14px; background: #f3ecff; flex: none; }
+.rewards-capsule .capsule-art { width: 44px; height: 52px; flex: none; }
+.rewards-capsule > span { flex: 1; min-width: 0; font-size: 12px; line-height: 1.3; color: var(--ui-ink-soft); }
+.rewards-capsule .ui-btn { flex: none; }
 
 .capsule-layout { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 12px; align-items: center; flex: 1; }
 .capsule-art { width: 132px; height: 154px; }
 .capsule-prizes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.capsule-prize { flex-direction: row; justify-content: flex-start; gap: 6px; padding: 6px 8px; --c: #3db0ff; --c-lo: #1676d6; }
-.capsule-prize[data-kind=coins] { --c: #ffcf4a; --c-lo: #f08a14; }
-.capsule-prize[data-kind=permanent] { --c: #b67cf2; --c-lo: #7d47c9; }
+.capsule-prize { --c: var(--ui-blue); flex-direction: row; justify-content: flex-start; gap: 8px; padding: 13px 8px 7px; }
+.capsule-prize[data-kind=coins] { --c: var(--ui-gold); }
+.capsule-prize[data-kind=permanent] { --c: var(--ui-purple); }
 .capsule-prize > div { display: grid; justify-items: start; min-width: 0; }
-.capsule-prize b { font-size: 14px; line-height: 1.15; }
-.capsule-prize strong { font-size: 18px; color: var(--ui-text-gold); }
+.capsule-prize b { font-size: 13px; line-height: 1.15; color: var(--ui-ink); -webkit-text-stroke: 0; }
+.capsule-prize strong { font-size: 18px; color: var(--ui-ink); -webkit-text-stroke: 0; }
 .capsule-prize small { text-align: left; }
 .capsule-prize-art { width: 40px; height: 40px; flex: none; }
 .capsule-reveal-art { width: 120px; height: 120px; }
@@ -30,4 +52,8 @@
   .capsule-layout { grid-template-columns: 96px minmax(0, 1fr); }
   .capsule-art { width: 92px; height: 108px; }
   .capsule-prizes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container game (max-height: 360px) {
+  .reward-card { min-height: 128px; }
+  .rewards-capsule .capsule-art { width: 36px; height: 42px; }
 }

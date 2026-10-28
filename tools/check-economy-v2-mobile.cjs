@@ -145,7 +145,7 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
     await shot('12-hud-world2-tech');
     await page.evaluate(() => window.__miningValidation.teleport([0, 1, 283.2]));
     await settle(); await page.getByRole('dialog', { name: '世界传送门' }).waitFor(); await shot('13-world3-ticket');
-    const ticket = await page.locator('.world-mats').innerText();
+    const ticket = await page.locator('.portal-world[data-state=next] .portal-ticket').innerText();
     assert.match(ticket, /镐子等级/); assert.match(ticket, /科技币/); assert.match(ticket, /Lv\.3\/20/);
     await check('World 2: HUD switches to 科技币 (2600); the portal shows the world 3 ticket.');
 
