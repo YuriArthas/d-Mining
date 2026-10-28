@@ -15,7 +15,7 @@ export class MiningInteraction {
   readonly marker = createSelectionOutline();
   selected: Coord | null = null;
   /** The accepted hit of this frame: where the pick swings, the block kind it hit, and whether it broke. */
-  strike: { target: Coord; speed: number; cell: Coord; kind: number; breaking: boolean } | null = null;
+  strike: { target: Coord; speed: number; cell: Coord; kind: number; damage: number; breaking: boolean } | null = null;
   private readonly point = new Vector2();
   private readonly ray = new Raycaster();
   private readonly session: GameSession;
@@ -62,7 +62,7 @@ export class MiningInteraction {
     if (selected && (press || input.getSnapshot().mining)) {
       const kind=terrain.cell(selected)??0, result=this.session.hit(selected);
       if((result.status==='hit'||result.status==='breaking')&&result.damage>0)
-        this.strike={target:selected.map(v=>(v+.5)*CELL) as unknown as Coord,speed:this.session.getSnapshot().miningStats.speed,cell:selected,kind,breaking:result.status==='breaking'};
+        this.strike={target:selected.map(v=>(v+.5)*CELL) as unknown as Coord,speed:this.session.getSnapshot().miningStats.speed,cell:selected,kind,damage:result.damage,breaking:result.status==='breaking'};
     }
     this.cracks.sync(terrain.render.pipeline.residents);
   }

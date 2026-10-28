@@ -143,8 +143,9 @@ export class GameSession {
     if(key!==this.baseStatsKey){this.baseStatsKey=key;this.cachedBaseStats=pickaxeStats(level,(boosted?REWARD_CONFIG.miningMultiplier:1)*(1+pets/100),enhance);}
     return this.cachedBaseStats;
   };
-  private readonly pickupListeners = new Set<(batch: readonly {itemId:string;count:number}[]) => void>();
-  onOreCollected = (listener: (batch: readonly {itemId:string;count:number}[]) => void) => {
+  private readonly pickupListeners = new Set<(batch: readonly {itemId:string;count:number}[], stored: readonly {itemId:string;count:number}[]) => void>();
+  /** Ore that reached the bag or, for ticket minerals, the material store (`stored`, a part of `batch`). */
+  onOreCollected = (listener: (batch: readonly {itemId:string;count:number}[], stored: readonly {itemId:string;count:number}[]) => void) => {
     this.pickupListeners.add(listener);
     return () => { this.pickupListeners.delete(listener); };
   };
@@ -471,11 +472,9 @@ export class GameSession {
       this.refreshTarget();
       this.publish();
     } else if (result.status === 'locked') {
-      const text = `需要 Lv.${result.requiredLevel} 镐子`;
-      if (this.notice !== text) { this.notice = text; this.publish(); }
+      // The plate over the block says it (MiningOverlay), not a notice.
       this.refuse('locked');
     } else if (result.status === "full") {
-      if (this.notice !== "背包已满，前往售卖点出售") { this.notice = "背包已满，前往售卖点出售"; this.publish(); }
       this.refuse('full');
     }
     return result;
@@ -624,7 +623,7 @@ export class GameSession {
     const kept=this.stored.at(-1);
     if (kept) this.notice = `材料仓 +${this.stored.reduce((n,s)=>n+s.count,0)}：${itemDefinition(kept.itemId).name} ${this.materials.count(kept.itemId)}/${this.ticketNeed(kept.itemId)}`;
     this.publish();
-    if (resources.length) for (const listener of this.pickupListeners) listener(oreDrops(resources));
+    if (resources.length) for (const listener of this.pickupListeners) listener(oreDrops(resources), this.stored);
     if (!wasFull && this.inventory.isFull()) this.refuse('full');
   };
   upgradePickaxe = (expectedLevel: number) => {

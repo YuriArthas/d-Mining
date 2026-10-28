@@ -77,22 +77,10 @@ button { font: inherit; touch-action: manipulation; }
 .mineral-legend span { display: inline-flex; align-items: center; gap: 3px; }
 .mineral-legend i { width: 8px; height: 8px; border: 1px solid #ffffff70; }
 
-.target-health { position: absolute; z-index: 2; top: calc(88px + var(--safe-top)); left: calc(10px + var(--safe-left)); width: 160px; padding: 6px 8px; background: #142c31ed; border-radius: 9px; pointer-events: none; font-size: 12px; }
-.target-health > div:first-child { display: flex; justify-content: space-between; gap: 8px; }
-.target-health-track { height: 7px; background: #466163; border-radius: 4px; overflow: hidden; margin: 7px 0 5px; }
-.target-health-track span { display: block; height: 100%; background: #edc775; }
-.target-health small { font-size: 10px; color: #b4d3c5; }
 .hit-flash { animation: mining-hit .2s ease-out; }
 @keyframes mining-hit { from { background: #fff; } to { background: #edc775; } }
 /* Debug tools leave the selected mineral readout clear. */
-.game-shell:has(.target-health) .input-monitor { top: calc(152px + var(--safe-top)); }
-.game-shell:has(.target-health) .validation-panel { top: calc(187px + var(--safe-top)); }
-@media (max-height: 400px) and (orientation: landscape), (max-width: 400px) and (orientation: portrait) {
 
-  .target-health { width: 160px; }
-}
-
-.target-value { display: block; margin-bottom: 3px; }
 
 /* Resource count is unbounded by the HUD: only owned items are shown, with a bounded list. */
 

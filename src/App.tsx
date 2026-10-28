@@ -48,6 +48,7 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
   const hosted = /\/games\/mining(?:-test|-surface-play)?\/(?:index\.html)?$/.test(window.location.pathname);
   const canvas = useRef<HTMLCanvasElement>(null);
   const guideMarker = useRef<HTMLDivElement>(null);
+  const miningLayer = useRef<HTMLDivElement>(null);
   const scene = useRef<RootState | null>(null);
   const exiting = useRef(false);
   const [exited, setExited] = useState(false);
@@ -171,9 +172,11 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
           gl={{ antialias: true }}
           fallback={<p>当前浏览器无法启动 3D 画面，请使用支持 WebGL2 的浏览器。</p>}
         >
-          <ValidationScene shopView={shopView} guideMarker={guideMarker} savedGame={savedGame} content={GAME_CONTENT} renderRate={renderRate} shadowsEnabled={shadowsEnabled} probeMode={probeMode} input={input} onStatus={setStatus} onLoading={onLoading} onPerformance={setPerformanceStats} session={session} />
+          <ValidationScene shopView={shopView} guideMarker={guideMarker} miningLayer={miningLayer} savedGame={savedGame} content={GAME_CONTENT} renderRate={renderRate} shadowsEnabled={shadowsEnabled} probeMode={probeMode} input={input} onStatus={setStatus} onLoading={onLoading} onPerformance={setPerformanceStats} session={session} />
         </Canvas></LoadingBoundary>
       </div>
+      {/* The plate, damage numbers and flying ore over the block being mined (MiningOverlay), under the HUD. */}
+      <div ref={miningLayer} className="mining-overlay" aria-live="polite" style={{display:showLoading?'none':undefined}} />
       <header inert={!!exitState} className="game-header" style={{display:showLoading?'none':undefined}}>
         {debug && <details className="hud-debug-tools"><summary>调试</summary><div className="hud-debug-content"><span className="wordmark">MINING</span><span className="stage-label">{status}</span>
           <div className="performance-hud" aria-label="实时性能" title="帧率模式可切换60帧上限或跟随屏幕回调；FPS 按实际提交的主画面计数；CPU 是每次逻辑更新均值，提交是实际绘制的主线程均值（含反射）。RAF 是浏览器回调频率，调度是游戏限帧的跳过比例；GPU 计时需显式开启；绘制次数拆为主画面 / 反射，三角面含两个通道。">

@@ -29,7 +29,7 @@
 .hud-sell[data-state=full] { outline: 3px solid var(--ui-gold); outline-offset: 2px; animation: hud-sell-full 1s ease-in-out infinite; }
 @keyframes hud-sell-full { 50% { transform: scale(1.07); } }
 
-/* Top centre: where you are, the bar to the next layer, then buffs, tips, the mining target and pickups. */
+/* Top centre: where you are, the bar to the next layer, then buffs and tips. */
 .hud-center {
   position: absolute; top: calc(6px + var(--safe-top)); left: 50%; transform: translateX(-50%);
   display: grid; justify-items: center; gap: 6px; pointer-events: none;
@@ -87,33 +87,6 @@
 .hud-notice .ui-toast { white-space: normal; text-align: center; justify-content: center; }
 .hud-bottom .capsule-world-prompt, .hud-bottom .egg-world-prompt { position: static; transform: none; }
 
-/* Mining target card (TargetHealth markup); it moves onto the block itself in U3. */
-.hud-center .target-health {
-  position: static; width: min(230px, 100%); padding: 5px 12px 6px;
-  border: var(--ui-edge) solid var(--ui-ink); border-radius: 12px; background: var(--ui-paper);
-  font: 700 12px/1.3 var(--ui-font); color: var(--ui-ink);
-}
-.hud-center .target-health > div:first-child { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; min-width: 0; }
-.hud-center .target-health > div:first-child > span { flex: none; }
-.hud-center .target-health strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; }
-.hud-center .target-health-track { height: 10px; margin: 4px 0 3px; border: 2px solid var(--ui-ink); border-radius: 6px; background: var(--ui-sheet); }
-.hud-center .target-health-track span { border-radius: 4px; background: var(--ui-red); }
-.hud-center .target-health small { display: block; font-size: 11px; color: var(--ui-ink-soft); }
-.hud-center .target-health .hit-flash { animation: hud-hit .2s ease-out; }
-@keyframes hud-hit { from { background: #fff; } }
-
-/* New-ore feed: short white chips under the depth, clear of the character. */
-.ui-hud .ore-pickup-feed { display: grid; justify-items: center; gap: 5px; pointer-events: none; }
-.ui-hud .ore-pickup {
-  display: flex; align-items: center; gap: 6px; padding: 2px 12px 2px 4px;
-  border: 2.5px solid var(--ui-ink); border-radius: 999px; background: var(--ui-paper); color: var(--ui-ink);
-  font: 800 14px/1.2 var(--ui-font); white-space: nowrap;
-  animation: hud-ore var(--pickup-lifetime) ease-out forwards;
-}
-.ui-hud .ore-pickup .ore-icon { width: 24px; height: 24px; color: var(--ui-ink); }
-.ui-hud .ore-pickup strong { color: var(--ui-green-lo); }
-@keyframes hud-ore { 0% { opacity: 0; transform: translateY(6px) scale(.92); } 10%, 70% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-8px); } }
-
 /* Touch controls: Roblox-style thumbstick ring and jump button, translucent so the scene shows through. */
 .game-shell .joystick {
   left: calc(16px + var(--safe-left)); bottom: calc(14px + var(--safe-bottom)); width: 120px; height: 120px;
@@ -159,6 +132,4 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .hud-sell[data-state=full] { animation: none; }
-  .ui-hud .ore-pickup { animation: hud-ore-still var(--pickup-lifetime) linear forwards; }
-  @keyframes hud-ore-still { 0%, 70% { opacity: 1; } 100% { opacity: 0; } }
 }

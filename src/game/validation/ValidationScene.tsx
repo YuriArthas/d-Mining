@@ -1,5 +1,6 @@
 import type { ShopView } from '../presentation/ShopView.ts';
 import { GuideMarkerProjector } from '../presentation/GuideMarkerProjector.ts';
+import { attachMiningOverlay } from '../ui/hud/miningOverlay.ts';
 import { GuideDirectionArrow, updateGuideRoute } from '../presentation/GuideDirectionArrow.tsx';
 import type { SavedGame } from '../persistence/SaveBootstrap.ts';
 import type { GameContent } from "../content/gameContent.ts";
@@ -42,9 +43,11 @@ export function ValidationScene({
   onPerformance,
   session,
   guideMarker,
+  miningLayer,
 }: {
   shopView: ShopView;
   guideMarker: RefObject<HTMLDivElement | null>;
+  miningLayer: RefObject<HTMLDivElement | null>;
   content: GameContent;
   savedGame: SavedGame;
   renderRate: RenderRate;
@@ -64,6 +67,8 @@ export function ValidationScene({
   const sunShadow = useRef<Group>(null);
   const loadingReleased = useRef(false);
   const guideProjector = useRef(new GuideMarkerProjector());
+  const mining = useRef<ReturnType<typeof attachMiningOverlay> | null>(null);
+  useEffect(() => () => { mining.current?.dispose(); mining.current = null; }, []);
   const guideArrow = useRef<Group>(null);
   const settings = useRef({ sceneShadowsEnabled });
   settings.current = { sceneShadowsEnabled };
@@ -287,6 +292,10 @@ export function ValidationScene({
     } catch (error) { savedGame.saves.invalidate(error); throw error; }
     if (game.terrain.error) savedGame.saves.invalidate(game.terrain.error);
     const tipState = session.getSnapshot(), tip = tipState.tip;
+    // The plate, damage numbers and flying ore over the block being mined.
+    const layer = miningLayer.current;
+    if (layer && mining.current?.root !== layer) { mining.current?.dispose(); mining.current = attachMiningOverlay(layer, session, () => runtime.current?.interaction.selected ?? null); }
+    mining.current?.overlay.update(camera, performance.now() / 1000, game.interaction.selected, tipState.target, game.feedback.landed, avatar.current.position.toArray());
     // First-dig tip: an arrow to the mine on the surface, then a glowing block once there.
     if (tip?.anchor === 'mine') guideProjector.current.update(camera, tipState.tipAnchor, guideMarker.current);
     game.interaction.lesson.update(camera as PerspectiveCamera, game.physics.feet(), game.interaction.selected, game.terrain, tipState.pickaxe.level, guideMarker.current, tip?.anchor === 'dig' && !game.player.travelling && !session.suspended);

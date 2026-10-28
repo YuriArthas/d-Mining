@@ -4,7 +4,6 @@ import { selectDepthGoal } from '../../application/Tips.ts';
 import { formatNumber as number } from '../../presentation/formatNumber.ts';
 import { CountUp, Pill, Tile, UiButton } from '../kit/controls.tsx';
 import { Icon } from '../kit/icons.tsx';
-import { OrePickupFeed } from '../OrePickupFeed.tsx';
 import { teamCanImprove } from '../bag/BagSheet.tsx';
 import { claimableRewards } from '../rewards/RewardsSheet.tsx';
 import { SystemMenu, type SystemControls } from './SystemMenu.tsx';
@@ -20,12 +19,12 @@ type HudActions = {
  *  the miner and the pit:
  *  - top left: the world's money and the bag, with the two trips (sell, back to the surface) small underneath;
  *  - top centre: where you are (the world's name on the surface; the layer and depth below it) over one thin bar
- *    to the next layer, then buffs, a one-time tip, the block being mined and fresh pickups;
+ *    to the next layer, then buffs and a one-time tip (the block being mined has its plate over it, MiningOverlay);
  *  - top right: one menu (help and settings), then pets and shop large, rebirth and rewards small;
  *  - bottom centre: what the spot you stand on offers (an egg, the capsule machine) and short notices. */
-export function Hud({ session, actions, system, target, prompts, tipHidden = false }: {
+export function Hud({ session, actions, system, prompts, tipHidden = false }: {
   session: GameSession; actions: HudActions; system: SystemControls;
-  target?: ReactNode; prompts?: ReactNode; tipHidden?: boolean;
+  prompts?: ReactNode; tipHidden?: boolean;
 }) {
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot);
   const pets = useSyncExternalStore(session.pets.subscribe, session.pets.getSnapshot);
@@ -66,8 +65,6 @@ export function Hud({ session, actions, system, target, prompts, tipHidden = fal
         {sell > 0 && <span className="hud-buff"><Icon kind={currencyIcon(state.currency)} />出售 ×2<b className="ui-num">{clock(sell)}</b></span>}
       </div>}
       <TipToast session={session} tip={tip} />
-      {target}
-      <OrePickupFeed session={session} />
     </div>
 
     <SystemMenu system={system} onHelp={run(actions.openHelp)} />
@@ -84,7 +81,8 @@ export function Hud({ session, actions, system, target, prompts, tipHidden = fal
     <div className="hud-bottom">
       {prompts}
       {/* The one-time sell tip already says it; do not repeat the full-bag notice under it. */}
-      <HudNotice text={tip?.id === 'sell' && state.inventory.isFull ? '' : state.notice} />
+      {/* Ticket ore says where it went in the chip by the bag (MiningOverlay), so its store notice is not repeated here. */}
+      <HudNotice text={tip?.id === 'sell' && state.inventory.isFull || state.notice.startsWith('材料仓 +') ? '' : state.notice} />
     </div>
   </div>;
 }

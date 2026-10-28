@@ -1,0 +1,54 @@
+/* The mining overlay (MiningOverlay, docs/draft-ui-v2.md U3): the plate over the block being mined, damage numbers,
+   ore flying to the bag. Flat style A; it sits over the scene and under the HUD, and never takes a touch. */
+.mining-overlay { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; font-family: var(--ui-font); color: var(--ui-ink); }
+.game-shell:has(.session-ui:not([data-panel=none])) .mining-overlay { display: none; }
+
+.mine-plate {
+  position: absolute; left: 0; top: 0; min-width: 118px; padding: 3px 9px 6px;
+  border: 3px solid var(--ui-ink); border-radius: 12px; background: var(--ui-paper);
+  opacity: 0; transition: opacity .15s ease, scale .2s ease; will-change: transform;
+}
+.mine-plate.mine-plate-on { opacity: 1; }
+.mine-plate-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13px; line-height: 1.3; white-space: nowrap; }
+.mine-plate-price { display: inline-flex; align-items: center; gap: 2px; font-size: 12px; }
+.mine-plate-price .ui-icon { width: 16px; height: 16px; }
+.mine-plate-price i { font-style: normal; }
+/* Red health over a yellow trail: the part a swing takes off shows yellow, then shrinks after it. */
+.mine-plate-bar { position: relative; height: 12px; margin-top: 3px; overflow: hidden; border: 2.5px solid var(--ui-ink); border-radius: 999px; background: var(--ui-well-bg); }
+.mine-plate-lag, .mine-plate-hp { position: absolute; inset: 0 auto 0 0; }
+.mine-plate-lag { background: var(--ui-gold); transition: width .4s ease .18s; }
+.mine-plate-hp { background: var(--ui-red); transition: width .08s linear; }
+.mine-plate-note { display: none; align-items: center; gap: 4px; margin-top: 2px; font-size: 13px; white-space: nowrap; }
+.mine-plate-note .ui-icon { width: 18px; height: 18px; }
+.mine-plate[data-state=locked] { background: #dfe5ef; }
+.mine-plate[data-state=locked] .mine-plate-head { color: var(--ui-ink-soft); }
+.mine-plate[data-state=locked] .mine-plate-note { display: flex; color: var(--ui-red-lo); }
+.mine-plate[data-state=full] .mine-plate-note { display: flex; color: var(--ui-orange-lo); }
+.mine-plate:is([data-state=locked], [data-state=full]) .mine-plate-bar { display: none; }
+/* The last blow: the plate swells and goes. */
+.mine-plate.mine-plate-on[data-state=broken] { opacity: 0; scale: 1.18; transition: opacity .25s ease, scale .25s ease; }
+.mine-shake { animation: mine-shake .36s ease-out; }
+@keyframes mine-shake { 20% { translate: -6px 0; } 40% { translate: 6px 0; } 60% { translate: -4px 0; } 80% { translate: 3px 0; } }
+
+.mine-dmg { position: absolute; left: 0; top: 0; opacity: 0; white-space: nowrap; font: 900 24px/1 var(--ui-font); color: #fff; -webkit-text-stroke: 5px var(--ui-ink); paint-order: stroke fill; }
+.mine-dmg[data-final=true] { font-size: 34px; color: var(--ui-gold); -webkit-text-stroke-width: 6px; }
+
+.mine-fly { position: absolute; left: 0; top: 0; width: 34px; height: 34px; }
+.mine-fly .ore-icon { display: block; width: 100%; height: 100%; }
+.mine-chip {
+  position: absolute; left: 0; top: 0; padding: 2px 10px; border: 2.5px solid var(--ui-ink); border-radius: 999px; background: var(--ui-paper);
+  font: 800 13px/1.3 var(--ui-font); white-space: nowrap; opacity: 0; translate: 0 -4px; transition: opacity .2s ease, translate .2s ease;
+}
+.mine-chip.mine-chip-in { opacity: 1; translate: 0 0; }
+
+@container game (min-width: 1000px) and (min-height: 620px) {
+  .mine-plate { min-width: 150px; }
+  .mine-plate-head { font-size: 16px; }
+  .mine-plate-bar { height: 15px; }
+  .mine-dmg { font-size: 30px; }
+  .mine-dmg[data-final=true] { font-size: 42px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mine-shake { animation: none; }
+  .mine-plate-lag, .mine-plate-hp, .mine-chip { transition: none; }
+}

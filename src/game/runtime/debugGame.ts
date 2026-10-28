@@ -24,6 +24,7 @@ import type { RenderSubmission } from "../presentation/RenderSubmission.ts";
 import type { RenderProfiler } from "../presentation/RenderProfiler.ts";
 import { GAME_CONFIG } from "../config.ts";
 import { mineralName } from "../terrain/minerals.ts";
+import { setMiningOverlayTimeScale } from '../presentation/MiningOverlay.ts';
 type ValidationDebug = {
   advanceOnline: (seconds: number) => void;
   snapshot: () => unknown;
@@ -47,6 +48,8 @@ type ValidationDebug = {
   excavate: (coords: readonly Coord[]) => boolean;
   /** Slows the creek splashes (1 = normal) so screenshots can catch them. */
   splashTimeScale: (scale: number) => void;
+  /** Slows the mining plate, damage numbers and flying ore (1 = normal) so screenshots can catch them. */
+  overlayTimeScale: (scale: number) => void;
   canMine: (coord: Coord) => boolean;
   cell: (coord: Coord) => number | null;
   mine: (coord: Coord) => boolean;
@@ -238,6 +241,7 @@ export function attachGameDebug(
     cameraDistance: (metres) => { cameraView.rig.boom = metres; },
     excavate: (coords) => terrain.mineMany(coords),
     splashTimeScale: scale => { current.feedback.splash.timeScale = scale; },
+    overlayTimeScale: scale => setMiningOverlayTimeScale(scale),
     cell: (coord) => terrain.cell(coord),
     canMine: (coord) => terrain.canMine(coord),
     hit: session.hit,

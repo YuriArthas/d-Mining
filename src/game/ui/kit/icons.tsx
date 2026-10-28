@@ -36,6 +36,9 @@ const ICONS: Record<IconKind, string> = {
   lock: "<path d=\"M16 21v-5a8 8 0 0 1 16 0v5\" fill=\"none\" stroke=\"#1b2340\" stroke-width=\"4\"/><rect x=\"10.5\" y=\"21\" width=\"27\" height=\"20.5\" rx=\"4\" fill=\"#ffc61a\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"24\" cy=\"29.5\" r=\"2.8\" fill=\"#1b2340\"/><path d=\"M24 31v5\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linecap=\"round\"/>",
 };
 
+/** The same icon as markup, for overlays drawn without React (MiningOverlay). */
+export const iconMarkup = (kind: IconKind, className = 'ui-icon') => `<svg class="${className}" viewBox="0 0 48 48" aria-hidden="true" focusable="false">${ICONS[kind]}</svg>`;
+
 export function Icon({ kind, className = 'ui-icon' }: { kind: IconKind; className?: string }) {
   return <svg className={className} viewBox="0 0 48 48" aria-hidden="true" focusable="false" dangerouslySetInnerHTML={{ __html: ICONS[kind] }} />;
 }

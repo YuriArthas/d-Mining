@@ -16,7 +16,6 @@ import { CapsuleSheet, RewardsSheet, rewardsTabFor, type RewardsTab } from './re
 import { ShopPanel, showShopCategory } from './ShopPanel.tsx';
 import type { ShopCategory } from '../content/shopCatalog.ts';
 import { MYSTERY_EGG_NAME } from '../content/petAppearance.ts';
-import { TargetHealth } from './TargetHealth.tsx';
 import { PortalSheet, StationSheet } from './world/WorldSheet.tsx';
 import { RebirthCelebration, RebirthSheet } from './rebirth/RebirthSheet.tsx';
 
@@ -94,7 +93,7 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
   </>;
   return <div className="session-ui" data-panel={panel}>
     <TipMarker tip={state.tip} anchor={state.tipAnchor} marker={guideMarker} hidden={tipHidden} />
-    {!modal && !shopOpen && <Hud session={session} system={system} prompts={prompts} target={<TargetHealth session={session} />} tipHidden={blocked || !focused}
+    {!modal && !shopOpen && <Hud session={session} system={system} prompts={prompts} tipHidden={blocked || !focused}
       actions={{
         openPets: () => { session.dismissTip('pets'); open({ kind: 'bag', tab: 'pets' }); }, openMinerals: () => open({ kind: 'bag', tab: 'ores' }),
         openShop: () => { session.dismissTip('shop'); openShop('tools'); }, openBackpacks: () => openShop('backpacks'),

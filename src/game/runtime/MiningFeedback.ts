@@ -13,8 +13,9 @@ import { OreSparkles, type SparkleOre } from '../presentation/OreSparkles.ts';
 import { MINERAL_TIME } from '../terrain/mineralMaterial.ts';
 import { CELL, type Coord } from '../terrain/SparseWorld.ts';
 import { footSurface } from './footSurface.ts';
+import type { LandedHit } from '../presentation/MiningOverlay.ts';
 
-type FeedbackStrike = Readonly<{ cell: Coord; kind: number; breaking: boolean }>;
+type FeedbackStrike = Readonly<{ cell: Coord; kind: number; damage: number; breaking: boolean }>;
 /** `contact` is the pick tip's world position on the frame the swing reaches the block; `step` is a
  *  foot planting (with its strength). */
 type AvatarMoments = Readonly<{ contact: readonly number[] | null; jump: boolean; land: number | null; step?: number | null }>;
@@ -71,6 +72,8 @@ export class MiningFeedback {
   private readonly soundscape = new Soundscape();
   private theme = 'meadow_mine';
   private pending: FeedbackStrike | null = null;
+  /** The swings that reached their block this frame (for the damage numbers over it, MiningOverlay). */
+  readonly landed: LandedHit[] = [];
   private readonly ports: Ports;
   private readonly audio: GameAudio;
   private readonly detach: (() => void)[];
@@ -84,10 +87,12 @@ export class MiningFeedback {
   /** Call once per frame after the avatar update, with that frame's accepted hit (if any). */
   update(delta: number, strike: FeedbackStrike | null, moments: AvatarMoments, feet: readonly number[]) {
     const chest = [feet[0], feet[1] + 1.1, feet[2]];
+    this.landed.length = 0;
     if (moments.contact && this.pending) {
-      const { cell, kind } = this.pending;
+      const { cell, kind, damage } = this.pending;
       this.pending = null;
       if (this.ports.cell(cell)) {
+        this.landed.push({ cell, damage, final: false });
         this.effects.hit(cell, chest, this.colors(cell, kind), n => !this.ports.cell([cell[0] + n.x, cell[1] + n.y, cell[2] + n.z]), moments.contact);
         this.audio.play({ type: 'hit', material: hitMaterial(kind) });
       }
@@ -95,6 +100,7 @@ export class MiningFeedback {
     if (strike) {
       if (strike.breaking) {
         this.pending = null;
+        this.landed.push({ cell: strike.cell, damage: strike.damage, final: true });
         this.effects.burst(strike.cell, this.colors(strike.cell, strike.kind));
         this.audio.play({ type: 'break', material: hitMaterial(strike.kind) });
       } else this.pending = strike;
