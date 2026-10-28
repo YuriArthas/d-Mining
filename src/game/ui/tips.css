@@ -24,8 +24,6 @@
 .ui-hud[data-tip=shop] [data-tip-target=shop],
 .ui-hud[data-tip=pets] [data-tip-target=pets] { outline: 3px solid #ffe386; outline-offset: 3px; animation: tip-pulse .9s ease-in-out infinite; }
 
-/* Next layer: a slim progress line. */
-.journey-goals progress { width: 100%; height: 8px; accent-color: #e5c263; }
 
 @keyframes tip-blink { 50% { opacity: .45; } }
 @keyframes tip-pulse { 50% { outline-offset: 6px; } }

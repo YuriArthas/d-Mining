@@ -1,7 +1,8 @@
-import { useEffect, useState, useSyncExternalStore, type ReactNode } from 'react';
+import { useEffect, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react';
 import type { GameSession } from '../../application/GameSession.ts';
-import { formatDepth, formatNumber as number } from '../../presentation/formatNumber.ts';
-import { Pill, Tile, UiButton } from '../kit/controls.tsx';
+import { selectDepthGoal } from '../../application/Tips.ts';
+import { formatNumber as number } from '../../presentation/formatNumber.ts';
+import { CountUp, Pill, Tile, UiButton } from '../kit/controls.tsx';
 import { Icon } from '../kit/icons.tsx';
 import { OrePickupFeed } from '../OrePickupFeed.tsx';
 import { teamCanImprove } from '../bag/BagSheet.tsx';
@@ -15,46 +16,55 @@ type HudActions = {
   openPets(): void; openShop(): void; openBackpacks(): void; openRewards(): void; openMinerals(): void; openHelp(): void; openRebirth(): void;
 };
 
-/** Screen-space HUD. Zones mirror the original: resources left, depth top-centre, four
- *  actions down the right edge, Sell / Surface trips at the bottom when they help. The block
- *  being mined and fresh pickups stack under the depth, clear of the miner in the lower middle. */
-export function Hud({ session, actions, system, objective, target, prompts, tipHidden = false }: {
+/** Screen-space HUD (docs/draft-ui-v2.md, U2). Phone landscape first, and the middle of the screen stays clear for
+ *  the miner and the pit:
+ *  - top left: the world's money and the bag, with the two trips (sell, back to the surface) small underneath;
+ *  - top centre: where you are (the world's name on the surface; the layer and depth below it) over one thin bar
+ *    to the next layer, then buffs, a one-time tip, the block being mined and fresh pickups;
+ *  - top right: one menu (help and settings), then pets and shop large, rebirth and rewards small;
+ *  - bottom centre: what the spot you stand on offers (an egg, the capsule machine) and short notices. */
+export function Hud({ session, actions, system, target, prompts, tipHidden = false }: {
   session: GameSession; actions: HudActions; system: SystemControls;
-  objective?: ReactNode; target?: ReactNode; prompts?: ReactNode; tipHidden?: boolean;
+  target?: ReactNode; prompts?: ReactNode; tipHidden?: boolean;
 }) {
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot);
   const pets = useSyncExternalStore(session.pets.subscribe, session.pets.getSnapshot);
   const run = (action: () => void) => () => action();
   const claimable = claimableRewards(state.rewards);
   const bag = state.inventory;
-  const world = state.worlds.find(w => w.id === state.currentWorld)?.name ?? `世界 ${state.currentWorld}`;
+  const world = state.worlds.find(w => w.id === state.currentWorld);
   // Location is null until the first physics step; the game always starts on the surface.
   const surface = state.location !== 'mine' && state.location !== 'room';
-  const depth = surface ? '地表' : formatDepth(state.depth);
   const { speed, luck, sell } = state.rewards.timed;
   // HUD tips name a control on screen; the first-dig tip is drawn in the world instead.
   const tip = !tipHidden && state.tip && state.tip.anchor !== 'mine' && state.tip.anchor !== 'dig' ? state.tip : null;
+  const showSell = bag.used > 0 && !state.inSellZone;
   return <div className="ui-hud" data-location={state.location ?? 'surface'} data-tip={tip?.id}>
-    <section className="hud-left" aria-label="资源与目标">
-      <Pill icon="backpack" meter={bag.capacity > 0 ? bag.used / bag.capacity : 0} state={bag.isFull ? 'full' : undefined}
-        onPress={run(actions.openMinerals)} pressLabel="查看背包里的矿物" plus={{ label: '升级背包', onPress: run(actions.openBackpacks) }}>
-        <span data-testid="bag-count" aria-label={`背包容量 ${number(bag.used)} / ${number(bag.capacity)}`}>{number(bag.used)} / {number(bag.capacity)}</span>
-      </Pill>
-      <Pill icon={currencyIcon(state.currency)} tone="gold"><span data-testid="coins" aria-label={`${currencyName(state.currency)} ${number(state.coins)}`}>{number(state.coins)}</span>
-        {state.rebirth.multiplier > 1 && <b className="hud-coin-mult ui-outline" aria-label={`重生收益 ${state.rebirth.multiplier} 倍`}>×{state.rebirth.multiplier}</b>}</Pill>
-      {(speed > 0 || luck > 0 || sell > 0) && <div className="hud-buffs">
-        {speed > 0 && <span className="ui-toast"><Icon kind="bolt" />移速 ×2 · {Math.ceil(speed)} 秒</span>}
-        {luck > 0 && <span className="ui-toast"><Icon kind="clover" />稀有率 ×2 · {Math.ceil(luck)} 秒</span>}
-        {sell > 0 && <span className="ui-toast"><Icon kind={currencyIcon(state.currency)} />出售 ×2 · {Math.ceil(sell)} 秒</span>}
+    <section className="hud-left" aria-label="资源">
+      <div className="hud-wallet">
+        <Pill icon={currencyIcon(state.currency)} className="hud-coins">
+          <span data-testid="coins" aria-label={`${currencyName(state.currency)} ${number(state.coins)}`}><CountUp value={state.coins} format={number} /></span>
+          {state.rebirth.multiplier > 1 && <b className="hud-coin-mult" aria-label={`重生收益 ${state.rebirth.multiplier} 倍`}>×{state.rebirth.multiplier}</b>}
+        </Pill>
+        <Pill icon="backpack" className="hud-bag" meter={bag.capacity > 0 ? bag.used / bag.capacity : 0} state={bag.isFull ? 'full' : undefined}
+          onPress={run(actions.openMinerals)} pressLabel="查看背包里的矿物" plus={{ label: '升级背包', onPress: run(actions.openBackpacks) }}>
+          <span data-testid="bag-count" aria-label={`背包容量 ${number(bag.used)} / ${number(bag.capacity)}`}>{number(bag.used)}<small>/{number(bag.capacity)}</small></span>
+        </Pill>
+      </div>
+      {(showSell || !surface) && <div className="hud-trips">
+        {showSell && <UiButton className="hud-sell" size="s" tone="green" icon={currencyIcon(state.currency)} data-state={bag.isFull ? 'full' : undefined} data-tip-target="sell"
+          aria-label="传送到售卖圈出售" onPress={() => { session.dismissTip('sell'); session.goTo('sale'); }}>出售</UiButton>}
+        {!surface && <UiButton className="hud-return" size="s" tone="blue" icon="home" onPress={run(session.returnToSurface)}>回地表</UiButton>}
       </div>}
-      {objective && <div className="hud-objective">{objective}</div>}
     </section>
 
     <div className="hud-center">
-      <header className="hud-depth" aria-label={`${world}，${surface ? '地表' : `深度 ${Math.floor(state.depth)} 米`}`}>
-        <span className="hud-depth-kicker ui-outline">{world} · 深度</span>
-        <strong className="hud-depth-value ui-outline ui-num" data-testid="depth">{depth}</strong>
-      </header>
+      <Whereabouts session={session} title={world?.title ?? ''} kicker={world?.name ?? ''} surface={surface} />
+      {(speed > 0 || luck > 0 || sell > 0) && <div className="hud-buffs">
+        {speed > 0 && <span className="hud-buff"><Icon kind="bolt" />移速 ×2<b className="ui-num">{clock(speed)}</b></span>}
+        {luck > 0 && <span className="hud-buff"><Icon kind="clover" />稀有率 ×2<b className="ui-num">{clock(luck)}</b></span>}
+        {sell > 0 && <span className="hud-buff"><Icon kind={currencyIcon(state.currency)} />出售 ×2<b className="ui-num">{clock(sell)}</b></span>}
+      </div>}
       <TipToast session={session} tip={tip} />
       {target}
       <OrePickupFeed session={session} />
@@ -63,22 +73,40 @@ export function Hud({ session, actions, system, objective, target, prompts, tipH
     <SystemMenu system={system} onHelp={run(actions.openHelp)} />
 
     <nav className="hud-rail" aria-label="游戏功能">
-      <Tile icon="paw" label="宠物" tone="orange" aria-label="打开我的宠物" data-tip-target="pets" badge={teamCanImprove(pets) ? '!' : undefined} onPress={run(actions.openPets)} />
-      <Tile icon="chest" label="商店" tone="blue" aria-label="商店" data-kind="upgrade" data-tip-target="shop" onPress={run(actions.openShop)} />
-      <Tile icon="gift" label="奖励" tone="purple" aria-label={claimable ? `奖励，${claimable} 个可领取` : '奖励'} badge={claimable || undefined} onPress={run(actions.openRewards)} />
-      {state.rebirth.shown && <Tile icon="rebirth" label="重生" tone="green" aria-label={state.rebirth.ready ? '重生，可以重生了' : '重生'} badge={state.rebirth.ready ? '!' : undefined} onPress={run(actions.openRebirth)} />}
+      <Tile icon="paw" label="宠物" tone="orange" className="hud-big" aria-label="打开我的宠物" data-tip-target="pets" badge={teamCanImprove(pets) ? '!' : undefined} onPress={run(actions.openPets)} />
+      <Tile icon="chest" label="商店" tone="blue" className="hud-big" aria-label="商店" data-kind="upgrade" data-tip-target="shop" onPress={run(actions.openShop)} />
+      <div className="hud-rail-row">
+        {state.rebirth.shown && <Tile icon="rebirth" label="重生" tone="green" aria-label={state.rebirth.ready ? '重生，可以重生了' : '重生'} badge={state.rebirth.ready ? '!' : undefined} onPress={run(actions.openRebirth)} />}
+        <Tile icon="gift" label="奖励" tone="purple" aria-label={claimable ? `奖励，${claimable} 个可领取` : '奖励'} badge={claimable || undefined} onPress={run(actions.openRewards)} />
+      </div>
     </nav>
 
     <div className="hud-bottom">
       {prompts}
       {/* The one-time sell tip already says it; do not repeat the full-bag notice under it. */}
       <HudNotice text={tip?.id === 'sell' && state.inventory.isFull ? '' : state.notice} />
-      {(bag.used > 0 && !state.inSellZone || !surface) && <div className="hud-trips">
-        {bag.used > 0 && !state.inSellZone && <UiButton className="hud-sell" size="l" tone="green" icon={currencyIcon(state.currency)} data-state={bag.isFull ? 'full' : undefined} aria-label="传送到售卖圈出售" onPress={() => { session.dismissTip('sell'); session.goTo('sale'); }}>出售</UiButton>}
-        {!surface && <UiButton className="hud-return" size="l" icon="home" onPress={run(session.returnToSurface)}>返回地表</UiButton>}
-      </div>}
     </div>
   </div>;
+}
+
+const clock = (seconds: number) => { const s = Math.ceil(seconds); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
+
+/** Where the player is: the world's place name on the surface; underground the layer and the depth. Under it, one
+ *  thin bar to the next layer not reached yet (by the deepest point reached), until every layer is open. */
+function Whereabouts({ session, title, kicker, surface }: { session: GameSession; title: string; kicker: string; surface: boolean }) {
+  const state = useSyncExternalStore(session.subscribe, session.getSnapshot);
+  const goal = selectDepthGoal(state.maxDepth, state.destinations);
+  const layer = state.destinations.filter(d => d.depth <= state.depth).sort((a, b) => a.depth - b.depth).at(-1);
+  const metres = Math.floor(state.depth);
+  return <header className="hud-where" aria-label={surface ? `${kicker}，${title}，地表` : `${kicker}，${layer?.name ?? title}，深度 ${metres} 米`}>
+    {surface
+      ? <div className="hud-place"><small>{kicker}</small><b>{title}</b></div>
+      : <div className="hud-depth"><small>{layer?.name ?? title}</small><b className="ui-num" data-testid="depth">{metres}<u>米</u></b></div>}
+    {goal && <div className="hud-goal" data-testid="journey-goals" role="progressbar" aria-label={`下一层 ${goal.name}`} aria-valuemin={0} aria-valuemax={goal.depth} aria-valuenow={Math.floor(goal.currentDepth)}
+      style={{ '--v': `${Math.min(100, goal.currentDepth / goal.depth * 100).toFixed(1)}%` } as CSSProperties}>
+      <i /><span>下一层 {goal.name}<em className="ui-num">{Math.floor(goal.currentDepth)} / {goal.depth} 米</em></span>
+    </div>}
+  </header>;
 }
 
 /** Session notices are transient: show each new message briefly, then clear the stage. */

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState, type RefObject, useSyncExternalStore } from 'react';
 import type { GameSession } from '../application/GameSession.ts';
-import { selectDepthGoal } from '../application/Tips.ts';
 import type { GameInput } from '../GameInput.ts';
 import { Controls } from '../Controls.tsx';
 import type { ShopView } from '../presentation/ShopView.ts';
@@ -12,7 +11,7 @@ import { Hud } from './hud/Hud.tsx';
 import type { SystemControls } from './hud/SystemMenu.tsx';
 import { Icon } from './kit/icons.tsx';
 import { DevUnlockPage } from './DevUnlock.tsx';
-import { DepthGoalCard, TipMarker } from './TipsUi.tsx';
+import { TipMarker } from './TipsUi.tsx';
 import { CapsuleSheet, RewardsSheet, rewardsTabFor, type RewardsTab } from './rewards/RewardsSheet.tsx';
 import { ShopPanel, showShopCategory } from './ShopPanel.tsx';
 import type { ShopCategory } from '../content/shopCatalog.ts';
@@ -20,6 +19,9 @@ import { MYSTERY_EGG_NAME } from '../content/petAppearance.ts';
 import { TargetHealth } from './TargetHealth.tsx';
 import { PortalSheet, StationSheet } from './world/WorldSheet.tsx';
 import { RebirthCelebration, RebirthSheet } from './rebirth/RebirthSheet.tsx';
+
+// The testing unlock page is a debug tool: its corner button shows only with ?debug=1.
+const DEBUG = new URLSearchParams(window.location.search).get('debug') === '1';
 
 type Modal =
   | { kind: 'bag'; tab: BagTab } | { kind: 'rewards'; tab: RewardsTab }
@@ -86,14 +88,13 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
   const panel = modal?.kind ?? (shopOpen ? 'shop' : stationOpen ? 'station' : portalOpen ? 'portal' : 'none');
   const tipHidden = !!modal || shopOpen || stationOpen || portalOpen || blocked || !focused;
   useEffect(() => { if (stationOpen || portalOpen) input.reset(); }, [stationOpen, portalOpen, input]);
-  const objective = !blocked && <DepthGoalCard goal={selectDepthGoal(state.maxDepth, state.destinations)} />;
   const prompts = <>
     {state.atMachine && <GameButton className="ui-btn capsule-world-prompt" data-tone="purple" data-size="m" onPress={() => open({ kind: 'capsule' })}><Icon kind="gift" /><span className="ui-outline"><span className="desktop-hint">E · </span>幸运扭蛋</span></GameButton>}
     {state.eggStation && eggName && <GameButton className="ui-btn egg-world-prompt" data-tone="orange" data-size="m" aria-label={`查看${eggName}`} onPress={() => open({ kind: 'egg' })}><Icon kind="paw" /><span className="ui-outline"><span className="desktop-hint">E · </span>查看{eggName}</span></GameButton>}
   </>;
   return <div className="session-ui" data-panel={panel}>
     <TipMarker tip={state.tip} anchor={state.tipAnchor} marker={guideMarker} hidden={tipHidden} />
-    {!modal && !shopOpen && <Hud session={session} system={system} objective={objective} prompts={prompts} target={<TargetHealth session={session} />} tipHidden={blocked || !focused}
+    {!modal && !shopOpen && <Hud session={session} system={system} prompts={prompts} target={<TargetHealth session={session} />} tipHidden={blocked || !focused}
       actions={{
         openPets: () => { session.dismissTip('pets'); open({ kind: 'bag', tab: 'pets' }); }, openMinerals: () => open({ kind: 'bag', tab: 'ores' }),
         openShop: () => { session.dismissTip('shop'); openShop('tools'); }, openBackpacks: () => openShop('backpacks'),
@@ -111,7 +112,7 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
     {modal?.kind === 'rebirth' && <RebirthSheet session={session} onClose={close} onReborn={(count, multiplier) => setReborn({ count, multiplier })} />}
     {reborn && <RebirthCelebration count={reborn.count} multiplier={reborn.multiplier} onDone={endCelebration} />}
     {shopOpen && shop.mode !== 'closed' && <ShopPanel session={session} view={shopView} onClose={closeShop} />}
-    {!blocked && <button className="dev-unlock-button" onClick={() => { input.reset(); setDevUnlock(v => !v); }}>解锁</button>}
+    {DEBUG && !blocked && <button className="dev-unlock-button" onClick={() => { input.reset(); setDevUnlock(v => !v); }}>解锁</button>}
     {devUnlock && <DevUnlockPage session={session} onClose={() => { setDevUnlock(false); surface.current?.focus(); }} />}
   </div>;
 }

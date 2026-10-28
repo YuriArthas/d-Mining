@@ -1,10 +1,9 @@
 import { useSyncExternalStore, type RefObject } from 'react';
 import type { GameSession } from '../application/GameSession.ts';
-import type { DepthGoal, Tip } from '../application/Tips.ts';
+import type { Tip } from '../application/Tips.ts';
 import type { TipId } from '../logic/Onboarding.ts';
 import { GameButton } from './GameButton.tsx';
 import { Icon, type IconKind } from './kit/icons.tsx';
-import { Bar } from './kit/panel.tsx';
 import './tips.css';
 
 const touchControls = window.matchMedia('(any-pointer: coarse)');
@@ -40,12 +39,3 @@ export function TipToast({ session, tip }: { session: GameSession; tip: Tip | nu
   </GameButton>;
 }
 
-/** Where the next layer is: one compact strip in the HUD's style (like the resource capsules), not a task list. */
-export function DepthGoalCard({ goal }: { goal: DepthGoal | null }) {
-  if (!goal) return null;
-  const now = Math.floor(goal.currentDepth);
-  return <aside className="journey-goals" aria-label="探索目标" data-testid="journey-goals">
-    <div className="journey-depth"><span className="guide-kicker ui-outline">下一层</span><strong className="ui-outline">{goal.name}</strong></div>
-    <Bar value={now} max={goal.depth} size="s">{now} / {goal.depth} 米</Bar>
-  </aside>;
-}
