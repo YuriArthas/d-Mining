@@ -1,153 +1,41 @@
-import type { ReactNode } from 'react';
-
-/** Chunky two-tone vector icons with navy outlines, drawn on a 48 × 48 grid. */
+/* Generated from the U0 mockup icon sheet (output/ui-v2-u0/v2/icons2.py, icons3.py). High-contrast, flat:
+   every icon pairs a bright body with a dark mark and a white highlight, and none carries a drop shadow. */
 export type IconKind =
-  | 'backpack' | 'coin' | 'paw' | 'chest' | 'gift' | 'grid' | 'globe' | 'portal' | 'gem'
-  | 'question' | 'gear' | 'home' | 'jump' | 'plus' | 'bolt' | 'clover' | 'exit' | 'close' | 'pickaxe' | 'luck' | 'rebirth'
-  | 'tech' | 'starcoin';
+  'backpack' | 'coin' | 'tech' | 'starcoin' | 'luck' | 'paw' | 'chest' | 'gift' | 'grid' | 'globe' | 'portal' | 'gem' | 'question' | 'gear' | 'home' | 'jump' | 'plus' | 'bolt' | 'clover' | 'exit' | 'close' | 'pickaxe' | 'rebirth' | 'lock';
 
-const INK = '#13355d';
-const line = { stroke: INK, strokeWidth: 3, strokeLinejoin: 'round' as const, strokeLinecap: 'round' as const };
-
-const ICONS: Record<IconKind, ReactNode> = {
-  backpack: <>
-    <path d="M18 11V9a6 6 0 0 1 12 0v2" fill="none" {...line} />
-    <path d="M10 18c0-4 3-7 7-7h14c4 0 7 3 7 7v19c0 3-2 5-5 5H15c-3 0-5-2-5-5Z" fill="#ec5a40" {...line} />
-    <path d="M10 22h28" {...line} />
-    <path d="M17 28h14v7a3 3 0 0 1-3 3h-8a3 3 0 0 1-3-3Z" fill="#ff9a45" {...line} />
-    <path d="M15 15h6" stroke="#ffc0a6" strokeWidth="3" strokeLinecap="round" />
-  </>,
-  coin: <>
-    <circle cx="25.5" cy="26" r="17" fill="#c9840f" {...line} />
-    <circle cx="22.5" cy="23" r="17" fill="#ffcf3d" {...line} />
-    <circle cx="22.5" cy="23" r="11.5" fill="#ffdd66" stroke="#e39a12" strokeWidth="2.5" />
-    <path d="m22.5 15 2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8Z" fill="#fff6c4" stroke="#e39a12" strokeWidth="1.6" strokeLinejoin="round" />
-    <path d="M12 16a12 12 0 0 1 6-6" stroke="#fff8d8" strokeWidth="3" strokeLinecap="round" fill="none" />
-  </>,
-  // World 2's tech coin: a cyan coin with a cog.
-  tech: <>
-    <circle cx="25.5" cy="26" r="17" fill="#1f7fa8" {...line} />
-    <circle cx="22.5" cy="23" r="17" fill="#45d3f5" {...line} />
-    <circle cx="22.5" cy="23" r="11.5" fill="#8fe9ff" stroke="#1c9cc4" strokeWidth="2.5" />
-    <path d="m20.6 13.5h3.8l.8 3 2.3 1 2.7-1.6 2.7 2.7-1.6 2.7 1 2.3 3 .8v3.8l-3 .8-1 2.3 1.6 2.7-2.7 2.7-2.7-1.6-2.3 1-.8 3h-3.8l-.8-3-2.3-1-2.7 1.6-2.7-2.7 1.6-2.7-1-2.3-3-.8v-3.8l3-.8 1-2.3-1.6-2.7 2.7-2.7 2.7 1.6 2.3-1Z" fill="#effcff" stroke="#1c9cc4" strokeWidth="1.6" strokeLinejoin="round" />
-    <circle cx="22.5" cy="23" r="3.6" fill="#45d3f5" stroke="#1c9cc4" strokeWidth="1.6" />
-    <path d="M12 16a12 12 0 0 1 6-6" stroke="#dcf8ff" strokeWidth="3" strokeLinecap="round" fill="none" />
-  </>,
-  // World 3's star crystal: a violet gem with a star.
-  starcoin: <>
-    <path d="M24 3 41 16 35 41H13L7 16Z" fill="#6b3fc4" {...line} />
-    <path d="M22 5 37 17 32 38H12L7 17Z" fill="#b48cff" {...line} />
-    <path d="m22 12 2.9 6 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9Z" fill="#fff4c2" stroke="#e0a31a" strokeWidth="1.6" strokeLinejoin="round" />
-    <path d="M12 17l5-4" stroke="#ece0ff" strokeWidth="3" strokeLinecap="round" />
-  </>,
-  // Lucky coin (rewards and the capsule machine): pink with a four-leaf clover, never mistaken for gold.
-  luck: <>
-    <circle cx="25.5" cy="26" r="17" fill="#c2367a" {...line} />
-    <circle cx="22.5" cy="23" r="17" fill="#ff6fb1" {...line} />
-    <circle cx="22.5" cy="23" r="11.5" fill="#ff9ccb" stroke="#e0458f" strokeWidth="2.5" />
-    <g fill="#5fd36a" stroke="#227a3c" strokeWidth="1.6"><circle cx="18.6" cy="19.3" r="4.2" /><circle cx="26.4" cy="19.3" r="4.2" /><circle cx="18.6" cy="27" r="4.2" /><circle cx="26.4" cy="27" r="4.2" /></g>
-    <path d="M22.5 23.2c1.5 3 2.6 5.6 3.3 8.6" stroke="#227a3c" strokeWidth="2" strokeLinecap="round" fill="none" />
-    <path d="M12 16a12 12 0 0 1 6-6" stroke="#ffd9ec" strokeWidth="3" strokeLinecap="round" fill="none" />
-  </>,
-  paw: <>
-    <ellipse cx="11.5" cy="20" rx="4.6" ry="5.6" fill="#ffd24d" {...line} />
-    <ellipse cx="19.5" cy="11.5" rx="4.6" ry="5.6" fill="#ffd24d" {...line} />
-    <ellipse cx="28.5" cy="11.5" rx="4.6" ry="5.6" fill="#ffd24d" {...line} />
-    <ellipse cx="36.5" cy="20" rx="4.6" ry="5.6" fill="#ffd24d" {...line} />
-    <path d="M24 22c-6 0-12.5 8-12.5 13.5 0 5 5 6 8.5 5 2-.6 2.8-1 4-1s2 .4 4 1c3.5 1 8.5 0 8.5-5C36.5 30 30 22 24 22Z" fill="#ffd24d" {...line} />
-    <path d="M17 31c1-2.5 3-4.5 5-5.5" stroke="#fff3b8" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-  </>,
-  chest: <>
-    <path d="M6 23h36v16a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3Z" fill="#c9652c" {...line} />
-    <path d="M6 23c0-8 6-14 18-14s18 6 18 14Z" fill="#ea8139" {...line} />
-    <path d="M13 11.5V42M35 11.5V42" stroke={INK} strokeWidth="7" />
-    <path d="M13 11.5V42M35 11.5V42" stroke="#ffd447" strokeWidth="3.4" />
-    <path d="M6 23h36" {...line} />
-    <rect x="19.5" y="19" width="9" height="11" rx="2.5" fill="#ffd447" {...line} />
-    <path d="M24 23.5v2.5" {...line} />
-  </>,
-  gift: <>
-    <rect x="8" y="21" width="32" height="20" rx="3" fill="#ff6c9c" {...line} />
-    <rect x="5" y="14.5" width="38" height="9" rx="3" fill="#ff93b9" {...line} />
-    <path d="M24 14.5V41" stroke={INK} strokeWidth="9" />
-    <path d="M24 14.5V41" stroke="#ffd447" strokeWidth="5" />
-    <path d="M24 14c-3-6-10-9-12.5-5.5S16.5 14 24 14Zm0 0c3-6 10-9 12.5-5.5S31.5 14 24 14Z" fill="#ffd447" {...line} />
-  </>,
-  grid: <>
-    {[[6, 6], [26, 6], [6, 26], [26, 26]].map(([x, y]) => <rect key={`${x}:${y}`} x={x} y={y} width="16" height="16" rx="4.5" fill="#f2fbff" {...line} />)}
-  </>,
-  globe: <>
-    <circle cx="24" cy="24" r="18" fill="#58c8ff" {...line} />
-    <path d="M11 15c4-2 7-1 8 2s-2 5-5 6-5 3-4 6c-2-4-2-10 1-14Zm14-8c3 3 8 3 10 6s-1 6-5 6-6 4-4 8 6 4 7 8c3-4 4-8 3-13-1-8-6-14-11-15ZM19 33c3-1 6 1 6 4s-2 4-5 4c-2-2-3-5-1-8Z" fill="#7bd96a" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
-    <path d="M12 21a13 13 0 0 1 7-10" stroke="#e5fbff" strokeWidth="3" strokeLinecap="round" fill="none" />
-  </>,
-  portal: <>
-    <path d="M8 42V22C8 6 40 6 40 22v20Z" fill="#b991f2" {...line} />
-    <path d="M15 42V23c0-10 18-10 18 0v19Z" fill="#5d3fb0" {...line} />
-    <path d="m26 17-7 11h6l-3 9 9-13h-6l4-7Z" fill="#9ff3ff" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
-    <path d="M5 42h38" {...line} />
-  </>,
-  gem: <>
-    <path d="M13 8h22l8 11-19 22L5 19Z" fill="#53d8f2" {...line} />
-    <path d="M5 19h38M13 8l6 11 5-11 5 11 6-11M19 19l5 22 5-22" fill="none" stroke={INK} strokeWidth="2.2" strokeLinejoin="round" />
-    <path d="M14 12l3 5" stroke="#e8fdff" strokeWidth="3" strokeLinecap="round" />
-  </>,
-  question: <>
-    <path d="M15 17c0-11 19-11 18 0-.6 6-9 6-9 12" fill="none" stroke={INK} strokeWidth="11" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M15 17c0-11 19-11 18 0-.6 6-9 6-9 12" fill="none" stroke="#fff" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round" />
-    <circle cx="24" cy="39.5" r="5" fill="#fff" {...line} />
-  </>,
-  gear: <>
-    <path d="m21 4h6l1.3 5.2 3.6 1.5 4.6-2.8 4.2 4.2-2.8 4.6 1.5 3.6L44 21v6l-5.2 1.3-1.5 3.6 2.8 4.6-4.2 4.2-4.6-2.8-3.6 1.5L27 44h-6l-1.3-5.2-3.6-1.5-4.6 2.8-4.2-4.2 2.8-4.6-1.5-3.6L4 27v-6l5.2-1.3 1.5-3.6-2.8-4.6 4.2-4.2 4.6 2.8 3.6-1.5Z" fill="#f2fbff" {...line} />
-    <circle cx="24" cy="24" r="7" fill="#58c8ff" {...line} />
-  </>,
-  home: <>
-    <path d="M10 22v18a2 2 0 0 0 2 2h24a2 2 0 0 0 2-2V22" fill="#fff6d6" {...line} />
-    <path d="M4 24 24 6l20 18" fill="none" stroke={INK} strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M4 24 24 6l20 18" fill="none" stroke="#ff7a3d" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M19 42V30h10v12" fill="#d98a33" {...line} />
-  </>,
-  jump: <>
-    <path d="M10 30 24 16l14 14" fill="none" stroke={INK} strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M10 30 24 16l14 14" fill="none" stroke="#fff" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
-  </>,
-  plus: <>
-    <path d="M24 10v28M10 24h28" stroke={INK} strokeWidth="12" strokeLinecap="round" />
-    <path d="M24 10v28M10 24h28" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
-  </>,
-  bolt: <path d="M28 4 9 27h12l-4 17 22-26H27Z" fill="#ffd447" {...line} />,
-  clover: <>
-    {[[17, 17], [31, 17], [17, 31], [31, 31]].map(([x, y]) => <circle key={`${x}:${y}`} cx={x} cy={y} r="8.5" fill="#5bd46a" {...line} />)}
-    <path d="M24 24c2 6 6 11 12 16" fill="none" {...line} />
-  </>,
-  exit: <>
-    <path d="M27 7H10v34h17" fill="none" stroke={INK} strokeWidth="9" strokeLinejoin="round" />
-    <path d="M27 7H10v34h17" fill="none" stroke="#fff" strokeWidth="4.5" strokeLinejoin="round" />
-    <path d="M21 24h20m-7-8 8 8-8 8" fill="none" stroke={INK} strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M21 24h20m-7-8 8 8-8 8" fill="none" stroke="#ffd447" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" />
-  </>,
-  close: <>
-    <path d="m12 12 24 24M36 12 12 36" stroke={INK} strokeWidth="13" strokeLinecap="round" />
-    <path d="m12 12 24 24M36 12 12 36" stroke="#fff" strokeWidth="6.5" strokeLinecap="round" />
-  </>,
-  pickaxe: <>
-    <path d="m12 41 18-21" stroke={INK} strokeWidth="9" strokeLinecap="round" />
-    <path d="m12 41 18-21" stroke="#c98f55" strokeWidth="4.5" strokeLinecap="round" />
-    <path d="M8 13C17 4 33 5 41 17c-6-3-12-4-17-3-6 0-11 1-16-1Z" fill="#d7e5ee" {...line} />
-    <path d="M14 11c5-2 11-2 16 0" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-  </>,
+const ICONS: Record<IconKind, string> = {
+  backpack: "<path d=\"M17 13V10a7 7 0 0 1 14 0v3\" fill=\"none\" stroke=\"#1b2340\" stroke-width=\"3.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><rect x=\"8.5\" y=\"12.5\" width=\"31\" height=\"30\" rx=\"7\" fill=\"#e8463a\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M8.5 22h31\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><rect x=\"15\" y=\"26\" width=\"18\" height=\"11.5\" rx=\"3\" fill=\"#ffd23a\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M14 17h7\" stroke=\"#fff\" stroke-width=\"3.2\" stroke-linecap=\"round\"/>",
+  // World 1 gold: a dark star struck on a bright coin.
+  coin: "<circle cx=\"24\" cy=\"24\" r=\"18\" fill=\"#ffc61a\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"24\" cy=\"24\" r=\"12.5\" fill=\"none\" stroke=\"#b86e00\" stroke-width=\"2.6\"/><path d=\"M24.0,16.6L26.0,21.8L31.6,22.1L27.2,25.7L28.7,31.1L24.0,28.0L19.3,31.1L20.8,25.7L16.4,22.1L22.0,21.8Z\" fill=\"#b86e00\"/><path d=\"M12.5 18a13 13 0 0 1 6.5-6.5\" fill=\"none\" stroke=\"#fff\" stroke-width=\"3.2\" stroke-linecap=\"round\"/>",
+  // World 2's tech coin: a dark cog on cyan.
+  tech: "<circle cx=\"24\" cy=\"24\" r=\"18\" fill=\"#38cdf5\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M24.7,16.5L27.0,14.0L28.9,14.7L28.8,18.2L29.8,19.2L33.3,19.1L34.0,21.0L31.5,23.3L31.5,24.7L34.0,27.0L33.3,28.9L29.8,28.8L28.8,29.8L28.9,33.3L27.0,34.0L24.7,31.5L23.3,31.5L21.0,34.0L19.1,33.3L19.2,29.8L18.2,28.8L14.7,28.9L14.0,27.0L16.5,24.7L16.5,23.3L14.0,21.0L14.7,19.1L18.2,19.2L19.2,18.2L19.1,14.7L21.0,14.0L23.3,16.5Z\" fill=\"#0b4f78\"/><circle cx=\"24\" cy=\"24\" r=\"3.4\" fill=\"#38cdf5\"/><path d=\"M12.5 18a13 13 0 0 1 6.5-6.5\" fill=\"none\" stroke=\"#fff\" stroke-width=\"3.2\" stroke-linecap=\"round\"/>",
+  // World 3's star crystal coin: a yellow star on violet.
+  starcoin: "<circle cx=\"24\" cy=\"24\" r=\"18\" fill=\"#9d6bff\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M24.0,14.8L26.5,21.3L33.5,21.7L28.1,26.1L29.9,32.9L24.0,29.1L18.1,32.9L19.9,26.1L14.5,21.7L21.5,21.3Z\" fill=\"#ffe14a\" stroke=\"#1b2340\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M12.5 18a13 13 0 0 1 6.5-6.5\" fill=\"none\" stroke=\"#fff\" stroke-width=\"3.2\" stroke-linecap=\"round\"/>",
+  // Lucky coin (rewards, capsule machine): pink with a green clover, never mistaken for gold.
+  luck: "<circle cx=\"24\" cy=\"24\" r=\"18\" fill=\"#ff6fb1\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"20\" cy=\"20\" r=\"4.6\" fill=\"#3fc93a\" stroke=\"#1b2340\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"28\" cy=\"20\" r=\"4.6\" fill=\"#3fc93a\" stroke=\"#1b2340\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"20\" cy=\"28\" r=\"4.6\" fill=\"#3fc93a\" stroke=\"#1b2340\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"28\" cy=\"28\" r=\"4.6\" fill=\"#3fc93a\" stroke=\"#1b2340\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"24\" cy=\"24\" r=\"2.2\" fill=\"#1f7a2e\"/><path d=\"M12.5 18a13 13 0 0 1 6.5-6.5\" fill=\"none\" stroke=\"#fff\" stroke-width=\"3.2\" stroke-linecap=\"round\"/>",
+  // White pads with a pink bean read on any tile colour.
+  paw: "<ellipse cx=\"11.5\" cy=\"21\" rx=\"4.6\" ry=\"5.8\" transform=\"rotate(-20 11.5 21)\" fill=\"#fff\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><ellipse cx=\"19.5\" cy=\"12\" rx=\"4.6\" ry=\"5.8\" transform=\"rotate(-6 19.5 12)\" fill=\"#fff\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><ellipse cx=\"28.5\" cy=\"12\" rx=\"4.6\" ry=\"5.8\" transform=\"rotate(6 28.5 12)\" fill=\"#fff\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><ellipse cx=\"36.5\" cy=\"21\" rx=\"4.6\" ry=\"5.8\" transform=\"rotate(20 36.5 21)\" fill=\"#fff\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M24 25c-7.5 0-12.5 6.5-12.5 11.5 0 4 3 6.5 6.5 6.5 3 0 4-2 6-2s3 2 6 2c3.5 0 6.5-2.5 6.5-6.5 0-5-5-11.5-12.5-11.5Z\" fill=\"#fff\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><ellipse cx=\"24\" cy=\"35\" rx=\"5\" ry=\"3.6\" fill=\"#ff8fb1\"/>",
+  chest: "<path d=\"M7.5 21c0-7.5 6-11.5 16.5-11.5S40.5 13.5 40.5 21Z\" fill=\"#c9773a\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><rect x=\"7.5\" y=\"21\" width=\"33\" height=\"19.5\" rx=\"2\" fill=\"#8f4a1c\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><rect x=\"13\" y=\"10.5\" width=\"5\" height=\"30\" fill=\"#ffd23a\" stroke=\"#1b2340\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><rect x=\"30\" y=\"10.5\" width=\"5\" height=\"30\" fill=\"#ffd23a\" stroke=\"#1b2340\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><rect x=\"19.5\" y=\"17.5\" width=\"9\" height=\"10.5\" rx=\"2\" fill=\"#ffd23a\" stroke=\"#1b2340\" stroke-width=\"2.4\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"24\" cy=\"22.2\" r=\"1.7\" fill=\"#1b2340\"/>",
+  gift: "<rect x=\"10.5\" y=\"26\" width=\"27\" height=\"15.5\" rx=\"2\" fill=\"#e0306f\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><rect x=\"7.5\" y=\"18.5\" width=\"33\" height=\"8\" rx=\"2\" fill=\"#ff5f97\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><rect x=\"21\" y=\"18.5\" width=\"6\" height=\"23\" fill=\"#ffe14a\" stroke=\"#1b2340\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M24 18.5C21 12 12.5 9.5 12.5 14.5c0 3.5 5.5 4 11.5 4Z\" fill=\"#ffe14a\" stroke=\"#1b2340\" stroke-width=\"2.4\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M24 18.5C27 12 35.5 9.5 35.5 14.5c0 3.5-5.5 4-11.5 4Z\" fill=\"#ffe14a\" stroke=\"#1b2340\" stroke-width=\"2.4\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>",
+  grid: "<rect x=\"7\" y=\"7\" width=\"15\" height=\"15\" rx=\"4\" fill=\"#2fb4ff\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><rect x=\"26\" y=\"7\" width=\"15\" height=\"15\" rx=\"4\" fill=\"#ffc61a\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><rect x=\"7\" y=\"26\" width=\"15\" height=\"15\" rx=\"4\" fill=\"#3fc93a\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><rect x=\"26\" y=\"26\" width=\"15\" height=\"15\" rx=\"4\" fill=\"#ff5f97\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M10.5 12v-1.5\" stroke=\"#fff\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M29.5 12v-1.5\" stroke=\"#fff\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M10.5 31v-1.5\" stroke=\"#fff\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M29.5 31v-1.5\" stroke=\"#fff\" stroke-width=\"3\" stroke-linecap=\"round\"/>",
+  globe: "<circle cx=\"24\" cy=\"24\" r=\"18\" fill=\"#2fb4ff\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M12 15c4 0 6 2 6 5s-3 3-3 6 3 4 2 8c-3-1-8-6-8-12 0-3 1-5 3-7ZM28 8c3 2 2 5 5 6s6-1 8 3c1 6-2 11-5 14-1-4-4-4-5-7s2-5 0-7-6-1-6-4 1-4 3-5Z\" fill=\"#3fc93a\" stroke=\"#1b2340\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"24\" cy=\"24\" r=\"18\" fill=\"none\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M13 12a15 15 0 0 1 5-3.5\" stroke=\"#fff\" stroke-width=\"3\" stroke-linecap=\"round\" fill=\"none\"/>",
+  portal: "<ellipse cx=\"24\" cy=\"24\" rx=\"15\" ry=\"19\" fill=\"#7c4ddb\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><ellipse cx=\"24\" cy=\"24\" rx=\"9.5\" ry=\"13.5\" fill=\"#3fd6ff\" stroke=\"#1b2340\" stroke-width=\"2.4\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M24 15c5 0 6 6 2 8s-6 6-1 8\" fill=\"none\" stroke=\"#fff\" stroke-width=\"3\" stroke-linecap=\"round\"/>",
+  gem: "<path d=\"M24 6 39.5 18 24 42.5 8.5 18Z\" fill=\"#3fd6ff\"/><path d=\"M8.5 18 24 42.5 18 18Z\" fill=\"#1592d4\"/><path d=\"M39.5 18 24 42.5 30 18Z\" fill=\"#8be9ff\"/><path d=\"M8.5 18h31M18 18l6-12 6 12M18 18l6 24.5 6-24.5\" fill=\"none\" stroke=\"#1b2340\" stroke-width=\"2\"/><path d=\"M24 6 39.5 18 24 42.5 8.5 18Z\" fill=\"none\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M16 12.5l-3 3.5\" stroke=\"#fff\" stroke-width=\"3\" stroke-linecap=\"round\"/>",
+  question: "<circle cx=\"24\" cy=\"24\" r=\"18\" fill=\"#2fb4ff\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M18 19c0-7 12-7 12 0 0 4-6 4-6 8.5\" fill=\"none\" stroke=\"#fff\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"24\" cy=\"34.5\" r=\"3\" fill=\"#fff\"/>",
+  gear: "<path d=\"M25.4,9.6L29.5,5.8L33.0,7.2L33.2,12.8L35.2,14.8L40.8,15.0L42.2,18.5L38.4,22.6L38.4,25.4L42.2,29.5L40.8,33.0L35.2,33.2L33.2,35.2L33.0,40.8L29.5,42.2L25.4,38.4L22.6,38.4L18.5,42.2L15.0,40.8L14.8,35.2L12.8,33.2L7.2,33.0L5.8,29.5L9.6,25.4L9.6,22.6L5.8,18.5L7.2,15.0L12.8,14.8L14.8,12.8L15.0,7.2L18.5,5.8L22.6,9.6Z\" fill=\"#eef2f8\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"24\" cy=\"24\" r=\"6.5\" fill=\"#55627f\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>",
+  home: "<rect x=\"11\" y=\"22\" width=\"26\" height=\"19.5\" fill=\"#fff4dc\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M5 24.5 24 8.5l19 16Z\" fill=\"#e8463a\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><rect x=\"20\" y=\"29\" width=\"8\" height=\"12.5\" fill=\"#7a4320\" stroke=\"#1b2340\" stroke-width=\"2.6\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>",
+  jump: "<path d=\"M11 30 24 17l13 13\" fill=\"none\" stroke=\"#1b2340\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M11 30 24 17l13 13\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+  plus: "<path d=\"M24 11v26M11 24h26\" stroke=\"#1b2340\" stroke-width=\"10\" stroke-linecap=\"round\"/><path d=\"M24 11v26M11 24h26\" stroke=\"#fff\" stroke-width=\"4.5\" stroke-linecap=\"round\"/>",
+  bolt: "<path d=\"M28 4 10 27.5h12.5L19 44l19.5-25.5H26Z\" fill=\"#ffe14a\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>",
+  clover: "<circle cx=\"17\" cy=\"17\" r=\"8.5\" fill=\"#3fc93a\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"31\" cy=\"17\" r=\"8.5\" fill=\"#3fc93a\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"17\" cy=\"31\" r=\"8.5\" fill=\"#3fc93a\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"31\" cy=\"31\" r=\"8.5\" fill=\"#3fc93a\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M17 17l7 7M31 17l-7 7M17 31l7-7M31 31l-7-7\" stroke=\"#1f7a2e\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><path d=\"M24 24c2 6 6 11 12 16\" fill=\"none\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M13.5 13.5l2-1\" stroke=\"#fff\" stroke-width=\"2.6\" stroke-linecap=\"round\"/>",
+  exit: "<rect x=\"8\" y=\"6\" width=\"22\" height=\"36\" rx=\"2\" fill=\"#a8622e\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><rect x=\"12\" y=\"10\" width=\"14\" height=\"28\" fill=\"#7a4320\" stroke=\"#1b2340\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M22 24h18m-7-7 7 7-7 7\" fill=\"none\" stroke=\"#1b2340\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M22 24h18m-7-7 7 7-7 7\" fill=\"none\" stroke=\"#ffd23a\" stroke-width=\"4.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>",
+  close: "<path d=\"M14 14l20 20M34 14 14 34\" stroke=\"#1b2340\" stroke-width=\"10\" stroke-linecap=\"round\"/><path d=\"M14 14l20 20M34 14 14 34\" stroke=\"#fff\" stroke-width=\"4.5\" stroke-linecap=\"round\"/>",
+  pickaxe: "<path d=\"M14 40 31 19\" stroke=\"#1b2340\" stroke-width=\"8.5\" stroke-linecap=\"round\"/><path d=\"M14 40 31 19\" stroke=\"#c9813f\" stroke-width=\"3.6\" stroke-linecap=\"round\"/><path d=\"M7.5 18.5C14 8.5 30 5.5 41 11.5l-3.5 5C28.5 12.5 18 13 12 21.5Z\" fill=\"#dfe6ef\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M12 21.5l-4.5-3\" fill=\"none\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>",
   // Rebirth: two green arrows chasing round a gold star.
-  rebirth: <>
-    <path d="M10 24a14 14 0 0 1 24.5-9.3" fill="none" stroke={INK} strokeWidth="9" strokeLinecap="round" />
-    <path d="M38 24a14 14 0 0 1-24.5 9.3" fill="none" stroke={INK} strokeWidth="9" strokeLinecap="round" />
-    <path d="M10 24a14 14 0 0 1 24.5-9.3" fill="none" stroke="#5fd36a" strokeWidth="4.5" strokeLinecap="round" />
-    <path d="M38 24a14 14 0 0 1-24.5 9.3" fill="none" stroke="#5fd36a" strokeWidth="4.5" strokeLinecap="round" />
-    <path d="M30 7.5 39.5 13 30 19.5Z" fill="#5fd36a" {...line} />
-    <path d="M18 40.5 8.5 35 18 28.5Z" fill="#5fd36a" {...line} />
-    <path d="m24 16.5 2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.6-4.8 2.6.9-5.4-3.9-3.8 5.4-.8Z" fill="#ffd24d" {...line} strokeWidth="2" />
-  </>,
+  rebirth: "<path d=\"M10 24a14 14 0 0 1 24.5-9.3\" fill=\"none\" stroke=\"#1b2340\" stroke-width=\"9\" stroke-linecap=\"round\"/><path d=\"M38 24a14 14 0 0 1-24.5 9.3\" fill=\"none\" stroke=\"#1b2340\" stroke-width=\"9\" stroke-linecap=\"round\"/><path d=\"M10 24a14 14 0 0 1 24.5-9.3\" fill=\"none\" stroke=\"#3fc93a\" stroke-width=\"4.4\" stroke-linecap=\"round\"/><path d=\"M38 24a14 14 0 0 1-24.5 9.3\" fill=\"none\" stroke=\"#3fc93a\" stroke-width=\"4.4\" stroke-linecap=\"round\"/><path d=\"M30 7.5 39.5 13 30 19.5Z\" fill=\"#3fc93a\" stroke=\"#1b2340\" stroke-width=\"2.6\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M18 40.5 8.5 35 18 28.5Z\" fill=\"#3fc93a\" stroke=\"#1b2340\" stroke-width=\"2.6\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M24.0,16.5L26.0,21.7L31.6,22.0L27.2,25.6L28.7,31.0L24.0,27.9L19.3,31.0L20.8,25.6L16.4,22.0L22.0,21.7Z\" fill=\"#ffc61a\" stroke=\"#1b2340\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>",
+  lock: "<path d=\"M16 21v-5a8 8 0 0 1 16 0v5\" fill=\"none\" stroke=\"#1b2340\" stroke-width=\"4\"/><rect x=\"10.5\" y=\"21\" width=\"27\" height=\"20.5\" rx=\"4\" fill=\"#ffc61a\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"24\" cy=\"29.5\" r=\"2.8\" fill=\"#1b2340\"/><path d=\"M24 31v5\" stroke=\"#1b2340\" stroke-width=\"3\" stroke-linecap=\"round\"/>",
 };
 
 export function Icon({ kind, className = 'ui-icon' }: { kind: IconKind; className?: string }) {
-  return <svg className={className} viewBox="0 0 48 48" aria-hidden="true" focusable="false">{ICONS[kind]}</svg>;
+  return <svg className={className} viewBox="0 0 48 48" aria-hidden="true" focusable="false" dangerouslySetInnerHTML={{ __html: ICONS[kind] }} />;
 }

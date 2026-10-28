@@ -47,7 +47,7 @@ export function RewardsSheet({ session, tab, onTab, onClose }: { session: GameSe
     { id: 'invite', label: '邀请', icon: 'paw' },
   ];
   const footer = <><span className="ui-hint" role="status">{message || '幸运币在地表扭蛋机抽奖：货币、加速、永久挖矿加速、双倍出售……'}</span><span className="ui-grow" />
-    <UiButton size="s" tone="pink" icon="gift" onPress={() => { if (session.goTo('capsule') === 'travelling') onClose(); }}>传送到扭蛋机</UiButton></>;
+    <UiButton size="s" tone="purple" icon="gift" onPress={() => { if (session.goTo('capsule') === 'travelling') onClose(); }}>传送到扭蛋机</UiButton></>;
   return <Sheet title="奖励" tabs={tabs} tab={tab} onTab={onTab} onClose={onClose} footer={footer}>
     <div className="ui-row"><Chip icon="luck">幸运币 <b>{number(rewards.balance)}</b></Chip>
       <span className="ui-hint">{tab === 'online' ? `今日在线 ${clock(rewards.onlineSeconds)} · 每档每天领一次` : tab === 'signin' ? '连续签到 7 天一轮，断签从第 1 天重新开始' : `分享每天 +${REWARD_CONFIG.shareReward}，兑换朋友的邀请码 +${REWARD_CONFIG.inviteReward}`}</span></div>
@@ -101,7 +101,7 @@ export function CapsuleSheet({ session, onClose }: { session: GameSession; onClo
     <Sheet title="幸运扭蛋机" subtitle={`每次抽一项；已拥有的永久权益会换成${unit}`} size="m" className="capsule-sheet" onClose={onClose} footer={<>
       <Chip icon="luck">幸运币 <b>{number(rewards.balance)}</b></Chip>
       <span className="ui-hint" role="status">{message || (!state.atMachine ? '走到扭蛋机旁边才能抽' : rewards.balance < REWARD_CONFIG.spinCost ? '幸运币不够，去奖励里领一些吧' : '')}</span><span className="ui-grow" />
-      <UiButton size="m" tone="pink" icon="luck" disabled={!state.atMachine || rewards.balance < REWARD_CONFIG.spinCost} onPress={spin}>抽一次 · {REWARD_CONFIG.spinCost} 幸运币</UiButton>
+      <UiButton size="m" tone="purple" icon="luck" disabled={!state.atMachine || rewards.balance < REWARD_CONFIG.spinCost} onPress={spin}>抽一次 · {REWARD_CONFIG.spinCost} 幸运币</UiButton>
     </>}>
       <div className="capsule-layout"><CapsuleArt />
         <div className="capsule-prizes">{CAPSULE_REWARDS.map(reward => {
@@ -121,7 +121,7 @@ export function CapsuleSheet({ session, onClose }: { session: GameSession; onClo
         <h2 className="ui-outline">{result.duplicate || result.reward === 'coins' ? `${number(result.coinReward)} ${unit}` : prize.name}</h2>
         <span className="ui-hint">{result.duplicate ? `${prize.name}已经拥有，换成了${unit}` : result.reward === 'coins' ? `${unit}已到账` : result.durationSeconds > 0 ? `持续时间增加 ${result.durationSeconds / 60} 分钟` : '永久生效'}</span>
         <div className="ui-row hatch-actions"><UiButton size="m" tone="steel" onPress={() => setResult(null)}>好的</UiButton>
-          <UiButton size="m" tone="pink" icon="gift" disabled={rewards.balance < REWARD_CONFIG.spinCost} onPress={() => { setResult(null); spin(); }}>再抽一次</UiButton></div>
+          <UiButton size="m" tone="purple" icon="gift" disabled={rewards.balance < REWARD_CONFIG.spinCost} onPress={() => { setResult(null); spin(); }}>再抽一次</UiButton></div>
       </div></div>
     </div>}
   </>;

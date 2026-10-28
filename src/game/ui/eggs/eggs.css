@@ -10,8 +10,8 @@
 .egg-outcome { display: grid; justify-items: center; gap: 3px; min-width: 0; }
 .egg-outcome .ui-cell { aspect-ratio: 1; height: auto; cursor: default; }
 .egg-odds { font-size: 22px; line-height: 1; }
-.egg-owned { font: 700 11px/1.2 var(--ui-font-body); color: #e3f6ff; text-shadow: 0 1px 0 #0b3d6e; }
-.egg-mining { font: 800 12px/1.1 var(--ui-font); color: #bdf3ff; --ui-stroke: 2px; white-space: nowrap; }
+.egg-owned { font: 700 11px/1.2 var(--ui-font); color: var(--ui-ink-soft); }
+.egg-mining { font: 800 12px/1.1 var(--ui-font); color: var(--ui-ink-soft); -webkit-text-stroke: 0; white-space: nowrap; }
 .egg-status { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .hatch {
@@ -24,7 +24,7 @@
 .hatch-egg { grid-area: 1 / 1; width: 150px; height: 175px; animation: hatch-shake .8s ease-in-out, hatch-out .2s .8s forwards; }
 .hatch-flash { grid-area: 1 / 1; width: 520px; height: 520px; border-radius: 50%; background: radial-gradient(circle, #fff 0, #ffffffcc 30%, transparent 70%); opacity: 0; pointer-events: none; animation: hatch-flash .45s .8s; }
 .hatch-result { grid-area: 1 / 1; display: grid; justify-items: center; gap: 4px; opacity: 0; transform: scale(.6); animation: hatch-pop .45s 1s cubic-bezier(.3, 1.6, .5, 1) forwards; }
-.hatch-pet { width: 150px; height: 150px; filter: drop-shadow(0 6px 0 #0b1d3355); }
+.hatch-pet { width: 150px; height: 150px;  }
 .hatch-result h2 { margin: 0; font-size: 30px; --ui-stroke: 5px; }
 .hatch-ribbon { padding: 4px 28px 6px; border: var(--ui-edge) solid var(--ui-ink); background: linear-gradient(180deg, var(--r), var(--r-lo)); clip-path: polygon(0 0, 100% 0, 94% 50%, 100% 100%, 0 100%, 6% 50%); font-size: 24px; line-height: 1; }
 .hatch-new { background: var(--ui-pink); }

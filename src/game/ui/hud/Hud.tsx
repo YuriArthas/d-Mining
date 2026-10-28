@@ -63,9 +63,9 @@ export function Hud({ session, actions, system, objective, target, prompts, tipH
     <SystemMenu system={system} onHelp={run(actions.openHelp)} />
 
     <nav className="hud-rail" aria-label="游戏功能">
-      <Tile icon="paw" label="宠物" aria-label="打开我的宠物" data-tip-target="pets" badge={teamCanImprove(pets) ? '!' : undefined} onPress={run(actions.openPets)} />
-      <Tile icon="chest" label="商店" tone="orange" aria-label="商店" data-kind="upgrade" data-tip-target="shop" onPress={run(actions.openShop)} />
-      <Tile icon="gift" label="奖励" tone="pink" aria-label={claimable ? `奖励，${claimable} 个可领取` : '奖励'} badge={claimable || undefined} onPress={run(actions.openRewards)} />
+      <Tile icon="paw" label="宠物" tone="orange" aria-label="打开我的宠物" data-tip-target="pets" badge={teamCanImprove(pets) ? '!' : undefined} onPress={run(actions.openPets)} />
+      <Tile icon="chest" label="商店" tone="blue" aria-label="商店" data-kind="upgrade" data-tip-target="shop" onPress={run(actions.openShop)} />
+      <Tile icon="gift" label="奖励" tone="purple" aria-label={claimable ? `奖励，${claimable} 个可领取` : '奖励'} badge={claimable || undefined} onPress={run(actions.openRewards)} />
       {state.rebirth.shown && <Tile icon="rebirth" label="重生" tone="green" aria-label={state.rebirth.ready ? '重生，可以重生了' : '重生'} badge={state.rebirth.ready ? '!' : undefined} onPress={run(actions.openRebirth)} />}
     </nav>
 

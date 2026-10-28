@@ -5,7 +5,7 @@ import {initialLoading,updateLoading,type LoadingEvent} from './game/ui/loadingS
 import type {RenderRate} from './game/movement.ts';
 import {SURFACE_EXPOSURE} from './game/world/SceneLighting.ts';
 import {applyToneGrade} from './game/presentation/toneGrade.ts';
-import { useCallback, useReducer, useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react';
+import { lazy, Suspense, useCallback, useReducer, useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react';
 import { flushSync } from 'react-dom';
 import { Canvas, unmountComponentAtNode, type RootState } from '@react-three/fiber';
 import { GAME_CONFIG } from './game/config.ts';
@@ -38,7 +38,10 @@ declare global {
   }
 }
 
+// ?kit=1 shows the UI kit sample page instead of the game (docs/draft-ui-v2.md, U1).
+const KitSample = lazy(() => import('./game/ui/kit/KitSample.tsx').then(m => ({ default: m.KitSample })));
 export function App() {
+  if (new URLSearchParams(window.location.search).get('kit') === '1') return <Suspense><KitSample /></Suspense>;
   return <SaveEntry content={GAME_CONTENT.session} generation={GAME_GENERATION}>{game => <GameView savedGame={game} />}</SaveEntry>;
 }
 function GameView({ savedGame }: { savedGame: SavedGame }) {

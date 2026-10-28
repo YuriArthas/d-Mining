@@ -25,14 +25,12 @@
 .shop-under { position: absolute; left: 50%; bottom: calc(5% + var(--safe-bottom)); transform: translateX(-50%); display: grid; justify-items: center; gap: 14px; }
 .shop-stats { display: flex; gap: 18px; }
 .shop-stat { --disc: var(--ui-orange); --disc-lo: var(--ui-orange-lo); position: relative; display: flex; align-items: center; height: 46px; padding: 0 18px 0 52px;
-  border: 3px solid var(--ui-ink); border-radius: 999px; box-shadow: inset 0 -4px 0 #00000030, 0 4px 0 var(--ui-ink);
-  background: linear-gradient(180deg, #ffffff30 0, #ffffff0c 40%, transparent 41%), linear-gradient(180deg, #2a78c8, #154a86); }
+  border: 3px solid var(--ui-ink); border-radius: 999px; background: linear-gradient(180deg, #ffffff30 0, #ffffff0c 40%, transparent 41%), linear-gradient(180deg, #2a78c8, #154a86); }
 .shop-stat[data-kind=speed] { --disc: var(--ui-gold); --disc-lo: var(--ui-gold-lo); }
 .shop-stat[data-kind=capacity] { --disc: var(--ui-red); --disc-lo: var(--ui-red-lo); }
 .shop-stat-icon { position: absolute; left: -10px; top: 50%; transform: translateY(-50%); width: 56px; height: 56px; display: grid; place-items: center;
-  border: 3px solid var(--ui-ink); border-radius: 50%; box-shadow: inset 0 -4px 0 #00000030, 0 3px 0 var(--ui-ink);
-  background: linear-gradient(180deg, #ffffff66 0, #ffffff14 42%, transparent 43%), linear-gradient(180deg, var(--disc), var(--disc-lo)); }
-.shop-stat-icon .ui-icon { width: 34px; height: 34px; filter: drop-shadow(0 2px 0 #0b2a4a66); }
+  border: 3px solid var(--ui-ink); border-radius: 50%; background: linear-gradient(180deg, #ffffff66 0, #ffffff14 42%, transparent 43%), linear-gradient(180deg, var(--disc), var(--disc-lo)); }
+.shop-stat-icon .ui-icon { width: 34px; height: 34px;  }
 .shop-stat b { font-size: 28px; line-height: 1; --ui-stroke: 5px; }
 /* The gain over what is worn now: a green tag pinned to the badge's corner. */
 .shop-gain { position: absolute; top: -14px; right: -12px; padding: 2px 8px; border: 2px solid var(--ui-ink); border-radius: 999px; font-style: normal; font-size: 15px; line-height: 1.2;
@@ -40,8 +38,8 @@
 @keyframes shop-gain-in { from { opacity: 0; transform: rotate(6deg) scale(.4); } }
 
 .shop-buy.ui-btn { position: relative; overflow: hidden; min-width: 300px; min-height: 68px; padding: 0 30px; gap: 10px; border-radius: 20px; font-size: 32px;
-  border-width: 4px; box-shadow: inset 0 -6px 0 #00000030, 0 6px 0 var(--ui-ink); }
-.shop-buy.ui-btn > .ui-icon { width: 42px; height: 42px; filter: drop-shadow(0 3px 0 #0b2a4a66); }
+  border-width: 4px; }
+.shop-buy.ui-btn > .ui-icon { width: 42px; height: 42px;  }
 .shop-buy.ui-btn > .ui-outline { --ui-stroke: 6px; }
 /* The states read by colour, never by a washed-out grey. */
 .shop-buy.ui-btn:disabled { filter: none; opacity: 1; }
@@ -52,7 +50,7 @@
 @keyframes shop-buy-shine { 0%, 55% { left: -60%; } 85%, 100% { left: 130%; } }
 .shop-buy[data-mood=short] { --tone: #b8484a; --tone-lo: #6e2228; }
 .shop-buy[data-mood=short] > .ui-outline { color: #ffc9c2; }
-.shop-buy[data-mood=short] > .ui-icon, .shop-buy[data-mood=locked] > .ui-icon { filter: grayscale(.6) brightness(.85) drop-shadow(0 3px 0 #0b2a4a66); }
+.shop-buy[data-mood=short] > .ui-icon, .shop-buy[data-mood=locked] > .ui-icon { filter: grayscale(.6) brightness(.85); }
 .shop-buy[data-mood=locked] { --tone: #5d7290; --tone-lo: #34465f; }
 .shop-buy[data-mood=locked] > .ui-outline { color: #c9d6e6; }
 .shop-buy[data-mood=equipped] { --tone: #2fb3e8; --tone-lo: #1676b0; cursor: default; }

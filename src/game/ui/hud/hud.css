@@ -32,7 +32,7 @@
 }
 .hud-depth { display: grid; justify-items: center; text-align: center; white-space: nowrap; }
 .hud-depth-kicker { font-size: 13px; --ui-stroke: 3px; }
-.hud-depth-value { font-size: 30px; line-height: 1.05; --ui-stroke: 5px; text-shadow: 0 3px 0 var(--ui-ink); }
+.hud-depth-value { font-size: 30px; line-height: 1.05; --ui-stroke: 5px; }
 
 /* Right edge: the action column. */
 .hud-rail {
@@ -67,7 +67,7 @@
 .hud-trips { display: flex; gap: 10px; justify-content: center; }
 .hud-return, .hud-sell { min-width: 150px; }
 .hud-sell[data-state=full] { animation: hud-sell-full 1s ease-in-out infinite; }
-@keyframes hud-sell-full { 50% { transform: scale(1.06); box-shadow: 0 0 0 4px #fff7b0, 0 3px 0 var(--ui-ink); } }
+@keyframes hud-sell-full { 50% { transform: scale(1.06); outline: 3px solid var(--ui-gold); outline-offset: 3px; } }
 .hud-notice { display: block; max-width: 100%; }
 .hud-notice:empty { display: none; }
 .hud-notice .ui-toast { white-space: normal; text-align: center; justify-content: center; }
@@ -77,15 +77,14 @@
 .hud-center .target-health {
   position: static; width: min(250px, 100%); padding: 7px 12px 8px;
   border: var(--ui-edge) solid var(--ui-ink); border-radius: 12px;
-  background: linear-gradient(180deg, var(--ui-card), var(--ui-card-lo)); box-shadow: inset 0 2px 0 #ffffff26, 0 3px 0 var(--ui-ink);
-  font: 700 13px/1.35 var(--ui-font-body); color: var(--ui-text-soft);
+  background: var(--ui-paper); font: 700 13px/1.35 var(--ui-font); color: var(--ui-ink);
 }
 .hud-center .target-health > div:first-child { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; min-width: 0; }
 .hud-center .target-health > div:first-child > span { flex: none; }
 .hud-center .target-health strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--ui-font); font-size: 16px; color: #fff; -webkit-text-stroke: 3px var(--ui-ink); paint-order: stroke fill; }
-.hud-center .target-health-track { height: 10px; margin: 6px 0 4px; border: 2px solid var(--ui-ink); border-radius: 6px; background: #0a2a4d; }
-.hud-center .target-health-track span { border-radius: 4px; background: linear-gradient(180deg, #a6f58e, #43c12f); }
-.hud-center .target-health small { display: block; font-size: 12px; color: #bfe6ff; }
+.hud-center .target-health-track { height: 10px; margin: 6px 0 4px; border: 2px solid var(--ui-ink); border-radius: 6px; background: var(--ui-sheet); }
+.hud-center .target-health-track span { border-radius: 4px; background: var(--ui-green); }
+.hud-center .target-health small { display: block; font-size: 12px; color: var(--ui-ink-soft); }
 .hud-center .target-health .hit-flash { animation: hud-hit .2s ease-out; }
 @keyframes hud-hit { from { background: #fff; } }
 
@@ -98,12 +97,11 @@
 .hud-objective .journey-goals {
   display: grid; gap: 5px; width: min(100%, 236px); padding: 6px 10px 8px;
   border: var(--ui-edge) solid var(--ui-ink); border-radius: 14px; pointer-events: none;
-  background: linear-gradient(180deg, var(--ui-blue-hi) 0, var(--ui-blue) 48%, var(--ui-blue-lo) 100%);
-  box-shadow: inset 0 2px 0 #ffffff66, 0 3px 0 var(--ui-ink);
-}
+  background: var(--ui-paper);
+  }
 .hud-objective .journey-depth { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
 .hud-objective .journey-depth .guide-kicker { margin: 0; font-size: 12px; --ui-stroke: 3px; }
-.hud-objective .journey-depth strong { font-size: 17px; line-height: 1.1; color: #fff; --ui-stroke: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hud-objective .journey-depth strong { font-size: 17px; line-height: 1.1; color: var(--ui-ink); -webkit-text-stroke: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .hud-objective .journey-goals .ui-bar { height: 18px; }
 .hud-objective .journey-goals .ui-bar > span { font-size: 12px; }
 
@@ -111,8 +109,7 @@
 .ui-hud .ore-pickup-feed { display: grid; justify-items: center; gap: 5px; pointer-events: none; }
 .ui-hud .ore-pickup {
   display: flex; align-items: center; gap: 8px; padding: 3px 14px 3px 6px;
-  border: 2px solid var(--ui-ink); border-radius: 999px; background: #0f305ad9; box-shadow: 0 2px 0 var(--ui-ink);
-  color: #fff; font: 800 15px/1.2 var(--ui-font); white-space: nowrap;
+  border: 2.5px solid var(--ui-ink); border-radius: 999px; background: var(--ui-paper); color: var(--ui-ink); font: 800 15px/1.2 var(--ui-font); white-space: nowrap;
   animation: hud-ore var(--pickup-lifetime) ease-out forwards;
 }
 .ui-hud .ore-pickup .ore-icon { width: 26px; height: 26px; color: var(--ui-ink); }
@@ -122,14 +119,12 @@
 /* Touch controls: Roblox-style thumbstick ring and jump button. */
 .game-shell .joystick {
   left: calc(16px + var(--safe-left)); bottom: calc(14px + var(--safe-bottom)); width: 124px; height: 124px;
-  border: 3px solid #ffffffb3; background: radial-gradient(circle, #0b1d3326 0, #0b1d3355 70%); box-shadow: 0 0 0 2px #13355d55;
-}
-.game-shell .joystick-knob { width: 50px; height: 50px; left: 34px; top: 34px; background: #ffffffe6; border: 3px solid var(--ui-ink); box-shadow: 0 3px 0 #13355d88; }
+  border: 3px solid #ffffffb3; background: radial-gradient(circle, #0b1d3326 0, #0b1d3355 70%); }
+.game-shell .joystick-knob { width: 50px; height: 50px; left: 34px; top: 34px; background: #ffffffe6; border: 3px solid var(--ui-ink); }
 .game-shell .action-buttons { right: calc(18px + var(--safe-right)); bottom: calc(18px + var(--safe-bottom)); }
 .game-shell .jump-button {
   display: grid; place-items: center; width: 72px; height: 72px; padding: 14px;
-  border: 3px solid #ffffffb3; background: radial-gradient(circle, #0b1d3333 0, #0b1d3366 70%); box-shadow: 0 0 0 2px #13355d55;
-}
+  border: 3px solid #ffffffb3; background: radial-gradient(circle, #0b1d3333 0, #0b1d3366 70%); }
 .game-shell .action-buttons button[aria-pressed=true] { background: #ffd44799; border-color: #fff; }
 .game-shell .jump-button .ui-icon { width: 100%; height: 100%; }
 .game-shell .control-hint { display: none; }

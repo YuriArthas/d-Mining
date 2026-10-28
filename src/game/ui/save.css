@@ -1,11 +1,11 @@
 /* Save boot screen and save notices, matched to the loading screen and kit. */
 .save-boot {
   position: absolute; inset: 0; z-index: 120; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 24px; text-align: center; color: #fff;
-  background: var(--ui-pattern) center / 44px repeat, radial-gradient(ellipse at 50% 40%, #4fd0ff 0%, #13a2f4 45%, #0a6fc4 100%);
+  background: var(--ui-blue);
 }
-.save-boot-mark { font-size: 56px; line-height: 1; letter-spacing: .06em; --ui-stroke: 8px; text-shadow: 0 5px 0 var(--ui-ink); }
+.save-boot-mark { font-size: 56px; line-height: 1; letter-spacing: .06em; --ui-stroke: 8px; }
 .save-boot h2 { margin: 4px; font-size: 20px; }
-.save-boot-error { max-width: 520px; margin: 0; overflow-wrap: anywhere; font: 700 13px/1.5 var(--ui-font-body); color: #fff1b0; text-shadow: 0 1px 0 var(--ui-ink); }
+.save-boot-error { max-width: 520px; margin: 0; overflow-wrap: anywhere; font: 700 13px/1.5 var(--ui-font-body); color: #fff1b0; }
 .save-boot-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 6px; }
 .save-warning { position: absolute; z-index: 110; left: 50%; top: calc(64px + var(--safe-top)); transform: translateX(-50%); display: flex; align-items: center; gap: 12px; max-width: 85%; padding: 8px 10px 8px 14px; font: 700 13px/1.4 var(--ui-font-body); }
 .save-error { padding: 10px 12px; }

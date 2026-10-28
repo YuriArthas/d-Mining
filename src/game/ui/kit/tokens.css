@@ -1,49 +1,56 @@
-/* Mining UI kit tokens. One visual language for the HUD, panels and world prompts,
-   matched to the original Roblox screens: bright cyan bodies, thick navy outlines,
-   chunky 3D drop edges and outlined white display text. See docs/ui-kit.md. */
+/* Mining UI kit tokens, style A "奶油卡片" (docs/draft-ui-v2.md, U0): white cards with a thick dark outline,
+   flat colour blocks and coloured title strips. The kit is flat on purpose: no drop shadows, no glows, no
+   text shadows; depth comes from the outline and the colour blocks only. */
 .game-shell {
-  --ui-ink: #13355d;
-  --ui-ink-soft: #24578c;
-  --ui-blue: #0aaefc;
-  --ui-blue-hi: #6ad6ff;
-  --ui-blue-lo: #0684d6;
-  --ui-well: #0a64b4;
-  --ui-cell: #2a84dc;
-  --ui-green: #52d23d;
-  --ui-green-lo: #2b8f22;
-  --ui-orange: #ffa53c;
-  --ui-orange-lo: #c96a17;
-  --ui-gold: #ffd447;
-  --ui-gold-lo: #c9930f;
-  --ui-purple: #b672e6;
-  --ui-purple-lo: #7442a6;
-  --ui-pink: #ff78b5;
-  --ui-pink-lo: #c3407f;
-  --ui-red: #f06363;
-  --ui-red-lo: #a3333a;
-  --ui-steel: #6f8aac;
-  --ui-steel-lo: #415a7c;
-  --ui-text-gold: #ffd84d;
-  --ui-text-soft: #dcf3ff;
-  --ui-scrim: #0b1d3399;
-  --ui-card: #123d6ae6;
-  --ui-card-lo: #0c2a4ce6;
+  /* Ink and paper */
+  --ui-ink: #1b2340;
+  --ui-ink-soft: #56648a;
+  --ui-paper: #ffffff;
+  --ui-sheet: #eef3fa;
+  --ui-well-bg: #e3eaf5;
+  --ui-line: #cdd7e8;
+  --ui-mute: #8d9cba;
+  /* Tones: flat bodies; -lo is the pressed / darker step of the same colour. */
+  --ui-blue: #2fb4ff;
+  --ui-blue-lo: #1993dc;
+  --ui-orange: #ff9f1a;
+  --ui-orange-lo: #e6830a;
+  --ui-gold: #ffc61a;
+  --ui-gold-lo: #e0a400;
+  --ui-green: #3fc93a;
+  --ui-green-lo: #2aa526;
+  --ui-purple: #9b6bff;
+  --ui-purple-lo: #7d4ee6;
+  --ui-pink: #ff5f97;
+  --ui-pink-lo: #e8407b;
+  --ui-red: #ff4f4f;
+  --ui-red-lo: #e03434;
+  --ui-steel: #8d9cba;
+  --ui-steel-lo: #6f7fa0;
+  /* Text on colour */
+  --ui-text-gold: #ffd23a;
+  --ui-scrim: #1b234070;
+  /* Shape */
   --ui-stroke: 3px;
   --ui-edge: 3px;
+  --ui-radius: 14px;
+  /* Type scale: display (titles, big numbers), title (card names), body, small. */
+  --ui-fs-display: 28px;
+  --ui-fs-title: 18px;
+  --ui-fs-body: 14px;
+  --ui-fs-small: 12px;
   --ui-font-cjk: "Mining Display Noto";
   --ui-font: var(--ui-font-cjk), "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Microsoft YaHei", system-ui, sans-serif;
-  --ui-font-body: "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Microsoft YaHei", system-ui, sans-serif;
-  --ui-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'%3E%3Cpath d='M22 13l6 9-6 9-6-9z' fill='%23fff' fill-opacity='.09'/%3E%3Cpath d='M0 0l4 6-4 6M44 32l-4 6 4 6' fill='none'/%3E%3C/svg%3E");
+  --ui-font-body: var(--ui-font);
 }
 
-/* Outlined display text: white fill over a navy stroke, like Roblox UIStroke. */
+/* Outlined display text: white fill over an ink stroke, like Roblox UIStroke. No shadow under it. */
 .ui-outline {
   color: #fff;
   font-family: var(--ui-font);
   font-weight: 800;
   -webkit-text-stroke: var(--ui-stroke) var(--ui-ink);
   paint-order: stroke fill;
-  text-shadow: 0 2px 0 var(--ui-ink);
   letter-spacing: .01em;
 }
 .ui-num { font-variant-numeric: tabular-nums; }

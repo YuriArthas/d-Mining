@@ -1,10 +1,10 @@
-import type { ComponentProps, CSSProperties, ReactNode } from 'react';
+import { useEffect, useRef, useState, type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 import { GameButton } from '../GameButton.tsx';
 import { Icon, type IconKind } from './icons.tsx';
 import './tokens.css';
 import './kit.css';
 
-export type Tone = 'blue' | 'orange' | 'purple' | 'pink' | 'green' | 'gold' | 'red' | 'steel';
+export type Tone = 'blue' | 'orange' | 'purple' | 'pink' | 'green' | 'gold' | 'red' | 'steel' | 'white';
 type PressProps = Omit<ComponentProps<typeof GameButton>, 'children'>;
 
 /** Square action tile: icon on a chunky colored body, outlined label across the bottom. */
@@ -21,6 +21,35 @@ export function UiButton({ tone = 'blue', size = 'm', icon, children, className 
   return <GameButton {...props} className={`ui-btn ${className}`} data-tone={tone} data-size={size}>
     {icon && <Icon kind={icon} />}<span className="ui-outline">{children}</span>
   </GameButton>;
+}
+
+/** Purchase button: the verb, then the price on its own white plate (“购买 [金币 480]”). `short` marks a price
+ *  the player cannot pay yet: the plate turns red and the button stays pressable so it can explain why. */
+export function PriceButton({ verb, price, currency, short = false, tone = 'green', size = 'm', className = '', ...props }: PressProps & {
+  verb: string; price: ReactNode; currency: IconKind; short?: boolean; tone?: Tone; size?: 's' | 'm' | 'l';
+}) {
+  return <GameButton {...props} className={`ui-btn ui-price-btn ${className}`} data-tone={tone} data-size={size} data-short={short || undefined}>
+    <span className="ui-outline">{verb}</span><span className="ui-price-tag ui-num"><Icon kind={currency} />{price}</span>
+  </GameButton>;
+}
+
+/** A number that rolls to its new value instead of jumping (coins, counts). */
+export function CountUp({ value, format = String, ms = 450 }: { value: number; format?(value: number): string; ms?: number }) {
+  const [shown, setShown] = useState(value);
+  const from = useRef(value);
+  useEffect(() => {
+    const start = performance.now(), a = from.current, reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce || a === value) { from.current = value; setShown(value); return; }
+    let frame = 0;
+    const step = (now: number) => {
+      const t = Math.min(1, (now - start) / ms), v = a + (value - a) * (1 - (1 - t) ** 3);
+      from.current = v; setShown(t < 1 ? Math.round(v) : value);
+      if (t < 1) frame = requestAnimationFrame(step);
+    };
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, [value, ms]);
+  return <>{format(shown)}</>;
 }
 
 export function CloseButton({ label, className = '', ...props }: PressProps & { label: string }) {

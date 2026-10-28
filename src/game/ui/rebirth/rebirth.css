@@ -1,19 +1,19 @@
 /* Rebirth panel: the multiplier comparison first, then what goes and what stays. */
 .rebirth-boost { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; justify-items: center; gap: 2px 10px; padding: 10px 14px; }
-.rebirth-boost-label { grid-column: 1 / -1; font-size: 15px; color: #fff1c2; }
+.rebirth-boost-label { grid-column: 1 / -1; font-size: 15px; color: var(--ui-ink); }
 .rebirth-mult { font: 900 44px/1 var(--ui-font-display, inherit); color: #fff; --ui-stroke: 6px; }
 .rebirth-mult[data-next] { color: #7dff8a; animation: rebirth-pulse 1.4s ease-in-out infinite; }
 .rebirth-arrow { width: 44px; height: 32px; }
 .rebirth-boost small { grid-column: 1 / -1; font-size: 12px; opacity: .9; }
 @keyframes rebirth-pulse { 50% { transform: scale(1.08); } }
 .rebirth-terms { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-.rebirth-term { display: grid; gap: 6px; align-content: start; padding: 10px 12px; border-radius: 14px; background: rgba(10, 30, 60, .35); }
+.rebirth-term { display: grid; gap: 6px; align-content: start; padding: 10px 12px; border-radius: 14px; border: 3px solid var(--ui-line); background: var(--ui-paper); color: var(--ui-ink); }
 .rebirth-term > b { font-size: 16px; }
-.rebirth-term[data-kind=lose] > b { color: #ff9a8a; }
-.rebirth-term[data-kind=keep] > b { color: #8dffa0; }
+.rebirth-term[data-kind=lose] > b { color: var(--ui-red-lo); }
+.rebirth-term[data-kind=keep] > b { color: var(--ui-green-lo); }
 .rebirth-term span { display: flex; align-items: center; gap: 6px; font-size: 13px; }
 .rebirth-term .ui-icon { width: 22px; height: 22px; flex: none; }
-.rebirth-warning { color: #ffd0c8; font-weight: 800; }
+.rebirth-warning { color: var(--ui-red-lo); font-weight: 800; }
 @container game (max-height: 560px) {
   .rebirth-mult { font-size: 34px; }
   .rebirth-term { padding: 7px 10px; gap: 4px; }
