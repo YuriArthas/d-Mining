@@ -5,6 +5,7 @@ import { Icon, type IconKind } from './icons.tsx';
 import type { PetRarity } from '../../logic/pets/types.ts';
 import './panel.css';
 
+import { tr } from '../../i18n/i18n.ts';
 export type SheetTab<T extends string> = { id: T; label: string; icon: IconKind | ReactNode; badge?: ReactNode };
 const FOCUSABLE = 'button:not(:disabled),input:not(:disabled),textarea:not(:disabled),select:not(:disabled),a[href],[tabindex]:not([tabindex="-1"])';
 
@@ -30,9 +31,9 @@ export function Sheet<T extends string>({ title, subtitle, size = 'l', tabs, tab
       className={`ui-sheet ui-panel ${className}`} data-size={size} data-tabs={!!tabs}>
       <h1 className="ui-sheet-title ui-outline">{title}</h1>
       {subtitle && <p className="ui-sheet-sub">{subtitle}</p>}
-      {onClose && <CloseButton className="ui-sheet-close" label={`关闭${label ?? title}`} onPress={onClose} />}
-      {tabs && <nav className="ui-tabs" role="tablist" aria-label={`${title}分类`}>{tabs.map(item =>
-        <GameButton key={item.id} role="tab" className="ui-tab" aria-selected={item.id === tab} blurAfterPress={false} onPress={() => onTab?.(item.id)}>
+      {onClose && <CloseButton className="ui-sheet-close" label={tr('关闭{label}', { label: label ?? title })} onPress={onClose} />}
+      {tabs && <nav className="ui-tabs" role="tablist" aria-label={tr('{title}分类', { title: title })}>{tabs.map(item =>
+        <GameButton key={item.id} role="tab" className="ui-tab" data-long={item.label.length > 7 || undefined} aria-selected={item.id === tab} blurAfterPress={false} onPress={() => onTab?.(item.id)}>
           {typeof item.icon === 'string' ? <Icon kind={item.icon as IconKind} /> : item.icon}
           <span className="ui-outline">{item.label}</span>
           {item.badge != null && <b className="ui-badge ui-outline">{item.badge}</b>}
@@ -57,7 +58,7 @@ export function Toggle({ on, label, onPress }: { on: boolean; label: string; onP
   return <GameButton className="ui-toggle" aria-pressed={on} blurAfterPress={false} onPress={onPress}><i aria-hidden="true" /><span className="ui-outline">{label}</span></GameButton>;
 }
 
-const RARITY_LABEL: Record<PetRarity, string> = { common: '普通', rare: '稀有', epic: '史诗', legendary: '传说' };
+const RARITY_LABEL: Record<PetRarity, string> = { common: tr('普通'), rare: tr('稀有'), epic: tr('史诗'), legendary: tr('传说') };
 export function RarityTag({ rarity }: { rarity: PetRarity }) {
   return <span className="ui-rarity" data-rarity={rarity}>{RARITY_LABEL[rarity]}</span>;
 }

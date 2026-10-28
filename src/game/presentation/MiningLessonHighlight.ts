@@ -4,6 +4,7 @@ import { selectCell, SELECTION } from '../terrain/selection.ts';
 import { CELL, type Coord } from '../terrain/SparseWorld.ts';
 import { oreDefinition } from '../application/items.ts';
 
+import { tr } from '../i18n/i18n.ts';
 type Terrain = { cell(c:Coord):number|null; canMine(c:Coord):boolean };
 export class MiningLessonHighlight {
   readonly group=new Group();
@@ -66,7 +67,7 @@ export class MiningLessonHighlight {
     const touch=element.dataset.input==='touch';
     if(!this.cell){
       element.style.left='50%';element.style.top='70%';
-      if(caption)caption.textContent=touch?'拖动观察，寻找可挖方块':'按住右键向下看，寻找可挖方块';
+      if(caption)caption.textContent=touch?tr('拖动观察，寻找可挖方块'):tr('按住右键向下看，寻找可挖方块');
       return;
     }
     this.group.visible=true;
@@ -75,7 +76,7 @@ export class MiningLessonHighlight {
     this.projected.set(...this.anchor!).project(camera);
     element.style.left=`${(this.projected.x+1)*50}%`;element.style.top=`${(1-this.projected.y)*50}%`;
     element.dataset.cell=this.cell.join(',');
-    if(caption)caption.textContent=touch?'长按这里挖矿':'鼠标移到这里 · 按住左键';
+    if(caption)caption.textContent=touch?tr('长按这里挖矿'):tr('鼠标移到这里 · 按住左键');
   }
   dispose(){this.fill.geometry.dispose();this.fill.material.dispose();this.outline.geometry.dispose();this.outline.material.dispose();this.group.removeFromParent();}
 }

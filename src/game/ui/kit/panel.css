@@ -55,6 +55,9 @@
 .ui-tab:active { transform: scale(.95); }
 .ui-tab > .ui-icon { position: absolute; top: 4px; left: 50%; width: 34px; height: 34px; transform: translateX(-50%); }
 .ui-tab > span { position: absolute; bottom: 4px; left: 0; right: 0; text-align: center; font-size: 14px; color: var(--ui-ink); -webkit-text-stroke: 0; }
+/* A long label (Vietnamese, Indonesian…): a smaller icon and up to two small lines under it. */
+.ui-tab[data-long] > .ui-icon { top: 3px; width: 24px; height: 24px; }
+.ui-tab[data-long] > span { bottom: 3px; padding: 0 2px; font-size: 11px; line-height: 1.05; }
 .ui-tab[aria-selected=true] { background: var(--sheet-tone); }
 .ui-tab[aria-selected=true] > span { color: #fff; -webkit-text-stroke: 3.5px var(--ui-ink); }
 .ui-tab .ui-badge { top: -7px; right: -7px; }
@@ -67,6 +70,9 @@
 }
 .ui-sheet:not([data-tabs=true]) .ui-sheet-body { padding: 34px 14px 8px; }
 .ui-sheet-footer { display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 4px 12px 10px 10px; }
+/* Footer buttons keep their full label; the hint beside them wraps instead. */
+.ui-sheet-footer > .ui-btn { flex: none; }
+.ui-sheet-footer > .ui-hint { flex: 1 1 0; min-width: 0; }
 .ui-sheet:not([data-tabs=true]) .ui-sheet-footer { padding: 4px 14px 12px; }
 .ui-row { display: flex; align-items: center; gap: 8px; min-height: 32px; flex-wrap: wrap; }
 .ui-grow { flex: 1; }
@@ -90,15 +96,19 @@
   background: var(--ui-paper);
 }
 .ui-cell[data-empty] { cursor: default; background: var(--ui-sheet); border: 3px dashed var(--ui-mute); }
-.ui-cell-art { position: absolute; left: 21%; top: 18%; width: 58%; height: 58%; pointer-events: none; }
-.ui-cell-name { position: absolute; top: 3px; left: 3px; right: 3px; text-align: center; font-size: 12px; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Name on top (up to two lines: English names run long), the art filling what is left, the stat band at the bottom. */
+.ui-cell { display: flex; flex-direction: column; align-items: center; }
+.ui-cell-name { order: 0; flex: none; max-width: 100%; padding: 2px 3px 0; text-align: center; font-size: 12px; line-height: 1.05; overflow: hidden;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow-wrap: anywhere; }
+.ui-cell-art { order: 1; flex: 1 1 0; min-height: 0; width: 70%; object-fit: contain; pointer-events: none; margin-bottom: 22px; }
+html:not([lang^=zh]) .ui-cell-name { font-size: 11px; }
 .ui-cell-name.ui-outline { color: var(--ui-ink); -webkit-text-stroke: 0; }
 .ui-cell-stat { position: absolute; left: 0; right: 0; bottom: 0; height: 21px; display: flex; align-items: center; justify-content: center; gap: 2px;
   background: var(--r, var(--ui-blue)); font-size: 13px; color: #fff; --ui-stroke: 3px; }
 .ui-cell-currency { width: 15px; height: 15px; flex: none; }
 .ui-cell-note { position: absolute; left: 6px; bottom: 24px; font-size: 11px; color: var(--ui-ink-soft); -webkit-text-stroke: 0; }
 .ui-cell[data-equipped] { outline: 3px solid var(--ui-green); outline-offset: -1px; }
-.ui-cell-check { position: absolute; right: 3px; top: 19px; width: 20px; height: 20px; border-radius: 50%; border: 2.5px solid var(--ui-ink); background: var(--ui-green); display: grid; place-items: center; font: 900 13px/1 var(--ui-font); color: #fff; }
+.ui-cell-check { position: absolute; right: 3px; bottom: 24px; width: 20px; height: 20px; border-radius: 50%; border: 2.5px solid var(--ui-ink); background: var(--ui-green); display: grid; place-items: center; font: 900 13px/1 var(--ui-font); color: #fff; }
 .ui-cell[aria-pressed=true] { outline: 4px solid var(--ui-ink); outline-offset: 1px; }
 .ui-cell:focus-visible { outline: 3px solid var(--ui-gold); outline-offset: 2px; }
 

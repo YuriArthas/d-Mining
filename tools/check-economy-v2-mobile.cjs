@@ -17,7 +17,7 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
   page.setDefaultTimeout(60000);
   page.on('pageerror', e => report.errors.push(e.message));
   page.on('console', m => { if (m.type() === 'error') report.errors.push(m.text()); });
-  const url = `${base}?debug=1&submission=fenced&framesInFlight=1&saveTest=econ-${Date.now()}`;
+  const url = `${base}?lang=zh&debug=1&submission=fenced&framesInFlight=1&saveTest=econ-${Date.now()}`;
   const ready = async () => {
     await page.waitForFunction(() => window.__miningValidation?.snapshot().ready && !document.querySelector('.loading-screen'), null, { timeout: 300000 });
     await page.addStyleTag({ content: '.hud-debug-tools{display:none!important}' });

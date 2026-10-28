@@ -60,7 +60,7 @@
 .ui-hud .hud-menu .ui-tile-label { display: none; }
 .ui-hud .hud-menu-panel {
   position: absolute; z-index: 6; top: calc(100% + 10px); right: 0;
-  width: 300px; max-height: calc(100cqh - var(--hud-menu) - 30px - var(--safe-top) - var(--safe-bottom)); overflow-y: auto;
+  width: 340px; max-height: calc(100cqh - var(--hud-menu) - 30px - var(--safe-top) - var(--safe-bottom)); overflow-y: auto;
   padding: 10px 14px 14px; display: grid; gap: 8px; pointer-events: auto; overscroll-behavior: contain; transform-origin: top right;
 }
 .hud-menu-panel .ui-panel-title { font-size: 20px; }
@@ -133,3 +133,5 @@
 @media (prefers-reduced-motion: reduce) {
   .hud-sell[data-state=full] { animation: none; }
 }
+.hud-menu-lang { display: flex; }
+.hud-menu-lang > button { flex: 1; }

@@ -9,7 +9,8 @@ type PressProps = Omit<ComponentProps<typeof GameButton>, 'children'>;
 
 /** Square action tile: icon on a chunky colored body, outlined label across the bottom. */
 export function Tile({ icon, label, tone = 'blue', badge, className = '', ...props }: PressProps & { icon: IconKind; label: string; tone?: Tone; badge?: ReactNode }) {
-  return <GameButton {...props} className={`ui-tile ${className}`} data-tone={tone}>
+  // A long label (English, Vietnamese…) steps down a size so it stays on the tile.
+  return <GameButton {...props} className={`ui-tile ${className}`} data-tone={tone} data-long={label.length > 7 || undefined}>
     <Icon kind={icon} />
     <span className="ui-tile-label ui-outline">{label}</span>
     {badge != null && <b className="ui-badge ui-outline">{badge}</b>}

@@ -10,6 +10,9 @@ for p in [Path(f) for f in ['src/game/content/themes.ts','src/game/content/pets.
  chars.update(re.findall(r'[\u4e00-\u9fff]',p.read_text()))
 for p in sorted(Path('src/game/content/rooms').glob('*.scene.json')):
  chars.update(re.findall(r'[\u4e00-\u9fff]',p.read_text()))
+# Signs and egg labels in every language: all letters of the translation tables (src/game/i18n/*.json).
+for p in sorted(Path('src/game/i18n').glob('*.json')):
+ chars.update(c for v in json.loads(p.read_text()).values() for c in v if not c.isspace())
 chars.update(json.loads(Path('src/game/assets/sign-font.json').read_text())['glyphs'])
 cmap=font.getBestCmap();glyphset=font.getGlyphSet();glyphs={}
 class Pen(BasePen):

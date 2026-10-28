@@ -13,6 +13,7 @@
 .shop-head { position: absolute; top: calc(8px + var(--safe-top)); left: 50%; transform: translateX(-50%); display: grid; justify-items: center; gap: 5px; pointer-events: none;
   animation: shop-name-in .3s cubic-bezier(.2, .9, .25, 1.2); }
 .shop-name { margin: 0; white-space: nowrap; font-size: 38px; line-height: 1.1; color: #fff; --ui-stroke: 6px; }
+.shop-name[data-long] { font-size: 28px; max-width: 420px; white-space: normal; text-align: center; line-height: 1.05; }
 .shop-name[data-tier=fine] { color: #7fe6ff; }
 .shop-name[data-tier=star] { color: #ffd84d; }
 .shop-tags { display: flex; gap: 6px; }
@@ -63,6 +64,7 @@
 .session-ui[data-panel=shop] .ui-hud, .game-shell:has(.session-ui[data-panel=shop]) .game-header { display: none; }
 @container game (max-height: 560px) {
   .shop-name { font-size: 28px; --ui-stroke: 5px; }
+  .shop-name[data-long] { font-size: 22px; max-width: 380px; }
   .shop-tag { height: 24px; font-size: 12px; }
   .shop-blurb { font-size: 12px; -webkit-text-stroke-width: 3px; }
   .shop-stat { height: 44px; }

@@ -19,6 +19,7 @@ import { MYSTERY_EGG_NAME } from '../content/petAppearance.ts';
 import { PortalSheet, StationSheet } from './world/WorldSheet.tsx';
 import { RebirthCelebration, RebirthSheet } from './rebirth/RebirthSheet.tsx';
 
+import { tr } from '../i18n/i18n.ts';
 // The testing unlock page is a debug tool: its corner button shows only with ?debug=1.
 const DEBUG = new URLSearchParams(window.location.search).get('debug') === '1';
 
@@ -72,7 +73,7 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
   const openShop = (category: ShopCategory) => { input.reset(); setModal(null); setShopRequest(category); if (shopView.active) showShopCategory(shopView, state, category); };
   const pets = useSyncExternalStore(session.pets.subscribe, session.pets.getSnapshot);
   const standEgg = state.eggId ? pets.eggs.find(egg => egg.id === state.eggId) : undefined;
-  const eggName = state.eggId ? standEgg ? standEgg.unlocked ? standEgg.name : MYSTERY_EGG_NAME : '宠物蛋' : null;
+  const eggName = state.eggId ? standEgg ? standEgg.unlocked ? standEgg.name : MYSTERY_EGG_NAME : tr('宠物蛋') : null;
 
   useEffect(() => {
     if (modal || shopOpen || (!state.eggStation && !state.atMachine) || blocked || !focused) return;
@@ -88,8 +89,8 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
   const tipHidden = !!modal || shopOpen || stationOpen || portalOpen || blocked || !focused;
   useEffect(() => { if (stationOpen || portalOpen) input.reset(); }, [stationOpen, portalOpen, input]);
   const prompts = <>
-    {state.atMachine && <GameButton className="ui-btn capsule-world-prompt" data-tone="purple" data-size="m" onPress={() => open({ kind: 'capsule' })}><Icon kind="gift" /><span className="ui-outline"><span className="desktop-hint">E · </span>幸运扭蛋</span></GameButton>}
-    {state.eggStation && eggName && <GameButton className="ui-btn egg-world-prompt" data-tone="orange" data-size="m" aria-label={`查看${eggName}`} onPress={() => open({ kind: 'egg' })}><Icon kind="paw" /><span className="ui-outline"><span className="desktop-hint">E · </span>查看{eggName}</span></GameButton>}
+    {state.atMachine && <GameButton className="ui-btn capsule-world-prompt" data-tone="purple" data-size="m" onPress={() => open({ kind: 'capsule' })}><Icon kind="gift" /><span className="ui-outline"><span className="desktop-hint">E · </span>{tr('幸运扭蛋')}</span></GameButton>}
+    {state.eggStation && eggName && <GameButton className="ui-btn egg-world-prompt" data-tone="orange" data-size="m" aria-label={tr('查看{eggName}', { eggName: eggName })} onPress={() => open({ kind: 'egg' })}><Icon kind="paw" /><span className="ui-outline"><span className="desktop-hint">E · </span>查看{eggName}</span></GameButton>}
   </>;
   return <div className="session-ui" data-panel={panel}>
     <TipMarker tip={state.tip} anchor={state.tipAnchor} marker={guideMarker} hidden={tipHidden} />
@@ -111,7 +112,7 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
     {modal?.kind === 'rebirth' && <RebirthSheet session={session} onClose={close} onReborn={(count, multiplier) => setReborn({ count, multiplier })} />}
     {reborn && <RebirthCelebration count={reborn.count} multiplier={reborn.multiplier} onDone={endCelebration} />}
     {shopOpen && shop.mode !== 'closed' && <ShopPanel session={session} view={shopView} onClose={closeShop} />}
-    {DEBUG && !blocked && <button className="dev-unlock-button" onClick={() => { input.reset(); setDevUnlock(v => !v); }}>解锁</button>}
+    {DEBUG && !blocked && <button className="dev-unlock-button" onClick={() => { input.reset(); setDevUnlock(v => !v); }}>{tr('解锁')}</button>}
     {devUnlock && <DevUnlockPage session={session} onClose={() => { setDevUnlock(false); surface.current?.focus(); }} />}
   </div>;
 }

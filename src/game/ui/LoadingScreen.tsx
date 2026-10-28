@@ -1,30 +1,31 @@
 import {Component,type ReactNode} from 'react';
 import {LOADING_STAGES,type LoadingState} from './loadingState.ts';
 import loadingEmblem from './loading-emblem.svg?inline';
-const labels={assets:'矿场资源',terrain:'附近地形',rooms:'场景布置',shaders:'画面准备'};
-const descriptions={assets:'正在装载矿场',terrain:'正在铺设脚下的土地',rooms:'正在布置地下营地',shaders:'正在点亮矿场'};
+import { tr } from '../i18n/i18n.ts';
+const labels={assets:tr('矿场资源'),terrain:tr('附近地形'),rooms:tr('场景布置'),shaders:tr('画面准备')};
+const descriptions={assets:tr('正在装载矿场'),terrain:tr('正在铺设脚下的土地'),rooms:tr('正在布置地下营地'),shaders:tr('正在点亮矿场')};
 export function LoadingScreen({state,onExit}:{state:LoadingState;onExit:()=>void}){
  const active=LOADING_STAGES.find(s=>!state.steps[s].complete);
  const percent=Math.floor(state.progress*100);
- return <section className="loading-screen" aria-label="正在加载 Mining" data-phase={state.error?'error':state.ready?'ready':active??'entering'}>
-  <div className="loading-topline"><span>MINING <b>·</b> 矿场</span><button type="button" onClick={onExit}>退出游戏 <span aria-hidden="true">↗</span></button></div>
+ return <section className="loading-screen" aria-label={tr('正在加载 Mining')} data-phase={state.error?'error':state.ready?'ready':active??'entering'}>
+  <div className="loading-topline"><span>MINING <b>·</b> {tr('矿场')}</span><button type="button" onClick={onExit}>{tr('退出游戏')} <span aria-hidden="true">↗</span></button></div>
   <div className="loading-content">
    <img className="loading-emblem" src={loadingEmblem} alt=""/>
-   <div className="loading-eyebrow">向下探索 · 满载而归</div>
+   <div className="loading-eyebrow">{tr('向下探索 · 满载而归')}</div>
    <h1>MINING</h1>
    <div className="loading-status" role="status" aria-live="polite">
-    <h2>{state.error?'暂时没能进入矿场':state.ready?'准备就绪，出发！':active?descriptions[active]:'矿场就绪，即将出发'}</h2>
-    {state.error&&<p className="loading-error">加载遇到了一点问题，请重新尝试。</p>}
+    <h2>{state.error?tr('暂时没能进入矿场'):state.ready?tr('准备就绪，出发！'):active?descriptions[active]:tr('矿场就绪，即将出发')}</h2>
+    {state.error&&<p className="loading-error">{tr('加载遇到了一点问题，请重新尝试。')}</p>}
    </div>
    {!state.error?<>
-    <div className="loading-track" role="progressbar" aria-label="总加载进度" aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent}>
+    <div className="loading-track" role="progressbar" aria-label={tr('总加载进度')} aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent}>
      <span style={{width:`${state.progress*100}%`}}/>
     </div>
-    <div className="loading-detail"><span>{state.ready?'准备就绪':active?labels[active]:'等待首帧画面'}</span><span>{percent}%</span></div>
+    <div className="loading-detail"><span>{state.ready?tr('准备就绪'):active?labels[active]:tr('等待首帧画面')}</span><span>{percent}%</span></div>
     <ol className="loading-steps">{LOADING_STAGES.map((stage,i)=><li key={stage} data-complete={state.steps[stage].complete} data-active={stage===active}><span>{state.steps[stage].complete?'✓':String(i+1).padStart(2,'0')}</span>{labels[stage]}</li>)}</ol>
-   </>:<button className="loading-retry" onClick={()=>location.reload()}>重新加载</button>}
+   </>:<button className="loading-retry" onClick={()=>location.reload()}>{tr('重新加载')}</button>}
   </div>
-  <div className="loading-bottom"><span className="loading-tip">小提示：背包满了点「出售」，一键传送去卖矿。</span><span>探索 · 采集 · 成长</span></div>
+  <div className="loading-bottom"><span className="loading-tip">{tr('小提示：背包满了点「出售」，一键传送去卖矿。')}</span><span>{tr('探索 · 采集 · 成长')}</span></div>
  </section>;
 }
 export class LoadingBoundary extends Component<{onFailure:(message:string)=>void;children:ReactNode},{failed:boolean}>{

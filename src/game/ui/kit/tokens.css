@@ -44,6 +44,9 @@
   --ui-font-body: var(--ui-font);
 }
 
+/* Vietnamese sets every letter in Noto (Fredoka lacks its tone marks), so no word mixes two fonts. */
+html[lang=vi] .game-shell { --ui-font-cjk: "Mining Display Vi"; }
+
 /* Outlined display text: white fill over an ink stroke, like Roblox UIStroke. No shadow under it. */
 .ui-outline {
   color: #fff;

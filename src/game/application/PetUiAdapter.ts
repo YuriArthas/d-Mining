@@ -3,6 +3,7 @@ import type { PetService, HatchResult, EquipOwnedResult, MergeResult } from './P
 import { petStats } from '../logic/pets/petRules.ts';
 import type { CurrencyId } from '../content/economy.ts';
 
+import { tr } from '../i18n/i18n.ts';
 /** A pet's bonuses: extra income in its own currency (`bonusPct`, only in that world) and faster mining
  *  (`miningPct`, every world), both in percent. */
 export type PetCardView = Readonly<{
@@ -64,7 +65,7 @@ export class PetUiAdapter implements PetUiApi {
     const equippedSlots = new Map(equipment.slots.map((id, slot) => [id, slot]));
     const pets = previous && inventory === this.inventory && equipment === this.equipment ? previous.pets : Object.freeze(inventory.pets.map(pet => {
       const definition = petStats(pet, id => catalog.pet(id));
-      return Object.freeze({ pet, name: (pet.golden ? '金色' : '') + definition.name, rarity: definition.rarity, bonusPct: definition.bonusPct, currency: definition.currency,
+      return Object.freeze({ pet, name: pet.golden ? tr('金色{name}', { name: definition.name }) : definition.name, rarity: definition.rarity, bonusPct: definition.bonusPct, currency: definition.currency,
         miningPct: definition.miningPct, equippedSlot: equippedSlots.get(pet.id) ?? null, golden: !!pet.golden,
         mergeable: pet.golden ? 0 : inventory.pets.filter(p => p.speciesId === pet.speciesId && !p.golden).length });
     }));

@@ -1,4 +1,5 @@
 import { ECONOMY } from './economy.ts';
+import { tr } from '../i18n/i18n.ts';
 // Lucky coins and the capsule machine; every amount, weight and multiplier is in economy.json.
 const LUCKY = ECONOMY.luckyCoins, CAPSULE = ECONOMY.capsule;
 export const ONLINE_REWARD_MINUTES: readonly number[] = Object.freeze(LUCKY.online.map(o => o.minutes));
@@ -19,13 +20,13 @@ export const REWARD_CONFIG = Object.freeze({
 });
 const PRIZE_NAMES = {
   // The coin prize pays the current world's currency, about two minutes of income at its deepest layer reached.
-  coins: '货币',
-  speed: `移动速度 ×${CAPSULE.movementMultiplier}`,
-  mining: `永久挖矿速度 ×${CAPSULE.miningSpeedMultiplier}`,
+  coins: tr('货币'),
+  speed: tr('移动速度 ×{x}', { x: CAPSULE.movementMultiplier }),
+  mining: tr('永久挖矿速度 ×{x}', { x: CAPSULE.miningSpeedMultiplier }),
   // Was “便携传送” (teleport anywhere), which every player now has; a timed double sale instead.
-  sell: `出售收入 ×${CAPSULE.sellMultiplier}`,
-  autoHatch: '自动孵蛋',
-  luck: `稀有宠物概率 ×${CAPSULE.luckMultiplier}`,
+  sell: tr('出售收入 ×{x}', { x: CAPSULE.sellMultiplier }),
+  autoHatch: tr('自动孵蛋'),
+  luck: tr('稀有宠物概率 ×{x}', { x: CAPSULE.luckMultiplier }),
 } as const;
 export type CapsuleRewardId = keyof typeof PRIZE_NAMES;
 export const CAPSULE_REWARDS: readonly Readonly<{ id: CapsuleRewardId; name: string; weight: number }>[] = Object.freeze(CAPSULE.prizes.map(p => {

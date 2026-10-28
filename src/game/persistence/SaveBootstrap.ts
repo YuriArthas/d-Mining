@@ -6,6 +6,7 @@ import { acquireSaveOwnership } from "./SaveOwnership.ts";
 import { SaveCoordinator } from "./SaveCoordinator.ts";
 import { compatibleHead } from "./saveMigrations.ts";
 import type { SaveHeadV1 } from "./saveTypes.ts";
+import { tr } from '../i18n/i18n.ts';
 export type SavedGame = Awaited<ReturnType<typeof openSavedGame>>;
 export async function openSavedGame(
   namespace: string,
@@ -26,7 +27,7 @@ export async function openSavedGame(
       saves?.invalidate(error);
     });
     signal.throwIfAborted();
-    onProgress("正在读取存档");
+    onProgress(tr('正在读取存档'));
     const read = await store.read();
     signal.throwIfAborted();
     const head: SaveHeadV1 =
@@ -53,7 +54,7 @@ export async function openSavedGame(
       for (let i = 0; i < read.regions.length; i++) {
         world.restoreRegion(read.regions[i]);
         if (performance.now() - slice > 8) {
-          onProgress(`正在恢复矿坑 ${i + 1}/${read.regions.length}`);
+          onProgress(tr('正在恢复矿坑 {i}/{regions}', { i: i + 1, regions: read.regions.length }));
           await new Promise<void>((resolve) => setTimeout(resolve, 0));
           signal.throwIfAborted();
           slice = performance.now();

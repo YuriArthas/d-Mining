@@ -14,6 +14,7 @@ import { worldAtFeet, worldRequirement } from '../content/worldJourney.ts';
 import { Vector3 } from "three";
 import { bakedLightState, bakedSunAlignment, bakedSunDirection, setStandingSun } from '../presentation/bakedLight.ts';
 import { standingSun } from '../presentation/standingLight.ts';
+import { tr } from '../i18n/i18n.ts';
 export function updateGame(
   current: PreparedGame,
   elapsed: number,
@@ -137,7 +138,7 @@ export function updateGame(
     terrain.measurements.add("frameCpuMs", performance.now() - start);
     terrain.measurements.add("frameIntervalMs", elapsed * 1000);
   } catch (reason) {
-    const error = `运行失败：${String(reason)}`;
+    const error = tr('运行失败：{reason}', { reason: String(reason) });
     onStatus(error);
     onLoading({ error });
     throw reason;

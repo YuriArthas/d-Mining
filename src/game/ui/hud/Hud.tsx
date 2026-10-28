@@ -11,6 +11,7 @@ import { TipToast } from '../TipsUi.tsx';
 import './hud.css';
 import { currencyIcon, currencyName } from '../currency.ts';
 
+import { tr } from '../../i18n/i18n.ts';
 type HudActions = {
   openPets(): void; openShop(): void; openBackpacks(): void; openRewards(): void; openMinerals(): void; openHelp(): void; openRebirth(): void;
 };
@@ -39,43 +40,43 @@ export function Hud({ session, actions, system, prompts, tipHidden = false }: {
   const tip = !tipHidden && state.tip && state.tip.anchor !== 'mine' && state.tip.anchor !== 'dig' ? state.tip : null;
   const showSell = bag.used > 0 && !state.inSellZone;
   return <div className="ui-hud" data-location={state.location ?? 'surface'} data-tip={tip?.id}>
-    <section className="hud-left" aria-label="资源">
+    <section className="hud-left" aria-label={tr('资源')}>
       <div className="hud-wallet">
         <Pill icon={currencyIcon(state.currency)} className="hud-coins">
           {/* Keyed by currency: a new world's money appears at once instead of rolling from the last world's. */}
           <span data-testid="coins" aria-label={`${currencyName(state.currency)} ${number(state.coins)}`}><CountUp key={state.currency} value={state.coins} format={number} /></span>
-          {state.rebirth.multiplier > 1 && <b className="hud-coin-mult" aria-label={`重生收益 ${state.rebirth.multiplier} 倍`}>×{state.rebirth.multiplier}</b>}
+          {state.rebirth.multiplier > 1 && <b className="hud-coin-mult" aria-label={tr('重生收益 {multiplier} 倍', { multiplier: state.rebirth.multiplier })}>×{state.rebirth.multiplier}</b>}
         </Pill>
         <Pill icon="backpack" className="hud-bag" meter={bag.capacity > 0 ? bag.used / bag.capacity : 0} state={bag.isFull ? 'full' : undefined}
-          onPress={run(actions.openMinerals)} pressLabel="查看背包里的矿物" plus={{ label: '升级背包', onPress: run(actions.openBackpacks) }}>
-          <span data-testid="bag-count" aria-label={`背包容量 ${number(bag.used)} / ${number(bag.capacity)}`}>{number(bag.used)}<small>/{number(bag.capacity)}</small></span>
+          onPress={run(actions.openMinerals)} pressLabel={tr('查看背包里的矿物')} plus={{ label: tr('升级背包'), onPress: run(actions.openBackpacks) }}>
+          <span data-testid="bag-count" aria-label={tr('背包容量 {used} / {capacity}', { used: number(bag.used), capacity: number(bag.capacity) })}>{number(bag.used)}<small>/{number(bag.capacity)}</small></span>
         </Pill>
       </div>
       {(showSell || !surface) && <div className="hud-trips">
         {showSell && <UiButton className="hud-sell" size="s" tone="green" icon={currencyIcon(state.currency)} data-state={bag.isFull ? 'full' : undefined} data-tip-target="sell"
-          aria-label="传送到售卖圈出售" onPress={() => { session.dismissTip('sell'); session.goTo('sale'); }}>出售</UiButton>}
-        {!surface && <UiButton className="hud-return" size="s" tone="blue" icon="home" onPress={run(session.returnToSurface)}>回地表</UiButton>}
+          aria-label={tr('传送到售卖圈出售')} onPress={() => { session.dismissTip('sell'); session.goTo('sale'); }}>{tr('出售')}</UiButton>}
+        {!surface && <UiButton className="hud-return" size="s" tone="blue" icon="home" onPress={run(session.returnToSurface)}>{tr('回地表')}</UiButton>}
       </div>}
     </section>
 
     <div className="hud-center">
       <Whereabouts session={session} title={world?.title ?? ''} kicker={world?.name ?? ''} surface={surface} />
       {(speed > 0 || luck > 0 || sell > 0) && <div className="hud-buffs">
-        {speed > 0 && <span className="hud-buff"><Icon kind="bolt" />移速 ×2<b className="ui-num">{clock(speed)}</b></span>}
-        {luck > 0 && <span className="hud-buff"><Icon kind="clover" />稀有率 ×2<b className="ui-num">{clock(luck)}</b></span>}
-        {sell > 0 && <span className="hud-buff"><Icon kind={currencyIcon(state.currency)} />出售 ×2<b className="ui-num">{clock(sell)}</b></span>}
+        {speed > 0 && <span className="hud-buff"><Icon kind="bolt" />{tr('移速 ×2')}<b className="ui-num">{clock(speed)}</b></span>}
+        {luck > 0 && <span className="hud-buff"><Icon kind="clover" />{tr('稀有率 ×2')}<b className="ui-num">{clock(luck)}</b></span>}
+        {sell > 0 && <span className="hud-buff"><Icon kind={currencyIcon(state.currency)} />{tr('出售 ×2')}<b className="ui-num">{clock(sell)}</b></span>}
       </div>}
       <TipToast session={session} tip={tip} />
     </div>
 
     <SystemMenu system={system} onHelp={run(actions.openHelp)} />
 
-    <nav className="hud-rail" aria-label="游戏功能">
-      <Tile icon="paw" label="宠物" tone="orange" className="hud-big" aria-label="打开我的宠物" data-tip-target="pets" badge={teamCanImprove(pets) ? '!' : undefined} onPress={run(actions.openPets)} />
-      <Tile icon="chest" label="商店" tone="blue" className="hud-big" aria-label="商店" data-kind="upgrade" data-tip-target="shop" onPress={run(actions.openShop)} />
+    <nav className="hud-rail" aria-label={tr('游戏功能')}>
+      <Tile icon="paw" label={tr('宠物')} tone="orange" className="hud-big" aria-label={tr('打开我的宠物')} data-tip-target="pets" badge={teamCanImprove(pets) ? '!' : undefined} onPress={run(actions.openPets)} />
+      <Tile icon="chest" label={tr('商店')} tone="blue" className="hud-big" aria-label={tr('商店')} data-kind="upgrade" data-tip-target="shop" onPress={run(actions.openShop)} />
       <div className="hud-rail-row">
-        {state.rebirth.shown && <Tile icon="rebirth" label="重生" tone="green" aria-label={state.rebirth.ready ? '重生，可以重生了' : '重生'} badge={state.rebirth.ready ? '!' : undefined} onPress={run(actions.openRebirth)} />}
-        <Tile icon="gift" label="奖励" tone="purple" aria-label={claimable ? `奖励，${claimable} 个可领取` : '奖励'} badge={claimable || undefined} onPress={run(actions.openRewards)} />
+        {state.rebirth.shown && <Tile icon="rebirth" label={tr('重生')} tone="green" aria-label={state.rebirth.ready ? tr('重生，可以重生了') : tr('重生')} badge={state.rebirth.ready ? '!' : undefined} onPress={run(actions.openRebirth)} />}
+        <Tile icon="gift" label={tr('奖励')} tone="purple" aria-label={claimable ? tr('奖励，{claimable} 个可领取', { claimable: claimable }) : tr('奖励')} badge={claimable || undefined} onPress={run(actions.openRewards)} />
       </div>
     </nav>
 
@@ -83,7 +84,7 @@ export function Hud({ session, actions, system, prompts, tipHidden = false }: {
       {prompts}
       {/* The one-time sell tip already says it; do not repeat the full-bag notice under it. */}
       {/* Ticket ore says where it went in the chip by the bag (MiningOverlay), so its store notice is not repeated here. */}
-      <HudNotice text={tip?.id === 'sell' && state.inventory.isFull || state.notice.startsWith('材料仓 +') ? '' : state.notice} />
+      <HudNotice text={tip?.id === 'sell' && state.inventory.isFull || state.notice.startsWith(tr('材料仓 +')) ? '' : state.notice} />
     </div>
   </div>;
 }
@@ -97,13 +98,13 @@ function Whereabouts({ session, title, kicker, surface }: { session: GameSession
   const goal = selectDepthGoal(state.maxDepth, state.destinations);
   const layer = state.destinations.filter(d => d.depth <= state.depth).sort((a, b) => a.depth - b.depth).at(-1);
   const metres = Math.floor(state.depth);
-  return <header className="hud-where" aria-label={surface ? `${kicker}，${title}，地表` : `${kicker}，${layer?.name ?? title}，深度 ${metres} 米`}>
+  return <header className="hud-where" aria-label={surface ? tr('{kicker}，{title}，地表', { kicker: kicker, title: title }) : tr('{kicker}，{name}，深度 {metres} 米', { kicker: kicker, name: layer?.name ?? title, metres: metres })}>
     {surface
       ? <div className="hud-place"><small>{kicker}</small><b>{title}</b></div>
-      : <div className="hud-depth"><small>{layer?.name ?? title}</small><b className="ui-num" data-testid="depth">{metres}<u>米</u></b></div>}
-    {goal && <div className="hud-goal" data-testid="journey-goals" role="progressbar" aria-label={`下一层 ${goal.name}`} aria-valuemin={0} aria-valuemax={goal.depth} aria-valuenow={Math.floor(goal.currentDepth)}
+      : <div className="hud-depth"><small>{layer?.name ?? title}</small><b className="ui-num" data-testid="depth">{metres}<u>{tr('米')}</u></b></div>}
+    {goal && <div className="hud-goal" data-testid="journey-goals" role="progressbar" aria-label={tr('下一层 {name}', { name: goal.name })} aria-valuemin={0} aria-valuemax={goal.depth} aria-valuenow={Math.floor(goal.currentDepth)}
       style={{ '--v': `${Math.min(100, goal.currentDepth / goal.depth * 100).toFixed(1)}%` } as CSSProperties}>
-      <i /><span>下一层 {goal.name}<em className="ui-num">{Math.floor(goal.currentDepth)} / {goal.depth} 米</em></span>
+      <i /><span>{tr('下一层 {layer}', { layer: goal.name })}<em className="ui-num">{tr('{now} / {depth} 米', { now: Math.floor(goal.currentDepth), depth: goal.depth })}</em></span>
     </div>}
   </header>;
 }

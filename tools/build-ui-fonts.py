@@ -152,6 +152,23 @@ def main():
                        f'font-weight: 100 900; font-display: swap; unicode-range: {ranges(codepoints)}; }}')
         print(f"{spec['id']:7} glyphs={len(covered):5} bytes={out['bytes']:7} missing={missing}")
     print(f"digits  glyphs={len(latin):5} bytes={digits_out['bytes']:7}")
+    # Vietnamese: Fredoka has no ă ơ ư đ or stacked tones, so a Vietnamese page sets every letter in Noto (one face,
+    # so a word never mixes two fonts). Its text is the Vietnamese table plus ASCII.
+    vi_path = ROOT / 'src/game/i18n/vi.json'
+    if vi_path.exists():
+        spec = CJK[0]
+        font = load(spec)
+        vi_text = {chr(c) for c in range(0x20, 0x7F)} | {c for v in json.loads(vi_path.read_text(encoding='utf-8')).values() for c in v if not c.isspace()}
+        vi_text |= set('0123456789+-×/%:,.!?·↑✓…—')
+        covered = {ord(c) for c in vi_text if ord(c) in font.getBestCmap()}
+        vi_spec = dict(spec, id='vi', file='mining-vi-noto.woff2')
+        out = write_subset(vi_spec, font, covered, 'Mining Display Vi')
+        (OUT / 'licenses' / 'vi-OFL.txt').write_bytes(fetch(spec['license_url'], spec['license_sha256']))
+        manifest['faces'].append(dict(id='vi', file=vi_spec['file'], source=spec['name'], url=spec['url'], sourceSha256=spec['sha256'], axes=spec['axes'],
+                                      license='SIL OFL 1.1', glyphs=len(covered), unicodeRange=ranges(covered), **out))
+        css.append(f'@font-face {{ font-family: "Mining Display Vi"; src: url("../../assets/fonts/mining-vi-noto.woff2") format("woff2"); '
+                   f'font-weight: 100 900; font-display: swap; unicode-range: {ranges(covered)}; }}')
+        print(f"vi      glyphs={len(covered):5} bytes={out['bytes']:7}")
     CSS.parent.mkdir(parents=True, exist_ok=True)
     CSS.write_text('\n'.join(css) + '\n', encoding='utf-8')
     (OUT / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')

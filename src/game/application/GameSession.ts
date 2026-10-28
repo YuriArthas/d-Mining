@@ -28,6 +28,7 @@ import { Pickaxe, pickaxeStats } from "../logic/Pickaxe.ts";
 import { MiningCombat } from "./MiningCombat.ts";
 import { oreDrops, oreDefinition, itemDefinition, itemVolume, itemPrice } from "./items.ts";
 import type { Coord } from "../terrain/SparseWorld.ts";
+import { tr } from '../i18n/i18n.ts';
 type WorldCommands = {
   cell(target: Coord): number | null;
   canMine?(target: Coord): boolean;
@@ -84,7 +85,7 @@ export class GameSession {
     if(!slot)return null;
     const room=this.content.destinations.filter(d=>d.worldId===slot.world)[slot.layer-1];
     const unlocked=!!room&&this.worldProgress.isOpen(slot.world as WorldId)&&!!this.explorations.get(slot.world as WorldId)?.has(room.id);
-    return Object.freeze({slot:slot.slot,price:slot.price,currency:slot.currency,unlocked,unlockName:`${worldRequirement(slot.world as WorldId).name}的${room?.name??''}`,
+    return Object.freeze({slot:slot.slot,price:slot.price,currency:slot.currency,unlocked,unlockName:tr('{name}的{name2}', { name: worldRequirement(slot.world as WorldId).name, name2: room?.name??'' }),
       canAfford:unlocked&&this.wallet.getBalance(slot.currency)>=slot.price});
   }
   /** Buys the next pet slot; `expectedSlots` guards against a stale panel. */
@@ -399,6 +400,7 @@ export class GameSession {
         id: r.id,
         name: r.name,
         depth: r.depth,
+        theme: r.theme,
         unlocked: this.exploration.has(r.id),
       })),
       notice: this.notice,
@@ -544,9 +546,9 @@ export class GameSession {
   shareReward = async (platform: 'wechat'|'douyin') => {
     if(this.suspended)return {status:'unavailable' as const};
     if(platform!=='wechat'&&platform!=='douyin')throw Error('未知分享平台');
-    const name=platform==='wechat'?'微信':'抖音';
+    const name=platform==='wechat'?tr('微信'):tr('抖音');
     const url=typeof location==='undefined'?'https://w-sunjun-public.dev.clock-p.com/games/mining-test/index.html':new URL(location.pathname,location.origin).href;
-    const text=`我在 Mining 挖到了 ${Math.floor(this.exploration.maxDepth)} 米！一起来挑战深度纪录。\n${url}\n邀请码：${this.rewards.getSnapshot().inviteCode}\n进入游戏，在“奖励”中粘贴口令领取幸运币。分享至${name}。`;
+    const text=tr('我在 Mining 挖到了 {maxDepth} 米！一起来挑战深度纪录。\n{url}\n邀请码：{inviteCode}\n进入游戏，在“奖励”中粘贴口令领取幸运币。分享至{name}。', { maxDepth: Math.floor(this.exploration.maxDepth), url: url, inviteCode: this.rewards.getSnapshot().inviteCode, name: name });
     try { await navigator.clipboard.writeText(text); }
     catch { return {status:'clipboard-failed' as const}; }
     if(this.suspended)return {status:'unavailable' as const};
@@ -586,7 +588,7 @@ export class GameSession {
         this.autoHatchElapsed=0;
         const hatched=this.petService.hatch(this.autoHatchEgg);
         if(hatched.status==='hatched'){this.lastAutoHatch=hatched;this.committed(true);this.feedback({type:'hatched',tier:this.petTier(hatched.pet),auto:true});}
-        else {this.stopAutoHatch();this.notice='自动孵蛋已停止';}
+        else {this.stopAutoHatch();this.notice=tr('自动孵蛋已停止');}
       }
     }
     if(result.changed)this.committed(false);
@@ -618,10 +620,10 @@ export class GameSession {
     for (const resource of resources)
       if (resource.cell) this.combat.destroyed(resource.cell.join(","));
     this.refreshTarget();
-    this.notice = this.inventory.isFull() ? "背包已满，前往售卖点出售" : "";
+    this.notice = this.inventory.isFull() ? tr('背包已满，前往售卖点出售') : "";
     // Ticket ore says where it went: the store, and how much of it the tickets still lack.
     const kept=this.stored.at(-1);
-    if (kept) this.notice = `材料仓 +${this.stored.reduce((n,s)=>n+s.count,0)}：${itemDefinition(kept.itemId).name} ${this.materials.count(kept.itemId)}/${this.ticketNeed(kept.itemId)}`;
+    if (kept) this.notice = tr('材料仓 +{count}：{name} {itemId}/{itemId2}', { count: this.stored.reduce((n,s)=>n+s.count,0), name: itemDefinition(kept.itemId).name, itemId: this.materials.count(kept.itemId), itemId2: this.ticketNeed(kept.itemId) });
     this.publish();
     if (resources.length) for (const listener of this.pickupListeners) listener(oreDrops(resources), this.stored);
     if (!wasFull && this.inventory.isFull()) this.refuse('full');
@@ -707,7 +709,7 @@ export class GameSession {
     const added = this.exploration.visit(sampledDepth);
     if (this.exploration.maxDepth !== oldMaximum || added.length) { changed=true; this.committed(added.length > 0); }
     if (added.length) {
-      this.notice = `已解锁 ${this.content.destinations.find((r) => r.id === added.at(-1))!.name}，回到地表可传送；对应宠物蛋已解锁`;
+      this.notice = tr('已解锁 {name}，回到地表可传送；对应宠物蛋已解锁', { name: this.content.destinations.find((r) => r.id === added.at(-1))!.name });
       changed = true;
       this.feedback({ type: 'unlocked' });
     }
@@ -750,10 +752,10 @@ export class GameSession {
       if (result.status === 'sold') { this.onboarding.record('soldOnce'); this.committed(true); this.feedback({ type: 'sold', coins: result.coins, count: result.count }); }
       this.notice =
         result.status === "sold"
-          ? `出售 ${result.count} 件，获得 ${result.coins} ${currencyName(this.currency)}`
+          ? tr('出售 {count} 件，获得 {coins} {currency}', { count: result.count, coins: result.coins, currency: currencyName(this.currency) })
           : result.status === "empty"
-            ? "没有可出售的矿物"
-            : "货币数值超出范围";
+            ? tr('没有可出售的矿物')
+            : tr('货币数值超出范围');
     }
     if (changed) this.publish();
   }
@@ -789,7 +791,7 @@ export class GameSession {
     this.world!.travelTo!(room.spawn);
     this.resetPosition();
     // Pad detectors keep their entry latch until feet actually leave the pad.
-    this.notice = `前往 ${room.name}`;
+    this.notice = tr('前往 {name}', { name: room.name });
     this.publish();
     return "travelling" as const;
   }
@@ -896,7 +898,7 @@ export class GameSession {
   sellAvailable = () => {
     if(this.suspended||!this.inSellZone)return {status:'unavailable'} as const;
     const result=this.executeSale();
-    if(result.status==='sold'){this.onboarding.record('soldOnce');this.committed(true);this.notice=`出售 ${result.count} 件，获得 ${result.coins} ${currencyName(this.currency)}`;}else this.notice=result.status==='empty'?'没有可出售的矿产':'货币数值超出范围';
+    if(result.status==='sold'){this.onboarding.record('soldOnce');this.committed(true);this.notice=tr('出售 {count} 件，获得 {coins} {currency}', { count: result.count, coins: result.coins, currency: currencyName(this.currency) });}else this.notice=result.status==='empty'?tr('没有可出售的矿产'):tr('货币数值超出范围');
     this.publish();return result;
   };
   /** Pays a world's price at a portal and opens it for good. */
@@ -913,7 +915,7 @@ export class GameSession {
     if(!this.materials.pay(requirement.materials))throw Error('缴纳矿产发生变化');
     if(!this.wallet.debit(ticket.currency,ticket.price))throw Error('缴纳货币发生变化');
     this.worldProgress.unlock(id);
-    this.notice=`${requirement.name}已开放，可以传送过去了`;
+    this.notice=tr('{name}已开放，可以传送过去了', { name: requirement.name });
     this.committed(true);this.publish();return {status:'opened'} as const;
   };
 }

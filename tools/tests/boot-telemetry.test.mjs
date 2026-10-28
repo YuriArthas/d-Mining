@@ -28,7 +28,7 @@ test('receiver failure stays nonblocking and queue is bounded',async()=>{
 test('early script failure produces a visible error, retry and identifiable event',async()=>{
  const f=boot();await tick();
  f.listeners.error({target:{tagName:'SCRIPT',src:'https://example/main.js'}});await tick();
- assert.equal(f.nodes['boot-status'].textContent,'暂时没能进入矿场');assert.equal(f.nodes['boot-retry'].hidden,false);
+ assert.equal(f.nodes['boot-status'].textContent,'Could not enter the mine');assert.equal(f.nodes['boot-retry'].hidden,false);
  assert.equal(f.nodes['boot-session'].textContent,undefined);
  assert.ok(!f.nodes['boot-detail'].textContent.includes('main.js'));
  assert.ok(f.calls.flatMap(c=>c.body.events).some(e=>e.type==='boot.script-failed'));

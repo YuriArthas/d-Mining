@@ -1,4 +1,5 @@
 import { ECONOMY, type CurrencyId, type TicketEconomy } from './economy.ts';
+import { tr } from '../i18n/i18n.ts';
 // Each world's ticket, paid at a world portal: the previous world's currency, a pickaxe level (the new world's
 // first gate) and minerals from earlier worlds (economy.json). `currency` is what the world's own ore sells for.
 export type WorldId = 1 | 2 | 3;
@@ -7,7 +8,7 @@ type WorldRequirement = Readonly<{ id: WorldId; name: string; title: string; z: 
   /** The ticket's minerals (none for world 1). */
   materials: TicketEconomy['materials'] }>;
 const PLACES: Readonly<Record<WorldId, { name: string; title: string; z: number }>> = {
-  1: { name: '第一世界', title: '松风矿谷', z: 0 }, 2: { name: '第二世界', title: '沙海基地', z: 224 }, 3: { name: '第三世界', title: '星陨秘境', z: 448 } };
+  1: { name: tr('第一世界'), title: tr('松风矿谷'), z: 0 }, 2: { name: tr('第二世界'), title: tr('沙海基地'), z: 224 }, 3: { name: tr('第三世界'), title: tr('星陨秘境'), z: 448 } };
 export const WORLD_REQUIREMENTS: readonly WorldRequirement[] = Object.freeze(ECONOMY.worlds.map(w =>
   Object.freeze({ id: w.id, ...PLACES[w.id], currency: w.currency, ticket: w.ticket, materials: w.ticket?.materials ?? [] })));
 export function worldRequirement(id: WorldId) {

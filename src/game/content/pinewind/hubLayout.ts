@@ -4,6 +4,7 @@ import type { Sign } from '../../world/sceneryKit.ts';
 import { CAPSULE_MACHINE_AT, CAPSULE_MACHINE_YAW } from '../feedbackFacilities.ts';
 import { worldStation } from '../worldJourney.ts';
 
+import { tr } from '../../i18n/i18n.ts';
 /** Pinewind hub plan for world 1. One source for the playable zones, collision, the
  *  runtime composition and the offline art pipeline (tools/export-pinewind-layout.mjs).
  *  Coordinates: +X east, +Z toward the spawn (south); the mine square spans 8 m either side of the origin. */
@@ -72,13 +73,13 @@ export const PINEWIND_SERVICES = { sale: service('sale'), shop: service('shop'),
 /** The gate to the next world stands in the pass of the wooded ridge behind the spawn. */
 export const PINEWIND_GATE = { x: 0, z: 69, opening: 8, height: 9.6, wallTo: 14 } as const;
 /** The gate is world 1's portal to the other worlds; its name hangs over the opening, facing the valley. */
-export const PINEWIND_PORTAL_SIGN: Sign = { at: [PINEWIND_GATE.x, PINEWIND_GATE.height + .9, PINEWIND_GATE.z - 1.3], yaw: Math.PI, width: 5.2, title: '世界传送门', subtitle: '', color: '#ffe7a8', background: '#2a1d46' };
+export const PINEWIND_PORTAL_SIGN: Sign = { at: [PINEWIND_GATE.x, PINEWIND_GATE.height + .9, PINEWIND_GATE.z - 1.3], yaw: Math.PI, width: 5.2, title: tr('世界传送门'), subtitle: '', color: '#ffe7a8', background: '#2a1d46' };
 
 /** The teleport station west of the spawn, facing it (worldJourney.ts owns the spot for every world). Its
  *  pad opens this world's layers; the big word floats over the arch. */
 const station = worldStation(1);
 export const PINEWIND_STATION = { x: station.x, z: station.z, yaw: round(station.yaw), pad: { x: round(station.zone.x), z: round(station.zone.z) } } as const;
-export const PINEWIND_STATION_SIGN: Sign = { at: [station.x, 7.6, station.z], yaw: round(station.yaw), width: 4.4, title: '传送站', subtitle: '', color: '#9ff3ff', background: '#18283d' };
+export const PINEWIND_STATION_SIGN: Sign = { at: [station.x, 7.6, station.z], yaw: round(station.yaw), width: 4.4, title: tr('传送站'), subtitle: '', color: '#9ff3ff', background: '#18283d' };
 
 /** Two egg terraces facing the plaza: world 1's seven eggs (the later worlds' stand in their own bases). Rows
  *  step up 2.2 m and alternate by half a bay, so the always-on name/price labels never stack. Progression runs

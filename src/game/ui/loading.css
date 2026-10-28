@@ -44,3 +44,4 @@
   .loading-bottom { padding-top: 4px; }
 }
 @media (prefers-reduced-motion: reduce) { .loading-track > span { transition: none; animation: none !important; } }
+.loading-screen i { font-style: normal; }

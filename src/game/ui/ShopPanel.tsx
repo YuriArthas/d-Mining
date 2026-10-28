@@ -10,6 +10,7 @@ import { WORLD_REQUIREMENTS } from '../content/worldJourney.ts';
 import './shop.css';
 import { currencyIcon, currencyName } from './currency.ts';
 
+import { tr } from '../i18n/i18n.ts';
 /** Opens the showroom on a counter at the item the player has now. */
 export function showShopCategory(view: ShopView, state: ReturnType<GameSession['getSnapshot']>, category: ShopCategory) {
   const items = state.shopCatalog[category];
@@ -51,61 +52,61 @@ export function ShopPanel({ session, view, onClose }: { session: GameSession; vi
   const enhancing = top && offer === 'equipped' && !!enhance.next;
   const improve = () => {
     const result = session.enhancePickaxe(enhance.level, enhance.enhance);
-    setMessage(result.status === 'enhanced' ? `强化到 +${result.enhance}！` : result.status === 'insufficient' ? '' : result.status === 'max' ? '已经强化满了' : '请重新进入商店');
+    setMessage(result.status === 'enhanced' ? tr('强化到 +{enhance}！', { enhance: result.enhance }) : result.status === 'insufficient' ? '' : result.status === 'max' ? tr('已经强化满了') : tr('请重新进入商店'));
   };
   const purchase = () => {
     const result = session.useShopItem(category, item.id);
-    setMessage(result.status === 'upgraded' ? '购买成功，已装备！' : result.status === 'equipped' ? '已装备' : result.status === 'insufficient' ? '' : result.status === 'too-small' ? '背包装不下现有矿石，先去卖掉' : result.status === 'locked' ? '请先购买上一件' : '请重新进入商店');
+    setMessage(result.status === 'upgraded' ? tr('购买成功，已装备！') : result.status === 'equipped' ? tr('已装备') : result.status === 'insufficient' ? '' : result.status === 'too-small' ? tr('背包装不下现有矿石，先去卖掉') : result.status === 'locked' ? tr('请先购买上一件') : tr('请重新进入商店'));
   };
   const lean = (event: PointerEvent<HTMLElement>) => {
     const box = event.currentTarget.getBoundingClientRect();
     view.setPointer((event.clientX - box.left) / box.width * 2 - 1, (event.clientY - box.top) / box.height * 2 - 1);
   };
-  return <section className="shop-showroom" role="dialog" aria-modal="true" aria-label={category === 'tools' ? '工具商店' : '背包商店'} data-category={category} data-item={item.id} onPointerMove={lean}>
-    <div className="shop-wallet" aria-label="随身资源">
+  return <section className="shop-showroom" role="dialog" aria-modal="true" aria-label={category === 'tools' ? tr('工具商店') : tr('背包商店')} data-category={category} data-item={item.id} onPointerMove={lean}>
+    <div className="shop-wallet" aria-label={tr('随身资源')}>
       <Pill icon="backpack" meter={state.inventory.capacity ? state.inventory.used / state.inventory.capacity : 0}>{number(state.inventory.used)} / {number(state.inventory.capacity)}</Pill>
       <Pill icon={currencyIcon(item.currency)} tone="gold">{number(state.balances[item.currency])}</Pill>
     </div>
-    <nav className="shop-top-actions" aria-label="商店操作">
-      <Tile icon={category === 'tools' ? 'backpack' : 'pickaxe'} label={category === 'tools' ? '背包' : '工具'} tone="purple" className="shop-switch" aria-label={category === 'tools' ? '切换到背包商店' : '切换到工具商店'} onPress={() => open(category === 'tools' ? 'backpacks' : 'tools')} />
-      <CloseButton label="关闭商店" onPress={onClose} />
+    <nav className="shop-top-actions" aria-label={tr('商店操作')}>
+      <Tile icon={category === 'tools' ? 'backpack' : 'pickaxe'} label={category === 'tools' ? tr('背包') : tr('工具')} tone="purple" className="shop-switch" aria-label={category === 'tools' ? tr('切换到背包商店') : tr('切换到工具商店')} onPress={() => open(category === 'tools' ? 'backpacks' : 'tools')} />
+      <CloseButton label={tr('关闭商店')} onPress={onClose} />
     </nav>
     <header className="shop-head" key={item.id}>
-      <h1 className="shop-name ui-outline" data-tier={offerTier(item)}>{item.name}{top && state.equipment.enhance ? ` +${state.equipment.enhance}` : ''}</h1>
+      <h1 className="shop-name ui-outline" data-tier={offerTier(item)} data-long={item.name.length > 13 || undefined}>{item.name}{top && state.equipment.enhance ? ` +${state.equipment.enhance}` : ''}</h1>
       <div className="shop-tags">
         <span className="shop-tag ui-num">Lv.{item.level}<small>/{items.length}</small></span>
         <span className="shop-tag"><Icon kind={currencyIcon(item.currency)} />{WORLD_REQUIREMENTS[offerWorld(item) - 1].name}</span>
-        {category === 'tools' && <span className="shop-tag shop-reach"><Icon kind="pickaxe" />能挖到 {toolReach(item.level)}</span>}
+        {category === 'tools' && <span className="shop-tag shop-reach"><Icon kind="pickaxe" />{tr('能挖到 {layer}', { layer: toolReach(item.level) })}</span>}
       </div>
       <p className="shop-blurb">{item.description}</p>
     </header>
-    <UiButton className="shop-arrow shop-prev" aria-label="上一件商品" disabled={display.index === 0} onPress={() => view.select(display.index - 1)}>◀</UiButton>
-    <UiButton className="shop-arrow shop-next" aria-label="下一件商品" disabled={display.index === items.length - 1} onPress={() => view.select(display.index + 1)}>▶</UiButton>
-    {!display.ready && !display.error && <div className="shop-loading ui-card" role="status">正在布置展厅…</div>}
-    {display.error && <div className="shop-loading ui-card" role="alert"><p>展厅资源加载失败</p><UiButton size="s" onPress={view.retry}>重新加载</UiButton></div>}
+    <UiButton className="shop-arrow shop-prev" aria-label={tr('上一件商品')} disabled={display.index === 0} onPress={() => view.select(display.index - 1)}>◀</UiButton>
+    <UiButton className="shop-arrow shop-next" aria-label={tr('下一件商品')} disabled={display.index === items.length - 1} onPress={() => view.select(display.index + 1)}>▶</UiButton>
+    {!display.ready && !display.error && <div className="shop-loading ui-card" role="status">{tr('正在布置展厅…')}</div>}
+    {display.error && <div className="shop-loading ui-card" role="alert"><p>{tr('展厅资源加载失败')}</p><UiButton size="s" onPress={view.retry}>{tr('重新加载')}</UiButton></div>}
     <footer className="shop-under" data-state={offer}>
       <div className="shop-stats">{offerStats(category, item, items, state).map(stat => {
         // The worn newest pickaxe shows what its next enhancement brings instead.
-        const gain = enhancing && stat.key === 'power' ? `强化后 ${number(enhance.next!.power)}` : offerGain(stat);
+        const gain = enhancing && stat.key === 'power' ? tr('强化后 {power}', { power: number(enhance.next!.power) }) : offerGain(stat);
         return <span key={stat.key} className="shop-stat" data-kind={stat.key}>
           <i className="shop-stat-icon"><Icon kind={stat.key === 'speed' ? 'bolt' : stat.key === 'capacity' ? 'backpack' : 'pickaxe'} /></i>
           <span className="shop-stat-text"><small>{stat.label}</small><b className="ui-num">{stat.key === 'power' ? '+' : ''}{number(stat.value)}{stat.unit}</b></span>
           {gain && <em className="shop-gain ui-outline" key={`${item.id}-${stat.key}`}>{gain}</em>}
         </span>;
       })}</div>
-      {enhancing ? <PriceButton verb={`强化 +${enhance.next!.enhance}`} price={number(enhance.next!.price)} currency={currencyIcon(enhance.next!.currency)} tone="orange" size="l"
+      {enhancing ? <PriceButton verb={tr('强化 +{enhance}', { enhance: enhance.next!.enhance })} price={number(enhance.next!.price)} currency={currencyIcon(enhance.next!.currency)} tone="orange" size="l"
         className="shop-buy" data-mood={enhance.canAfford ? 'buy' : 'short'} data-testid="shop-enhance" disabled={!enhance.canAfford || !display.ready} onPress={improve}
-        aria-label={`强化到 +${enhance.next!.enhance}，${number(enhance.next!.price)} ${unit}`} />
-      : priced ? <PriceButton verb="购买" price={number(item.price)} currency={currencyIcon(item.currency)} tone="green" size="l"
+        aria-label={tr('强化到 +{enhance}，{price} {unit}', { enhance: enhance.next!.enhance, price: number(enhance.next!.price), unit: unit })} />
+      : priced ? <PriceButton verb={tr('购买')} price={number(item.price)} currency={currencyIcon(item.currency)} tone="green" size="l"
         className="shop-buy" data-mood={mood} data-testid="shop-buy" disabled={blocked} onPress={purchase}
-        aria-label={offer === 'locked' ? `先买上一件，${number(item.price)} ${unit}` : `购买，${number(item.price)} ${unit}`} />
+        aria-label={offer === 'locked' ? tr('先买上一件，{price} {unit}', { price: number(item.price), unit: unit }) : tr('购买，{price} {unit}', { price: number(item.price), unit: unit })} />
       : <UiButton size="l" tone={mood === 'owned' ? 'purple' : 'white'} icon={mood === 'equipped' ? undefined : category === 'tools' ? 'pickaxe' : 'backpack'}
         className="shop-buy" data-mood={mood} data-testid="shop-buy" disabled={blocked} onPress={purchase} aria-label={action.label}>
-        {mood === 'equipped' ? '✓ 已装备' : action.label}
+        {mood === 'equipped' ? tr('✓ 已装备') : action.label}
       </UiButton>}
       <div className="shop-hint" data-mood={message ? 'message' : enhancing ? 'enhance' : mood} role="status">{message || (enhancing
-        ? '强化：伤害变高，模型和门槛不变'
-        : mood === 'locked' ? '先买上一件' : top && offer === 'equipped' && category === 'tools' ? '已经强化满了' : '')}</div>
+        ? tr('强化：伤害变高，模型和门槛不变')
+        : mood === 'locked' ? tr('先买上一件') : top && offer === 'equipped' && category === 'tools' ? tr('已经强化满了') : '')}</div>
     </footer>
   </section>;
 }

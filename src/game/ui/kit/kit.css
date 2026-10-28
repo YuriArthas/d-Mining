@@ -52,6 +52,7 @@
   font-size: calc(var(--tile) * .26); line-height: 1; text-align: center; white-space: nowrap;
   --ui-stroke: calc(var(--tile) * .07);
 }
+.ui-tile[data-long] .ui-tile-label { font-size: calc(var(--tile) * .19); --ui-stroke: calc(var(--tile) * .055); }
 .ui-badge {
   position: absolute; z-index: 2; top: -8px; right: -8px;
   min-width: 22px; height: 22px; padding: 0 5px; box-sizing: border-box;

@@ -6,6 +6,7 @@ import type {SceneryPlan,V3,Solid} from './sceneryKit.ts';
 import {ENTRANCE_WORLD} from './entrance.ts';
 import {CELL} from '../terrain/grid.ts';
 
+import { tr } from '../i18n/i18n.ts';
 export function authoredRoomPlan(room:RestRoom,providedAsset?:RoomSceneAsset):SceneryPlan {
   const definition=room.sceneDefinition;
   if(!definition)throw Error(`房间未配置独立场景: ${room.id}`);
@@ -63,7 +64,8 @@ export function authoredRoomPlan(room:RestRoom,providedAsset?:RoomSceneAsset):Sc
     if(s.at[0]+hx>shaft.minX&&s.at[0]-hx<shaft.maxX&&s.at[2]+hz>shaft.minZ&&s.at[2]-hz<shaft.maxZ)throw Error(`休整层布景占用垂直入口: ${room.id}`);
   }
   const at=(id:RoomAnchor,offset:readonly number[])=>world(anchor(id).map((v,i)=>v+offset[i]));
-  const text=(value:string)=>value.replace(/\{(name|number|depth)\}/g,(_,key:'name'|'number'|'depth')=>key==='number'?String(room.number).padStart(2,'0'):String(room[key]));
+  // Sign text from the scene file, in the page's language (tools/i18n-scan.mjs reads the scene files' sign text).
+  const text=(value:string)=>tr(value,{name:room.name,number:String(room.number).padStart(2,'0'),depth:room.depth});
   return {
     shapes:definition.rings.filter(r=>r.anchor!=='shop'||room.shop).map(r=>{
       const zone=r.anchor==='sell'?room.sell:room.shop!;
@@ -83,7 +85,8 @@ function hallPlan(room:RestRoom,hallId:string):SceneryPlan {
   const scale:V3=[room.layout.widthCells*CELL/reference[0],room.layout.heightCells*CELL/reference[1],room.layout.depthCells*CELL/reference[2]];
   const anchor=(id:RoomAnchor)=>id==='room'?[0,0,0]:definition.facilities[id]!.at;
   const at=(id:RoomAnchor,offset:readonly number[]):V3=>anchor(id).map((v,i)=>[room.x,0,room.z][i]+(v+offset[i])*scale[i]) as V3;
-  const text=(value:string)=>value.replace(/\{(name|number|depth)\}/g,(_,key:'name'|'number'|'depth')=>key==='number'?String(room.number).padStart(2,'0'):String(room[key]));
+  // Sign text from the scene file, in the page's language (tools/i18n-scan.mjs reads the scene files' sign text).
+  const text=(value:string)=>tr(value,{name:room.name,number:String(room.number).padStart(2,'0'),depth:room.depth});
   return {
     shapes:definition.rings.filter(r=>r.anchor!=='shop'||room.shop).map(r=>{const zone=r.anchor==='sell'?room.sell:room.shop!;return {type:'ring',at:at(r.anchor,r.offset),size:[zone.radius,r.height,zone.radius],color:r.color,glow:r.glow,interaction:true};}),
     solids:solids.map(s=>({...s,at:[s.at[0]+room.x,s.at[1],s.at[2]+room.z] as V3})),

@@ -1,6 +1,18 @@
 /* Injected inline before the game module. No React, Three.js, storage or server dependency. */
 (function () {
   'use strict';
+  // The page's language, as src/game/i18n/i18n.ts decides it: ?lang=, then the saved choice, then the browser.
+  // English unless the player chose another language.
+  var lang = (function () {
+    var known = function (v) { return v === 'en' || v === 'zh' || v === 'id' || v === 'vi' ? v : null; };
+    var asked = null, saved = null;
+    try { asked = known(new URLSearchParams(location.search).get('lang')); } catch (e) {}
+    try { saved = known(localStorage.getItem('mining.language')); } catch (e) {}
+    return asked || saved || 'en';
+  })();
+  window.__MINING_LANG__ = lang;
+  // One line in each language: [zh, en, id, vi].
+  var say = function (zh, en, id, vi) { return { zh: zh, en: en, id: id, vi: vi }[lang] || en; };
   var config = window.__MINING_LOG_CONFIG__ || {};
   var endpoint = config.enabled === false ? '' : (config.endpoint !== undefined ? config.endpoint :
     (/^\/games\/mining-test\//.test(location.pathname) ? 'https://mining-log-sunjun-public.dev.clock-p.com/ingest' : ''));
@@ -53,8 +65,8 @@
   function show() {
     var label=document.getElementById('boot-status');if(!label)return;
     var seconds=Math.floor((Date.now()-started)/1000);
-    label.textContent=failed?'暂时没能进入矿场':seconds>=30?'矿场还在准备中，请稍候':'正在进入矿场…';
-    var detail=document.getElementById('boot-detail');if(detail){detail.hidden=!failed;detail.textContent=failed?'加载遇到了一点问题，请重新尝试。':'';}
+    label.textContent=failed?say('暂时没能进入矿场','Could not enter the mine','Gagal masuk tambang','Không vào được mỏ'):seconds>=30?say('矿场还在准备中，请稍候','The mine is still getting ready…','Tambang masih disiapkan…','Mỏ vẫn đang chuẩn bị…'):say('正在进入矿场…','Entering the mine…','Masuk ke tambang…','Đang vào mỏ…');
+    var detail=document.getElementById('boot-detail');if(detail){detail.hidden=!failed;detail.textContent=failed?say('加载遇到了一点问题，请重新尝试。','Something went wrong while loading. Please try again.','Ada masalah saat memuat. Coba lagi ya.','Có lỗi khi tải. Vui lòng thử lại.'):'';}
     var busy=document.getElementById('boot-busy');if(busy)busy.hidden=failed;
     var retry=document.getElementById('boot-retry');if(retry)retry.hidden=!failed&&seconds<30;
   }
@@ -72,7 +84,7 @@
     if(e.target&&e.target!==window){
       var url=e.target.src||e.target.href||'';
       write('resource.error',{tag:e.target.tagName,url:String(url).split('?')[0]});
-      if(!bootDone&&e.target.tagName==='SCRIPT')fail('启动脚本下载失败，请重试。','boot.script-failed');
+      if(!bootDone&&e.target.tagName==='SCRIPT')fail(say('启动脚本下载失败，请重试。','The game failed to download. Please try again.','Game gagal diunduh. Coba lagi ya.','Tải game thất bại. Vui lòng thử lại.'),'boot.script-failed');
     }else{write('window.error',{message:e.message,filename:e.filename,line:e.lineno,column:e.colno,stack:e.error&&e.error.stack});if(document.getElementById('boot-status'))fail(e.error||e.message);}
   }
   window.addEventListener('error',onError,true);

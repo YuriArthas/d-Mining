@@ -30,6 +30,7 @@ import type { GameInput } from "../GameInput.ts";
 import type { GameSession } from "../application/GameSession.ts";
 import { ContactShadow } from "../presentation/ContactShadow.tsx";
 
+import { tr } from '../i18n/i18n.ts';
 export function ValidationScene({
   content,
   shopView,
@@ -137,7 +138,7 @@ export function ValidationScene({
       .catch((reason) => {
         if (controller.signal.aborted) return;
         savedGame.saves.invalidate(reason);
-        const error = `初始化失败：${String(reason)}`;
+        const error = tr('初始化失败：{reason}', { reason: String(reason) });
         onStatus(error);
         onLoading({ error });
       });
@@ -209,7 +210,7 @@ export function ValidationScene({
       });
       if (submitted && drewWorld) current.environment.markSubmitted();
     } catch (reason) {
-      const error = `渲染失败：${String(reason)}`;
+      const error = tr('渲染失败：{reason}', { reason: String(reason) });
       onStatus(error);
       onLoading({ error });
       throw reason;

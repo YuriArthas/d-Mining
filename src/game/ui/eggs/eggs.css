@@ -26,6 +26,7 @@
 .egg-odds { position: absolute; left: 0; right: 0; top: 3px; text-align: center; font-size: 23px; line-height: 1.1; --ui-stroke: 4.5px; }
 .egg-card-art { position: absolute; left: 50%; top: 36px; width: 62px; height: 62px; translate: -50% 0; }
 .egg-card-name { position: absolute; left: 2px; right: 2px; bottom: 25px; text-align: center; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html:not([lang^=zh]) .egg-card-name { font-size: 11px; line-height: 1.05; white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .egg-card-band { position: absolute; left: 0; right: 0; bottom: 0; height: 23px; display: flex; align-items: center; justify-content: center; gap: 3px;
   background: var(--r); font-size: 13px; --ui-stroke: 3px; white-space: nowrap; }
 .egg-card-band .ui-icon { width: 15px; height: 15px; }

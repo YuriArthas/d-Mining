@@ -21,7 +21,7 @@ const AIM = { x: 560, y: 230 };
   page.on('console', m => { if (m.type() === 'error') report.errors.push(m.text()); });
   const cdp = await context.newCDPSession(page);
   const touch = (type, points = []) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: points });
-  const url = `${base}?debug=1&submission=fenced&framesInFlight=1&saveTest=mine-${Date.now()}`;
+  const url = `${base}?lang=zh&debug=1&submission=fenced&framesInFlight=1&saveTest=mine-${Date.now()}`;
   const ready = async () => {
     await page.waitForFunction(() => window.__miningValidation?.snapshot().ready && !document.querySelector('.loading-screen'), null, { timeout: 300000 });
     await page.addStyleTag({ content: '.hud-debug-tools{display:none!important}' });

@@ -1,9 +1,8 @@
-import { GAME_CONTENT } from './content/gameContent.ts';
-import { useEffect, useRef, useState, useSyncExternalStore, type RefObject } from 'react';
+import { useEffect, useRef, type RefObject } from 'react';
 import type { GameInput } from './GameInput.ts';
-import { MINERALS } from './terrain/minerals.ts';
 import { bindInput } from './bindInput.ts';
 import { Icon } from './ui/kit/icons.tsx';
+import { tr } from './i18n/i18n.ts';
 
 export function Controls({ input, surface }: { input: GameInput; surface: RefObject<HTMLDivElement | null> }) {
   const touchTarget = useRef<HTMLDivElement>(null);
@@ -16,45 +15,16 @@ export function Controls({ input, surface }: { input: GameInput; surface: RefObj
   return <>
     <div ref={touchTarget} className="touch-target" hidden aria-hidden="true" />
     <div className="touch-controls">
-      <div ref={stick} className="joystick" role="group" aria-label="移动摇杆">
+      <div ref={stick} className="joystick" role="group" aria-label={tr('移动摇杆')}>
         <span ref={knob} className="joystick-knob" />
       </div>
       <div className="action-buttons">
-        <button ref={jump} className="jump-button" type="button" aria-label="跳跃输入" title="跳跃" aria-pressed="false"><Icon kind="jump" /></button>
+        <button ref={jump} className="jump-button" type="button" aria-label={tr('跳跃')} title={tr('跳跃')} aria-pressed="false"><Icon kind="jump" /></button>
       </div>
     </div>
     <div className="control-hint">
-      <span className="desktop-hint">WASD 移动 · 空格跳跃 · 右键观察 · 鼠标指向 · 按住左键挖掘</span>
-      <span className="touch-hint">左侧移动 · 拖动观察 · 点按敲击 · 长按挖掘</span>
+      <span className="desktop-hint">{tr('WASD 移动 · 空格跳跃 · 右键观察 · 鼠标指向 · 按住左键挖掘')}</span>
+      <span className="touch-hint">{tr('左侧移动 · 拖动观察 · 点按敲击 · 长按挖掘')}</span>
     </div>
   </>;
-}
-
-export function InputMonitor({ input }: { input: GameInput }) {
-  const value = useSyncExternalStore(input.subscribe, input.getSnapshot);
-  return <output className="input-monitor" aria-label="输入调试">
-    移动 {value.moveX.toFixed(2)}, {value.moveY.toFixed(2)} · 跳跃 {value.jumpCount} · 挥镐 {value.mining ? '按住' : '松开'}
-  </output>;
-}
-
-
-export function ValidationPanel() {
-  const [summary, setSummary] = useState('正在加载');
-  useEffect(() => {
-    const id = window.setInterval(() => {
-      const stats = window.__miningValidation?.snapshot() as { chunks: number; terrainColliders: number; editBytes: number; pendingEdit: boolean } | undefined;
-      if (stats) setSummary(`区块 ${stats.chunks} · 碰撞 ${stats.terrainColliders} · 修改 ${(stats.editBytes / 1024).toFixed(2)} KiB${stats.pendingEdit ? ' · 更新中' : ''}`);
-    }, 250);
-    return () => clearInterval(id);
-  }, []);
-  return <aside className="validation-panel">
-    <output>{summary}</output>
-    <details><summary>矿物图例 · {MINERALS.length} 种</summary><div className="mineral-legend">{MINERALS.map(m => <span key={m.id}><i style={{ background: m.color }} />{m.name}</span>)}</div></details>
-    <div><button type="button" onClick={() => window.__miningValidation?.teleport('surface')}>定位地表</button><button type="button" onClick={() => window.__miningValidation?.teleport('deep')}>定位最深层</button></div>
-    <select aria-label="预览场景" defaultValue="" onChange={event => {
-      const room=GAME_CONTENT.session.destinations.find(r=>r.id===event.target.value);
-      if(room)window.__miningValidation?.teleport(room.spawn);
-      else if(event.target.value==='surface')window.__miningValidation?.teleport('surface');
-    }}><option value="" disabled>选择主题场景</option><option value="surface">松风矿谷 · 地表</option>{GAME_CONTENT.session.destinations.map(r=><option key={r.id} value={r.id}>世界 {r.worldId} · {r.name} · {r.depth} 米</option>)}</select>
-  </aside>;
 }

@@ -2,6 +2,7 @@ import { Vector3, type Camera } from 'three';
 import { CELL, type Coord } from '../terrain/SparseWorld.ts';
 import { formatNumber } from './formatNumber.ts';
 
+import { tr } from '../i18n/i18n.ts';
 /** What the session says about the block under the pick (GameSession snapshot `target`). */
 export type OverlayTarget = Readonly<{ key: string; name: string; hp: number; maximum: number; price: number; requiredLevel: number; locked: boolean }>;
 /** A swing that reached its block this frame (MiningFeedback): the damage it did, and whether it broke the block. */
@@ -97,7 +98,7 @@ export class MiningOverlay {
       run.onfinish = () => { fly.remove(); bounce(bag!); };
     } else if (bag) bounce(bag);
     // Two kinds at most; a wide break names the first two and says there was more.
-    this.chip.textContent = items.slice(0, 2).map(i => `+${i.count} ${i.name}${i.note ? ` · ${i.note}` : ''}`).join('  ') + (items.length > 2 ? ' 等' : '');
+    this.chip.textContent = items.slice(0, 2).map(i => `+${i.count} ${i.name}${i.note ? ` · ${i.note}` : ''}`).join('  ') + (items.length > 2 ? tr(' 等') : '');
     if (target) { this.chip.style.left = `${target.left - box.left}px`; this.chip.style.top = `${target.bottom - box.top + 6}px`; }
     this.chip.classList.remove('mine-chip-in'); void this.chip.offsetWidth; this.chip.classList.add('mine-chip-in');
     clearTimeout(this.chipTimer);
@@ -131,8 +132,8 @@ export class MiningOverlay {
     const locked = this.refusal === 'locked' || !!info?.locked;
     const state = this.broken ? 'broken' : locked ? 'locked' : this.refusal === 'full' ? 'full' : 'hit';
     if (this.shown.get('state') !== state) { this.shown.set('state', state); this.plate.dataset.state = state; }
-    this.write(this.note, state === 'locked' ? `${this.icons.lock}<span>需要 Lv.${info?.requiredLevel ?? ''} 镐子</span>`
-      : state === 'full' ? `${this.icons.bag}<span>背包满了，去出售</span>` : '');
+    this.write(this.note, state === 'locked' ? `${this.icons.lock}<span>${tr('需要 Lv.{level} 镐子', { level: info?.requiredLevel ?? '' })}</span>`
+      : state === 'full' ? `${this.icons.bag}<span>${tr('背包满了，去出售')}</span>` : '');
     const ratio = `${(Math.max(0, Math.min(1, this.shownHp / Math.max(1, this.shownMax))) * 100).toFixed(1)}%`;
     if (this.shown.get('ratio') !== ratio) { this.shown.set('ratio', ratio); this.hp.style.width = ratio; this.lag.style.width = ratio; }
     if (!this.size || this.shown.get('size') !== `${state}|${this.plateName.textContent}`) {

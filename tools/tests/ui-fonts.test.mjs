@@ -31,7 +31,7 @@ test('generated faces exist, are small subsets and reuse the shared digits face'
   const manifest = JSON.parse(readFileSync(join(fontsDir, 'manifest.json'), 'utf8'));
   const css = readFileSync(fontsCss, 'utf8');
   for (const face of manifest.faces) {
-    const file = face.id === 'digits' ? 'mining-digits.woff2' : `mining-cjk-${face.id}.woff2`;
+    const file = face.file ?? (face.id === 'digits' ? 'mining-digits.woff2' : `mining-cjk-${face.id}.woff2`);
     assert.ok(existsSync(join(fontsDir, file)), file);
     assert.ok(face.bytes < 200_000, `${file} stays a subset (${face.bytes} bytes)`);
     assert.equal(face.license, 'SIL OFL 1.1');

@@ -44,6 +44,7 @@ import { MiningFeedback } from "./MiningFeedback.ts";
 import { worldAtFeet, worldAtZ, worldRequirement, type WorldId } from "../content/worldJourney.ts";
 import { DisposalScope } from "./DisposalScope.ts";
 
+import { tr } from '../i18n/i18n.ts';
 function createStartupStats() {
   return {
     started: performance.now(),
@@ -223,7 +224,7 @@ export async function startGame(options: StartGameOptions) {
         if (!requested.has(world)) {
           requested.add(world);
           // The count keeps the notice up (it hides a few seconds after its text last changed).
-          const going = `正在前往${worldRequirement(world).name}…`;
+          const going = tr('正在前往{name}…', { name: worldRequirement(world).name });
           session.announce(going);
           surface.loadWorld!(world, (done, total) => { if (done < total) session.announce(`${going} ${done}/${total}`); }).then(
             (part) => { if (part) { motion.add(part); lockedEggs.attach(part); } },

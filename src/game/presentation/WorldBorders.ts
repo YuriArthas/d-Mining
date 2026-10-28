@@ -10,6 +10,7 @@ import techBaseSolids from '../content/underground/tech-base.json' with { type: 
 import { STAR_BASE } from '../content/world3/starBase.ts';
 import starBaseSolids from '../content/underground/star-base.json' with { type: 'json' };
 
+import { tr } from '../i18n/i18n.ts';
 /** A later world's portal frame (until its surface authors one): a platform, two pillars and a lintel round the
  *  portal disc TeleportStations draws 2.9 m up. */
 function portalFrame(p:Planner,id:WorldId,z0:number){
@@ -17,7 +18,7 @@ function portalFrame(p:Planner,id:WorldId,z0:number){
   p.shape('cylinder',[x,.2,z],[3.4,.4,3.4],'#5b6478');
   for(const side of [-1,1]){p.box(across(side*2.45,2.7),[.9,5.4,.9],'#3a414c',true,[0,pt.yaw,0]);p.box(across(side*2.45,5.6),[1.2,.4,1.2],'#f2c230',false,[0,pt.yaw,0]);}
   p.box([x,5.75,z],[5.9,.7,1.1],'#24324a',false,[0,pt.yaw,0]);
-  p.sign([x,7.5,z],4.6,'世界传送门','',t);
+  p.sign([x,7.5,z],4.6,tr('世界传送门'),'',t);
 }
 /** World 2's surface: the authored desert colony brings its own ground, buildings, portal dais and frame, station
  *  and colliders; the plan adds the service rings and the signs on the domes' boards, over the portal and the
@@ -32,8 +33,8 @@ function techBasePlan():SceneryPlan {
   return {
     shapes:[...rings(sell.ring,'#ffd387'),...rings(shop.ring,'#80efd0')],
     solids:(techBaseSolids.solids as SceneryPlan['solids']).map(s=>({...s,at:[s.at[0],s.at[1],s.at[2]+z] as V3})),
-    signs:[sign(pt.sign,pt.yaw,4.6,'世界传送门','#ffe7a8'),sign(sell.sign,sell.yaw,4.4,'SELL','#ffe08a'),sign(shop.sign,shop.yaw,4.4,'UPGRADE','#9ff7e6'),
-      sign([st.x,7.4,st.z],st.yaw,4.4,'传送站','#9ff4ff'),
+    signs:[sign(pt.sign,pt.yaw,4.6,tr('世界传送门'),'#ffe7a8'),sign(sell.sign,sell.yaw,4.4,'SELL','#ffe08a'),sign(shop.sign,shop.yaw,4.4,'UPGRADE','#9ff7e6'),
+      sign([st.x,7.4,st.z],st.yaw,4.4,tr('传送站'),'#9ff4ff'),
       sign(TECH_BASE.rig.sign,0,4.4,worldRequirement(2).name,'#ffe7a8')],
   };
 }
@@ -58,7 +59,7 @@ export function journeySurfacePlan(z:number):SceneryPlan {
    for(const side of [-1,1]){local.box(across(side*1.9,2.5),[.85,5,.85],'#8b9cb0',true,[0,yaw,0]);local.box(across(side*1.9,5.1),[1.1,.35,1.1],'#273d56',false,[0,yaw,0]);}
    local.box([st.x,5.45,st.z],[4.9,.6,1],'#273d56',false,[0,yaw,0]);
    local.shape('torus',[st.x,2.75,st.z],[1.45,.18,Math.PI*2],theme.accent,[0,yaw,0],true);
-   local.sign([st.x,7.4,st.z],4.4,'传送站','',theme);}
+   local.sign([st.x,7.4,st.z],4.4,tr('传送站'),'',theme);}
   for(const shape of local.plan.shapes)p.plan.shapes.push({...shape,at:[shape.at[0],shape.at[1],shape.at[2]+z]});
   for(const solid of local.plan.solids)p.plan.solids.push({...solid,at:[solid.at[0],solid.at[1],solid.at[2]+z]});
   // The authored hatchery (star-base): its egg stands' colliders.

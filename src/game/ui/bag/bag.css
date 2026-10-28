@@ -28,11 +28,11 @@
 .bag-pets { display: grid; grid-template-columns: minmax(0, 1fr) 196px; grid-template-rows: minmax(0, 1fr); gap: 10px; flex: 1; min-height: 0; }
 /* Columns stretch to the width; rows keep the cell height. */
 .bag-pet-grid { --cell: 80px; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); align-content: start; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; min-height: 0; padding: 4px; }
-.bag-merge-ready { position: absolute; z-index: 2; left: 3px; top: 18px; padding: 0 5px; border: 2px solid var(--ui-ink); border-radius: 8px; background: var(--ui-gold);
+.bag-merge-ready { position: absolute; z-index: 2; left: 3px; bottom: 24px; padding: 0 5px; border: 2px solid var(--ui-ink); border-radius: 8px; background: var(--ui-gold);
   font: 900 10px/1.4 var(--ui-font); font-style: normal; color: var(--ui-ink); }
 .ui-cell.bag-get { border: 3px dashed var(--ui-mute); background: var(--ui-sheet); }
 .bag-get-art { position: absolute; left: 26%; top: 18%; width: 48%; height: 56%; }
-.bag-get .ui-cell-name { top: auto; bottom: 4px; color: var(--ui-ink); }
+.bag-get .ui-cell-name { order: 2; margin-top: auto; padding-bottom: 5px; color: var(--ui-ink); }
 .bag-get-plus { position: absolute; right: 4px; top: 4px; width: 20px !important; height: 20px !important; }
 .ui-cell[data-golden] { --r: var(--ui-gold); background: #fff3c4; }
 .ui-cell[data-golden] .ui-cell-art, .bag-detail[data-golden] .bag-detail-art { filter: sepia(1) saturate(3.2) hue-rotate(-12deg) brightness(1.12); }
@@ -43,7 +43,7 @@
 .bag-detail-head { display: flex; align-items: center; gap: 6px; width: 100%; }
 .bag-detail-head > div { display: grid; justify-items: start; gap: 2px; min-width: 0; }
 .bag-detail-art { width: 54px; height: 54px; flex: none; }
-.bag-detail h3 { font-size: 16px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.bag-detail h3 { font-size: 16px; line-height: 1.1; text-align: left; overflow-wrap: anywhere; max-width: 100%; }
 .bag-detail-empty { justify-content: center; }
 .bag-detail-empty h3 { text-align: center; }
 .bag-detail .ui-stat { padding: 2px 8px; }
@@ -67,11 +67,12 @@
 .bag-egg:active { transform: scale(.95); }
 .bag-egg[data-locked] { cursor: default; border-color: var(--ui-mute); background: var(--ui-sheet); }
 .bag-egg-art { flex: none; width: 34px; height: 40px; }
-.bag-egg-name { font-size: 14px; white-space: nowrap; }
+.bag-egg-name { max-width: 100%; font-size: 14px; line-height: 1.1; text-align: center; overflow-wrap: anywhere; }
+html:not([lang^=zh]) .bag-egg-name { font-size: 12px; }
 .bag-egg-price { display: inline-flex; align-items: center; gap: 3px; font-size: 13px; }
 .bag-egg-price .ui-icon { width: 17px; height: 17px; }
 .bag-egg-go { align-self: stretch; margin: 2px -4px 0; padding: 1px 4px 2px; background: var(--ui-green); color: #fff; font-size: 14px; text-align: center;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; -webkit-text-stroke: 3px var(--ui-ink); paint-order: stroke fill; }
+  line-height: 1.15; overflow-wrap: anywhere; -webkit-text-stroke: 3px var(--ui-ink); paint-order: stroke fill; }
 .bag-egg[data-locked] .bag-egg-go { background: var(--ui-mute); font-size: 11px; -webkit-text-stroke-width: 2.5px; }
 
 /* Ores: what the bag holds and sells for, the material store as a ticket card, the ores with their unit price. */

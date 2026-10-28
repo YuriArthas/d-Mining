@@ -4,6 +4,7 @@ import { pickaxeStats } from '../logic/Pickaxe.ts';
 import { ECONOMY } from '../content/economy.ts';
 import { JOURNEY_WORLDS } from '../content/journeyWorlds.ts';
 
+import { tr } from '../i18n/i18n.ts';
 type Snapshot = Readonly<{
   balances: Readonly<Record<CurrencyId, number>>;
   pickaxe: Readonly<{ level: number }>;
@@ -32,13 +33,13 @@ export function offerState(category: ShopCategory, item: ShopItem, s: Snapshot):
 /** The item's numbers next to what the player carries now, and the best in the shop (for the bars). */
 export function offerStats(category: ShopCategory, item: ShopItem, items: readonly ShopItem[], s: Snapshot): OfferStat[] {
   const last = items[items.length - 1];
-  if (category === 'backpacks') return [{ key: 'capacity', label: '容量', value: item.capacity!, current: s.inventory.capacity, max: last.capacity!, unit: '' }];
+  if (category === 'backpacks') return [{ key: 'capacity', label: tr('容量'), value: item.capacity!, current: s.inventory.capacity, max: last.capacity!, unit: '' }];
   const worn = items.find(i => i.level === s.pickaxe.level) ?? items[0];
   // The newest pickaxe counts with its enhancements (+1..+3); older ones were never enhanced.
   const power = (i: ShopItem) => i.level === s.equipment.toolLevel && s.equipment.enhance ? pickaxeStats(i.level, 1, s.equipment.enhance).power : i.power!;
   return [
-    { key: 'power', label: '伤害', value: power(item), current: power(worn), max: last.power!, unit: '' },
-    { key: 'speed', label: '攻速', value: item.speed!, current: worn.speed!, max: last.speed!, unit: '/秒' },
+    { key: 'power', label: tr('伤害'), value: power(item), current: power(worn), max: last.power!, unit: '' },
+    { key: 'speed', label: tr('攻速'), value: item.speed!, current: worn.speed!, max: last.speed!, unit: tr('/秒') },
   ];
 }
 
@@ -63,9 +64,9 @@ export function offerGain(stat: Readonly<{ key: 'power' | 'speed' | 'capacity'; 
 export function offerAction(category: ShopCategory, item: ShopItem, s: Snapshot, state = offerState(category, item, s)) {
   const tooSmall = category === 'backpacks' && item.capacity! < s.inventory.used;
   const balance = s.balances[item.currency], affordable = balance >= item.price;
-  if (state === 'equipped') return { label: '已装备', enabled: false, buy: false };
-  if (state === 'owned') return tooSmall ? { label: '先卖掉矿石', enabled: false, buy: false } : { label: '装备', enabled: true, buy: false };
-  if (state === 'locked') return { label: '先买上一件', enabled: false, buy: false };
+  if (state === 'equipped') return { label: tr('已装备'), enabled: false, buy: false };
+  if (state === 'owned') return tooSmall ? { label: tr('先卖掉矿石'), enabled: false, buy: false } : { label: tr('装备'), enabled: true, buy: false };
+  if (state === 'locked') return { label: tr('先买上一件'), enabled: false, buy: false };
   // Short of coins: the same button with its price, greyed (never a missing amount).
-  return { label: '购买', enabled: affordable, buy: affordable };
+  return { label: tr('购买'), enabled: affordable, buy: affordable };
 }

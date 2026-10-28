@@ -1,6 +1,7 @@
 import {ROOM_LAYOUT,type RoomLayout} from './roomLayout.ts';
 import { resourceByKind } from './resources.ts';
 import { themeById } from './themes.ts';
+import { tr } from '../i18n/i18n.ts';
 /** `deepAt`: metres below `from` where the rock turns dense (`deepKind`); `oreChance`: the share of cells that are ore. */
 export type Layer = Readonly<{ id: string; name: string; from: number; theme: string; scene?:string; base: number; deepKind?: number; deepAt?: number | null;
   oreChance: number; ores: readonly Readonly<{kind:number;weight:number}>[]; shop: boolean; room?:RoomLayout }>;
@@ -10,22 +11,22 @@ export const WORLD_DEPTH = 4000;
 /** `scene`: world 1's room scene (an authored hall); `laterScene`: the kit scene worlds 2 and 3 use instead. */
 type LayerTemplate = Readonly<{ id: string; name: string; theme: string; scene?: string; laterScene?: string }>;
 export const LAYER_TEMPLATES: readonly LayerTemplate[] = Object.freeze([
-  {id:'surface',name:'草地矿场',theme:'meadow_mine'},
-  {id:'old_mine',name:'老矿井',theme:'timber_mine',scene:'old-mine-hall'},
-  {id:'fungal',name:'蘑菇洞穴',theme:'mushroom_cave',scene:'fungal-station-v1'},
-  {id:'crystal',name:'水晶洞穴',theme:'crystal_cave',scene:'crystal-hall',laterScene:'crystal-station-v1'},
-  {id:'ruins',name:'地下遗迹',theme:'buried_ruins',scene:'ruins-hall',laterScene:'ruins-station-v1'},
-  {id:'frozen',name:'冰封矿洞',theme:'frozen_cave',scene:'frozen-hall',laterScene:'frozen-station-v1'},
-  {id:'volcanic',name:'熔岩矿洞',theme:'lava_cave',scene:'volcanic-hall'},
-  {id:'fossil',name:'巨型化石',theme:'fossil_cave',scene:'fossil-station-v1'},
-  {id:'machinery',name:'古代机械',theme:'ancient_machine',scene:'machinery-station-v1'},
-  {id:'core',name:'地心秘境',theme:'core_sanctum',scene:'core-station-v1'},
-  {id:'automine',name:'自动化矿道',theme:'ancient_machine',scene:'automine-hall'},
-  {id:'reactor',name:'地心反应堆',theme:'core_sanctum',scene:'reactor-hall'},
-  {id:'gear',name:'巨齿工厂',theme:'ancient_machine',scene:'gear-hall'},
-  {id:'refinery',name:'水晶精炼厂',theme:'crystal_cave',scene:'refinery-hall'},
-  {id:'survey',name:'遗迹勘探站',theme:'buried_ruins',scene:'survey-hall'},
-  {id:'cryo',name:'冰封实验室',theme:'frozen_cave',scene:'cryo-hall'},
+  {id:'surface',name:tr('草地矿场'),theme:'meadow_mine'},
+  {id:'old_mine',name:tr('老矿井'),theme:'timber_mine',scene:'old-mine-hall'},
+  {id:'fungal',name:tr('蘑菇洞穴'),theme:'mushroom_cave',scene:'fungal-station-v1'},
+  {id:'crystal',name:tr('水晶洞穴'),theme:'crystal_cave',scene:'crystal-hall',laterScene:'crystal-station-v1'},
+  {id:'ruins',name:tr('地下遗迹'),theme:'buried_ruins',scene:'ruins-hall',laterScene:'ruins-station-v1'},
+  {id:'frozen',name:tr('冰封矿洞'),theme:'frozen_cave',scene:'frozen-hall',laterScene:'frozen-station-v1'},
+  {id:'volcanic',name:tr('熔岩矿洞'),theme:'lava_cave',scene:'volcanic-hall'},
+  {id:'fossil',name:tr('巨型化石'),theme:'fossil_cave',scene:'fossil-station-v1'},
+  {id:'machinery',name:tr('古代机械'),theme:'ancient_machine',scene:'machinery-station-v1'},
+  {id:'core',name:tr('地心秘境'),theme:'core_sanctum',scene:'core-station-v1'},
+  {id:'automine',name:tr('自动化矿道'),theme:'ancient_machine',scene:'automine-hall'},
+  {id:'reactor',name:tr('地心反应堆'),theme:'core_sanctum',scene:'reactor-hall'},
+  {id:'gear',name:tr('巨齿工厂'),theme:'ancient_machine',scene:'gear-hall'},
+  {id:'refinery',name:tr('水晶精炼厂'),theme:'crystal_cave',scene:'refinery-hall'},
+  {id:'survey',name:tr('遗迹勘探站'),theme:'buried_ruins',scene:'survey-hall'},
+  {id:'cryo',name:tr('冰封实验室'),theme:'frozen_cave',scene:'cryo-hall'},
 ].map(l => Object.freeze(l)));
 export function validateLayers(layers: readonly Layer[]) {
   const ids = new Set<string>(), bases = new Set<number>();

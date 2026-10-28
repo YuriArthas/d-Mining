@@ -35,8 +35,11 @@
 .station-sheet .world-cards { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 6px; }
 .station-sheet .world-cards .ui-card-tile { min-height: 0; padding: 8px 5px; }
 .station-sheet .world-cards .ui-card-art { width: 44px; height: 44px; }
-.station-sheet .world-cards h4 { font-size: 15px; white-space: nowrap; }
-.station-sheet .world-cards small { white-space: nowrap; }
+.station-sheet .world-cards h4 { font-size: 15px; line-height: 1.1; overflow-wrap: anywhere; }
+.station-sheet .world-cards small { line-height: 1.15; }
+/* Longer names in the Latin-script languages: smaller, on up to two lines. */
+html:not([lang^=zh]) .station-sheet .world-cards h4 { font-size: 13px; }
+html:not([lang^=zh]) .world-cards small { font-size: 10px; }
 .station-sheet .world-cards .ui-btn { padding: 0 4px; }
 /* Short screens: the portal's cards give up height so the unlock list below fits without scrolling. */
 @container game (max-height: 440px) {
@@ -49,3 +52,5 @@
 @container game (max-height: 380px) {
   .portal-sheet .world-cards .ui-card-art { width: 36px; height: 36px; }
 }
+/* Card buttons in the Latin-script languages: a size down so a long verb stays inside. */
+html:not([lang^=zh]) .ui-card-tile .ui-btn { font-size: 13px; padding: 0 4px; }
