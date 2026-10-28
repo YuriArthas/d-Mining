@@ -230,9 +230,9 @@ function GearTab({ session, common, onShop }: Props & { common: Common }) {
     return <div className="ui-card-tile bag-gear" data-kind={kind}>
       <div className="bag-gear-art"><Icon kind={kind === 'tools' ? 'pickaxe' : 'backpack'} /><span className="bag-gear-level ui-num">Lv.{current.level}<small>/{kind === 'tools' ? tools.length : bags.length}</small></span></div>
       <div className="bag-gear-info"><h4 className="ui-outline">{current.name}{kind === 'tools' && state.pickaxe.enhance ? ` +${state.pickaxe.enhance}` : ''}</h4>
-        {kind === 'tools' ? <><div className="ui-stat"><span>力量</span><b>+{number(state.pickaxe.basePower)}</b></div><div className="ui-stat"><span>攻速</span><b>{current.speed} 次/秒</b></div></>
+        {kind === 'tools' ? <><div className="ui-stat"><span>伤害</span><b>+{number(state.pickaxe.basePower)}</b></div><div className="ui-stat"><span>攻速</span><b>{current.speed} 次/秒</b></div></>
           : <><div className="ui-stat"><span>容量</span><b>{number(current.capacity!)}</b></div><div className="ui-stat"><span>已装</span><b>{number(state.inventory.used)}</b></div></>}
-        {next ? <div className="bag-gear-next"><small>下一件 <b>{next.name}</b> · {kind === 'tools' ? `力量 +${number(next.power!)}` : `容量 ${number(next.capacity!)}`}</small>
+        {next ? <div className="bag-gear-next"><small>下一件 <b>{next.name}</b> · {kind === 'tools' ? `伤害 +${number(next.power!)}` : `容量 ${number(next.capacity!)}`}</small>
           <PriceButton verb="去商店" price={number(next.price)} currency={currencyIcon(next.currency)} size="s" tone="orange" onPress={() => onShop(kind)} /></div>
           : <span className="ui-stamp">已经是最好的了</span>}
       </div>

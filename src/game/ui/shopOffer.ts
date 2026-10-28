@@ -1,6 +1,8 @@
 import type { ShopCategory, ShopItem } from '../content/shopCatalog.ts';
 import type { CurrencyId } from '../content/economy.ts';
 import { pickaxeStats } from '../logic/Pickaxe.ts';
+import { ECONOMY } from '../content/economy.ts';
+import { JOURNEY_WORLDS } from '../content/journeyWorlds.ts';
 
 type Snapshot = Readonly<{
   balances: Readonly<Record<CurrencyId, number>>;
@@ -35,9 +37,26 @@ export function offerStats(category: ShopCategory, item: ShopItem, items: readon
   // The newest pickaxe counts with its enhancements (+1..+3); older ones were never enhanced.
   const power = (i: ShopItem) => i.level === s.equipment.toolLevel && s.equipment.enhance ? pickaxeStats(i.level, 1, s.equipment.enhance).power : i.power!;
   return [
-    { key: 'power', label: '力量', value: power(item), current: power(worn), max: last.power!, unit: '' },
+    { key: 'power', label: '伤害', value: power(item), current: power(worn), max: last.power!, unit: '' },
     { key: 'speed', label: '攻速', value: item.speed!, current: worn.speed!, max: last.speed!, unit: '/秒' },
   ];
+}
+
+/** The world a shop item belongs to: the world whose currency buys it. */
+export const offerWorld = (item: ShopItem) => ({ gold: 1, tech: 2, star: 3 } as const)[item.currency];
+/** How deep a pickaxe of this level digs in its own world: the deepest layer whose gate it meets. */
+export function toolReach(level: number) {
+  const world = level <= 10 ? 1 : level <= 20 ? 2 : 3, layers = JOURNEY_WORLDS[world - 1].layers;
+  let reach = layers[0].name;
+  layers.forEach((layer, local) => { if (ECONOMY.layers[(world - 1) * 7 + local].gate <= level) reach = layer.name; });
+  return reach;
+}
+/** The gain over what the player carries, as the shop shows it: damage as a multiple (×1.5), speed and capacity
+ *  as an increase (+0.5, +5); nothing for an item that is not better. */
+export function offerGain(stat: Readonly<{ key: 'power' | 'speed' | 'capacity'; value: number; current: number }>) {
+  if (!(stat.value > stat.current) || stat.current <= 0) return null;
+  if (stat.key === 'power') { const r = stat.value / stat.current; return `×${r >= 10 ? Math.round(r) : Math.round(r * 10) / 10}`; }
+  return `+${Math.round((stat.value - stat.current) * 100) / 100}`;
 }
 
 /** What the buy button says and whether it works. */
