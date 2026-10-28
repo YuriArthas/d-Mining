@@ -105,7 +105,7 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
     {stationOpen && <StationSheet session={session} onClose={() => { input.reset(); setStationDismissed(true); surface.current?.focus(); }} />}
     {portalOpen && !stationOpen && <PortalSheet session={session} onClose={() => { input.reset(); setPortalDismissed(true); surface.current?.focus(); }} />}
     {modal?.kind === 'rewards' && <RewardsSheet session={session} tab={modal.tab} onTab={tab => setModal({ kind: 'rewards', tab })} onClose={close} />}
-    {modal?.kind === 'egg' && state.eggId && <EggSheet key={state.eggStation!.id} session={session} eggId={state.eggId} onOpenPets={() => open({ kind: 'bag', tab: 'pets' })} onClose={close} />}
+    {modal?.kind === 'egg' && state.eggId && <EggSheet key={state.eggStation!.id} session={session} eggId={state.eggId} onClose={close} />}
     {modal?.kind === 'capsule' && <CapsuleSheet session={session} onClose={close} />}
     {modal?.kind === 'help' && <HelpSheet onClose={close} />}
     {modal?.kind === 'rebirth' && <RebirthSheet session={session} onClose={close} onReborn={(count, multiplier) => setReborn({ count, multiplier })} />}

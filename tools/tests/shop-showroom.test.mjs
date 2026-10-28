@@ -41,7 +41,7 @@ test('商店卡片：已装备、已拥有、下一件、未到；数值和当�
   assert.deepEqual(offerAction('tools', tools[0], s), { label: '装备', enabled: true, buy: false });
   assert.equal(offerAction('tools', tools[5], s).label, '先买上一件');
   const next = offerAction('tools', tools[4], { ...s, balances: { gold: 0, tech: 0, star: 0 } });
-  assert.equal(next.enabled, false); assert.equal(next.short, tools[4].price);
+  assert.deepEqual(next, { label: '购买', enabled: false, buy: false });
   assert.equal(offerAction('tools', tools[4], { ...s, balances: { gold: tools[4].price, tech: 0, star: 0 } }).buy, true);
   assert.deepEqual([tools[0], tools[10], tools[25]].map(offerTier), ['plain', 'fine', 'star']);
 });

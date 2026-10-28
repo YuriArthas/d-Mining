@@ -1,55 +1,107 @@
-/* Egg stand sheet and the full-screen hatch reveal. */
-.egg-layout { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 12px; align-items: center; flex: 1; }
-.egg-hero { display: grid; justify-items: center; gap: 4px; }
-.egg-hero-art { width: 116px; height: 132px; }
-.egg-outcomes { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
-/* A locked egg keeps its pets secret: one dark panel with a big question mark and where it unlocks. */
-.egg-mystery { display: grid; place-items: center; gap: 6px; min-height: 180px; border-radius: 14px; background: rgba(8, 14, 26, .55); color: #fff; text-align: center; }
-.egg-mystery strong { font-size: 56px; line-height: 1; }
-.egg-mystery span { font-size: 18px; }
-.egg-outcome { display: grid; justify-items: center; gap: 3px; min-width: 0; }
-.egg-outcome .ui-cell { aspect-ratio: 1; height: auto; cursor: default; }
-.egg-odds { font-size: 22px; line-height: 1; }
-.egg-owned { font: 700 11px/1.2 var(--ui-font); color: var(--ui-ink-soft); }
-.egg-mining { font: 800 12px/1.1 var(--ui-font); color: var(--ui-ink-soft); -webkit-text-stroke: 0; white-space: nowrap; }
-.egg-status { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Egg stand sheet and the full-screen hatch (docs/draft-ui-v2.md, U5). Style A: white cards framed in their rarity
+   colour on the light sheet; the hatch runs on the rarity's colour with flat rays, shells and a pop. */
+.ui-sheet.egg-sheet { --sheet-tone: var(--ui-orange); }
+.ui-sheet.egg-sheet:has(.egg-layout[data-locked]) { --sheet-tone: var(--ui-steel); }
+.egg-sheet .ui-sheet-body { position: relative; overflow: hidden; padding-top: 50px; }
+.egg-toast { position: absolute; z-index: 5; left: 50%; bottom: 12px; translate: -50% 0; }
 
+.egg-layout { display: grid; grid-template-columns: 196px minmax(0, 1fr); gap: 14px; flex: 1; min-height: 0; }
+.egg-side { display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 0; }
+.egg-hero-art { width: 104px; height: 120px; flex: none; }
+.egg-wallet { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; color: var(--ui-ink-soft); }
+.egg-wallet .ui-icon { width: 20px; height: 20px; }
+.egg-wallet b { font-size: 16px; color: var(--ui-ink); }
+.egg-side .egg-buy.ui-btn { width: 100%; }
+.egg-side .ui-toggle { min-height: 36px; }
+.egg-last { display: flex; align-items: center; gap: 6px; width: 100%; padding: 3px 8px 3px 4px; border: 3px solid var(--r); border-radius: 12px; background: var(--ui-paper); }
+.egg-last-art { width: 34px; height: 34px; flex: none; }
+.egg-last span { display: grid; line-height: 1.15; min-width: 0; }
+.egg-last small { font-size: 10px; color: var(--ui-ink-soft); }
+.egg-last b { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Every pet in the egg, on one row: its odds large, then the pet, its income bonus on the rarity band. */
+.egg-outcomes { display: grid; grid-template-columns: repeat(var(--n, 5), minmax(0, 1fr)); gap: 8px; align-content: start; min-height: 0; }
+.egg-outcome { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 0; }
+.egg-card { position: relative; width: 100%; height: 148px; overflow: hidden; border: 3px solid var(--r); border-radius: 14px; background: var(--ui-paper); }
+.egg-odds { position: absolute; left: 0; right: 0; top: 3px; text-align: center; font-size: 23px; line-height: 1.1; --ui-stroke: 4.5px; }
+.egg-card-art { position: absolute; left: 50%; top: 36px; width: 62px; height: 62px; translate: -50% 0; }
+.egg-card-name { position: absolute; left: 2px; right: 2px; bottom: 25px; text-align: center; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.egg-card-band { position: absolute; left: 0; right: 0; bottom: 0; height: 23px; display: flex; align-items: center; justify-content: center; gap: 3px;
+  background: var(--r); font-size: 13px; --ui-stroke: 3px; white-space: nowrap; }
+.egg-card-band .ui-icon { width: 15px; height: 15px; }
+.egg-mining { font-size: 12px; color: var(--ui-ink-soft); white-space: nowrap; }
+.egg-tags { display: flex; min-height: 22px; }
+.egg-tag { padding: 1px 8px; border: 2px solid var(--ui-ink); border-radius: 999px; font-size: 11px; line-height: 1.4; white-space: nowrap; }
+.egg-better { background: var(--ui-green); --ui-stroke: 2.5px; }
+.egg-owned { border-color: var(--ui-line); color: var(--ui-ink-soft); background: var(--ui-paper); }
+/* A locked egg keeps its pets secret: one dashed panel saying where it unlocks. */
+.egg-mystery { display: grid; place-items: center; align-content: center; gap: 4px; border: 3px dashed var(--ui-mute); border-radius: 16px; background: var(--ui-well-bg);
+  color: var(--ui-ink-soft); text-align: center; }
+.egg-mystery strong { font-size: 54px; line-height: 1; color: var(--ui-mute); }
+.egg-mystery span { font-size: 18px; }
+.egg-mystery small { font-size: 12px; }
+
+/* The hatch. */
 .hatch {
-  position: absolute; inset: 0; z-index: 70; display: grid; place-items: center; overflow: hidden;
-  background: radial-gradient(circle at 50% 46%, color-mix(in srgb, var(--r) 70%, white) 0, var(--r-lo) 38%, #0b1d33 80%);
-  touch-action: none;
+  --hatch-ms: 1000ms; --hl: #e3eaf5; --hm: #8d9cba;
+  position: absolute; inset: 0; z-index: 70; display: grid; place-items: center; overflow: hidden; touch-action: none;
+  background: radial-gradient(circle at 50% 46%, var(--hl) 0, var(--hm) 38%, var(--ui-ink) 85%);
+  font-family: var(--ui-font); color: var(--ui-ink);
 }
-.hatch-rays { position: absolute; inset: -40%; background: repeating-conic-gradient(from 0deg, #ffffff30 0 9deg, transparent 9deg 22deg); opacity: 0; animation: hatch-fade .3s 1s forwards, hatch-spin 24s linear infinite; }
-.hatch-stage { position: relative; display: grid; place-items: center; }
-.hatch-egg { grid-area: 1 / 1; width: 150px; height: 175px; animation: hatch-shake .8s ease-in-out, hatch-out .2s .8s forwards; }
-.hatch-flash { grid-area: 1 / 1; width: 520px; height: 520px; border-radius: 50%; background: radial-gradient(circle, #fff 0, #ffffffcc 30%, transparent 70%); opacity: 0; pointer-events: none; animation: hatch-flash .45s .8s; }
-.hatch-result { grid-area: 1 / 1; display: grid; justify-items: center; gap: 4px; opacity: 0; transform: scale(.6); animation: hatch-pop .45s 1s cubic-bezier(.3, 1.6, .5, 1) forwards; }
-.hatch-pet { width: 150px; height: 150px;  }
-.hatch-result h2 { margin: 0; font-size: 30px; --ui-stroke: 5px; }
-.hatch-ribbon { padding: 4px 28px 6px; border: var(--ui-edge) solid var(--ui-ink); background: linear-gradient(180deg, var(--r), var(--r-lo)); clip-path: polygon(0 0, 100% 0, 94% 50%, 100% 100%, 0 100%, 6% 50%); font-size: 24px; line-height: 1; }
-.hatch-new { background: var(--ui-pink); }
-.hatch-actions { justify-content: center; margin-top: 6px; }
+.hatch[data-rarity=rare] { --hl: #c9ecff; --hm: #2fa0ff; }
+.hatch[data-rarity=epic] { --hl: #ecd9ff; --hm: #a463f2; }
+.hatch[data-rarity=legendary] { --hl: #fff1c4; --hm: #ff9f1a; }
+.hatch-rays { position: absolute; inset: -40%; background: repeating-conic-gradient(from 0deg, #ffffff2e 0 9deg, transparent 9deg 22deg); animation: hatch-spin 24s linear infinite; }
+.hatch[data-rarity=common] .hatch-rays { opacity: .5; }
+.hatch-stage { position: relative; display: grid; place-items: center; width: 100%; height: 100%; }
+.hatch-egg { grid-area: 1 / 1; position: relative; width: 140px; height: 163px;
+  animation: hatch-shake calc(var(--hatch-ms) - 250ms) ease-in-out, hatch-out .2s calc(var(--hatch-ms) - 250ms) forwards; }
+.hatch-egg-art { width: 100%; height: 100%; }
+.hatch-crack { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; animation: hatch-fade .1s calc(var(--hatch-ms) * .55) forwards; }
+.hatch-crack path { fill: none; stroke: var(--ui-ink); stroke-width: 5; stroke-linejoin: round; stroke-linecap: round; }
+.hatch-shells { grid-area: 1 / 1; position: relative; width: 0; height: 0; }
+.hatch-shells i { position: absolute; left: -14px; top: -10px; width: 28px; height: 20px; border: 3px solid var(--ui-ink); border-radius: 40% 60% 50% 40%; background: #efe3cc;
+  opacity: 0; animation: hatch-shell .6s calc(var(--hatch-ms) - 250ms) cubic-bezier(.2, .7, .4, 1) forwards; --a: calc(var(--k) * 60deg + 20deg); }
+.hatch-result { grid-area: 1 / 1; display: grid; justify-items: center; gap: 6px; opacity: 0; transform: scale(.6);
+  animation: hatch-pop .45s calc(var(--hatch-ms) - 120ms) cubic-bezier(.3, 1.6, .5, 1) forwards; }
+.hatch-pet { width: 140px; height: 140px; }
+.hatch-result h2 { margin: -4px 0 0; font-size: 30px; --ui-stroke: 6px; }
+.hatch-ribbon { padding: 4px 30px 6px; border: 3px solid var(--ui-ink); background: var(--hm); clip-path: polygon(0 0, 100% 0, 94% 50%, 100% 100%, 0 100%, 6% 50%); font-size: 24px; line-height: 1; --ui-stroke: 5px; }
+.hatch-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 760px; }
+.hatch-chip { display: inline-flex; align-items: center; gap: 4px; height: 30px; padding: 0 11px 0 5px; border: 2.5px solid var(--ui-ink); border-radius: 999px; background: var(--ui-paper);
+  font-size: 15px; white-space: nowrap; }
+.hatch-chip .ui-icon { width: 22px; height: 22px; }
+.hatch-new { background: var(--ui-pink); padding: 0 11px; --ui-stroke: 3px; }
+.hatch-better { background: var(--ui-green); padding: 0 11px; --ui-stroke: 3px; }
+.hatch-actions { display: flex; justify-content: center; gap: 10px; margin-top: 8px; }
 .hatch-skip { position: absolute; inset: 0; z-index: 2; padding: 0; border: 0; background: none; cursor: pointer; }
-.hatch[data-done=true] .hatch-egg { display: none; }
-.hatch[data-done=true] .hatch-flash { display: none; }
+.hatch[data-done=true] .hatch-egg, .hatch[data-done=true] .hatch-shells { display: none; }
 .hatch[data-done=true] .hatch-result { opacity: 1; transform: none; animation: none; }
-.hatch[data-done=true] .hatch-rays { opacity: 1; animation: hatch-spin 24s linear infinite; }
-@keyframes hatch-shake { 0%, 100% { transform: rotate(0); } 15% { transform: rotate(-9deg); } 30% { transform: rotate(9deg); } 45% { transform: rotate(-12deg) scale(1.04); } 60% { transform: rotate(12deg) scale(1.06); } 75% { transform: rotate(-6deg) scale(1.1); } }
-@keyframes hatch-out { to { opacity: 0; transform: scale(1.35); } }
-@keyframes hatch-flash { 30% { opacity: 1; } 100% { opacity: 0; } }
-@keyframes hatch-pop { to { opacity: 1; transform: none; } }
+@keyframes hatch-shake { 0%, 100% { rotate: 0deg; } 12% { rotate: -9deg; } 24% { rotate: 9deg; } 40% { rotate: -11deg; } 52% { rotate: 11deg; scale: 1.04; }
+  66% { rotate: -13deg; scale: 1.06; } 80% { rotate: 13deg; scale: 1.08; } 92% { rotate: -6deg; scale: 1.12; } }
+@keyframes hatch-out { to { opacity: 0; scale: 1.35; } }
 @keyframes hatch-fade { to { opacity: 1; } }
+@keyframes hatch-shell { 0% { opacity: 1; transform: rotate(var(--a)) translateX(0) rotate(0deg); } 100% { opacity: 0; transform: rotate(var(--a)) translateX(170px) rotate(220deg); } }
+@keyframes hatch-pop { to { opacity: 1; transform: none; } }
 @keyframes hatch-spin { to { rotate: 360deg; } }
 
 @container game (max-height: 360px) {
-  .egg-layout { grid-template-columns: 96px minmax(0, 1fr); gap: 8px; }
-  .egg-hero-art { width: 84px; height: 96px; }
-  .egg-odds { font-size: 18px; }
-  .hatch-pet { width: 116px; height: 116px; }
+  .egg-layout { grid-template-columns: 160px minmax(0, 1fr); }
+  .egg-hero-art { width: 76px; height: 88px; }
+  .egg-card { height: 128px; }
+  .egg-card-art { width: 50px; height: 50px; top: 32px; }
+  .hatch-pet { width: 104px; height: 104px; }
   .hatch-result h2 { font-size: 24px; }
 }
+@container game (min-width: 1000px) and (min-height: 620px) {
+  .egg-layout { grid-template-columns: 240px minmax(0, 1fr); }
+  .egg-hero-art { width: 140px; height: 163px; }
+  .egg-card { height: 190px; }
+  .egg-card-art { width: 90px; height: 90px; top: 44px; }
+  .egg-odds { font-size: 30px; }
+}
 @media (prefers-reduced-motion: reduce) {
-  .hatch-egg, .hatch-flash { display: none; }
+  .hatch-egg, .hatch-shells { display: none; }
   .hatch-result { opacity: 1; transform: none; animation: none; }
-  .hatch-rays { opacity: 1; animation: none; }
+  .hatch-rays { animation: none; }
 }

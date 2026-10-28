@@ -69,7 +69,8 @@ function PetsTab({ session, pets, common, onClose }: Props & { pets: PetPanelSna
   if (finding) return <EggFinder session={session} pets={pets} common={common} onBack={() => setFinding(false)} onClose={onClose} />;
   const buySlot = () => {
     const result = session.buyPetSlot(pets.slots.length);
-    toast(result.status === 'bought' ? `第 ${result.slots} 格开放了，可以多带一只宠物` : result.status === 'insufficient' ? '钱还不够' : result.status === 'locked' ? `到达${slot?.unlockName}后才能买` : '请稍后再试');
+    const text = result.status === 'bought' ? `第 ${result.slots} 格开放了，可以多带一只宠物` : result.status === 'insufficient' ? '' : result.status === 'locked' ? `到达${slot?.unlockName}后才能买` : '请稍后再试';
+    if (text) toast(text);
   };
   const merge = (card: PetCardView) => {
     const result = session.pets.mergeGolden(card.pet.speciesId);
@@ -95,7 +96,7 @@ function PetsTab({ session, pets, common, onClose }: Props & { pets: PetPanelSna
         </GameButton>;
       })}
       {slot && (slot.unlocked
-        ? <PriceButton verb={`第 ${slot.slot} 格`} price={number(slot.price)} currency={currencyIcon(slot.currency)} size="s" short={!slot.canAfford} className="bag-buy-slot"
+        ? <PriceButton verb={`第 ${slot.slot} 格`} price={number(slot.price)} currency={currencyIcon(slot.currency)} size="s" disabled={!slot.canAfford} className="bag-buy-slot"
             aria-label={`购买第 ${slot.slot} 格，${number(slot.price)} ${currencyName(slot.currency)}`} onPress={buySlot} />
         : <GameButton className="bag-slot" data-locked="" aria-label={`第 ${slot.slot} 格，到达${slot.unlockName}解锁`} blurAfterPress={false}
             onPress={() => toast(`到达${slot.unlockName}解锁第 ${slot.slot} 格`)}><Icon kind="lock" /></GameButton>)}

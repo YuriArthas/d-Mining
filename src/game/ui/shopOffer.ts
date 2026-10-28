@@ -47,6 +47,6 @@ export function offerAction(category: ShopCategory, item: ShopItem, s: Snapshot,
   if (state === 'equipped') return { label: '已装备', enabled: false, buy: false };
   if (state === 'owned') return tooSmall ? { label: '先卖掉矿石', enabled: false, buy: false } : { label: '装备', enabled: true, buy: false };
   if (state === 'locked') return { label: '先买上一件', enabled: false, buy: false };
-  // Short of coins: the panel writes the missing amount in the game's number style.
-  return affordable ? { label: '购买', enabled: true, buy: true } : { label: '还差', enabled: false, buy: false, short: item.price - balance };
+  // Short of coins: the same button with its price, greyed (never a missing amount).
+  return { label: '购买', enabled: affordable, buy: affordable };
 }

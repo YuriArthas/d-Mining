@@ -23,12 +23,12 @@ export function UiButton({ tone = 'blue', size = 'm', icon, children, className 
   </GameButton>;
 }
 
-/** Purchase button: the verb, then the price on its own white plate (“购买 [金币 480]”). `short` marks a price
- *  the player cannot pay yet: the plate turns red and the button stays pressable so it can explain why. */
-export function PriceButton({ verb, price, currency, short = false, tone = 'green', size = 'm', className = '', ...props }: PressProps & {
-  verb: string; price: ReactNode; currency: IconKind; short?: boolean; tone?: Tone; size?: 's' | 'm' | 'l';
+/** Purchase button: the verb, then the price on its own white plate (“购买 [金币 480]”). A price the player cannot
+ *  pay yet is the same button disabled: grey, the price still on it (never a missing amount). */
+export function PriceButton({ verb, price, currency, tone = 'green', size = 'm', className = '', ...props }: PressProps & {
+  verb: string; price: ReactNode; currency: IconKind; tone?: Tone; size?: 's' | 'm' | 'l';
 }) {
-  return <GameButton {...props} className={`ui-btn ui-price-btn ${className}`} data-tone={tone} data-size={size} data-short={short || undefined}>
+  return <GameButton {...props} className={`ui-btn ui-price-btn ${className}`} data-tone={tone} data-size={size}>
     <span className="ui-outline">{verb}</span><span className="ui-price-tag ui-num"><Icon kind={currency} />{price}</span>
   </GameButton>;
 }

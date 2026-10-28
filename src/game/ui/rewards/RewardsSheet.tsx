@@ -93,14 +93,14 @@ export function CapsuleSheet({ session, onClose }: { session: GameSession; onClo
     try {
       const outcome = session.spinCapsule();
       if (outcome.status === 'spun') { setResult(outcome); setMessage(''); return; }
-      setMessage({ away: '先走到扭蛋机旁边', unavailable: '现在无法抽奖', overflow: `${unit}已达上限，这次没扣幸运币`, 'insufficient-currency': '幸运币不够，去奖励里领一些吧' }[outcome.status]);
+      setMessage({ away: '先走到扭蛋机旁边', unavailable: '现在无法抽奖', overflow: `${unit}已达上限，这次没扣幸运币`, 'insufficient-currency': '' }[outcome.status]);
     } catch (error) { setMessage(`操作失败：${String(error)}`); }
   };
   const prize = result ? CAPSULE_REWARDS.find(r => r.id === result.reward)! : null;
   return <>
     <Sheet title="幸运扭蛋机" subtitle={`每次抽一项；已拥有的永久权益会换成${unit}`} size="m" className="capsule-sheet" onClose={onClose} footer={<>
       <Chip icon="luck">幸运币 <b>{number(rewards.balance)}</b></Chip>
-      <span className="ui-hint" role="status">{message || (!state.atMachine ? '走到扭蛋机旁边才能抽' : rewards.balance < REWARD_CONFIG.spinCost ? '幸运币不够，去奖励里领一些吧' : '')}</span><span className="ui-grow" />
+      <span className="ui-hint" role="status">{message || (!state.atMachine ? '走到扭蛋机旁边才能抽' : '')}</span><span className="ui-grow" />
       <UiButton size="m" tone="purple" icon="luck" disabled={!state.atMachine || rewards.balance < REWARD_CONFIG.spinCost} onPress={spin}>抽一次 · {REWARD_CONFIG.spinCost} 幸运币</UiButton>
     </>}>
       <div className="capsule-layout"><CapsuleArt />

@@ -105,7 +105,7 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
     assert.equal(await page.locator('.egg-mining').count(), 5);
     await tap(page.locator('.egg-buy')); await page.locator('.hatch').waitFor();
     await page.waitForFunction(() => document.querySelector('.hatch')?.dataset.done === 'true', null, { timeout: 5000 }); await page.waitForTimeout(400); await shot('07-hatch-result');
-    assert.match(await page.locator('.hatch-tags').innerText(), /金币收益/); assert.match(await page.locator('.hatch-tags').innerText(), /挖矿/);
+    assert.match(await page.locator('.hatch-tags').innerText(), /金币收入/); assert.match(await page.locator('.hatch-tags').innerText(), /挖矿/);
     await tap(button('完成')); await tap(button('关闭卵石蛋'));
     await check('Pebble egg: price in gold, outcomes with +% bonuses, hatch result says 金币收益.');
 

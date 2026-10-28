@@ -586,7 +586,7 @@ export class GameSession {
         this.autoHatchElapsed=0;
         const hatched=this.petService.hatch(this.autoHatchEgg);
         if(hatched.status==='hatched'){this.lastAutoHatch=hatched;this.committed(true);this.feedback({type:'hatched',tier:this.petTier(hatched.pet),auto:true});}
-        else {this.stopAutoHatch();this.notice=hatched.status==='insufficient-coins'?'钱不够了，自动孵蛋已停止':'蛋台不可用，自动孵蛋已停止';}
+        else {this.stopAutoHatch();this.notice='自动孵蛋已停止';}
       }
     }
     if(result.changed)this.committed(false);

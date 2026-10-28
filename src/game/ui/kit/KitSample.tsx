@@ -58,7 +58,7 @@ export function KitSample() {
         <div className="kit-row">
           <PriceButton verb="购买" price="480" currency="coin" onPress={noop} />
           <PriceButton verb="强化 +2" price="1.2万" currency="coin" tone="orange" onPress={noop} />
-          <PriceButton verb="购买" price="2,600" currency="tech" short onPress={noop} />
+          <PriceButton verb="购买" price="2,600" currency="tech" disabled onPress={noop} />
           <PriceButton verb="开蛋" price="350" currency="starcoin" size="l" tone="purple" onPress={noop} />
         </div>
       </section>

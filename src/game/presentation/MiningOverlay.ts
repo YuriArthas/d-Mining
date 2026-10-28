@@ -16,6 +16,8 @@ const SPREAD = [-26, 20, -8, 30, -20, 8];
 /** Stretches the overlay's timings (1 = normal) so screenshots on a slow renderer can catch them (debug only). */
 let timeScale = 1;
 export const setMiningOverlayTimeScale = (scale: number) => { timeScale = scale; };
+/** The same stretch for other UI flourishes timed in script (the hatch). */
+export const uiTimeScale = () => timeScale;
 
 /** The mining layer of the UI, drawn over the scene without React (docs/draft-ui-v2.md, U3):
  *  - a plate over the block being mined: name, sell price and a health bar whose lost part first turns white and

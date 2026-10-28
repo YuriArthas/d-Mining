@@ -41,20 +41,19 @@ export function ShopPanel({ session, view, onClose }: { session: GameSession; vi
   const blocked = !action.enabled || !display.ready || !!display.error;
   // Items still to buy show their price on the button; further ones too, on a greyed button.
   const priced = offer === 'next' || offer === 'locked';
-  // How the button feels: buy now, short of coins, further up the ladder, owned or worn.
+  // How the button feels: buy now, short of coins (the price, greyed), further up the ladder, owned or worn.
   const mood = offer === 'next' ? (action.enabled ? 'buy' : 'short') : offer === 'locked' ? 'locked' : offer === 'owned' ? (action.enabled ? 'owned' : 'locked') : 'equipped';
   const unit = currencyName(item.currency);
   // The newest pickaxe, worn: its button enhances it (+1..+3) while it can; its name carries the enhancement.
   const top = category === 'tools' && item.level === state.equipment.toolLevel, enhance = state.pickaxeEnhance;
   const enhancing = top && offer === 'equipped' && !!enhance.next;
-  const enhanceShort = enhance.next ? Math.max(0, enhance.next.price - state.balances[enhance.next.currency]) : 0;
   const improve = () => {
     const result = session.enhancePickaxe(enhance.level, enhance.enhance);
-    setMessage(result.status === 'enhanced' ? `强化到 +${result.enhance}！` : result.status === 'insufficient' ? `${unit}不足` : result.status === 'max' ? '已经强化满了' : '请重新进入商店');
+    setMessage(result.status === 'enhanced' ? `强化到 +${result.enhance}！` : result.status === 'insufficient' ? '' : result.status === 'max' ? '已经强化满了' : '请重新进入商店');
   };
   const purchase = () => {
     const result = session.useShopItem(category, item.id);
-    setMessage(result.status === 'upgraded' ? '购买成功，已装备！' : result.status === 'equipped' ? '已装备' : result.status === 'insufficient' ? `${currencyName(item.currency)}不足` : result.status === 'too-small' ? '背包装不下现有矿石，先去卖掉' : result.status === 'locked' ? '请先购买上一件' : '请重新进入商店');
+    setMessage(result.status === 'upgraded' ? '购买成功，已装备！' : result.status === 'equipped' ? '已装备' : result.status === 'insufficient' ? '' : result.status === 'too-small' ? '背包装不下现有矿石，先去卖掉' : result.status === 'locked' ? '请先购买上一件' : '请重新进入商店');
   };
   const lean = (event: PointerEvent<HTMLElement>) => {
     const box = event.currentTarget.getBoundingClientRect();
@@ -84,19 +83,19 @@ export function ShopPanel({ session, view, onClose }: { session: GameSession; vi
           {gain > 0 && <em className="shop-gain ui-outline" key={item.id}>▲{number(gain)}</em>}
         </span>;
       })}</div>
-      {enhancing ? <UiButton size="l" tone={enhance.canAfford ? 'orange' : 'red'} icon={currencyIcon(enhance.next!.currency)} className="shop-buy" data-mood={enhance.canAfford ? 'buy' : 'short'}
+      {enhancing ? <UiButton size="l" tone={enhance.canAfford ? 'orange' : 'steel'} icon={currencyIcon(enhance.next!.currency)} className="shop-buy" data-mood={enhance.canAfford ? 'buy' : 'short'}
         data-testid="shop-enhance" disabled={!enhance.canAfford || !display.ready} onPress={improve}
-        aria-label={enhance.canAfford ? `强化到 +${enhance.next!.enhance}，${number(enhance.next!.price)} ${unit}` : `强化还差 ${number(enhanceShort)} ${unit}`}>
+        aria-label={`强化到 +${enhance.next!.enhance}，${number(enhance.next!.price)} ${unit}`}>
         强化 +{enhance.next!.enhance} · {number(enhance.next!.price)}
       </UiButton>
-      : <UiButton size="l" tone={mood === 'buy' ? 'green' : mood === 'short' ? 'red' : mood === 'owned' ? 'purple' : mood === 'equipped' ? 'blue' : 'steel'} icon={priced ? currencyIcon(item.currency) : undefined}
+      : <UiButton size="l" tone={mood === 'buy' ? 'green' : mood === 'short' ? 'steel' : mood === 'owned' ? 'purple' : mood === 'equipped' ? 'blue' : 'steel'} icon={priced ? currencyIcon(item.currency) : undefined}
         className="shop-buy" data-mood={mood} data-testid="shop-buy" disabled={blocked} onPress={purchase}
-        aria-label={offer === 'locked' ? `先买上一件，${number(item.price)} ${unit}` : priced ? (action.enabled ? `购买，${number(item.price)} ${unit}` : `还差 ${number(action.short ?? item.price)} ${unit}`) : action.label}>
+        aria-label={offer === 'locked' ? `先买上一件，${number(item.price)} ${unit}` : priced ? `购买，${number(item.price)} ${unit}` : action.label}>
         {priced ? number(item.price) : mood === 'equipped' ? '✓ 已装备' : action.label}
       </UiButton>}
       <div className="shop-hint ui-outline" data-mood={message ? 'message' : enhancing ? 'enhance' : mood} role="status">{message || (enhancing
-        ? (enhance.canAfford ? `强化后力量 +${number(enhance.next!.power)}，模型和门槛不变` : `还差 ${number(enhanceShort)}`)
-        : mood === 'short' ? `还差 ${number(action.short!)}` : mood === 'locked' ? '先买上一件' : '')}</div>
+        ? `强化后力量 +${number(enhance.next!.power)}，模型和门槛不变`
+        : mood === 'locked' ? '先买上一件' : '')}</div>
     </footer>
   </section>;
 }

@@ -48,7 +48,7 @@ type ValidationDebug = {
   excavate: (coords: readonly Coord[]) => boolean;
   /** Slows the creek splashes (1 = normal) so screenshots can catch them. */
   splashTimeScale: (scale: number) => void;
-  /** Slows the mining plate, damage numbers and flying ore (1 = normal) so screenshots can catch them. */
+  /** Slows the mining plate, damage numbers, flying ore and the hatch (1 = normal) so screenshots can catch them. */
   overlayTimeScale: (scale: number) => void;
   canMine: (coord: Coord) => boolean;
   cell: (coord: Coord) => number | null;
@@ -122,6 +122,8 @@ export function attachGameDebug(
           spawn: r.spawn,
           layout: r.layout,
         })),
+        /** Where to stand to use each egg (checks walk up to a locked one). */
+        eggStations: current.content.session.eggStations.map((s) => ({ eggId: s.eggId, zone: s.zone })),
       },
       player: {
         height: GAME_CONFIG.player.height,

@@ -79,7 +79,8 @@
 .ui-price-tag { display: inline-flex; align-items: center; gap: 3px; height: calc(100% - 10px); min-height: 28px; padding: 0 9px 0 4px;
   border: 2px solid var(--ui-ink); border-radius: 8px; background: var(--ui-paper); color: var(--ui-ink); font: 800 .8em/1 var(--ui-font); }
 .ui-price-tag > .ui-icon { width: 1.35em; height: 1.35em; }
-.ui-price-btn[data-short] .ui-price-tag { color: var(--ui-red-lo); }
+.ui-price-btn:disabled .ui-price-tag { color: var(--ui-ink-soft); border-color: var(--ui-mute); }
+.ui-price-btn:disabled .ui-price-tag > .ui-icon { opacity: .6; }
 
 .ui-close {
   --tone: var(--ui-red); --tone-lo: var(--ui-red-lo);
