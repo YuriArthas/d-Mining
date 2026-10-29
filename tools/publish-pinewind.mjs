@@ -12,12 +12,15 @@ const root = fileURLToPath(new URL('..', import.meta.url));
 const source = join(root, 'dist');
 const host = '/root/threejs_space/d-game1';
 const served = join(host, 'dist');
-const slug = 'mining-surface-play';
+// --formal publishes the same build to the formal entry, games/mining (only when the user has authorised it); the
+// test entry, games/mining-surface-play, is the default. The save store follows the path (SaveBootstrap.saveNamespace).
+const formal = process.argv.includes('--formal');
+const slug = formal ? 'mining' : 'mining-surface-play';
 const destination = join(served, 'games', slug);
 const publicRoot = 'https://w-sunjun-public.dev.clock-p.com/';
 const publicGame = `${publicRoot}games/${slug}/`;
 const withLauncher = process.argv.includes('--launcher');
-const unknownArgs = process.argv.slice(2).filter(arg => arg !== '--launcher');
+const unknownArgs = process.argv.slice(2).filter(arg => arg !== '--launcher' && arg !== '--formal');
 if (unknownArgs.length) throw new Error(`Unknown publisher arguments: ${unknownArgs.join(', ')}`);
 
 const files = dir => readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
@@ -116,12 +119,10 @@ try {
   }
 
   mkdirSync(join(root, 'artifacts'), { recursive: true });
-  const releaseRecord = resolve(root, process.env.PINEWIND_RELEASE_RECORD || 'artifacts/pinewind-public-release.json');
+  const releaseRecord = resolve(root, process.env.PINEWIND_RELEASE_RECORD || (formal ? 'artifacts/mining-formal-release.json' : 'artifacts/pinewind-public-release.json'));
   mkdirSync(dirname(releaseRecord), { recursive: true });
   writeFileSync(releaseRecord, JSON.stringify({
     sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim(),
-    masterBaseline: JSON.parse(readFileSync(join(root, 'artifacts/master-baseline/manifest.json'), 'utf8')).capturedAt,
-    masterBaselineSha256: hash(join(root, 'artifacts/master-baseline/manifest.json')),
     sourceFilesSha256: digest(Object.fromEntries(files(source).map(path => [relative(source, path), hash(path)]))),
     publishedAt: new Date().toISOString(),
     url: publicGame + 'index.html',
@@ -133,7 +134,7 @@ try {
     protectedGameFiles: Object.entries(before).map(([file, sha256]) => ({ file, sha256 })),
     verified,
   }, null, 2) + '\n');
-  console.log('松风矿谷 · 场景设计 published and publicly hash-verified:', publicGame + 'index.html');
+  console.log(formal ? 'Mining (formal entry)' : '松风矿谷 · 场景设计', 'published and publicly hash-verified:', publicGame + 'index.html');
 } finally {
   rmSync(temporary, { recursive: true, force: true });
 }
