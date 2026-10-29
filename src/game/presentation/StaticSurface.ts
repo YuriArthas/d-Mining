@@ -41,8 +41,9 @@ export async function loadStaticSurface(
     if(m.name.startsWith('Glow halo')){m.blending=AdditiveBlending;m.depthWrite=false;m.fog=false;m.transparent=true;}
     if(m.map){m.map.magFilter=NearestFilter;m.map.minFilter=NearestMipmapNearestFilter;}
     if(request.name==='pinewind-architecture')liftAlbedo(m);
-    // Woods, rocks and the cliff walls: lit all round like the original's valley, not near black in shade.
-    else if(m.name==='Nature_PixelAtlas_Opaque'||m.name.startsWith('Valley cliff'))liftFoliage(m);
+    // Woods, rocks and the cliff walls (the valley's, world 2's mesas, world 3's crater walls): lit all round
+    // like the original's valley, not near black in shade.
+    else if(m.name==='Nature_PixelAtlas_Opaque'||/^(Valley cliff|Base cliff|Base crater rock)/.test(m.name))liftFoliage(m);
     if(m.name==='Creek water')applyCreekWater(m);
     applyBakedLight(m);
   };

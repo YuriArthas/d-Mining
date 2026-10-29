@@ -2,12 +2,12 @@
   "parts": [
     "tech-base.000.part"
   ],
-  "bytes": 736264,
-  "decodedBytes": 1392232,
-  "sha256": "43f1ff404cd673aa57cd4414948cee221bf20e5a69738927f174479f27f80547",
-  "sourceSha256": "9e4d2f34bb6d86b7acfa62282076ac40e50f02da63b2f8e2ef1ef8090242dbec",
-  "triangles": 105937,
-  "source": "tech base: Blender props (surface-game-art/tools/blender/build_tech_base.py, surface-game-art/tools/blender/build_egg_stands.py) and an offline procedural cave shell (surface-game-art/tools/underground/techBaseHall.ts on caveKit.ts); baked occlusion per vertex",
+  "bytes": 811536,
+  "decodedBytes": 1526200,
+  "sha256": "5fbc66b70547686aa95199336f30a4990c491ed69e2cba6608e262c3ca10d1b4",
+  "sourceSha256": "7949ae513997a256a090ead807eb78f2f380dd3afebc3f97bbdbb9fe60e642f7",
+  "triangles": 109475,
+  "source": "tech base: Blender props (surface-game-art/tools/blender/build_tech_base.py, surface-game-art/tools/blender/build_egg_stands.py, surface-game-art/tools/blender/build_gear.py, surface-game-art/tools/blender/build_refinery.py, surface-game-art/tools/blender/build_cryo.py, surface-game-art/tools/blender/build_reactor.py) and an offline procedural cave shell (surface-game-art/tools/underground/techBaseHall.ts on caveKit.ts); baked occlusion per vertex",
   "materialProfile": "authored-color",
   "coordinateSpace": "authored",
   "geometryEdits": false,

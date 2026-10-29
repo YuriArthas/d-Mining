@@ -32,7 +32,9 @@ export function assembleAuthoredSurface(assets:Assets,content:SurfaceContent,ins
  const extend=(more:Assets,list:readonly AuthoredInstance[])=>{
   if(disposed)throw Error('Surface disposed');
   loaded.push(more);for(const template of more.templates.values())bundle.retain(template);
-  const part=new Group();part.name=`${art.version}+${list.map(p=>p.asset).join(',')}`;place(more,list,part);bundle.retain(part);group.add(part);
+  const part=new Group();part.name=`${art.version}+${list.map(p=>p.asset).join(',')}`;place(more,list,part);
+  const halos=surfaceHalos(list);if(halos)part.add(halos);
+  bundle.retain(part);group.add(part);
   return part;
  };
  try {

@@ -1,13 +1,15 @@
-import { AdditiveBlending, CircleGeometry, Color, CylinderGeometry, DoubleSide, Group, Mesh, PlaneGeometry, RingGeometry, ShaderMaterial, Vector3 } from 'three';
+import { AdditiveBlending, CircleGeometry, Color, CylinderGeometry, DoubleSide, Group, Mesh, PlaneGeometry, ShaderMaterial, Vector3 } from 'three';
 import { WORLD_REQUIREMENTS, worldPortal, worldStation } from '../content/worldJourney.ts';
 import { PINEWIND_GATE } from '../content/pinewind/hubLayout.ts';
 
 /** The swirling portal disc in every world's teleport station ring (2.75 m up, 1.32 m across), and every world
  *  portal's sheet, violet and gold (world 1's fills its old ridge gate, the later worlds' a ring 2.9 m up). Where
- *  the player stands to open one: in world 1 a round pad (Blender builds its rim) filled with glowing water under
- *  a faint column of light, cyan for the station and violet for the gate; in the later worlds a soft ring. The
- *  frames themselves are scenery. */
+ *  the player stands to open one, in every world: a round pad of glowing water under a faint column of light, cyan
+ *  for the station and violet for the portal, so the two read the same everywhere, just above the ground (world
+ *  2's portal: its dais floor) where the player stands. World 1's lie in rims Blender builds on the ground, the
+ *  later worlds' stations on a plate flush with it. The frames themselves are scenery. */
 const UP = new Vector3(0, 1, 0);
+const STATION = ['#1fa8ec', '#aef4ff'] as const, PORTAL = ['#7a3fe0', '#f1d2ff'] as const;
 export class TeleportStations {
   readonly group = new Group();
   private readonly time = { value: 0 };
@@ -22,21 +24,12 @@ export class TeleportStations {
       float glow = smoothstep(1.0, .55, r) * (.35 + .65 * arms) + smoothstep(.98, .86, r) * smoothstep(.7, .9, r) * .9;
       vec3 color = mix(vec3(.12, .55, .95), vec3(.55, 1.0, .95), arms * smoothstep(1.0, .2, r));
       gl_FragColor = vec4(color * glow, glow * smoothstep(1.02, .9, r));`);
-    const pad = this.material(`
-      // RingGeometry UVs are planar: distance from the ring's middle radius (0.57 of the half-size).
-      float d = length(vUv * 2.0 - 1.0), r = clamp(abs(d - .85) / .15, 0.0, 1.0);
-      float pulse = .55 + .45 * sin(uTime * 2.0);
-      gl_FragColor = vec4(vec3(.35, .9, 1.0) * (1.0 - r) * pulse, (1.0 - r) * pulse);`);
     for (const world of WORLD_REQUIREMENTS) {
       const st = worldStation(world.id), station = new Group();
       station.position.set(st.x, 0, st.z); station.rotation.y = st.yaw;
       const disc = new Mesh(new CircleGeometry(1.34, 48), swirl); disc.position.y = 2.75; disc.renderOrder = 2;
       const at = new Vector3(st.zone.x - st.x, 0, st.zone.z - st.z).applyAxisAngle(UP, -st.yaw);
-      if (world.id === 1) station.add(disc, ...this.pad(at, st.zone.radius, '#1fa8ec', '#aef4ff'));
-      else {
-        const ring = new Mesh(new RingGeometry(.95, 1.35, 48, 1).rotateX(-Math.PI / 2), pad);
-        ring.position.set(at.x, .48, at.z); station.add(disc, ring);
-      }
+      station.add(disc, ...this.pad(at, st.zone.radius, ...STATION, .085));
       this.group.add(station);
     }
     const sheet = this.material(`
@@ -45,10 +38,6 @@ export class TeleportStations {
       float glow = smoothstep(1.0, .5, r) * (.4 + .6 * arms) + smoothstep(.99, .88, r) * smoothstep(.72, .9, r);
       vec3 color = mix(vec3(.55, .2, .95), vec3(1.0, .82, .4), arms * smoothstep(1.0, .15, r));
       gl_FragColor = vec4(color * glow, glow * smoothstep(1.02, .92, r));`);
-    const portalPad = this.material(`
-      float d = length(vUv * 2.0 - 1.0), r = clamp(abs(d - .85) / .15, 0.0, 1.0);
-      float pulse = .55 + .45 * sin(uTime * 1.6);
-      gl_FragColor = vec4(vec3(.85, .55, 1.0) * (1.0 - r) * pulse, (1.0 - r) * pulse);`);
     for (const world of WORLD_REQUIREMENTS) {
       const pt = worldPortal(world.id), portal = new Group();
       portal.position.set(pt.x, pt.y, pt.z); portal.rotation.y = pt.yaw;
@@ -56,11 +45,7 @@ export class TeleportStations {
         ? new Mesh(new PlaneGeometry(g.opening - .3, g.height - 1.9), sheet) : new Mesh(new CircleGeometry(1.85, 48), sheet);
       face.position.y = world.id === 1 ? (g.height - 1.9) / 2 + .05 : 2.9; face.renderOrder = 2;
       const at = new Vector3(pt.zone.x - pt.x, 0, pt.zone.z - pt.z).applyAxisAngle(UP, -pt.yaw);
-      if (world.id === 1) portal.add(face, ...this.pad(at, pt.zone.radius, '#7a3fe0', '#f1d2ff'));
-      else {
-        const ring = new Mesh(new RingGeometry(1.3, 1.8, 48, 1).rotateX(-Math.PI / 2), portalPad);
-        ring.position.set(at.x, .06, at.z); portal.add(face, ring);
-      }
+      portal.add(face, ...this.pad(at, pt.zone.radius, ...PORTAL, .085));
       this.group.add(portal);
     }
   }
@@ -75,7 +60,7 @@ export class TeleportStations {
 
   /** A pad's glowing water (opaque, so it reads on the pale sand: rings drifting outward over a slow swirl,
    *  brightest at the rim) and the column of light rising from it, fading upward. */
-  private pad(at: Vector3, radius: number, deep: string, bright: string) {
+  private pad(at: Vector3, radius: number, deep: string, bright: string, y: number) {
     const colors = { uDeep: { value: new Color(deep) }, uBright: { value: new Color(bright) } };
     const water = new ShaderMaterial({
       uniforms: { uTime: this.time, ...colors },
@@ -93,7 +78,7 @@ export class TeleportStations {
     });
     this.materials.push(water);
     const pool = new Mesh(new CircleGeometry(radius - .26, 48).rotateX(-Math.PI / 2), water);
-    pool.position.set(at.x, .085, at.z);
+    pool.position.set(at.x, y, at.z);
     const beam = new ShaderMaterial({
       uniforms: { uTime: this.time, ...colors }, transparent: true, depthWrite: false, blending: AdditiveBlending, side: DoubleSide,
       vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
@@ -106,7 +91,7 @@ export class TeleportStations {
     });
     this.materials.push(beam);
     const column = new Mesh(new CylinderGeometry(radius - .32, radius - .32, 2.6, 40, 1, true), beam);
-    column.position.set(at.x, 1.39, at.z); column.renderOrder = 3;
+    column.position.set(at.x, y + 1.3, at.z); column.renderOrder = 3;
     return [pool, column];
   }
 

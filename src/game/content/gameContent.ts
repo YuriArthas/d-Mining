@@ -24,10 +24,11 @@ export type SurfaceContent = Readonly<{
 export type HubEgg = Readonly<{ id: string; eggId: string; tier: number; x: number; y: number; z: number; yaw: number; color: string }>;
 
 const zone = (x: number, z: number, radius = 3): ServiceZone => ({ x, y: 0, z, radius, heightTolerance: .3, hysteresis: .3 });
-// World 2's services stand where its tech base puts them; world 3 keeps plain booths either side of its path.
-const serviceZone = (worldZ: number, kind: 'sell' | 'shop') => worldZ === TECH_BASE.worldZ
-  ? zone(TECH_BASE.kiosks[kind].ring[0], worldZ + TECH_BASE.kiosks[kind].ring[2])
-  : zone(kind === 'sell' ? -STAR_BASE.booths.x : STAR_BASE.booths.x, worldZ + STAR_BASE.booths.z);
+// The later worlds' services stand where their bases put them: before the ore buyer's and the shop's counters.
+const serviceZone = (worldZ: number, kind: 'sell' | 'shop') => {
+  const base = worldZ === TECH_BASE.worldZ ? TECH_BASE : STAR_BASE;
+  return zone(base.kiosks[kind].ring[0], worldZ + base.kiosks[kind].ring[2]);
+};
 // Each world's eggs stand in it: world 1's on Pinewind's terrace, the later worlds' in their bases' hatcheries.
 const inBase = (stands: readonly EggStand[], worldZ: number): HubEgg[] => stands.map(s => ({ ...s, tier: 0, y: 0, z: s.z + worldZ }));
 const eggs: readonly HubEgg[] = [...PINEWIND_EGG_DISPLAYS, ...inBase(TECH_BASE.stands, TECH_BASE.worldZ), ...inBase(STAR_BASE.stands, STAR_BASE.worldZ)];

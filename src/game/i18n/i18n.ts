@@ -29,7 +29,8 @@ function detect(): Lang {
 }
 /** The page's language. */
 export const LANG: Lang = detect();
-if (typeof document !== 'undefined') document.documentElement.lang = LANG === 'zh' ? 'zh-CN' : LANG;
+// The offline art builds stub `document` for canvas only (no documentElement).
+if (typeof document !== 'undefined' && document.documentElement) document.documentElement.lang = LANG === 'zh' ? 'zh-CN' : LANG;
 
 const missing = new Set<string>();
 /** The text in the page's language, with {name} parameters filled in. */

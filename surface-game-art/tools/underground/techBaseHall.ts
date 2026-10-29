@@ -14,7 +14,8 @@ import { buildHatchery } from './hatchery.ts';
 
 export const ASSET = BASE.asset;
 export const SUN = true;
-export const PROPS = ['tech-base', 'egg-stands'];
+// The station's decor comes from world 2's own layers' halls (their prop kits).
+export const PROPS = ['tech-base', 'egg-stands', 'gear', 'refinery', 'cryo', 'reactor'];
 
 const SHAFT = 8;
 
@@ -44,7 +45,7 @@ export function tessellate(source: THREE.BufferGeometry, max: number) {
 }
 
 /** Flat triangles at height y from XZ corner triples, each wound to face up. */
-function flat(tris: number[][], y: number) {
+export function flat(tris: number[][], y: number) {
   const pos: number[] = [];
   for (const [ax, az, bx, bz, cx, cz] of tris) {
     const up = (bz - az) * (cx - ax) - (bx - ax) * (cz - az) > 0;
@@ -54,7 +55,7 @@ function flat(tris: number[][], y: number) {
   return g;
 }
 /** A painted strip of `width` along the XZ points (closed: back to the first). */
-function ribbon(pts: readonly THREE.Vector2[], width: number, y: number, closed = false) {
+export function ribbon(pts: readonly THREE.Vector2[], width: number, y: number, closed = false) {
   const n = pts.length, side = (i: number) => {
     const a = pts[closed ? (i - 1 + n) % n : Math.max(i - 1, 0)], b = pts[closed ? (i + 1) % n : Math.min(i + 1, n - 1)];
     const t = b.clone().sub(a).normalize(); return new THREE.Vector2(-t.y, t.x).multiplyScalar(width / 2);
@@ -67,7 +68,7 @@ function ribbon(pts: readonly THREE.Vector2[], width: number, y: number, closed 
   return flat(tris, y);
 }
 /** A rounded square path round the origin (half size, corner radius), counter-clockwise from +X. */
-function roundedSquare(half: number, corner: number, steps = 6) {
+export function roundedSquare(half: number, corner: number, steps = 6) {
   const pts: THREE.Vector2[] = [], c = half - corner;
   for (const [cx, cz, a0] of [[c, c, 0], [-c, c, Math.PI / 2], [-c, -c, Math.PI], [c, -c, Math.PI * 1.5]] as const)
     for (let k = 0; k <= steps; k++) { const a = a0 + Math.PI / 2 * k / steps; pts.push(new THREE.Vector2(cx + Math.cos(a) * corner, cz + Math.sin(a) * corner)); }
@@ -239,6 +240,18 @@ export function buildHall(getProp: GetProp) {
   const st = BASE.station;
   place('Tech_Station', [st.x, 0, st.z], st.yaw);
   for (const side of [-1, 1]) box([st.x + Math.cos(st.yaw) * 1.9 * side, 2.6, st.z - Math.sin(st.yaw) * 1.9 * side], [.45, 2.6, .45], st.yaw);
+  // Round the station, the layers below (their halls' props); by the portal, world 3 ahead. Each in its anchor's
+  // frame (x across, +Z toward the spawn), on the ground, with one collider.
+  const decor = (list: typeof BASE.stationDecor, ax: number, ay: number, az: number, yaw: number) => {
+    const c = Math.cos(yaw), s = Math.sin(yaw);
+    for (const d of list) {
+      const at: [number, number, number] = [ax + d.x * c + d.z * s, ay + (d.y ?? 0), az - d.x * s + d.z * c];
+      place(d.prop, at, yaw + d.yaw, group, d.scale);
+      box([at[0], ay + d.half[1], at[2]], d.half, yaw + d.yaw);
+    }
+  };
+  decor(BASE.stationDecor, st.x, 0, st.z, st.yaw);
+  decor(BASE.portalDecor, pt.at[0], 0, pt.at[2], pt.yaw);
 
   // THE WEST YARD: a raised deck with a hazard edge and steps, tanks, stacked containers and the beacon mast;
   // a pipe run along its back.

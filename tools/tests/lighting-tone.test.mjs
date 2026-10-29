@@ -65,3 +65,20 @@ test('房子图集里的灯、信标、熔岩、水晶自发光：按 Blender �
   for (const [tile, strength] of Object.entries(glow.glow)) assert.equal(strengths[tiles.indexOf(+tile)], strength, `tile ${tile}`);
   assert.ok(glow.halos.length > 0 && glow.halos.every(h => h.node && h.at.length === 3 && h.size > 0), 'halos sit in a model frame');
 });
+
+test('世界 2、3 的路灯、信标和坠星也有柔光晕：随各自的基地加载，一个基地一次绘制', async () => {
+  const { surfaceHalos } = await import('../../src/game/presentation/SurfaceHalos.ts');
+  const { TECH_BASE } = await import('../../src/game/content/world2/techBase.ts');
+  const { STAR_BASE } = await import('../../src/game/content/world3/starBase.ts');
+  const base = (asset, z) => ({ asset, at: [0, 0, z], rotation: [0, 0, 0, 1], scale: [1, 1, 1] });
+  for (const [instance, count, top] of [[base(TECH_BASE.asset, TECH_BASE.worldZ), TECH_BASE.lamps.length + 1, 14.2 + TECH_BASE.beacon[1]],
+    [base(STAR_BASE.asset, STAR_BASE.worldZ), STAR_BASE.lamps.length + 1, STAR_BASE.star.at[1]]]) {
+    const mesh = surfaceHalos([instance]);
+    assert.ok(mesh, instance.asset);
+    const p = mesh.geometry.getAttribute('position');
+    assert.equal(p.count, count * 4, `${instance.asset}: four corners per halo`);
+    let high = 0; for (let i = 0; i < p.count; i++) { high = Math.max(high, p.getY(i)); assert.ok(Math.abs(p.getZ(i) - instance.at[2]) < 80, 'in its own world'); }
+    assert.ok(Math.abs(high - top) < 1e-6, `${instance.asset}: the highest halo is the beacon / the star`);
+  }
+  assert.equal(surfaceHalos([base('automine-hall', 0)]), null, 'halls carry none');
+});

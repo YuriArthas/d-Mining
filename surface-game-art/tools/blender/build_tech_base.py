@@ -51,8 +51,10 @@ TILES = [
     ('f2be36', [(3, 3, 26, 4, 'ffd86a'), (5, 26, 24, 3, 'd8a020')]),           # 29 gold
     ('0c6c74', [(6, 6, 20, 20, '12808a'), (11, 11, 10, 10, '1a9aa4')]),        # 30 glow teal (deep)
     ('a0603a', [(3, 12, 26, 3, '7c4626'), (12, 3, 8, 8, 'b87448')]),           # 31 backpack leather
+    ('9a90a8', [(3, 4, 12, 6, 'aca2ba'), (16, 18, 12, 6, '857b94')]),          # 32 meteor rock (world 3's lilac stone)
+    ('f6efe0', [(3, 4, 26, 3, 'fffaf0'), (3, 25, 26, 3, 'e2d8c2')]),           # 33 bone
 ]
-start('TechBase', 'tech-base', TILES, glowing={3, 7, 8, 9, 13, 21, 30})
+start('TechBase', 'tech-base', TILES, glowing={3, 7, 8, 9, 13, 21, 30}, rows=5)
 
 def cbox(name, at, size, t, q=None):
     """A box with chamfered vertical edges (the chunky toy look)."""
@@ -313,13 +315,14 @@ mesh('Flight', v, f, 27)
 # TELEPORT STATION (local +Z faces the pad and the spawn): a round white platform with a glowing rim, two white
 # pillars at +-1.9 across, a teal lintel, and a ring frame round the portal disc (2.75 m up, ~1.34 m radius).
 model('Tech_Station')
-lathe('Platform', [(0, 3.1), (.32, 3.1), (.4, 2.95)], 16, 6)
-lathe('PlatformGlow', [(.4, 2.72), (.43, 2.72), (.44, 2.58)], 24, 7, cap_bottom=False)
-cbox('Step', (0, .1, 3.0), (2.6, .2, 1.4), 2)
+# A plate flush with the sand (the glowing pad the game draws in front, 2.8 m out, lies on it and on the sand, where
+# the player stands), not a raised platform the player would sink into.
+lathe('Platform', [(0, 3.1), (.06, 3.1)], 16, 6)
+lathe('PlatformGlow', [(.06, 2.72), (.08, 2.72)], 24, 7, cap_top=False, cap_bottom=False)
 for sx in (-1, 1):
     cbox('Pillar', (sx * 1.9, 2.8, 0), (.85, 4.8, .85), 3)
     box('PillarGlow', (sx * 1.9, 2.8, .44), (.14, 3.6, .04), 7)
-    cbox('PillarFoot', (sx * 1.9, .7, 0), (1.15, .6, 1.15), 17)
+    cbox('PillarFoot', (sx * 1.9, .36, 0), (1.15, .6, 1.15), 17)
     cbox('PillarCap', (sx * 1.9, 5.3, 0), (1.15, .3, 1.15), 0)
 cbox('Lintel', (0, 5.65, 0), (5.0, .6, 1.0), 17)
 box('LintelGlow', (0, 5.65, .51), (4.2, .14, .04), 7)
@@ -542,4 +545,48 @@ v.append((2.15, 2.4, 3.6))
 mesh('DrillCone', v, [tuple(range(6))] + [(k, (k + 1) % 6, 6) for k in range(6)], 27)
 for sx, dz in ((-1, .25), (-1, -.25)):
     beam('Claw', (-2.15, 2.4, 2.1), (-2.15 + .2, 2.4 + dz * 2, 2.9), .2, .2, 0)
+
+# WORLD 3 AHEAD, by the portal: a fallen star (a lilac meteor rock bristling with violet crystals, a big gold star
+# standing out of it) and a giant fossil (ribs arching out of a sand mound) - the star that fell and 巨型化石, the
+# first layer below it.
+def wobble(r, n, phase, amount):
+    return [(math.cos(phase + 2 * math.pi * k / n) * r * (1 + amount[k % len(amount)]), math.sin(phase + 2 * math.pi * k / n) * r * (1 + amount[k % len(amount)])) for k in range(n)]
+def loft(name, rings, t):
+    """Stacked outlines [(y, [(x, z), ...]), ...] bottom to top, all with the same count; capped both ends."""
+    n = len(rings[0][1]); v = [(x, y, z) for y, pts in rings for x, z in pts]
+    f = [tuple(reversed(range(n))), tuple(range((len(rings) - 1) * n, len(rings) * n))]
+    for k in range(len(rings) - 1):
+        f += [(k * n + i, k * n + (i + 1) % n, (k + 1) * n + (i + 1) % n, (k + 1) * n + i) for i in range(n)]
+    return mesh(name, v, f, t)
+def star(name, cx, cy, z, outer, inner, depth, t, tilt=0):
+    """A five-point star in the XY plane round (cx, cy), `depth` thick, turned by `tilt` (radians)."""
+    pts = [(cx + math.cos(math.pi / 2 + tilt + k * math.pi / 5) * (outer if k % 2 == 0 else inner),
+            cy + math.sin(math.pi / 2 + tilt + k * math.pi / 5) * (outer if k % 2 == 0 else inner)) for k in range(10)]
+    return prism(name, pts, z - depth / 2, z + depth / 2, t, axis='z')
+
+model('Star_Shard')
+loft('Rock', [(-.4, wobble(1.9, 8, 0, [.06, -.1, .12, -.04, .08, -.12, .03, -.06])), (.35, wobble(1.8, 8, .3, [-.05, .1, -.08, .09, -.03, .06, -.1, .04])),
+              (1.15, wobble(1.25, 8, .6, [.1, -.06, .05, -.1, .07, 0, -.05, .08])), (1.7, wobble(.55, 8, .9, [0]))], 32)
+for (x, y, z), h, r, lean in (((.95, .7, .5), 1.6, .3, (.35, .25)), ((-.8, .75, .45), 1.25, .26, (-.4, .3)), ((.2, 1.1, -.7), 1.45, .27, (.05, -.4)),
+                              ((-1.25, .2, -.4), .9, .2, (-.45, -.2)), ((1.3, .15, -.55), .8, .18, (.45, -.3))):
+    crystal('Crystal', x, y, z, h, r, 21, lean=lean)
+star('Star', 0, 3.05, 0, 1.3, .56, .5, 29, tilt=.18)
+star('StarCore', 0, 3.05, 0, .62, .27, .62, 21, tilt=.18)
+beam('StarFoot', (0, 1.5, 0), (-.12, 2.2, 0), .34, .3, 29)
+star('Shard', 1.7, .25, 1.1, .45, .2, .2, 29, tilt=.9)
+
+model('Fossil_Ribs')
+loft('Mound', [(-.3, wobble(2.3, 8, .2, [.05, -.08, .1, -.06, .04, -.1, .08, -.03])), (.25, wobble(2.0, 8, .5, [-.06, .08, -.04, .1, -.08, .05, -.02, .06])),
+               (.55, wobble(1.2, 8, .8, [.08, -.05, .06, -.08]))], 20)
+spine = [(-2.4, .25), (-1.2, .55), (0, .7), (1.2, .55), (2.2, .2)]
+for a, b in zip(spine, spine[1:]):
+    beam('Spine', (a[0], a[1], 0), (b[0], b[1], 0), .34, .3, 33)
+for k, (x, h) in enumerate(((-1.5, 1.7), (-.6, 2.25), (.3, 2.4), (1.2, 2.0))):
+    for side in (-1, 1):
+        arc = [(x + .1 * j, .55 + h * math.sin(math.pi * j / 8), side * (.15 + 1.25 * (1 - math.cos(math.pi * j / 8)) / 2)) for j in range(5)]
+        for a, b in zip(arc, arc[1:]):
+            beam('Rib', a, b, .2, .24, 33)
+cbox('Skull', (2.55, .55, 0), (1.1, .8, .95), 33, q=.2)
+box('Eye', (2.95, .7, .3), (.3, .22, .06), 15)
+box('Eye', (2.95, .7, -.3), (.3, .22, .06), 15)
 finish(__file__)
