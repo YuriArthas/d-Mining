@@ -13,7 +13,7 @@ const parse=name=>{
   return loader.parseAsync(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength),'');
 };
 async function avatar() {
-  const result=Reflect.construct(MinerAvatar,await Promise.all(['character/miner-a','shop/equipment'].map(parse)));
+  const result=Reflect.construct(MinerAvatar,await Promise.all(['character/miner-d','shop/equipment'].map(parse)));
   new Group().add(result.group);result.update([0,0,0],0,true,false);
   return result;
 }
@@ -120,7 +120,7 @@ test('走下矮台阶或短暂离地不算下落，也不触发落地下蹲',asy
 });
 
 test('落地下蹲姿势把两脚留在原地：只降低骨盆、弯曲膝盖',async()=>{
-  const gltf=await parse('character/miner-a');
+  const gltf=await parse('character/miner-d');
   const rig=gltf.scene,feet=['LeftFoot','RightFoot'];
   rig.updateMatrixWorld(true);
   const rest=feet.map(n=>rig.getObjectByName(n).getWorldPosition(new Vector3()));

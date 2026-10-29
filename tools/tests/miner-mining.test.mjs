@@ -9,7 +9,7 @@ import {GameInput} from '../../src/game/GameInput.ts';
 
 async function avatar() {
   const loader=new GLTFLoader().register(()=>({name:'cpu-test-textures',loadTexture:()=>Promise.resolve(new Texture())}));
-  const assets=await Promise.all(['character/miner-a','shop/equipment'].map(async name=>{
+  const assets=await Promise.all(['character/miner-d','shop/equipment'].map(async name=>{
     const b=readFileSync(new URL(`../../src/game/assets/${name}.glb`,import.meta.url));
     return loader.parseAsync(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength),'');
   }));

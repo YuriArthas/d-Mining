@@ -45,13 +45,13 @@ test('old saves derive owned tiers; corrupt new collections fail instead of hidi
 const loader=new GLTFLoader().register(()=>({name:'cpu-test-textures',loadTexture:()=>Promise.resolve(new Texture())}));
 async function asset(path) { const b=readFileSync(new URL('../../src/game/assets/'+path,import.meta.url));return loader.parseAsync(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength),''); }
 test('all 60 catalog models exist, real prices/capacities match game progression, and avatar equips the selected models',async()=>{
- const [library,character,stage]=await Promise.all([asset('shop/equipment.glb'),asset('character/miner-a.glb'),asset('shop/showroom.glb')]);
+ const [library,character,stage]=await Promise.all([asset('shop/equipment.glb'),asset('character/miner-d.glb'),asset('shop/showroom.glb')]);
  const s=funded(),catalog=s.getSnapshot().shopCatalog;
  assert.equal(catalog.tools.length,30);assert.equal(catalog.backpacks.length,30);
  for(const [i,item] of catalog.tools.entries()){assert.ok(library.scene.getObjectByName(item.model));assert.equal(item.price,ECONOMY.tools[i].price);assert.equal(item.currency,ECONOMY.tools[i].currency);}
  for(const [i,item] of catalog.backpacks.entries()){assert.ok(library.scene.getObjectByName(item.model));assert.equal(item.capacity,ECONOMY.bags[i].capacity);assert.equal(item.price,ECONOMY.bags[i].price);}
  assert.ok(stage.scene.getObjectByName('ShowCart'));assert.ok(stage.scene.getObjectByName('ShowroomStage'));
- const a=Reflect.construct(MinerAvatar,[character,library]);try{a.setEquipment(12,23);const d=a.diagnostics();assert.equal(d.pickaxe.model,'Tool12');assert.equal(d.backpack.model,'Bag23');assert.equal(d.backpack.attachedTo,'UpperTorso');assert.equal(d.bones,16);assert.equal(d.triangles,11678);assert.ok(d.pickaxe.tip.every(Number.isFinite));}finally{a.dispose();}
+ const a=Reflect.construct(MinerAvatar,[character,library]);try{a.setEquipment(12,23);const d=a.diagnostics();assert.equal(d.pickaxe.model,'Tool12');assert.equal(d.backpack.model,'Bag23');assert.equal(d.backpack.attachedTo,'UpperTorso');assert.equal(d.bones,16);assert.equal(d.triangles,11912);assert.ok(d.pickaxe.tip.every(Number.isFinite));}finally{a.dispose();}
 });
 
 test('三十把工具和三十个背包各有自己的名字和一句介绍；电钻类是打蛋器、冲击电钻、链锯、等离子钻和独角兽角钻',()=>{

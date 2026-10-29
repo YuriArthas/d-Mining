@@ -4,6 +4,7 @@ import {
   type ColorSpace,
 } from 'three';
 import type { PetFace, PetLook, PetPattern, PetSparkle } from '../../content/petLooks.ts';
+import { applyCharacterFill } from '../characterFill.ts';
 import { PATTERN_BASE, drawFace, drawGlow, drawPattern, drawSparkle, sparkleIsLight } from './petArt.ts';
 
 /** Pet textures drawn once per face, pattern and sparkle, shared by every pet that uses them. */
@@ -71,6 +72,7 @@ export class PetModel {
       emissive: color, emissiveIntensity: look.rarity === 'legendary' ? .16 : look.rarity === 'epic' ? .06 : 0,
     }));
     this.body.castShadow = true;
+    (this.body.material as MeshStandardMaterial).name = 'Pet body';
     this.open = textures.face(look.face, false); this.closed = textures.face(look.face, true);
     // The face is lit like the body, so it does not glow in the dark; it sits just in front of the +Z side.
     this.face = new Mesh(new PlaneGeometry(FACE_SIZE, FACE_SIZE), new MeshStandardMaterial({
@@ -78,6 +80,9 @@ export class PetModel {
       polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
     }));
     this.face.position.set(0, .5, .5 + .002);
+    (this.face.material as MeshStandardMaterial).name = 'Pet face';
+    // Lit like the player: with the sun behind it, the side the camera sees is filled (characterFill.ts).
+    applyCharacterFill(this.body.material as MeshStandardMaterial); applyCharacterFill(this.face.material as MeshStandardMaterial);
     this.shape.scale.setScalar(look.size);
     this.shape.add(this.body, this.face); this.pose.add(this.shape); this.group.add(this.pose);
     const count = look.particles ? SPARKLE_COUNT[look.rarity] : 0;

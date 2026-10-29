@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {AnimationMixer, Box3, Quaternion, Texture, Vector3} from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 
-const bytes = readFileSync(process.env.MINER_AVATAR_TEST_MODEL ?? new URL('../../src/game/assets/character/miner-a.glb',import.meta.url));
+const bytes = readFileSync(process.env.MINER_AVATAR_TEST_MODEL ?? new URL('../../src/game/assets/character/miner-d.glb',import.meta.url));
 // CPU 资产测试不解码贴图；公网浏览器另行验证真实贴图和 WebGL 播放。
 const loader = new GLTFLoader().register(() => ({name:'cpu-test-textures',loadTexture:()=>Promise.resolve(new Texture())}));
 const gltf = await loader.parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');
@@ -71,7 +71,7 @@ test('实际鞋底的前后轴跟随 RAB 动作，不能叠加模型静止姿势
 
 test('矿工保留完整网格、16 骨架以及每个顶点的归一化权重', () => {
   assert.equal(mesh.skeleton.bones.length,16);
-  assert.equal(mesh.geometry.index.count/3,11678);
+  assert.equal(mesh.geometry.index.count/3,JSON.parse(readFileSync(new URL('../../src/game/assets/character/miner-d.manifest.json',import.meta.url))).triangles);
   const weights=mesh.geometry.attributes.skinWeight,indices=mesh.geometry.attributes.skinIndex;
   for(let i=0;i<weights.count;i++) {
     const w=[weights.getX(i),weights.getY(i),weights.getZ(i),weights.getW(i)];

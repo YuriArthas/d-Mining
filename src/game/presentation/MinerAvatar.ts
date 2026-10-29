@@ -6,12 +6,14 @@ import {
 } from 'three';
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { applyStandingLight } from './bakedLight.ts';
+import { applyCharacterFill } from './characterFill.ts';
 import { disposeScenery } from './disposeScenery.ts';
 import { MinerMiningLayer } from './MinerMiningLayer.ts';
 import { UPPER_BODY, createMinerMotions } from './minerMotions.ts';
 import { crossed, footContacts } from './minerSteps.ts';
 
-const MODEL_URL = new URL('../assets/character/miner-a.glb', import.meta.url).href;
+// D, the young explorer (Tripo 84856ff3, rigged by tools/rig-miner-d.py on Miner A's R15 skeleton and weights).
+const MODEL_URL = new URL('../assets/character/miner-d.glb', import.meta.url).href;
 const LANDING_SECONDS = .32;
 /** A drill's shake: two fast wobbles (Hz) on the arms, degrees at full weight. A working tool's moving parts (whisks,
  *  bit, gear, clock hands) turn `spin` rad/s; a backpack's (a portal's swirl) turn `idle` rad/s all the time. */
@@ -124,7 +126,7 @@ export class MinerAvatar {
       for(const material of Array.isArray(object.material)?object.material:[object.material]) {
         material.userData.opacity=material.opacity;
         material.transparent=true;
-        if(material instanceof MeshStandardMaterial){material.roughness=.9;material.metalness=0;applyStandingLight(material);}
+        if(material instanceof MeshStandardMaterial){material.roughness=.9;material.metalness=0;applyStandingLight(material);applyCharacterFill(material);}
       }
     });
     this.setEquipment(1,1);
@@ -147,6 +149,8 @@ export class MinerAvatar {
           material.metalness = 0;
           // Walking into a baked shadow darkens the miner like the ground around it.
           applyStandingLight(material);
+          // With the sun behind the miner the side the camera sees takes fill, like the scenery's shaded walls.
+          applyCharacterFill(material);
         }
       }
     });

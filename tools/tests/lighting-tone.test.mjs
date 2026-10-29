@@ -82,3 +82,36 @@ test('世界 2、3 的路灯、信标和坠星也有柔光晕：随各自的基�
   }
   assert.equal(surfaceHalos([base('automine-hall', 0)]), null, 'halls carry none');
 });
+
+test('主角、身上的装备和宠物都有角色补光：背光面补环境光，朝镜头的背阳面再补一道；关掉时和原来一样', async () => {
+  const { applyCharacterFill, setCharacterFill, CHARACTER_FILL } = await import('../../src/game/presentation/characterFill.ts');
+  const { MeshStandardMaterial, BoxGeometry, Group, Texture } = await import('three');
+  const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
+  const { MinerAvatar } = await import('../../src/game/presentation/MinerAvatar.ts');
+  const { PetModel, PetTextures } = await import('../../src/game/presentation/pets/PetModel.ts');
+  const { petLook } = await import('../../src/game/content/petLooks.ts');
+  // The shader: after the lights, the sky's light scaled; a second call does not patch twice.
+  const m = new MeshStandardMaterial(); applyCharacterFill(m); applyCharacterFill(m);
+  const shader = { uniforms: {}, vertexShader: '', fragmentShader: '#include <lights_fragment_end>\n' };
+  m.onBeforeCompile(shader, null);
+  assert.equal(shader.fragmentShader.match(/characterViewFill \* towardCamera/g).length, 1);
+  assert.match(shader.fragmentShader, /reflectedLight\.indirectDiffuse \*= mix\( characterBounce/);
+  assert.match(m.customProgramCacheKey(), /character-fill-v1/);
+  // Off is exactly the old lighting; the default fills the shaded side.
+  setCharacterFill({ bounce: 1, view: 0 });
+  assert.deepEqual(shader.uniforms.characterBounce.value.toArray(), [1, 1, 1]); assert.equal(shader.uniforms.characterViewFill.value, 0);
+  setCharacterFill(null);
+  assert.ok(Math.abs(shader.uniforms.characterBounce.value.y - CHARACTER_FILL.bounce) < 1e-9 && shader.uniforms.characterViewFill.value === CHARACTER_FILL.view);
+  // Every material of the player (with the pickaxe and the bag) and of a pet takes it.
+  const loader = new GLTFLoader().register(() => ({ name: 'cpu-test-textures', loadTexture: () => Promise.resolve(new Texture()) }));
+  const parse = name => { const b = readFileSync(new URL(`../../src/game/assets/${name}.glb`, import.meta.url)); return loader.parseAsync(b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength), ''); };
+  const avatar = Reflect.construct(MinerAvatar, await Promise.all(['character/miner-d', 'shop/equipment'].map(parse)));
+  new Group().add(avatar.group); avatar.setEquipment(5, 5);
+  const pet = new PetModel(petLook('amber-fox'), new BoxGeometry(1, 1, 1), new PetTextures(), () => .5);
+  try {
+    for (const root of [avatar.group, pet.group]) root.traverse(o => {
+      if (!o.isMesh) return;
+      for (const material of [o.material].flat()) if (material.isMeshStandardMaterial) assert.ok(material.userData.characterFill, `${root.name}: ${o.name} (${material.name})`);
+    });
+  } finally { avatar.dispose(); pet.dispose?.(); }
+});

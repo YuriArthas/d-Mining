@@ -10,13 +10,13 @@ import { footSurface, hubSurface, kindSurface } from '../../src/game/runtime/foo
 const loader = new GLTFLoader().register(() => ({ name: 'cpu-test-textures', loadTexture: () => Promise.resolve(new Texture()) }));
 const parse = name => { const b = readFileSync(new URL(`../../src/game/assets/${name}.glb`, import.meta.url)); return loader.parseAsync(b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength), ''); };
 async function avatar() {
-  const a = Reflect.construct(MinerAvatar, await Promise.all(['character/miner-a', 'shop/equipment'].map(parse)));
+  const a = Reflect.construct(MinerAvatar, await Promise.all(['character/miner-d', 'shop/equipment'].map(parse)));
   new Group().add(a.group); a.update([0, 0, 0], 0, true, false);
   return a;
 }
 
 test('从走路和跑步动画里找出两只脚落地的时刻：每个循环两步，相隔半个循环', async () => {
-  const gltf = await parse('character/miner-a');
+  const gltf = await parse('character/miner-d');
   for (const name of ['Walk', 'Run']) {
     const contacts = footContacts(gltf.scene, gltf.animations.find(c => c.name === name));
     assert.equal(contacts.length, 2);

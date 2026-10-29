@@ -1,3 +1,4 @@
+import { setCharacterFill } from '../presentation/characterFill.ts';
 import { Color } from "three";
 import type {
   Group,
@@ -38,6 +39,8 @@ type ValidationDebug = {
   /** Verification only: multiply the colour of every material whose name matches a rule (case-insensitive
    *  pattern, linear RGB factors), live; null restores the authored colours. Returns how many were tinted. */
   materialTint: (rules: readonly { match: string; color: readonly [number, number, number] }[] | null) => number;
+  /** The figures' fill (characterFill.ts): `bounce` on faces not facing up, `view` toward the camera; null restores it. */
+  characterFill: (look: { bounce?: number; view?: number } | null) => void;
   /** Final audio output level (dBFS) and a recordable stream of it, for checks. */
   audioLevel: () => number | null;
   audioStream: () => MediaStream | null;
@@ -224,6 +227,7 @@ export function attachGameDebug(
       // false: no baked light at all (for side-by-side checks); an object retunes it.
       setBakedLightTuning(look?.baked === false ? { shadow: 0, ao: 0, aoBuildings: 0 } : look?.baked ?? null);
     },
+    characterFill: look => setCharacterFill(look),
     materialTint: rules => {
       for (const [material, color] of tinted) material.color.copy(color);
       tinted.clear();
