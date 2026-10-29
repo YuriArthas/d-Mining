@@ -15,6 +15,7 @@ export class BlockCracks {
   private material: MeshBasicMaterial;
   private matrix = new Matrix4();
   private updates = 0;
+  private readonly warm: InstancedMesh;
   constructor() {
     this.texture = new DataTexture(crackAtlas(), CRACK_TILE * CRACK_STAGES, CRACK_TILE, RGBAFormat);
     // Crisp pixels up close; filtered mip levels at distance and grazing angles, where one-pixel
@@ -36,6 +37,12 @@ export class BlockCracks {
         `textureLod( map, vec2((vCrackTile + crackUv.x) / ${CRACK_STAGES.toFixed(1)}, crackUv.y), crackLod )`) + '\nif (diffuseColor.a < 0.01) discard;');
     };
     this.material.customProgramCacheKey = () => 'block-cracks-v2-mip';
+    // A hidden overlay of the same kind, so loading compiles the crack shader instead of the first hit.
+    const warm = new BoxGeometry(CELL, CELL, CELL);
+    warm.setAttribute('crackTile', new InstancedBufferAttribute(new Float32Array(1), 1));
+    this.warm = new InstancedMesh(warm, this.material, 1);
+    this.warm.visible = false; this.warm.userData.prewarm = true; this.warm.name = 'block-cracks-prewarm';
+    this.group.add(this.warm);
   }
   setDamage = ({ cell, hp, maximum }: BlockDamage) => {
     const region = chunkKey(regionOf(cell, RENDER_SIZE)), key = chunkKey(cell), stage = maximum > 0 ? crackStage(hp, maximum) : 0;
@@ -83,5 +90,8 @@ export class BlockCracks {
     return { regions: this.active.size, instances: [...this.active.values()].reduce((n, r) => n + r.mesh.count, 0),
       instanceBytes: [...this.active.values()].reduce((n, r) => n + r.capacity * 68, 0), atlasBytes: CRACK_TILE * CRACK_TILE * CRACK_STAGES * 4, updates: this.updates };
   }
-  dispose() { for (const [key, overlay] of this.active) this.remove(key, overlay); this.buckets.clear(); this.dirty.clear(); this.material.dispose(); this.texture.dispose(); }
+  dispose() {
+    for (const [key, overlay] of this.active) this.remove(key, overlay);
+    this.buckets.clear(); this.dirty.clear(); this.warm.removeFromParent(); this.warm.geometry.dispose(); this.warm.dispose(); this.material.dispose(); this.texture.dispose();
+  }
 }

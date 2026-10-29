@@ -35,14 +35,14 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
   const layout = async label => {
     const boxes = await page.evaluate(() => {
       const box = s => { const e = document.querySelector(s); if (!e) return null; const r = e.getBoundingClientRect(); return r.width ? { x: r.left, y: r.top, r: r.right, b: r.bottom } : null; };
-      return { left: box('.hud-left'), where: box('.hud-where'), menu: box('.hud-system'), rail: box('.hud-rail'), jump: box('.jump-button'), stick: box('.joystick'),
+      return { left: box('.hud-left'), where: box('.hud-where'), menu: box('.hud-system'), rail: box('.hud-rail'), jump: box('.jump-button'), stick: box('.joystick'), perf: box('.hud-perf'), bottom: box('.hud-bottom'),
         w: innerWidth, h: innerHeight };
     });
     const hit = (a, b) => a && b && a.x < b.r && b.x < a.r && a.y < b.b && b.y < a.b;
-    for (const [a, b] of [['left', 'where'], ['where', 'menu'], ['where', 'rail'], ['left', 'rail'], ['rail', 'jump'], ['left', 'stick'], ['menu', 'rail']])
+    for (const [a, b] of [['left', 'where'], ['where', 'menu'], ['where', 'rail'], ['left', 'rail'], ['rail', 'jump'], ['left', 'stick'], ['menu', 'rail'], ['perf', 'left'], ['perf', 'stick'], ['perf', 'jump'], ['perf', 'rail'], ['perf', 'bottom']])
       assert.ok(!hit(boxes[a], boxes[b]), `${label}: ${a} overlaps ${b} ${JSON.stringify([boxes[a], boxes[b]])}`);
-    for (const k of ['left', 'where', 'menu', 'rail']) { const b = boxes[k]; assert.ok(b && b.x >= 0 && b.y >= 0 && b.r <= boxes.w && b.b <= boxes.h, `${label}: ${k} on screen`); }
-    await check(`${label}: wallet, whereabouts, menu, rail, joystick and jump button do not overlap at ${boxes.w}×${boxes.h}.`);
+    for (const k of ['left', 'where', 'menu', 'rail', 'perf']) { const b = boxes[k]; assert.ok(b && b.x >= 0 && b.y >= 0 && b.r <= boxes.w && b.b <= boxes.h, `${label}: ${k} on screen`); }
+    await check(`${label}: wallet, whereabouts, menu, rail, joystick, jump button and the performance button do not overlap at ${boxes.w}×${boxes.h}.`);
   };
   const seed = async mutate => {
     await page.evaluate(() => window.__miningSave.flush());

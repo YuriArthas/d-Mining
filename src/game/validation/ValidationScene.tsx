@@ -29,8 +29,9 @@ import type { LoadingEvent } from "../ui/loadingState.ts";
 import type { GameInput } from "../GameInput.ts";
 import type { GameSession } from "../application/GameSession.ts";
 import { ContactShadow } from "../presentation/ContactShadow.tsx";
+import { performanceRecorder } from "../presentation/PerformanceRecorder.ts";
 
-import { tr } from '../i18n/i18n.ts';
+import { LANG, tr } from '../i18n/i18n.ts';
 export function ValidationScene({
   content,
   shopView,
@@ -87,7 +88,7 @@ export function ValidationScene({
 
   useEffect(() => {
     const controller = new AbortController();
-    let detachDebug = () => {};
+    let detachDebug = () => {}, detachRecorder = () => {};
     loadingReleased.current = false;
     onLoading({ reset: true });
     startGame({
@@ -116,6 +117,20 @@ export function ValidationScene({
           return;
         }
         runtime.current = game;
+        // The bottom-left "report performance" button reads where the player is and these settings.
+        detachRecorder = performanceRecorder.attach({
+          renderer: gl,
+          where: () => ({ place: session.getSnapshot().location ?? "surface", position: game.physics.feet() }),
+          game: () => {
+            const state = session.getSnapshot();
+            return {
+              world: state.currentWorld, depth: Math.round(state.depth), travelling: !!game.player.travelling,
+              renderRate: activeRate.current, bakedShadows: settings.current.sceneShadowsEnabled, language: LANG,
+              startup: game.startup, terrain: game.terrain.measurements.snapshot(),
+            };
+          },
+          probe: () => activeProbe.current,
+        });
         if (params.get("debug") === "1")
           detachDebug = attachGameDebug(
             game,
@@ -144,6 +159,7 @@ export function ValidationScene({
       });
     return () => {
       detachDebug();
+      detachRecorder();
       controller.abort();
       runtime.current?.dispose();
       runtime.current = null;
@@ -225,6 +241,7 @@ export function ValidationScene({
       // One RAF owner; render cap is independent from fixed 60 Hz physics.
       const scheduled = schedule.due(now, activeRate.current);
       meter.recordRaf(scheduled);
+      let cpuMs = 0, drawn = false;
       if (scheduled) {
         const before = submission.current?.submitted ?? 0,
           start = performance.now();
@@ -238,13 +255,14 @@ export function ValidationScene({
           input.reset();
           onLoading({ ready: true });
         }
-        const end = performance.now(),
-          cpuMs = end - start;
+        const end = performance.now();
+        cpuMs = end - start;
+        drawn = (submission.current?.submitted ?? 0) > before;
         runtime.current?.terrain.measurements.add("mainFrameMs", cpuMs);
         const stats = meter.record(
           end,
           cpuMs,
-          (submission.current?.submitted ?? 0) > before,
+          drawn,
           gl.info.render.calls,
           gl.info.render.triangles,
           profiler.current?.snapshot(),
@@ -256,6 +274,7 @@ export function ValidationScene({
           onPerformance(stats);
         }
       }
+      performanceRecorder.record(now, scheduled, cpuMs, drawn, gl.info.render.calls, gl.info.render.triangles);
       id = requestAnimationFrame(frame);
     };
     id = requestAnimationFrame(frame);

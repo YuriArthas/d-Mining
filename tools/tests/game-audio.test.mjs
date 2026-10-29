@@ -24,6 +24,29 @@ test('声音只在首次手势后开始：之前不建上下文、不出声；�
   assert.equal(audio.diagnostics().state, 'locked');
 }));
 
+test('加载时就把声音建好（暂停着），首次点击只需恢复：不在点击里卡几百毫秒；点击之前不出声', () => withAudioContext(() => {
+  const timers = [], listeners = new Map();
+  const target = {
+    addEventListener: (type, f) => listeners.set(type, f), removeEventListener: type => listeners.delete(type),
+    document: { hidden: false, addEventListener() {}, removeEventListener() {} },
+    setInterval: () => 1, clearInterval() {}, setTimeout: f => timers.push(f), clearTimeout() {},
+  };
+  const audio = new GameAudio(store()), detach = audio.attach(target);
+  assert.equal(audio.diagnostics().state, 'locked', 'nothing is built inside attach itself');
+  for (const run of timers) run();
+  assert.equal(audio.diagnostics().state, 'suspended', 'built while loading, still silent');
+  assert.equal(audio.play({ type: 'ui' }), false);
+  const context = audio['context'];
+  listeners.get('pointerdown')();
+  assert.equal(audio['context'], context, 'the first click reuses it');
+  assert.equal(audio.diagnostics().state, 'running');
+  assert.equal(audio.play({ type: 'ui' }), true);
+  detach(); audio.dispose();
+  const muted = store(); muted.setItem('mining:sound', 'off'); muted.setItem('mining:music', 'off');
+  const silent = new GameAudio(muted); timers.length = 0; silent.attach(target); for (const run of timers) run();
+  assert.equal(silent.diagnostics().state, 'locked', 'sound and music off: no audio device is opened');
+}));
+
 test('同类音效连发会合并，不同类不受影响', () => withAudioContext(() => {
   const audio = new GameAudio(store());
   audio.unlock();

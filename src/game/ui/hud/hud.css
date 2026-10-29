@@ -87,6 +87,27 @@
 .hud-notice .ui-toast { white-space: normal; text-align: center; justify-content: center; }
 .hud-bottom .capsule-world-prompt, .hud-bottom .egg-world-prompt { position: static; transform: none; }
 
+/* Bottom left: the small "report performance" button; on touch screens it sits above the thumbstick. */
+.hud-perf {
+  position: absolute; left: calc(var(--hud-edge) + var(--safe-left)); bottom: calc(var(--hud-edge) + var(--safe-bottom));
+  display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 10px 0 5px; pointer-events: auto; cursor: pointer;
+  border: 2px solid var(--ui-ink); border-radius: 14px; background: var(--ui-paper); color: var(--ui-ink);
+  font: 700 12px/1 var(--ui-font); white-space: nowrap; opacity: .9;
+}
+.hud-perf .ui-icon { width: 20px; height: 20px; }
+.hud-perf:hover { opacity: 1; }
+.hud-perf[data-state=sending] { opacity: .6; cursor: progress; }
+.hud-perf[data-state=sent] { background: var(--ui-green); color: #fff; }
+.hud-perf[data-state=failed] { background: var(--ui-red); color: #fff; }
+/* Touch screens: a round icon just right of the thumbstick's foot (the left column above it grows tall on
+   narrow phones); the label shows only while sending and for the result, which carries the report's id. */
+@media (pointer: coarse), (any-pointer: coarse) {
+  .hud-perf { left: calc(16px + 120px + 12px + var(--safe-left)); bottom: calc(14px + var(--safe-bottom)); }
+  .hud-perf[data-state=idle] { width: 36px; height: 36px; padding: 0; justify-content: center; border-radius: 50%; }
+  .hud-perf[data-state=idle] .ui-icon { width: 24px; height: 24px; }
+  .hud-perf[data-state=idle] span { display: none; }
+}
+
 /* Touch controls: Roblox-style thumbstick ring and jump button, translucent so the scene shows through. */
 .game-shell .joystick {
   left: calc(16px + var(--safe-left)); bottom: calc(14px + var(--safe-bottom)); width: 120px; height: 120px;
@@ -129,6 +150,9 @@
   .game-shell .joystick { width: 108px; height: 108px; }
   .game-shell .joystick-knob { left: 27px; top: 27px; }
   .game-shell .jump-button { width: 62px; height: 62px; padding: 12px; }
+}
+@container game (max-height: 360px) {
+  @media (pointer: coarse), (any-pointer: coarse) { .hud-perf { left: calc(16px + 108px + 10px + var(--safe-left)); } }
 }
 @media (prefers-reduced-motion: reduce) {
   .hud-sell[data-state=full] { animation: none; }

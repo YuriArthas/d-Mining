@@ -4,7 +4,7 @@ import { Box3, Float32BufferAttribute, Group, Mesh, MeshBasicMaterial, Shape, Sh
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { createWorldText } from './WorldText.ts';
 import { disposeScenery } from './disposeScenery.ts';
-import { currencyName, type CurrencyId } from '../content/economy.ts';
+import { ECONOMY, currencyName, type CurrencyId } from '../content/economy.ts';
 
 type Stand = Readonly<{ id: string; eggId: string; x: number; y: number; z: number }>;
 type Offer = Readonly<{ id: string; name: string; price: number; currency: CurrencyId }>;
@@ -12,7 +12,7 @@ type Offer = Readonly<{ id: string; name: string; price: number; currency: Curre
 /** Overhead name and price of every egg, always shown: compact, sitting just above the egg (its top is
  *  2.91 m above the stand), on a dark rounded plate so it reads over the trees and the eggs on the tiers
  *  behind. An egg the player has not unlocked yet is a mystery: its name reads `mystery`, its price stays. */
-export const EGG_LABEL = { width: 1.7, plateBottom: 3.05, padding: .14, plate: '#13263a', plateOpacity: .74, text: '#fff4b8', mystery: MYSTERY_EGG_NAME, mysteryWidth: 1 } as const;
+export const EGG_LABEL = { width: 1.7, plateBottom: 3.05, padding: .14, plate: '#13263a', plateOpacity: .74, text: '#fff4b8', mystery: MYSTERY_EGG_NAME, mysteryWidth: 1, curveSegments: 3 } as const;
 /** Each stand carries both labels; the GPU shows the named one once the egg is unlocked, the mystery one before. */
 const NAMED = 1, MYSTERY = 2;
 
@@ -23,9 +23,10 @@ const BILLBOARD = `
   gl_Position = projectionMatrix * mvPosition;
 `;
 
-// Two static batches for all labels: extruded glyphs (vertex colours) and their plates. Each vertex keeps
-// its label's anchor, slot and variant; the camera matrices orient them in the shader and one uniform per
-// slot says whether the egg is still locked.
+// Two static batches per world: extruded glyphs (vertex colours) and their plates. Each vertex keeps its
+// label's anchor, slot and variant; the camera matrices orient them in the shader and one uniform per slot
+// says whether the egg is still locked. One batch for all three worlds spanned the whole valley, so it was
+// never culled: in world 1 every frame drew all 29 eggs' labels, about 127k triangles (report 2026-10-28).
 export class EggStandLabels {
   readonly group = new Group();
   private triangles = 0;
@@ -38,22 +39,27 @@ export class EggStandLabels {
     this.locked = { value: stands.map(() => 0) };
     const labels: { at: [number, number, number]; eggId: string; id: string; extruded: true }[] = [];
     const templates = new Map<string, { group: Group; bounds: Box3 }>();
-    const textParts: BufferGeometry[] = [], plateParts: BufferGeometry[] = [];
-    const bounds = new Box3(), point = new Vector3();
+    const worldOf = new Map(ECONOMY.eggs.flatMap(egg => egg.id ? [[egg.id, egg.world as number]] : []));
+    const batches = new Map<number, { text: BufferGeometry[]; plates: BufferGeometry[]; bounds: Box3 }>();
+    const point = new Vector3();
     try {
       stands.forEach((stand, slot) => {
         const offer = offers.find(offer => offer.id === stand.eggId);
         if (!offer) throw Error(`蛋台缺少文字配置: ${stand.eggId}`);
+        const world = worldOf.get(stand.eggId) ?? 0;
+        const batch = batches.get(world) ?? { text: [], plates: [], bounds: new Box3() };
+        batches.set(world, batch);
+        const bounds = batch.bounds;
         for (const variant of [NAMED, MYSTERY]) {
           const key = `${stand.eggId}|${variant}`;
           let template = templates.get(key);
           if (!template) {
             const text = { at: [0, 0, 0] as [number, number, number], color: EGG_LABEL.text, background: EGG_LABEL.plate };
             const group = variant === NAMED
-              ? createWorldText({ ...text, width: EGG_LABEL.width, title: offer.name, subtitle: `${formatNumber(offer.price)} ${currencyName(offer.currency)}` }, { bevel: false })
+              ? createWorldText({ ...text, width: EGG_LABEL.width, title: offer.name, subtitle: `${formatNumber(offer.price)} ${currencyName(offer.currency)}` }, { bevel: false, curveSegments: EGG_LABEL.curveSegments })
               // "???" fitted to the full width would tower over the price: it gets a narrower line, about as
               // tall as an egg's name, over the very same price line.
-              : createWorldText({ ...text, width: EGG_LABEL.mysteryWidth, title: EGG_LABEL.mystery, subtitle: '' }, { bevel: false });
+              : createWorldText({ ...text, width: EGG_LABEL.mysteryWidth, title: EGG_LABEL.mystery, subtitle: '' }, { bevel: false, curveSegments: EGG_LABEL.curveSegments });
             if (variant === MYSTERY) group.add(templates.get(`${stand.eggId}|${NAMED}`)!.group.children[1].clone());
             const box = new Box3();
             for (const line of group.children as Mesh[]) {
@@ -95,25 +101,27 @@ export class EggStandLabels {
             // tilts out of its plate when the camera looks up or down.
             geometry.translate(0, glyph.position.y, 0);
             tag(geometry);
-            textParts.push(geometry);
+            batch.text.push(geometry);
           }
-          plateParts.push(plateGeometry(template.bounds, tag));
+          batch.plates.push(plateGeometry(template.bounds, tag));
         }
       });
       this.group.userData.labels = labels;
-      if (!textParts.length) return;
-      const text = mergeGeometries(textParts, false), plates = mergeGeometries(plateParts, false);
-      if (!text || !plates) throw Error('蛋台文字几何合批失败');
-      for (const geometry of [text, plates]) { geometry.boundingBox = bounds.clone(); geometry.boundingSphere = bounds.getBoundingSphere(new Sphere()); }
+      if (!batches.size) return;
       const textMaterial = this.billboard(new MeshBasicMaterial({ vertexColors: true }), 'egg-label-text-v4');
       // Drawn after the opaque glyphs: a plate in front of an egg shades it, glyphs stay on top of their plate.
       const plateMaterial = this.billboard(new MeshBasicMaterial({ color: EGG_LABEL.plate, transparent: true, opacity: EGG_LABEL.plateOpacity, depthWrite: false }), 'egg-label-plate-v3');
-      const textMesh = new Mesh(text, textMaterial), plateMesh = new Mesh(plates, plateMaterial);
-      textMesh.name = 'egg-labels-batched'; plateMesh.name = 'egg-label-plates';
-      this.triangles = (text.index?.count ?? text.getAttribute('position').count) / 3;
-      this.group.add(textMesh, plateMesh);
+      for (const [world, batch] of batches) {
+        const text = mergeGeometries(batch.text, false), plates = mergeGeometries(batch.plates, false);
+        if (!text || !plates) throw Error('蛋台文字几何合批失败');
+        for (const geometry of [text, plates]) { geometry.boundingBox = batch.bounds.clone(); geometry.boundingSphere = batch.bounds.getBoundingSphere(new Sphere()); }
+        const textMesh = new Mesh(text, textMaterial), plateMesh = new Mesh(plates, plateMaterial);
+        textMesh.name = `egg-labels-batched-${world}`; plateMesh.name = `egg-label-plates-${world}`;
+        this.triangles += (text.index?.count ?? text.getAttribute('position').count) / 3;
+        this.group.add(textMesh, plateMesh);
+      }
     } finally {
-      for (const geometry of [...textParts, ...plateParts]) geometry.dispose();
+      for (const batch of batches.values()) for (const geometry of [...batch.text, ...batch.plates]) geometry.dispose();
       for (const template of templates.values()) disposeScenery(template.group);
     }
   }

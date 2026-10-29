@@ -6,6 +6,8 @@ import { BlockHealth } from '../../src/game/logic/BlockHealth.ts';
 import { BlockCracks } from '../../src/game/presentation/BlockCracks.ts';
 import { crackAtlas, crackStage, CRACK_TILE, CRACK_STAGES } from '../../src/game/presentation/cracks.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
+// The overlays drawn for damage; the group also holds one hidden overlay that only warms the shader at load.
+const overlays=view=>view.group.children.filter(child=>!child.userData.prewarm);
 const SESSION_CONTENT = GAME_CONTENT.session;
 
 test('crack stages derive from HP fraction, clamp, and allocate nothing for intact blocks',()=>{
@@ -36,13 +38,13 @@ const damage=(x,hp=50)=>({cell:[x,-1,-25],hp,maximum:100});
 test('damage rendering batches by region, skips idle work and restores after render unloading',()=>{
  const view=new BlockCracks();try{
   view.setDamage(damage(14));view.setDamage(damage(15,20));view.sync(near);
-  assert.equal(view.group.children.length,1);assert.equal(view.diagnostics().instances,2);assert.equal(view.diagnostics().regions,1);
-  const mesh=view.group.children[0];assert.deepEqual(Array.from(mesh.geometry.getAttribute('crackTile').array),[4,7]);
+  assert.equal(overlays(view).length,1);assert.equal(view.diagnostics().instances,2);assert.equal(view.diagnostics().regions,1);
+  const mesh=overlays(view)[0];assert.deepEqual(Array.from(mesh.geometry.getAttribute('crackTile').array),[4,7]);
   const updates=view.diagnostics().updates;for(let i=0;i<1000;i++)view.sync(near);assert.equal(view.diagnostics().updates,updates);
   view.setDamage(damage(14,49));view.sync(near);assert.equal(view.diagnostics().updates,updates+1);
   view.setDamage(damage(14,48));view.sync(near);assert.equal(view.diagnostics().updates,updates+1,'same stage does not reupload');
   let disposed=0;mesh.addEventListener('dispose',()=>disposed++);view.sync(new Map());assert.equal(view.diagnostics().instances,0);assert.equal(disposed,1);
-  view.sync(near);assert.equal(view.diagnostics().instances,2);assert.equal(view.group.children[0].geometry.getAttribute('crackTile').getX(0),5);
+  view.sync(near);assert.equal(view.diagnostics().instances,2);assert.equal(overlays(view)[0].geometry.getAttribute('crackTile').getX(0),5);
   view.setDamage({cell:[14,-1,-25],hp:0,maximum:0});view.sync(near);assert.equal(view.diagnostics().instances,1);
   view.setDamage({cell:[15,-1,-25],hp:0,maximum:0});view.sync(near);assert.equal(view.diagnostics().regions,0);
  }finally{view.dispose()}
@@ -51,16 +53,16 @@ test('distant damage allocates no meshes; negative/deep coordinates and cleanup 
  const view=new BlockCracks();for(let y=-2;y>-2000;y-=16)view.setDamage({cell:[-1,y,0],hp:1,maximum:10});
  view.sync(near);assert.equal(view.diagnostics().instanceBytes,0);assert.equal(view.diagnostics().instances,0);
  view.sync(new Map([['-1,-1,0',{coord:[-1,-1,0],resource:{mesh:{}}}]]));assert.equal(view.diagnostics().instances,1);
- const mesh=view.group.children[0];assert.deepEqual(mesh.position.toArray(),[-32,-32,0]);assert.equal(mesh.instanceMatrix.array[12],31);assert.equal(mesh.instanceMatrix.array[13],29);
- view.dispose();assert.equal(view.group.children.length,0);assert.equal(view.diagnostics().regions,0);
+ const mesh=overlays(view)[0];assert.deepEqual(mesh.position.toArray(),[-32,-32,0]);assert.equal(mesh.instanceMatrix.array[12],31);assert.equal(mesh.instanceMatrix.array[13],29);
+ view.dispose();assert.equal(overlays(view).length,0);assert.equal(view.diagnostics().regions,0);
 });
 test('session damage projection persists across selection and clears only on actual removal',()=>{
  let now=0,solid=true;const session=new GameSession(SESSION_CONTENT, 50,()=>now),view=new BlockCracks();
  const cell=[14,-1,-25];session.attach({cell:()=>solid?65:0,pending:()=>false,mine:()=>true,cancelMining:()=>{}});
  const off=session.observeBlockDamage(view.setDamage);
- session.hit(cell);view.sync(near);assert.equal(view.group.children[0].geometry.getAttribute('crackTile').getX(0),0);
+ session.hit(cell);view.sync(near);assert.equal(overlays(view)[0].geometry.getAttribute('crackTile').getX(0),0);
  session.selectTarget(null);session.resetPosition();view.sync(near);assert.equal(view.diagnostics().instances,1);
- for(let i=1;i<Math.ceil(resourceByKind(65).maxHp/10);i++){now=i*.5;session.hit(cell)}view.sync(near);assert.equal(view.group.children[0].geometry.getAttribute('crackTile').getX(0),9);
+ for(let i=1;i<Math.ceil(resourceByKind(65).maxHp/10);i++){now=i*.5;session.hit(cell)}view.sync(near);assert.equal(overlays(view)[0].geometry.getAttribute('crackTile').getX(0),9);
  assert.equal(session.getSnapshot().inventory.used,0);solid=false;session.collected([{cell,kind:65}]);view.sync(near);
  assert.equal(view.diagnostics().instances,0);assert.equal(session.getSnapshot().inventory.used,resourceByKind(65).volume);off();view.dispose();
 });

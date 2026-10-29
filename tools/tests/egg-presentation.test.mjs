@@ -1,5 +1,5 @@
 import {formatNumber} from '../../src/game/presentation/formatNumber.ts';
-import { currencyName } from '../../src/game/content/economy.ts';
+import { ECONOMY, currencyName } from '../../src/game/content/economy.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { PerspectiveCamera, Vector3, Quaternion } from 'three';
@@ -10,25 +10,33 @@ import { PET_CONTENT } from '../../src/game/content/petContent.ts';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
 const SESSION_CONTENT = GAME_CONTENT.session, PET_DISPLAYS = GAME_CONTENT.eggs;
+const worldOf = eggId => ECONOMY.eggs.find(egg => egg.id === eggId).world;
+const texts = labels => labels.group.children.filter(mesh => mesh.name.startsWith('egg-labels-batched-'));
+const plateMeshes = labels => labels.group.children.filter(mesh => mesh.name.startsWith('egg-label-plates-'));
 
-test('egg labels keep extruded glyphs and front/side colours in one draw, plus one draw of plates', () => {
+test('egg labels keep extruded glyphs and front/side colours: per world one draw of glyphs and one of plates, each only as wide as its own stands', () => {
   const labels = new EggStandLabels(PET_DISPLAYS, PET_CONTENT.eggs);
   try {
-    assert.equal(labels.group.children.length, 2);
-    assert.equal(labels.diagnostics().draws, 2);
+    assert.equal(labels.group.children.length, 6);
+    assert.equal(labels.diagnostics().draws, 6);
     assert.ok(labels.diagnostics().triangles > 20000);
-    const [mesh, plates] = labels.group.children, geometry = mesh.geometry;
-    assert.equal(mesh.material.map, null);
-    assert.equal(mesh.material.vertexColors, true);
-    assert.equal(geometry.groups.length, 0);
-    assert.equal(plates.material.transparent, true); assert.equal(plates.material.depthWrite, false);
-    let vertexOffset = 0, indexOffset = 0;
+    for (const mesh of texts(labels)) {
+      assert.equal(mesh.material.map, null); assert.equal(mesh.material.vertexColors, true); assert.equal(mesh.geometry.groups.length, 0);
+      // One batch across the whole valley was never culled (127k triangles every frame in world 1).
+      assert.ok(mesh.geometry.boundingSphere.radius < 30, `${mesh.name} spans ${mesh.geometry.boundingSphere.radius} m`);
+    }
+    for (const plates of plateMeshes(labels)) { assert.equal(plates.material.transparent, true); assert.equal(plates.material.depthWrite, false); }
+    assert.equal(new Set(texts(labels).map(m => m.material)).size, 1, 'all worlds share one glyph material');
+    const offsets = new Map();
     for (const [slot, stand] of PET_DISPLAYS.entries()) {
+      const mesh = texts(labels).find(m => m.name === `egg-labels-batched-${worldOf(stand.eggId)}`), geometry = mesh.geometry;
+      const offset = offsets.get(mesh) ?? { vertex: 0, index: 0 };
+      let vertexOffset = offset.vertex, indexOffset = offset.index;
       const offer = PET_CONTENT.eggs.find(offer => offer.id === stand.eggId), at = labels.diagnostics().labels[slot].at;
       // Each stand carries its named label (variant 1) then its mystery label (variant 2), same price.
-      const named = createWorldText({ at: [0,0,0], width: EGG_LABEL.width, title: offer.name, subtitle: `${formatNumber(offer.price)} ${currencyName(offer.currency)}`, color: EGG_LABEL.text, background: EGG_LABEL.plate }, { bevel: false });
+      const named = createWorldText({ at: [0,0,0], width: EGG_LABEL.width, title: offer.name, subtitle: `${formatNumber(offer.price)} ${currencyName(offer.currency)}`, color: EGG_LABEL.text, background: EGG_LABEL.plate }, { bevel: false, curveSegments: EGG_LABEL.curveSegments });
       // The mystery label: a narrower "???" line over the named label's own price line.
-      const mystery = createWorldText({ at: [0,0,0], width: EGG_LABEL.mysteryWidth, title: EGG_LABEL.mystery, subtitle: '', color: EGG_LABEL.text, background: EGG_LABEL.plate }, { bevel: false });
+      const mystery = createWorldText({ at: [0,0,0], width: EGG_LABEL.mysteryWidth, title: EGG_LABEL.mystery, subtitle: '', color: EGG_LABEL.text, background: EGG_LABEL.plate }, { bevel: false, curveSegments: EGG_LABEL.curveSegments });
       for (const [variant, lines] of [[1, named.children], [2, [...mystery.children, named.children[1]]]]) {
       const source = variant === 1 ? named : mystery;
       try {
@@ -53,22 +61,24 @@ test('egg labels keep extruded glyphs and front/side colours in one draw, plus o
         }
       } finally { if (variant === 2) { disposeScenery(named); disposeScenery(mystery); } }
       }
+      offsets.set(mesh, { vertex: vertexOffset, index: indexOffset });
     }
-    assert.equal(geometry.index.count, indexOffset);
-    assert.equal(geometry.attributes.position.count, vertexOffset);
+    for (const mesh of texts(labels)) {
+      assert.equal(mesh.geometry.index.count, offsets.get(mesh).index);
+      assert.equal(mesh.geometry.attributes.position.count, offsets.get(mesh).vertex);
+    }
   } finally { disposeScenery(labels.group); }
 });
 
 test('each label sits just above its egg on a plate behind the text; locked eggs read ??? over their price', () => {
   const labels = new EggStandLabels(PET_DISPLAYS, PET_CONTENT.eggs);
   try {
-    const plates = labels.group.children[1].geometry, text = labels.group.children[0].geometry;
     const lowest = new Map(), behind = new Map(), front = new Map();
-    for (let i = 0; i < plates.attributes.position.count; i++) {
+    for (const plates of plateMeshes(labels).map(m => m.geometry)) for (let i = 0; i < plates.attributes.position.count; i++) {
       const slot = plates.attributes.labelSlot.getX(i), y = plates.attributes.position.getY(i) + plates.attributes.labelAnchor.getY(i), key = slot + ':' + plates.attributes.labelVariant.getX(i);
       lowest.set(slot, Math.min(lowest.get(slot) ?? Infinity, y)); behind.set(key, Math.max(behind.get(key) ?? -Infinity, plates.attributes.position.getZ(i)));
     }
-    for (let i = 0; i < text.attributes.position.count; i++) {
+    for (const text of texts(labels).map(m => m.geometry)) for (let i = 0; i < text.attributes.position.count; i++) {
       const key = text.attributes.labelSlot.getX(i) + ':' + text.attributes.labelVariant.getX(i);
       front.set(key, Math.min(front.get(key) ?? Infinity, text.attributes.position.getZ(i)));
     }
@@ -107,7 +117,7 @@ test('GPU billboards retain world anchors, camera orientation and conservative b
       assert.deepEqual(Object.values(geometry.attributes).map(attribute => attribute.version), versions);
     }
     assert.equal(labels.diagnostics().labelCount, PET_CONTENT.eggs.length);
-    assert.equal(labels.diagnostics().draws, 2);
+    assert.equal(labels.diagnostics().draws, 6);
   } finally { disposeScenery(labels.group); }
 });
 
@@ -116,8 +126,9 @@ test('empty label sets draw nothing and batch resources release once', () => {
   assert.equal(empty.diagnostics().draws, 0); disposeScenery(empty.group);
   const labels = new EggStandLabels(PET_DISPLAYS, PET_CONTENT.eggs);
   let geometries = 0, materials = 0;
-  for (const mesh of labels.group.children) { mesh.geometry.addEventListener('dispose', () => geometries++); mesh.material.addEventListener('dispose', () => materials++); }
-  disposeScenery(labels.group); assert.equal(geometries, 2); assert.equal(materials, 2);
+  for (const mesh of labels.group.children) mesh.geometry.addEventListener('dispose', () => geometries++);
+  for (const material of new Set(labels.group.children.map(mesh => mesh.material))) material.addEventListener('dispose', () => materials++);
+  disposeScenery(labels.group); assert.equal(geometries, 6); assert.equal(materials, 2);
   assert.throws(() => new EggStandLabels([{...PET_DISPLAYS[0], eggId:'missing'}], PET_CONTENT.eggs), /缺少文字配置/);
 });
 

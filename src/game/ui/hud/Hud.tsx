@@ -8,6 +8,7 @@ import { teamCanImprove } from '../bag/BagSheet.tsx';
 import { claimableRewards } from '../rewards/RewardsSheet.tsx';
 import { SystemMenu, type SystemControls } from './SystemMenu.tsx';
 import { TipToast } from '../TipsUi.tsx';
+import { PerformanceReportButton } from './PerformanceReportButton.tsx';
 import './hud.css';
 import { currencyIcon, currencyName } from '../currency.ts';
 
@@ -22,7 +23,8 @@ type HudActions = {
  *  - top centre: where you are (the world's name on the surface; the layer and depth below it) over one thin bar
  *    to the next layer, then buffs and a one-time tip (the block being mined has its plate over it, MiningOverlay);
  *  - top right: one menu (help and settings), then pets and shop large, rebirth and rewards small;
- *  - bottom centre: what the spot you stand on offers (an egg, the capsule machine) and short notices. */
+ *  - bottom centre: what the spot you stand on offers (an egg, the capsule machine) and short notices;
+ *  - bottom left: a small button that reports performance (on touch screens a round icon beside the thumbstick). */
 export function Hud({ session, actions, system, prompts, tipHidden = false }: {
   session: GameSession; actions: HudActions; system: SystemControls;
   prompts?: ReactNode; tipHidden?: boolean;
@@ -86,6 +88,8 @@ export function Hud({ session, actions, system, prompts, tipHidden = false }: {
       {/* Ticket ore says where it went in the chip by the bag (MiningOverlay), so its store notice is not repeated here. */}
       <HudNotice text={tip?.id === 'sell' && state.inventory.isFull || state.notice.startsWith(tr('材料仓 +')) ? '' : state.notice} />
     </div>
+
+    <PerformanceReportButton />
   </div>;
 }
 

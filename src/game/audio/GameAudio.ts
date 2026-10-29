@@ -35,8 +35,8 @@ function audioContextClass(): AudioContextClass | null {
   return scope.AudioContext ?? scope.webkitAudioContext ?? null;
 }
 
-/** Game sound: browsers only allow audio after a user gesture, so the context is created and resumed
- *  inside one. Sound effects (with ambience) and music are switched separately; both are on by
+/** Game sound: browsers only allow audio after a user gesture. The context and the mixer are built while the game
+ *  loads (suspended) and resumed inside the first gesture. Sound effects (with ambience) and music are switched separately; both are on by
  *  default and the choices are kept on the device. */
 export class GameAudio {
   private context: AudioContext | null = null;
@@ -89,21 +89,27 @@ export class GameAudio {
     this.settle();
   }
 
+  /** Builds the context, mixer, noise and players, suspended: opening the audio device and making the reverb and the
+   *  noise took 316 ms on a Windows PC, a freeze on the first click (performance report 2026-10-28), so attach()
+   *  does it while the game loads. Nothing plays until unlock() resumes it inside a gesture. */
+  prepare = () => {
+    if (this.context || (!this.sound && !this.musicOn)) return;
+    const Context = audioContextClass();
+    if (!Context) return;
+    const context = new Context({ latencyHint: 'interactive' }), mixer = createMixer(context), noise = makeNoise(context);
+    setGates(context, mixer.soundGates, this.sound ? 1 : 0);
+    setGates(context, mixer.musicGates, this.musicOn ? MUSIC_LEVEL : 0);
+    this.context = context; this.mixer = mixer; this.noise = noise;
+    this.music = new MusicPlayer(context, mixer.music, mixer.musicWet, noise, this.random);
+    this.ambience = new Ambience(context, mixer.ambience, mixer.ambienceWet, noise, makeLoopNoise(context), this.random);
+    this.apply(true);
+  };
+
   /** Must run inside a user gesture the first time. */
   unlock = () => {
     if (!this.sound && !this.musicOn) return;
-    if (!this.context) {
-      const Context = audioContextClass();
-      if (!Context) return;
-      const context = new Context({ latencyHint: 'interactive' }), mixer = createMixer(context), noise = makeNoise(context);
-      setGates(context, mixer.soundGates, this.sound ? 1 : 0);
-      setGates(context, mixer.musicGates, this.musicOn ? MUSIC_LEVEL : 0);
-      this.context = context; this.mixer = mixer; this.noise = noise;
-      this.music = new MusicPlayer(context, mixer.music, mixer.musicWet, noise, this.random);
-      this.ambience = new Ambience(context, mixer.ambience, mixer.ambienceWet, noise, makeLoopNoise(context), this.random);
-      this.apply(true);
-    }
-    if (this.context.state !== 'running') void this.context.resume().catch(() => {});
+    this.prepare();
+    if (this.context && this.context.state !== 'running') void this.context.resume().catch(() => {});
   };
 
   /** Called by the game every frame; only real changes reach the players. */
@@ -136,10 +142,12 @@ export class GameAudio {
     if (this.sound) this.ambience?.tick();
   };
 
-  /** Unlock on the first gesture, pause while the page is hidden, and drive the schedulers. */
+  /** Prepare while the game loads, unlock on the first gesture, pause while the page is hidden, and drive the
+   *  schedulers. */
   attach(target: Window = window) {
     const events = ['pointerdown', 'touchend', 'keydown', 'click'] as const;
     for (const type of events) target.addEventListener(type, this.unlock, { capture: true, passive: true });
+    const early = target.setTimeout(this.prepare, 0);
     const visibility = () => {
       if (!this.context) return;
       if (target.document.hidden) void this.context.suspend();
@@ -148,6 +156,7 @@ export class GameAudio {
     target.document.addEventListener('visibilitychange', visibility);
     const timer = target.setInterval(this.tick, TICK_MS);
     return () => {
+      target.clearTimeout(early);
       for (const type of events) target.removeEventListener(type, this.unlock, { capture: true });
       target.document.removeEventListener('visibilitychange', visibility);
       target.clearInterval(timer);

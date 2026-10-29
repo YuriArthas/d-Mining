@@ -49,7 +49,8 @@ export function GuideDirectionArrow({ arrowRef }: { arrowRef: RefObject<Group | 
     })};
   },[texture]);
   useEffect(()=>()=>{resources.geometry.dispose();resources.material.dispose();},[resources]);
-  return <group ref={arrowRef} name="onboarding-direction" visible={false} userData={{style:'roblox-image-v1',texture:arrowUrl}}>
+  // Hidden until a tip needs it; `prewarm` has loading compile its shader anyway (prepareShaders).
+  return <group ref={arrowRef} name="onboarding-direction" visible={false} userData={{style:'roblox-image-v1',texture:arrowUrl,prewarm:true}}>
     <mesh geometry={resources.geometry} material={resources.material} renderOrder={20}/>
   </group>;
 }
