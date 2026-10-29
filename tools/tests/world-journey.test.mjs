@@ -163,3 +163,13 @@ test('the testing unlock page opens worlds and layers, and the result survives a
   assert.ok(reloaded.devUnlocks().every(w=>w.open&&w.layers.every(l=>l.unlocked)));
   assert.equal(reloaded.getSnapshot().maxDepth,0);
 });
+test('the testing page clears every unlock back to a fresh start, keeping the rest of the progress', () => {
+  const s=new GameSession(content),travels=commands(s),fresh=new GameSession(content).devUnlocks();
+  s.devGrantCoins(500);s.devUnlockLayer();
+  s.devResetUnlocks();
+  assert.deepEqual(s.devUnlocks(),fresh);
+  assert.deepEqual(travels.at(-1),worldSpawn(1));
+  assert.equal(s.getSnapshot().currentWorld,1);
+  assert.equal(s.exportProgress().wallet.balances[worldRequirement(1).currency],500);
+  assert.deepEqual(GameSession.fromData(s.exportProgress(),content).devUnlocks(),fresh);
+});

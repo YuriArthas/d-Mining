@@ -13,6 +13,9 @@ import './hud.css';
 import { currencyIcon, currencyName } from '../currency.ts';
 
 import { tr } from '../../i18n/i18n.ts';
+
+/** Testing tools (the performance report) show only with ?debug=1. */
+const DEBUG = new URLSearchParams(window.location.search).get('debug') === '1';
 type HudActions = {
   openPets(): void; openShop(): void; openBackpacks(): void; openRewards(): void; openMinerals(): void; openHelp(): void; openRebirth(): void;
 };
@@ -89,7 +92,7 @@ export function Hud({ session, actions, system, prompts, tipHidden = false }: {
       <HudNotice text={tip?.id === 'sell' && state.inventory.isFull || state.notice.startsWith(tr('材料仓 +')) ? '' : state.notice} />
     </div>
 
-    <PerformanceReportButton />
+    {DEBUG && <PerformanceReportButton />}
   </div>;
 }
 

@@ -6,7 +6,7 @@ import { tr } from '../../i18n/i18n.ts';
 
 type State = { kind: 'idle' } | { kind: 'sending' } | { kind: 'sent'; id: string } | { kind: 'failed' };
 
-/** Bottom left: one press sends the last 30 seconds of frames, the device and where the player is to the public host
+/** Bottom left, with ?debug=1 only: one press sends the last 30 seconds of frames, the device and where the player is to the public host
  *  (PerformanceRecorder). It then shows the report's short id for a few seconds, or that it failed (press again). */
 export function PerformanceReportButton() {
   const [state, setState] = useState<State>({ kind: 'idle' });

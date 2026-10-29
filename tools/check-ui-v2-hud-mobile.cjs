@@ -1,6 +1,6 @@
 // Public phone-landscape check for UI v2 U2 (docs/draft-ui-v2.md): the new HUD on the surface, while mining, in a
 // rest hall, with a full bag, buffs and the rebirth button, at four screen sizes; the HUD zones never overlap each
-// other or the jump button, and the testing unlock button shows only with ?debug=1.
+// other or the jump button, and the testing unlock and performance report buttons show only with ?debug=1.
 const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
 const fs = require('node:fs/promises'), path = require('node:path'), assert = require('node:assert/strict');
 const base = 'https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html';
@@ -124,8 +124,9 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
     await plain.goto(`${base}?lang=zh&saveTest=hud-plain-${Date.now()}`, { waitUntil: 'domcontentloaded' });
     await plain.locator('.ui-hud').waitFor({ timeout: 300000 });
     assert.equal(await plain.locator('.dev-unlock-button').count(), 0);
+    assert.equal(await plain.locator('.hud-perf').count(), 0);
     await plain.close();
-    await check('Without ?debug=1 there is no testing 解锁 button.');
+    await check('Without ?debug=1 there is no testing 解锁 button and no performance report button.');
 
     assert.deepEqual(report.errors.filter(e => !/favicon|404/.test(e)), [], 'no page errors');
     report.finishedAt = new Date().toISOString(); await save();

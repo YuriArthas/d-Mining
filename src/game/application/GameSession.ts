@@ -892,6 +892,16 @@ export class GameSession {
     }
     this.committed(true);this.publish();
   };
+  /** Test shortcut: every world past the first and every layer locked again, as at a fresh start, and the player back
+   *  at world 1's spawn; money, tools, bag, material store and pets stay. */
+  devResetUnlocks = () => {
+    this.world?.cancelMining();
+    this.worldProgress.reset();
+    for(const w of WORLD_REQUIREMENTS)this.explorations.set(w.id,new Exploration(this.content.destinations.filter(d=>d.worldId===w.id)));
+    this.currentWorld=1;
+    this.world?.travelTo?.(worldSpawn(1));this.resetPosition();
+    this.refreshTarget();this.committed(true);this.publish();
+  };
   /** Sells the whole bag (ticket minerals wait in the material store, never in the bag). */
   private executeSale() {
     return sellItems(this.inventory,this.till(),itemPrice,this.inventory.getSnapshot().items,this.saleMultiplier());
