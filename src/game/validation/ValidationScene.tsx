@@ -1,7 +1,8 @@
 import type { ShopView } from '../presentation/ShopView.ts';
 import { GuideMarkerProjector } from '../presentation/GuideMarkerProjector.ts';
 import { attachMiningOverlay } from '../ui/hud/miningOverlay.ts';
-import { GuideDirectionArrow, updateGuideRoute } from '../presentation/GuideDirectionArrow.tsx';
+import { GuidePath } from '../presentation/GuidePath.tsx';
+import { updateGuidePath } from '../presentation/guidePath.ts';
 import type { SavedGame } from '../persistence/SaveBootstrap.ts';
 import type { GameContent } from "../content/gameContent.ts";
 import { useEffect, useRef, type RefObject } from "react";
@@ -71,7 +72,8 @@ export function ValidationScene({
   const guideProjector = useRef(new GuideMarkerProjector());
   const mining = useRef<ReturnType<typeof attachMiningOverlay> | null>(null);
   useEffect(() => () => { mining.current?.dispose(); mining.current = null; }, []);
-  const guideArrow = useRef<Group>(null);
+  const guidePath = useRef<Group>(null);
+  const guideClock = useRef(0);
   const settings = useRef({ sceneShadowsEnabled });
   settings.current = { sceneShadowsEnabled };
   const { advance, gl, scene, camera: activeCamera } = useThree();
@@ -289,7 +291,7 @@ export function ValidationScene({
     game.minerAvatar.setBagFill(gear.inventory.capacity > 0 ? gear.inventory.used / gear.inventory.capacity : 0);
     if (shopView.active) {
       input.reset(); game.minerAvatar.cancelMining();
-      if (guideArrow.current) guideArrow.current.visible = false;
+      if (guidePath.current) guidePath.current.visible = false;
       if (guideMarker.current) guideMarker.current.style.visibility = 'hidden';
       if (!document.hidden && !session.suspended) session.advanceOnline(Math.min(Math.max(elapsed, 0), 1));
       return;
@@ -319,22 +321,28 @@ export function ValidationScene({
     // First-dig tip: an arrow to the mine on the surface, then a glowing block once there.
     if (tip?.anchor === 'mine') guideProjector.current.update(camera, tipState.tipAnchor, guideMarker.current);
     game.interaction.lesson.update(camera as PerspectiveCamera, game.physics.feet(), game.interaction.selected, game.terrain, tipState.pickaxe.level, guideMarker.current, tip?.anchor === 'dig' && !game.player.travelling && !session.suspended);
-    const arrow = guideArrow.current, target = tip?.anchor === 'mine' ? tipState.tipAnchor : null;
-    if (arrow) {
+    // The way there: chevrons along it (over the bridge), each on the surface under it, an arrow over the mine.
+    const path = guidePath.current, target = tip?.anchor === 'mine' ? tipState.tipAnchor : null;
+    if (path) {
       const feet = avatar.current.position;
-      const dx = target ? target[0] - feet.x : 0, dz = target ? target[2] - feet.z : 0;
-      const distance = Math.hypot(dx, dz);
-      arrow.visible = !!target && !!guideMarker.current && !game.player.travelling && distance > 2;
-      if (arrow.visible) {
-        updateGuideRoute(arrow,feet.toArray(),target!);
+      const distance = target ? Math.hypot(target[0] - feet.x, target[2] - feet.z) : 0;
+      path.visible = !!target && !!guideMarker.current && !game.player.travelling && distance > 2;
+      if (path.visible) {
+        guideClock.current += Math.min(Math.max(elapsed, 0), .1);
+        // Looked for from above the feet (a bridge deck is lower than that), never from inside a post.
+        const from = Math.max(feet.y, 0) + 1.6;
+        updateGuidePath(path, feet.toArray(), target!, camera.position.toArray(), guideClock.current, (x, z) => {
+          const y = game.physics.surfaceBelow(x, z, from, 4);
+          return y !== null && y < from - .25 ? y : null;
+        });
       }
-      if (guideMarker.current) guideMarker.current.dataset.directionVisible = String(arrow.visible);
+      if (guideMarker.current) guideMarker.current.dataset.directionVisible = String(path.visible);
     }
   });
 
   return (
     <group ref={root}>
-      <GuideDirectionArrow arrowRef={guideArrow} />
+      <GuidePath pathRef={guidePath} />
       <hemisphereLight ref={ambient} args={["#eef4ef", "#718574", 1.15]} />
       <directionalLight
         ref={sun}

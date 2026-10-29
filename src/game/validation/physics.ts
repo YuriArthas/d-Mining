@@ -40,6 +40,13 @@ export class CharacterPhysics {
   feet(): [number, number, number] {
     const p = this.body.translation(); return [p.x, p.y - GAME_CONFIG.player.height / 2, p.z];
   }
+  /** The height of whatever stands under (x, z), looking down from `from` for `depth` metres (the player's own
+   *  capsule aside): ground, a bridge deck, a step. Null where nothing is loaded there (colliders are kept near
+   *  the player only). */
+  surfaceBelow(x: number, z: number, from: number, depth: number) {
+    const hit = this.world.castRay(new RAPIER.Ray({ x, y: from, z }, { x: 0, y: -1, z: 0 }), depth, true, undefined, undefined, this.collider);
+    return hit ? from - hit.timeOfImpact : null;
+  }
   teleport(feet: readonly number[]) {
     const p = { x: feet[0], y: feet[1] + GAME_CONFIG.player.height / 2, z: feet[2] };
     this.body.setTranslation(p, true); this.body.setNextKinematicTranslation(p);

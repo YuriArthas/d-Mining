@@ -173,8 +173,8 @@ export function attachGameDebug(
       position: physics.feet(),
       guideMining: {visible:interaction.lesson.group.visible,cell:interaction.lesson.cell},
       guideDirection: (() => {
-        const arrow=scene.getObjectByName('onboarding-direction');
-        return arrow?{style:arrow.userData.style,texture:arrow.userData.texture,visible:arrow.visible,position:arrow.position.toArray(),yaw:arrow.rotation.y,length:arrow.userData.length,destination:arrow.userData.destination}:null;
+        const path=scene.getObjectByName('onboarding-path');
+        return path?{style:path.userData.style,visible:path.visible,route:path.userData.route,chevrons:path.userData.chevrons,marker:path.userData.marker}:null;
       })(),
       grounded: physics.grounded,
       ready: !player.travelling && terrain.ready(physics.feet()),
