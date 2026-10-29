@@ -32,18 +32,18 @@ def tile(i,base,marks):
     for x,y,w,h,c in marks: rect(ox+x,oy+y,w,h,c)
 # Large, quiet patches survive an overview. Strong outlines belong to geometry.
 recipes=[
- ('192f46',[]), #0 quiet structural navy
+ ('5e3b28',[]), #0 walnut structure, warm like the original's dark timber
  ('b5793f',[(4,5,24,3,'c38b4c'),(6,24,19,2,'aa713a')]), #1 broad timber
  ('e3aa60',[(4,5,24,3,'eebc77'),(7,24,17,2,'d49b54')]), #2 honey timber
- ('899cab',[(4,5,10,3,'9aabba'),(18,20,10,6,'8195a5')]), #3 quiet masonry
+ ('b0a89e',[(4,5,10,3,'bdb5ab'),(18,20,10,6,'a49c92')]), #3 quiet warm masonry
  ('f4e3bf',[(4,5,7,4,'f9ebce'),(22,23,6,4,'ecdab7')]), #4 plaster
  ('f18133',[(3,3,26,4,'f99646'),(4,26,24,2,'e7782f')]), #5 broad orange roof
  ('159aa5',[(3,3,26,4,'2daeb6'),(4,26,24,2,'128d98')]), #6 broad teal roof
  ('60d0e3',[(3,3,25,4,'91e5ed'),(4,7,6,9,'82dee9'),(21,21,7,7,'4cbcd4')]), #7 toy glazing
  ('f2be56',[(3,3,26,4,'ffd27a'),(5,26,24,3,'e2ad49')]), #8 gold accent
- ('4e7185',[(4,5,22,3,'608396'),(6,25,20,3,'45677c')]), #9 matte metal
+ ('7a7069',[(4,5,22,3,'887e76'),(6,25,20,3,'6d645d')]), #9 matte warm iron
  ('674833',[(4,6,24,3,'75543b')]), #10 dark timber
- ('bcc8cb',[(3,3,11,3,'cbd5d6'),(19,23,9,4,'afbdc3')]), #11 pale stone
+ ('e2dace',[(3,3,11,3,'ebe4d9'),(19,23,9,4,'d5cdc0')]), #11 pale cream stone
  ('d86a2b',[(4,5,24,3,'e07832')]), #12 orange edge
  ('42bec5',[(3,3,24,4,'60cbd0')]), #13 teal highlight
  ('bd8749',[(10,3,2,26,'ab773f'),(22,3,2,26,'ab773f'),(4,6,4,11,'cb9859')]), #14 quiet door planks
@@ -51,8 +51,8 @@ recipes=[
  ('fff0cc',[(5,9,5,5,'34adb5'),(10,12,4,5,'34adb5'),(19,22,6,4,'e5bd70'),(22,18,5,5,'e5bd70')]), #16 egg ivory
  ('65d5cc',[(5,9,5,5,'fff0cc'),(10,12,4,5,'fff0cc'),(19,22,6,4,'209fa7'),(22,18,5,5,'209fa7')]), #17 egg teal
  ('c99cdd',[(5,9,5,5,'fff0cc'),(10,12,4,5,'fff0cc'),(19,22,6,4,'a575c5'),(22,18,5,5,'a575c5')]), #18 egg lavender
- ('506b82',[(4,5,10,3,'607b90'),(19,22,9,5,'47647b')]), #19 dark stone
- ('31576e',[(4,5,24,3,'3c647b')]), #20 navy metal
+ ('8c8279',[(4,5,10,3,'998f86'),(19,22,9,5,'7f756c')]), #19 warm grey stone
+ ('9a3d2c',[(4,5,24,3,'b04a36')]), #20 rust-red band
  ('f58a3b',[(4,4,24,4,'ffa055')]), #21 orange trim
  ('1b929d',[(4,4,24,4,'2ca5af')]), #22 teal trim
  ('dfba73',[(4,4,24,3,'eed09a')]), #23 broad straw
@@ -78,7 +78,28 @@ for e in layout['eggs']:
     spotted=len(recipes); recipes.append((base,[(5,9,5,5,'fff0cc'),(10,12,4,5,'fff0cc'),(19,22,6,4,deep),(22,18,5,5,deep)]))
     plain=len(recipes); recipes.append((base,[]))
     EGG_TILES[e['id']]=(spotted,plain)
+# Portal scenery: the caves around the teleport station and the next worlds beside the gate.
+def add_tile(base,marks): recipes.append((base,marks)); return len(recipes)-1
+CAP_TILE=add_tile('e5582c',[(3,3,26,3,'ee6a3a'),(4,26,24,3,'cf4a24')])
+SPOT_TILE=add_tile('e5582c',[(10,7,12,18,'fff1d0'),(7,10,18,12,'fff1d0')])
+GILL_TILE=add_tile('ecc58c',[(3,6,26,2,'dcae74'),(3,14,26,2,'dcae74'),(3,22,26,2,'dcae74')])
+PURPLE_TILE=add_tile('a46cf5',[(4,4,6,24,'c9a2ff'),(20,6,4,20,'8b56dd')])
+BLUE_TILE=add_tile('46b2f5',[(4,4,6,24,'96dcff'),(20,6,4,20,'2f93dd')])
+ROCK_TILE=add_tile('8a8290',[(4,5,10,3,'9a93a0'),(18,20,9,5,'7b7383')])
+TEAL_TILE=add_tile('4fe0d0',[(4,4,6,24,'a2f6ec'),(20,6,4,20,'2fbfb0')])
+ICE_TILE=add_tile('bde7fb',[(4,4,7,22,'eaf9ff'),(19,8,5,18,'9cd2f0')])
+SNOW_TILE=add_tile('f5fbff',[(4,6,10,3,'e1eef8'),(18,20,9,3,'e1eef8')])
+BASALT_TILE=add_tile('584a42',[(4,5,11,3,'6a5b52'),(17,20,10,4,'4a3d36')])
+MAGMA_TILE=add_tile('ff7a1c',[(4,6,12,3,'ffc83c'),(14,16,13,3,'ffb02e'),(6,24,8,3,'ffd85a')])
+SAND_TILE=add_tile('f0d08c',[(4,6,11,3,'f7deaa'),(17,19,10,3,'e2bc72')])
+CACTUS_TILE=add_tile('45b04c',[(6,2,3,28,'67cc6c'),(16,2,3,28,'379a40'),(25,2,3,28,'67cc6c')])
+METEOR_TILE=add_tile('6f6590',[(4,5,10,3,'81779f'),(18,20,9,5,'615783')])
+BEACON_TILE=add_tile('9ff4ff',[(6,6,20,20,'d8fdff')])
 assert len(recipes)<=64, 'atlas full'
+# Tiles that light themselves (lamp glass, the beacon, magma, crystals, ice): the game adds each one's own
+# colour as emission at this strength, so they stay bright in shade (StaticSurface/albedoLift.ts).
+GLOW={15:.8,BEACON_TILE:.9,MAGMA_TILE:.75,PURPLE_TILE:.3,BLUE_TILE:.3,TEAL_TILE:.3,ICE_TILE:.18}
+assert len(GLOW)<=12
 for i,(base,marks) in enumerate(recipes): tile(i,base,marks)
 # Duplicate boundary pixels into the 2px gutters for mip-safe atlas islands.
 for i in range(len(recipes)):
@@ -105,6 +126,9 @@ material.node_tree.links.new(tex.outputs['Color'],bsdf.inputs['Base Color'])
 
 P=lambda v:(v[0],-v[2],v[1])
 MODELS={}; ACTIVE=None
+# Soft halos the game draws round lights (lamp glass, the beacon, magma), in their model's own frame.
+HALOS=[]
+def halo(ob,at,size,color): HALOS.append({'object':ob,'node':ACTIVE.name,'at':[round(v,3) for v in at],'size':size,'color':color})
 
 def model(name,at=(0,0,0),yaw=0):
     global ACTIVE
@@ -178,6 +202,118 @@ def stepped_outline(w,h,q):
     a=w/2; b=h/2
     return [(-a+q,-b),(a-q,-b),(a,-b+q),(a,b-q),(a-q,b),(-a+q,b),(-a,b-q),(-a,-b+q)]
 
+def ngon(r,n,phase=0.,sx=1.,sz=1.,wobble=None):
+    """A ring of n points in x,z, angle increasing like octagon(); wobble scales each point's radius."""
+    return [(math.cos(phase+2*math.pi*i/n)*r*sx*(1+(wobble[i%len(wobble)] if wobble else 0)),
+             math.sin(phase+2*math.pi*i/n)*r*sz*(1+(wobble[i%len(wobble)] if wobble else 0))) for i in range(n)]
+
+def loft(name,rings,bands,bottom=None,top=None,apex=None,at=(0,0,0),tilt=(0,0),spin=0):
+    """A closed solid through stacked rings [(y, ngon outline)], bottom to top: a flat bottom, one tile per band
+    between rings, then a flat top or a point at `apex`. Tilted about its base centre (radians about X, then Z),
+    turned by `spin` about Y and moved to `at`."""
+    n=len(rings[0][1]); verts=[(x,y,z) for y,outline in rings for x,z in outline]
+    faces=[tuple(range(n))]; ts=[bottom if bottom is not None else bands[0]]
+    for k in range(len(rings)-1):
+        a=k*n; b=a+n
+        for i in range(n): faces.append((a+i,b+i,b+(i+1)%n,a+(i+1)%n)); ts.append(bands[min(k,len(bands)-1)])
+    last=(len(rings)-1)*n; cap=top if top is not None else bands[-1]
+    if apex is None: faces.append(tuple(reversed(range(last,last+n)))); ts.append(cap)
+    else:
+        verts.append(apex)
+        for i in range(n): faces.append((last+i,len(verts)-1,last+(i+1)%n)); ts.append(cap)
+    turn=Matrix.Rotation(spin,3,'Y')@Matrix.Rotation(tilt[1],3,'Z')@Matrix.Rotation(tilt[0],3,'X')
+    return mesh(name,[tuple(Vector(at)+turn@Vector(v)) for v in verts],faces,ts)
+
+def annulus(name,cx,cz,r0,r1,y0,y1,n,t):
+    """A flat ring lying on the ground (a pad's rim): outer wall, inner wall, top and bottom."""
+    o=[(cx+x,cz+z) for x,z in ngon(r1,n)]; i=[(cx+x,cz+z) for x,z in ngon(r0,n)]
+    vs=[(x,y,z) for y in (y0,y1) for x,z in o]+[(x,y,z) for y in (y0,y1) for x,z in i]
+    fs=[]
+    for k in range(n):
+        j=(k+1)%n
+        fs+=[(k,k+n,j+n,j),(2*n+k,2*n+j,3*n+j,3*n+k),(n+k,3*n+k,3*n+j,n+j),(k,j,2*n+j,2*n+k)]
+    return mesh(name,vs,fs,t)
+
+def clip_front(outline,zmax):
+    """Cut an outline (x,z) by the plane z=zmax, keeping the back; the order is kept."""
+    out=[]
+    for i,(x0,z0) in enumerate(outline):
+        x1,z1=outline[(i+1)%len(outline)]
+        if z0<=zmax: out.append((x0,z0))
+        if (z0<=zmax)!=(z1<=zmax): t=(zmax-z0)/(z1-z0); out.append((x0+(x1-x0)*t,zmax))
+    return out
+
+def teleport_pad(name,cx,cz,radius):
+    """A round pad flush with the ground where a portal's zone is: a stone rim with a gold lip round a teal
+    pool (the game draws the glowing water over the pool)."""
+    annulus(name+'_Rim',cx,cz,radius-.22,radius+.18,-.06,.12,24,19)
+    annulus(name+'_GoldLip',cx,cz,radius-.3,radius-.18,-.06,.14,24,8)
+    slab(name+'_Pool',[(cx+x,cz+z) for x,z in ngon(radius-.26,24)],-.06,.07,13)
+
+def crystal(name,at,h,r,tilt,spin,t):
+    """A six-sided crystal with a pointed tip, standing from `at`."""
+    return loft(name,[(0,ngon(r,6)),(h*.7,ngon(r*1.06,6))],[t],apex=(0,h,0),at=at,tilt=tilt,spin=spin)
+
+def decor_mushroom(name,at,spin=0):
+    x,y,z=at
+    for k,(dx,dz,s,turn) in enumerate(((0,0,1,0),(1.15,.85,.38,.6),(-.95,1.05,.3,1.3),(.9,-.95,.26,2.1))):
+        base=(x+dx,y-.1,z+dz)
+        loft(name+'_Stem',[(0,ngon(.62*s,8)),(.35*s,ngon(.55*s,8)),(1.9*s,ngon(.42*s,8)),(2.25*s,ngon(.5*s,8))],[4],at=base,spin=spin+turn)
+        loft(name+'_Cap',[(2.15*s,ngon(.45*s,10)),(2.05*s,ngon(1.55*s,10)),(2.45*s,ngon(1.68*s,10)),(2.95*s,ngon(1.35*s,10)),(3.3*s,ngon(.75*s,10))],
+             [GILL_TILE,CAP_TILE,SPOT_TILE,SPOT_TILE],bottom=GILL_TILE,top=CAP_TILE,apex=(0,3.42*s,0),at=base,spin=spin+turn)
+
+def decor_crystals(name,at,spin=0):
+    x,y,z=at; wob=[.05,-.08,.1,-.04,.07,-.1,0]
+    loft(name+'_Rock',[(-.1,ngon(1.05,7,0,1,1,wob)),(.3,ngon(1.0,7,.2,1,1,wob)),(.55,ngon(.62,7,.4,1,1,wob))],[ROCK_TILE],at=(x,y,z),spin=spin)
+    turn=Matrix.Rotation(spin,3,'Y')
+    for (dx,dy,dz),h,r,tilt,t in (((0,.2,-.1),2.5,.36,(-.08,.06),BLUE_TILE),((.5,.15,.25),1.75,.3,(.3,-.35),TEAL_TILE),((-.55,.15,.2),1.4,.27,(.32,.4),PURPLE_TILE),
+                                  ((.2,.15,-.55),1.15,.24,(-.4,-.2),TEAL_TILE),((-.4,.15,-.45),.85,.2,(-.35,.45),BLUE_TILE)):
+        crystal(name+'_Crystal',tuple(Vector((x,y,z))+turn@Vector((dx,dy,dz))),h,r,tilt,spin,t)
+
+def decor_ice(name,at,spin=0):
+    x,y,z=at; turn=Matrix.Rotation(spin,3,'Y')
+    loft(name+'_Snow',[(-.1,ngon(1.45,8,0,1,1,[.06,-.05,.08,0,-.07,.05,-.03,.04])),(.12,ngon(1.3,8,.2)),(.24,ngon(.85,8,.4))],[SNOW_TILE],at=(x,y,z),spin=spin)
+    for (dx,dz),h,phase in (((0,0),3.1,0),((.95,.55),2.3,.4),((-.85,.6),1.7,.9)):
+        base=tuple(Vector((x,y+.1,z))+turn@Vector((dx,0,dz))); w=h*.3
+        loft(name+'_Spike',[(0,ngon(.8*w,6,phase)),(.18*h,ngon(.64*w,6,phase))],[ICE_TILE],apex=(0,.62*h,0),at=base,spin=spin)
+        loft(name+'_SpikeTop',[(.4*h,ngon(.58*w,6,phase+.5)),(.52*h,ngon(.45*w,6,phase+.5))],[ICE_TILE],apex=(0,h,0),at=base,spin=spin)
+    crystal(name+'_Shard',tuple(Vector((x,y+.1,z))+turn@Vector((.65,0,-.75))),.85,.16,(-.3,-.3),spin,ICE_TILE)
+
+def decor_lava(name,at,spin=0):
+    x,y,z=at; turn=Matrix.Rotation(spin,3,'Y'); wob=[.06,-.07,.09,-.05,.04,-.09,.02]
+    basalt=loft(name+'_Basalt',[(-.1,ngon(1.2,7,0,1,1,wob)),(.4,ngon(1.12,7,.25,1,1,wob)),(.75,ngon(.82,7,.5,1,1,wob)),(.62,ngon(.55,7,.5,1,1,wob))],[BASALT_TILE],top=MAGMA_TILE,at=(x,y,z),spin=spin)
+    halo(basalt,(x,y+.85,z),2.0,'ff8a2a')
+    for (dx,dz),h,r,tilt in (((.95,.5),.9,.18,(.3,-.35)),((1.1,-.25),.6,.15,(-.2,-.4)),((-1.0,.35),.7,.16,(.3,.35))):
+        crystal(name+'_Ember',tuple(Vector((x,y,z))+turn@Vector((dx,0,dz))),h,r,tilt,spin,MAGMA_TILE)
+    loft(name+'_Pebble',[(-.05,ngon(.42,6,.3,1,1,[.1,-.1,.05])),(.3,ngon(.25,6,.6))],[BASALT_TILE],at=tuple(Vector((x,y,z))+turn@Vector((-.85,0,-.85))),spin=spin)
+
+def decor_desert(name,at):
+    x,y,z=at; k=1.35; wob=[.04,-.06,.08,-.03,.05,-.07,.03,-.05,.06]
+    loft(name+'_Dune',[(-.5,ngon(1.75*k,9,0,1.15,.9,wob)),(.15,ngon(1.6*k,9,.1,1.15,.9,wob)),(.6,ngon(1.1*k,9,.2,1.1,.85,wob)),(.85,ngon(.55*k,9,.3))],[SAND_TILE],at=(x,y,z))
+    def cactus(cx,cz,s,arms=True):
+        loft(name+'_Cactus',[(0,ngon(.3*s,8,math.pi/8)),(2.2*s,ngon(.3*s,8,math.pi/8)),(2.42*s,ngon(.2*s,8,math.pi/8))],[CACTUS_TILE],at=(cx,y+.4,cz))
+        if not arms: return
+        box(name+'_CactusArm',(cx+.48*s,y+.4+1.32*s,cz),(.62*s,.32*s,.32*s),CACTUS_TILE)
+        loft(name+'_CactusArmUp',[(0,ngon(.18*s,8,math.pi/8)),(.95*s,ngon(.18*s,8,math.pi/8)),(1.08*s,ngon(.11*s,8,math.pi/8))],[CACTUS_TILE],at=(cx+.7*s,y+.4+1.18*s,cz))
+        box(name+'_CactusArm',(cx-.44*s,y+.4+1.7*s,cz),(.55*s,.28*s,.28*s),CACTUS_TILE)
+        loft(name+'_CactusArmUp',[(0,ngon(.16*s,8,math.pi/8)),(.7*s,ngon(.16*s,8,math.pi/8)),(.8*s,ngon(.1*s,8,math.pi/8))],[CACTUS_TILE],at=(cx-.62*s,y+.4+1.58*s,cz))
+    cactus(x-.45,z+.15,1.3); cactus(x+.55,z+.75,.62,False)
+    bx,bz=x+1.25,z-.5
+    box(name+'_BeaconFoot',(bx,y+.75,bz),(.75,.4,.75),9)
+    box(name+'_BeaconPost',(bx,y+1.55,bz),(.28,1.3,.28),9)
+    halo(box(name+'_BeaconLight',(bx,y+2.45,bz),(.6,.55,.6),BEACON_TILE),(bx,y+2.45,bz),1.5,'8ff6ff')
+    box(name+'_BeaconCap',(bx,y+2.8,bz),(.7,.16,.7),8)
+    box(name+'_BeaconAerial',(bx,y+3.2,bz),(.08,.7,.08),9)
+
+def decor_meteor(name,at):
+    x,y,z=at
+    loft(name+'_Rock',[(-.5,ngon(1.5,7,0,1.1,.95,[.05,-.08,.1,-.03,.07,-.1,.02])),(.25,ngon(1.45,7,.3,1.1,.95,[-.04,.09,-.06,.08,-.02,.05,-.08])),
+                      (.95,ngon(1.05,7,.6,1,1,[.08,-.05,.04,-.09,.06,0,-.04])),(1.35,ngon(.5,7,.9))],[METEOR_TILE],at=(x,y,z))
+    for (dx,dy,dz),h,r,tilt in (((.6,.6,.3),1.4,.25,(.35,-.4)),((-.5,.6,.35),1.0,.21,(.4,.35)),((.1,.95,-.4),1.2,.22,(-.35,-.1)),((-.95,.1,-.25),.7,.17,(-.2,.5))):
+        crystal(name+'_Crystal',(x+dx,y+dy,z+dz),h,r,tilt,0,PURPLE_TILE)
+    star=[(math.cos(math.pi/2+i*math.pi/5)*(.85 if i%2==0 else .37),math.sin(math.pi/2+i*math.pi/5)*(.85 if i%2==0 else .37)+y+2.8) for i in range(10)]
+    prism(name+'_Star',[(x+u,v) for u,v in star],z-.15,z+.15,8)
+
 def window(name,at,w,h,side=False):
     # Author on the front, then transform vertices for an east-facing window.
     before=set(bpy.data.objects)
@@ -206,7 +342,7 @@ def door(name,at,w=1.8,h=2.8,t=14):
 
 def roof(name,width,depth,eave,rise,t=5,courses=4):
     # Closed continuous slopes with only four broad raised panels per side.
-    # The thick navy end face is structural fascia, not a postprocess outline.
+    # The thick walnut end face is structural fascia, not a postprocess outline.
     half=width/2; courses=4; step=half/courses
     outline=[(-half,eave),(0,eave+rise),(half,eave),(half,eave-.38),(0,eave+rise-.38),(-half,eave-.38)]
     prism(name+'_ContinuousRoof',outline,-depth/2,depth/2,0,[t,t,0,0,0,0])
@@ -235,7 +371,7 @@ def hip_roof(name,outline,rings,t=6):
 
 def lamp(name,at,s=1):
     x,y,z=at
-    box(name+'_Light',(x,y,z),(.43*s,.64*s,.43*s),15)
+    halo(box(name+'_Light',(x,y,z),(.43*s,.64*s,.43*s),15),(x,y,z),1.2*s,'ffcf6a')
     for xx in (-.24,.24):
         for zz in (-.24,.24): box(name+'_Frame',(x+xx*s,y,z+zz*s),(.10*s,.74*s,.10*s),0)
     box(name+'_Base',(x,y-.38*s,z),(.64*s,.13*s,.64*s),0)
@@ -358,7 +494,7 @@ window('Pack_EastWindow',(4.15,2.40,0),2.35,2.25,True)
 box('Pack_FirstStep',(0,.14,4.73),(3.55,.28,.80),3)
 box('Pack_UpperStep',(0,.37,4.02),(3.25,.30,1.0),11)
 lamp('Pack_Lantern',(1.25,3.26,3.72),.80)
-# Badge: a big backpack on a navy plate above the door, read from across the plaza.
+# Badge: a big backpack on a walnut plate above the door, read from across the plaza.
 prism('Pack_BadgeBacking',[(x,y+5.10) for x,y in stepped_outline(1.55,1.70,.28)],3.74,3.95,0)
 prism('Pack_BadgeBody',[(x,y+4.98) for x,y in stepped_outline(1.02,1.10,.18)],3.96,4.12,21)
 prism('Pack_BadgeFlap',[(x,y+5.40) for x,y in stepped_outline(1.10,.42,.12)],4.13,4.24,12)
@@ -495,7 +631,7 @@ box('Mine_RearLoadingRail',(0,2.15,-7.45),(4.60,.26,.28),2)
 
 # BRIDGE (layout `bridge`): a humpback timber footbridge. The deck is one smooth raised-cosine arch that
 # leaves the path at ground level on both banks, so there is no slab, ramp or step to climb: boards laid
-# across it with dark seams between them, navy side beams under the overhanging board ends tracing the
+# across it with dark seams between them, walnut side beams under the overhanging board ends tracing the
 # arch, stone footings where the arch meets the banks. Posts, rails and the four lantern pillars are a
 # separate model, so the game collides with them apart from the deck the character stands on.
 bridge=layout['bridge']; BL=bridge['halfSpan']; BH=bridge['rise']; BW=bridge['width']/2
@@ -627,10 +763,13 @@ for i,p in enumerate(layout['steps']):
 st=layout['station']
 model('Teleport_Station',(st['x'],0,st['z']),st['yaw'])
 octagon=lambda r:[(math.cos(math.pi/8+i*math.pi/4)*r,math.sin(math.pi/8+i*math.pi/4)*r) for i in range(8)]
-slab('Station_Plinth',octagon(3.15),0,.24,19)
-slab('Station_Deck',octagon(2.8),.24,.42,11)
-slab('Station_GoldRim',octagon(2.86),.40,.46,8)
-slab('Station_Inlay',octagon(1.55),.42,.47,13)
+# The platform's front is cut straight where the round teleport pad (the zone that opens the sheet) meets it.
+pad_at=math.hypot(st['pad']['x']-st['x'],st['pad']['z']-st['z']); pad_r=layout['stationPad']['radius']; front=pad_at-pad_r+.1
+slab('Station_Plinth',clip_front(octagon(3.15),front),0,.24,19)
+slab('Station_Deck',clip_front(octagon(2.8),front),.24,.42,11)
+slab('Station_GoldRim',clip_front(octagon(2.86),front),.40,.46,8)
+slab('Station_Inlay',clip_front(octagon(1.55),front),.42,.47,13)
+teleport_pad('Station_Pad',0,pad_at,pad_r)
 for side in (-1,1):
     x=side*1.9
     slab('Station_PillarFoot',[(x+u,v) for u,v in stepped_outline(1.15,1.15,.22)],.42,1.0,19)
@@ -648,7 +787,8 @@ circle=[(math.cos(2*math.pi*i/20)*1.62,math.sin(2*math.pi*i/20)*1.62) for i in r
 ring('Station_Ring',circle,.82,-.16,.16,2.75,13)
 ring('Station_RingGold',[(x*1.05,y*1.05) for x,y in circle],.93,.17,.24,2.75,8)
 for side in (-1,1): box('Station_RingStrut',(side*1.42,2.75,0),(.5,.34,.3),0)
-for side in (-1,1): crate('Station_Crate',(side*2.95,.42,-1.55),.62)
+DECOR={'mushroom':decor_mushroom,'crystal':decor_crystals,'ice':decor_ice,'lava':decor_lava}
+for i,d in enumerate(layout['stationDecor']): DECOR[d['kind']]('Station_'+d['kind'].title(),(d['x'],d['y'],d['z']),.5+i*1.1)
 
 # Functional furniture: a newly authored shell; its live label is attached in-game.
 # A faceted teal toy cabinet with a recessed capsule display and bold roof/collars.
@@ -688,6 +828,8 @@ box('Gate_SignBoard',(0,gh-1.6,-.9),(6.6,1.05,.22),0)
 box('Gate_Frieze',(0,gh-.55,0),(lw,.8,1.2),1)
 for sz in (-1,1): tilted_box('Gate_RoofPlane',(0,gh+.15,sz*.72),(lw+.9,.32,1.75),5,sz*.52,'X')
 box('Gate_RoofRidge',(0,gh+.62,0),(lw+1.1,.3,.42),21)
+gp=layout['gatePad']; teleport_pad('Gate_Pad',gp['x']-gate['x'],gp['z']-gate['z'],gp['radius'])
+for d in layout['gateDecor']: {'desert':decor_desert,'meteor':decor_meteor}[d['kind']]('Gate_'+d['kind'].title(),(d['x'],d['y'],d['z']))
 for side,sx in (('L',-1),('R',1)):
     model('World_Gate_Door'+side,(gate['x']+sx*half_open,0,gate['z']))
     w=half_open-.05; cx=-sx*w/2
@@ -696,6 +838,13 @@ for side,sx in (('L',-1),('R',1)):
     for y in (1.0,6.3):
         for k in range(3): box('GateDoor_Stud',(cx+(k-1)*(w-1.0)/2,y,-.31),(.24,.24,.12),8)
     box('GateDoor_Ring',(-sx*(w-.5),3.65,-.31),(.38,.52,.12),8)
+
+# Glowing tiles and halos for the game, once every model is built (the mine's removed lift lantern drops out).
+def alive(ob):
+    try: return bpy.data.objects.get(ob.name) is ob
+    except ReferenceError: return False
+(ROOT.parent/'src/game/content/pinewind/architecture-glow.json').write_text(json.dumps({'atlasTiles':8,'glow':{str(k):v for k,v in sorted(GLOW.items())},
+    'halos':[{k:h[k] for k in ('node','at','size','color')} for h in HALOS if alive(h['object'])]},indent=1)+'\n')
 
 # A bounded set of prominent block edges receive a single broad chamfer.
 # Main diagonal beams already have eight-sided sections, so no bevel modifier

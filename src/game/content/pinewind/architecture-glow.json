@@ -1,0 +1,164 @@
+{
+ "atlasTiles": 8,
+ "glow": {
+  "15": 0.8,
+  "49": 0.3,
+  "50": 0.3,
+  "52": 0.3,
+  "53": 0.18,
+  "56": 0.75,
+  "60": 0.9
+ },
+ "halos": [
+  {
+   "node": "Merchant_Store",
+   "at": [
+    -1.3,
+    3.3,
+    3.85
+   ],
+   "size": 1.08,
+   "color": "ffcf6a"
+  },
+  {
+   "node": "Pack_Shop",
+   "at": [
+    1.25,
+    3.26,
+    3.72
+   ],
+   "size": 0.96,
+   "color": "ffcf6a"
+  },
+  {
+   "node": "Copper_Forge",
+   "at": [
+    2.82,
+    3.76,
+    2.77
+   ],
+   "size": 1.08,
+   "color": "ffcf6a"
+  },
+  {
+   "node": "Creek_Bridge_Rails",
+   "at": [
+    -2.6,
+    1.784,
+    -5.55
+   ],
+   "size": 0.8999999999999999,
+   "color": "ffcf6a"
+  },
+  {
+   "node": "Creek_Bridge_Rails",
+   "at": [
+    -2.6,
+    1.784,
+    5.55
+   ],
+   "size": 0.8999999999999999,
+   "color": "ffcf6a"
+  },
+  {
+   "node": "Creek_Bridge_Rails",
+   "at": [
+    2.6,
+    1.784,
+    -5.55
+   ],
+   "size": 0.8999999999999999,
+   "color": "ffcf6a"
+  },
+  {
+   "node": "Creek_Bridge_Rails",
+   "at": [
+    2.6,
+    1.784,
+    5.55
+   ],
+   "size": 0.8999999999999999,
+   "color": "ffcf6a"
+  },
+  {
+   "node": "Plaza_Lamp_0",
+   "at": [
+    0.78,
+    3.13,
+    0
+   ],
+   "size": 1.26,
+   "color": "ffcf6a"
+  },
+  {
+   "node": "Plaza_Lamp_1",
+   "at": [
+    0.78,
+    3.13,
+    0
+   ],
+   "size": 1.26,
+   "color": "ffcf6a"
+  },
+  {
+   "node": "Teleport_Station",
+   "at": [
+    -1.9,
+    3.25,
+    0.62
+   ],
+   "size": 1.02,
+   "color": "ffcf6a"
+  },
+  {
+   "node": "Teleport_Station",
+   "at": [
+    1.9,
+    3.25,
+    0.62
+   ],
+   "size": 1.02,
+   "color": "ffcf6a"
+  },
+  {
+   "node": "Teleport_Station",
+   "at": [
+    3.9,
+    0.85,
+    -2.8
+   ],
+   "size": 2.0,
+   "color": "ff8a2a"
+  },
+  {
+   "node": "World_Gate",
+   "at": [
+    -5.0,
+    6.7,
+    -1.55
+   ],
+   "size": 1.32,
+   "color": "ffcf6a"
+  },
+  {
+   "node": "World_Gate",
+   "at": [
+    5.0,
+    6.7,
+    -1.55
+   ],
+   "size": 1.32,
+   "color": "ffcf6a"
+  },
+  {
+   "node": "World_Gate",
+   "at": [
+    9.85,
+    2.6,
+    -2.9
+   ],
+   "size": 1.5,
+   "color": "8ff6ff"
+  }
+ ]
+}

@@ -81,6 +81,23 @@ const station = worldStation(1);
 export const PINEWIND_STATION = { x: station.x, z: station.z, yaw: round(station.yaw), pad: { x: round(station.zone.x), z: round(station.zone.z) } } as const;
 export const PINEWIND_STATION_SIGN: Sign = { at: [station.x, 7.6, station.z], yaw: round(station.yaw), width: 4.4, title: tr('传送站'), subtitle: '', color: '#9ff3ff', background: '#18283d' };
 
+/** Scenery that says where a portal leads: around the station in its own frame (x across, +z toward the spawn),
+ *  around the gate as offsets from its centre (the gate faces -z, the spawn); y lifts a piece onto the slope. The
+ *  station is flanked by four of the caves below it — a giant mushroom, a crystal
+ *  cluster, ice spikes and a lava rock — and the world gate by the next worlds: a desert dune with a cactus and a
+ *  beacon (world 2), a fallen star with violet crystals (world 3). `half` is each piece's collider. */
+export type PortalDecor = Readonly<{ kind: 'mushroom' | 'crystal' | 'ice' | 'lava' | 'desert' | 'meteor'; x: number; y: number; z: number; half: readonly [number, number, number] }>;
+export const PINEWIND_STATION_DECOR: readonly PortalDecor[] = [
+  { kind: 'crystal', x: -4.9, y: 0, z: -.4, half: [.95, 1.2, .95] },
+  { kind: 'mushroom', x: -3.9, y: 0, z: -2.8, half: [.6, 1.7, .6] },
+  { kind: 'ice', x: 4.9, y: 0, z: -.4, half: [1, 1.5, 1] },
+  { kind: 'lava', x: 3.9, y: 0, z: -2.8, half: [1.15, .6, 1.15] },
+];
+export const PINEWIND_GATE_DECOR: readonly PortalDecor[] = [
+  { kind: 'desert', x: 8.6, y: .15, z: -2.4, half: [1.9, 1.6, 1.4] },
+  { kind: 'meteor', x: -8.6, y: .15, z: -2.4, half: [1.4, 1, 1.2] },
+];
+
 /** Two egg terraces facing the plaza: world 1's seven eggs (the later worlds' stand in their own bases). Rows
  *  step up 2.2 m and alternate by half a bay, so the always-on name/price labels never stack. Progression runs
  *  north to south and low to high: the front row holds the first four eggs, the upper row the last three. */

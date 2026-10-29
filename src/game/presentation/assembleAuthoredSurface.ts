@@ -8,6 +8,7 @@ import {setCreekTime} from './creekWater.ts';
 import {setLockedEggTime} from './LockedEggs.ts';
 import type {loadModelAssets} from './ModelAssetLoader.ts';
 import type {AuthoredInstance} from '../content/authoredSurface.ts';
+import {surfaceHalos} from './SurfaceHalos.ts';
 
 type Assets=Awaited<ReturnType<typeof loadModelAssets>>;
 /** Places the authored instances given (assets are session-owned by the loader) and the plan's props and signs;
@@ -37,6 +38,7 @@ export function assembleAuthoredSurface(assets:Assets,content:SurfaceContent,ins
  try {
   place(assets,instances,group);
   group.add(createScenery(content.plan));
+  const halos=surfaceHalos(instances);if(halos)group.add(halos);
   group.userData.surfaceShading={version:art.version,assets:assets.stats,distanceUnloading:false,modelCoordinates:'content descriptors',collisionCoordinates:'content.plan'};
   bundle.retain(group);
   // Baked light lives in the materials (bakedLight.ts); the key light's direction decides when it shows.

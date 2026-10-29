@@ -1,10 +1,13 @@
-import { AdditiveBlending, CircleGeometry, DoubleSide, Group, Mesh, PlaneGeometry, RingGeometry, ShaderMaterial, Vector3 } from 'three';
+import { AdditiveBlending, CircleGeometry, Color, CylinderGeometry, DoubleSide, Group, Mesh, PlaneGeometry, RingGeometry, ShaderMaterial, Vector3 } from 'three';
 import { WORLD_REQUIREMENTS, worldPortal, worldStation } from '../content/worldJourney.ts';
 import { PINEWIND_GATE } from '../content/pinewind/hubLayout.ts';
 
-/** The swirling portal disc in every world's teleport station ring (2.75 m up, 1.32 m across), and a soft
- *  glowing ring on its pad; and every world portal's sheet, violet and gold (world 1's fills its old ridge gate,
- *  the later worlds' a ring 2.9 m up). The frames themselves are scenery. */
+/** The swirling portal disc in every world's teleport station ring (2.75 m up, 1.32 m across), and every world
+ *  portal's sheet, violet and gold (world 1's fills its old ridge gate, the later worlds' a ring 2.9 m up). Where
+ *  the player stands to open one: in world 1 a round pad (Blender builds its rim) filled with glowing water under
+ *  a faint column of light, cyan for the station and violet for the gate; in the later worlds a soft ring. The
+ *  frames themselves are scenery. */
+const UP = new Vector3(0, 1, 0);
 export class TeleportStations {
   readonly group = new Group();
   private readonly time = { value: 0 };
@@ -28,9 +31,13 @@ export class TeleportStations {
       const st = worldStation(world.id), station = new Group();
       station.position.set(st.x, 0, st.z); station.rotation.y = st.yaw;
       const disc = new Mesh(new CircleGeometry(1.34, 48), swirl); disc.position.y = 2.75; disc.renderOrder = 2;
-      const ring = new Mesh(new RingGeometry(.95, 1.35, 48, 1).rotateX(-Math.PI / 2), pad);
-      ring.position.copy(new Vector3(st.zone.x - st.x, .48, st.zone.z - st.z).applyAxisAngle(new Vector3(0, 1, 0), -st.yaw));
-      station.add(disc, ring); this.group.add(station);
+      const at = new Vector3(st.zone.x - st.x, 0, st.zone.z - st.z).applyAxisAngle(UP, -st.yaw);
+      if (world.id === 1) station.add(disc, ...this.pad(at, st.zone.radius, '#1fa8ec', '#aef4ff'));
+      else {
+        const ring = new Mesh(new RingGeometry(.95, 1.35, 48, 1).rotateX(-Math.PI / 2), pad);
+        ring.position.set(at.x, .48, at.z); station.add(disc, ring);
+      }
+      this.group.add(station);
     }
     const sheet = this.material(`
       vec2 p = vUv * 2.0 - 1.0; float r = length(p), a = atan(p.y, p.x);
@@ -48,9 +55,13 @@ export class TeleportStations {
       const g = PINEWIND_GATE, face = world.id === 1
         ? new Mesh(new PlaneGeometry(g.opening - .3, g.height - 1.9), sheet) : new Mesh(new CircleGeometry(1.85, 48), sheet);
       face.position.y = world.id === 1 ? (g.height - 1.9) / 2 + .05 : 2.9; face.renderOrder = 2;
-      const ring = new Mesh(new RingGeometry(world.id === 1 ? 1.6 : 1.3, world.id === 1 ? 2.2 : 1.8, 48, 1).rotateX(-Math.PI / 2), portalPad);
-      ring.position.copy(new Vector3(pt.zone.x - pt.x, .06, pt.zone.z - pt.z).applyAxisAngle(new Vector3(0, 1, 0), -pt.yaw));
-      portal.add(face, ring); this.group.add(portal);
+      const at = new Vector3(pt.zone.x - pt.x, 0, pt.zone.z - pt.z).applyAxisAngle(UP, -pt.yaw);
+      if (world.id === 1) portal.add(face, ...this.pad(at, pt.zone.radius, '#7a3fe0', '#f1d2ff'));
+      else {
+        const ring = new Mesh(new RingGeometry(1.3, 1.8, 48, 1).rotateX(-Math.PI / 2), portalPad);
+        ring.position.set(at.x, .06, at.z); portal.add(face, ring);
+      }
+      this.group.add(portal);
     }
   }
 
@@ -60,6 +71,43 @@ export class TeleportStations {
     this.group.removeFromParent();
     this.group.traverse(o => { if (o instanceof Mesh) o.geometry.dispose(); });
     for (const m of this.materials) m.dispose();
+  }
+
+  /** A pad's glowing water (opaque, so it reads on the pale sand: rings drifting outward over a slow swirl,
+   *  brightest at the rim) and the column of light rising from it, fading upward. */
+  private pad(at: Vector3, radius: number, deep: string, bright: string) {
+    const colors = { uDeep: { value: new Color(deep) }, uBright: { value: new Color(bright) } };
+    const water = new ShaderMaterial({
+      uniforms: { uTime: this.time, ...colors },
+      vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+      fragmentShader: `uniform float uTime; uniform vec3 uDeep; uniform vec3 uBright; varying vec2 vUv;
+        void main(){
+          vec2 p = vUv * 2.0 - 1.0; float r = length(p);
+          float wave = sin(r * 13.0 - uTime * 2.6) * .5 + .5;
+          float swirl = sin(atan(p.y, p.x) * 3.0 + r * 5.0 - uTime * 1.3) * .5 + .5;
+          float light = clamp(.25 + .45 * wave * (.55 + .45 * swirl) + .55 * smoothstep(.72, 1.0, r), 0.0, 1.0);
+          gl_FragColor = vec4(mix(uDeep, uBright, light), 1.0);
+          #include <tonemapping_fragment>
+          #include <colorspace_fragment>
+        }`,
+    });
+    this.materials.push(water);
+    const pool = new Mesh(new CircleGeometry(radius - .26, 48).rotateX(-Math.PI / 2), water);
+    pool.position.set(at.x, .085, at.z);
+    const beam = new ShaderMaterial({
+      uniforms: { uTime: this.time, ...colors }, transparent: true, depthWrite: false, blending: AdditiveBlending, side: DoubleSide,
+      vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+      fragmentShader: `uniform float uTime; uniform vec3 uBright; varying vec2 vUv;
+        void main(){
+          float fade = pow(1.0 - vUv.y, 2.4);
+          float streak = .65 + .35 * sin(vUv.x * 37.7 + uTime * 1.1) * sin(vUv.y * 8.0 - uTime * 2.2);
+          gl_FragColor = vec4(uBright, fade * streak * .42);
+        }`,
+    });
+    this.materials.push(beam);
+    const column = new Mesh(new CylinderGeometry(radius - .32, radius - .32, 2.6, 40, 1, true), beam);
+    column.position.set(at.x, 1.39, at.z); column.renderOrder = 3;
+    return [pool, column];
   }
 
   private material(body: string) {

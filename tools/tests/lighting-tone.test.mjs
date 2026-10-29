@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Color, CustomToneMapping, NeutralToneMapping, ShaderChunk } from 'three';
@@ -44,8 +45,23 @@ test('房子材质：贴图颜色提亮提饱和；墙面多吃一份暖色反�
   material.onBeforeCompile(shader, null);
   assert.equal(shader.fragmentShader.match(/albedoSaturation \)/g)?.length, 1, 'patched once even if lifted twice');
   assert.match(shader.fragmentShader, /reflectedLight\.indirectDiffuse \*= mix\( albedoBounce/);
-  assert.equal(material.customProgramCacheKey(), 'architecture-albedo-lift-v3');
+  assert.equal(material.customProgramCacheKey(), 'architecture-albedo-lift-v4');
   assert.equal(shader.uniforms.albedoSaturation.value, ARCHITECTURE_ALBEDO.saturation);
   const [r, g, b] = shader.uniforms.albedoBounce.value.toArray();
   assert.ok(g === ARCHITECTURE_ALBEDO.bounce && r > g && b < g, `warm daytime bounce: ${[r, g, b]}`);
+});
+
+test('房子图集里的灯、信标、熔岩、水晶自发光：按 Blender 导出的色块表加自身颜色', async () => {
+  const { MeshStandardMaterial, Texture } = await import('three');
+  const { liftAlbedo } = await import('../../src/game/presentation/albedoLift.ts');
+  const glow = JSON.parse(readFileSync(new URL('../../src/game/content/pinewind/architecture-glow.json', import.meta.url), 'utf8'));
+  assert.ok(glow.glow['15'] > 0, 'lamp glass glows');
+  const material = new MeshStandardMaterial({ map: new Texture() });
+  liftAlbedo(material);
+  const shader = { uniforms: {}, fragmentShader: 'void main(){\n#include <map_fragment>\n#include <emissivemap_fragment>\n#include <lights_fragment_end>\n}' };
+  material.onBeforeCompile(shader, null);
+  assert.match(shader.fragmentShader, /totalEmissiveRadiance \+= diffuseColor\.rgb \* glow/);
+  const tiles = shader.uniforms.glowTile.value.flatMap(v => v.toArray()), strengths = shader.uniforms.glowStrength.value.flatMap(v => v.toArray());
+  for (const [tile, strength] of Object.entries(glow.glow)) assert.equal(strengths[tiles.indexOf(+tile)], strength, `tile ${tile}`);
+  assert.ok(glow.halos.length > 0 && glow.halos.every(h => h.node && h.at.length === 3 && h.size > 0), 'halos sit in a model frame');
 });

@@ -6,7 +6,7 @@ import {ENTRANCE_WORLD} from '../world/entrance.ts';
 import {CatmullRomCurve3,Vector3} from 'three';
 import {CELL} from '../terrain/grid.ts';
 import {
- PINEWIND_SERVICES, PINEWIND_STATION, PINEWIND_STATION_SIGN,PINEWIND_PORTAL_SIGN, PINEWIND_EGG_TIERS,
+ PINEWIND_SERVICES, PINEWIND_STATION, PINEWIND_STATION_SIGN,PINEWIND_PORTAL_SIGN, PINEWIND_EGG_TIERS, PINEWIND_GATE, PINEWIND_STATION_DECOR, PINEWIND_GATE_DECOR,
  PINEWIND_TERRACE, PINEWIND_STAIR_STEPS, PINEWIND_CREEK,
 } from './pinewind/hubLayout.ts';
 import type {AuthoredInstance, AuthoredLight} from './authoredSurface.ts';
@@ -42,6 +42,9 @@ export function pinewindSurface(rooms:readonly RestRoom[],eggs:readonly HubEgg[]
  for(const p of eggs)solids.push({at:[p.x,p.y+1.5,p.z],half:[.95,1.5,.95],yaw:0});
  // The station's two pillars behind its pad (the step-up platform is walkable ground).
  {const {x,z,yaw}=PINEWIND_STATION;for(const side of [-1,1])solids.push({at:[x+Math.cos(yaw)*1.9*side,2.4,z-Math.sin(yaw)*1.9*side],half:[.45,2.4,.45],yaw});}
+ // The scenery around the station (in its turned frame) and the gate.
+ {const {x,z,yaw}=PINEWIND_STATION,c=Math.cos(yaw),s=Math.sin(yaw);for(const d of PINEWIND_STATION_DECOR)solids.push({at:[x+d.x*c+d.z*s,d.y+d.half[1],z-d.x*s+d.z*c],half:[...d.half],yaw});}
+ for(const d of PINEWIND_GATE_DECOR)solids.push({at:[PINEWIND_GATE.x+d.x,d.y+d.half[1],PINEWIND_GATE.z+d.z],half:[...d.half],yaw:0});
  return {
   authored:{version:'pinewind-plaza-v4',instances:models,light:{...authored.light,sun:authored.light.sun as [number,number,number]} satisfies AuthoredLight},
   plan:{shapes:services.map(s=>s.ring),signs:[...services.map(s=>s.sign),PINEWIND_STATION_SIGN,PINEWIND_PORTAL_SIGN],solids},

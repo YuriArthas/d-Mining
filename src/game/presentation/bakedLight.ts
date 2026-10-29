@@ -11,7 +11,7 @@ import { DataTexture, ShaderChunk, Vector3, Vector4, type MeshStandardMaterial, 
  *  - Buildings take a lighter sky occlusion (`aoBuildings`): their walls turned from the sun live on the
  *    warm fill (albedoLift.ts), and full occlusion would darken the houses again.
  *  Only texture or vertex reads; no shadow maps or extra passes. */
-export const BAKED_LIGHT = { shadow: 0.88, ao: 1, aoBuildings: 0.5, aoDirect: 0.3 } as const;
+export const BAKED_LIGHT = { shadow: 0.7, ao: 1, aoBuildings: 0.35, aoDirect: 0.3 } as const;
 type BakedLightMode = 'map' | 'vertex';
 
 const uniforms = {
