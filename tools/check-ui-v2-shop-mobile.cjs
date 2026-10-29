@@ -1,4 +1,5 @@
-// Public phone-landscape check for UI v2 U6 (docs/draft-ui-v2.md): the shop. Over the cart the name with its level,
+// Public phone-landscape check for UI v2 U6 (docs/draft-ui-v2.md): the shop, at the counter the shop button goes to
+// (each world's surface and its halls of layers 2 and 4 have their own shelves). Over the cart the name with its level,
 // world and how deep a pickaxe digs; under it the numbers with the gain (damage ×1.5); one button with verb and price:
 // 购买, 强化 +N, 装备, 已装备; a price the player cannot pay greyed (never a missing amount); the backpack counter.
 const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
@@ -58,6 +59,7 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
 
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded' }); await ready();
+    // World 1's surface forge (layer 2 not reached): its shelf L1-L3.
     await seed(`d.wallet.balances = { gold: 4800, tech: 0, star: 0 }; d.onboarding.status = 'skipped';
       d.pickaxe.level = 3; d.equipment.toolLevel = 3; d.equipment.enhance = 0;`);
     await openShop();
@@ -70,13 +72,27 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
     await shot('01-enhance');
     await check(`Worn newest pickaxe: ${h}; button 强化 +1 · price; the damage card shows 强化后.`);
 
+    assert.ok(await button('下一件商品').isDisabled(), 'the surface shelf ends at L3');
+    await step('prev');
+    assert.match(await page.getByTestId('shop-buy').innerText(), /装备/);
+    assert.equal(await page.locator('.shop-gain').count(), 0, 'an older pickaxe shows no gain');
+    await shot('04-owned');
+    await check('The surface shelf ends at L3; an older pickaxe already bought: 装备, no gain tags.');
+    await tap(button('关闭商店'));
+
+    // Layer 2 reached: the shop button goes to its hall; its shelf L4-L6 after the worn newest L3.
+    await seed(`d.wallet.balances = { gold: 4800, tech: 0, star: 0 }; d.pickaxe.level = 3; d.equipment.toolLevel = 3; d.equipment.enhance = 0;
+      d.worldExploration['1'] = { version: 1, maxDepth: 150, unlockedDestinationIds: ['old_mine', 'fungal'] };`);
+    await openShop();
+    assert.match(await head(), /Lv\.3/);
     await step('next');
     h = await head();
+    assert.match(h, /Lv\.4/);
     assert.match(await page.getByTestId('shop-buy').innerText(), /购买\s*[\d,]+/);
     assert.match(await page.locator('.shop-gain').first().innerText(), /^×\d/);
     assert.ok(!(await buy().isDisabled()));
     await shot('02-buy');
-    await check(`Next pickaxe: ${h}; 购买 · price in green; damage gain shown as ${await page.locator('.shop-gain').first().innerText()}.`);
+    await check(`Layer 2's hall, next pickaxe: ${h}; 购买 · price in green; damage gain shown as ${await page.locator('.shop-gain').first().innerText()}.`);
 
     await step('next');
     assert.ok(await buy().isDisabled());
@@ -84,19 +100,6 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
     assert.match(await page.locator('.shop-hint').innerText(), /先买上一件/);
     await shot('03-locked');
     await check('A pickaxe further up: the same 购买 · price, greyed, with 先买上一件 under it.');
-
-    await step('prev', 4);
-    assert.match(await page.getByTestId('shop-buy').innerText(), /装备/);
-    assert.equal(await page.locator('.shop-gain').count(), 0, 'an older pickaxe shows no gain');
-    await shot('04-owned');
-    await check('An older pickaxe already bought: 装备, no gain tags.');
-
-    await step('next', 10);
-    h = await head();
-    assert.match(h, /第二世界/); assert.match(h, /Lv\.11/);
-    assert.match(await page.getByTestId('shop-buy').getAttribute('aria-label'), /科技币/);
-    await shot('05-world2');
-    await check(`A world 2 pickaxe: ${h}; priced in 科技币.`);
 
     await tap(button('切换到背包商店'));
     await page.waitForFunction(() => document.querySelector('.shop-showroom')?.dataset.category === 'backpacks');
@@ -108,8 +111,23 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
     await check(`Backpack counter: capacity card with gain ${await page.locator('.shop-gain').first().innerText()}; the same buy button.`);
     await tap(button('关闭商店'));
 
-    // Short of gold: the next pickaxe's button is grey with its price; no missing amount anywhere.
-    await seed(`d.wallet.balances = { gold: 100, tech: 0, star: 0 }; d.pickaxe.level = 3; d.equipment.toolLevel = 3; d.equipment.enhance = 3;`);
+    // World 2's surface shop: its shelf in tech coins.
+    await seed(`d.wallet.balances = { gold: 0, tech: 500, star: 0 }; d.pickaxe.level = 10; d.equipment.toolLevel = 10; d.equipment.enhance = 0;
+      d.worldProgress = { version: 2, openWorlds: [1, 2] };`);
+    await page.evaluate(() => window.__miningValidation.teleport([0, .1, 270])); await settle();
+    await page.waitForFunction(() => /科技币/.test(document.querySelector('[data-testid=coins]')?.getAttribute('aria-label') ?? ''), null, { timeout: 120000 });
+    await openShop();
+    h = await head();
+    assert.match(h, /第二世界/); assert.match(h, /Lv\.11/);
+    assert.match(await page.getByTestId('shop-buy').getAttribute('aria-label'), /科技币/);
+    await shot('05-world2');
+    await check(`World 2's surface shop: ${h}; priced in 科技币.`);
+    await tap(button('关闭商店'));
+
+    // Short of gold (layer 2's hall): the next pickaxe's button is grey with its price; no missing amount anywhere.
+    await seed(`d.wallet.balances = { gold: 100, tech: 0, star: 0 }; d.pickaxe.level = 3; d.equipment.toolLevel = 3; d.equipment.enhance = 3;
+      d.worldProgress = { version: 2, openWorlds: [1] };
+      d.worldExploration['1'] = { version: 1, maxDepth: 150, unlockedDestinationIds: ['old_mine', 'fungal'] };`);
     await openShop();
     assert.match(await page.locator('.shop-hint').innerText(), /已经强化满了/);
     assert.match(await page.getByTestId('shop-buy').innerText(), /已装备/);

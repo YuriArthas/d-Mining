@@ -32,7 +32,7 @@
    "currency": "tech",
    "ticket": {
     "currency": "gold",
-    "price": 5400000,
+    "price": 5200000,
     "toolLevel": 10,
     "materials": [
      {
@@ -785,6 +785,7 @@
   {
    "level": 1,
    "currency": "gold",
+   "shop": 0,
    "price": 0,
    "power": 10,
    "speed": 2,
@@ -806,20 +807,21 @@
   {
    "level": 2,
    "currency": "gold",
+   "shop": 0,
    "price": 120,
    "power": 15,
    "speed": 2.5,
    "enhance": [
     {
-     "price": 170,
+     "price": 200,
      "power": 17
     },
     {
-     "price": 250,
+     "price": 300,
      "power": 19
     },
     {
-     "price": 330,
+     "price": 400,
      "power": 20
     }
    ]
@@ -827,20 +829,21 @@
   {
    "level": 3,
    "currency": "gold",
-   "price": 550,
+   "shop": 0,
+   "price": 670,
    "power": 23,
    "speed": 3,
    "enhance": [
     {
-     "price": 540,
+     "price": 660,
      "power": 25
     },
     {
-     "price": 810,
+     "price": 990,
      "power": 28
     },
     {
-     "price": 1100,
+     "price": 1300,
      "power": 31
     }
    ]
@@ -848,20 +851,21 @@
   {
    "level": 4,
    "currency": "gold",
-   "price": 1800,
+   "shop": 2,
+   "price": 2200,
    "power": 34,
    "speed": 3.5,
    "enhance": [
     {
-     "price": 690,
+     "price": 840,
      "power": 38
     },
     {
-     "price": 1000,
+     "price": 1300,
      "power": 42
     },
     {
-     "price": 1400,
+     "price": 1700,
      "power": 46
     }
    ]
@@ -869,20 +873,21 @@
   {
    "level": 5,
    "currency": "gold",
-   "price": 2300,
+   "shop": 2,
+   "price": 2800,
    "power": 51,
    "speed": 4,
    "enhance": [
     {
-     "price": 9000,
+     "price": 12000,
      "power": 57
     },
     {
-     "price": 14000,
+     "price": 18000,
      "power": 63
     },
     {
-     "price": 18000,
+     "price": 25000,
      "power": 69
     }
    ]
@@ -890,20 +895,21 @@
   {
    "level": 6,
    "currency": "gold",
-   "price": 30000,
+   "shop": 2,
+   "price": 41000,
    "power": 76,
    "speed": 5,
    "enhance": [
     {
-     "price": 30000,
+     "price": 33000,
      "power": 85
     },
     {
-     "price": 45000,
+     "price": 50000,
      "power": 94
     },
     {
-     "price": 60000,
+     "price": 66000,
      "power": 100
     }
    ]
@@ -911,20 +917,21 @@
   {
    "level": 7,
    "currency": "gold",
-   "price": 100000,
+   "shop": 4,
+   "price": 110000,
    "power": 110,
    "speed": 6,
    "enhance": [
     {
-     "price": 39000,
+     "price": 42000,
      "power": 130
     },
     {
-     "price": 59000,
+     "price": 63000,
      "power": 140
     },
     {
-     "price": 78000,
+     "price": 84000,
      "power": 150
     }
    ]
@@ -932,20 +939,21 @@
   {
    "level": 8,
    "currency": "gold",
-   "price": 130000,
+   "shop": 4,
+   "price": 140000,
    "power": 170,
    "speed": 7,
    "enhance": [
     {
-     "price": 600000,
+     "price": 660000,
      "power": 190
     },
     {
-     "price": 900000,
+     "price": 990000,
      "power": 210
     },
     {
-     "price": 1200000,
+     "price": 1300000,
      "power": 230
     }
    ]
@@ -953,20 +961,21 @@
   {
    "level": 9,
    "currency": "gold",
-   "price": 2000000,
+   "shop": 4,
+   "price": 2200000,
    "power": 260,
    "speed": 8,
    "enhance": [
     {
-     "price": 3300000,
+     "price": 3000000,
      "power": 290
     },
     {
-     "price": 5000000,
+     "price": 4500000,
      "power": 320
     },
     {
-     "price": 6600000,
+     "price": 6000000,
      "power": 350
     }
    ]
@@ -974,20 +983,21 @@
   {
    "level": 10,
    "currency": "gold",
-   "price": 11000000,
+   "shop": 4,
+   "price": 10000000,
    "power": 380,
    "speed": 8,
    "enhance": [
     {
-     "price": 5000000,
+     "price": 4500000,
      "power": 430
     },
     {
-     "price": 7400000,
+     "price": 6800000,
      "power": 480
     },
     {
-     "price": 9900000,
+     "price": 9000000,
      "power": 520
     }
    ]
@@ -995,20 +1005,21 @@
   {
    "level": 11,
    "currency": "tech",
-   "price": 610,
+   "shop": 0,
+   "price": 720,
    "power": 580,
    "speed": 8,
    "enhance": [
     {
-     "price": 1900,
+     "price": 2100,
      "power": 650
     },
     {
-     "price": 2900,
+     "price": 3200,
      "power": 720
     },
     {
-     "price": 3800,
+     "price": 4300,
      "power": 780
     }
    ]
@@ -1016,20 +1027,21 @@
   {
    "level": 12,
    "currency": "tech",
-   "price": 6400,
+   "shop": 0,
+   "price": 7100,
    "power": 860,
    "speed": 8,
    "enhance": [
     {
-     "price": 18000,
+     "price": 24000,
      "power": 970
     },
     {
-     "price": 27000,
+     "price": 36000,
      "power": 1100
     },
     {
-     "price": 37000,
+     "price": 47000,
      "power": 1200
     }
    ]
@@ -1037,12 +1049,13 @@
   {
    "level": 13,
    "currency": "tech",
-   "price": 61000,
+   "shop": 2,
+   "price": 79000,
    "power": 1300,
    "speed": 8,
    "enhance": [
     {
-     "price": 150000,
+     "price": 160000,
      "power": 1500
     },
     {
@@ -1050,7 +1063,7 @@
      "power": 1600
     },
     {
-     "price": 300000,
+     "price": 310000,
      "power": 1800
     }
    ]
@@ -1058,20 +1071,21 @@
   {
    "level": 14,
    "currency": "tech",
-   "price": 500000,
+   "shop": 2,
+   "price": 520000,
    "power": 1900,
    "speed": 8,
    "enhance": [
     {
-     "price": 510000,
+     "price": 540000,
      "power": 2200
     },
     {
-     "price": 770000,
+     "price": 810000,
      "power": 2400
     },
     {
-     "price": 1000000,
+     "price": 1100000,
      "power": 2600
     }
    ]
@@ -1079,20 +1093,21 @@
   {
    "level": 15,
    "currency": "tech",
-   "price": 1700000,
+   "shop": 4,
+   "price": 1800000,
    "power": 2900,
    "speed": 8,
    "enhance": [
     {
-     "price": 660000,
+     "price": 690000,
      "power": 3300
     },
     {
-     "price": 990000,
+     "price": 1000000,
      "power": 3600
     },
     {
-     "price": 1300000,
+     "price": 1400000,
      "power": 4000
     }
    ]
@@ -1100,20 +1115,21 @@
   {
    "level": 16,
    "currency": "tech",
-   "price": 2200000,
+   "shop": 4,
+   "price": 2300000,
    "power": 4400,
    "speed": 8,
    "enhance": [
     {
-     "price": 2500000,
+     "price": 3600000,
      "power": 4900
     },
     {
-     "price": 3800000,
+     "price": 5400000,
      "power": 5400
     },
     {
-     "price": 5000000,
+     "price": 7200000,
      "power": 6000
     }
    ]
@@ -1121,20 +1137,21 @@
   {
    "level": 17,
    "currency": "tech",
-   "price": 8400000,
+   "shop": 4,
+   "price": 12000000,
    "power": 6600,
    "speed": 8,
    "enhance": [
     {
-     "price": 3300000,
+     "price": 4500000,
      "power": 7400
     },
     {
-     "price": 5000000,
+     "price": 6800000,
      "power": 8100
     },
     {
-     "price": 6600000,
+     "price": 9000000,
      "power": 8900
     }
    ]
@@ -1142,20 +1159,21 @@
   {
    "level": 18,
    "currency": "tech",
-   "price": 11000000,
+   "shop": 4,
+   "price": 15000000,
    "power": 9900,
    "speed": 8,
    "enhance": [
     {
-     "price": 8700000,
+     "price": 9000000,
      "power": 11000
     },
     {
-     "price": 13000000,
+     "price": 14000000,
      "power": 12000
     },
     {
-     "price": 17000000,
+     "price": 18000000,
      "power": 13000
     }
    ]
@@ -1163,7 +1181,8 @@
   {
    "level": 19,
    "currency": "tech",
-   "price": 29000000,
+   "shop": 4,
+   "price": 30000000,
    "power": 15000,
    "speed": 8,
    "enhance": [
@@ -1172,11 +1191,11 @@
      "power": 17000
     },
     {
-     "price": 16000000,
+     "price": 17000000,
      "power": 18000
     },
     {
-     "price": 22000000,
+     "price": 23000000,
      "power": 20000
     }
    ]
@@ -1184,20 +1203,21 @@
   {
    "level": 20,
    "currency": "tech",
-   "price": 36000000,
+   "shop": 4,
+   "price": 38000000,
    "power": 22000,
    "speed": 8,
    "enhance": [
     {
-     "price": 16000000,
+     "price": 17000000,
      "power": 25000
     },
     {
-     "price": 24000000,
+     "price": 26000000,
      "power": 27000
     },
     {
-     "price": 32000000,
+     "price": 34000000,
      "power": 30000
     }
    ]
@@ -1205,20 +1225,21 @@
   {
    "level": 21,
    "currency": "star",
-   "price": 3000,
+   "shop": 0,
+   "price": 2900,
    "power": 33000,
    "speed": 8,
    "enhance": [
     {
-     "price": 9000,
+     "price": 12000,
      "power": 37000
     },
     {
-     "price": 14000,
+     "price": 18000,
      "power": 41000
     },
     {
-     "price": 18000,
+     "price": 23000,
      "power": 45000
     }
    ]
@@ -1226,12 +1247,13 @@
   {
    "level": 22,
    "currency": "star",
-   "price": 30000,
+   "shop": 0,
+   "price": 39000,
    "power": 50000,
    "speed": 8,
    "enhance": [
     {
-     "price": 90000,
+     "price": 93000,
      "power": 56000
     },
     {
@@ -1239,7 +1261,7 @@
      "power": 62000
     },
     {
-     "price": 180000,
+     "price": 190000,
      "power": 68000
     }
    ]
@@ -1247,20 +1269,21 @@
   {
    "level": 23,
    "currency": "star",
-   "price": 300000,
+   "shop": 2,
+   "price": 310000,
    "power": 75000,
    "speed": 8,
    "enhance": [
     {
-     "price": 840000,
+     "price": 810000,
      "power": 84000
     },
     {
-     "price": 1300000,
+     "price": 1200000,
      "power": 93000
     },
     {
-     "price": 1700000,
+     "price": 1600000,
      "power": 100000
     }
    ]
@@ -1268,20 +1291,21 @@
   {
    "level": 24,
    "currency": "star",
-   "price": 2800000,
+   "shop": 2,
+   "price": 2700000,
    "power": 110000,
    "speed": 8,
    "enhance": [
     {
-     "price": 2100000,
+     "price": 2300000,
      "power": 130000
     },
     {
-     "price": 3200000,
+     "price": 3400000,
      "power": 140000
     },
     {
-     "price": 4300000,
+     "price": 4600000,
      "power": 150000
     }
    ]
@@ -1289,20 +1313,21 @@
   {
    "level": 25,
    "currency": "star",
-   "price": 7100000,
+   "shop": 4,
+   "price": 7600000,
    "power": 170000,
    "speed": 8,
    "enhance": [
     {
-     "price": 2700000,
+     "price": 2900000,
      "power": 190000
     },
     {
-     "price": 4000000,
+     "price": 4300000,
      "power": 210000
     },
     {
-     "price": 5300000,
+     "price": 5700000,
      "power": 230000
     }
    ]
@@ -1310,7 +1335,8 @@
   {
    "level": 26,
    "currency": "star",
-   "price": 8900000,
+   "shop": 4,
+   "price": 9500000,
    "power": 250000,
    "speed": 8,
    "enhance": [
@@ -1331,6 +1357,7 @@
   {
    "level": 27,
    "currency": "star",
+   "shop": 4,
    "price": 32000000,
    "power": 380000,
    "speed": 8,
@@ -1352,6 +1379,7 @@
   {
    "level": 28,
    "currency": "star",
+   "shop": 4,
    "price": 40000000,
    "power": 570000,
    "speed": 8,
@@ -1373,6 +1401,7 @@
   {
    "level": 29,
    "currency": "star",
+   "shop": 4,
    "price": 150000000,
    "power": 850000,
    "speed": 8,
@@ -1394,6 +1423,7 @@
   {
    "level": 30,
    "currency": "star",
+   "shop": 4,
    "price": 190000000,
    "power": 1300000,
    "speed": 8,
@@ -1404,180 +1434,210 @@
   {
    "tier": 1,
    "currency": "gold",
+   "shop": 0,
    "price": 0,
    "capacity": 25
   },
   {
    "tier": 2,
    "currency": "gold",
+   "shop": 0,
    "price": 18,
    "capacity": 30
   },
   {
    "tier": 3,
    "currency": "gold",
-   "price": 83,
+   "shop": 0,
+   "price": 100,
    "capacity": 35
   },
   {
    "tier": 4,
    "currency": "gold",
-   "price": 270,
+   "shop": 2,
+   "price": 330,
    "capacity": 40
   },
   {
    "tier": 5,
    "currency": "gold",
-   "price": 350,
+   "shop": 2,
+   "price": 420,
    "capacity": 50
   },
   {
    "tier": 6,
    "currency": "gold",
-   "price": 4500,
+   "shop": 2,
+   "price": 6200,
    "capacity": 60
   },
   {
    "tier": 7,
    "currency": "gold",
-   "price": 15000,
+   "shop": 4,
+   "price": 17000,
    "capacity": 70
   },
   {
    "tier": 8,
    "currency": "gold",
-   "price": 20000,
+   "shop": 4,
+   "price": 21000,
    "capacity": 80
   },
   {
    "tier": 9,
    "currency": "gold",
-   "price": 300000,
+   "shop": 4,
+   "price": 330000,
    "capacity": 90
   },
   {
    "tier": 10,
    "currency": "gold",
-   "price": 1700000,
+   "shop": 4,
+   "price": 1500000,
    "capacity": 100
   },
   {
    "tier": 11,
    "currency": "tech",
-   "price": 310,
+   "shop": 0,
+   "price": 360,
    "capacity": 110
   },
   {
    "tier": 12,
    "currency": "tech",
-   "price": 960,
+   "shop": 0,
+   "price": 1100,
    "capacity": 120
   },
   {
    "tier": 13,
    "currency": "tech",
-   "price": 9200,
+   "shop": 2,
+   "price": 12000,
    "capacity": 140
   },
   {
    "tier": 14,
    "currency": "tech",
-   "price": 75000,
+   "shop": 2,
+   "price": 78000,
    "capacity": 160
   },
   {
    "tier": 15,
    "currency": "tech",
-   "price": 260000,
+   "shop": 4,
+   "price": 270000,
    "capacity": 180
   },
   {
    "tier": 16,
    "currency": "tech",
-   "price": 330000,
+   "shop": 4,
+   "price": 350000,
    "capacity": 200
   },
   {
    "tier": 17,
    "currency": "tech",
-   "price": 1300000,
+   "shop": 4,
+   "price": 1800000,
    "capacity": 220
   },
   {
    "tier": 18,
    "currency": "tech",
-   "price": 1700000,
+   "shop": 4,
+   "price": 2300000,
    "capacity": 240
   },
   {
    "tier": 19,
    "currency": "tech",
-   "price": 4400000,
+   "shop": 4,
+   "price": 4500000,
    "capacity": 260
   },
   {
    "tier": 20,
    "currency": "tech",
-   "price": 5400000,
+   "shop": 4,
+   "price": 5700000,
    "capacity": 280
   },
   {
    "tier": 21,
    "currency": "star",
+   "shop": 0,
    "price": 1500,
    "capacity": 300
   },
   {
    "tier": 22,
    "currency": "star",
-   "price": 4500,
+   "shop": 0,
+   "price": 5900,
    "capacity": 320
   },
   {
    "tier": 23,
    "currency": "star",
-   "price": 45000,
+   "shop": 2,
+   "price": 47000,
    "capacity": 340
   },
   {
    "tier": 24,
    "currency": "star",
-   "price": 420000,
+   "shop": 2,
+   "price": 410000,
    "capacity": 360
   },
   {
    "tier": 25,
    "currency": "star",
+   "shop": 4,
    "price": 1100000,
    "capacity": 380
   },
   {
    "tier": 26,
    "currency": "star",
-   "price": 1300000,
+   "shop": 4,
+   "price": 1400000,
    "capacity": 400
   },
   {
    "tier": 27,
    "currency": "star",
+   "shop": 4,
    "price": 4800000,
    "capacity": 420
   },
   {
    "tier": 28,
    "currency": "star",
+   "shop": 4,
    "price": 6000000,
    "capacity": 450
   },
   {
    "tier": 29,
    "currency": "star",
+   "shop": 4,
    "price": 23000000,
    "capacity": 480
   },
   {
    "tier": 30,
    "currency": "star",
+   "shop": 4,
    "price": 29000000,
    "capacity": 500
   }
@@ -1593,7 +1653,7 @@
   {
    "slot": 5,
    "currency": "star",
-   "price": 640000,
+   "price": 620000,
    "world": 3,
    "layer": 3
   }

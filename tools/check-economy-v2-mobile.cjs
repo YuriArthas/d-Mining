@@ -109,7 +109,7 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
     await tap(button('完成')); await tap(button('关闭卵石蛋'));
     await check('Pebble egg: price in gold, outcomes with +% bonuses, hatch result says 金币收入.');
 
-    // Shop: next tool in gold; a world 2 tool in tech coins.
+    // Shop: the furthest shop open (layer 2's hall: its shelf L4-L6, the worn newest L3 first); the next tool in gold.
     await tap(button('商店'));
     await page.locator('.shop-showroom, .shop-category').first().waitFor({ timeout: 30000 });
     if (await page.locator('.shop-category[data-category=tools]').isVisible().catch(() => false)) await tap(page.locator('.shop-category[data-category=tools]'));
@@ -123,11 +123,12 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
     await check('Shop: the worn newest pickaxe shows 强化 +1 with its gold price; buying it renames the pickaxe +1 and offers +2.');
     await tap(button('下一件商品')); await page.waitForTimeout(1500); await shot('08-shop-next-tool');
     assert.match(await page.getByTestId('shop-buy').getAttribute('aria-label'), /金币/);
-    for (let i = 0; i < 7; i++) await tap(button('下一件商品'));
-    await page.waitForTimeout(1500); await shot('09-shop-world2-tool');
-    assert.match(await page.getByTestId('shop-buy').getAttribute('aria-label'), /科技币/);
+    for (let i = 0; i < 2; i++) await tap(button('下一件商品'));
+    await page.waitForTimeout(1500); await shot('09-shop-shelf-end');
+    assert.match(await page.locator('.shop-head').innerText(), /Lv\.6/); assert.ok(await button('下一件商品').isDisabled(), 'layer 2 shelf ends at L6');
+    assert.match(await page.getByTestId('shop-buy').getAttribute('aria-label'), /金币/);
     await tap(button('关闭商店'));
-    await check('Shop: world 1 tools are priced in gold; level 11 (world 2) is priced in 科技币 with the tech coin icon.');
+    await check('Shop: the shop button goes to layer 2\'s hall, whose shelf runs L3 (worn) to L6, priced in gold.');
 
     // World 1 rest halls at their new depths.
     const rooms = await page.evaluate(() => window.__miningValidation.snapshot().content.rooms.slice(0, 2));
@@ -143,6 +144,12 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
     await page.waitForFunction(() => /科技币/.test(document.querySelector('[data-testid=coins]')?.getAttribute('aria-label') ?? ''));
     assert.equal(await page.getByTestId('coins').innerText(), '2600');
     await shot('12-hud-world2-tech');
+    // World 2's own shop: its surface shelf, priced in tech coins.
+    await tap(button('商店')); await page.locator('.shop-showroom').waitFor({ timeout: 120000 }); await page.waitForTimeout(2500);
+    assert.match(await page.locator('.shop-head').innerText(), /Lv\.11/);
+    assert.match(await page.getByTestId('shop-buy').getAttribute('aria-label'), /科技币/); await shot('12b-world2-shop');
+    await tap(button('关闭商店'));
+    await check('World 2: its surface shop sells level 11, priced in 科技币.');
     await page.evaluate(() => window.__miningValidation.teleport([0, 1, 283.2]));
     await settle(); await page.getByRole('dialog', { name: '世界传送门' }).waitFor(); await shot('13-world3-ticket');
     const ticket = await page.locator('.portal-world[data-state=next] .portal-ticket').innerText();

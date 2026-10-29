@@ -11,9 +11,12 @@ export type LayerEconomy = Readonly<{
   world: WorldNumber; layer: number; from: number; deepAt: number | null; gate: number; oreChance: number; capsuleCoins: number;
   rock: Block; deep: Block; ores: readonly Readonly<Block & { weight: number }>[];
 }>;
-export type ToolEconomy = Readonly<{ level: number; currency: CurrencyId; price: number; power: number; speed: number;
+/** `shop`: the layer of its world whose shop sells it, 0 (the surface), 2 or 4 (those halls); each shop its own shelf. */
+export type ToolEconomy = Readonly<{ level: number; currency: CurrencyId; shop: ShopLayer; price: number; power: number; speed: number;
   enhance: readonly Readonly<{ price: number; power: number }>[] }>;
-export type BagEconomy = Readonly<{ tier: number; currency: CurrencyId; price: number; capacity: number }>;
+export type BagEconomy = Readonly<{ tier: number; currency: CurrencyId; shop: ShopLayer; price: number; capacity: number }>;
+export const SHOP_LAYERS = [0, 2, 4] as const;
+export type ShopLayer = typeof SHOP_LAYERS[number];
 export type TicketEconomy = Readonly<{ currency: CurrencyId; price: number; toolLevel: number;
   materials: readonly Readonly<{ itemId: string; count: number; world: WorldNumber; layer: number }>[] }>;
 export type EggEconomy = Readonly<{ id: string | null; world: WorldNumber; layer: number; premium: boolean; currency: CurrencyId; price: number;
@@ -86,6 +89,11 @@ export function validateEconomy(e: Economy): Economy {
     t.enhance.forEach(x => { round(x.price, '强化价格'); round(x.power, '强化伤害'); });
   });
   check(e.bags.length === 30 && e.bags.every((b, i) => b.tier === i + 1 && b.currency === currencyOf(Math.floor(i / 10) + 1)), '背包 30 档，每世界 10 档');
+  // Each world's shelves go surface, layer 2, layer 4, every shop with something on it.
+  for (const list of [e.tools, e.bags] as readonly (readonly { shop: number }[])[]) for (let w = 0; w < 3; w++) {
+    const shops = list.slice(w * 10, w * 10 + 10).map(x => x.shop);
+    check(shops.every((x, i) => (SHOP_LAYERS as readonly number[]).includes(x) && (i === 0 || x >= shops[i - 1])) && SHOP_LAYERS.every(x => shops.includes(x)), '商店分层错：每个世界按地表、第 2 层、第 4 层排，每处都有货');
+  }
   rising(e.bags.map(b => b.capacity), '背包容量');
   e.bags.forEach((b, i) => { round(b.price, '背包价格'); check(i === 0 ? b.price === 0 : i % 10 === 0 || b.price > e.bags[i - 1].price, `背包第 ${b.tier} 档价格没有上升`); });
   check(e.start.toolLevel === 1 && e.start.bagTier === 1 && e.start.petSlots > 0, '开局配置错');

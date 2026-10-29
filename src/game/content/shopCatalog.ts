@@ -1,11 +1,12 @@
 import { pickaxeStats } from '../logic/Pickaxe.ts';
-import { ECONOMY, type CurrencyId } from './economy.ts';
+import { ECONOMY, type CurrencyId, type ShopLayer } from './economy.ts';
 
 import { tr } from '../i18n/i18n.ts';
 export type ShopCategory = 'tools' | 'backpacks';
 /** How the miner works a tool: a pick's overhead swing, or a drill held out and shaking. */
 export type ToolMotion = 'swing' | 'drill';
-export type ShopItem = Readonly<{ id: string; category: ShopCategory; level: number; model: string; name: string; description: string; price: number; currency: CurrencyId; power?: number; speed?: number; capacity?: number; motion?: ToolMotion }>;
+/** `world` and `shop`: the world it belongs to and the layer of that world whose shop sells it (0 the surface, 2, 4). */
+export type ShopItem = Readonly<{ id: string; category: ShopCategory; level: number; model: string; name: string; description: string; price: number; currency: CurrencyId; world: 1 | 2 | 3; shop: ShopLayer; power?: number; speed?: number; capacity?: number; motion?: ToolMotion }>;
 type Entry = readonly [name: string, description: string, motion?: ToolMotion];
 // World 1 (levels 1-10): joke items from home and kitchen, level 1 a plain pick so a new player knows what it is;
 // world 2 (11-20): machines; world 3 (21-30): fantasy and space.
@@ -80,7 +81,7 @@ export function shopTools(): readonly ShopItem[] {
   return ECONOMY.tools.map((tool,i) => {
     const level=i+1,stats=pickaxeStats(level),[name,description]=TOOLS[i];
     return Object.freeze({id:`tool-${level}`,category:'tools' as const,level,model:equipmentModel('tools',level),name,description,
-      price:tool.price,currency:tool.currency,power:stats.power,speed:stats.speed,motion:toolMotion(level)});
+      price:tool.price,currency:tool.currency,world:Math.ceil(level/10) as 1|2|3,shop:tool.shop,power:stats.power,speed:stats.speed,motion:toolMotion(level)});
   });
 }
 /** The 30 backpacks, ten per world, counted in blocks (economy.json). */
@@ -88,6 +89,6 @@ export function shopBackpacks(): readonly ShopItem[] {
   return ECONOMY.bags.map((bag,i)=>{
     const [name,description]=BAGS[i];
     return Object.freeze({id:i===0?'starter-bag':`journey-bag-${i+1}`,category:'backpacks' as const,
-      level:i+1,model:equipmentModel('backpacks',i+1),name,description,capacity:bag.capacity,price:bag.price,currency:bag.currency});
+      level:i+1,model:equipmentModel('backpacks',i+1),name,description,capacity:bag.capacity,price:bag.price,currency:bag.currency,world:Math.ceil((i+1)/10) as 1|2|3,shop:bag.shop});
   });
 }

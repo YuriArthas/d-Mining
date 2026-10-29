@@ -19,8 +19,9 @@ export const REACTOR_HALL = {
   spawn: [0, 0, 12],
   stalls: {
     sell: { at: [-12, 0, 15.2], ring: [-12, 0, 11.4] },
-    shop: { at: [12, 0, 15.2], ring: [12, 0, 11.4] },
   },
+  /** Where a shop stall would stand: crates (only layers 2 and 4 have a shop, 2026-10-29). */
+  spare: [12, 0, 15.2] as const,
   board: [0, 7.6, -17.4],
   layout: {
     /** The molten core: centre and radius; it sits half in the reactor facade on the north wall. */
@@ -41,7 +42,8 @@ export const REACTOR_HALL = {
       pool(0, 11, 5.5, '#fff0e0', .35),
     ] as readonly Pool[],
   },
-  /** Real-time lights: the core, both cooling towers, both stalls and a soft fill over the spawn. */
+  /** Real-time lights: the core, both cooling towers, the stall and the crates in the spare place, a soft fill over
+   *  the spawn. */
   lights: [
     { at: [0, 10, -12.5], color: '#ff6a1e', intensity: 170, distance: 32 },
     { at: [-12.5, 6, -12], color: '#ff8a3a', intensity: 80, distance: 20 },

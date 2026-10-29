@@ -58,19 +58,26 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
   const [dismissedShop, setDismissedShop] = useState<string | null>(null);
   const [lastShop, setLastShop] = useState(state.shopId);
   if (lastShop !== state.shopId) { setLastShop(state.shopId); setDismissedShop(null); }
-  // The shop opens in place from the HUD (its counter chosen by the button), or on walking into a shop: the forge
-  // opens on pickaxes, the pack shop on backpacks.
+  // The shop opens at a counter: on walking into one (the forge opens on pickaxes, the pack shop on backpacks), or
+  // where the shop buttons take the player (the HUD's: the furthest shop open in this world; the bag's: where the
+  // next pickaxe or backpack is sold), on the page asked for.
   const [shopRequest, setShopRequest] = useState<ShopCategory | null>(null);
   const [reborn, setReborn] = useState<{ count: number; multiplier: number } | null>(null);
   const endCelebration = useCallback(() => setReborn(null), []);
   const shop = useSyncExternalStore(shopView.subscribe, shopView.getSnapshot);
-  const shopOpen = !modal && (shopRequest !== null || (state.shopId !== null && dismissedShop !== state.shopId));
+  const shopOpen = !modal && state.shopId !== null && (shopRequest !== null || dismissedShop !== state.shopId);
   useEffect(() => { input.reset(); if (shopOpen) { if (!shopView.active) showShopCategory(shopView, session.getSnapshot(), shopRequest ?? state.shopCategory); } else shopView.close(); }, [shopOpen, shopRequest, shopView, session, input, state.shopCategory]);
 
   const open = (next: Modal) => { input.reset(); setModal(next); };
   const close = () => { input.reset(); session.setAutoHatch(false); setModal(null); surface.current?.focus(); };
   const closeShop = () => { input.reset(); setShopRequest(null); setDismissedShop(state.shopId); shopView.close(); surface.current?.focus(); };
-  const openShop = (category: ShopCategory) => { input.reset(); setModal(null); setShopRequest(category); if (shopView.active) showShopCategory(shopView, state, category); };
+  const openShop = (category: ShopCategory, aim: 'furthest' | 'next' = 'furthest') => {
+    input.reset(); setModal(null);
+    const trip = session.goToShop(category, aim);
+    if (trip === 'unavailable') return;
+    setDismissedShop(null); setShopRequest(category);
+    if (trip === 'here' && shopView.active) showShopCategory(shopView, session.getSnapshot(), category);
+  };
   const pets = useSyncExternalStore(session.pets.subscribe, session.pets.getSnapshot);
   const standEgg = state.eggId ? pets.eggs.find(egg => egg.id === state.eggId) : undefined;
   const eggName = state.eggId ? standEgg ? standEgg.unlocked ? standEgg.name : MYSTERY_EGG_NAME : tr('宠物蛋') : null;
@@ -97,12 +104,12 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
     {!modal && !shopOpen && <Hud session={session} system={system} prompts={prompts} tipHidden={blocked || !focused}
       actions={{
         openPets: () => { session.dismissTip('pets'); open({ kind: 'bag', tab: 'pets' }); }, openMinerals: () => open({ kind: 'bag', tab: 'ores' }),
-        openShop: () => { session.dismissTip('shop'); openShop('tools'); }, openBackpacks: () => openShop('backpacks'),
+        openShop: () => { session.dismissTip('shop'); openShop('tools'); }, openBackpacks: () => openShop('backpacks', 'next'),
         openRewards: () => open({ kind: 'rewards', tab: rewardsTabFor(state.rewards) }), openHelp: () => open({ kind: 'help' }),
         openRebirth: () => open({ kind: 'rebirth' }),
       }} />}
     {!modal && !shopOpen && <Controls input={input} surface={surface} />}
-    {modal?.kind === 'bag' && <BagSheet session={session} tab={modal.tab} onTab={tab => setModal({ kind: 'bag', tab })} onClose={close} onShop={openShop} />}
+    {modal?.kind === 'bag' && <BagSheet session={session} tab={modal.tab} onTab={tab => setModal({ kind: 'bag', tab })} onClose={close} onShop={category => openShop(category, 'next')} />}
     {stationOpen && <StationSheet session={session} onClose={() => { input.reset(); setStationDismissed(true); surface.current?.focus(); }} />}
     {portalOpen && !stationOpen && <PortalSheet session={session} onClose={() => { input.reset(); setPortalDismissed(true); surface.current?.focus(); }} />}
     {modal?.kind === 'rewards' && <RewardsSheet session={session} tab={modal.tab} onTab={tab => setModal({ kind: 'rewards', tab })} onClose={close} />}

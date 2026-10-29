@@ -18,6 +18,7 @@ export function buildHall(getProp: GetProp) {
     stalactite: ['#2e2729', '#4a3834'], joint: '#1e1e22', stones: ['#5a5c62'], curb: '#f2c230',
   }, [
     ...L.towers.map(([x, z]) => ({ x, z, radius: 2.8 })),
+    { x: HALL.spare[0], z: HALL.spare[2], radius: 3.4 },
   ]);
   const { r, box, add, place, HALF } = kit;
   kit.useProps(getProp);
@@ -33,6 +34,14 @@ export function buildHall(getProp: GetProp) {
   tech.base({ hall: HALL, lanterns: L.lanterns, lamps: L.lamps, loop: L.loop, accent: '#ff7a2c',
     arrows: [[-6, 14.2, Math.PI / 2], [6, 14.2, -Math.PI / 2], [0, -14.6, 0], [-14.6, 0, 0], [14.6, 0, 0]] });
   tech.lane([[0, -L.loop.half], [0, -17.6]], 2.2, '#e8e6e0', tech.laneMaterial);
+  // In the spare stall's place (this layer has no shop): a few crate stacks.
+  {
+    const [x, , z] = HALL.spare;
+    for (const [dx, dz, yaw, scale] of [[-1.3, .4, .2, 1.15], [1.2, .2, -.35, 1], [0, 1.6, 1.4, .9]] as const) {
+      place('Crate_Stack', [x + dx, 0, z + dz], yaw, scale);
+      box([x + dx, .7 * scale, z + dz], [.9 * scale, .7 * scale, .9 * scale], yaw);
+    }
+  }
   tech.hazard([-7.6, -17.9], [7.6, -17.9], .7, tech.paintMaterial);
 
   // REACTOR FACADE on the north wall, the CORE in it: a faceted ball of lava plates and dark crust (unlit, its

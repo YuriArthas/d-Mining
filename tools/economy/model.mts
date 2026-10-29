@@ -5,15 +5,19 @@
 //   node tools/economy/model.mts calibrate   tune the per-layer budgets K to TARGET, write k3.json, plan.json, economy.json
 //   node tools/economy/model.mts export      rebuild economy.json and plan.json from k3.json
 //   node tools/economy/model.mts report      simulate economy.json and print arrival times and upgrade gaps
-// Player knobs: AIM (s per block spent aiming), SELL (s per trip to sell), PM (pull multiplier).
+// Player knobs: AIM (s per block spent re-aiming), SELL (s per trip to sell; default: the measured trip of each world),
+// PM (pull multiplier), DAY (minutes played per day: the daily lucky coins), UI (s per menu choice), CAPSULE=0.
 import { writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { LAYER_ITEMS } from '../../src/game/content/journeyResources.ts';
 import { EGG_DEFINITIONS } from '../../src/game/content/pets.ts';
+import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
+import { worldPortal } from '../../src/game/content/worldJourney.ts';
 
 const ECONOMY_FILE = new URL('../../src/game/content/economy.json', import.meta.url);
 const K_FILE = new URL('./k3.json', import.meta.url), PLAN_FILE = new URL('./plan.json', import.meta.url);
-const AIM=+(process.env.AIM??.35), SELL=+(process.env.SELL??15), HATCH=3, PM=+(process.env.PM??1);
+const AIM=+(process.env.AIM??.35), PM=+(process.env.PM??1);
+const SELL=process.env.SELL?+process.env.SELL:null;
 export const N=21; export const world=(i:number)=>Math.floor(i/7), local=(i:number)=>i%7;
 /** Two significant figures: 468 -> 470, 4 680 -> 4 700, never below 1. */
 export const nice=(x:number)=>{if(x<10)return Math.max(1,Math.round(x));const p=10**(Math.floor(Math.log10(x))-1);return Math.round(x/p)*p;};
@@ -54,6 +58,12 @@ const TICKET_MATERIALS:Record<number,{layer:number;ore:number;count:number}[]>={
   2:[{layer:3,ore:1,count:20},{layer:5,ore:1,count:15},{layer:6,ore:1,count:10}],
   3:[{layer:6,ore:0,count:30},{layer:11,ore:1,count:20},{layer:13,ore:1,count:15}],
 };
+// Each world's shops: its surface (layer 0) and the halls of layers 2 and 4, every one with its own shelf. A pickaxe is
+// sold at the deepest of them a player has reached when the model buys it (on the layer whose way out needs it), so
+// the furthest shop open always has the next pickaxe; a bag stands with the pickaxe of its rank.
+const SHOP_LAYERS=[0,2,4];
+const exitOf=(k:number)=>local(k)<6?gate(k+1):(world(k)+1)*10;
+const shopLayer=(L:number)=>{const k=Array.from({length:N},(_,i)=>i).find(i=>exitOf(i)>=L)!;return [...SHOP_LAYERS].reverse().find(x=>x<=local(k))!;};
 const CAPSULE_SECONDS=120;   // the capsule's coin prize: about this much income at the deepest layer reached
 // minutes per layer for a typical player (layer i -> i+1; the last of each world: to the next world / the end)
 const TARGET=[7,8,12,15,18,25,35, 12,20,30,38,42,46,52, 18,30,45,58,65,70,74];
@@ -91,11 +101,11 @@ export function build(K:number[]){
         capsuleCoins:nice(CAPSULE_SECONDS*arrivalIncome(i)),
         rock:{itemId:items.rock.itemId,hp:b.rock.hp,price:b.rock.v},deep:{itemId:items.deep.itemId,hp:b.deep.hp,price:b.deep.v},
         ores:[b.a,b.b].map((o,j)=>({itemId:items.ores[j].itemId,hp:o.hp,price:o.v,weight:ORE_WEIGHTS[j]}))};}),
-    tools:Array.from({length:30},(_,k)=>{const L=k+1;return {level:L,currency:currency(Math.floor(k/10)),price:L===1?0:tool[L],power:toolPower(L),speed:toolSpeed(L),
+    tools:Array.from({length:30},(_,k)=>{const L=k+1;return {level:L,currency:currency(Math.floor(k/10)),shop:shopLayer(L),price:L===1?0:tool[L],power:toolPower(L),speed:toolSpeed(L),
       // enhancements cost a share of the next pickaxe; the last of a world (L10, L20) has its next one in another
       // currency, so its share is of this one's price grown like a level (×1.5)
       enhance:L<30?ENH.cost.map((cost,e)=>({price:nice((L%10?tool[L+1]:tool[L]*1.5)*cost),power:toolPower(L,e+1)})):[]};}),
-    bags:BAG.map((capacity,t)=>({tier:t+1,currency:currency(Math.floor(t/10)),price:bag[t],capacity})),
+    bags:BAG.map((capacity,t)=>({tier:t+1,currency:currency(Math.floor(t/10)),shop:shopLayer(t+1),price:bag[t],capacity})),
     petSlots:SLOT_LAYERS.map((i,k)=>({slot:4+k,currency:currency(world(i)),price:slot[k],world:world(i)+1,layer:local(i)})),
     eggs:SLOTS.map((s,k)=>{const d=eggDefinition(s);return {id:d?.id??null,world:world(s.layer)+1,layer:local(s.layer),premium:s.premium,currency:currency(world(s.layer)),price:egg[k],
       pets:WT.map((weight,r)=>({id:d?.pets[r][0]??null,weight,bonusPct:bonusPct(s,r),miningPct:miningPct(s,r)}))};}),
@@ -108,6 +118,34 @@ export function build(K:number[]){
   return {economy,plan:{pulls} as Plan};
 }
 
+// ---- the player's time outside the swings (P6, docs/phase-economy-calibration-20261029.md) -----------------------
+// Measured (docs/phase-economy-calibration-20261029.md): on the public build, the sell button's trip (teleport, sold
+// on entering the ring) 0.2 s and the station's trip to a hall 0.8 s; the rest with the game's own logic and no
+// rendering (measure-headless.mts), a bot playing stretches of layers in each world. The swing cadence is exact
+// (AttackCooldown), so the player's re-aim (AIM, an assumption) overlaps the wait for the next swing: a block costs
+// its swings plus whatever of AIM and MOVE (stepping to the next face, the broken block's removal) outlasts one swing.
+const SOLD=.2, TELEPORT=.8, TAP=.5, WALK=6, MOVE=.1;
+const UI=+(process.env.UI??1.5);                          // s per menu choice: a hall at the station, a shop row
+const DAY=+(process.env.DAY??120)*60;                      // s played per day: the daily lucky coins
+const CAPSULE=process.env.CAPSULE!=='0';                     // CAPSULE=0: no lucky coins (to see what they are worth)
+// a pull: the reveal by rarity (EggSheet HATCH_MS: 1.0 / 1.4 / 2.0 / 2.0 s, ≈1.2 s by the odds) and the press
+const HATCH=2;
+// on foot to the teleport station from where the sell, shop and egg buttons land the player (world 1 over the bridge)
+const SURFACE=[{sale:7.8,shop:7.7,egg:8},{sale:5,shop:5.7,egg:5.3},{sale:5.1,shop:5.7,egg:5.6}];
+// a bagful sold while mining a layer, measured whole: the button, the walk, the station, back down the pit to the face
+const LAYER_TRIP=[16.5,18.6,20.2];
+const sellTrip=(w:number)=>SELL??LAYER_TRIP[w]+(UI-1.5);
+/** Selling during a descent: the same, then straight back down the shaft (fall added by the caller). */
+const descentTrip=(w:number)=>SELL??TAP+SOLD+SURFACE[w].sale+UI+TELEPORT+1;
+// a round of buying adds the choices and the shop's (or the egg's) way to the station instead of the ring's
+const shopExtra=(w:number)=>2*UI+SURFACE[w].shop-SURFACE[w].sale, eggExtra=(w:number)=>UI+SURFACE[w].egg-SURFACE[w].sale;
+const PORTAL=[1,2,3].map(id=>{const st=GAME_CONTENT.session.stations.find(x=>x.worldId===id)!.zone,p=worldPortal(id as 1).zone;return Math.hypot(p.x-st.x,p.z-st.z);});
+const portalTrip=(w:number)=>PORTAL[w]/WALK+UI+TELEPORT+10.7/WALK;
+/** Buying at a hall's shop after selling: the shop button there, the choices, back to the surface and on to the
+ *  station (from the spawn, instead of from the ring). */
+const hallShopExtra=(w:number)=>TAP+TELEPORT+2*UI+TAP+TELEPORT+10.7/WALK-SURFACE[w].sale;
+const fall=(h:number)=>h<=28*28/48?Math.sqrt(2*h/24):28/24+(h-28*28/48)/28;
+
 // ---- simulate: a typical player through economy.json ----------------------------------------------------------
 type Pet={w:number;b:number;m:number;id:string;gold?:boolean};
 export function simulate(E:Economy,plan:Plan,seed:number,trace=false,keep:Pet[]=[],mult=1,slots0=E.start.petSlots){
@@ -116,48 +154,84 @@ export function simulate(E:Economy,plan:Plan,seed:number,trace=false,keep:Pet[]=
   const eggLayer=E.eggs.map(e=>(e.world-1)*7+e.layer),slotLayer=E.petSlots.map(p=>(p.world-1)*7+p.layer);
   const target=(j:number)=>Math.max(1,Math.round(plan.pulls[j]*PM));
   let T=0,lv=1,enh=0,bag=0,layer=0,slots=slots0,lastImp=0,maxGap=0;const cur=[0,0,0],pets:Pet[]=[...keep],arrive=[0],ev:string[]=[],hatched=E.eggs.map(()=>0),gapAt:number[]=[];
+  // the reward page and the capsule: lucky coins per play day, spins, the mining boost, double sale until sellUntil
+  let lucky=0,day=-1,signins=0,boosted=false,sellUntil=0,spins=0,boostedAt:number|null=null,farmed=0;const online:number[]=[];
+  // ticket minerals kept in the material store (expected counts)
+  const stored:Record<string,number>={};
   const w=()=>world(layer);
   // "equip best": this world's currency first, then mining for the slots left
   const equipped=()=>[...pets].sort((a,b)=>(b.w===w()?b.b:0)-(a.w===w()?a.b:0)||b.m-a.m).slice(0,slots);
   const team=()=>1+equipped().filter(p=>p.w===w()).reduce((a,p)=>a+p.b,0);
-  const mining=()=>1+equipped().reduce((a,p)=>a+p.m,0);
+  const mining=()=>(boosted?E.capsule.miningSpeedMultiplier:1)*(1+equipped().reduce((a,p)=>a+p.m,0));
   const power=()=>enh?E.tools[lv-1].enhance[enh-1].power:E.tools[lv-1].power;
   const CAP=4*E.tools[0].speed;
-  const bt=(hp:number)=>{const base=E.tools[lv-1].speed,m=mining(),speed=Math.min(CAP,base*m);return Math.ceil(hp/(power()*base*m/speed))/speed+AIM;};
-  const rate=(i:number)=>{const l=L[i],c=l.oreChance,wt=l.ores.reduce((a,o)=>a+o.weight,0);let v=0,t=0;
-    for(const [x,q] of [[l.rock,1-c],...l.ores.map(o=>[o,c*o.weight/wt] as const)] as const){v+=q*x.price;t+=q*bt(x.hp);}return {v:v*team()*mult,t};};
+  // a block: its swings, and whatever of the re-aim and MOVE outlasts one swing (none re-aims digging straight down)
+  const bt=(hp:number,aim=AIM)=>{const base=E.tools[lv-1].speed,m=mining(),speed=Math.min(CAP,base*m);return Math.ceil(hp/(power()*base*m/speed))/speed+Math.max(0,aim+MOVE-1/speed);};
+  const rate=(i:number,aim=AIM)=>{const l=L[i],c=l.oreChance,wt=l.ores.reduce((a,o)=>a+o.weight,0);let v=0,t=0;
+    for(const [x,q] of [[l.rock,1-c],...l.ores.map(o=>[o,c*o.weight/wt] as const)] as const){v+=q*x.price;t+=q*bt(x.hp,aim);}return {v:v*team()*mult,t};};
+  /** Income from mining that starts now and lasts dt: the capsule's double sale pays for the part of it inside. */
+  const earn=(v:number,dt:number)=>v*(1+(E.capsule.sellMultiplier-1)*Math.min(1,Math.max(0,(sellUntil-T)/Math.max(dt,1e-9))));
   const imp=(what:string)=>{const g=T-lastImp;if(g>maxGap){maxGap=g;}gapAt.push(g);lastImp=T;if(trace)ev.push(`${(T/60).toFixed(1)}m ${what}`);};
   const pay=(c:number,cw=w())=>{cur[cw]-=c;};
   const wantEgg=(j:number)=>eggLayer[j]<=layer&&world(eggLayer[j])===w()&&hatched[j]<target(j)&&(eggLayer[j]===layer||E.eggs[j].premium);
+  const deepestShop=()=>[...SHOP_LAYERS].reverse().find(x=>x<=local(layer))!;
   const enhPrice=()=>enh<3&&E.tools[lv-1].enhance.length?E.tools[lv-1].enhance[enh].price:Infinity;
+  // the store takes a ticket mineral while a world not yet open still lacks it
+  const needed=(item:string)=>E.worlds.filter(x=>x.id-1>w()&&x.ticket).flatMap(x=>x.ticket!.materials).filter(m=>m.itemId===item).reduce((a,m)=>a+m.count,0);
+  const collect=(i:number,blocks:number)=>{const l=L[i],wt=l.ores.reduce((a,o)=>a+o.weight,0);
+    for(const o of l.ores){const room=needed(o.itemId)-(stored[o.itemId]??0);if(room>0)stored[o.itemId]=(stored[o.itemId]??0)+Math.min(room,blocks*l.oreChance*o.weight/wt);}};
+  /** Mine the next world's missing ticket minerals where they are found, on the way out of this world. */
+  const farmTicket=()=>{for(const m of E.worlds[w()+1].ticket!.materials){const lack=m.count-(stored[m.itemId]??0);if(lack<=1e-9)continue;
+    const i=(m.world-1)*7+m.layer,l=L[i],wt=l.ores.reduce((a,o)=>a+o.weight,0),o=l.ores.find(x=>x.itemId===m.itemId)!,blocks=lack/(l.oreChance*o.weight/wt),r=rate(i);
+    const dt=blocks*r.t+Math.ceil(blocks/E.bags[bag].capacity)*sellTrip(world(i))+UI+TELEPORT+(world(i)!==w()?2*portalTrip(w()):0);
+    if(world(i)===w())cur[w()]+=earn(blocks*r.v,dt);
+    collect(i,blocks);farmed+=dt;T+=dt;}};
+  /** The day's lucky coins (sign-in, then online at 5/10/20/30 min), spun at the capsule in world 1: at once there,
+   *  from later worlds once a handful has gathered (a trip through the portal and back). */
+  const rewards=()=>{if(!CAPSULE)return;const d=Math.floor(T/DAY);if(d>day){day=d;online.length=0;lucky+=E.luckyCoins.signin[signins++%E.luckyCoins.signin.length];}
+    for(const o of E.luckyCoins.online)if(T-d*DAY>=o.minutes*60&&!online.includes(o.minutes)){online.push(o.minutes);lucky+=o.coins;}
+    if(!lucky||(w()>0&&lucky<7))return;
+    if(w()>0)T+=2*portalTrip(w());
+    const prizes=E.capsule.prizes,total=prizes.reduce((a,p)=>a+p.weight,0);
+    for(;lucky>0;lucky--){T+=UI;spins++;let r=rnd()*total,q=0;for(;q<prizes.length-1&&r>=prizes[q].weight;q++)r-=prizes[q].weight;
+      const prize=prizes[q].id,coins=L[layer].capsuleCoins;
+      if(prize==='coins')cur[w()]+=coins;
+      else if(prize==='mining'){if(boosted)cur[w()]+=coins;else{boosted=true;boostedAt=T;}}
+      else if(prize==='sell')sellUntil=Math.max(sellUntil,T)+E.capsule.timedSeconds;}};
   while(T<30*3600){
+    rewards();
+    let shop=-1,eggs=false;
     for(let k=0;k<400;k++){const opts:[string,number,number][]=[];
       E.eggs.forEach((e,j)=>{if(wantEgg(j))opts.push(['egg',e.price,j]);});
-      if(lv<exitLevel(layer))opts.push(['tool',E.tools[lv].price,0]);
+      // the next pickaxe once its shop is reached (its hall on this world's way down)
+      if(lv<exitLevel(layer)&&E.tools[lv].shop<=local(layer))opts.push(['tool',E.tools[lv].price,0]);
       if(enhPrice()<Infinity)opts.push(['enh',enhPrice(),0]);
       const si=slotLayer.findIndex((l,q)=>l<=layer&&slots===3+q&&world(l)===w());if(si>=0)opts.push(['slot',E.petSlots[si].price,si]);
       const ok=opts.filter(o=>o[1]<=cur[w()]).sort((a,b)=>a[1]-b[1]);if(!ok.length)break;const [what,c,j]=ok[0];pay(c);
-      if(what==='egg'){T+=HATCH;hatched[j]++;const pool=E.eggs[j].pets,total=pool.reduce((a,p)=>a+p.weight,0);let r=rnd()*total,q=0;for(;q<pool.length-1&&r>=pool[q].weight;q++)r-=pool[q].weight;
+      if(what==='egg'){eggs=true;T+=HATCH;hatched[j]++;const pool=E.eggs[j].pets,total=pool.reduce((a,p)=>a+p.weight,0);let r=rnd()*total,q=0;for(;q<pool.length-1&&r>=pool[q].weight;q++)r-=pool[q].weight;
         const worth=()=>{const r=rate(layer);return r.v/r.t;},before=worth(),b=pool[q].bonusPct/100,m=pool[q].miningPct/100,id=`${j}:${q}`;pets.push({w:w(),b,m,id});const same=pets.filter(p=>p.id===id&&!p.gold);
         if(same.length>=E.golden.need){for(const p of same.slice(0,E.golden.need))pets.splice(pets.indexOf(p),1);pets.push({w:w(),b:b*E.golden.bonusMultiplier,m:m*E.golden.bonusMultiplier,id,gold:true});}
         if(worth()>before*1.05)imp(`egg${eggLayer[j]}${E.eggs[j].premium?'P':''} r${q}`);}
-      else if(what==='tool'){lv++;enh=0;imp(`L${lv}`);} else if(what==='enh'){enh++;imp(`L${lv}+${enh}`);} else {slots++;imp(`slot${slots}`);}}
+      else{if(what!=='slot')shop=Math.max(shop,what==='tool'?E.tools[lv].shop:deepestShop());if(what==='tool'){lv++;enh=0;imp(`L${lv}`);} else if(what==='enh'){enh++;imp(`L${lv}+${enh}`);} else {slots++;imp(`slot${slots}`);}}}
     const nb=bag+1,nbw=nb<E.bags.length?E.currencies.findIndex(c=>c.id===E.bags[nb].currency):9;
-    if(nb<E.bags.length&&nbw<=w()&&E.bags[nb].price<=cur[nbw]*.3){pay(E.bags[nb].price,nbw);bag=nb;imp(`bag${E.bags[bag].capacity}`);}
+    if(nb<E.bags.length&&nbw<=w()&&(nbw<w()||E.bags[nb].shop<=local(layer))&&E.bags[nb].price<=cur[nbw]*.3){pay(E.bags[nb].price,nbw);bag=nb;shop=Math.max(shop,nbw<w()?0:E.bags[nb].shop);imp(`bag${E.bags[bag].capacity}`);}
+    T+=(shop<0?0:shop>0?hallShopExtra(w()):shopExtra(w()))+(eggs?eggExtra(w()):0);
     const done=E.eggs.every((e,j)=>eggLayer[j]!==layer||hatched[j]>=target(j));
     const slotDone=!slotLayer.includes(layer)||slots>3+slotLayer.indexOf(layer);
     if(done&&lv>=exitLevel(layer)&&slotDone){
-      if(local(layer)===6){if(w()===2){arrive.push(T);break;}const price=E.worlds[w()+1].ticket!.price;if(cur[w()]>=price){pay(price);layer++;arrive.push(T);imp('portal');continue;}}
-      else{const l=L[layer],n=(L[layer+1].from-l.from)/2,d=n-(l.deepAt??n*2)/2,cap=E.bags[bag].capacity;
-        T+=(n-d)*bt(l.rock.hp)+d*bt(l.deep.hp)+Math.ceil(n/cap)*SELL;
-        cur[w()]+=((n-d)*l.rock.price+d*l.deep.price)*team()*mult;layer++;arrive.push(T);imp('arrive');continue;}}
-    let best=layer,br=-1;for(let i=w()*7;i<=layer;i++)if(gateOf(i)<=lv){const r=rate(i),cap=E.bags[bag].capacity,c=cap*r.v/(cap*r.t+SELL);if(c>br){br=c;best=i;}}
+      if(local(layer)===6){if(w()===2){arrive.push(T);break;}const price=E.worlds[w()+1].ticket!.price;if(cur[w()]>=price){farmTicket();pay(price);layer++;arrive.push(T);imp('portal');continue;}}
+      else{// the shaft down: the layer's rock and ores, then its dense rock; each bagful sold, then back down the shaft
+        const l=L[layer],n=(L[layer+1].from-l.from)/2,d=n-(l.deepAt??n*2)/2,cap=E.bags[bag].capacity,r=rate(layer,0);
+        const dt=(n-d)*r.t+d*bt(l.deep.hp,0)+Math.ceil(n/cap)*(descentTrip(w())+fall((L[layer+1].from-l.from)/2));
+        cur[w()]+=earn((n-d)*r.v+d*l.deep.price*team()*mult,dt);collect(layer,n-d);T+=dt;layer++;arrive.push(T);imp('arrive');continue;}}
+    let best=layer,br=-1;for(let i=w()*7;i<=layer;i++)if(gateOf(i)<=lv){const r=rate(i),cap=E.bags[bag].capacity,c=cap*r.v/(cap*r.t+sellTrip(w()));if(c>br){br=c;best=i;}}
     // a player heads to sell once the next thing they want is paid for, or the bag is full
     const r=rate(best);const want=[...E.eggs.map((e,j)=>wantEgg(j)?e.price:Infinity),lv<exitLevel(layer)?E.tools[lv].price:Infinity,enhPrice(),
       local(layer)===6&&w()<2?E.worlds[w()+1].ticket!.price:Infinity];
-    const need=Math.min(...want)-cur[w()],n=Math.min(E.bags[bag].capacity,Math.max(5,Math.ceil(need/r.v)));T+=n*r.t+SELL;cur[w()]+=n*r.v;
+    const need=Math.min(...want)-cur[w()],n=Math.min(E.bags[bag].capacity,Math.max(5,Math.ceil(need/r.v))),dt=n*r.t+sellTrip(w());
+    cur[w()]+=earn(n*r.v,dt);collect(best,n);T+=dt;
   }
-  return {arrive,maxGap,ev,gapAt,T,pets,slots};
+  return {arrive,maxGap,ev,gapAt,T,pets,slots,spins,boostedAt,farmed};
 }
 
 // ---- commands ------------------------------------------------------------------------------------------------
@@ -171,7 +245,9 @@ const command=process.argv[1]===fileURLToPath(import.meta.url)?process.argv[2]:u
 if(command==='calibrate'||command==='export'){
   const K:number[]=command==='export'||existsSync(K_FILE)?readJson(K_FILE):TARGET.map(t=>t*60*2);
   if(command==='calibrate')for(let it=0;it<60;it++){const {economy,plan}=build(K),runs=seeds.map(s=>simulate(economy,plan,s));
-    for(let i=0;i<N;i++){const d=median(runs.map(r=>(r.arrive[i+1]??Infinity)-r.arrive[i]))/60;if(isFinite(d))K[i]*=Math.pow(TARGET[i]/Math.max(.3,d),.5);}}
+    // The first layer keeps its designed budget: the first pickaxe should come within minutes whether or not the
+    // player has found the capsule yet (the day's first lucky coins would otherwise price it up for everyone).
+    for(let i=1;i<N;i++){const d=median(runs.map(r=>(r.arrive[i+1]??Infinity)-r.arrive[i]))/60;if(isFinite(d))K[i]*=Math.pow(TARGET[i]/Math.max(.3,d),.5);}}
   const {economy,plan}=build(K);
   if(command==='calibrate')writeFileSync(K_FILE,JSON.stringify(K));
   write(ECONOMY_FILE,economy);write(PLAN_FILE,plan);

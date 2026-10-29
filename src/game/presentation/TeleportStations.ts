@@ -3,13 +3,17 @@ import { WORLD_REQUIREMENTS, worldPortal, worldStation } from '../content/worldJ
 import { PINEWIND_GATE } from '../content/pinewind/hubLayout.ts';
 
 /** The swirling portal disc in every world's teleport station ring (2.75 m up, 1.32 m across), and every world
- *  portal's sheet, violet and gold (world 1's fills its old ridge gate, the later worlds' a ring 2.9 m up). Where
+ *  portal's sheet, violet and gold (world 1's fills its old ridge gate, the later worlds' a ring 2.9 m up). The swirl
+ *  glows over an opaque backing of its own colours, so nothing behind a portal shows through it (2026-10-29: the
+ *  far world's labels and the sky did, through the additive glow). Where
  *  the player stands to open one, in every world: a round pad of glowing water under a faint column of light, cyan
  *  for the station and violet for the portal, so the two read the same everywhere, just above the ground (world
  *  2's portal: its dais floor) where the player stands. World 1's lie in rims Blender builds on the ground, the
  *  later worlds' stations on a plate flush with it. The frames themselves are scenery. */
 const UP = new Vector3(0, 1, 0);
 const STATION = ['#1fa8ec', '#aef4ff'] as const, PORTAL = ['#7a3fe0', '#f1d2ff'] as const;
+/** The backing behind each swirl: deep at the edge, lighter toward the middle. */
+const STATION_BACK = ['#0a3f80', '#2f9be0'] as const, PORTAL_BACK = ['#2c1366', '#7d4fd6'] as const;
 export class TeleportStations {
   readonly group = new Group();
   private readonly time = { value: 0 };
@@ -28,8 +32,9 @@ export class TeleportStations {
       const st = worldStation(world.id), station = new Group();
       station.position.set(st.x, 0, st.z); station.rotation.y = st.yaw;
       const disc = new Mesh(new CircleGeometry(1.34, 48), swirl); disc.position.y = 2.75; disc.renderOrder = 2;
+      const back = new Mesh(disc.geometry, this.backing(...STATION_BACK)); back.position.copy(disc.position); back.renderOrder = 1;
       const at = new Vector3(st.zone.x - st.x, 0, st.zone.z - st.z).applyAxisAngle(UP, -st.yaw);
-      station.add(disc, ...this.pad(at, st.zone.radius, ...STATION, .085));
+      station.add(back, disc, ...this.pad(at, st.zone.radius, ...STATION, .085));
       this.group.add(station);
     }
     const sheet = this.material(`
@@ -44,8 +49,10 @@ export class TeleportStations {
       const g = PINEWIND_GATE, face = world.id === 1
         ? new Mesh(new PlaneGeometry(g.opening - .3, g.height - 1.9), sheet) : new Mesh(new CircleGeometry(1.85, 48), sheet);
       face.position.y = world.id === 1 ? (g.height - 1.9) / 2 + .05 : 2.9; face.renderOrder = 2;
+      // World 1's sheet fills the gate's whole opening, corners included (the swirl itself fades out at its circle).
+      const back = new Mesh(face.geometry, this.backing(...PORTAL_BACK)); back.position.copy(face.position); back.renderOrder = 1;
       const at = new Vector3(pt.zone.x - pt.x, 0, pt.zone.z - pt.z).applyAxisAngle(UP, -pt.yaw);
-      portal.add(face, ...this.pad(at, pt.zone.radius, ...PORTAL, .085));
+      portal.add(back, face, ...this.pad(at, pt.zone.radius, ...PORTAL, .085));
       this.group.add(portal);
     }
   }
@@ -93,6 +100,24 @@ export class TeleportStations {
     const column = new Mesh(new CylinderGeometry(radius - .32, radius - .32, 2.6, 40, 1, true), beam);
     column.position.set(at.x, y + 1.3, at.z); column.renderOrder = 3;
     return [pool, column];
+  }
+
+  /** Opaque, both sides, drawn before the swirl in the same plane: it writes the depth the swirl then glows over
+   *  (equal depth passes), so the swirl keeps its look and the view through the portal is closed. */
+  private backing(deep: string, middle: string) {
+    const material = new ShaderMaterial({
+      uniforms: { uDeep: { value: new Color(deep) }, uMiddle: { value: new Color(middle) } }, side: DoubleSide,
+      vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+      fragmentShader: `uniform vec3 uDeep; uniform vec3 uMiddle; varying vec2 vUv;
+        void main(){
+          float r = length(vUv * 2.0 - 1.0);
+          gl_FragColor = vec4(mix(uMiddle, uDeep, smoothstep(.1, 1.05, r)), 1.0);
+          #include <tonemapping_fragment>
+          #include <colorspace_fragment>
+        }`,
+    });
+    this.materials.push(material);
+    return material;
   }
 
   private material(body: string) {

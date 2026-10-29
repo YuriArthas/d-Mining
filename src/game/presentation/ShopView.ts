@@ -37,7 +37,8 @@ export class ShopView {
   private sources:Group[]=[];
   private abort:AbortController|null=null;
   private items:readonly ShopItem[]=[];
-  private builtCategory:ShopCategory|null=null;
+  /** The shelf built: its category and items (a counter's shelf changes when its newest pickaxe does). */
+  private builtCategory:string|null=null;
   private clock=0;
   private size=new Vector2();
   /** Camera rig: position along the track (m) and its speed; `intro` eases the opening dolly-in. */
@@ -113,8 +114,9 @@ export class ShopView {
     for(let i=0;i<=count;i++){const f=frame.clone(true);f.position.x=(i-.5)*SHOWROOM.spacing;this.stage.add(f);}
   }
   private build(category:ShopCategory) {
-    if(category===this.builtCategory&&this.strip.children.length===this.items.length)return;
-    this.strip.clear();this.builtCategory=category;
+    const shelf=`${category}:${this.items.map(i=>i.id).join(',')}`;
+    if(shelf===this.builtCategory)return;
+    this.strip.clear();this.builtCategory=shelf;
     this.buildStage(this.items.length);
     for(const [index,item] of this.items.entries()) {
       const station=new Group();station.position.x=index*SHOWROOM.spacing;

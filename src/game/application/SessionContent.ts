@@ -36,6 +36,8 @@ export type SessionContent = Readonly<{
   eggStations: readonly EggStation[];
   destinations: readonly Destination[];
   sales: readonly ServiceZone[];
-  /** Shop counters; `category` picks the page a counter opens on (tools when absent). */
-  shops: readonly Readonly<{ id: string; zone: ServiceZone; category?: import('../content/shopCatalog.ts').ShopCategory }>[];
+  /** Shop counters: each world's surface (layer 0) and its halls of layers 2 and 4, each selling the items of its world
+   *  and layer (economy.json `shop`); a hall's opens once the player has reached it. `category` picks the page a
+   *  counter opens on (tools when absent). */
+  shops: readonly Readonly<{ id: string; zone: ServiceZone; world: 1 | 2 | 3; layer: 0 | 2 | 4; category?: import('../content/shopCatalog.ts').ShopCategory }>[];
 }>;

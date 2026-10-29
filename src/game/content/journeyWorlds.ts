@@ -13,7 +13,7 @@ export const JOURNEY_WORLDS = WORLD_REQUIREMENTS.map(world => {
     return {...source,scene:world.id===1?source.scene:laterScene??source.scene,id:world.id===1?source.id:`world${world.id}.${local}`,
       from:numbers.from,base,deepKind:base+1,deepAt:numbers.deepAt,oreChance:numbers.oreChance,
       name:local===0?tr('{world}矿场',{world:world.name}):source.name,
-      ores:numbers.ores.map((ore,j)=>({kind:base+2+j,weight:ore.weight})),shop:local>0&&local%2===0};
+      ores:numbers.ores.map((ore,j)=>({kind:base+2+j,weight:ore.weight})),shop:local===2||local===4};
   });
   validateLayers(layers);
   const localRooms=roomsFor(layers);

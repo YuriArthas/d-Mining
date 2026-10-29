@@ -23,6 +23,7 @@
  "{n} 分钟": "{n} mnt",
  "{n} 次/秒": "{n}/dtk",
  "{n} 米": "{n} m",
+ "{place}的商店有售": "Dijual di toko {place}",
  "{title}分类": "Kategori {title}",
  "{unit}已到账": "{unit} diterima",
  "{unit}已达上限，这次没扣幸运币": "{unit} sudah maksimal — Koin Hoki tidak terpakai",

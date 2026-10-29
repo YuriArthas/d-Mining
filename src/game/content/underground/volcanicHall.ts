@@ -16,8 +16,9 @@ export const VOLCANIC_HALL = {
   spawn: [0, 0, 12],
   stalls: {
     sell: { at: [-12, 0, 15.2], ring: [-12, 0, 11.4] },
-    shop: { at: [12, 0, 15.2], ring: [12, 0, 11.4] },
   },
+  /** Where a shop stall would stand: obsidian (only layers 2 and 4 have a shop, 2026-10-29). */
+  spare: [12, 0, 15.2] as V3,
   board: [0, 7.6, -17.4],
   /** Basalt column clusters: the hall's landmarks. The first four are the big ones (kept clear by the walls). */
   columns: [
@@ -28,7 +29,8 @@ export const VOLCANIC_HALL = {
   pool: { at: [-12.4, 0, -4] as V3, radius: 3 },
   /** Ember vents: low cones with a glowing crater. The first stands behind the spawn between the lanterns. */
   vents: [{ at: [0, 0, 17.4] as V3, scale: 1.9 }, { at: [16.6, 0, -6.2] as V3, scale: 1.2 }, { at: [-16.8, 0, 1.8] as V3, scale: 1.1 }],
-  /** Real-time lights (a fixed pool of six): the lava pool, the big columns, the east wall, both stalls, the vent. */
+  /** Real-time lights (a fixed pool of six): the lava pool, the big columns, the east wall, the stall and the
+   *  obsidian in the spare place, the vent. */
   lights: [
     { at: [-9.6, 6, -3.2], color: '#ff7a2a', intensity: 120, distance: 30 },
     { at: [9.6, 6.5, -9.6], color: '#ff9a48', intensity: 120, distance: 30 },

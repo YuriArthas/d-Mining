@@ -12,6 +12,7 @@ export function buildHall(getProp: GetProp) {
   }, [
     ...HALL.columns.slice(0, 4).map(c => ({ x: c.at[0], z: c.at[2], radius: c.radius * .9 })),
     { x: HALL.pool.at[0], z: HALL.pool.at[2], radius: HALL.pool.radius + .6 },
+    { x: HALL.spare[0], z: HALL.spare[2], radius: 3.4 },
   ]);
   const { r, box, add, place, hull, M } = kit;
   kit.useProps(getProp);
@@ -75,8 +76,16 @@ export function buildHall(getProp: GetProp) {
     box([v.at[0], .5 * v.scale, v.at[2]], [.75 * v.scale, .5 * v.scale, .75 * v.scale]);
   }
   kit.services();
-  // The iron roofs stand on two front posts as well.
-  for (const stall of [HALL.stalls.sell, HALL.stalls.shop]) for (const side of [-1, 1]) box([stall.at[0] + side * 2.2, 1.35, stall.at[2] - 1.6], [.12, 1.35, .12]);
+  // The iron roof stands on two front posts as well.
+  for (const side of [-1, 1]) box([HALL.stalls.sell.at[0] + side * 2.2, 1.35, HALL.stalls.sell.at[2] - 1.6], [.12, 1.35, .12]);
+  // In the spare stall's place (this layer has no shop): a big obsidian cluster between two basalt stubs.
+  {
+    const [x, , z] = HALL.spare;
+    for (const [dx, dz, name, scale, solid] of [[0, 0, 'Obsidian_Cluster', 2.1, [.45, .55]], [-2.1, .5, 'Basalt_Stub', 1.4, [.55, .45]], [2.2, -.3, 'Basalt_Stub', 1.1, [.55, .45]]] as const) {
+      place(name, [x + dx, 0, z + dz], r() * 6.3, scale);
+      box([x + dx, solid[1] * scale, z + dz], [solid[0] * scale, solid[1] * scale, solid[0] * scale]);
+    }
+  }
   kit.wallFoot(30, () => {
     const pick = r();
     return pick < .45 ? { name: 'Obsidian_Cluster', scale: () => .9 + r() * .8, solid: [.45, .55] as const }

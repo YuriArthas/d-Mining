@@ -1,6 +1,6 @@
 import { TIP_IDS, type TipId, Onboarding } from '../logic/Onboarding.ts';
 import { EquipmentCollection } from '../logic/EquipmentCollection.ts';
-import { shopTools, shopBackpacks, type ShopCategory } from '../content/shopCatalog.ts';
+import { shopTools, shopBackpacks, type ShopCategory, type ShopItem } from '../content/shopCatalog.ts';
 import { WorldProgress } from '../logic/WorldProgress.ts';
 import { MaterialStore } from '../logic/MaterialStore.ts';
 import { WORLD_REQUIREMENTS, worldRequirement, worldAtZ, worldAtFeet, worldSpawn, type WorldId } from '../content/worldJourney.ts';
@@ -355,7 +355,7 @@ export class GameSession {
   private makeSnapshot() {
     const bag=this.inventory.getSnapshot(), tip=this.tip?tipView(this.tip,this.tipState()):null;
     return Object.freeze({
-      equipment: this.equipment.exportData(), shopCatalog:{tools:this.toolCatalog,backpacks:this.bagCatalog},
+      equipment: this.equipment.exportData(), shopCatalog:{tools:this.toolCatalog,backpacks:this.bagCatalog}, shopStock:this.shopStock(),
       currentWorld: this.currentWorld,
       // Worlds past the next one to unlock stay unknown: no name, no price (the portal shows ???).
       worlds:WORLD_REQUIREMENTS.map(w=>({...w,open:this.worldProgress.isOpen(w.id),known:this.worldProgress.isOpen(w.id)||this.worldProgress.unlockable(w.id),
@@ -641,6 +641,7 @@ export class GameSession {
   /** Enhances the newest pickaxe once (and equips it). `expected*` guard against a stale panel buying twice. */
   enhancePickaxe = (expectedLevel: number, expectedEnhance: number) => {
     if(this.suspended||expectedLevel!==this.equipment.toolLevel||expectedEnhance!==this.equipment.enhance)return {status:'stale'} as const;
+    if(!this.shopStock()?.tools.some(t=>t.level===expectedLevel))return {status:'away'} as const;
     const offer=this.enhanceOffer();
     if(!offer.next)return {status:'max'} as const;
     if(!this.wallet.debit(offer.next.currency,offer.next.price)){this.feedback({type:'denied',reason:'coins'});return {status:'insufficient'} as const;}
@@ -658,10 +659,46 @@ export class GameSession {
     this.committed(true);this.publish();this.feedback({type:'purchased'});
     return {status:'upgraded',capacity:next.capacity!,spent:next.price} as const;
   };
+  /** The shop counters open in a world: its surface's, and those of its halls of layers 2 and 4 once reached. */
+  private openShops(world: WorldId) {
+    return this.content.shops.filter(s => s.world === world && (s.layer === 0 || !!this.explorations.get(world)?.has(s.id)));
+  }
+  /** What the counter the player stands at sells (economy.json `shop`: its world and layer), and the newest pickaxe
+   *  of that world, which every shop of the world enhances. Null away from a counter. */
+  private shopStock() {
+    const counter = this.content.shops.find(s => s.id === this.shopId);
+    if (!counter) return null;
+    const sells = (item: ShopItem) => item.world === counter.world && item.shop === counter.layer;
+    return Object.freeze({
+      tools: this.toolCatalog.filter(t => sells(t) || (t.level === this.equipment.toolLevel && t.world === counter.world)),
+      backpacks: this.bagCatalog.filter(sells),
+    });
+  }
+  /** The shop button: to the furthest shop open in this world (on world 1's surface, the counter of the page asked
+   *  for); with 'next', to the one selling the next pickaxe or backpack, when it is open. 'here' if already there. */
+  goToShop = (category: ShopCategory = 'tools', aim: 'furthest' | 'next' = 'furthest') => {
+    if (this.suspended || !this.world?.travelTo) return 'unavailable' as const;
+    const open = this.openShops(this.currentWorld);
+    const atLayer = (layer: number) => open.filter(s => s.layer === layer).sort((a, b) => +(b.category === category) - +(a.category === category))[0];
+    let target = atLayer(Math.max(...open.map(s => s.layer)));
+    if (aim === 'next') {
+      const next = category === 'tools' ? this.toolCatalog[this.equipment.toolLevel] : this.bagCatalog.find(b => b.id === this.bagOffer().next?.id);
+      if (next && next.world === this.currentWorld) target = atLayer(next.shop) ?? target;
+    }
+    if (!target) return 'unavailable' as const;
+    if (target.id === this.shopId) return 'here' as const;
+    const z = target.zone;
+    this.world.cancelMining();
+    this.world.travelTo([z.x, z.y + .1, z.z], z.lookAt ?? [z.x, z.y + 1, z.z - 6]);
+    this.resetPosition();
+    return 'travelling' as const;
+  };
   useShopItem = (category:ShopCategory,id:string) => {
-    // The shop opens anywhere (HUD button or the surface shop); purchases do not need the shop circle.
+    // Bought and worn at a counter, from what that counter sells (the shop button takes the player to one).
     if(this.suspended)return {status:'unavailable'} as const;
-    const item=(category==='tools'?this.toolCatalog:this.bagCatalog).find(x=>x.id===id);
+    const stock=this.shopStock();
+    if(!stock)return {status:'away'} as const;
+    const item=stock[category].find(x=>x.id===id);
     if(!item)return {status:'unavailable'} as const;
     const owned=category==='tools'?item.level<=this.equipment.toolLevel:item.capacity!<=this.equipment.backpackCapacity;
     if(!owned) {

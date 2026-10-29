@@ -29,6 +29,12 @@ const serviceZone = (worldZ: number, kind: 'sell' | 'shop') => {
   const base = worldZ === TECH_BASE.worldZ ? TECH_BASE : STAR_BASE;
   return zone(base.kiosks[kind].ring[0], worldZ + base.kiosks[kind].ring[2]);
 };
+/** A hall's shop counter (layers 2 and 4): its stall stands 4 m past the ring toward +Z, where a trip there faces. */
+const hallShop = (room: { id: string; shop: ServiceZone | null; worldId: number }, world: 1 | 2 | 3) => {
+  const layer = JOURNEY_WORLDS[world - 1].rooms.findIndex(r => r.id === room.id) + 1, z = room.shop!;
+  if (layer !== 2 && layer !== 4) throw Error(`商店只在第 2、4 层: ${room.id}`);
+  return { id: room.id, zone: { ...z, lookAt: [z.x, z.y + 1, z.z + 6] as const }, world, layer: layer as 2 | 4 };
+};
 // Each world's eggs stand in it: world 1's on Pinewind's terrace, the later worlds' in their bases' hatcheries.
 const inBase = (stands: readonly EggStand[], worldZ: number): HubEgg[] => stands.map(s => ({ ...s, tier: 0, y: 0, z: s.z + worldZ }));
 const eggs: readonly HubEgg[] = [...PINEWIND_EGG_DISPLAYS, ...inBase(TECH_BASE.stands, TECH_BASE.worldZ), ...inBase(STAR_BASE.stands, STAR_BASE.worldZ)];
@@ -63,10 +69,10 @@ const session: SessionContent = {
     ...later.flatMap(w => [serviceZone(w.z, 'sell'), ...w.rooms.map(r => r.sell)]),
   ],
   shops: [
-    { id: 'surface-upgrade', zone: PINEWIND_SERVICES.shop.trigger, category: 'tools' },
-    { id: PINEWIND_SERVICES.bags.id, zone: PINEWIND_SERVICES.bags.trigger, category: 'backpacks' },
-    ...first.rooms.filter(r => r.shop).map(r => ({ id: r.id, zone: r.shop! })),
-    ...later.flatMap(w => [{ id: `world${w.id}.shop`, zone: serviceZone(w.z, 'shop') }, ...w.rooms.filter(r => r.shop).map(r => ({ id: r.id, zone: r.shop! }))]),
+    { id: 'surface-upgrade', zone: PINEWIND_SERVICES.shop.trigger, world: 1, layer: 0, category: 'tools' },
+    { id: PINEWIND_SERVICES.bags.id, zone: PINEWIND_SERVICES.bags.trigger, world: 1, layer: 0, category: 'backpacks' },
+    ...first.rooms.filter(r => r.shop).map(r => hallShop(r, 1)),
+    ...later.flatMap(w => [{ id: `world${w.id}.shop`, zone: serviceZone(w.z, 'shop'), world: w.id, layer: 0 as const }, ...w.rooms.filter(r => r.shop).map(r => hallShop(r, w.id))]),
   ],
   homes: WORLD_REQUIREMENTS.map(w => ({ worldId: w.id, zone: zone(0, worldSpawn(w.id)[2], 6) })),
   stations: WORLD_REQUIREMENTS.map(w => ({ worldId: w.id, zone: worldStation(w.id).zone })),

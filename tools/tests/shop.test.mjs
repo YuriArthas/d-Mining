@@ -13,8 +13,9 @@ const content=GAME_CONTENT.session;
 const T2=ECONOMY.tools[1].price,T3=ECONOMY.tools[2].price,T4=ECONOMY.tools[3].price,B2=ECONOMY.bags[1].price,[C1,C2,C3]=ECONOMY.bags.map(b=>b.capacity);
 function funded(coins=10000) { const data=new GameSession(content).exportProgress();data.wallet.balances.gold=coins;return GameSession.fromData(data,content); }
 function enter(s) { const {zone}=content.shops[0];s.updatePosition([zone.x,zone.y,zone.z],true);assert.ok(s.getSnapshot().shopId); }
-test('shop opens anywhere: purchases need affordability and sequence, never the shop circle; repeated touch never double-debits',()=>{
- const away=funded();assert.equal(away.useShopItem('tools','tool-2').status,'upgraded','bought far from the shop');assert.equal(away.getSnapshot().coins,10000-T2);
+test('gear is bought at a shop counter, from its shelf: affordability and sequence; repeated touch never double-debits',()=>{
+ const away=funded();assert.equal(away.useShopItem('tools','tool-2').status,'away','nothing is bought away from a counter');assert.equal(away.getSnapshot().coins,10000);
+ assert.equal(away.enhancePickaxe(1,0).status,'away');
  const s=funded();
  enter(s);assert.equal(s.useShopItem('tools','tool-3').status,'locked');assert.equal(s.useShopItem('backpacks','journey-bag-3').status,'locked');assert.equal(s.getSnapshot().coins,10000);
  let commits=0;s.onProgressCommitted(()=>commits++);
@@ -23,7 +24,7 @@ test('shop opens anywhere: purchases need affordability and sequence, never the 
  const short=Math.min(T2,B2)-1,poor=funded(short);enter(poor);assert.equal(poor.useShopItem('tools','tool-2').status,'insufficient');assert.equal(poor.useShopItem('backpacks','journey-bag-2').status,'insufficient');assert.equal(poor.getSnapshot().coins,short);
  // Later worlds' gear is priced in their own currency: gold never buys it.
  const tech=funded(1e12),data=tech.exportProgress();data.pickaxe.level=data.equipment.toolLevel=10;
- const at10=GameSession.fromData(data,content);assert.equal(at10.getSnapshot().pickaxeUpgrade.currency,'tech');assert.equal(at10.useShopItem('tools','tool-11').status,'insufficient');
+ const at10=GameSession.fromData(data,content);assert.equal(at10.getSnapshot().pickaxeUpgrade.currency,'tech');
  s.setSuspended(true);assert.equal(s.useShopItem('tools','tool-3').status,'unavailable');
 });
 test('equipping old gear is free, persists, and preserves highest purchase and next price',()=>{
@@ -65,7 +66,7 @@ test('三十把工具和三十个背包各有自己的名字和一句介绍；�
   assert.ok(tools.every(t=>t.motion==='drill'||t.motion==='swing'));
 });
 test('the newest pickaxe enhances three times in its own currency: more damage, same gate; the next pickaxe starts at +0',()=>{
- const s=funded(1e9),tool2=ECONOMY.tools[1];
+ const s=funded(1e9),tool2=ECONOMY.tools[1];enter(s);
  assert.equal(s.getSnapshot().pickaxeEnhance.next.price,ECONOMY.tools[0].enhance[0].price,'even the first pickaxe can be enhanced');
  s.useShopItem('tools','tool-2');let gold=s.getSnapshot().coins,commits=0;s.onProgressCommitted(()=>commits++);
  for(const [k,step] of tool2.enhance.entries()){
@@ -77,8 +78,8 @@ test('the newest pickaxe enhances three times in its own currency: more damage, 
  assert.equal(s.useShopItem('tools','tool-1').status,'equipped');assert.equal(s.getSnapshot().pickaxe.basePower,ECONOMY.tools[0].power);
  s.useShopItem('tools','tool-2');assert.equal(s.getSnapshot().pickaxe.enhance,3);
  const r=GameSession.fromData(s.exportProgress(),content);assert.equal(r.getSnapshot().pickaxe.basePower,tool2.enhance[2].power);assert.equal(r.getSnapshot().equipment.enhance,3);
- r.useShopItem('tools','tool-3');assert.equal(r.getSnapshot().pickaxe.enhance,0);assert.equal(r.getSnapshot().pickaxeEnhance.enhance,0);
- const poor=funded(0);assert.equal(poor.enhancePickaxe(1,0).status,'insufficient');assert.equal(poor.getSnapshot().pickaxe.enhance,0);
+ enter(r);r.useShopItem('tools','tool-3');assert.equal(r.getSnapshot().pickaxe.enhance,0);assert.equal(r.getSnapshot().pickaxeEnhance.enhance,0);
+ const poor=funded(0);enter(poor);assert.equal(poor.enhancePickaxe(1,0).status,'insufficient');assert.equal(poor.getSnapshot().pickaxe.enhance,0);
  const bad=s.exportProgress();bad.pickaxe={version:1,level:1,enhance:2};assert.throws(()=>GameSession.fromData(bad,content));
 });
 test('the 4th and 5th pet slots are bought in worlds 2 and 3 once their layer is reached; rebirth keeps them',()=>{
@@ -93,4 +94,30 @@ test('the 4th and 5th pet slots are bought in worlds 2 and 3 once their layer is
  assert.equal(s.getSnapshot().petSlot.slot,5);assert.equal(s.getSnapshot().petSlot.currency,'star');
  s.devUnlockLayer(room(3).id);assert.equal(s.buyPetSlot(4).status,'bought');assert.equal(s.getSnapshot().petSlot,null);assert.equal(s.buyPetSlot(5).status,'max');
  assert.equal(GameSession.fromData(s.exportProgress(),content).pets.getSnapshot().slots.length,5);
+});
+
+test('each world sells its gear in three shops with their own shelves: the surface, then the halls of layers 2 and 4; the shop button goes to the furthest open',()=>{
+ for(const w of [1,2,3]){
+  assert.deepEqual([...new Set(content.shops.filter(x=>x.world===w).map(x=>x.layer))].sort(),[0,2,4]);
+  const halls=content.destinations.filter(d=>d.worldId===w);
+  assert.deepEqual(halls.map((d,i)=>[i+1,!!d.shop]).filter(([,shop])=>shop).map(([n])=>n),[2,4],'shops in the halls of layers 2 and 4 only');
+ }
+ // The pickaxe a layer asks for is on a shelf already open on the layer above (or in an earlier world).
+ for(const l of ECONOMY.layers.filter(l=>l.layer>0)){const t=ECONOMY.tools[l.gate-1];assert.ok(Math.ceil(l.gate/10)<l.world||t.shop<=l.layer-1,`world ${l.world} layer ${l.layer}: L${l.gate} is sold at layer ${t.shop}`);}
+ const s=funded(1e9),trips=[];s.attach({cell:()=>64,pending:()=>false,mine:()=>true,cancelMining(){},travelTo:feet=>trips.push(feet)});
+ const arrive=()=>{s.updatePosition(trips.at(-1),true);return s.getSnapshot();};
+ const shelf=v=>({tools:v.shopStock.tools.map(i=>i.level),bags:v.shopStock.backpacks.map(i=>i.level)});
+ const halls=content.destinations.filter(d=>d.worldId===1),packs=content.shops.find(x=>x.world===1&&x.category==='backpacks');
+ assert.equal(s.goToShop(),'travelling');let v=arrive();
+ assert.equal(v.shopId,'surface-upgrade');assert.deepEqual(shelf(v),{tools:[1,2,3],bags:[1,2,3]});assert.equal(s.goToShop(),'here');
+ s.devUnlockLayer(halls[1].id);assert.equal(s.goToShop(),'travelling');v=arrive();
+ assert.equal(v.shopId,halls[1].id);assert.deepEqual(shelf(v),{tools:[1,4,5,6],bags:[4,5,6]},'its own shelf, and the newest pickaxe to enhance');
+ assert.equal(s.useShopItem('tools','tool-4').status,'locked');assert.equal(s.useShopItem('tools','tool-2').status,'unavailable','not on this shelf');
+ assert.equal(s.enhancePickaxe(1,0).status,'enhanced','any shop of its world enhances the newest pickaxe');
+ // The bag's shortcut goes where the next item is sold: the next pickaxe, L2, is on the surface.
+ assert.equal(s.goToShop('tools','next'),'travelling');v=arrive();assert.equal(v.shopId,'surface-upgrade');
+ s.useShopItem('tools','tool-2');s.useShopItem('tools','tool-3');assert.equal(s.getSnapshot().equipment.toolLevel,3);
+ s.devUnlockLayer(halls[3].id);assert.equal(s.goToShop(),'travelling');v=arrive();assert.equal(v.shopId,halls[3].id);assert.deepEqual(shelf(v),{tools:[3,7,8,9,10],bags:[7,8,9,10]});
+ // World 1's surface has a pack shop beside the forge: backpacks go there.
+ assert.equal(s.goToShop('backpacks','next'),'travelling');v=arrive();assert.equal(v.shopId,packs.id);
 });

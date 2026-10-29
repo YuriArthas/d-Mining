@@ -12,23 +12,38 @@ import { currencyIcon, currencyName } from './currency.ts';
 
 import { tr } from '../i18n/i18n.ts';
 /** Opens the showroom on a counter at the item the player has now. */
+/** Shows a page of the counter the player stands at: on the item worn, else the next one to buy, else the first. */
 export function showShopCategory(view: ShopView, state: ReturnType<GameSession['getSnapshot']>, category: ShopCategory) {
-  const items = state.shopCatalog[category];
-  const index = items.findIndex(item => category === 'tools' ? item.level === state.pickaxe.level : item.capacity === state.inventory.capacity);
-  view.show(category, items, Math.max(0, index));
+  const items = state.shopStock?.[category] ?? [];
+  if (!items.length) return;
+  const worn = items.findIndex(item => category === 'tools' ? item.level === state.pickaxe.level : item.capacity === state.inventory.capacity);
+  const next = items.findIndex(item => offerState(category, item, state) === 'next');
+  view.show(category, items, worn >= 0 ? worn : Math.max(0, next));
 }
 
 /** The tool & backpack shop (docs/draft-ui-v2.md, U6): a 3D showroom the camera glides along. Over the cart: the
  *  item's name, its level, its world and (for a pickaxe) how deep it digs; under it: its numbers with the gain over
  *  what the player carries (damage ×1.5, speed +0.5), and one button that says what it does and what it costs
  *  (购买 · 价格, 强化 +N · 价格, 装备, 已装备). A price the player cannot pay yet is greyed, never a missing amount.
- *  It opens anywhere (the HUD button, the bag's plus, or walking into a surface shop). */
+ *  It opens at a shop counter, with what that counter sells: each world's surface and its halls of layers 2 and 4
+ *  have their own shelves (economy.json `shop`); the shop button takes the player to the furthest one open. */
 export function ShopPanel({ session, view, onClose }: { session: GameSession; view: ShopView; onClose(): void }) {
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot);
   const display = useSyncExternalStore(view.subscribe, view.getSnapshot);
   const [message, setMessage] = useState('');
   useEffect(() => { setMessage(''); }, [display.mode, display.index]);
-  const count = display.mode === 'tools' || display.mode === 'backpacks' ? state.shopCatalog[display.mode].length : 0;
+  // A purchase can change the shelf (the newest pickaxe stands on every shelf of its world, to be enhanced there):
+  // rebuild it and stay on the item looked at.
+  const shelf = display.mode === 'tools' || display.mode === 'backpacks' ? state.shopStock?.[display.mode] : undefined;
+  const shelfKey = shelf?.map(i => i.id).join(',') ?? '';
+  const [lastShelf, setLastShelf] = useState(shelfKey);
+  useEffect(() => {
+    if (shelfKey === lastShelf) return;
+    const previous = view.getSnapshot(), looked = lastShelf.split(',')[previous.index];
+    setLastShelf(shelfKey);
+    if (shelf && (previous.mode === 'tools' || previous.mode === 'backpacks')) view.show(previous.mode, shelf, Math.max(0, shelf.findIndex(i => i.id === looked)));
+  }, [shelfKey, lastShelf, shelf, view]);
+  const count = display.mode === 'tools' || display.mode === 'backpacks' ? state.shopStock?.[display.mode].length ?? 0 : 0;
   useEffect(() => {
     const keys = (event: KeyboardEvent) => {
       if (event.key === 'Escape') { event.preventDefault(); onClose(); return; }
@@ -38,8 +53,10 @@ export function ShopPanel({ session, view, onClose }: { session: GameSession; vi
     window.addEventListener('keydown', keys); return () => window.removeEventListener('keydown', keys);
   }, [onClose, view, count]);
   const open = (category: ShopCategory) => showShopCategory(view, state, category);
-  if (display.mode !== 'tools' && display.mode !== 'backpacks') return null;
-  const category = display.mode, items = state.shopCatalog[category], item = items[display.index];
+  if (display.mode !== 'tools' && display.mode !== 'backpacks' || !state.shopStock) return null;
+  // The counter's shelf; levels and the stat bars count against the whole catalogue.
+  const category = display.mode, items = state.shopStock[category], all = state.shopCatalog[category], item = items[display.index];
+  if (!item) return null;
   const offer = offerState(category, item, state), action = offerAction(category, item, state, offer);
   const blocked = !action.enabled || !display.ready || !!display.error;
   // Items still to buy show their price on the button; further ones too, on a greyed button.
@@ -74,7 +91,7 @@ export function ShopPanel({ session, view, onClose }: { session: GameSession; vi
     <header className="shop-head" key={item.id}>
       <h1 className="shop-name ui-outline" data-tier={offerTier(item)} data-long={item.name.length > 13 || undefined}>{item.name}{top && state.equipment.enhance ? ` +${state.equipment.enhance}` : ''}</h1>
       <div className="shop-tags">
-        <span className="shop-tag ui-num">Lv.{item.level}<small>/{items.length}</small></span>
+        <span className="shop-tag ui-num">Lv.{item.level}<small>/{all.length}</small></span>
         <span className="shop-tag"><Icon kind={currencyIcon(item.currency)} />{WORLD_REQUIREMENTS[offerWorld(item) - 1].name}</span>
         {category === 'tools' && <span className="shop-tag shop-reach"><Icon kind="pickaxe" />{tr('能挖到 {layer}', { layer: toolReach(item.level) })}</span>}
       </div>
@@ -85,7 +102,7 @@ export function ShopPanel({ session, view, onClose }: { session: GameSession; vi
     {!display.ready && !display.error && <div className="shop-loading ui-card" role="status">{tr('正在布置展厅…')}</div>}
     {display.error && <div className="shop-loading ui-card" role="alert"><p>{tr('展厅资源加载失败')}</p><UiButton size="s" onPress={view.retry}>{tr('重新加载')}</UiButton></div>}
     <footer className="shop-under" data-state={offer}>
-      <div className="shop-stats">{offerStats(category, item, items, state).map(stat => {
+      <div className="shop-stats">{offerStats(category, item, all, state).map(stat => {
         // The worn newest pickaxe shows what its next enhancement brings instead.
         const gain = enhancing && stat.key === 'power' ? tr('强化后 {power}', { power: number(enhance.next!.power) }) : offerGain(stat);
         return <span key={stat.key} className="shop-stat" data-kind={stat.key}>

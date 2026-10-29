@@ -33,6 +33,8 @@ export function authoredRoomPlan(room:RestRoom,providedAsset?:RoomSceneAsset):Sc
   for(const material of Object.values(layout.materials))if(!Number.isInteger(material.tile)||material.tile<0||material.tile>=atlas.columns*atlas.rows)throw Error(`无效图集单元: ${room.id}`);
   for(const group of layout.groups){
     if(ids.has(group.id)||!vector(group.offset))throw Error(`无效场景组件组: ${group.id}`);
+    // A layer without a shop (only layers 2 and 4 have one) leaves out the shop's stall, like its ring and sign.
+    if(group.anchor==='shop'&&!room.shop){ids.add(group.id);continue;}
     ids.add(group.id);
     const base=anchor(group.anchor).map((v,i)=>v+group.offset[i]);
     const position=(at:readonly number[]):V3=>{if(!vector(at))throw Error(`无效组件坐标: ${group.id}`);return at.map((v,i)=>v+base[i]) as V3;};

@@ -3,6 +3,7 @@ import type { GameSession } from '../../application/GameSession.ts';
 import type { PetCardView, PetPanelSnapshot } from '../../application/PetUiAdapter.ts';
 import { itemDefinition } from '../../application/items.ts';
 import type { CurrencyId } from '../../content/economy.ts';
+import type { ShopItem } from '../../content/shopCatalog.ts';
 import { formatNumber as number } from '../../presentation/formatNumber.ts';
 import { GameButton } from '../GameButton.tsx';
 import { OreIcon } from '../InventoryIcons.tsx';
@@ -226,6 +227,13 @@ function GearTab({ session, common, onShop }: Props & { common: Common }) {
   const nextTool = tools.find(item => item.level === state.equipment.toolLevel + 1);
   const bag = bags.find(item => item.capacity === state.inventory.capacity) ?? bags[0];
   const nextBag = bags.find(item => item.capacity! > state.equipment.backpackCapacity);
+  // Where the next item is sold: this world's surface shop, or the shop of its hall of layer 2 or 4 once reached; a
+  // later world's in that world. Not open yet: the card says where instead of a button.
+  const soldAt = (item: ShopItem) => {
+    if (item.world !== state.currentWorld) return { open: false, place: WORLD_REQUIREMENTS[item.world - 1].name };
+    const hall = item.shop ? state.destinations[item.shop - 1] : null;
+    return { open: !hall || hall.unlocked, place: hall?.name ?? '' };
+  };
   const card = (kind: 'tools' | 'backpacks') => {
     const current = kind === 'tools' ? tool : bag, next = kind === 'tools' ? nextTool : nextBag;
     return <div className="ui-card-tile bag-gear" data-kind={kind}>
@@ -234,7 +242,8 @@ function GearTab({ session, common, onShop }: Props & { common: Common }) {
         {kind === 'tools' ? <><div className="ui-stat"><span>{tr('伤害')}</span><b>+{number(state.pickaxe.basePower)}</b></div><div className="ui-stat"><span>{tr('攻速')}</span><b>{tr('{n} 次/秒', { n: current.speed })}</b></div></>
           : <><div className="ui-stat"><span>{tr('容量')}</span><b>{number(current.capacity!)}</b></div><div className="ui-stat"><span>{tr('已装')}</span><b>{number(state.inventory.used)}</b></div></>}
         {next ? <div className="bag-gear-next"><small>{tr('下一件')} <b>{next.name}</b> · {kind === 'tools' ? tr('伤害 +{power}', { power: number(next.power!) }) : tr('容量 {capacity}', { capacity: number(next.capacity!) })}</small>
-          <PriceButton verb={tr('去商店')} price={number(next.price)} currency={currencyIcon(next.currency)} size="s" tone="orange" onPress={() => onShop(kind)} /></div>
+          {soldAt(next).open ? <PriceButton verb={tr('去商店')} price={number(next.price)} currency={currencyIcon(next.currency)} size="s" tone="orange" onPress={() => onShop(kind)} />
+            : <span className="ui-hint bag-gear-where">{tr('{place}的商店有售', { place: soldAt(next).place })}</span>}</div>
           : <span className="ui-stamp">{tr('已经是最好的了')}</span>}
       </div>
     </div>;

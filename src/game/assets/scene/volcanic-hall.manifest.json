@@ -2,11 +2,11 @@
   "parts": [
     "volcanic-hall.000.part"
   ],
-  "bytes": 301835,
-  "decodedBytes": 633620,
-  "sha256": "6c54104e49944769d6ea1357c8ddcdb240e2d9eb9933d834b7a432a1e83bec9d",
-  "sourceSha256": "1eb3e10b3dcac2ae9a36032af55caf189f7ef8fff9277969efad50a91a4ec305",
-  "triangles": 32430,
+  "bytes": 299400,
+  "decodedBytes": 627524,
+  "sha256": "1bd90edc6b055e5f985100d0972976818149cc2a4ef632c21c14de9d2a51c7bd",
+  "sourceSha256": "16e5d42bfc877ecbbb35fbe77161e9a20041edb483a6db9e67331e97a6d95b37",
+  "triangles": 32098,
   "source": "volcanic hall: Blender props (surface-game-art/tools/blender/build_volcanic.py) and an offline procedural cave shell (surface-game-art/tools/underground/volcanicHall.ts on caveKit.ts); baked occlusion per vertex",
   "materialProfile": "authored-color",
   "coordinateSpace": "authored",
