@@ -4,12 +4,13 @@ import { formatNumber } from './formatNumber.ts';
 
 import { tr } from '../i18n/i18n.ts';
 /** What the session says about the block under the pick (GameSession snapshot `target`). */
-export type OverlayTarget = Readonly<{ key: string; name: string; hp: number; maximum: number; price: number; requiredLevel: number; locked: boolean }>;
+export type OverlayTarget = Readonly<{ key: string; name: string; hp: number; maximum: number; price: number; requiredLevel: number; locked: boolean;
+  recommendedLevel?: number; underLevel?: boolean }>;
 /** A swing that reached its block this frame (MiningFeedback): the damage it did, and whether it broke the block. */
 export type LandedHit = Readonly<{ cell: Coord; damage: number; final: boolean }>;
 type Refusal = 'locked' | 'full';
 /** SVG markup for the icons the overlay draws (the kit's icons, without React). */
-export type OverlayIcons = Readonly<{ currency(): string; lock: string; bag: string; ore(color: string): string }>;
+export type OverlayIcons = Readonly<{ currency(): string; lock: string; bag: string; pickaxe: string; ore(color: string): string }>;
 
 const PLATE_SECONDS = 1.5, MAX_NUMBERS = 6, NUMBER_MS = 700, FLY_MS = 480, FLY_GAP_MS = 160, TOP_CLEAR = 72, EDGE = 8;
 const keyOf = (cell: Coord) => cell.join(',');
@@ -132,12 +133,17 @@ export class MiningOverlay {
     const locked = this.refusal === 'locked' || !!info?.locked;
     const state = this.broken ? 'broken' : locked ? 'locked' : this.refusal === 'full' ? 'full' : 'hit';
     if (this.shown.get('state') !== state) { this.shown.set('state', state); this.plate.dataset.state = state; }
+    // A layer's cap under its recommended pickaxe: still breaking (health bar kept), with a line under it.
+    const under = state === 'hit' && !!info?.underLevel;
+    if (this.shown.get('under') !== String(under)) { this.shown.set('under', String(under)); if (under) this.plate.dataset.under = 'true'; else delete this.plate.dataset.under; }
+    // A layer's cap under its recommended pickaxe still breaks, slowly: the plate says which pickaxe it is meant for.
     this.write(this.note, state === 'locked' ? `${this.icons.lock}<span>${tr('需要 Lv.{level} 镐子', { level: info?.requiredLevel ?? '' })}</span>`
-      : state === 'full' ? `${this.icons.bag}<span>${tr('背包满了，去出售')}</span>` : '');
+      : state === 'full' ? `${this.icons.bag}<span>${tr('背包满了，去出售')}</span>`
+      : under ? `${this.icons.pickaxe}<span>${tr('建议 Lv.{level} 镐子', { level: info?.recommendedLevel ?? '' })}</span>` : '');
     const ratio = `${(Math.max(0, Math.min(1, this.shownHp / Math.max(1, this.shownMax))) * 100).toFixed(1)}%`;
     if (this.shown.get('ratio') !== ratio) { this.shown.set('ratio', ratio); this.hp.style.width = ratio; this.lag.style.width = ratio; }
-    if (!this.size || this.shown.get('size') !== `${state}|${this.plateName.textContent}`) {
-      this.shown.set('size', `${state}|${this.plateName.textContent}`); this.size = { w: this.plate.offsetWidth || 130, h: this.plate.offsetHeight || 44 };
+    if (!this.size || this.shown.get('size') !== `${state}|${under}|${this.plateName.textContent}`) {
+      this.shown.set('size', `${state}|${under}|${this.plateName.textContent}`); this.size = { w: this.plate.offsetWidth || 130, h: this.plate.offsetHeight || 44 };
     }
     const { w, h } = this.size;
     const x = Math.min(width - EDGE - w / 2, Math.max(EDGE + w / 2, at.x));

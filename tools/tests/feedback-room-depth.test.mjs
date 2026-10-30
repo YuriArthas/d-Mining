@@ -116,7 +116,7 @@ test('airborne room entry and grounded objects above its floor window never gran
     { feet: room.spawn, grounded: false },
     { feet: [0, -(d - .025), 11], grounded: false },
     { feet: [0, -(d - .5), 11], grounded: false },
-    { feet: [0, room.spawn[1] + .002, 11], grounded: true },
+    { feet: [0, room.spawn[1] + .032, 11], grounded: true },
     { feet: [room.roomBounds.maxX, room.spawn[1], 11], grounded: true },
   ];
   for (const { feet, grounded } of samples) {
@@ -142,4 +142,11 @@ test('natural descent outside room bounds keeps exact airborne thresholds and th
     assert.equal(session.exportProgress().exploration.maxDepth, -y + (grounded ? .04 : 0));
     assert.equal(visualFrame(feet, grounded).depth, unlocked ? d : 0);
   }
+});
+
+test('standing on a hall floor stone (8.5 cm, with the skin about 11 cm over the floor) reaches the hall', () => {
+  const room = destinations.find(destination => destination.id === 'old_mine');
+  const session = GameSession.createNew(GAME_CONTENT.session);
+  session.updatePosition([0, -room.depth + .112, 11], true);
+  assert.equal(session.getSnapshot().destinations.find(destination => destination.id === room.id).unlocked, true);
 });

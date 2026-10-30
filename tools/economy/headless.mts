@@ -36,11 +36,13 @@ class InlineWorker {
   terminate() {}
 }
 
-export async function createHeadlessGame(saved?: unknown) {
+/** `random` drives the eggs and the capsule; `day(now)` names the reward day at simulated time `now` (YYYY-MM-DD). */
+export async function createHeadlessGame(saved?: unknown, options: { random?: () => number; day?: (now: number) => string } = {}) {
   await initPhysics();
   const content = GAME_CONTENT;
   const clock = { now: 0 };
-  const session = new GameSession(content.session, undefined, () => clock.now, {}, saved);
+  const day = options.day, rewards = { ...(day ? { day: () => day(clock.now) } : {}), ...(options.random ? { random: options.random } : {}) };
+  const session = new GameSession(content.session, undefined, () => clock.now, { ...(options.random ? { random: options.random } : {}), rewards }, saved);
   const physics = new CharacterPhysics();
   const workers: InlineWorker[] = [];
   const terrain = new TerrainStream(physics, GAME_GENERATION, () => { const w = new InlineWorker(); workers.push(w); return w as unknown as Worker; }, session.collected);

@@ -24,6 +24,8 @@
 .mine-plate[data-state=locked] .mine-plate-head { color: var(--ui-ink-soft); }
 .mine-plate[data-state=locked] .mine-plate-note { display: flex; color: var(--ui-red-lo); }
 .mine-plate[data-state=full] .mine-plate-note { display: flex; color: var(--ui-orange-lo); }
+/* A layer's cap under its recommended pickaxe: the health bar stays, the line under it says which pickaxe. */
+.mine-plate[data-under=true] .mine-plate-note { display: flex; color: var(--ui-orange-lo); }
 .mine-plate:is([data-state=locked], [data-state=full]) .mine-plate-bar { display: none; }
 /* The last blow: the plate swells and goes. */
 .mine-plate.mine-plate-on[data-state=broken] { opacity: 0; scale: 1.18; transition: opacity .25s ease, scale .25s ease; }

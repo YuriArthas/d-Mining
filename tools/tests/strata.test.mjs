@@ -17,7 +17,9 @@ test('layer boundaries use metres and the top face of each block', () => {
 });
 test('shallow terrain holds only the surface layer\'s rock and ores under the protected floor', () => {
  const game=new SparseWorld(WORLD1),surface=LAYERS[0],allowed=[surface.base,...surface.ores.map(o=>o.kind)];
- for(let x=-16;x<32;x++)for(let y=-16;y<0;y++)for(let z=-32;z<-16;z++)assert.ok((y===-1?[7]:allowed).includes(game.cell([x,y,z])));
+ // from `deepAt` down it is the layer's cap
+ const at=y=>-(y+1)*2>=surface.deepAt?[surface.deepKind]:allowed;
+ for(let x=-16;x<32;x++)for(let y=-16;y<0;y++)for(let z=-32;z<-16;z++)assert.ok((y===-1?[7]:at(y)).includes(game.cell([x,y,z])));
  assert.equal(game.stats().editBytes,0);
 });
 test('per-cell frequencies follow layer weights and each layer\'s ore chance, which rises layer by layer', () => {
@@ -74,7 +76,9 @@ test('theme blocks occur only in their owning layer, including every seam and mo
   for(let i=0;i<layers.length;i++) {
    const layer=layers[i], end=layers[i+1]?.from??layer.from+400, counts=new Map();
    // Away from room footprints: inspect both boundary-adjacent block slices and the interior.
-   for(const depth of [layer.from, layer.from+Math.floor((end-layer.from)/4)*2, end-2]) {
+   // the layer's top, the middle of its rock above the cap, its bottom (the cap)
+   const rock=layer.deepAt??end-layer.from;
+   for(const depth of [layer.from, layer.from+Math.floor(rock/4)*2, end-2]) {
     const y=-depth/2-1;
     for(let x=20;x<40;x++)for(let z=20;z<40;z++) {
      const kind=world.cell([x,y,z]);

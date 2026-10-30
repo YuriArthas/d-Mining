@@ -60,9 +60,10 @@ test('session damage projection persists across selection and clears only on act
  let now=0,solid=true;const session=new GameSession(SESSION_CONTENT, 50,()=>now),view=new BlockCracks();
  const cell=[14,-1,-25];session.attach({cell:()=>solid?65:0,pending:()=>false,mine:()=>true,cancelMining:()=>{}});
  const off=session.observeBlockDamage(view.setDamage);
- session.hit(cell);view.sync(near);assert.equal(overlays(view)[0].geometry.getAttribute('crackTile').getX(0),0);
+ // Kind 65 is the surface layer's cap: the first pickaxe hits it at a fraction of its damage; count real hits.
+ const damage=session.hit(cell).damage;view.sync(near);assert.equal(overlays(view)[0].geometry.getAttribute('crackTile').getX(0),0);
  session.selectTarget(null);session.resetPosition();view.sync(near);assert.equal(view.diagnostics().instances,1);
- for(let i=1;i<Math.ceil(resourceByKind(65).maxHp/10);i++){now=i*.5;session.hit(cell)}view.sync(near);assert.equal(overlays(view)[0].geometry.getAttribute('crackTile').getX(0),9);
+ for(let i=1;i<Math.ceil(resourceByKind(65).maxHp/damage);i++){now=i*.5;session.hit(cell)}view.sync(near);assert.equal(overlays(view)[0].geometry.getAttribute('crackTile').getX(0),9);
  assert.equal(session.getSnapshot().inventory.used,0);solid=false;session.collected([{cell,kind:65}]);view.sync(near);
  assert.equal(view.diagnostics().instances,0);assert.equal(session.getSnapshot().inventory.used,resourceByKind(65).volume);off();view.dispose();
 });

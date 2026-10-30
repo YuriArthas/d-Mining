@@ -223,6 +223,9 @@ export class GameSession {
     price: number;
     requiredLevel: number;
     locked: boolean;
+    /** A layer's cap below its recommended pickaxe (`recommendedLevel`): mined at a fraction of the damage. */
+    recommendedLevel: number;
+    underLevel: boolean;
   }> | null = null;
   private lastHit = 0;
   private clock: () => number;
@@ -303,9 +306,10 @@ export class GameSession {
       level: () => this.pickaxe.getSnapshot().level,
       read: (cell) => {
         const kind = this.mineableKind(cell);
-        return kind
-          ? { key: cell.join(","), maximum: oreDefinition(kind).maxHp, requiredLevel: oreDefinition(kind).requiredLevel }
-          : null;
+        if (!kind) return null;
+        // A layer's cap under its recommended pickaxe takes only part of each hit (a soft gate, economy.json capPenalty).
+        const block = oreDefinition(kind), under = this.pickaxe.getSnapshot().level < block.recommendedLevel;
+        return { key: cell.join(","), maximum: block.maxHp, requiredLevel: block.requiredLevel, damageScale: under ? ECONOMY.capPenalty : 1 };
       },
       pending: (cell) => this.world?.pending(cell) ?? false,
       destroy: (cell) => this.world?.mine([cell]) ?? false,
@@ -449,8 +453,9 @@ export class GameSession {
       this.targetView = null;
       return true;
     }
-    const requiredLevel = item.requiredLevel ?? 0, locked = this.pickaxe.getSnapshot().level < requiredLevel;
-    if (this.targetView?.key === key && this.targetView.hp === hp && this.targetView.locked === locked) return false;
+    const level = this.pickaxe.getSnapshot().level, requiredLevel = item.requiredLevel ?? 0, locked = level < requiredLevel;
+    const recommendedLevel = item.recommendedLevel ?? 0, underLevel = !locked && level < recommendedLevel;
+    if (this.targetView?.key === key && this.targetView.hp === hp && this.targetView.locked === locked && this.targetView.underLevel === underLevel) return false;
     this.targetView = Object.freeze({
       key,
       name: item.name,
@@ -458,7 +463,7 @@ export class GameSession {
       maximum: item.maxHp,
       volume: item.volume,
       price: item.price,
-      requiredLevel, locked,
+      requiredLevel, locked, recommendedLevel, underLevel,
     });
     return true;
   }

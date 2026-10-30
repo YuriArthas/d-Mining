@@ -8,7 +8,9 @@ type DepthDestination = Readonly<{
 }>;
 
 const CONTACT_DEPTH_TOLERANCE = .04;
-const FLOOR_POSITION_EPSILON = .001;
+// Up to 3 cm over the spawn (0.1 m clearance): the tallest floor stones of the halls (8.5 cm, with the physics skin
+// about 11 cm) still count as the floor (2026-10-29: a player who landed on one did not reach the hall).
+const FLOOR_POSITION_EPSILON = .03;
 
 function withinFootprint(feet: readonly number[], bounds: NonNullable<DepthDestination['roomBounds']>) {
   return feet[0] >= bounds.minX && feet[0] < bounds.maxX

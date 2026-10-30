@@ -189,7 +189,8 @@ test('UI adapter publishes coherent snapshots, filters unrelated frames, release
 test('equipped pets raise what ore sells for in their currency and mine faster in every world', () => {
   let now = 0, serial = 0;
   const session = new GameSession(SESSION_CONTENT, 50, () => now, { random: () => 0, createPetId: () => `p${++serial}` });
-  session.attach({ cell: () => 65, pending: () => false, mine: () => true, cancelMining() {} });
+  // The surface layer's plain rock (its cap, kind 65, takes part of the first pickaxe's damage).
+  session.attach({ cell: () => 64, pending: () => false, mine: () => true, cancelMining() {} });
   goToEgg(session);
   const acquired = session.pets.hatch('meadow-egg'); assert.equal(acquired.status, 'hatched'); assert.equal(session.getSnapshot().coins, 190);
   session.pets.equip(acquired.pet.id); assert.equal(session.getSnapshot().saleMultiplier, 1.1);

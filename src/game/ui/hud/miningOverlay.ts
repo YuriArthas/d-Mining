@@ -14,7 +14,7 @@ const oreMarkup = (color: string) => `<svg class="ore-icon" viewBox="0 0 32 32" 
 export function attachMiningOverlay(root: HTMLElement, session: GameSession, selected: () => Coord | null) {
   const overlay = new MiningOverlay(root, {
     currency: () => iconMarkup(currencyIcon(session.getSnapshot().currency)),
-    lock: iconMarkup('lock'), bag: iconMarkup('backpack'), ore: oreMarkup,
+    lock: iconMarkup('lock'), bag: iconMarkup('backpack'), pickaxe: iconMarkup('pickaxe'), ore: oreMarkup,
   });
   const now = () => performance.now() / 1000;
   const detach = [
