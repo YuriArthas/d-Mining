@@ -2,7 +2,9 @@ import type { Theme } from '../content/themes.ts';
 import type { AuthoredRoom } from '../content/rooms/authoredRoom.ts';
 export type V3 = [number,number,number];
 export type Shape = { type:'box'|'rock'|'cylinder'|'ring'|'cap'|'torus'; at:V3; size:V3; color:string; interaction?:boolean; rotation?:V3; glow?:boolean };
-export type Solid = { at:V3; half:V3; yaw:number; hull?:number[]; triangles?:{vertices:number[];indices:number[]} };
+/** A collider: a box (centre, half size, turn round Y), or a convex hull or triangles round `at`. `ground`: the
+ *  landscape's walkable ground (the collider view leaves it out). */
+export type Solid = { at:V3; half:V3; yaw:number; hull?:number[]; triangles?:{vertices:number[];indices:number[]}; ground?:boolean };
 export type Sign = { at:V3; width:number; title:string; subtitle:string; color:string; background:string; style?:'facility'; yaw?:number };
 export type SceneryPlan = { shapes:Shape[]; solids:Solid[]; signs:Sign[]; style?:'plastic'; authored?:AuthoredRoom };
 const WOOD='#986b48', METAL='#425658', CREAM='#f0ddb0';

@@ -6,7 +6,7 @@
 // portal past the spawn and round the crater; the fallen star hung and turning over the shaft (a Spin_* node), the
 // crater arch behind it, the observatories facing the paths, the portal and the station; crystal trees, clusters
 // and star lanterns; world 3's eggs on their pad east of the spawn. Baked with the daytime sun, so large flat
-// surfaces are subdivided.
+// surfaces are subdivided. The props bring their colliders (their kits'); the base adds its own shapes'.
 import * as THREE from 'three';
 import { colour, matte, rockMass, type GetProp, type HallSolid } from './caveKit.ts';
 import { rng } from '../terrain/kit.ts';
@@ -36,11 +36,6 @@ export function buildHall(getProp: GetProp) {
     const p = getProp(name); p.position.set(at[0], at[1], at[2]); p.rotation.y = yaw; p.scale.setScalar(scale); parent.add(p);
     p.traverse(o => { if (o instanceof THREE.Mesh) { let g = fine.get(o.geometry); if (!g) { g = tessellate(o.geometry, 1.8); fine.set(o.geometry, g); } o.geometry = g; } });
     return p;
-  };
-  // A box collider given in a prop's own frame (turned by its yaw round its origin, scaled by k).
-  const solidAt = (at: readonly number[], yaw: number, local: readonly number[], half: readonly number[], k = 1) => {
-    const c = Math.cos(yaw), s = Math.sin(yaw);
-    box([at[0] + (local[0] * c + local[2] * s) * k, at[1] + local[1] * k, at[2] + (-local[0] * s + local[2] * c) * k], half.map(v => v * k), yaw);
   };
   const M = { ground: matte('Base ground'), rim: matte('Base crater rim'), paint: matte('Base paint'), rock: matte('Base crater rock'), rail: matte('Base rail') };
   const tint = (g: THREE.BufferGeometry, hex: string | ((y: number) => THREE.Color)) => colour(g, typeof hex === 'string' ? () => new THREE.Color(hex) : hex);
@@ -176,45 +171,36 @@ export function buildHall(getProp: GetProp) {
   // THE FALLEN STAR, hung over the shaft and turning; THE CRATER ARCH behind the shaft's far edge.
   const star = new THREE.Group(); star.name = 'Spin_y_25'; star.position.set(...BASE.star.at); place('Fallen_Star', [0, 0, 0], 0, star, BASE.star.scale); group.add(star);
   place('Crater_Arch', BASE.arch.at);
-  for (const s of [-1, 1]) box([BASE.arch.at[0] + s * 9, 4.7, BASE.arch.at[2]], [1.2, 4.7, 1.2]);
 
   // THE OBSERVATORIES: the ore buyer and the gear shop, fronts to the paths.
-  for (const [name, k] of [['Star_Buyer', BASE.kiosks.sell], ['Star_Workshop', BASE.kiosks.shop]] as const) {
-    place(name, k.at, k.yaw, group, k.scale);
-    solidAt(k.at, k.yaw, [0, 4.4, -3.4], [4.6, 4.4, 4.6], k.scale);
-    for (const s of [-1, 1]) solidAt(k.at, k.yaw, [s * 3.95, 2.4, 1.15], [.45, 2.4, 1.15], k.scale);
-    solidAt(k.at, k.yaw, [0, 1.0, 2.65], [3.4, 1.0, .5], k.scale);
-  }
+  for (const [name, k] of [['Star_Buyer', BASE.kiosks.sell], ['Star_Workshop', BASE.kiosks.shop]] as const) place(name, k.at, k.yaw, group, k.scale);
 
   // THE WORLD PORTAL and THE TELEPORT STATION.
   const pt = BASE.portal;
   place('Star_Portal', pt.at, pt.yaw);
-  for (const s of [-1, 1]) solidAt(pt.at, pt.yaw, [s * 2.1, .7, 0], [.6, .7, .6]);
-  solidAt(pt.at, pt.yaw, [0, 2.9, 0], [2.7, 2.9, .45]);
   const st = BASE.station;
   place('Star_Station', [st.x, 0, st.z], st.yaw);
-  for (const side of [-1, 1]) box([st.x + Math.cos(st.yaw) * 1.9 * side, 2.6, st.z - Math.sin(st.yaw) * 1.9 * side], [.5, 2.6, .5], st.yaw);
-  // Round the station, the layers below (their halls' props), each in the station's frame, on the ground.
+  // Round the station, the layers below (their halls' props, colliders and all), each in the station's frame, on the
+  // ground.
   {
     const c = Math.cos(st.yaw), s = Math.sin(st.yaw);
     for (const d of BASE.stationDecor) {
       const at: [number, number, number] = [st.x + d.x * c + d.z * s, d.y ?? 0, st.z - d.x * s + d.z * c];
       place(d.prop, at, st.yaw + d.yaw, group, d.scale);
-      box([at[0], d.half[1], at[2]], d.half, st.yaw + d.yaw);
     }
   }
 
   // THE HATCHERY: pale marble, a gold rim, a violet ring at its centre.
   buildHatchery(BASE.hatchery, BASE.stands, { pad: '#f1edf7', rim: '#f2be36', mark: '#9c66e6' },
-    { place: (name, at, yaw) => place(name, at, yaw), paint: (g, hex, name, max) => paint(g, hex, name, M.paint, max), box });
+    { place: (name, at, yaw) => place(name, at, yaw), paint: (g, hex, name, max) => paint(g, hex, name, M.paint, max) });
 
   // STAR LANTERNS, CRYSTAL TREES AND CLUSTERS.
-  for (const [x, z] of BASE.lamps) { place('Star_Lamp', [x, 0, z], 0); box([x, 2.4, z], [.3, 2.4, .3]); }
+  for (const [x, z] of BASE.lamps) place('Star_Lamp', [x, 0, z], 0);
   const treeKinds = ['Crystal_Tree_Violet', 'Crystal_Tree_Teal', 'Crystal_Tree_Pink'];
-  for (const [x, z, k, yaw, kind] of BASE.trees) { place(treeKinds[kind], [x, 0, z], yaw, group, k); box([x, 1.7 * k, z], [.55 * k, 1.7 * k, .55 * k]); }
+  for (const [x, z, k, yaw, kind] of BASE.trees) place(treeKinds[kind], [x, 0, z], yaw, group, k);
   for (const [x, z, k, yaw, kind] of BASE.clusters) {
-    if (kind === 1) { place('Star_Fragment', [x, 0, z], yaw, group, k); box([x, .6 * k, z], [1 * k, .6 * k, 1 * k], yaw); }
-    else { place(clusterKinds[Math.floor(r() * 3)], [x, 0, z], yaw, group, k * 1.2); box([x, .9 * k, z], [.8 * k, .9 * k, .8 * k], yaw); }
+    if (kind === 1) place('Star_Fragment', [x, 0, z], yaw, group, k);
+    else place(clusterKinds[Math.floor(r() * 3)], [x, 0, z], yaw, group, k * 1.2);
   }
   return { group, solids, lights: [] };
 }

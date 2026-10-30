@@ -1,5 +1,6 @@
 // Offline: the 蘑菇洞穴 rest hall on the shared cave shell (caveKit.ts): an indigo cave, moss carpets with glowing
-// specks, a raised glowing pool in the north-east, glowing vines, and giant mushrooms from build_fungal.py.
+// specks, a raised glowing pool in the north-east, glowing vines, and giant mushrooms from build_fungal.py (props
+// with their colliders).
 import * as THREE from 'three';
 import { caveKit, colour, glow, matte, type GetProp } from './caveKit.ts';
 import { FUNGAL_HALL as HALL } from '../../../src/game/content/underground/fungalHall.ts';
@@ -31,14 +32,11 @@ export function buildHall(getProp: GetProp) {
 
   kit.hangers(22, [teal, violet], moss, '#2c5d58');
 
-  for (const m of HALL.mushrooms) {
-    place(m.tint === 'teal' ? 'Mushroom_Teal' : 'Mushroom_Violet', m.at, m.yaw, m.height);
-    box([m.at[0], m.height * .36, m.at[2]], [m.height * .075, m.height * .36, m.height * .075]);
-  }
+  for (const m of HALL.mushrooms) place(m.tint === 'teal' ? 'Mushroom_Teal' : 'Mushroom_Violet', m.at, m.yaw, m.height);
   kit.services();
   // Crystals and small mushroom clumps along the wall feet.
   kit.wallFoot(34, () => r() < .35
-    ? { name: 'Crystal_Cluster', scale: () => .9 + r() * .7, solid: [.45, .5] }
+    ? { name: 'Crystal_Cluster', scale: () => .9 + r() * .7 }
     : { name: 'Mushroom_Cluster', scale: () => .9 + r() * .9 });
   return { group: kit.group, solids: kit.solids, lights: HALL.lights };
 }

@@ -10,6 +10,7 @@ import { WORLD_REQUIREMENTS, worldPortal, worldSpawn, worldStation } from './wor
 import { PET_CONTENT } from './petContent.ts';
 import { PINEWIND_EGG_DISPLAYS, PINEWIND_SERVICES } from './pinewind/hubLayout.ts';
 import { CREEK_CELLS, pinewindSurface } from './pinewindSurface.ts';
+import { baseSurfacePlan } from './baseSurfaces.ts';
 import { TECH_BASE } from './world2/techBase.ts';
 import { STAR_BASE } from './world3/starBase.ts';
 import type { EggStand } from './eggStands.ts';
@@ -80,13 +81,20 @@ const session: SessionContent = {
   sunkenSurface: CREEK_CELLS,
 };
 
+/** Where the scenery stands, for the view and the colliders alike: each world's surface (world 1's is `surface`),
+ *  then its rest rooms (the later worlds' at their world's Z). */
+const sites: readonly ScenerySite[] = JOURNEY_WORLDS.flatMap(w => [
+  w.id === 1 ? { id: 'surface', depth: 0, plan: surface.plan } : { id: `world${w.id}.surface`, depth: 0, plan: baseSurfacePlan(w.id as 2 | 3) },
+  ...w.localRooms.map(r => ({ id: r.id, depth: r.depth, ...(w.id === 1 ? {} : { z: w.z }), plan: roomPlan(r) })),
+]);
+
 /** The whole game: three worlds of surface plus six rest layers each; world 1's surface is the Pinewind valley. */
 export const GAME_CONTENT = {
   layers: first.layers,
-  /** World 1's rest rooms; the later worlds' rooms are `extraSites`. */
+  /** World 1's rest rooms. */
   rooms: first.rooms,
   worlds: JOURNEY_WORLDS,
-  extraSites: later.flatMap(w => w.localRooms.map(r => ({ id: r.id, depth: r.depth, z: w.z, plan: roomPlan(r) }))) as readonly ScenerySite[],
+  sites,
   session,
   surface,
   eggs,

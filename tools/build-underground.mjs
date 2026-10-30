@@ -5,7 +5,10 @@
 // `ASSET` (default <id>-hall), `SUN = true` (bake the daytime sun's shadows too, for the surface) and `PROPS` (the
 // prop kits it places, default [<id>]: <kit>-props.glb each). Nodes named Spin_* / Slide_* stay out of the static
 // batches and move in the game (SceneMotion.ts); Egg_* (egg stands) keep their own node too, so the game can find
-// each stand by name (LockedEggs.ts), and cast their shadows like the static scene. Output:
+// each stand by name (LockedEggs.ts), and cast their shadows like the static scene. Every placed prop brings the
+// colliders its Blender function gave it (collision.py, placed with it by propCollision.ts; a placement may set
+// `userData.passable` to leave a small one out); the hall's own shapes add theirs with the kit's box() and hull().
+// Output:
 // surface-game-art/public/assets/underground/<asset>.glb, the packed runtime asset in src/game/assets/scene
 // (<asset>.*), and its colliders in src/game/content/underground/<asset>.json.
 import * as THREE from 'three';
@@ -20,6 +23,7 @@ import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { bakeOcclusion, OCCLUDER } from '../surface-game-art/tools/terrain/bakeLight.mjs';
 import { batchStatic } from '../surface-game-art/tools/terrain/kit.ts';
+import { placeProp } from '../src/game/world/propCollision.ts';
 const require = createRequire(new URL('../surface-game-art/package.json', import.meta.url));
 const { createCanvas, loadImage, ImageData, Image } = require('@napi-rs/canvas');
 globalThis.self = globalThis; globalThis.ImageData = ImageData; globalThis.HTMLImageElement = Image;
@@ -36,7 +40,35 @@ const name = ASSET ?? `${id}-hall`;
 const art = 'surface-game-art/public/assets/underground', shipped = 'src/game/assets/scene';
 const kits = await Promise.all(PROPS.map(kit => { const buffer = readFileSync(`${art}/${kit}-props.glb`);
   return new GLTFLoader().parseAsync(buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.length), '').then(g => g.scene); }));
-const built = buildHall(prop => { const node = kits.map(kit => kit.getObjectByName(prop)).find(Boolean); if (!node) throw Error(`Missing prop ${prop}`); const copy = node.clone(true); copy.position.set(0, 0, 0); copy.rotation.set(0, 0, 0); copy.scale.set(1, 1, 1); return copy; });
+// A prop is a kit's top-level node of that name (a part deeper in may share it).
+const built = buildHall(prop => {
+  const node = kits.map(kit => kit.children.find(o => o.name === prop)).find(Boolean); if (!node) throw Error(`Missing prop ${prop}`);
+  if (typeof node.userData.collision !== 'string') throw Error(`Prop ${prop} has no collision (rebuild its kit with collision.py)`);
+  const copy = node.clone(true); copy.position.set(0, 0, 0); copy.rotation.set(0, 0, 0); copy.scale.set(1, 1, 1);
+  copy.userData = { prop, collision: JSON.parse(node.userData.collision) }; return copy;
+});
+
+// The props' colliders where they stand (moving parts at rest); their own triangles for a `mesh` prop.
+const placed = { solids: 0, passable: 0, props: 0 };
+built.group.updateMatrixWorld(true);
+const toHall = built.group.matrixWorld.clone().invert();
+built.group.traverse(o => {
+  if (!o.userData.prop) return;
+  const { prop, collision, passable } = o.userData, matrix = new THREE.Matrix4().multiplyMatrices(toHall, o.matrixWorld);
+  o.userData = {}; placed.props++;
+  if (passable || collision.passable) { placed.passable++; return; }
+  if (!collision.solids?.length && !collision.mesh) throw Error(`Prop ${prop} decided no collision`);
+  if (collision.mesh) {
+    const vertices = [], indices = [];
+    o.traverse(m => { if (!m.isMesh) return; const g = m.geometry, p = g.attributes.position, base = vertices.length / 3, to = new THREE.Matrix4().multiplyMatrices(toHall, m.matrixWorld);
+      for (let i = 0; i < p.count; i++) vertices.push(...new THREE.Vector3().fromBufferAttribute(p, i).applyMatrix4(to).toArray());
+      for (let i = 0; i < (g.index?.count ?? p.count); i++) indices.push(base + (g.index ? g.index.getX(i) : i)); });
+    built.solids.push(...placeProp(prop, { solids: [{ at: [0, 0, 0], half: [1, 1, 1], yaw: 0, triangles: { vertices, indices } }] }, new THREE.Matrix4()));
+    placed.solids++;
+  }
+  const solids = collision.solids?.length ? placeProp(prop, { solids: collision.solids }, matrix) : [];
+  built.solids.push(...solids); placed.solids += solids.length;
+});
 
 // Moving parts and egg stands keep their own nodes (and their own geometry, since each carries its own bake). A
 // spinning part or a stand is merged into one mesh per material in its own frame (a prop's many pieces would each
@@ -104,5 +136,5 @@ const manifest = { parts: [`${name}.000.part`], bytes: compressed.length, decode
 writeFileSync(`${shipped}/${name}.manifest.json`, JSON.stringify(manifest, null, 2) + '\n');
 const propsReport = Object.fromEntries(PROPS.map(kit => [kit, JSON.parse(readFileSync(`surface-game-art/artifacts/${kit}-props.json`))]));
 const singleKit = PROPS.length === 1 ? propsReport[PROPS[0]] : propsReport;
-writeFileSync(`surface-game-art/artifacts/${name}.json`, JSON.stringify({ hall: { triangles: batched.stats.triangles, batches: batched.stats.batches, colliders: built.solids.length, glbSha256: hash(glb), runtimeSha256: hash(runtime) }, props: singleKit, occlusion: baked.stats }, null, 2) + '\n');
-console.log(`${name}:`, batched.stats.triangles, 'triangles,', batched.stats.batches, 'batches,', built.solids.length, 'colliders,', compressed.length, 'bytes packed');
+writeFileSync(`surface-game-art/artifacts/${name}.json`, JSON.stringify({ hall: { triangles: batched.stats.triangles, batches: batched.stats.batches, colliders: built.solids.length, props: placed, glbSha256: hash(glb), runtimeSha256: hash(runtime) }, props: singleKit, occlusion: baked.stats }, null, 2) + '\n');
+console.log(`${name}:`, batched.stats.triangles, 'triangles,', batched.stats.batches, 'batches,', built.solids.length, 'colliders,', `(${placed.props} props: ${placed.solids} from props, ${placed.passable} passable),`, compressed.length, 'bytes packed');

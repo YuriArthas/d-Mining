@@ -2,10 +2,10 @@
   "parts": [
     "star-base.000.part"
   ],
-  "bytes": 666334,
-  "decodedBytes": 1178320,
-  "sha256": "86b79821b5aa6bdd98e9919637fccc30f91377514c835b3068f6089c6f4b4555",
-  "sourceSha256": "4ebb7912ab67cbaf51ee1dfb08b9a42dac297ee8f4a8a693619a6255747eed11",
+  "bytes": 666270,
+  "decodedBytes": 1177840,
+  "sha256": "bed37ce2a6e3f00c6d7b26f90d2faad6444c8e61ccc58c6792b301edd3b09c95",
+  "sourceSha256": "198150e339aeff093067900e46eeb8a5e98fd6e6f437107f31d043eb54502b11",
   "triangles": 70687,
   "source": "star base: Blender props (surface-game-art/tools/blender/build_star_base.py, surface-game-art/tools/blender/build_egg_stands.py, surface-game-art/tools/blender/build_tech_base.py, surface-game-art/tools/blender/build_gear.py, surface-game-art/tools/blender/build_crystal.py, surface-game-art/tools/blender/build_ruins.py, surface-game-art/tools/blender/build_frozen.py) and an offline procedural cave shell (surface-game-art/tools/underground/starBaseHall.ts on caveKit.ts); baked occlusion per vertex",
   "materialProfile": "authored-color",

@@ -1,12 +1,12 @@
 """地下遗迹 hall props: a buried sandstone temple. Whole and broken columns with jade glyph bands, a toppled drum,
 the temple gate that frames the name board, a carved guardian head, flame braziers, broad vine curtains, rubble
 and glyph blocks, and the service stalls under striped cloth awnings (red for the sale, teal for the shop) on
-stone posts, on the shared footprints in cave_props.py.
+stone posts, on the shared footprints in cave_props.py. Each prop's collider follows its parts.
 Run: blender -b --python tools/blender/build_ruins.py
 """
 import sys, math, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from cave_props import start, finish, model, mesh, box, lathe, prism, stepped, circle, spike, stall, lantern_post, name_board, pit_post
+from cave_props import start, finish, model, mesh, box, lathe, prism, stepped, circle, spike, stall, lantern_post, name_board, pit_post, solid, solid_of, passable
 
 TILES = [
     ('b09a74', [(4, 6, 24, 3, 'bea882'), (6, 24, 18, 2, 'a08a66')]),                          # 0 dark sandstone (frames)
@@ -49,6 +49,7 @@ lathe('Shaft', [(1.08, .82), (7.6, .74)], 8, 16, spin=math.pi / 8, cap_top=False
 column_band(3.0)
 lathe('Capital', [(7.6, .76), (7.95, 1.02), (8.2, 1.1)], 8, 1, spin=math.pi / 8, cap_bottom=False)
 prism('Abacus', stepped(2.6, 2.6, .3), 8.2, 9.0, 0)
+solid((0, .4, 0), (2.6, .8, 2.6)); solid((0, 4.5, 0), (1.7, 9, 1.7))  # plinth, shaft
 # BROKEN COLUMN: the shaft snaps off at about 4.4 m in a jagged top; a fallen chunk leans at its foot.
 model('Column_Broken')
 column_base()
@@ -60,8 +61,9 @@ mesh('BrokenShaft', v, [(i, (i + 1) % 8, (i + 1) % 8 + 8, i + 8) for i in range(
      [16] * 8 + [2] * 8)
 column_band(2.6)
 prism('Chunk', [(-.5, -.4), (.45, -.5), (.6, .2), (.1, .55), (-.55, .3)], 0, .7, 2)
-mesh('ChunkMove', [(1.2 + x, y, .9 + z) for x, y, z in [(-.4, 0, -.4), (.5, 0, -.4), (.5, 0, .4), (-.4, 0, .4), (-.3, .6, -.3), (.4, .5, -.3), (.4, .7, .3), (-.3, .6, .3)]],
+chunk = mesh('ChunkMove', [(1.2 + x, y, .9 + z) for x, y, z in [(-.4, 0, -.4), (.5, 0, -.4), (.5, 0, .4), (-.4, 0, .4), (-.3, .6, -.3), (.4, .5, -.3), (.4, .7, .3), (-.3, .6, .3)]],
      [(3, 2, 1, 0), (4, 5, 6, 7), (0, 1, 5, 4), (7, 6, 2, 3), (0, 4, 7, 3), (2, 6, 5, 1)], 16)
+solid((0, .4, 0), (2.6, .8, 2.6)); solid((0, 2.4, 0), (1.7, 4.8, 1.7)); solid_of([chunk], hull=True)  # plinth, stump, fallen chunk
 # TOPPLED DRUM: one fallen column drum lying along X, a jade band round its middle.
 model('Column_Drum')
 def drum(r, x0, x1, t, cap):
@@ -73,6 +75,7 @@ def drum(r, x0, x1, t, cap):
     f = [(i, (i + 1) % n, (i + 1) % n + n, i + n) for i in range(n)] + [tuple(reversed(range(n))), tuple(range(n, 2 * n))]
     mesh('Drum', v, f, [t] * n + [cap, cap])
 drum(.82, -.9, -.2, 16, 1); drum(.86, -.2, .25, 18, 0); drum(.82, .25, .9, 16, 1)
+solid_of(hull=True)
 
 # TEMPLE GATE framing the name board (placed at the board, front +Z): two massive pillars with jade glyph strips,
 # a carved lintel with a glowing glyph frieze, and a stepped crown. The board stands between the pillars.
@@ -91,6 +94,7 @@ box('Crown2', (0, 12.3, -.5), (7.0, .8, 1.5), 17)
 box('Crown3', (0, 13.05, -.6), (3.2, .7, 1.2), 1)
 lathe('CrownGem', [(13.4, .5), (13.9, .5), (14.6, 0)], 4, 7, cz=.15, spin=math.pi / 4, cap_bottom=False)
 box('Step', (0, .06, 1.4), (9.0, .12, 1.0), 2)
+for side in (-1, 1): solid((side * 6.1, 4.5, -.3), (2.5, 9, 2.4))  # the pillars; the low step and the opening stay walkable
 
 # GUARDIAN HEAD, about 4.6 m: a carved block face on a plinth, jade eyes, a broad brow, ear flaps, a crested
 # headdress. Faces +Z.
@@ -108,12 +112,14 @@ box('HeaddressBand', (0, 4.1, 1.27), (3.1, .3, .1), 11)
 mesh('Crest', [(x, 4.37 + y, z) for x, y, z in [(-1.1, 0, -.4), (1.1, 0, -.4), (1.1, 0, .4), (-1.1, 0, .4), (-.5, 1.0, -.25), (.5, 1.0, -.25), (.5, 1.0, .25), (-.5, 1.0, .25)]],
      [(3, 2, 1, 0), (4, 5, 6, 7), (0, 1, 5, 4), (7, 6, 2, 3), (0, 4, 7, 3), (2, 6, 5, 1)], 17)
 lathe('CrestGem', [(5.37, .22), (5.6, .22), (5.85, 0)], 4, 7, spin=math.pi / 4, cap_bottom=False)
+solid((0, 2.4, 0), (3.1, 4.8, 2.8))
 
 # BRAZIER, 1.4 m bowl on a pedestal with a cluster of flame spikes (glow).
 model('Brazier')
-prism('Foot', stepped(1.0, 1.0, .22), 0, .25, 2)
-lathe('Pedestal', [(.25, .3), (.4, .22), (.9, .2), (1.0, .26)], 8, 1, spin=math.pi / 8)
-lathe('Bowl', [(1.0, .26), (1.12, .58), (1.36, .72), (1.44, .66)], 8, 10, spin=math.pi / 8, cap_top=False)
+brazier = [prism('Foot', stepped(1.0, 1.0, .22), 0, .25, 2)]
+brazier.append(lathe('Pedestal', [(.25, .3), (.4, .22), (.9, .2), (1.0, .26)], 8, 1, spin=math.pi / 8))
+brazier.append(lathe('Bowl', [(1.0, .26), (1.12, .58), (1.36, .72), (1.44, .66)], 8, 10, spin=math.pi / 8, cap_top=False))
+solid_of(brazier, hull=True)  # the flames above the bowl stay out
 lathe('Coals', [(1.32, .64), (1.36, .64)], 8, 20, spin=math.pi / 8, cap_bottom=False)
 for x, z, h, r, t, lean in [(0, 0, 1.25, .3, 20, (0, 0)), (.25, .12, .85, .22, 8, (.12, 0)), (-.24, .1, .8, .2, 8, (-.12, .05)), (.05, -.26, .9, .22, 8, (0, -.12)), (-.1, .28, .65, .18, 20, (0, .1))]:
     spike('Flame', x, z, h, r, 5, t, lean=lean, y=1.34, tip=.25, spin=x * 3)
@@ -127,16 +133,18 @@ for k, (x, n) in enumerate([(-1.1, 6), (0, 8), (1.05, 5)]):
         y = -.7 - i * .62; w = .62 - i * .03; dx = .14 * (1 if (i + k) % 2 else -1)
         prism('Leaf', [(x + dx, y - .5), (x + dx + w, y), (x + dx, y + .5), (x + dx - w, y)], -.12 - .02 * (i % 2), .1, 19, axis='z')
         if (i + k) % 3 == 2: lathe('Blossom', [(y - .14, .13), (y + .14, .13)], 5, 7, cx=x + dx, cz=.18)
+passable('hangs on the wall, its foot 6 m up and more')
 
 # RUBBLE: three tumbled sandstone blocks; GLYPH BLOCK: a carved block with glowing jade glyphs.
 model('Rubble')
-prism('Block', [(-.6, -.45), (.5, -.55), (.65, .3), (-.4, .5)], 0, .7, 2)
-prism('Block', [(.4, .2), (1.2, .1), (1.25, .8), (.5, .85)], 0, .5, 1)
-prism('Block', [(-.3, -.2), (.35, -.3), (.4, .25), (-.25, .3)], .7, 1.1, 17)
+for block in (prism('Block', [(-.6, -.45), (.5, -.55), (.65, .3), (-.4, .5)], 0, .7, 2),
+              prism('Block', [(.4, .2), (1.2, .1), (1.25, .8), (.5, .85)], 0, .5, 1),
+              prism('Block', [(-.3, -.2), (.35, -.3), (.4, .25), (-.25, .3)], .7, 1.1, 17)): solid_of([block], hull=True)
 model('Glyph_Block')
 box('Block', (0, .45, 0), (1.15, .9, 1.0), 17)
 box('GlyphFront', (0, .48, .51), (.7, .5, .04), 18)
 box('GlyphTop', (0, .91, 0), (.6, .03, .5), 18)
+solid_of()
 
 # SERVICE STALLS: stone column posts, a beam, and a striped cloth awning sloping to the front with a scalloped
 # valance. Red for the sale, teal for the shop.

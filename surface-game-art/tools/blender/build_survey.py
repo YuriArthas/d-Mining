@@ -6,7 +6,7 @@ Run: blender -b --python tools/blender/build_survey.py
 """
 import sys, math, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from cave_props import finish, model, box, prism, circle
+from cave_props import finish, model, box, prism, circle, solid, solid_of, passable
 from tech_props import tech_start, tech_services, bevel_box, ring_segments
 
 ACCENT = ('b88214', 'c89420')  # deep gold
@@ -56,6 +56,10 @@ for i, (w, y) in enumerate(((19.4, 19.0), (17.0, 18.0))):
     slab('Lintel', (0, y, .6 + i * .2), (w, 1.0, 1.2), 20 if i else 21)
 for i in range(3):
     slab('Step', (0, .2 + i * .4, 1.6 - i * .5), (16.4 - i * 1.2, .4, 1.6), 20 if i % 2 else 21, .1)
+# The wall, the pylons, and the three steps, each solid down to the floor (a step each, no jump).
+solid((0, 10, -.1), (17.6, 20, .8))
+for x in (-8.9, 8.9): solid((x, 10, .5), (2.0, 20, 1.6))
+for i in range(3): solid((0, .2 * (i + 1), 1.6 - i * .5), (16.4 - i * 1.2, .4 * (i + 1), 1.6))
 
 # GLYPH DOOR (front +Z, centre at the origin): a ring of carved blocks with a keystone, a stone disc inside it and
 # a glowing gold lip; the glyph itself turns (Glyph_Rotor).
@@ -66,6 +70,7 @@ slab('Keystone', (0, 6.1, 0), (1.8, 2.0, 1.7), 22)
 prism('Disc', circle(4.62, 24), -.5, -.1, 27, axis='z')
 ring_segments('Lip', 4.36, 4.62, -.1, .3, 24, 7)
 for side in (-1, 1): slab('DoorFoot', (side * 5.0, -5.4, 0), (2.4, 1.6, 1.8), 21)
+passable('set in the temple front, 6.4 m up')
 model('Glyph_Rotor')
 ring_segments('GlyphRing', 1.0, 1.4, 0, .22, 16, 7)
 prism('GlyphDot', circle(.5, 12), 0, .26, 16, axis='z')
@@ -75,6 +80,7 @@ for k in range(8):
     r1 = 3.7 if k % 2 == 0 else 2.9
     prism('GlyphRay', [(1.8 * c - .16 * s, 1.8 * s + .16 * c), (r1 * c - .16 * s, r1 * s + .16 * c), (r1 * c + .16 * s, r1 * s - .16 * c), (1.8 * c + .16 * s, 1.8 * s - .16 * c)], 0, .22, 7, axis='z')
 ring_segments('GlyphOuter', 3.95, 4.15, 0, .18, 24, 24, gaps=(2, 8, 14, 20))
+passable('turns in the glyph door, 8 m up')
 
 # SEATED STATUE (front +Z), about 9.5 m: a stepped plinth, a seated body of big blocks, hands on the knees, a gold
 # emblem on the chest, a head with a headdress and glowing cyan eyes (at local (+-.34, 7.15, .82)).
@@ -99,6 +105,7 @@ box('Brow', (0, 7.45, .67), (1.3, .18, .2), 21)
 box('Nose', (0, 7.0, .72), (.24, .5, .2), 21)
 for side in (-1, 1): box('Eye', (side * .34, 7.15, .7), (.3, .14, .12), 24)
 box('Mouth', (0, 6.6, .67), (.6, .1, .12), 21)
+solid((0, 4.5, 0), (3.6, 9.0, 3.2))  # plinth to headdress: nobody climbs it
 
 # PILLARS: drums of sandstone on a base with a gold band and a cap (7.2 m); the broken one stops short under a
 # cracked top block.
@@ -115,14 +122,15 @@ def pillar(name, drums, broken=False):
     else:
         prism('Band', circle(.86, 8, 0, 0, math.pi / 8), 3.4, 3.7, 25)
         slab('Cap', (0, y + .35, 0), (2.1, .7, 2.1), 20, .14)
+        solid_of('Cap')
+    solid_of('Base'); solid_of(['Drum', 'Band', 'Crack'], hull=True)  # the square base, the round shaft
 pillar('Ruin_Pillar', 4)
 pillar('Ruin_Pillar_Broken', 2, broken=True)
 
 # RUBBLE: two or three fallen sandstone blocks.
 model('Ruin_Block')
-slab('Block', (0, .45, 0), (1.4, .9, 1.1), 20, .1)
-slab('Block', (.9, .3, .5), (.9, .6, .8), 21, .08)
-slab('Block', (.2, 1.05, .1), (.8, .4, .7), 22, .08)
+for block in (slab('Block', (0, .45, 0), (1.4, .9, 1.1), 20, .1), slab('Block', (.9, .3, .5), (.9, .6, .8), 21, .08),
+              slab('Block', (.2, 1.05, .1), (.8, .4, .7), 22, .08)): solid_of([block])
 
 # SURVEY SCAFFOLD (front +Z), 3 m wide, 2 m deep, 6.6 m tall: white posts and beams, braces, two plank decks with
 # yellow rails at the front, an instrument box with a cyan screen and a lamp on top (light at (0, 6.95, .3)).
@@ -145,6 +153,7 @@ box('InstrumentScreen', (-.6, 3.8, .16), (.6, .4, .04), 24)
 box('LampMast', (.9, 6.7, -.6), (.1, 1.0, .1), 0)
 box('LampHead', (.9, 7.1, -.45), (.5, .28, .3), 11)
 box('Lamp', (.9, 7.0, -.29), (.4, .14, .04), 9)
+solid((0, 3.3, 0), (3.1, 6.6, 2.1))  # the whole frame: not a place to walk into
 
 # LAMP TOWER, 6.6 m: a yellow lattice mast on a charcoal foot crowned by a four-light head facing +Z (lights at
 # local (+-.28, 6.2 / 6.6, .32)).
@@ -160,5 +169,6 @@ for y0 in (.4, 1.6, 2.8, 4.0, 5.2):
 box('HeadPlate', (0, 6.4, .1), (1.1, 1.0, .16), 0)
 for x in (-.28, .28):
     for y in (6.18, 6.62): box('Light', (x, y, .22), (.4, .32, .08), 9)
+solid((0, 3.3, 0), (1.1, 6.6, 1.1))
 
 finish(__file__)

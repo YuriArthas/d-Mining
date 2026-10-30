@@ -6,11 +6,12 @@ lamp posts, palms, cacti, ore crates and barrels, storage tanks, wind turbines (
 habitat domes and a module, the ore silo and its conveyor (frame, sliding cleats and ore), cargo containers, an
 antenna mast and a parked mining mech.
 Run: blender -b --python tools/blender/build_tech_base.py
-Shared atlas, primitives and report in cave_props.py; tools/underground/techBaseHall.ts places the props.
+Shared atlas, primitives and report in cave_props.py; tools/underground/techBaseHall.ts places the props, each with
+the colliders it gets here.
 """
 import sys, math, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from cave_props import start, finish, model, mesh, box, lathe, prism, stepped, circle, spike
+from cave_props import start, finish, model, mesh, box, lathe, prism, stepped, circle, spike, solid, solid_of, passable
 
 # Panels carry soft seams inside the tile (the face UVs span its inner 27 px). Glow tiles are deep and saturated:
 # the emission (x2.2) plus the lit colour must keep their hue, not wash out to white. The two sunless tiles are
@@ -179,6 +180,8 @@ def dome_hall(name, paint, glow, clerk_x, front=None, white=6):
     # The emblem disc above the band.
     prism('EmblemRim', circle(1.78, 24, 0, 7.9), 3.0, 3.3, front, axis='z')
     prism('EmblemDisc', circle(1.46, 24, 0, 7.9), 3.3, 3.42, white, axis='z')
+    # The vault, its front wall and the counter in one block (the opening is only seen into); the plinth round it.
+    solid((0, 4.4, -.95), (12.2, 8.8, 8.3)); solid_of(['Plinth'])
 
 dome_hall('Ore_Buyer', 11, 8, 1.7, front=13, white=3)  # its front never sees the sun
 # Red crystals rising out of the emblem, ore on the shelves and the counter (crystals, gems, gold).
@@ -229,6 +232,10 @@ for s in (-1, 1):
     cbox('PylonCap', (s * 4.6, 3.88, 5.0), (.8, .16, .8), 0, q=.1)
 box('CurbBack', (0, 1.2, -3.2), (10.4, .6, .4), 6)
 box('CurbBackTop', (0, 1.53, -3.2), (10.5, .08, .5), 11)
+# The platform and its two steps (each a step up), the curbs round three sides and the lamp pylons.
+solid((0, .45, 1.0), (10.4, .9, 8.8)); solid((0, .3, 5.8), (8.0, .6, .8)); solid((0, .15, 6.6), (8.0, .3, .8))
+for s in (-1, 1): solid((s * 5.0, 1.2, 1.0), (.4, .6, 8.8)); solid((s * 4.6, 2.1, 5.0), (.7, 4.2, .7))
+solid((0, 1.2, -3.2), (10.4, .6, .4))
 
 # WORLD PORTAL FRAME, front +Z, origin on the dais floor: a broad white ring round the portal disc (radius 1.85,
 # 2.9 m up) with a violet glow lip, a yellow outer band and six yellow clamps, set in a yellow plinth; white pylons
@@ -251,6 +258,9 @@ for s in (-1, 1):
 cbox('Lintel', (0, 6.4, 0), (8.6, .8, 1.2), 3, q=.18)
 box('LintelBand', (0, 6.02, .61), (8.4, .14, .04), 13)
 box('LintelGlow', (0, 6.42, .61), (7.0, .12, .04), 21)
+# The pylons, and the ring with its plinth closed off (the portal opens by its zone in front, not by walking in).
+for s in (-1, 1): solid((s * 3.7, 3.0, 0), (1.0, 6.0, 1.1))
+solid((0, 2.9, 0), (6.4, 5.8, 1.0))
 
 # DRILL TOWER over the shaft (origin at the shaft's centre): four yellow legs from striped feet at the apron's
 # corners (+-10.2) leaning in to a white column (y 12.5-23.5) with yellow bands, lit windows and the name screen
@@ -290,6 +300,9 @@ box('WheelPost', (0, 26.2, 0), (.5, 1.0, .5), 0)
 cbox('Beacon', (1.4, 26.1, 1.4), (.45, .45, .45), 8, q=.06)
 lathe('Stem', [(11.4, .5), (12.6, .5)], 8, 10, cap_top=False)
 lathe('Collar', [(12.0, .8), (12.3, .9), (12.5, .7)], 10, 11)
+# The four feet and the legs' lower part, up to where they lean in over the head; the rest is high over the shaft.
+for sx in (-1, 1):
+    for sz in (-1, 1): solid((sx * F, .6, sz * F), (2.2, 1.2, 2.2)); solid((sx * (F - .7), 2.4, sz * (F - .7)), (1.4, 2.4, 1.4))
 
 # DRILL BIT, spinning about y (origin at its top, 7 m long): a steel core tapering to a point inside a spiral
 # flight of three turns, a yellow collar on top.
@@ -311,6 +324,7 @@ for k in range(N):
     f += [(a, a + 1, b + 1, b), (a + 2, b + 2, b + 3, a + 3), (a + 1, a + 3, b + 3, b + 1), (a, b, b + 2, a + 2)]
 f += [(0, 2, 3, 1), (4 * N, 4 * N + 1, 4 * N + 3, 4 * N + 2)]
 mesh('Flight', v, f, 27)
+passable('turns over the open shaft, its tip 2.3 m above the ground')
 
 # TELEPORT STATION (local +Z faces the pad and the spawn): a round white platform with a glowing rim, two white
 # pillars at +-1.9 across, a teal lintel, and a ring frame round the portal disc (2.75 m up, ~1.34 m radius).
@@ -329,6 +343,7 @@ box('LintelGlow', (0, 5.65, .51), (4.2, .14, .04), 7)
 ring('Ring', 2.75, 1.42, 1.78, -.17, .17, 3, n=16)
 ring('RingGlow', 2.75, 1.34, 1.43, -.2, .2, 7, n=16)
 for sx in (-1, 1): box('RingArm', (sx * 1.66, 2.75, 0), (.4, .3, .3), 0)
+for sx in (-1, 1): solid((sx * 1.9, 2.6, 0), (.9, 5.2, .9))  # the pillars; the plate is flush with the sand
 
 # RAIL POSTS round the shaft (the rails between them are the hall builder's): a white post with a yellow band and
 # a warm glowing cap; a taller striped post either side of each opening.
@@ -336,9 +351,11 @@ model('Rail_Post')
 cbox('Post', (0, .55, 0), (.3, 1.1, .3), 6, q=.05)
 box('Band', (0, .3, 0), (.34, .14, .34), 11)
 cbox('Cap', (0, 1.18, 0), (.36, .16, .36), 9, q=.05)
+solid_of()
 model('Rail_Gate')
 cbox('Post', (0, .8, 0), (.5, 1.6, .5), 5, q=.08)
 cbox('Cap', (0, 1.7, 0), (.56, .2, .56), 8, q=.08)
+solid_of()
 
 # LAMP POST: a white pole on a charcoal foot, a yellow band, a lantern head glowing warm.
 model('Lamp_Post')
@@ -348,6 +365,7 @@ box('Band', (0, 1.0, 0), (.3, .24, .3), 11)
 cbox('Head', (0, 5.0, 0), (.8, .3, .8), 0, q=.12)
 cbox('Lantern', (0, 4.7, 0), (.6, .4, .6), 9, q=.1)
 cbox('HeadCap', (0, 5.22, 0), (.5, .14, .5), 0, q=.08)
+solid((0, 2.6, 0), (.6, 5.2, .6))  # the pole on its foot; the head is overhead
 
 # PALM: a thick ringed trunk leaning and curving, seven broad drooping fronds, three coconuts.
 model('Palm_Tree')
@@ -370,6 +388,7 @@ for k in range(7):
 for k in range(3):
     a = 2 * math.pi * k / 3 + .5
     cbox('Coconut', (tx + math.cos(a) * .32, H - .25, tz + math.sin(a) * .32), (.34, .34, .34), 22, q=.08)
+solid_of(['Trunk'], hull=True)  # the leaning trunk; the fronds droop from 5.7 m
 
 # CACTI: a saguaro with two arms, and a cluster of barrel cacti.
 model('Cactus_A')
@@ -379,9 +398,10 @@ lathe('ArmRUp', [(1.3, .24), (2.35, .24), (2.55, .14), (2.62, 0)], 8, 25, cx=1.0
 beam('ArmL', (-.3, 1.05, 0), (-.9, 1.05, 0), .42, .42, 25)
 lathe('ArmLUp', [(.85, .22), (1.75, .22), (1.95, .12), (2.0, 0)], 8, 25, cx=-.9)
 cbox('Flower', (0, 3.32, 0), (.2, .12, .2), 16, q=.04)
+solid_of(['Body'], hull=True); solid_of(['ArmR'], hull=True); solid_of(['ArmL'], hull=True)  # the body and each arm
 model('Cactus_B')
 for k, (x, z, r, h) in enumerate(((0, 0, .5, .9), (.75, .3, .36, .62), (-.55, .5, .32, .5), (.2, -.7, .3, .45))):
-    lathe('Barrel', [(0, r * .8), (h * .25, r), (h * .8, r), (h, r * .5), (h + .06, 0)], 8, 25, cx=x, cz=z)
+    solid_of([lathe('Barrel', [(0, r * .8), (h * .25, r), (h * .8, r), (h, r * .5), (h + .06, 0)], 8, 25, cx=x, cz=z)], hull=True)
     cbox('Bloom', (x, h + .05, z), (.14, .1, .14), 16 if k % 2 else 12, q=.03)
 
 # ORE CRATES (wood with a charcoal band, crystals on top) and a BARREL.
@@ -392,10 +412,12 @@ for name, t in (('Crate_Red', 12), ('Crate_Blue', 26)):
     crystal('Ore', 0, .86, 0, .62, .2, t)
     crystal('Ore', -.25, .86, .2, .42, .14, t, lean=(-.3, .1))
     crystal('Ore', .28, .86, -.15, .46, .15, t, lean=(.3, -.1))
+    solid_of()  # the crate with the ore on it
 model('Barrel')
 lathe('Body', [(0, .4), (.1, .44), (.9, .44), (1.0, .4)], 10, 16)
 for y in (.25, .75): lathe('Hoop', [(y, .455), (y + .08, .455)], 10, 0, cap_bottom=False, cap_top=False)
 lathe('Lid', [(1.0, .36), (1.04, .36)], 10, 0)
+solid_of(hull=True)
 
 # STORAGE TANK (origin at its foot), 5.9 m: a white cylinder with yellow bands, a dome, a ladder, a glowing gauge.
 model('Storage_Tank')
@@ -404,6 +426,7 @@ lathe('Body', [(.5, 1.6), (1.4, 1.6), (1.7, 1.6), (4.0, 1.6), (4.3, 1.6), (4.6, 
 lathe('Dome', [(4.6, 1.6), (5.2, 1.35), (5.7, .8), (5.9, .1)], 12, 6)
 box('Ladder', (1.66, 2.9, 0), (.08, 4.8, .5), 0)
 box('Gauge', (0, 3.0, 1.62), (.7, .7, .06), 7)
+solid_of(hull=True)
 
 # WIND TURBINE: a tapered tower (22.6 m to the hub) with a nacelle; the rotor turns about its own z.
 model('Wind_Turbine_Tower')
@@ -413,6 +436,7 @@ lathe('TowerStripe', [(2.0, .94), (2.6, .93)], 8, 5, cap_bottom=False, cap_top=F
 cbox('Nacelle', (0, 22.6, -.3), (1.5, 1.5, 3.4), 6)
 cbox('NacelleTrim', (0, 23.4, -.6), (1.2, .16, 2.4), 2)
 cbox('NacelleLight', (0, 23.55, -1.6), (.3, .2, .3), 8, q=.05)
+passable('stands on the tall mesa tops, out of reach')
 model('Wind_Turbine_Rotor')
 cbox('Hub', (0, 0, 0), (1.2, 1.2, .9), 6)
 mesh('Nose', [(-.6, -.6, .45), (.6, -.6, .45), (.6, .6, .45), (-.6, .6, .45), (0, 0, 1.3)], [(0, 1, 2, 3), (0, 1, 4), (1, 2, 4), (2, 3, 4), (3, 0, 4)], 6)
@@ -427,6 +451,7 @@ for k in range(3):
     v = [at(9.0, -.24, -.1), at(9.0, .27, -.1), at(10.55, .23, -.09), at(10.55, -.19, -.09),
          at(9.0, -.24, .1), at(9.0, .27, .1), at(10.55, .23, .09), at(10.55, -.19, .09)]
     mesh('BladeTip', v, [(0, 1, 2, 3), (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)], 16)
+passable('turns 22 m up on the mesa tops')
 
 # SOLAR ROW, 12 m along x: posts, a rail and panels tilted toward the sun (+Z, up).
 model('Solar_Row')
@@ -436,6 +461,7 @@ beam('Rail', (-6, 1.45, 0), (6, 1.45, 0), .3, .3, 0)
 for k in range(4):
     x0, x1 = -6 + k * 3 + .06, -3 + k * 3 - .06
     slab('Panel', [(x0, 1.1, 1.05), (x1, 1.1, 1.05), (x1, 2.05, -1.05), (x0, 2.05, -1.05)], .1, 18)
+solid_of()
 
 # HABITAT DOME: a ring base, a low wall with a glowing window band, a white dome with a yellow band, a yellow door
 # facing +Z.
@@ -450,6 +476,7 @@ lathe('DomeHatchGlow', [(7.6, .4), (7.7, .3)], 8, 7)
 cbox('Door', (0, 1.5, 5.95), (2.2, 2.8, 1.0), 11)
 box('DoorGlow', (0, 2.98, 6.46), (2.0, .14, .06), 8)
 box('DoorPanel', (0, 1.4, 6.46), (1.4, 2.2, .04), 6)
+solid_of(hull=True)  # the round dome, its door and its hatch
 
 # HABITAT MODULE: a white capsule block on skids with a teal band, windows, a door and a roof unit.
 model('Habitat_Module')
@@ -462,6 +489,7 @@ cbox('Door', (3.0, 1.85, 2.0), (1.4, 2.5, .6), 11)
 box('DoorLight', (3.0, 3.25, 2.32), (1.2, .12, .04), 8)
 cbox('RoofUnit', (-1.5, 4.05, 0), (3.0, .7, 2.0), 2)
 box('RoofVent', (-1.5, 4.05, 1.02), (2.4, .4, .06), 0)
+solid_of()
 
 # ORE SILO (origin at its foot): a white tower with a hazard band and a yellow top band, a conical top, a glowing
 # band and the conveyor's intake on -X.
@@ -474,6 +502,7 @@ lathe('SiloTop', [(12.0, 3.35), (12.4, 3.35), (14.6, 1.2), (15.0, .5)], 12, 6)
 cbox('Intake', (-3.4, 3.4, 0), (1.6, 1.6, 2.0), 11)
 box('IntakeMouth', (-4.22, 3.3, 0), (.06, .9, 1.4), 15)
 cbox('Ladder', (2.2, 7, 2.4), (.3, 12, .3), 0, q=.04)
+solid_of(['SiloBase', 'SiloBody', 'SiloTop'], hull=True)  # the round tower; the intake is over the head
 
 # CONVEYOR frame, 16 m along +x from its origin (belt top 3.2 m): a bed with glowing side strips, two legs, a
 # hopper at the start. The cleats and ore riding on it are separate props (they slide in the game).
@@ -484,15 +513,17 @@ for s in (-1, 1):
     box('Rail', (8, 3.35, s * .8), (16.2, .3, .14), 11)
     box('RailGlow', (8, 3.35, s * .88), (15.6, .08, .04), 9)
 for x in (8, 13.5):
-    cbox('Leg', (x, 1.4, 0), (.5, 2.8, 1.5), 6, q=.08)
-    box('LegStripe', (x, .4, 0), (.54, .5, 1.54), 5)
+    solid_of([cbox('Leg', (x, 1.4, 0), (.5, 2.8, 1.5), 6, q=.08), box('LegStripe', (x, .4, 0), (.54, .5, 1.54), 5)])
 cbox('Hopper', (.6, 3.9, 0), (1.8, 1.4, 2.2), 11)
 box('HopperMouth', (.6, 4.62, 0), (1.4, .06, 1.8), 15)
+solid_of(['Bed', 'Belt', 'Rail']); solid_of(['Hopper'])  # the bed over the head, a jump bumps into it
 model('Conveyor_Cleat')
 box('Cleat', (0, .06, 0), (.16, .12, 1.3), 10)
+passable('rides on the belt, over the head')
 model('Conveyor_Ore')
 for k, (x, z, s) in enumerate(((0, 0, .5), (.35, .25, .36), (-.3, -.2, .32))):
     cbox('Ore', (x, .15 + s / 2, z), (s, s, s), (12, 29, 26)[k], q=s * .2)
+passable('rides on the belt, over the head')
 
 # CARGO CONTAINERS, 6 x 2.6 x 2.5: ribbed sides, an end with doors and a hazard band.
 for name, paint in (('Container_Orange', 16), ('Container_Navy', 4), ('Container_Teal', 17)):
@@ -504,6 +535,7 @@ for name, paint in (('Container_Orange', 16), ('Container_Navy', 4), ('Container
     box('Door', (3.02, 1.3, 0), (.06, 2.2, 2.2), 0)
     box('DoorStripe', (3.06, .45, 0), (.04, .3, 2.2), 5)
     box('Code', (-.5, 1.9, 1.32), (1.6, .5, .03), 6)
+    solid_of()
 
 # ANTENNA MAST: a tapered pole with a dish and a beacon.
 model('Antenna_Mast')
@@ -514,6 +546,7 @@ cbox('DishArm', (0, 9.1, 0), (.3, .3, .3), 0)
 cbox('Beacon', (0, 14.2, 0), (.4, .4, .4), 8, q=.06)
 for y in (4, 8, 12):
     cbox('Ring', (0, y, 0), (.8, .2, .8), 11)
+solid_of(['Base']); solid_of(['Mast'], hull=True)  # the foot and the pole; the dish is overhead
 
 # MINING MECH, parked, facing +Z (about 4.8 m): stubby legs on big feet, an orange cab with a cyan visor, a drill
 # arm and a claw arm, a light bar and an antenna.
@@ -545,6 +578,7 @@ v.append((2.15, 2.4, 3.6))
 mesh('DrillCone', v, [tuple(range(6))] + [(k, (k + 1) % 6, 6) for k in range(6)], 27)
 for sx, dz in ((-1, .25), (-1, -.25)):
     beam('Claw', (-2.15, 2.4, 2.1), (-2.15 + .2, 2.4 + dz * 2, 2.9), .2, .2, 0)
+solid_of(hull=True)  # parked: the whole mech, its arms and the drill reaching forward
 
 # WORLD 3 AHEAD, by the portal: a fallen star (a lilac meteor rock bristling with violet crystals, a big gold star
 # standing out of it) and a giant fossil (ribs arching out of a sand mound) - the star that fell and 巨型化石, the
@@ -574,6 +608,7 @@ star('Star', 0, 3.05, 0, 1.3, .56, .5, 29, tilt=.18)
 star('StarCore', 0, 3.05, 0, .62, .27, .62, 21, tilt=.18)
 beam('StarFoot', (0, 1.5, 0), (-.12, 2.2, 0), .34, .3, 29)
 star('Shard', 1.7, .25, 1.1, .45, .2, .2, 29, tilt=.9)
+solid_of(['Rock', 'Crystal', 'Shard'], hull=True)  # the rock and its crystals; the star stands over the head
 
 model('Fossil_Ribs')
 loft('Mound', [(-.3, wobble(2.3, 8, .2, [.05, -.08, .1, -.06, .04, -.1, .08, -.03])), (.25, wobble(2.0, 8, .5, [-.06, .08, -.04, .1, -.08, .05, -.02, .06])),
@@ -589,4 +624,5 @@ for k, (x, h) in enumerate(((-1.5, 1.7), (-.6, 2.25), (.3, 2.4), (1.2, 2.0))):
 cbox('Skull', (2.55, .55, 0), (1.1, .8, .95), 33, q=.2)
 box('Eye', (2.95, .7, .3), (.3, .22, .06), 15)
 box('Eye', (2.95, .7, -.3), (.3, .22, .06), 15)
+solid_of(hull=True)  # the mound and the rib cage arching over it
 finish(__file__)

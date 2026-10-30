@@ -8,7 +8,7 @@ Run: blender -b --python tools/blender/build_reactor.py
 """
 import sys, math, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from cave_props import finish, model, box, lathe, prism
+from cave_props import finish, model, box, lathe, prism, solid, solid_of, passable
 from tech_props import tech_start, tech_services, tech_facade, bevel_box, ring_segments
 
 ACCENT = ('c2460a', 'd45a12')  # deep orange
@@ -34,6 +34,7 @@ for k in range(4):
     prism('ClampArm', rot([(4.2, -.55), (6.9, -.75), (6.9, .75), (4.2, .55)]), -.5, .9, 11, axis='z')
     prism('ClampJaw', rot([(3.9, -.8), (4.5, -.8), (4.5, .8), (3.9, .8)]), -.3, 1.1, 0, axis='z')
     prism('ClampLight', rot([(5.2, -.12), (6.4, -.12), (6.4, .12), (5.2, .12)]), .9, .96, 9, axis='z')
+passable('round the core in the facade, its lowest clamp 7.7 m up')
 # The ROTOR turns about Z just inside the ring: eight glowing pods on a thin dark track.
 model('Reactor_Rotor')
 ring_segments('Track', 5.0, 5.3, .62, .74, 32, 0)
@@ -41,6 +42,7 @@ for k in range(8):
     a = 2 * math.pi * k / 8
     c, s = math.cos(a), math.sin(a)
     prism('Pod', [(5.15 * c + px * c - py * s, 5.15 * s + px * s + py * c) for px, py in ((-.3, -.4), (.3, -.4), (.3, .4), (-.3, .4))], .7, 1.0, 16, axis='z')
+passable('turns inside the ring, 7 m up')
 
 # COOLING TOWER (on the floor beside the facade): a white drum with yellow bands, an orange vent ring and a dark
 # grille, crowned by a fan housing; the fan (Cooling_Fan) turns on top at y = 8.15.
@@ -52,11 +54,13 @@ lathe('Housing', [(7.8, 1.8), (8.2, 1.8)], 12, 0)
 for k in range(4):
     a = k * math.pi / 2
     box('Grille', (math.cos(a) * 2.02, 4.6, math.sin(a) * 2.02), (.9 if k % 2 else .06, .8, .06 if k % 2 else .9), 18)
+solid_of(['Drum', 'Housing'], hull=True)  # the round drum up to its fan housing
 model('Cooling_Fan')
 lathe('Hub', [(0, .3), (.25, .3)], 8, 2)
 for k in range(5):
     a = k * 2 * math.pi / 5
     c, s = math.cos(a), math.sin(a)
     prism('Blade', [(px * c - pz * s, px * s + pz * c) for px, pz in ((.25, -.18), (1.6, -.3), (1.6, .26), (.25, .14))], .06, .16, 2)
+passable('turns on top of its tower, 8.2 m up')
 
 finish(__file__)

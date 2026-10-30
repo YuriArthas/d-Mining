@@ -2,10 +2,10 @@
   "parts": [
     "refinery-hall.000.part"
   ],
-  "bytes": 296379,
-  "decodedBytes": 536492,
-  "sha256": "0f7635d6c4cff9ee45941230b8638097f37a84a515de273cba69a71ead80bf78",
-  "sourceSha256": "e8d41b44dcc7d5f949a780774460a226c0580bc3dd41fe51858c87a6597ab24e",
+  "bytes": 296384,
+  "decodedBytes": 536536,
+  "sha256": "ee4817e64de0c1f45c1303af0dc2522d688f29d2419d374817ced159169a5a88",
+  "sourceSha256": "219b13afce181b55d388c2ca85426531f7c9b5d50cce56b4fb5665fdc3215742",
   "triangles": 42879,
   "source": "world2.3 hall: Blender props (surface-game-art/tools/blender/build_refinery.py) and an offline procedural cave shell (surface-game-art/tools/underground/refineryHall.ts on caveKit.ts); baked occlusion per vertex",
   "materialProfile": "authored-color",

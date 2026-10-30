@@ -5,31 +5,25 @@ import type {RestRoom} from '../world/rooms.ts';
 import {ENTRANCE_WORLD} from '../world/entrance.ts';
 import {CatmullRomCurve3,Vector3} from 'three';
 import {CELL} from '../terrain/grid.ts';
-import {
- PINEWIND_SERVICES, PINEWIND_STATION, PINEWIND_STATION_SIGN,PINEWIND_PORTAL_SIGN, PINEWIND_EGG_TIERS, PINEWIND_GATE, PINEWIND_STATION_DECOR, PINEWIND_GATE_DECOR,
- PINEWIND_TERRACE, PINEWIND_STAIR_STEPS, PINEWIND_CREEK,
-} from './pinewind/hubLayout.ts';
+import {PINEWIND_SERVICES, PINEWIND_STATION, PINEWIND_STATION_SIGN, PINEWIND_PORTAL_SIGN, PINEWIND_CREEK} from './pinewind/hubLayout.ts';
 import type {AuthoredInstance, AuthoredLight} from './authoredSurface.ts';
 import {worldAtZ} from './worldJourney.ts';
+import {placeProp, placement, type PropCollision} from '../world/propCollision.ts';
 
-type Root = {node:string;at:V3;rotation:[number,number,number,number];scale:V3};
+/** A Blender model of the valley (build_architecture.py) and its collision in its own frame (collision.py). */
+type Root = {node:string;at:V3;rotation:[number,number,number,number];scale:V3;collision:PropCollision};
 const roots=authored.roots as Root[];
 const root=(name:string)=>{const p=roots.find(r=>r.node===name);if(!p)throw Error(`Missing authored surface node ${name}`);return p;};
-const instance=(name:string):AuthoredInstance=>({...root(name),asset:'pinewind-architecture',at:[...root(name).at],rotation:[...root(name).rotation],scale:[...root(name).scale]});
+const instance=(name:string):AuthoredInstance=>{const r=root(name);return {node:r.node,asset:'pinewind-architecture',at:[...r.at],rotation:[...r.rotation],scale:[...r.scale]};};
 const rotation=(yaw:number):[number,number,number,number]=>[0,Math.sin(yaw/2),0,Math.cos(yaw/2)];
-
-/** Terrace and stair shells; the egg terraces render as authored blocks. */
-const PINEWIND_TERRACE_SOLIDS:readonly Solid[]=[
- ...PINEWIND_EGG_TIERS.map(t=>({at:[t.x,t.y/2,(PINEWIND_TERRACE.minZ+PINEWIND_TERRACE.maxZ)/2],half:[PINEWIND_TERRACE.width/2,t.y/2,(PINEWIND_TERRACE.maxZ-PINEWIND_TERRACE.minZ)/2],yaw:0} as Solid)),
- ...PINEWIND_STAIR_STEPS.map(s=>({at:[s.x,s.y/2,s.z],half:[s.width/2,s.y/2,s.depth/2],yaw:0} as Solid)),
-];
 
 /** World 1's surface: the authored Pinewind valley (its art, collision, signs and service rings) and the
  *  rest halls built with the same pipeline in their rooms below (world 1's load with it, the later worlds' when
- *  the player first goes there). */
+ *  the player first goes there). Every model brings its colliders, placed where the model stands; the gate's
+ *  doors are left out (the portal sheet closes the opening). */
 export function pinewindSurface(rooms:readonly RestRoom[],eggs:readonly HubEgg[]):SurfaceContent {
  const services=[PINEWIND_SERVICES.sale,PINEWIND_SERVICES.shop,PINEWIND_SERVICES.bags];
- const models=roots.filter(r=>!r.node.startsWith('Egg_')).map(r=>instance(r.node));
+ const models=roots.filter(r=>!r.node.startsWith('Egg_')&&!r.node.startsWith('World_Gate_Door')).map(r=>instance(r.node));
  {const p=models.find(r=>r.node==='Teleport_Station');if(!p)throw Error('Missing authored surface node Teleport_Station');p.at=[PINEWIND_STATION.x,0,PINEWIND_STATION.z];p.rotation=rotation(PINEWIND_STATION.yaw);}
  for(const [node,service] of [['Merchant_Store',PINEWIND_SERVICES.sale],['Copper_Forge',PINEWIND_SERVICES.shop],['Pack_Shop',PINEWIND_SERVICES.bags]] as const){
   const p=models.find(r=>r.node===node)!;p.at=[service.placement.x,0,service.placement.z];p.rotation=rotation(service.placement.yaw);
@@ -38,13 +32,8 @@ export function pinewindSurface(rooms:readonly RestRoom[],eggs:readonly HubEgg[]
  for(const model of models)model.ground=model.node==='Creek_Bridge'||model.node?.startsWith('Terrace')===true;
  for(const room of rooms){const hall=room.sceneDefinition?.hall;if(hall)models.push({asset:hall,at:[room.x,-room.depth,room.z],rotation:[0,0,0,1],scale:[1,1,1],world:worldAtZ(room.z)});}
  models.unshift({asset:'pinewind-landscape',at:[0,0,0],rotation:[0,0,0,1],scale:[1,1,1]});
- const solids:Solid[]=[...authored.solids as Solid[],...PINEWIND_TERRACE_SOLIDS,...services.map(s=>s.solid)];
- for(const p of eggs)solids.push({at:[p.x,p.y+1.5,p.z],half:[.95,1.5,.95],yaw:0});
- // The station's two pillars behind its pad (the step-up platform is walkable ground).
- {const {x,z,yaw}=PINEWIND_STATION;for(const side of [-1,1])solids.push({at:[x+Math.cos(yaw)*1.9*side,2.4,z-Math.sin(yaw)*1.9*side],half:[.45,2.4,.45],yaw});}
- // The scenery around the station (in its turned frame) and the gate.
- {const {x,z,yaw}=PINEWIND_STATION,c=Math.cos(yaw),s=Math.sin(yaw);for(const d of PINEWIND_STATION_DECOR)solids.push({at:[x+d.x*c+d.z*s,d.y+d.half[1],z-d.x*s+d.z*c],half:[...d.half],yaw});}
- for(const d of PINEWIND_GATE_DECOR)solids.push({at:[PINEWIND_GATE.x+d.x,d.y+d.half[1],PINEWIND_GATE.z+d.z],half:[...d.half],yaw:0});
+ // The landscape's ground, trunks and cliffs, then every model's colliders where it stands.
+ const solids:Solid[]=[...authored.solids as Solid[],...models.flatMap(m=>m.node?placeProp(m.node,root(m.node).collision,placement(m.at,m.rotation,m.scale)):[])];
  return {
   authored:{version:'pinewind-plaza-v4',instances:models,light:{...authored.light,sun:authored.light.sun as [number,number,number]} satisfies AuthoredLight},
   plan:{shapes:services.map(s=>s.ring),signs:[...services.map(s=>s.sign),PINEWIND_STATION_SIGN,PINEWIND_PORTAL_SIGN],solids},

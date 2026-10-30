@@ -3,9 +3,9 @@
     "gear-hall.000.part"
   ],
   "bytes": 284502,
-  "decodedBytes": 588908,
-  "sha256": "a4ec9bbcef50aa3e62257d1703e9cfd888635723749187c7e999e872d3d46be7",
-  "sourceSha256": "467c00e576e567ca505651cb717fda59fbf2182e1fedcf6014dc73b4c62f2455",
+  "decodedBytes": 588992,
+  "sha256": "0b207f02cc50b4be9fc445c3b5f0eeb4ef9e063c7561c6039926f7aa1bd944fb",
+  "sourceSha256": "d30bed69a0e33f1393d782690a5eb06ce8c440232bb907c288a0b5af0810feff",
   "triangles": 32981,
   "source": "world2.2 hall: Blender props (surface-game-art/tools/blender/build_gear.py) and an offline procedural cave shell (surface-game-art/tools/underground/gearHall.ts on caveKit.ts); baked occlusion per vertex",
   "materialProfile": "authored-color",

@@ -58,6 +58,7 @@ export function updateGame(
     const currentFeet = player.travelling ?? physics.feet();
     const sceneryStart = performance.now();
     current.sceneryCollision.sync(currentFeet);
+    current.colliderView.update();
     terrain.measurements.add(
       "sceneResidencyMs",
       performance.now() - sceneryStart,

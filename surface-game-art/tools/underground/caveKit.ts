@@ -312,7 +312,7 @@ export function caveKit(hall: HallDefinition, seed: number, palette: CavePalette
           box(at, axis === 'x' ? [len / 2, .14, .275] : [.275, .14, len / 2]);
         }
       }
-      for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { place(post, [sx * (PIT + .5), 0, sz * (PIT + .5)], r() * 6); box([sx * (PIT + .5), .55, sz * (PIT + .5)], [.35, .55, .35]); }
+      for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) place(post, [sx * (PIT + .5), 0, sz * (PIT + .5)], r() * 6);
     },
 
     /** Hanging strands found by casting rays up to the rock: beads in `beads` (two picked evenly), a strand. */
@@ -334,32 +334,28 @@ export function caveKit(hall: HallDefinition, seed: number, palette: CavePalette
       }
     },
 
-    /** The service stalls (Stall_Sell, Stall_Shop), the name board and lantern posts, with their colliders. Every
-     *  hall's stall keeps the same footprint: a counter in front, two back posts and a back shelf. */
+    /** The service stalls (Stall_Sell, Stall_Shop), the name board and lantern posts. Every hall's stall keeps the
+     *  same footprint and colliders (cave_props.py): a counter in front, two back posts and a back shelf. */
     services(lanterns: readonly (readonly [number, number, number])[] = [[-3.6, 15.2, 0], [3.6, 15.2, Math.PI], [-8.8, -12.6, 0], [8.8, -12.6, Math.PI]]) {
       for (const [name, stall] of [['Stall_Sell', hall.stalls.sell], ['Stall_Shop', hall.stalls.shop]] as const) {
         if (!stall) continue;
         place(name, stall.at, Math.PI);
-        box([stall.at[0], .7, stall.at[2] - .45], [2.4, .7, .7]);
-        for (const side of [-1, 1]) box([stall.at[0] + side * 2.2, 1.9, stall.at[2] + .9], [.2, 1.9, .2]);
-        box([stall.at[0], .9, stall.at[2] + 1.15], [2.1, .9, .4]);
       }
       place('Name_Board', [hall.board[0], 0, hall.board[2]], 0);
-      for (const side of [-1, 1]) box([hall.board[0] + side * 3.9, 3.8, hall.board[2]], [.3, 3.8, .3]);
-      for (const [x, z, yaw] of lanterns) { place('Lantern_Post', [x, 0, z], yaw); box([x, 1.4, z], [.2, 1.4, .2]); }
+      for (const [x, z, yaw] of lanterns) place('Lantern_Post', [x, 0, z], yaw);
     },
 
-    /** Small props along the wall feet: `pick` chooses the prop, its scale (drawn after the turn) and its
-     *  collider (half width, half height), if any. */
-    wallFoot(count: number, pick: () => Readonly<{ name: string; scale: () => number; solid?: readonly [number, number] }>) {
+    /** Small props along the wall feet: `pick` chooses the prop and its scale (drawn after the turn); the prop
+     *  brings its collider, unless `passable` says why this one is left out (a small one). */
+    wallFoot(count: number, pick: () => Readonly<{ name: string; scale: () => number; passable?: string }>) {
       for (let i = 0; i < count; i++) {
         const side = Math.floor(r() * 4), d = (r() - .5) * 34, inset = HALF - 2.9 - r() * .8;
         const [x, z] = alongWall(side, d, inset);
         if (!clearOf(x, z, .8)) continue;
         const choice = pick();
         const yaw = r() * 6.3;
-        place(choice.name, [x, 0, z], yaw, choice.scale());
-        if (choice.solid) box([x, choice.solid[1], z], [choice.solid[0], choice.solid[1], choice.solid[0]]);
+        const prop = place(choice.name, [x, 0, z], yaw, choice.scale());
+        if (choice.passable) prop.userData.passable = choice.passable;
       }
     },
   };

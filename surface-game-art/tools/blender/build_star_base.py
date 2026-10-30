@@ -6,11 +6,12 @@ world's name on its keystone), the world portal (a marble ring with gold clamps 
 station, rail posts round the crater's mouth, star lanterns, crystal trees (a thick pale trunk, three big faceted
 crowns) in violet, teal and pink, crystal clusters and a small fallen shard.
 Run: blender -b --python tools/blender/build_star_base.py
-Shared atlas, primitives and report in cave_props.py; tools/underground/starBaseHall.ts places the props.
+Shared atlas, primitives and report in cave_props.py; tools/underground/starBaseHall.ts places the props, each with
+the colliders it gets here.
 """
 import sys, math, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from cave_props import start, finish, model, mesh, box, lathe, prism, stepped, circle, spike
+from cave_props import start, finish, model, mesh, box, lathe, prism, stepped, circle, spike, solid, solid_of, passable
 
 # Panels carry soft seams inside the tile. Glow tiles are deep and saturated (the emission plus the lit colour must
 # keep their hue). The sunless white and gold glow too, for fronts that face away from the sun (the observatories'
@@ -137,7 +138,7 @@ def observatory(name, paint, glow, front=None, white=0, dome_t=2, rib_t=3):
     box('PorticoBeam', (0, 4.6, 1.15), (8.8, .4, 2.3), white)
     box('PorticoRoof', (0, 4.95, 1.0), (9.2, .3, 2.7), 2)
     for s in (-1, 1):
-        lathe('Column', [(.4, .36), (4.4, .3)], 8, white, cx=s * 3.75, cz=2.42)
+        solid_of([lathe('Column', [(.4, .36), (4.4, .3)], 8, white, cx=s * 3.75, cz=2.42)], hull=True)
         cbox('ColumnCap', (s * 3.75, 4.5, 2.42), (.8, .2, .8), 3, q=.1)
         box('WallLamp', (s * 4.35, 3.7, 2.36), (.3, .5, .16), 8)
     box('OpeningLintel', (0, 4.6, 2.36), (8.4, .5, .3), front)
@@ -154,6 +155,10 @@ def observatory(name, paint, glow, front=None, white=0, dome_t=2, rib_t=3):
     box('Counter', (0, .95, 2.65), (6.6, 1.1, .8), front)
     box('CounterTop', (0, 1.56, 2.7), (6.9, .12, 1.0), 0)
     box('CounterGlow', (0, 1.25, 3.06), (6.2, .1, .04), glow)
+    # The drum, the portico's piers and the counter in the opening; the round plinth is a step (the columns above).
+    solid((0, 4.4, -3.4), (9.2, 8.8, 9.2)); solid((0, 1.0, 2.65), (6.8, 2.0, 1.0))
+    for s in (-1, 1): solid((s * 3.95, 2.4, 1.15), (.9, 4.8, 2.3))
+    solid_of(['Plinth'], hull=True)
 
 observatory('Star_Buyer', 3, 20, front=5, white=4, dome_t=3, rib_t=0)
 # A big star crystal over the portico (violet crystals round a gold star), ore on the shelves and the counter.
@@ -196,6 +201,7 @@ star3d('CoreBack', 0, 0, -.55, 1.9, .82, 1.6, 6)
 for k in range(5):
     a = math.pi / 2 + math.pi / 5 + k * 2 * math.pi / 5
     gem('Orbit', math.cos(a) * 4.6, math.sin(a) * 4.6, 0, .7, 1.0, (14, 15, 16, 14, 15)[k], spin=k)
+passable('hangs and turns 16 m over the shaft')
 
 # THE CRATER ARCH at the far side of the shaft, front +Z: two moonstone pillars topped with crystals, a gold arch
 # between them, the keystone's violet board facing the spawn (the world's name floats at y 11.6, z .6).
@@ -211,6 +217,7 @@ band('Arch', [(x * 1.06, y + .3) for x, y in arc], [(x * .94, y - .3) for x, y i
 cbox('Keystone', (0, 11.6, 0), (5.4, 1.6, .9), 2, q=.3)
 box('KeystoneBoard', (0, 11.6, .46), (5.0, 1.25, .06), 10)
 star3d('KeystoneStar', 0, 13.0, 0, .8, .34, .5, 13)
+for s in (-1, 1): solid((s * 9.0, 4.7, 0), (2.4, 9.4, 2.4))  # the pillars; the arch spans high over the rim
 
 # THE WORLD PORTAL, front +Z (placed facing the shaft), origin on the ground under the ring's centre: a thin round
 # plate (the glowing pad the game draws in front, 2.8 m out, lies just above it), a white marble ring round the sheet the game draws (2.9 m up, 1.85 across) with gold clamps and two pedestals,
@@ -230,6 +237,9 @@ for s in (-1, 1):
 crystal('Crown', 0, 5.4, 0, 1.8, .5, 14)
 crystal('Crown', -.7, 5.3, 0, 1.2, .34, 15, lean=(-.35, 0))
 crystal('Crown', .7, 5.3, 0, 1.25, .34, 16, lean=(.35, 0))
+# The pedestals, and the ring closed off (the portal opens by its zone in front, not by walking in); the plate is flush.
+for s in (-1, 1): solid((s * 2.1, .7, 0), (1.2, 1.4, 1.2))
+solid((0, 2.9, 0), (5.4, 5.8, .9))
 
 # THE TELEPORT STATION, front +Z (placed facing the spawn): a round plate flush with the stardust (the glowing pad
 # the game draws 2.8 m in front lies on it), two marble pillars with gold caps, an arched lintel and a teal ring
@@ -246,6 +256,7 @@ band('Lintel', [(math.cos(math.pi * k / 12) * 2.5, 5.0 + math.sin(math.pi * k / 
      [(math.cos(math.pi * k / 12) * 1.9, 4.9 + math.sin(math.pi * k / 12) * .7) for k in range(13)], -.4, .4, 0)
 ring('DiscRing', 2.75, 1.36, 1.6, -.15, .15, 7, n=28)
 ring('DiscTrim', 2.75, 1.6, 1.7, -.18, .18, 3, n=28)
+for s in (-1, 1): solid((s * 1.9, 2.6, 0), (1.0, 5.2, 1.0))  # the pillars; the plate is flush with the stardust
 
 # RAIL POSTS round the crater's mouth: a short moonstone post with a gold cap and a small glowing star on top; the
 # gate posts either side of each opening are taller with a bigger star.
@@ -253,11 +264,13 @@ model('Star_Post')
 cbox('Post', (0, .55, 0), (.34, 1.1, .34), 1, q=.06)
 cbox('Cap', (0, 1.14, 0), (.44, .1, .44), 3, q=.06)
 star3d('Star', 0, 1.42, 0, .22, .1, .12, 13)
+solid_of(['Post', 'Cap'])
 model('Star_Post_Gate')
 cbox('Post', (0, .8, 0), (.46, 1.6, .46), 1, q=.08)
 cbox('Cap', (0, 1.65, 0), (.58, .12, .58), 3, q=.08)
 star3d('Star', 0, 2.05, 0, .36, .16, .2, 13)
 star3d('Glow', 0, 2.05, 0, .2, .09, .24, 20)
+solid_of(['Post', 'Cap'])
 
 # STAR LANTERN: a white pole on a lilac foot, a gold band, a gold star head with a warm glowing heart (halo 4.8 up).
 model('Star_Lamp')
@@ -266,6 +279,7 @@ cbox('Pole', (0, 2.4, 0), (.24, 4.0, .24), 0, q=.05)
 box('Band', (0, 1.0, 0), (.3, .24, .3), 3)
 star3d('Head', 0, 4.85, 0, .72, .31, .42, 13)
 star3d('Heart', 0, 4.85, 0, .36, .16, .5, 20)
+solid((0, 2.4, 0), (.6, 4.8, .6))  # the pole on its foot; the star head is overhead
 
 # CRYSTAL TREES: a thick pale trunk leaning a little, three big faceted crowns (no thin branches).
 for name, tiles in (('Crystal_Tree_Violet', (14, 16, 14)), ('Crystal_Tree_Teal', (15, 14, 15)), ('Crystal_Tree_Pink', (16, 15, 16))):
@@ -276,16 +290,19 @@ for name, tiles in (('Crystal_Tree_Violet', (14, 16, 14)), ('Crystal_Tree_Teal',
     gem('Crown', 0, 4.6, 0, 2.6, 3.0, tiles[0], sides=7)
     gem('Crown', -1.15, 3.7, .25, 1.7, 2.0, tiles[1], spin=.4)
     gem('Crown', 1.05, 3.5, -.35, 1.6, 1.9, tiles[2], spin=.8)
+    solid_of(['Trunk'], hull=True)  # the trunk; the crowns sit from 2.5 m, over the head
 
 # CRYSTAL CLUSTERS on the stardust (the glow tiles keep them bright in the shade) and a small fallen shard.
 for name, t, glow in (('Crystal_Cluster_Violet', 14, 6), ('Crystal_Cluster_Teal', 15, 7), ('Crystal_Cluster_Pink', 16, 9)):
-    model(name)
+    root = model(name)
     lathe('Foot', [(0, .9), (.25, .8), (.4, .3)], 7, 22)
     for (x, z), h, r, lean in (((0, 0), 1.9, .34, (0, 0)), ((.5, .2), 1.3, .26, (.3, .1)), ((-.45, .25), 1.1, .24, (-.3, .15)), ((.1, -.45), 1.2, .25, (.05, -.3))):
         crystal('Crystal', x, .2, z, h, r, t, lean=lean)
     crystal('Heart', 0, .3, 0, .9, .16, glow)
+    for part in [o for o in root.children if o.type == 'MESH']: solid_of([part], hull=True)  # crystal by crystal
 model('Star_Fragment')
 lathe('Rock', [(-.2, 1.1), (.3, 1.0), (.65, .55), (.8, 0)], 7, 22)
 star3d('Star', .2, 1.25, .1, .9, .38, .5, 13)
 star3d('Core', .2, 1.25, .1, .42, .18, .62, 6)
+solid_of(['Rock'], hull=True); solid_of(['Star', 'Core'], hull=True)  # the rock and the star standing out of it
 finish(__file__)

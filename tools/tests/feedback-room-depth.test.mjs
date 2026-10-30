@@ -9,7 +9,6 @@ import { themeById } from '../../src/game/content/themes.ts';
 import { stratumAtDepth } from '../../src/game/terrain/strata.ts';
 import { initPhysics, CharacterPhysics, RAPIER } from '../../src/game/validation/physics.ts';
 import { SceneryCollision } from '../../src/game/presentation/SceneryCollision.ts';
-import { createScenerySites } from '../../src/game/world/createScenerySites.ts';
 import { buildRegion } from '../../src/game/terrain/meshing.ts';
 import { CELL, COLLISION_SIZE } from '../../src/game/terrain/SparseWorld.ts';
 import { EnvironmentController } from '../../src/game/presentation/EnvironmentController.ts';
@@ -28,7 +27,7 @@ function physicsAtRoom(room) {
         .setTranslation(...coord.map(value => value * COLLISION_SIZE * CELL)),
     );
   }
-  const scenery = new SceneryCollision(physics, createScenerySites(GAME_CONTENT.rooms, GAME_CONTENT.surface.plan));
+  const scenery = new SceneryCollision(physics, GAME_CONTENT.sites);
   scenery.sync(room.spawn);
   physics.teleport(room.spawn);
   return { physics, dispose() { scenery.dispose(); physics.dispose(); } };

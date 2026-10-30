@@ -3,7 +3,6 @@
 // at 60 frames a second. Terrain jobs run synchronously in place of the workers (results arrive the next frame). A
 // bot drives it through GameInput (movement, jump) and aims like the pointer does: a ray through selectCell, here
 // from the eye straight at the cell it wants. Used by measure-headless.mts.
-import { Group } from 'three';
 import { GAME_CONTENT, GAME_GENERATION } from '../../src/game/content/gameContent.ts';
 import { GameSession } from '../../src/game/application/GameSession.ts';
 import { TerrainStream } from '../../src/game/validation/TerrainStream.ts';
@@ -11,9 +10,7 @@ import { CharacterPhysics, initPhysics } from '../../src/game/validation/physics
 import { GameInput } from '../../src/game/GameInput.ts';
 import { PlayerController } from '../../src/game/runtime/PlayerController.ts';
 import { SceneryCollision } from '../../src/game/presentation/SceneryCollision.ts';
-import { WorldBorders, journeySurfacePlan } from '../../src/game/presentation/WorldBorders.ts';
-import { createScenerySites } from '../../src/game/world/createScenerySites.ts';
-import { FEEDBACK_COLLISION_SITE } from '../../src/game/content/feedbackFacilities.ts';
+import { WorldBorders } from '../../src/game/presentation/WorldBorders.ts';
 import { buildRegion } from '../../src/game/terrain/meshing.ts';
 import { selectCell } from '../../src/game/terrain/selection.ts';
 import { CELL, type Coord } from '../../src/game/terrain/SparseWorld.ts';
@@ -48,10 +45,9 @@ export async function createHeadlessGame(saved?: unknown, options: { random?: ()
   const terrain = new TerrainStream(physics, GAME_GENERATION, () => { const w = new InlineWorker(); workers.push(w); return w as unknown as Worker; }, session.collected);
   const input = new GameInput();
   const player = new PlayerController(physics, terrain, input, session);
-  const sites = [...createScenerySites(content.rooms, content.surface.plan), FEEDBACK_COLLISION_SITE, ...content.extraSites,
-    ...content.worlds.slice(1).map(w => ({ id: `world${w.id}.surface`, depth: 0, plan: journeySurfacePlan(w.z) }))];
+  const sites = content.sites;
   const scenery = new SceneryCollision(physics, sites);
-  const borders = new WorldBorders(physics, new Group());
+  const borders = new WorldBorders(physics);
   const detach = session.attach({
     cell: c => terrain.cell(c), canMine: c => terrain.canMine(c), pending: c => terrain.pending(c), pendingCount: () => terrain.pendingCount(),
     mine: targets => terrain.mineMany(targets), cancelMining: () => terrain.cancelPending(), travelTo: feet => player.travelTo(feet),

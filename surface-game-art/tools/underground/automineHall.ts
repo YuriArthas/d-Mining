@@ -4,7 +4,8 @@
 // light trusses under the ceiling, a drill machine with a spinning bit, conveyors carrying ore to a hopper and a
 // crusher, an ore cart on a rail, two mining robots and a garage bay where the shop would stand. The hero: a tunnel
 // boring machine in the north wall's facade above the name board, its cutterhead turning in a white shield.
-// Moving parts are direct children named Spin_* / Slide_* (SceneMotion.ts).
+// Moving parts are direct children named Spin_* / Slide_* (SceneMotion.ts). Props bring their colliders
+// (build_automine.py); the hall's own shapes (rock, floor, conveyors, rail buffers) add theirs here.
 import * as THREE from 'three';
 import { caveKit, colour, glow, matte, type GetProp } from './caveKit.ts';
 import { techKit, softFrame, glowGrid } from './techKit.ts';
@@ -51,9 +52,6 @@ export function buildHall(getProp: GetProp) {
   // THE BORING MACHINE in the facade: the shield and its rams, the cutterhead turning slowly, a cyan halo behind
   // and round the shield and a streak of its light down the floor.
   place('TBM_Facade', [0, 0, facade.z], 0);
-  box([0, 10, facade.z - .1], [facade.half - .8, 10, .4]);
-  for (const s of [-1, 1]) box([s * 8.9, 10, facade.z + .4], [.8, 10, .7]);
-  box([0, .6, facade.z + .55], [8.2, .6, .45]);
   place('TBM_Shield', [0, shield.y, shield.z], 0);
   {
     const cutter = new THREE.Group(); cutter.name = 'Spin_z_n15'; cutter.position.set(0, shield.y, shield.z + .1);
@@ -82,7 +80,6 @@ export function buildHall(getProp: GetProp) {
   for (const { side, d } of L.bulkheads) {
     const wall = onRock(side, d, [.6, 2.5, 4.6], 1.7), p = wall.at(wall.nearest - .4, 0);
     place('Bulkhead', [p.x, 0, p.z], wall.yaw);
-    box([p.x - wall.dir.x * .1, 1.2, p.z - wall.dir.z * .1], [side < 2 ? 2.15 : .35, 1.2, side < 2 ? .35 : 2.15]);
   }
   for (const { side, d, y } of L.fans) {
     const wall = onRock(side, d, [y - 1.2, y, y + 1.2], 1.2), p = wall.at(wall.nearest - .55, y);
@@ -105,7 +102,6 @@ export function buildHall(getProp: GetProp) {
   {
     const { at, yaw } = L.drill;
     place('Drill_Machine', [at[0], 0, at[1]], yaw);
-    box([at[0], 1.7, at[1]], [1.8, 1.7, 1.5], yaw);
     const [bx, bz] = local(at, yaw, .9, .2), spin = new THREE.Group(); spin.name = 'Spin_y_420'; spin.position.set(bx, .25, bz);
     spin.add(getProp('Drill_Bit')); kit.group.add(spin);
   }
@@ -133,8 +129,8 @@ export function buildHall(getProp: GetProp) {
       const ore = block([.36, .3, .36], [0, 1.2, 0], '#4a6ad8', steel, r() * 3); ore.position[c.axis] = t; slide.add(ore);
     }
     kit.group.add(slide);
-    if (c.to === 'Ore_Hopper') { place('Ore_Hopper', [c.end[0], 0, c.end[1]], -Math.PI / 2); box([c.end[0], 1.75, c.end[1]], [1.45, 1.75, 1.45]); }
-    else { place('Crusher', [c.end[0], 0, c.end[1]], Math.PI / 2); box([c.end[0], 1.5, c.end[1]], [1.5, 1.5, 1.25], Math.PI / 2); }
+    if (c.to === 'Ore_Hopper') place('Ore_Hopper', [c.end[0], 0, c.end[1]], -Math.PI / 2);
+    else place('Crusher', [c.end[0], 0, c.end[1]], Math.PI / 2);
   }
   // RAIL along the east side with an ore cart on it and a buffer at each end.
   {
@@ -142,14 +138,12 @@ export function buildHall(getProp: GetProp) {
     for (const s of [-1, 1]) add(block([.1, .1, to - from], [x + s * .5, .12, (from + to) / 2], '#8d95a1'), 'Rail');
     for (let z = from + .3; z < to; z += .8) add(block([1.4, .06, .24], [x, .08, z], '#3a414c'), 'Rail sleeper');
     for (const z of [from - .2, to + .2]) { add(block([1.4, .7, .3], [x, .35, z], '#f2c230'), 'Rail buffer'); box([x, .35, z], [.7, .35, .15]); }
-    place('Ore_Cart', [x, .1, cart], 0); box([x, .75, cart], [.68, .75, 1.0]);
+    place('Ore_Cart', [x, .1, cart], 0);
   }
-  for (const { at, yaw } of L.robots) { place('Robot_Miner', [at[0], 0, at[1]], yaw); box([at[0], 1.3, at[1]], [1.0, 1.3, 1.0], yaw); }
+  for (const { at, yaw } of L.robots) place('Robot_Miner', [at[0], 0, at[1]], yaw);
   place('Garage_Gate', [L.garage[0], 0, L.garage[1]], Math.PI);
-  for (const s of [-1, 1]) box([L.garage[0] + s * 2.6, 2.4, L.garage[1]], [.4, 2.4, .5]);
-  box([L.garage[0], 2.2, L.garage[1] + .4], [2.2, 2.2, .3]);
-  for (const [x, z, yaw] of [[15.8, 15.6, .3], [8.2, 17.4, -.2]] as const) { place('Crate_Stack', [x, 0, z], yaw); box([x + .3, .7, z], [1.1, .7, .7], yaw); }
+  for (const [x, z, yaw] of [[15.8, 15.6, .3], [8.2, 17.4, -.2]] as const) place('Crate_Stack', [x, 0, z], yaw);
 
-  kit.wallFoot(14, () => ({ name: 'Crate_Stack', scale: () => .7 + r() * .3, solid: [.9, .6] }));
+  kit.wallFoot(14, () => ({ name: 'Crate_Stack', scale: () => .7 + r() * .3 }));
   return { group: kit.group, solids: kit.solids, lights: HALL.lights };
 }

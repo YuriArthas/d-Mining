@@ -3,7 +3,7 @@
 // the north wall above the name board: bronze-and-teal gears turning slowly in a slate frame, a teal power core
 // either side, the colony's white catwalk with a yellow rail across it, and a yellow jib crane on each side hanging
 // a hazard crate over the floor. Glow is faked for phones: additive halos and floor streaks.
-// Moving parts are direct children named Spin_* (SceneMotion.ts).
+// Moving parts are direct children named Spin_* (SceneMotion.ts). Props bring their colliders (build_gear.py).
 import * as THREE from 'three';
 import { caveKit, glow, type GetProp } from './caveKit.ts';
 import { techKit, softFrame, glowGrid } from './techKit.ts';
@@ -18,7 +18,7 @@ export function buildHall(getProp: GetProp) {
     rock: ['#262c34', '#3a424c'], upper: ['#323a44', '#1c2128'], ceiling: ['#181c22', '#262c34'],
     stalactite: ['#2a3038', '#46505c'], joint: '#1c1e22', stones: ['#5a5c62'], curb: '#f2c230',
   }, L.cranes.map(c => ({ x: c.at[0], z: c.at[1], radius: 2.2 })));
-  const { r, box, place } = kit;
+  const { r, place } = kit;
   kit.useProps(getProp);
   const tech = techKit(kit, L.pools);
   const conduit = Object.assign(glow('Cave glow teal', '#14a0a0', 1.0), { side: THREE.DoubleSide });
@@ -36,9 +36,6 @@ export function buildHall(getProp: GetProp) {
   // MACHINE FRAME on the north wall with its GEARS: each a teal socket ring in the frame and the gear turning in
   // front of it, a halo round the socket on the slate and one over the glowing ring.
   place('Machine_Frame', [0, 0, facade.z], 0);
-  box([0, 10, facade.z - .1], [facade.half - .8, 10, .4]);
-  for (const s of [-1, 1]) box([s * 12.0, 10, facade.z + .4], [.8, 10, .7]);
-  box([0, .6, facade.z + .55], [11.1, .6, .45]);
   for (const g of L.gears) {
     place('Gear_Socket', [g.at[0], g.at[1], facade.z + .42], 0, g.radius * 1.02);
     const spin = new THREE.Group(); spin.name = `Spin_z_${g.rate < 0 ? 'n' : ''}${Math.abs(g.rate)}`; spin.position.set(...g.at);
@@ -51,28 +48,23 @@ export function buildHall(getProp: GetProp) {
   // POWER CORES either side of the gears: a halo up each column and its light on the floor.
   for (const [x, z] of L.cores) {
     place('Power_Core', [x, 0, z], 0);
-    box([x, 7.8, z], [1.3, 7.8, 1.3]);
     tech.glow(glowGrid(3.2, 13, 4, 10, TEAL, (u, v) => .34 * Math.sin(Math.PI * u) ** 1.5 * Math.sin(Math.PI * v) ** .6).translate(x, 7.6, z + 1.05), 'Glow halo core');
     tech.glow(glowGrid(3.6, 3.4, 4, 6, TEAL, (u, v) => .28 * Math.sin(Math.PI * u) * v ** 1.6).rotateX(-Math.PI / 2).translate(x, .075, z + 3.0), 'Glow halo floor');
   }
 
   // CATWALK across the frame above the board, on yellow legs.
   place('Catwalk', [0, catwalk.y, catwalk.z], 0);
-  for (const x of [-catwalk.half + .2, -6.5, 6.5, catwalk.half - .2]) {
-    const leg = place('Catwalk_Leg', [x, 0, catwalk.z + .5], 0); leg.scale.set(1, catwalk.y - .46, 1);
-    box([x, (catwalk.y - .46) / 2, catwalk.z + .5], [.2, (catwalk.y - .46) / 2, .2]);
-  }
+  for (const x of [-catwalk.half + .2, -6.5, 6.5, catwalk.half - .2]) place('Catwalk_Leg', [x, 0, catwalk.z + .5], 0).scale.set(1, catwalk.y - .46, 1);
 
   // JIB CRANES on either side, each hanging a hazard crate over the floor ring.
   for (const c of L.cranes) {
     place('Crane', [c.at[0], 0, c.at[1]], c.dir > 0 ? 0 : Math.PI);
-    box([c.at[0], 6, c.at[1]], [.85, 6, .85]);
     tech.glow(softFrame(0, 0, 0, .9, '#ffd8a0', .3, 3).rotateY(c.dir > 0 ? Math.PI / 2 : -Math.PI / 2).translate(c.at[0] + c.dir * .86, 12.3, c.at[1] + .2), 'Glow halo cab');
   }
 
   // TEAL POWER CONDUITS climbing the rock, never on the frame.
   tech.seams(12, conduit, TEAL, (side, d) => side === 0 && Math.abs(d) < facade.half + 2, 'Cave power conduit');
 
-  kit.wallFoot(12, () => ({ name: 'Crate_Stack', scale: () => .8 + r() * .3, solid: [.9, .7] }));
+  kit.wallFoot(12, () => ({ name: 'Crate_Stack', scale: () => .8 + r() * .3 }));
   return { group: kit.group, solids: kit.solids, lights: HALL.lights };
 }

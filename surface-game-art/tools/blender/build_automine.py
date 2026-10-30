@@ -7,7 +7,7 @@ Run: blender -b --python tools/blender/build_automine.py
 """
 import sys, math, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from cave_props import finish, model, mesh, box, lathe, prism, stepped, circle
+from cave_props import finish, model, mesh, box, lathe, prism, stepped, circle, solid, solid_of, passable
 from tech_props import tech_start, tech_services, tech_facade, bevel_box, ring_segments
 
 # The world 2 base kit (tech_props.py) with a deep cyan accent, then this hall's own tiles. Glow tiles are deep and
@@ -52,6 +52,7 @@ mesh('Drill', pts, faces, 2)
 bevel_box('ShoulderL', (-.95, 1.75, 0), (.4, .4, .4), 0, .1)
 box('ArmL', (-1.0, 1.35, .15), (.24, .8, .24), 2)
 box('ClawL', (-1.0, .9, .3), (.34, .2, .4), 0)
+solid((0, 1.3, 0), (2.0, 2.6, 2.0))  # treads, body and arms; the drill's point reaches past it
 
 # DRILL MACHINE (static part): a big orange cabin on a gunmetal base with a mast; the spinning bit is Drill_Bit.
 model('Drill_Machine')
@@ -65,6 +66,7 @@ bevel_box('Motor', (.9, 5.4, .2), (1.1, 1.0, 1.1), 20, .18)
 box('MotorLight', (.9, 5.4, .77), (.5, .3, .04), 23)
 box('Spindle', (.9, 3.8, .2), (.3, 2.4, .3), 2)
 box('Hose', (.0, 3.0, -.9), (1.6, .18, .18), 13)
+solid((0, 1.7, 0), (3.6, 3.4, 3.0))  # the base and the cabin, round the spinning bit; the mast is out of reach
 
 # DRILL BIT (spins about its own vertical axis): a ribbed chunky auger with a point.
 model('Drill_Bit')
@@ -72,6 +74,7 @@ lathe('Auger', [(0, 0), (.5, .32), (.75, .38), (1.1, .3), (1.35, .38), (1.7, .3)
 for k in range(3):
     a = k * 2 * math.pi / 3
     box('Flute', (math.cos(a) * .3, 1.4, math.sin(a) * .3), (.14, 1.6, .14), 20)
+solid_of(hull=True)  # round its own axis, so the same while it turns
 
 # WALL FAN (static frame, front +Z) and its BLADES (spin about Z through the origin).
 model('Fan_Frame')
@@ -79,6 +82,7 @@ prism('Housing', [(x, y) for x, y in circle(1.45, 8, 0, 0, math.pi / 8)], -.5, 0
 prism('Rim', [(x, y) for x, y in circle(1.25, 8, 0, 0, math.pi / 8)], 0, .08, 5, axis='z')
 prism('Hub', [(x, y) for x, y in circle(.32, 8)], -.1, .25, 2, axis='z')
 box('RimLight', (0, -1.38, .05), (1.0, .1, .1), 7)
+passable('bolted on the rock high over the floor')
 model('Fan_Blades')
 prism('Spinner', [(x, y) for x, y in circle(.26, 8)], .1, .32, 1, axis='z')
 for k in range(4):
@@ -86,6 +90,7 @@ for k in range(4):
     c, s = math.cos(a), math.sin(a)
     blade = [(.2, -.16), (1.1, -.26), (1.15, .22), (.2, .14)]
     prism('Blade', [(px * c - py * s, px * s + py * c) for px, py in blade], .12, .2, 1, axis='z')
+passable('turns in its fan frame high on the rock')
 
 # BULKHEAD wall panel (front +Z, 4 m wide, 5 m tall): a framed light panel with a vent, a screen and a cyan strip.
 model('Bulkhead')
@@ -98,6 +103,7 @@ box('Strip', (0, 4.65, .1), (3.6, .12, .06), 7)
 box('Foot', (0, .25, .05), (4.3, .5, .6), 5)
 for x in (-1.8, 1.8):
     for y in (.8, 4.4): box('Bolt', (x, y, .1), (.16, .16, .06), 2)
+solid((0, 1.2, .1), (4.3, 2.4, .7))  # its foot and panel against the rock
 
 # ORE HOPPER at a conveyor's end: a funnel bin on legs with an orange warning band and a level light.
 model('Ore_Hopper')
@@ -107,6 +113,7 @@ prism('Bin', [(px, pz) for px, pz in stepped(2.8, 2.8, .4)], 2.0, 3.4, 2)
 box('Band', (0, 3.1, 1.42), (2.4, .3, .04), 5)
 box('LevelLight', (0, 2.5, 1.42), (.6, .25, .04), 23)
 for k in range(5): box('Ore', (-.8 + k * .4, 3.5, (k % 2) * .4 - .2), (.4, .3, .4), 24)
+solid((0, 1.75, 0), (2.9, 3.5, 2.9))  # the bin and its legs
 
 # CRUSHER at the west conveyor's end: an orange machine block with a hopper mouth and a glowing gauge.
 model('Crusher')
@@ -115,6 +122,7 @@ bevel_box('Mouth', (0, 2.7, 0), (2.2, .6, 1.8), 0, .2)
 box('Gauge', (0, 1.5, 1.22), (1.2, .7, .04), 25)
 box('Stripe', (0, .4, 1.21), (2.8, .3, .04), 5)
 for x in (-1.6, 1.6): box('Vent', (x, 1.4, 0), (.06, 1.0, 1.6), 18)
+solid((0, 1.5, 0), (3.0, 3.0, 2.5))
 
 # ORE CART for the rail: a navy tub on a gunmetal chassis, cobalt ore heaped on top, a cyan running light.
 model('Ore_Cart')
@@ -125,6 +133,7 @@ bevel_box('Tub', (0, .95, 0), (1.25, .7, 1.9), 22, .16)
 box('TubBand', (0, 1.1, .96), (1.1, .2, .04), 5)
 box('RunLight', (0, .7, 1.01), (.6, .1, .04), 7)
 for k in range(4): box('Ore', (-.35 + (k % 2) * .7, 1.4, -.5 + (k // 2) * .9), (.45, .3, .45), 24)
+solid((0, .65, 0), (1.36, 1.5, 2.0))
 
 # GARAGE GATE (front +Z), set against the south wall: a hazard-striped frame round a half-open roller door
 # with the bay glowing orange behind it.
@@ -137,6 +146,8 @@ box('Door', (0, 3.4, -.1), (4.4, 2.6, .2), 2)
 for y in (2.4, 3.0, 3.6, 4.2): box('DoorRib', (0, y, .02), (4.4, .1, .06), 0)
 box('DoorEdge', (0, 2.12, .02), (4.4, .14, .08), 5)
 for x in (-2.6, 2.6): box('Signal', (x, 4.95, .52), (.3, .3, .1), 8)
+for x in (-2.6, 2.6): solid((x, 2.4, 0), (.8, 4.8, 1.0))  # the pillars and the half-open door in the bay
+solid((0, 2.2, -.4), (4.4, 4.4, .6))
 
 # THE NORTH WALL: the shared facade (navy panels), and the tunnel boring machine's SHIELD set in it (origin at its
 # centre, front +Z): a broad white ring with a yellow outer band, a cyan glow lip, dark seams, four hydraulic rams
@@ -156,6 +167,7 @@ for k in range(4):
     prism('Ram', rot([(6.6, -.32), (8.6, -.32), (8.6, .32), (6.6, .32)]), -.5, .14, 2, axis='z')
     prism('RamSleeve', rot([(6.5, -.5), (7.4, -.5), (7.4, .5), (6.5, .5)]), -.6, .3, 21, axis='z')
     prism('RamFoot', rot([(8.4, -.7), (9.0, -.7), (9.0, .7), (8.4, .7)]), -.7, .2, 0, axis='z')
+passable('set in the facade, its lowest ram 6 m up')
 model('TBM_Cutter')
 prism('Face', circle(5.0, 28), -.4, .1, 10, axis='z')
 ring_segments('Rim', 4.55, 5.0, .1, .5, 28, 21)
@@ -170,5 +182,6 @@ for k in range(6):
 prism('Hub', circle(1.05, 12), .1, .95, 1, axis='z')
 prism('HubBand', circle(1.12, 12), .45, .6, 11, axis='z')
 prism('HubCap', circle(.5, 10), .95, 1.15, 7, axis='z')
+passable('turns in the shield, 7 m up')
 
 finish(__file__)

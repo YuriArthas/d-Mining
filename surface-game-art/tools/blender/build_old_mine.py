@@ -1,12 +1,12 @@
 """老矿井 hall props: plank-roofed sale stall, timber support sets, two big hoist headframes, ore carts on rail
 track, crates, barrels and glowing amber ore piles, plus the shared lantern post, name board and pit post
-(footprints in cave_props.py).
+(footprints in cave_props.py). Each prop's collider follows its parts.
 Run: blender -b --python tools/blender/build_old_mine.py
 """
 import sys, math, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from mathutils import Vector
-from cave_props import start, finish, model, mesh, box, lathe, prism, stepped, circle, stall, lantern_post, name_board, pit_post
+from cave_props import start, finish, model, mesh, box, lathe, prism, stepped, circle, stall, lantern_post, name_board, pit_post, solid, solid_of, passable
 
 TILES = [
     ('6a4e3a', [(4, 6, 24, 3, '7a5c46'), (6, 24, 18, 2, '5a4030')]),          # 0 dark timber
@@ -94,6 +94,7 @@ box('Cap', (0, 6.95, 0), (5.6, .7, .8), 1)
 box('CapTrim', (0, 7.36, 0), (5.8, .14, .9), 0)
 box('Wedge', (0, 6.42, .0), (1.2, .3, .7), 0)
 box('Rope', (0, 6.15, .25), (.05, .5, .05), 13); lantern(0, 5.92, .25)
+for side in (-1, 1): solid((side * 2.0, 3.5, 0), (.84, 7, .84))  # the two posts; between them stays open
 
 # HOIST HEADFRAME (the hall's landmark), front +Z, ~11 m: four raked legs on a plank deck, cross-braces, a top
 # platform with a big sheave wheel, a rope down to a hanging ore bucket, a winch drum and two lanterns.
@@ -128,6 +129,8 @@ for z in (-.85, .85): box('WinchCheek', (3.9, .75, z), (.9, 1.5, .25), 0)
 prism('WinchDrum', circle(.55, 10, 3.9, 1.1), -.72, .72, 1, axis='z')
 prism('WinchBand', circle(.6, 10, 3.9, 1.1), -.12, .12, 10, axis='z')
 box('Crank', (3.9, 1.1, 1.05), (.12, .7, .12), 10)
+# The deck and the legs' feet as one footprint (the raked legs lean in above it), and the winch.
+solid((0, 1, 0), (6.4, 2, 5.2)); solid((3.9, .8, 0), (1.1, 1.6, 2.2))  # the winch with its crank
 
 # ORE CART on rails, along X: a red-painted tub with iron bands, four wheels and a heap of glowing amber ore.
 model('Ore_Cart')
@@ -140,32 +143,35 @@ for x in (-.6, .6):
 for x, z, s, t in ((-.45, -.2, .42, 19), (.1, .15, .5, 19), (.5, -.15, .38, 12), (-.1, -.25, .34, 12), (.35, .25, .3, 19)):
     box('Ore', (x, 1.3 + s * .3, z), (s, s * .8, s), t)
 box('Hitch', (1.05, .45, 0), (.3, .12, .2), 10)
+solid((0, .7, 0), (2.1, 1.4, 1.36))
 
 # RAIL TRACK, 4 m along X: two steel rails on timber sleepers (visual only; the floor carries the player).
 model('Rail_Track')
 for z in (-.55, .55): box('Rail', (0, .12, z), (4.0, .1, .12), 16)
 for k in range(5): box('Sleeper', (-1.6 + k * .8, .05, 0), (.34, .1, 1.6), 0)
+passable('rails and sleepers flat on the floor')
 # A buffer stop for a track's end.
 model('Rail_Buffer')
 for z in (-.55, .55): box('BufferPost', (0, .45, z), (.3, .9, .3), 0)
 box('BufferBeam', (.05, .78, 0), (.4, .36, 1.6), 17)
 for z in (-.4, .4): box('BufferPad', (.3, .78, z), (.14, .26, .26), 10)
+solid_of()
 
 # CRATES: a stack of three, banded.
 model('Crate_Stack')
 for x, y, z, s, yaw in ((-.55, .5, 0, 1.0, 0), (.55, .45, .1, .9, 0), (-.1, 1.42, .05, .85, 0)):
-    box('Crate', (x, y, z), (s, s, s), 1); box('CrateBand', (x, y, z), (s + .04, .14, s + .04), 0)
+    solid_of([box('Crate', (x, y, z), (s, s, s), 1)]); box('CrateBand', (x, y, z), (s + .04, .14, s + .04), 0)
     box('CrateSlat', (x, y, z + s / 2 + .01), (s * .9, .12, .03), 0)
 # BARRELS: three staved barrels with iron hoops.
 model('Barrel_Group')
 for x, z, h in ((0, 0, 1.1), (.75, .25, 1.0), (.2, .8, .95)):
-    lathe('Barrel', [(0, .32), (h * .5, .4), (h, .32)], 10, 18, cx=x, cz=z)
+    solid_of([lathe('Barrel', [(0, .32), (h * .5, .4), (h, .32)], 10, 18, cx=x, cz=z)], hull=True)
     for y in (h * .18, h * .82): lathe('Hoop', [(y - .04, .37), (y + .04, .37)], 10, 10, cx=x, cz=z, cap_top=False, cap_bottom=False)
 # SACKS of ore beside a crate.
 model('Sack_Pile')
 for x, z, s in ((0, 0, .7), (.6, .2, .6), (.25, .62, .55)):
-    lathe('Sack', [(0, s * .5), (s * .45, s * .6), (s * .85, s * .38), (s, .05)], 8, 21, cx=x, cz=z)
-box('Crate', (-.65, .4, .45), (.8, .8, .8), 1); box('CrateBand', (-.65, .4, .45), (.84, .12, .84), 0)
+    solid_of([lathe('Sack', [(0, s * .5), (s * .45, s * .6), (s * .85, s * .38), (s, .05)], 8, 21, cx=x, cz=z)], hull=True)
+solid_of([box('Crate', (-.65, .4, .45), (.8, .8, .8), 1)]); box('CrateBand', (-.65, .4, .45), (.84, .12, .84), 0)
 
 # ORE PILE: a big heap of rock with glowing amber chunks (the cart depot's load).
 model('Ore_Pile')
@@ -173,9 +179,11 @@ lathe('Heap', [(0, 1.5), (.35, 1.3), (.8, .85), (1.15, .3)], 8, 2, spin=.3)
 for x, y, z, s in ((-.5, .55, .6, .45), (.6, .7, .3, .5), (.1, 1.05, -.2, .42), (-.7, .4, -.5, .4), (.9, .35, -.6, .38), (0, .3, 1.15, .35)):
     box('Glint', (x, y, z), (s, s * .85, s), 19)
 for x, y, z, s in ((-.2, .9, .4, .4), (.5, .5, .8, .36), (-.9, .5, .1, .34)): box('Copper', (x, y, z), (s, s, s), 12)
+solid_of(hull=True)  # the heap with its chunks
 # ORE ROCK: a lump at the wall foot with two amber glints.
 model('Ore_Rock')
 lathe('Rock', [(0, .62), (.3, .55), (.62, .3), (.78, .06)], 7, 2, spin=.4)
 box('Glint', (.32, .42, .25), (.24, .2, .24), 19); box('Glint', (-.2, .55, -.18), (.2, .18, .2), 19)
+solid_of(hull=True)
 
 finish(__file__)

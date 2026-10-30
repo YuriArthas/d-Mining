@@ -7,7 +7,7 @@ Run: blender -b --python tools/blender/build_refinery.py
 """
 import sys, math, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from cave_props import finish, model, mesh, box, lathe, prism
+from cave_props import finish, model, mesh, box, lathe, prism, solid, solid_of, passable
 from tech_props import tech_start, tech_services, tech_facade, bevel_box
 
 ACCENT = ('8a1a7a', 'a42a92')  # deep magenta
@@ -36,16 +36,19 @@ def crystal(name, x, z, h, r, sides=6, lean=(0, 0), y=0, tip=.74, spin=0, tint=2
 
 # GIANT CRYSTAL (~9.5 m) on a dark rock root, ringed by a yellow cradle: posts and two rails, open to the front.
 model('Crystal_Giant')
-prism('Root', [(math.cos(a) * rr, math.sin(a) * rr) for a, rr in ((k * math.pi / 4 + .2, 2.3 + (k % 2) * .4) for k in range(8))], 0, .7, 23)
-crystal('Main', 0, 0, 9.6, 1.35, 6, (.06, .02), .4, .76, .3, 20)
+giant = [prism('Root', [(math.cos(a) * rr, math.sin(a) * rr) for a, rr in ((k * math.pi / 4 + .2, 2.3 + (k % 2) * .4) for k in range(8))], 0, .7, 23)]
+giant.append(crystal('Main', 0, 0, 9.6, 1.35, 6, (.06, .02), .4, .76, .3, 20))
 for (x, z, h, r, lx, lz, t) in ((1.3, .5, 5.2, .8, .22, .08, 21), (-1.2, .7, 4.4, .7, -.24, .1, 20), (.3, -1.3, 6.0, .75, .04, -.2, 21),
                                 (-.7, -1.0, 3.2, .55, -.2, -.22, 20), (1.1, -.9, 2.6, .5, .26, -.2, 20)):
-    crystal('Shard', x, z, h, r, 6, (lx, lz), .5, .72, x * 2, t)
+    giant.append(crystal('Shard', x, z, h, r, 6, (lx, lz), .5, .72, x * 2, t))
+cradle = []
 for k in range(6):
     a = math.pi * .35 + k * math.pi * 1.3 / 5  # a horseshoe round the back, open toward +Z
     x, z = math.cos(a) * 2.9, -math.sin(a) * 2.9
-    box('CradlePost', (x, 1.35, z), (.24, 2.7, .24), 11)
-    box('CradleFoot', (x, .15, z), (.5, .3, .5), 0)
+    cradle.append([box('CradlePost', (x, 1.35, z), (.24, 2.7, .24), 11), box('CradleFoot', (x, .15, z), (.5, .3, .5), 0)])
+# The rock root and each crystal; the cradle as a fence, post to post (its rails close the gaps).
+for part in giant: solid_of([part], hull=True)
+for k in range(5): solid_of(cradle[k] + cradle[k + 1], hull=True)
 for k in range(5):
     a0, a1 = math.pi * .35 + k * math.pi * 1.3 / 5, math.pi * .35 + (k + 1) * math.pi * 1.3 / 5
     for y in (1.3, 2.55):
@@ -59,10 +62,11 @@ model('Crystal_Cluster')
 prism('Root', [(math.cos(k * math.pi / 3) * .9, math.sin(k * math.pi / 3) * .9) for k in range(6)], 0, .25, 23)
 for (x, z, h, r, lx, lz, t) in ((0, 0, 2.6, .42, .03, .02, 20), (.5, .2, 1.7, .32, .3, .1, 21), (-.45, .25, 1.5, .3, -.32, .12, 20),
                                 (.1, -.5, 1.9, .3, .05, -.3, 21), (-.3, -.35, 1.1, .24, -.25, -.25, 20)):
-    crystal('Crystal', x, z, h, r, 5, (lx, lz), .1, .7, x * 3, t)
+    solid_of([crystal('Crystal', x, z, h, r, 5, (lx, lz), .1, .7, x * 3, t)], hull=True)  # crystal by crystal; the low root is a step
 model('Crystal_Small')
 for (x, z, h, r, lx, lz, t) in ((0, 0, 1.25, .26, .05, 0, 20), (.3, .12, .8, .18, .35, .1, 21), (-.24, .2, .7, .17, -.3, .15, 21)):
     crystal('Crystal', x, z, h, r, 5, (lx, lz), 0, .7, x * 4, t)
+solid_of(hull=True)
 
 # LASER RIG (front +Z): a white base and turret, a white arm up to a yellow joint, a long white boom forward and a
 # charcoal emitter head with a glowing magenta lens at local (0, 4.1, 2.75) (the hall builder draws the beam).
@@ -78,6 +82,7 @@ box('BoomBand', (0, 4.1, .6), (.5, .5, .3), 5)
 bevel_box('Head', (0, 4.1, 2.45), (.7, .7, .6), 0, .12)
 prism('Lens', [(math.cos(k * math.pi / 4) * .22, 4.1 + math.sin(k * math.pi / 4) * .22) for k in range(8)], 2.75, 2.82, 20, axis='z')
 box('Cable', (-.3, 1.6, -.4), (.12, 2.2, .12), 13)
+solid((0, .9, 0), (1.9, 1.8, 1.9)); solid((0, 2.4, 0), (.6, 3.0, .6))  # base and turret, the arm; the boom is overhead
 
 # CRYSTAL TANK (front +Z, ~4 m): a white plinth, four white posts, two glowing rings for the glass, a white cap
 # with a yellow band and a pipe; a crystal glows inside.
@@ -95,6 +100,7 @@ box('PipeRun', (0, 4.6, -1.0), (.24, .24, 1.2), 2)
 crystal('Inside', 0, 0, 2.3, .38, 6, (0, 0), .62, .72, .2, 20)
 crystal('InsideShard', .32, .15, 1.3, .2, 5, (.2, .05), .62, .7, .5, 21)
 crystal('InsideShard', -.3, -.12, 1.1, .18, 5, (-.2, -.05), .62, .7, 1.1, 21)
+solid_of(['Plinth', 'Post', 'Cap'], hull=True)  # the round tank, plinth to cap
 
 # CRYSTAL CART (front +Z): a yellow tub on a charcoal chassis heaped with crystal chunks.
 model('Crystal_Cart')
@@ -105,6 +111,7 @@ bevel_box('Tub', (0, .92, 0), (1.25, .68, 1.9), 11, .16)
 box('TubBand', (0, 1.06, .96), (1.1, .18, .04), 5)
 for (x, z, h, t) in ((-.3, -.5, .8, 20), (.3, -.3, .6, 21), (0, .2, .9, 20), (-.32, .6, .55, 21), (.34, .55, .7, 20)):
     crystal('Chunk', x, z, h, .17, 5, (x * .3, 0), 1.2, .68, x * 5, t)
+solid((0, .75, 0), (1.4, 1.5, 2.1))
 
 # THE NORTH WALL: the shared facade (dark panels), a white DECK across it above the name board (local to the
 # facade: y 7.8-8.4, z .3-3.4) with a yellow edge, brackets and the columns' header pipe; the REFINING COLUMNS
@@ -122,6 +129,7 @@ for x in (-6.6, -2.4, 2.4, 6.6):
 box('Header', (0, 18.0, 1.6), (11.0, .5, .5), 2)
 for x in (-5.2, 5.2): box('HeaderDrop', (x, 17.15, 1.6), (.4, 1.7, .4), 2)
 for x in (-7.6, 7.6): box('HeaderRun', (x * .86, 18.0, 1.6), (2.4, .4, .4), 13)
+passable('across the facade 7.8 m up, its brackets from 5.6 m')
 def column(name, glass):
     model(name)
     lathe('Base', [(0, 1.5), (.85, 1.5), (1.05, 1.28)], 8, 1, spin=math.pi / 8)
@@ -134,12 +142,14 @@ def column(name, glass):
     lathe('Cap', [(top, 1.45), (top + .6, 1.45), (top + .9, .9), (top + 1.1, .4)], 8, 1, spin=math.pi / 8)
     lathe('CapBand', [(top + .12, 1.47), (top + .36, 1.47)], 8, 11, cap_top=False, cap_bottom=False, spin=math.pi / 8)
     box('CapLight', (0, top + .45, 1.47), (.5, .16, .04), 7)
+    passable('stands on the deck, 8.4 m up')
 column('Refinery_Column_Tall', 7.0)
 column('Refinery_Column_Short', 5.4)
 model('Refinery_Core')
 crystal('Core', 0, 0, 3.4, .62, 6, (0, 0), 0, .7, .2, 20)
 crystal('CoreShard', .62, .2, 1.8, .3, 5, (.16, .05), .5, .68, .5, 21)
 crystal('CoreShard', -.56, -.24, 1.5, .26, 5, (-.16, -.05), .9, .7, 1.1, 21)
+passable('turns in its column on the deck, 9 m up')
 
 tech_services()
 finish(__file__)

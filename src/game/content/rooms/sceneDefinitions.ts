@@ -1,12 +1,12 @@
 import core from './core.scene.json' with {type:'json'};
 import machinery from './machinery.scene.json' with {type:'json'};
 import fossil from './fossil.scene.json' with {type:'json'};
-import volcanic from './volcanic.scene.json' with {type:'json'};
+import volcanicHall from './volcanicHall.scene.json' with {type:'json'};
 import frozen from './frozen.scene.json' with {type:'json'};
 import ruins from './ruins.scene.json' with {type:'json'};
 import crystal from './crystal.scene.json' with {type:'json'};
-import fungal from './fungal.scene.json' with {type:'json'};
-import oldMine from './oldMine.scene.json' with {type:'json'};
+import fungalHall from './fungalHall.scene.json' with {type:'json'};
+import oldMineHall from './oldMineHall.scene.json' with {type:'json'};
 import crystalHall from './crystalHall.scene.json' with {type:'json'};
 import ruinsHall from './ruinsHall.scene.json' with {type:'json'};
 import frozenHall from './frozenHall.scene.json' with {type:'json'};
@@ -24,15 +24,15 @@ export const ROOM_SCENES: Readonly<Record<string, RoomSceneDefinition>> = {
   'fossil-station-v1': fossil as RoomSceneDefinition,
   'machinery-station-v1': machinery as RoomSceneDefinition,
   'core-station-v1': core as RoomSceneDefinition,
-  'fungal-station-v1': fungal as RoomSceneDefinition,
   'crystal-station-v1': crystal as RoomSceneDefinition,
-  // World 1's rest layers are authored halls (src/game/content/underground); the later worlds keep the kits above.
-  'old-mine-hall': oldMine as RoomSceneDefinition,
+  // World 3's rest layers are the kit rooms above (Blender kits rendered by AuthoredRoomView.ts); worlds 1 and 2's
+  // are authored halls (src/game/content/underground), loaded with the surface art.
+  'old-mine-hall': oldMineHall as RoomSceneDefinition,
+  'fungal-hall': fungalHall as RoomSceneDefinition,
   'crystal-hall': crystalHall as RoomSceneDefinition,
   'ruins-hall': ruinsHall as RoomSceneDefinition,
   'frozen-hall': frozenHall as RoomSceneDefinition,
-  'volcanic-hall': volcanic as RoomSceneDefinition,
-  // World 2 (the tech base) is being rebuilt as authored halls, starting with its first layer.
+  'volcanic-hall': volcanicHall as RoomSceneDefinition,
   'automine-hall': automineHall as RoomSceneDefinition,
   'reactor-hall': reactorHall as RoomSceneDefinition,
   'gear-hall': gearHall as RoomSceneDefinition,

@@ -8,7 +8,7 @@ Run: blender -b --python tools/blender/build_gear.py
 """
 import sys, math, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from cave_props import finish, model, box, lathe, prism, circle
+from cave_props import finish, model, box, lathe, prism, circle, solid, solid_of, passable
 from tech_props import tech_start, tech_services, bevel_box, ring_segments
 
 ACCENT = ('0c6c74', '12808a')  # deep teal
@@ -43,6 +43,7 @@ def gear(name, R, teeth):
     prism('Hub', circle(R * .36, 12), -.55, .55, 20, axis='z')
     prism('HubRing', circle(R * .26, 12), .55, .62, 21, axis='z')
     prism('HubCap', circle(R * .18, 10), .62, .72, 7, axis='z')
+    solid_of(hull=True)  # the whole wheel: the same shape however it turns (high in the gear hall, on the ground by the bases' stations)
 gear('Gear_Large', 5.0, 20)
 gear('Gear_Medium', 4.2, 16)
 gear('Gear_Small', 2.4, 10)
@@ -52,6 +53,7 @@ ring_segments('Socket', 1.0, 1.16, -.12, .12, 32, 22)
 for k in range(8):
     a = 2 * math.pi * k / 8 + math.pi / 8
     box('Bolt', (math.cos(a) * 1.08, math.sin(a) * 1.08, .13), (.07, .07, .04), 20)
+passable('a ring set in the frame wall behind its gear')
 
 # MACHINE FRAME on the north wall (front +Z, its back at local z = -.3), 25.6 m wide and 20 m tall: slate panels
 # between bronze pylons with teal bands and glow strips, a bronze lintel, teal rails across and a hazard plinth.
@@ -71,6 +73,8 @@ box('PlinthTop', (0, 1.15, .55), (22.4, .12, 1.0), 0)
 for x in (-8, -4, 4, 8):
     box('Vent', (x, 3.4, .62), (1.6, 1.0, .06), 18)
     box('VentLight', (x, 4.05, .63), (1.4, .1, .05), 7)
+solid((0, 10, -.1), (24.0, 20, .8)); solid((0, .6, .55), (22.2, 1.2, .9))  # the wall and the hazard plinth
+for x in (-12.0, 12.0): solid((x, 10, .4), (1.6, 20, 1.4))
 
 # POWER CORE (on the floor, 15 m): a bronze base, a white four-post frame with yellow bands, a glowing teal column in
 # four segments between bronze collars, a white cap and a bronze dome.
@@ -88,6 +92,7 @@ for k in range(4):
 lathe('Collar', [(13.4, .92), (13.8, .92)], 10, 20)
 bevel_box('Cap', (0, 14.3, 0), (2.4, 1.0, 2.4), 1, .3)
 lathe('Dome', [(14.8, 1.0), (15.3, .8), (15.6, .4), (15.7, 0)], 10, 20)
+solid((0, 7.8, 0), (2.6, 15.6, 2.6))
 
 # CATWALK (deck top at y = 0, front edge at z = +.9, 27.2 m long): a white deck on a charcoal trim with a warm light
 # strip under its front edge, a yellow rail along the front, and yellow legs at x = +-6.5 and +-13.4 to the floor
@@ -101,8 +106,10 @@ for k in range(17):
     box('RailPost', (x, .5, .82), (.1, 1.0, .1), 11)
 for y in (1.0, .55): box('RailBar', (0, y, .82), (27.2, .09, .09), 11)
 box('Kick', (0, .08, .86), (27.2, .16, .04), 5)
+passable('its deck runs 8.8 m up, out of reach; its legs stand on the floor')
 model('Catwalk_Leg')
 box('Leg', (0, .5, 0), (.34, 1.0, .34), 11)
+solid((0, .5, 0), (.4, 1.0, .4))
 
 # JIB CRANE (tower foot at the origin, jib along +X): a yellow lattice tower on a charcoal base, a white cab with a
 # warm window, the jib with a hazard tip, a counter-jib with its weight, a trolley, the cable and a hazard crate
@@ -125,5 +132,6 @@ box('Cable', (6.0, 9.15, 0), (.06, 6.8, .06), 13)
 box('HookBar', (6.0, 5.7, 0), (1.0, .14, .14), 0)
 bevel_box('Crate', (6.0, 5.0, 0), (1.2, 1.1, 1.2), 5, .12)
 box('CrateLid', (6.0, 5.6, 0), (1.26, .1, 1.26), 0)
+solid((0, .3, 0), (2.2, .6, 2.2)); solid((0, 6, 0), (1.7, 12, 1.7))  # the base and the tower; the crate hangs 4.4 m up
 
 finish(__file__)

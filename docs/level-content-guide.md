@@ -55,7 +55,7 @@
 
 `Layer.scene` 选择场景资产，和深度、主题配色及矿物独立。第二层的 `timber-station-v2` 已迁出原主题分支：
 
-- `content/rooms/oldMine.scene.json` 定义参考尺寸、出生/售卖/商店位置、招牌、交互圈、图集采样与局部照明参数。`sceneDefinitions.ts` 只注册轻量元数据，体素 Worker 不导入网格或布景实例。
+- `content/rooms/oldMineHall.scene.json` 定义参考尺寸、出生/售卖/商店位置、招牌、交互圈、图集采样与局部照明参数。`sceneDefinitions.ts` 只注册轻量元数据，体素 Worker 不导入网格或布景实例。
 - `content/rooms/oldMine.layout.json` 定义材质，以及墙体、支撑、矿口、升降机、售卖台、仓储、轨道、工坊、矿脉九个组的摆放、独立碰撞和照明采样点。
 - `content/rooms/sceneAssets.ts` 单独注册重资源；`assets/rooms/crystal-v1.json 等` 仅保存 Blender 网格和小图集像素。
 - `world/authoredRoomPlan.ts` 按配置展开各组与功能位置，生成实例、碰撞和标识。层号由楼层顺序派生，深度由 Layer 派生；中央 8×8 入口固定，地板按房间边界铺到入口边缘，业务圈保持原触发半径。
@@ -69,7 +69,7 @@
 
 | 修改目标 | 修改位置 | 需要重新导出网格吗 |
 | --- | --- | --- |
-| 柜台及售卖触发区一起移动 | `oldMine.scene.json → facilities.sell.at` | 不需要 |
+| 柜台及售卖触发区一起移动 | `oldMineHall.scene.json → facilities.sell.at` | 不需要 |
 | 移动一组道具 | `oldMine.layout.json → groups[].offset` | 不需要 |
 | 某件道具的位置、尺寸、旋转或颜色 | 对应组的 `instances` / 顶层 `materials` | 不需要 |
 | 某件道具的碰撞 | 对应组的 `solids`，与视觉独立编辑 | 不需要 |

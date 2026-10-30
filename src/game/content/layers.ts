@@ -13,7 +13,7 @@ type LayerTemplate = Readonly<{ id: string; name: string; theme: string; scene?:
 export const LAYER_TEMPLATES: readonly LayerTemplate[] = Object.freeze([
   {id:'surface',name:tr('草地矿场'),theme:'meadow_mine'},
   {id:'old_mine',name:tr('老矿井'),theme:'timber_mine',scene:'old-mine-hall'},
-  {id:'fungal',name:tr('蘑菇洞穴'),theme:'mushroom_cave',scene:'fungal-station-v1'},
+  {id:'fungal',name:tr('蘑菇洞穴'),theme:'mushroom_cave',scene:'fungal-hall'},
   {id:'crystal',name:tr('水晶洞穴'),theme:'crystal_cave',scene:'crystal-hall',laterScene:'crystal-station-v1'},
   {id:'ruins',name:tr('地下遗迹'),theme:'buried_ruins',scene:'ruins-hall',laterScene:'ruins-station-v1'},
   {id:'frozen',name:tr('冰封矿洞'),theme:'frozen_cave',scene:'frozen-hall',laterScene:'frozen-station-v1'},

@@ -22,7 +22,7 @@ const hall = (at: V3, yaw: number, scale: number) => ({ at, yaw, scale, ring: lo
 const portal = worldPortal(3);
 /** World 3's twelve eggs east of the spawn, the arc opening toward it (stands from build_egg_stands.py). */
 const hatchery: Hatchery = { centre: [20, 50], radius: 13, span: 210 * Math.PI / 180, pad: 15 };
-type Decor = Readonly<{ prop: string; x: number; z: number; yaw: number; scale: number; y?: number; half: V3 }>;
+type Decor = Readonly<{ prop: string; x: number; z: number; yaw: number; scale: number; y?: number }>;
 
 export const STAR_BASE = {
   asset: 'star-base',
@@ -68,14 +68,14 @@ export const STAR_BASE = {
   islands: [[-26, 30, -14, 4.2], [24, 34, -18, 5], [-38, 26, 30, 3.6], [39, 28, 22, 4], [-14, 38, -32, 3.2], [16, 31, 76, 3.4]] as readonly (readonly [number, number, number, number])[],
   /** Round the teleport station, a piece of each layer below (props from their halls' kits), in the station's frame
    *  (x across, +Z toward the spawn): the giant fossil, the ancient machine, the crystal geode, the ruins' guardian,
-   *  the ice and the star's heart. `half` is the collider's half size (y up from the ground); `y` lifts a prop
-   *  built round its centre (the gear). */
+   *  the ice and the star's heart. Each collides as its kit says (the gear, passable high up in its hall, by its hull
+   *  here); `y` lifts a prop built round its centre (the gear). */
   stationDecor: [
-    { prop: 'Fossil_Ribs', x: -5.4, z: -.4, yaw: .6, scale: .5, half: [1.4, .85, 1.2] },
-    { prop: 'Gear_Medium', x: 5.2, z: -.6, yaw: -.5, scale: .3, y: 1.2, half: [1.25, 1.25, .3] },
-    { prop: 'Geode_Open', x: -4.4, z: -3.6, yaw: .4, scale: .45, half: [1.2, .75, 1.05] },
-    { prop: 'Guardian_Head', x: 4.4, z: -3.6, yaw: -.3, scale: .45, half: [.8, 1.3, .7] },
-    { prop: 'Ice_Cluster', x: -7.8, z: -2.2, yaw: 0, scale: 1.8, half: [1.05, 1.2, .9] },
-    { prop: 'Star_Shard', x: 7.9, z: -2.4, yaw: .3, scale: .55, half: [1.1, 1.3, 1.1] },
+    { prop: 'Fossil_Ribs', x: -5.4, z: -.4, yaw: .6, scale: .5 },
+    { prop: 'Gear_Medium', x: 5.2, z: -.6, yaw: -.5, scale: .3, y: 1.2 },
+    { prop: 'Geode_Open', x: -4.4, z: -3.6, yaw: .4, scale: .45 },
+    { prop: 'Guardian_Head', x: 4.4, z: -3.6, yaw: -.3, scale: .45 },
+    { prop: 'Ice_Cluster', x: -7.8, z: -2.2, yaw: 0, scale: 1.8 },
+    { prop: 'Star_Shard', x: 7.9, z: -2.4, yaw: .3, scale: .55 },
   ] as readonly Decor[],
 } as const;

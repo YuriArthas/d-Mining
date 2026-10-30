@@ -5,7 +5,7 @@ tools/underground/fungalHall.ts places them.
 """
 import sys, math, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from cave_props import start, finish, model, mesh, box, lathe, prism, stepped, circle, stall, lantern_post, name_board, pit_post
+from cave_props import start, finish, model, mesh, box, lathe, prism, stepped, circle, stall, lantern_post, name_board, pit_post, solid_of
 
 # Quiet bases with a few grouped marks.
 TILES = [
@@ -32,8 +32,9 @@ start('Fungal', 'fungal', TILES, glowing={7, 8, 9})
 # root flare and a skirt, a broad two-tier cap with pale spots, glowing gills underneath and a glow band.
 def giant(name, cap_tile, glow_tile):
     model(name)
-    lathe('Stem', [(0, .085), (.05, .07), (.16, .052), (.45, .046), (.62, .05), (.72, .055)], 9, 6)
-    lathe('Root', [(0, .13), (.04, .1), (.09, .06)], 9, 0, cap_top=False)
+    stem = lathe('Stem', [(0, .085), (.05, .07), (.16, .052), (.45, .046), (.62, .05), (.72, .055)], 9, 6)
+    root = lathe('Root', [(0, .13), (.04, .1), (.09, .06)], 9, 0, cap_top=False)
+    solid_of([stem, root], hull=True)  # the cap is over the head (its underside at .69 of the height, 4 m and up)
     lathe('Skirt', [(.56, .055), (.6, .1), (.63, .105), (.645, .06)], 9, 6, cap_top=False, cap_bottom=False)
     lathe('Gills', [(.66, .07), (.69, .33), (.705, .43)], 12, glow_tile, spin=.13, cap_bottom=False, cap_top=False)
     lathe('Cap', [(.69, .44), (.735, .47), (.80, .44), (.885, .34), (.955, .19), (.99, .05)], 12, cap_tile, spin=.13, cap_bottom=False)
@@ -43,9 +44,10 @@ giant('Mushroom_Violet', 5, 8)
 # A clump of three small glowing mushrooms (about 0.9 m tall), for wall feet and shelves.
 model('Mushroom_Cluster')
 for i, (x, z, h, t, g) in enumerate([(0, 0, .95, 4, 7), (.42, .2, .62, 5, 8), (-.3, .34, .5, 4, 7)]):
-    lathe('SmallStem', [(0, .07 * h), (h * .7, .05 * h)], 7, 6, cx=x, cz=z)
-    lathe('SmallCap', [(h * .66, .32 * h), (h * .8, .3 * h), (h * .93, .16 * h), (h, .03)], 9, t, cx=x, cz=z, spin=i)
+    stem = lathe('SmallStem', [(0, .07 * h), (h * .7, .05 * h)], 7, 6, cx=x, cz=z)
+    cap = lathe('SmallCap', [(h * .66, .32 * h), (h * .8, .3 * h), (h * .93, .16 * h), (h, .03)], 9, t, cx=x, cz=z, spin=i)
     lathe('SmallGlow', [(h * .63, .1 * h), (h * .665, .3 * h)], 9, g, cx=x, cz=z, cap_bottom=False, cap_top=False, spin=i)
+    solid_of([stem, cap], hull=True)
 
 # SERVICE STALL under a broad mushroom-cap canopy on two stem posts (shared frame in cave_props.stall).
 def fungal_stall(name, cap_tile, badge):
@@ -67,7 +69,7 @@ name_board(upright)
 
 # CRYSTAL CLUSTER: a few chunky teal prisms leaning out of a rock foot.
 model('Crystal_Cluster')
-lathe('CrystalFoot', [(0, .55), (.25, .45), (.38, .15)], 7, 2)
+solid_of([lathe('CrystalFoot', [(0, .55), (.25, .45), (.38, .15)], 7, 2)], hull=True)
 for i, (x, z, h, lean) in enumerate([(0, 0, 1.5, 0), (.32, .14, 1.0, .35), (-.28, .2, .85, -.4), (.05, -.3, .7, .25)]):
     c, s = math.cos(lean), math.sin(lean); r = .16 + .04 * (i == 0)
     pts = []
@@ -77,7 +79,7 @@ for i, (x, z, h, lean) in enumerate([(0, 0, 1.5, 0), (.32, .14, 1.0, .35), (-.28
             px, py = math.cos(a) * rr, y
             pts.append((x + px * c + py * s * .35, .2 + py * c - px * s * .1, z + math.sin(a) * rr))
     faces = [(0, 1, 2, 3, 4, 5)[::-1]] + [(k, (k + 1) % 6, (k + 1) % 6 + 6, k + 6) for k in range(6)] + [(6 + k, 6 + (k + 1) % 6, 12 + (k + 1) % 6, 12 + k) for k in range(6)]
-    mesh('Crystal', pts, faces, 12)
+    solid_of([mesh('Crystal', pts, faces, 12)], hull=True)  # crystal by crystal
 
 # PIT POST with a glowing crystal cap at the pit corners.
 pit_post(lambda: lathe('PostCrystal', [(1.1, .2), (1.35, .2), (1.6, 0)], 6, 7))
@@ -86,5 +88,6 @@ pit_post(lambda: lathe('PostCrystal', [(1.1, .2), (1.35, .2), (1.6, 0)], 6, 7))
 model('Pool_Stone')
 prism('Stone', [(-.55, -.32), (.5, -.36), (.62, .1), (.4, .38), (-.42, .34), (-.62, .02)], 0, .42, 2)
 prism('StoneMoss', [(-.45, -.22), (.4, -.26), (.48, .06), (.3, .26), (-.34, .24), (-.5, .0)], .42, .48, 3)
+solid_of(hull=True)
 
 finish(__file__)

@@ -1,6 +1,7 @@
 // Offline: the 水晶洞穴 rest hall on the shared cave shell (caveKit.ts): a pale blue geode cavern, giant crystal
 // spires in the corners, crystals bursting from the walls and hanging from the ceiling, crystal-sand patches with
-// sparkles, a raised geode pool in the north-east and an open geode in the south-east; props from build_crystal.py.
+// sparkles, a raised geode pool in the north-east and an open geode in the south-east; props (and their colliders)
+// from build_crystal.py.
 import * as THREE from 'three';
 import { caveKit, colour, gem, glow, matte, type GetProp } from './caveKit.ts';
 import { CRYSTAL_HALL as HALL } from '../../../src/game/content/underground/crystalHall.ts';
@@ -83,21 +84,15 @@ export function buildHall(getProp: GetProp) {
     sprout(hit, up, 2 + r() * 1.8, i);
   }
 
-  // SPIRES: the landmarks, with colliders round the core and the foot.
-  for (const s of HALL.spires) {
-    place(s.tint === 'cyan' ? 'Spire_Cyan' : s.tint === 'pink' ? 'Spire_Pink' : 'Spire_Violet', s.at, s.yaw, s.height);
-    box([s.at[0], s.height * .45, s.at[2]], [s.height * .09, s.height * .45, s.height * .09]);
-    box([s.at[0], s.height * .06, s.at[2]], [s.height * .17, s.height * .06, s.height * .17]);
-  }
+  // SPIRES: the landmarks.
+  for (const s of HALL.spires) place(s.tint === 'cyan' ? 'Spire_Cyan' : s.tint === 'pink' ? 'Spire_Pink' : 'Spire_Violet', s.at, s.yaw, s.height);
   // OPEN GEODE in the south-east, its back to the wall; crystal sand at its mouth.
   place('Geode_Open', HALL.geode.at, HALL.geode.yaw);
-  box([HALL.geode.at[0], 1.7, HALL.geode.at[2] + 1.2], [2.6, 1.7, 1.2]);
-  for (const side of [-1, 1]) box([HALL.geode.at[0] + side * 2.3, 1.2, HALL.geode.at[2] - .2], [.35, 1.2, .5]);
   kit.patches([[HALL.geode.at[0], HALL.geode.at[2] - 2.6, 2.2]], sand, '#7a88cc', 'Cave crystal sand', [G.pink, G.cyan], .6, 5);
 
   kit.services();
   kit.wallFoot(30, () => r() < .5
-    ? { name: r() < .5 ? 'Cluster_Cyan' : 'Cluster_Pink', scale: () => .8 + r() * .9, solid: [.4, .55] }
+    ? { name: r() < .5 ? 'Cluster_Cyan' : 'Cluster_Pink', scale: () => .8 + r() * .9 }
     : { name: 'Cluster_Pink', scale: () => .5 + r() * .4 });
   // Loose glints on the floor ring near the walls.
   for (let i = 0; i < 40; i++) {

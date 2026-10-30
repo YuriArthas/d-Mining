@@ -8,7 +8,7 @@ Run: blender -b --python tools/blender/build_egg_stands.py
 import sys, json, math, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import cave_props
-from cave_props import start, finish, model, mesh, prism, stepped, ROOT
+from cave_props import start, finish, model, mesh, prism, stepped, solid, ROOT
 
 EGGS = json.loads((ROOT / 'egg-stands.json').read_text())['eggs']
 def shade(h, f):
@@ -66,4 +66,5 @@ for e in EGGS:
     prism('Egg_Lip', stepped(2.18, 2.18, .26), .35, .49, lip)
     prism('Egg_Nest', stepped(1.95, 1.95, .26), .49, .66, nest)
     egg('Egg_Display', (0, .66, 0), 2.25, *EGG_TILES[e['id']])
+    solid((0, 1.5, 0), (1.9, 3, 1.9))  # as Pinewind's stands: the egg and its nest, the plinth's lip stays a step
 finish(__file__)

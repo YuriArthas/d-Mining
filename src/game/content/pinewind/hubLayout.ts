@@ -5,8 +5,8 @@ import { CAPSULE_MACHINE_AT, CAPSULE_MACHINE_YAW } from '../feedbackFacilities.t
 import { worldStation } from '../worldJourney.ts';
 
 import { tr } from '../../i18n/i18n.ts';
-/** Pinewind hub plan for world 1. One source for the playable zones, collision, the
- *  runtime composition and the offline art pipeline (tools/export-pinewind-layout.mjs).
+/** Pinewind hub plan for world 1. One source for the playable zones, the runtime composition and the offline
+ *  art pipeline (tools/export-pinewind-layout.mjs). The models' collision is their Blender build's.
  *  Coordinates: +X east, +Z toward the spawn (south); the mine square spans 8 m either side of the origin. */
 const DEG = Math.PI / 180;
 const round = (value: number) => Math.round(value * 100) / 100;
@@ -19,11 +19,10 @@ export const PINEWIND_PLAZA = { x: 0, z: 20, radius: 15 } as const;
 // south toward the arriving player so a walkway stays open past the terrace stairs to the capsule machine.
 // The two shops stand side by side on the west, each facing the plaza centre: the forge sells pickaxes, the
 // pack shop next to it backpacks. From the spawn the sell house and the shops read either side of the headframe.
-// Every building: its ring 6.7 m in front of the anchor, a 8.6 x 6 x 6.8 m collider, and its word on a dark plate.
+// Every building: its ring 6.7 m in front of the anchor and its word on a dark plate.
 const facility = (id: string, type: 'sell' | 'shop', anchor: SurfaceFacility['anchor'], title: string, color: string, ringColor: string): SurfaceFacility => ({
   id, type, anchor, ringColor,
   trigger: { x: 0, z: 6.7, radius: 1.7, heightTolerance: 0.25, hysteresis: 0.25 },
-  collider: { x: 0, y: 3, z: 0, half: [4.3, 3, 3.4], yaw: 0 },
   sign: { title, color, background: '#18283d', width: 3.6, y: 4.5 },
 });
 export const PINEWIND_FACILITIES = {
@@ -85,17 +84,17 @@ export const PINEWIND_STATION_SIGN: Sign = { at: [station.x, 7.6, station.z], ya
  *  around the gate as offsets from its centre (the gate faces -z, the spawn); y lifts a piece onto the slope. The
  *  station is flanked by four of the caves below it — a giant mushroom, a crystal
  *  cluster, ice spikes and a lava rock — and the world gate by the next worlds: a desert dune with a cactus and a
- *  beacon (world 2), a fallen star with violet crystals (world 3). `half` is each piece's collider. */
-export type PortalDecor = Readonly<{ kind: 'mushroom' | 'crystal' | 'ice' | 'lava' | 'desert' | 'meteor'; x: number; y: number; z: number; half: readonly [number, number, number] }>;
+ *  beacon (world 2), a fallen star with violet crystals (world 3). Each piece's collider is its model's. */
+export type PortalDecor = Readonly<{ kind: 'mushroom' | 'crystal' | 'ice' | 'lava' | 'desert' | 'meteor'; x: number; y: number; z: number }>;
 export const PINEWIND_STATION_DECOR: readonly PortalDecor[] = [
-  { kind: 'crystal', x: -4.9, y: 0, z: -.4, half: [.95, 1.2, .95] },
-  { kind: 'mushroom', x: -3.9, y: 0, z: -2.8, half: [.6, 1.7, .6] },
-  { kind: 'ice', x: 4.9, y: 0, z: -.4, half: [1, 1.5, 1] },
-  { kind: 'lava', x: 3.9, y: 0, z: -2.8, half: [1.15, .6, 1.15] },
+  { kind: 'crystal', x: -4.9, y: 0, z: -.4 },
+  { kind: 'mushroom', x: -3.9, y: 0, z: -2.8 },
+  { kind: 'ice', x: 4.9, y: 0, z: -.4 },
+  { kind: 'lava', x: 3.9, y: 0, z: -2.8 },
 ];
 export const PINEWIND_GATE_DECOR: readonly PortalDecor[] = [
-  { kind: 'desert', x: 8.6, y: .15, z: -2.4, half: [1.9, 1.6, 1.4] },
-  { kind: 'meteor', x: -8.6, y: .15, z: -2.4, half: [1.4, 1, 1.2] },
+  { kind: 'desert', x: 8.6, y: .15, z: -2.4 },
+  { kind: 'meteor', x: -8.6, y: .15, z: -2.4 },
 ];
 
 /** Two egg terraces facing the plaza: world 1's seven eggs (the later worlds' stand in their own bases). Rows

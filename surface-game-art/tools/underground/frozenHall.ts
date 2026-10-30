@@ -1,7 +1,7 @@
 // Offline: the 冰封矿洞 rest hall on the shared cave shell (caveKit.ts): pale blue rock frosted white on its upper
 // faces, icicles with glinting tips, snow drifts along the walls, glowing ice formations, a frozen waterfall
 // pouring down the east wall into a frozen pond, a campfire by the sale stall and an igloo in the south-east.
-// Props from build_frozen.py.
+// Props (and their colliders) from build_frozen.py.
 import * as THREE from 'three';
 import { ConvexGeometry } from 'three/addons/geometries/ConvexGeometry.js';
 import { caveKit, colour, glow, matte, rockMass, smooth, type GetProp } from './caveKit.ts';
@@ -81,27 +81,18 @@ export function buildHall(getProp: GetProp) {
   box([pond.at[0], .25, pond.at[2]], [pond.radius * .8, .25, pond.radius * .8]);
 
   // ICE FORMATIONS.
-  for (const s of HALL.spires) {
-    place('Ice_Spire', s.at, s.yaw, s.height);
-    box([s.at[0], s.height * .3, s.at[2]], [s.height * .16, s.height * .3, s.height * .16]);
-  }
+  for (const s of HALL.spires) place('Ice_Spire', s.at, s.yaw, s.height);
   kit.services();
 
   // CAMPFIRE with log seats east and west of it.
-  const [cx, , cz] = HALL.campfire;
   place('Campfire', HALL.campfire, 0, 1.35);
-  box([cx, .45, cz], [1.25, .45, 1.25]);
-  for (const side of [-1, 1]) box([cx + side * 2.3, .27, cz], [.3, .27, 1]);
   // IGLOO, its tunnel facing the hall, and the ore sled parked beside it.
   const [ix, , iz] = HALL.igloo;
   place('Igloo', HALL.igloo, Math.PI);
-  box([ix, 1.3, iz], [2.3, 1.3, 2.3]); box([ix, .85, iz - 2.7], [.95, .85, .8]);
-  box([ix + 1.9 * -1, .5, iz - 1.6], [.33, .5, .33]); box([ix + 2.1, .3, iz - 1.4], [.33, .3, .33]);
   place('Ore_Sled', [ix - 4.4, 0, iz - .4], .35);
-  box([ix - 4.4, .5, iz - .4], [.75, .5, 1.2], .35);
 
   kit.wallFoot(32, () => r() < .45
-    ? { name: 'Ice_Cluster', scale: () => .8 + r() * .8, solid: [.45, .6] }
-    : { name: 'Frost_Rock', scale: () => .8 + r() * .9, solid: [.5, .4] });
+    ? { name: 'Ice_Cluster', scale: () => .8 + r() * .8 }
+    : { name: 'Frost_Rock', scale: () => .8 + r() * .9 });
   return { group: kit.group, solids: kit.solids, lights: HALL.lights };
 }

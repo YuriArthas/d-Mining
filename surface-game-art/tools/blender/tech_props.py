@@ -1,12 +1,11 @@
 """World 2's base kit props, shared by every world 2 hall script (build_<hall>.py), in big flat colour blocks: light
 panel white, bright yellow, charcoal, and the hall's own accent glow. White kiosks with icon screens (an ore chunk
 for the sale, crossed pickaxes for the shop) on the shared stall frame, a white lamp post, a screen name board, a
-yellow bollard, a ceiling lamp and crate stacks; the footprints are cave_props.py's, so caveKit.ts gives them the
-same colliders. Halls add their own tiles from 20 up.
+yellow bollard, a ceiling lamp and crate stacks; the footprints and colliders are cave_props.py's. Halls add their own tiles from 20 up.
 Usage: tech_start('Reactor', 'reactor', ACCENT, extra_tiles); tech_services(); <hall models>; finish(__file__)
 """
 import math
-from cave_props import start, model, box, prism, stepped, stall, name_board, pit_post
+from cave_props import start, model, box, prism, stepped, stall, name_board, pit_post, solid, passable
 
 # The shared tiles. Glow tiles are deep and saturated: the atlas emission (x2.2) on top of the lit colour would wash bright ones out.
 TECH_TILES = [
@@ -62,6 +61,9 @@ def tech_facade(name, wall=3, vents=True):
         for x in (-6, -3, 3, 6):
             box('Vent', (x, 3.0, .32), (1.6, 1.2, .06), 18)
             box('VentLight', (x, 3.8, .33), (1.4, .1, .05), 7)
+    # The wall, its two pylons and the hazard plinth.
+    solid((0, 10, -.1), (17.6, 20, .8)); solid((0, .6, .55), (16.4, 1.2, .9))
+    for x in (-8.9, 8.9): solid((x, 10, .4), (1.6, 20, 1.4))
 
 def ring_segments(name, r0, r1, z0, z1, n, t, cy=0, spin=0, gaps=()):
     """A flat ring in the XY plane (facing +Z) from n trapezoid prisms, skipping the segment indices in `gaps`."""
@@ -113,6 +115,7 @@ def tech_services():
     box('Arm', (.38, 2.78, 0), (.92, .18, .24), 1)
     box('LightHood', (.55, 2.66, 0), (.6, .1, .34), 11)
     box('Light', (.55, 2.55, 0), (.5, .12, .26), 9)
+    solid((0, 1.4, 0), (.4, 2.8, .4))
 
     # NAME BOARD: white uprights with yellow bands and accent lamp caps; an accent glow edge round the dark screen.
     def upright(x):
@@ -135,9 +138,12 @@ def tech_services():
     box('Rod', (0, 2.2, 0), (.12, 4.0, .12), 0)
     bevel_box('Housing', (0, 0, 0), (1.8, .5, 1.1), 11, .2)
     box('Light', (0, -.27, 0), (1.5, .06, .8), 9)
+    passable('hangs from the ceiling, far over the head')
 
     # CRATE STACK: chunky white, yellow and charcoal crates with hazard bands.
     model('Crate_Stack')
     for (x, y, z, s, t) in ((0, .5, 0, 1.0, 1), (.15, 1.4, .05, .8, 11), (1.05, .35, .2, .7, 0)):
         bevel_box('Crate', (x, y, z), (s, s * .9 if y > .5 else s, s), t, .1)
         box('CrateBand', (x, y, z + s / 2 + .01), (s * .8, .12, .03), 5)
+    # The big crate with the one on it, and the small one beside.
+    solid((.05, .9, .02), (1.1, 1.8, 1.04)); solid((1.05, .35, .2), (.7, .7, .7))

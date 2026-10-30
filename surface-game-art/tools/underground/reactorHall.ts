@@ -4,7 +4,7 @@
 // and a turning rotor, cooling towers either side; one smooth poured floor with the lamps' light baked in, a lane
 // loop and arrows, a yellow rail round the pit, white kiosks. Glow is faked for phones: additive halos, light
 // cones and streaks of reflected light on the floor.
-// Moving parts are direct children named Spin_* (SceneMotion.ts).
+// Moving parts are direct children named Spin_* (SceneMotion.ts). Props bring their colliders (build_reactor.py).
 import * as THREE from 'three';
 import { caveKit, glow, matte, type GetProp } from './caveKit.ts';
 import { techKit, softFrame, glowGrid, unlit } from './techKit.ts';
@@ -20,7 +20,7 @@ export function buildHall(getProp: GetProp) {
     ...L.towers.map(([x, z]) => ({ x, z, radius: 2.8 })),
     { x: HALL.spare[0], z: HALL.spare[2], radius: 3.4 },
   ]);
-  const { r, box, add, place, HALF } = kit;
+  const { r, add, place, HALF } = kit;
   kit.useProps(getProp);
   const tech = techKit(kit, L.pools);
   const ember = Object.assign(glow('Cave glow ember', '#c8360c', 1.0), { side: THREE.DoubleSide }), steel = matte('Base steel');
@@ -37,10 +37,7 @@ export function buildHall(getProp: GetProp) {
   // In the spare stall's place (this layer has no shop): a few crate stacks.
   {
     const [x, , z] = HALL.spare;
-    for (const [dx, dz, yaw, scale] of [[-1.3, .4, .2, 1.15], [1.2, .2, -.35, 1], [0, 1.6, 1.4, .9]] as const) {
-      place('Crate_Stack', [x + dx, 0, z + dz], yaw, scale);
-      box([x + dx, .7 * scale, z + dz], [.9 * scale, .7 * scale, .9 * scale], yaw);
-    }
+    for (const [dx, dz, yaw, scale] of [[-1.3, .4, .2, 1.15], [1.2, .2, -.35, 1], [0, 1.6, 1.4, .9]] as const) place('Crate_Stack', [x + dx, 0, z + dz], yaw, scale);
   }
   tech.hazard([-7.6, -17.9], [7.6, -17.9], .7, tech.paintMaterial);
 
@@ -48,9 +45,6 @@ export function buildHall(getProp: GetProp) {
   // own light) turning slowly about Z, the ring and its clamps round it, the rotor turning the other way, a halo
   // behind and a streak of its light down the floor.
   place('Reactor_Facade', [0, 0, facade.z], 0);
-  box([0, 10, facade.z - .1], [facade.half - .8, 10, .4]);
-  for (const s of [-1, 1]) box([s * 8.9, 10, facade.z + .4], [.8, 10, .7]);
-  box([0, .6, facade.z + .55], [8.2, .6, .45]);
   {
     const lava = ['#ff6a14', '#ff8a24', '#f04a0c', '#ffb43c', '#ff7a1c'].map(c => new THREE.Color(c)), crust = new THREE.Color('#9a2a0c'), tone = rng(9071);
     const ball = new THREE.IcosahedronGeometry(core.radius, 3).toNonIndexed(); ball.computeVertexNormals();
@@ -73,7 +67,6 @@ export function buildHall(getProp: GetProp) {
   // COOLING TOWERS either side of the facade, fans turning on top, pipes into the rock; their glow on the floor.
   for (const [x, z] of L.towers) {
     place('Cooling_Tower', [x, 0, z], 0);
-    box([x, 4.1, z], [2.1, 4.1, 2.1]);
     const fan = new THREE.Group(); fan.name = 'Spin_y_180'; fan.position.set(x, 8.2, z); fan.add(getProp('Cooling_Fan')); kit.group.add(fan);
     for (const y of [3.0, 6.6]) {
       const g = new THREE.CylinderGeometry(.42, .42, HALF - Math.abs(z) + 1.4, 10).rotateX(Math.PI / 2).toNonIndexed(); g.computeVertexNormals();
@@ -89,6 +82,6 @@ export function buildHall(getProp: GetProp) {
   // RED-HOT SEAMS cracking the rock, never on the facade.
   tech.seams(18, ember, '#ff4a14', (side, d) => side === 0 && Math.abs(d) < facade.half + 2, 'Cave ember seam');
 
-  kit.wallFoot(12, () => ({ name: 'Crate_Stack', scale: () => .8 + r() * .3, solid: [.9, .7] }));
+  kit.wallFoot(12, () => ({ name: 'Crate_Stack', scale: () => .8 + r() * .3 }));
   return { group: kit.group, solids: kit.solids, lights: HALL.lights };
 }

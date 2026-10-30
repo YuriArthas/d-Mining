@@ -1,8 +1,8 @@
 import type { SparseWorld } from '../terrain/SparseWorld.ts';
-import { WorldBorders, journeySurfacePlan } from '../presentation/WorldBorders.ts';
+import { WorldBorders } from '../presentation/WorldBorders.ts';
+import { ColliderView } from '../presentation/ColliderView.ts';
 import { SceneMotion } from '../presentation/SceneMotion.ts';
 import { FeedbackFixtures } from '../presentation/FeedbackFixtures.ts';
-import { FEEDBACK_COLLISION_SITE } from '../content/feedbackFacilities.ts';
 import { surfaceLightStrengthAtFeet } from '../world/SurfaceLightFade.ts';
 import type { GameContent } from "../content/gameContent.ts";
 import type {
@@ -36,7 +36,6 @@ import { TeleportStations } from "../presentation/TeleportStations.ts";
 import { CaveLights } from "../presentation/CaveLights.ts";
 import { disposeScenery } from "../presentation/disposeScenery.ts";
 import { prepareShaders } from "../presentation/prepareShaders.ts";
-import { createScenerySites } from "../world/createScenerySites.ts";
 import { PlayerController } from "./PlayerController.ts";
 import { CameraView } from "./CameraView.ts";
 import { MiningInteraction } from "./MiningInteraction.ts";
@@ -290,14 +289,14 @@ export async function startGame(options: StartGameOptions) {
       card.equippedSlot === null ? [] : [{ ...card.pet, slot: card.equippedSlot }]));
     updatePets();
     scope.defer(session.pets.subscribe(updatePets));
-    const sites = [...createScenerySites(content.rooms, content.surface.plan),FEEDBACK_COLLISION_SITE,...content.extraSites,
-      ...content.worlds.slice(1).map(w=>({id:`world${w.id}.surface`,depth:0,plan:journeySurfacePlan(w.z)}))],
-      sceneryCollision = new SceneryCollision(physics, sites);
+    const sites = content.sites, sceneryCollision = new SceneryCollision(physics, sites);
     scope.defer(() => sceneryCollision.dispose());
     const facilities = new SceneryView(surface, sites);
     scope.defer(() => facilities.dispose());
     root.add(facilities.group, terrain.group);
-    const borders=new WorldBorders(physics,surface.group);root.add(borders.group);scope.defer(()=>borders.dispose());
+    const borders=new WorldBorders(physics);root.add(borders.group);scope.defer(()=>borders.dispose());
+    const colliderView = new ColliderView(physics.world, c => sceneryCollision.owns(c, false) || borders.owns(c));
+    root.add(colliderView.lines); scope.defer(() => colliderView.dispose());
     const feedbackFixtures = new FeedbackFixtures();
     root.add(feedbackFixtures.group);
     scope.defer(() => feedbackFixtures.dispose());
@@ -353,6 +352,7 @@ export async function startGame(options: StartGameOptions) {
       player,
       facilities,
       sceneryCollision,
+      colliderView,
       environment,
       cameraView,
       eggLabels,

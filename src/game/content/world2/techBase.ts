@@ -79,19 +79,20 @@ export const TECH_BASE = {
     [-14, -21.5, .9, 2], [15, -22, 1.1, 1], [-31, -21, 1, 0], [31.5, -20, .85, 3]] as readonly (readonly [number, number, number, number])[],
   /** Round the teleport station, a piece of the layers below from their halls' own prop kits, in the station's frame
    *  (x across, +Z toward the spawn): the gear factory, the crystal refinery, the frozen lab and the core reactor.
-   *  `half` is the collider's half size (y up from the ground); `y` lifts a prop built round its centre (the gear). */
+   *  Each collides as its kit says (the gear, passable high up in its hall, by its hull here); `y` lifts a prop built
+   *  round its centre (the gear). */
   stationDecor: [
-    { prop: 'Gear_Small', x: -4.7, z: -.5, yaw: .5, scale: .52, y: 1.12, half: [1.3, 1.2, .45] },
-    { prop: 'Crystal_Tank', x: 4.7, z: -.5, yaw: -.4, scale: .6, half: [.75, 1.45, .85] },
-    { prop: 'Cryo_Pod', x: -3.9, z: -3.1, yaw: .3, scale: .5, half: [1.2, 1.35, 1.2] },
-    { prop: 'Cooling_Tower', x: 3.9, z: -3.1, yaw: 0, scale: .34, half: [.8, 1.4, .8] },
-  ] as readonly Readonly<{ prop: string; x: number; z: number; yaw: number; scale: number; y?: number; half: V3 }>[],
+    { prop: 'Gear_Small', x: -4.7, z: -.5, yaw: .5, scale: .52, y: 1.12 },
+    { prop: 'Crystal_Tank', x: 4.7, z: -.5, yaw: -.4, scale: .6 },
+    { prop: 'Cryo_Pod', x: -3.9, z: -3.1, yaw: .3, scale: .5 },
+    { prop: 'Cooling_Tower', x: 3.9, z: -3.1, yaw: 0, scale: .34 },
+  ] as readonly Readonly<{ prop: string; x: number; z: number; yaw: number; scale: number; y?: number }>[],
   /** East of the portal dais (the station and its decor fill the west), world 3 ahead (portal frame: x across, +Z
    *  toward the spawn; the portal faces the spawn, so -x is east): the fallen star and the giant fossil. */
   portalDecor: [
-    { prop: 'Star_Shard', x: -8.6, z: 1, yaw: .4, scale: 1, half: [1.8, 1.9, 1.8] },
-    { prop: 'Fossil_Ribs', x: -14, z: -1.5, yaw: -.6, scale: 1, half: [2.6, 1.2, 1.6] },
-  ] as readonly Readonly<{ prop: string; x: number; z: number; yaw: number; scale: number; y?: number; half: V3 }>[],
+    { prop: 'Star_Shard', x: -8.6, z: 1, yaw: .4, scale: 1 },
+    { prop: 'Fossil_Ribs', x: -14, z: -1.5, yaw: -.6, scale: 1 },
+  ] as readonly Readonly<{ prop: string; x: number; z: number; yaw: number; scale: number; y?: number }>[],
   /** Crates of ore by the buyer, barrels by the shop: [x, z, yaw, kind]. */
   crates: [[-15.5, 15.5, .3, 'red'], [-16.8, 16.6, .1, 'blue'], [-14.4, 16.6, .5, 'red'], [-17.4, 33.2, .2, 'blue'], [-18.2, 34.6, .7, 'red'],
     [15.2, 15.6, .2, 'barrel'], [16.5, 15.2, 0, 'barrel'], [16.3, 33.4, .4, 'barrel'], [-15.5, 44.5, .3, 'red'], [-16.6, 45.6, .1, 'blue']] as readonly (readonly [number, number, number, 'red' | 'blue' | 'barrel'])[],

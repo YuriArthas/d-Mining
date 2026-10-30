@@ -1,11 +1,11 @@
 """熔岩矿洞 hall props: hexagonal basalt column clusters, lava-basin rim stones, ember vents, obsidian clusters,
 iron-roofed service stalls, the name board on basalt uprights and lava-capped pit posts, on the shared footprints in
-cave_props.py.
+cave_props.py. Each prop's collider follows its parts.
 Run: blender -b --python tools/blender/build_volcanic.py
 """
 import sys, math, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from cave_props import start, finish, model, mesh, box, lathe, prism, stepped, circle, spike, stall, lantern_post, name_board, pit_post
+from cave_props import start, finish, model, mesh, box, lathe, prism, stepped, circle, spike, stall, lantern_post, name_board, pit_post, solid, solid_of
 
 TILES = [
     ('3e2a28', [(4, 6, 24, 3, '4c3632'), (6, 24, 18, 2, '32221f')]),          # 0 dark basalt frame
@@ -47,16 +47,19 @@ for u, v, h in [(.5, .29, .55), (-.5, .29, .42), (0, -.58, .5), (1.25, .43, .3),
 # Two short columns carry pools of lava on their tops.
 for u, v, h in [(1.5, .87, .58), (-1, -1.73, .34)]:
     hexcol('LavaTop', u * R * 1.73, v * R * 1.73, R * .7, h, h + .012, spin=math.pi / 6, top=7, side=7)
+solid_of('Column', hull=True)  # one hull round the honeycomb, stepping down from the middle
 # A short honeycomb stub for wall feet (about 1 m, unit scale).
 model('Basalt_Stub')
 for u, v, h in [(0, 0, .95), (1, 0, .7), (.5, .87, .8), (-.5, .87, .55), (-1, 0, .6), (.5, -.87, .45)]:
     hexcol('Stub', u * .28 * 1.73, v * .28 * 1.73, .28, -.02, h, spin=math.pi / 6)
+solid_of(hull=True)
 
 # LAVA RIM STONE: one chunky basalt block for the ring round the lava basin, a glowing underlip on the inner side.
 model('Lava_Rim')
 prism('Stone', [(-.6, -.34), (.55, -.38), (.68, .1), (.42, .42), (-.46, .38), (-.68, .02)], 0, .55, 2)
 prism('StoneTop', [(-.5, -.26), (.46, -.3), (.56, .08), (.34, .32), (-.38, .3), (-.56, .02)], .55, .62, 17)
 box('Underlip', (0, .5, -.36), (.9, .08, .06), 7)
+solid_of(hull=True)
 
 # EMBER VENT: a broad faceted cone with a glowing crater and a few lava lumps (about 1.2 m tall, unit scale).
 model('Ember_Vent')
@@ -65,12 +68,13 @@ lathe('Lip', [(1.05, .42), (1.12, .4), (1.12, .3)], 9, 17, spin=.2, cap_top=Fals
 lathe('Crater', [(1.12, .3), (.98, .22)], 9, 7, spin=.2, cap_bottom=False)
 for a in (0.4, 2.3, 4.4):
     prism('Lump', circle(.16, 6, math.cos(a) * .95, math.sin(a) * .95), 0, .26, 7)
+solid_of(hull=True)  # the cone (its crater is not walked into)
 
 # OBSIDIAN CLUSTER: chunky black-violet glass spikes out of a basalt foot, an ember glint at the base.
 model('Obsidian_Cluster')
-lathe('Foot', [(0, .55), (.22, .46), (.36, .16)], 7, 2)
+solid_of([lathe('Foot', [(0, .55), (.22, .46), (.36, .16)], 7, 2)], hull=True)
 for i, (x, z, h, lx, lz) in enumerate([(0, 0, 1.6, 0, 0), (.3, .12, 1.05, .32, .1), (-.26, .2, .9, -.36, .14), (.06, -.28, .8, .08, -.3)]):
-    spike('Obsidian', x, z, h, .17 + .04 * (i == 0), 5, 16, lean=(lx, lz), y=.18, spin=i)
+    solid_of([spike('Obsidian', x, z, h, .17 + .04 * (i == 0), 5, 16, lean=(lx, lz), y=.18, spin=i)], hull=True)  # spike by spike
 prism('Glint', circle(.12, 6, .28, -.22), .02, .14, 8)
 
 # SERVICE STALL with riveted iron roof on square basalt posts (shared frame in cave_props.stall).
@@ -86,7 +90,7 @@ def iron_roof():
          [(0, 1, 2, 3), (3, 2, 5, 4), (9, 8, 7, 6), (6, 7, 1, 0), (8, 9, 4, 5), (6, 0, 3, 4, 9), (1, 7, 8, 5, 2)], [4, 4, 10, 10, 5, 0, 0])
     box('RoofRidge', (0, 4.42, -.3), (6.2, .16, .3), 5)
     box('RoofEdge', (0, 3.72, 1.82), (6.1, .12, .14), 5)
-    for x in (-2.2, 2.2): box('FrontPost', (x, 2.35, 1.6), (.18, 2.7, .18), 10)
+    for x in (-2.2, 2.2): box('FrontPost', (x, 2.35, 1.6), (.18, 2.7, .18), 10); solid((x, 1.35, 1.6), (.24, 2.7, .24))  # down to the floor
 stall('Stall_Sell', 'coin', iron_roof, iron_post)
 stall('Stall_Shop', 'pick', iron_roof, iron_post)
 

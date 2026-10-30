@@ -1,7 +1,8 @@
 """Shared helpers for the underground hall prop kits (build_<hall>.py): a small hand-painted pixel atlas, faceted
 mesh primitives authored in three's (x, y, z), and the props every hall shares with one footprint (the service
 stall frame, the lantern post, the name board, the pit post), so tools/underground/caveKit.ts can give them the
-same colliders. No imported geometry, no Decimate.
+same colliders. No imported geometry, no Decimate. Each prop says how it collides right after its parts (solid,
+solid_of, mesh_solid or passable, from collision.py); finish() refuses a kit with a prop that does not.
 
 Atlas: 32-pixel tiles, 8 x 4 (256 x 128; `start(..., rows=8)` for 8 x 8, 256 x 256). Tiles 0-15 have fixed roles that the shared props use; 16-31 are free:
   0 dark frame  1 counter  2 stone  3 ground accent  4 roof A  5 roof B  6 pale  7 glow A  8 glow B  9 glow warm
@@ -10,6 +11,7 @@ Usage: start('OldMine', 'old-mine', TILES, glowing={7, 8, 9, ...}); model(...); 
 """
 import bpy, bmesh, math, json, hashlib, struct, zlib, pathlib
 from mathutils import Vector
+import collision
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 OUT = ROOT / 'public/assets/underground'
@@ -66,10 +68,18 @@ def start(name, slug, tiles, glowing, emission=2.2, rows=4):
 
 P = lambda v: (v[0], -v[2], v[1])  # authoring in three's (x, y, z); Blender is Z-up
 def model(name):
-    """A prop root (an empty) named for its role; the hall builder places it by this name."""
+    """A prop root (an empty) named for its role; the hall builder places it by this name (a part already holding
+    the name gives it up)."""
+    taken = bpy.data.objects.get(name)
+    if taken: assert taken.name not in S['models'], f'two props named {name}'; taken.name = name + '_Part'
     o = bpy.data.objects.new(name, None); bpy.context.collection.objects.link(o)
     o['authorship'] = S['authorship']
     S['models'][name] = o; S['active'] = o; return o
+# The active prop's collision (collision.py): boxes and hulls in its own frame, its triangles, or nothing.
+def solid(at, size, yaw=0): collision.solid(S['active'], at, size, yaw)
+def solid_of(parts=None, hull=False): collision.solid_of(S['active'], parts, hull)
+def mesh_solid(): collision.mesh_solid(S['active'])
+def passable(reason): collision.passable(S['active'], reason)
 def mesh(name, verts, faces, tiles=0):
     """A flat-shaded part of the active prop; `tiles` is one atlas tile or one per face. Each face's UVs span
     the inner 27 px of its tile, projected on the face's own plane."""
@@ -158,8 +168,9 @@ def stall(name, badge, roof, post=None, stock_tile=None):
     box('LanternGlass', (0, 2.62, 1.35), (.34, .44, .34), 9)
     box('LanternFoot', (0, 2.37, 1.35), (.4, .08, .4), 10)
     for x, z in ((-2.6, .9), (2.65, .6)):
-        box('Crate', (x, .5, z), (.78, .62, .78), 1); box('CrateBand', (x, .5, z), (.82, .14, .82), 0)
-        for k in range(3): box('Ore', (x - .2 + k * .2, .9, z), (.2, .18, .2), 12 if k % 2 else 11)
+        crate = [box('Crate', (x, .5, z), (.78, .62, .78), 1), box('CrateBand', (x, .5, z), (.82, .14, .82), 0)]
+        for k in range(3): crate.append(box('Ore', (x - .2 + k * .2, .9, z), (.2, .18, .2), 12 if k % 2 else 11))
+        solid_of(crate)
     prism('BadgePlate', circle(.58, 12, 0, 3.05), 1.22, 1.34, 10, axis='z')
     if badge == 'coin':
         prism('BadgeCoin', circle(.36, 10, 0, 3.05), 1.34, 1.44, 11, axis='z')
@@ -167,6 +178,10 @@ def stall(name, badge, roof, post=None, stock_tile=None):
     else:
         prism('BadgePickHead', [(-.4, 3.2), (-.12, 3.32), (.12, 3.32), (.4, 3.2), (.3, 3.12), (0, 3.2), (-.3, 3.12)], 1.34, 1.46, 12, axis='z')
         prism('BadgePickHandle', [(-.05, 2.7), (.05, 2.7), (.05, 3.24), (-.05, 3.24)], 1.34, 1.44, 1, axis='z')
+    # The shared footprint: the counter, the two back posts and the back shelf (the side crates have their own).
+    solid((0, .7, .45), (4.8, 1.4, 1.4))
+    for side in (-1, 1): solid((side * 2.2, 1.9, -.9), (.4, 3.8, .4))
+    solid((0, .9, -1.15), (4.2, 1.8, .8))
 
 def lantern_post(name='Lantern_Post'):
     """A post with an iron arm and a warm hanging lantern, 2.8 m (collider: .4 x 2.8 x .4)."""
@@ -178,6 +193,7 @@ def lantern_post(name='Lantern_Post'):
     box('LanternCap', (.62, 2.28, 0), (.34, .08, .34), 10)
     box('LanternGlass', (.62, 2.06, 0), (.26, .36, .26), 9)
     box('LanternFoot', (.62, 1.85, 0), (.32, .06, .32), 10)
+    solid((0, 1.4, 0), (.4, 2.8, .4))
 
 def name_board(upright):
     """The name board on the north wall: `upright(x)` builds each of the two uprights at x = +-3.9 (collider:
@@ -187,6 +203,7 @@ def name_board(upright):
     box('Board', (0, 6.0, -.1), (7.4, 2.4, .3), 14)
     box('BoardTrim', (0, 7.25, -.05), (7.8, .16, .4), 11)
     box('BoardTrimLow', (0, 4.75, -.05), (7.8, .16, .4), 11)
+    for side in (-1, 1): solid((side * 3.9, 3.8, 0), (.6, 7.6, .6))
 
 def pit_post(cap):
     """A short stone post at each pit corner (collider .7 x 1.1 x .7); `cap()` tops it at y = 1.1."""
@@ -194,6 +211,7 @@ def pit_post(cap):
     prism('PostBase', stepped(.7, .7, .14), 0, .3, 2)
     prism('Post', stepped(.46, .46, .1), .3, 1.1, 2)
     cap()
+    solid((0, .55, 0), (.7, 1.1, .7))
 
 def finish(script):
     """Triangulate, save the .blend, export the GLB and write the provenance report (script, source, texture,
@@ -203,12 +221,14 @@ def finish(script):
         bm = bmesh.new(); bm.from_mesh(ob.data)
         bmesh.ops.triangulate(bm, faces=list(bm.faces), quad_method='FIXED', ngon_method='BEAUTY')
         bm.to_mesh(ob.data); bm.free(); ob.data.update()
+    collisions = collision.write(list(S['models'].values()))
+    bpy.context.preferences.filepaths.save_version = 0  # no .blend1 backups beside the source
     bpy.ops.wm.save_as_mainfile(filepath=str(ROOT / f'source-art/{name}.blend'))
     glb = OUT / f'{name}-props.glb'
-    bpy.ops.export_scene.gltf(filepath=str(glb), export_format='GLB', export_apply=True, export_yup=True)
+    bpy.ops.export_scene.gltf(filepath=str(glb), export_format='GLB', export_apply=True, export_yup=True, export_extras=True)
     def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
     tris = {k: sum(len(p.vertices) - 2 for o in m.children_recursive if o.type == 'MESH' for p in o.data.polygons) for k, m in S['models'].items()}
-    report = {'script': f'tools/blender/{pathlib.Path(script).name}', 'source': f'source-art/{name}.blend', 'texture': [W, H], 'models': tris,
+    report = {'script': f'tools/blender/{pathlib.Path(script).name}', 'source': f'source-art/{name}.blend', 'texture': [W, H], 'models': tris, 'collision': collisions,
               'triangles': sum(tris.values()), 'sha256': {'glb': sha(glb), 'atlas': sha(S['atlas'])}}
     (ROOT / f'artifacts/{name}-props.json').write_text(json.dumps(report, indent=2) + '\n')
     print(f"{name.upper().replace('-', '_')}_PROPS", json.dumps(report))

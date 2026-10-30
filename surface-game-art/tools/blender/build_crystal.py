@@ -6,7 +6,7 @@ Run: blender -b --python tools/blender/build_crystal.py
 """
 import sys, math, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from cave_props import start, finish, model, mesh, box, lathe, prism, stepped, stall, lantern_post, name_board, pit_post
+from cave_props import start, finish, model, mesh, box, lathe, prism, stepped, stall, lantern_post, name_board, pit_post, solid, solid_of
 
 TILES = [
     ('5a6890', [(4, 6, 24, 3, '6a78a2'), (6, 24, 18, 2, '4c5a80')]),           # 0 silver-blue frame
@@ -57,10 +57,11 @@ def lean(a, tilt): return (math.sin(tilt) * math.cos(a), math.cos(tilt), math.si
 def spire(name, tint, second):
     model(name)
     body, glow = TINT[tint]; body2, glow2 = TINT[second]
-    lathe('Foot', [(0, .24), (.05, .22), (.11, .15), (.15, .07)], 8, 20, spin=.2)
-    crystal('Core', (0, .05, 0), lean(.3, .05), 1.0, .14, body, glow, spin=.3)
+    parts = [lathe('Foot', [(0, .24), (.05, .22), (.11, .15), (.15, .07)], 8, 20, spin=.2)]
+    parts.append(crystal('Core', (0, .05, 0), lean(.3, .05), 1.0, .14, body, glow, spin=.3))
     for i, (a, tilt, h, r, alt) in enumerate([(0, .42, .62, .1, False), (2.1, .5, .52, .09, True), (3.7, .38, .46, .085, False), (5.0, .6, .34, .07, True)]):
-        crystal('Side', (math.cos(a) * .12, .06, math.sin(a) * .12), lean(a, tilt), h, r, body2 if alt else body, glow2 if alt else glow, spin=a)
+        parts.append(crystal('Side', (math.cos(a) * .12, .06, math.sin(a) * .12), lean(a, tilt), h, r, body2 if alt else body, glow2 if alt else glow, spin=a))
+    for part in parts: solid_of([part], hull=True)  # crystal by crystal: the leaning ones too
 spire('Spire_Cyan', 'cyan', 'violet')
 spire('Spire_Pink', 'pink', 'violet')
 spire('Spire_Violet', 'violet', 'cyan')
@@ -69,9 +70,10 @@ spire('Spire_Violet', 'violet', 'cyan')
 def cluster(name, tint, second):
     model(name)
     body, glow = TINT[tint]; body2, glow2 = TINT[second]
-    lathe('Foot', [(0, .45), (.15, .38), (.28, .14)], 7, 20)
+    parts = [lathe('Foot', [(0, .45), (.15, .38), (.28, .14)], 7, 20)]
     for i, (x, z, a, tilt, h, r) in enumerate([(0, 0, 0, .08, 1.25, .17), (.26, .1, .4, .45, .8, .13), (-.24, .16, 2.6, .5, .7, .12), (.04, -.26, 4.6, .4, .6, .11)]):
-        crystal('Crystal', (x, .15, z), lean(a, tilt), h, r, body2 if i % 2 else body, glow2 if i % 2 else glow, spin=i)
+        parts.append(crystal('Crystal', (x, .15, z), lean(a, tilt), h, r, body2 if i % 2 else body, glow2 if i % 2 else glow, spin=i))
+    for part in parts: solid_of([part], hull=True)
 cluster('Cluster_Cyan', 'cyan', 'pink')
 cluster('Cluster_Pink', 'pink', 'cyan')
 
@@ -110,6 +112,9 @@ for i, (k, b, h, r, t) in enumerate([(1, 0, 1.3, .2, 'pink'), (3, 1, 1.6, .24, '
     body, glow = TINT[t]
     crystal('Inner', (x, y, z), (-x, max(.3, 1.4 - y), -z * 1.2 + .8), h, r, body, glow, spin=i)
 lathe('Floor', [(0, R * .82), (.16, R * .78)], 10, 3, spin=0)
+# The shell's back half and its two cut ends; the open front stays walkable up to the inner crystals.
+solid((0, 1.7, -1.2), (5.2, 3.4, 2.4))
+for side in (-1, 1): solid((side * 2.3, 1.2, .2), (.7, 2.4, 1.0))
 
 # GEODE RIM STONE: one chunky pale stone with crystal teeth on its inner edge (placed in a ring round the pool).
 model('Geode_Stone')
@@ -117,6 +122,7 @@ prism('Stone', [(-.6, -.34), (.55, -.38), (.68, .1), (.44, .4), (-.46, .36), (-.
 prism('Lining', [(-.48, -.24), (.44, -.28), (.52, .06), (.32, .26), (-.36, .24), (-.52, 0)], .46, .52, 21)
 for x, h, t in ((-.25, .5, 'cyan'), (.05, .66, 'pink'), (.33, .42, 'violet')):
     crystal('Tooth', (x, .46, -.18), lean(-math.pi / 2, .35), h, .09, TINT[t][0], TINT[t][1], spin=x)
+solid_of(hull=True)
 
 # SALE STALL under a silver canopy crowned with a crystal clump; pale stone posts.
 def roof():

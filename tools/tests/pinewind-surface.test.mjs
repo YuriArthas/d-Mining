@@ -1,3 +1,4 @@
+import authored from '../../src/game/content/pinewind/authored.json' with {type:'json'};
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {Group,Mesh,BoxGeometry,MeshStandardMaterial,Texture} from 'three';
@@ -151,7 +152,8 @@ test('the bridge deck leaves the path at ground level and arches gently; the fee
  }finally{collisions.dispose();physics.dispose();}
 });
 test('cliffs enclose the valley outside the play area: the pass and the creek gorges stay open, and the walls stop the character',async()=>{
- const hulls=GAME_CONTENT.surface.plan.solids.filter(s=>s.hull);
+ // The landscape's cliff columns (the models' own hulls are theirs).
+ const hulls=authored.solids.filter(s=>s.hull);
  assert.ok(hulls.length>50,`${hulls.length} cliff columns`);
  const gap=(s,x,z)=>Math.hypot(Math.max(0,Math.abs(x-s.at[0])-s.half[0]),Math.max(0,Math.abs(z-s.at[2])-s.half[2]));
  for(const s of hulls){
@@ -204,10 +206,13 @@ test('布局 v5：出售在东北，镐子店和背包店在西侧，从出生�
  assert.equal(GAME_CONTENT.surface.plan.signs.some(s => s.title === 'PETS'), false, 'no PETS sign');
  assert.deepEqual(GAME_CONTENT.surface.plan.signs.map(s => s.title).sort(), ['BACKPACK', 'PICKAXE', 'SELL', '世界传送门', '传送站']);
  assert.ok(Math.hypot(CAPSULE_MACHINE_ZONE.x - CAPSULE_MACHINE_AT[0], CAPSULE_MACHINE_ZONE.z - CAPSULE_MACHINE_AT[2]) < 2, 'capsule zone in front of it');
- // The authored gate stands on the gameplay gate line, its doors hinged at the opening's edges.
+ // The authored gate stands on the gameplay gate line, its doors hinged at the opening's edges; the game leaves
+ // the doors out (the portal sheet closes the opening).
  assert.equal(PINEWIND_GATE.z, worldGateZ(2));
- const roots = new Map(GAME_CONTENT.surface.authored.instances.map(i => [i.node, i]));
+ const roots = new Map(GAME_CONTENT.surface.authored.instances.map(i => [i.node, i])), models = new Map(authored.roots.map(r => [r.node, r]));
  assert.deepEqual(roots.get('World_Gate').at, [PINEWIND_GATE.x, 0, PINEWIND_GATE.z]);
- for (const [node, sx] of [['World_Gate_DoorL', -1], ['World_Gate_DoorR', 1]])
-  assert.deepEqual(roots.get(node).at, [PINEWIND_GATE.x + sx * PINEWIND_GATE.opening / 2, 0, PINEWIND_GATE.z], node);
+ for (const [node, sx] of [['World_Gate_DoorL', -1], ['World_Gate_DoorR', 1]]) {
+  assert.deepEqual(models.get(node).at, [PINEWIND_GATE.x + sx * PINEWIND_GATE.opening / 2, 0, PINEWIND_GATE.z], node);
+  assert.equal(roots.has(node), false, `${node} left out`);
+ }
 });

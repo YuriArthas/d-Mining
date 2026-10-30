@@ -7,7 +7,6 @@ import { guideRoute, routeLength } from '../../src/game/world/guideRoute.ts';
 import { chevronGeometry, markerGeometry, updateGuidePath } from '../../src/game/presentation/guidePath.ts';
 import { CharacterPhysics, initPhysics } from '../../src/game/validation/physics.ts';
 import { SceneryCollision } from '../../src/game/presentation/SceneryCollision.ts';
-import { createScenerySites } from '../../src/game/world/createScenerySites.ts';
 
 const target = GAME_CONTENT.session.onboarding.entrance, spawn = GAME_CONTENT.returnPoint, B = PINEWIND_BRIDGE;
 const south = B.z + B.halfSpan + 1.5, north = B.z - B.halfSpan - 1.5;
@@ -40,7 +39,7 @@ test('chevrons and the arrow over the mine: a white face in front of a dark-blue
 
 test('laid on world 1, every chevron rides on the bridge deck, never inside it; the arrow bobs over the mine', async () => {
   await initPhysics();
-  const physics = new CharacterPhysics(), scenery = new SceneryCollision(physics, createScenerySites(GAME_CONTENT.rooms, GAME_CONTENT.surface.plan));
+  const physics = new CharacterPhysics(), scenery = new SceneryCollision(physics, GAME_CONTENT.sites);
   try {
     // Colliders join the queries with the world's next step, as in the game (physics ticks before the guide).
     scenery.sync([0, 0, B.z]); physics.world.step();

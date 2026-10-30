@@ -4,7 +4,7 @@
 // behind the name board, framed by a soft halo with a frost mist at its foot and its light streaking down the
 // floor; two giant ice pillars flank it, amber heater capsules stand at its foot and by the pods; white insulated
 // pods along the side walls and where a shop would be; frosted pipes into the ice; snow drifts at the wall feet.
-// Moving parts are direct children named Spin_* (SceneMotion.ts).
+// Moving parts are direct children named Spin_* (SceneMotion.ts). Props bring their colliders (build_cryo.py).
 import * as THREE from 'three';
 import { caveKit, glow, matte, rockMass, smooth, type GetProp } from './caveKit.ts';
 import { techKit, softFrame, glowGrid, glowBall, unlit } from './techKit.ts';
@@ -71,7 +71,6 @@ export function buildHall(getProp: GetProp) {
   // HEATER CAPSULES: amber glass in a yellow frame, a fan turning on top, a glow ball round the glass.
   for (const [x, z, yaw] of L.heaters) {
     place('Heater_Capsule', [x, 0, z], yaw);
-    box([x, 1.4, z], [.62, 1.4, .62]);
     const fan = new THREE.Group(); fan.name = 'Spin_y_300'; fan.position.set(x, 2.84, z); fan.add(getProp('Heater_Fan')); kit.group.add(fan);
     tech.glow(glowBall(1.3, '#ff9a40', .3).translate(x, 1.45, z), 'Glow halo heater');
   }
@@ -79,7 +78,6 @@ export function buildHall(getProp: GetProp) {
   // warm glow round its door.
   for (const [x, z, yaw] of L.pods) {
     place('Cryo_Pod', [x, 0, z], yaw);
-    box([x, 2.0, z], [1.95, 2.0, 1.95], yaw);
     const back = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw), front = back.clone().negate();
     place('Frost_Pipe', [x + back.x * 2.0, 0, z + back.z * 2.0], yaw + Math.PI);
     const door = new THREE.Vector3(x, 1.6, z).addScaledVector(front, 2.55);
@@ -97,6 +95,6 @@ export function buildHall(getProp: GetProp) {
   // GLOWING CRACKS in the ice, never over the falls; snow drifts along the wall feet.
   tech.seams(14, crack, '#3ac8ff', (side, d) => side === 0 && Math.abs(d) < falls.half + 2, 'Cave ice crack');
   kit.patches(kit.wallSpots(16), snow, '#8ea4b8', 'Cave snow');
-  kit.wallFoot(10, () => ({ name: 'Crate_Stack', scale: () => .8 + r() * .3, solid: [.9, .7] }));
+  kit.wallFoot(10, () => ({ name: 'Crate_Stack', scale: () => .8 + r() * .3 }));
   return { group: kit.group, solids: kit.solids, lights: HALL.lights };
 }

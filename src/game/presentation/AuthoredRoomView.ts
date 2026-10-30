@@ -2,7 +2,8 @@ import {BufferGeometry,Float32BufferAttribute,DataTexture,RGBAFormat,NoColorSpac
 import {roomIllumination} from './roomIllumination.ts';
 import type {AuthoredRoom} from '../content/rooms/authoredRoom.ts';
 
-// Generic Blender-kit renderer. It does not know layer IDs, depth, travel or sales.
+// The kit rooms' renderer (world 3's rest layers: Blender kit meshes instanced from *.layout.json, a shared atlas and
+// a baked light field). It does not know layer IDs, depth, travel or sales.
 export function addAuthoredRoom(group:Group,room:AuthoredRoom){
   const {kit,render}=room;
   const atlas=new DataTexture(Uint8Array.from(atob(kit.texture.data),c=>c.charCodeAt(0)),kit.texture.size,kit.texture.size,RGBAFormat);

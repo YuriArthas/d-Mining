@@ -5,7 +5,7 @@
   "bytes": 2143469,
   "decodedBytes": 2441192,
   "sha256": "4c722dc4f43fb3dcdfac5160704874424ffd6c0942d62ca78d0b519098962e36",
-  "sourceSha256": "36222a83a089baaa9da38983ea21c7b883bd77e0cfd9e5df93110ab21000299a",
+  "sourceSha256": "5ca0d93355d15c77056a641e9bee72248a057eabd055bb0d3e79aadf1767a716",
   "triangles": 18920,
   "source": "Authored Pinewind; Blender architecture and offline procedural landscape; offline baked sun visibility and sky occlusion",
   "materialProfile": "authored-color",

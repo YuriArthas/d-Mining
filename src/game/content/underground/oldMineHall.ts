@@ -28,9 +28,9 @@ export const OLD_MINE_HALL = {
     /** The cart depot's ore pile in the south-east, where the shop stands on other layers. */
     depot: [15.2, 15.2],
     depotProps: [
-      { name: 'Crate_Stack', at: [9.6, 16.6], yaw: .2, half: [1.1, 1] },
-      { name: 'Barrel_Group', at: [16.4, 11.2], yaw: 1.1, half: [.9, .55] },
-      { name: 'Sack_Pile', at: [11.6, 17.2], yaw: 2.4, half: [.9, .4] },
+      { name: 'Crate_Stack', at: [9.6, 16.6], yaw: .2 },
+      { name: 'Barrel_Group', at: [16.4, 11.2], yaw: 1.1 },
+      { name: 'Sack_Pile', at: [11.6, 17.2], yaw: 2.4 },
     ],
     lanterns: [[-3.6, 15.2, 0], [3.6, 15.2, Math.PI], [-6.6, -13.2, 0], [6.6, -13.2, Math.PI]],
   },

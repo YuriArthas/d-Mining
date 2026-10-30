@@ -13,6 +13,8 @@ export class SceneryCollision {
   private readonly physics: CharacterPhysics;
   private readonly entries;
   private readonly handles = new Map<string, RAPIER.Collider>();
+  /** Each live collider's handle, and whether it is ground. */
+  private readonly owned = new Map<number, boolean>();
   constructor(physics: CharacterPhysics, sites: readonly ScenerySite[]) {
     this.physics = physics;
     this.entries = sites.flatMap((site) =>
@@ -49,13 +51,20 @@ export class SceneryCollision {
           z: 0,
           w: Math.cos(solid.yaw / 2),
         });
-        this.handles.set(key, this.physics.world.createCollider(shape));
+        const collider = this.physics.world.createCollider(shape);
+        this.handles.set(key, collider); this.owned.set(collider.handle, !!solid.ground);
       }
       if (distance > 22 && this.handles.has(key)) {
-        this.physics.world.removeCollider(this.handles.get(key)!, false);
+        const collider = this.handles.get(key)!;
+        this.owned.delete(collider.handle); this.physics.world.removeCollider(collider, false);
         this.handles.delete(key);
       }
     }
+  }
+  /** Whether a collider is one of these (the collider view draws only the scenery's, ground left out). */
+  owns(collider: RAPIER.Collider, ground = true) {
+    const isGround = this.owned.get(collider.handle);
+    return isGround !== undefined && (ground || !isGround);
   }
   get count() {
     return this.handles.size;
@@ -63,6 +72,6 @@ export class SceneryCollision {
   dispose() {
     for (const collider of this.handles.values())
       this.physics.world.removeCollider(collider, false);
-    this.handles.clear();
+    this.handles.clear(); this.owned.clear();
   }
 }

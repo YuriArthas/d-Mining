@@ -14,3 +14,7 @@ assets-source/**/*.png
 assets-source/**/*.blend
 assets-source/**/*.bin
 __pycache__/
+
+# Blender's backups beside the sources, and the halls' packing intermediate (the shipped part is in src/game/assets/scene)
+*.blend1
+surface-game-art/public/assets/underground/*.runtime.glb

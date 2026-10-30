@@ -4,7 +4,8 @@
 // the west wall and in the south-east (where a shop would stand); crystal clusters growing out of the rock (one ray
 // each, turned to the rock face) and along the wall feet; violet veins in the rock. The hero on the north wall: three
 // refining columns on a deck in the shared facade above the name board, a crystal core turning in each. Glow is
-// faked for phones: additive halos round the crystals, tanks, columns and beams, no post-processing.
+// faked for phones: additive halos round the crystals, tanks, columns and beams, no post-processing. Props bring
+// their colliders (build_refinery.py).
 import * as THREE from 'three';
 import { caveKit, glow, type GetProp } from './caveKit.ts';
 import { techKit, glowBall, softFrame, glowGrid } from './techKit.ts';
@@ -22,7 +23,7 @@ export function buildHall(getProp: GetProp) {
     ...L.rigs.map(([x, z]) => ({ x, z, radius: 1.6 })),
     ...L.tanks.map(([x, z]) => ({ x, z, radius: 1.6 })),
   ]);
-  const { r, box, add, place, M, PIT } = kit;
+  const { r, add, place, M, PIT } = kit;
   kit.useProps(getProp);
   const tech = techKit(kit, L.pools);
   const tip = glow('Cave glow crystal', '#a01ca0', 1.1), vein = Object.assign(glow('Cave glow vein', '#7a28c8', 1.0), { side: THREE.DoubleSide });
@@ -44,9 +45,6 @@ export function buildHall(getProp: GetProp) {
   tech.hazard([-7.6, -17.9], [7.6, -17.9], .7, tech.paintMaterial);
   place('Refinery_Facade', [0, 0, facade.z], 0);
   place('Refinery_Deck', [0, 0, facade.z], 0);
-  box([0, 10, facade.z - .1], [facade.half - .8, 10, .4]);
-  for (const s of [-1, 1]) box([s * 8.9, 10, facade.z + .4], [.8, 10, .7]);
-  box([0, .6, facade.z + .55], [8.2, .6, .45]);
   const deck = 8.4, cz = facade.z + 1.6;
   for (const c of L.columns) {
     const glass = c.tall ? 7.0 : 5.4;
@@ -68,12 +66,9 @@ export function buildHall(getProp: GetProp) {
   L.giants.forEach((g, i) => {
     const [x, z] = g.at;
     place('Crystal_Giant', [x, 0, z], g.yaw, g.scale);
-    box([x, 1.5, z], [2.3 * g.scale, 1.5, 2.3 * g.scale]);
     tech.glow(glowBall(5.2 * g.scale, MAGENTA, .26).translate(x, 4.6 * g.scale, z), 'Glow halo crystal');
     const [rx, rz] = L.rigs[i], yaw = Math.atan2(x - rx, z - rz);
     place('Laser_Rig', [rx, 0, rz], yaw);
-    box([rx, .9, rz], [.95, .9, .95], yaw);
-    box([rx, 2.4, rz], [.3, 1.5, .3], yaw);
     const from = new THREE.Vector3(rx + 2.82 * Math.sin(yaw), 4.1, rz + 2.82 * Math.cos(yaw));
     const centre = new THREE.Vector3(x, 4.4 * g.scale, z), to = centre.clone().add(from.clone().sub(centre).setY(0).normalize().multiplyScalar(1.3 * g.scale));
     const dir = to.clone().sub(from), length = dir.length(), q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize());
@@ -90,10 +85,9 @@ export function buildHall(getProp: GetProp) {
   // CRYSTAL TANKS with a halo round the crystal inside; CARTS of crystal chunks.
   for (const [x, z, yaw] of L.tanks) {
     place('Crystal_Tank', [x, 0, z], yaw);
-    box([x, 2, z], [1.2, 2, 1.2]);
     tech.glow(glowBall(1.7, VIOLET, .32).translate(x, 1.9, z), 'Glow halo tank');
   }
-  for (const [x, z, yaw] of L.carts) { place('Crystal_Cart', [x, 0, z], yaw); box([x, .75, z], [.7, .75, 1.05], yaw); }
+  for (const [x, z, yaw] of L.carts) place('Crystal_Cart', [x, 0, z], yaw);
 
   // CRYSTALS IN THE ROCK: clusters where rays from the floor ring meet the rock, turned out of the rock face, each
   // with a soft halo. Never over the name board.
@@ -122,9 +116,9 @@ export function buildHall(getProp: GetProp) {
   tech.seams(10, vein, '#a040f0', (side, d) => side === 0 && Math.abs(d) < facade.half + 2, 'Cave crystal vein');
   kit.wallFoot(16, () => {
     const roll = r();
-    return roll < .45 ? { name: 'Crystal_Cluster', scale: () => .7 + r() * .6, solid: [.75, .8] }
+    return roll < .45 ? { name: 'Crystal_Cluster', scale: () => .7 + r() * .6 }
       : roll < .75 ? { name: 'Crystal_Small', scale: () => .9 + r() * .8 }
-      : { name: 'Crate_Stack', scale: () => .8 + r() * .3, solid: [.9, .7] };
+      : { name: 'Crate_Stack', scale: () => .8 + r() * .3 };
   });
   return { group: kit.group, solids: kit.solids, lights: HALL.lights };
 }

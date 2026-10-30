@@ -1,4 +1,5 @@
-// Offline: the 熔岩矿洞 rest hall on the shared cave shell (caveKit.ts), with props from build_volcanic.py. Red-brown
+// Offline: the 熔岩矿洞 rest hall on the shared cave shell (caveKit.ts), with props (and their colliders) from
+// build_volcanic.py. Red-brown
 // basalt over a column-top floor with lava in its seams, hexagonal column clusters along the walls, a raised lava basin with drifting crust plates,
 // ember vents, glowing ember cracks running over the rock faces, ash patches with ember specks.
 import * as THREE from 'three';
@@ -14,7 +15,7 @@ export function buildHall(getProp: GetProp) {
     { x: HALL.pool.at[0], z: HALL.pool.at[2], radius: HALL.pool.radius + .6 },
     { x: HALL.spare[0], z: HALL.spare[2], radius: 3.4 },
   ]);
-  const { r, box, add, place, hull, M } = kit;
+  const { r, box, add, place, M } = kit;
   kit.useProps(getProp);
   const lava = glow('Cave glow lava', '#ff7a2a', 1.3), ember = glow('Cave glow ember', '#ffb040', 1.15), ash = matte('Cave ash');
 
@@ -64,32 +65,18 @@ export function buildHall(getProp: GetProp) {
     }
   }
 
-  // LANDMARKS: basalt column clusters (a hull round each), ember vents.
-  for (const c of HALL.columns) {
-    place('Basalt_Columns', c.at, c.yaw, c.height);
-    const pts: THREE.Vector3[] = [], foot = c.radius;
-    for (let k = 0; k < 8; k++) { const b = k / 8 * Math.PI * 2; for (const [y, f] of [[0, 1], [c.height * .55, .8], [c.height, .45]] as const) pts.push(new THREE.Vector3(c.at[0] + Math.cos(b) * foot * f, y, c.at[2] + Math.sin(b) * foot * f)); }
-    hull(pts);
-  }
-  for (const v of HALL.vents) {
-    place('Ember_Vent', v.at, r() * 6.3, v.scale);
-    box([v.at[0], .5 * v.scale, v.at[2]], [.75 * v.scale, .5 * v.scale, .75 * v.scale]);
-  }
+  // LANDMARKS: basalt column clusters, ember vents.
+  for (const c of HALL.columns) place('Basalt_Columns', c.at, c.yaw, c.height);
+  for (const v of HALL.vents) place('Ember_Vent', v.at, r() * 6.3, v.scale);
   kit.services();
-  // The iron roof stands on two front posts as well.
-  for (const side of [-1, 1]) box([HALL.stalls.sell.at[0] + side * 2.2, 1.35, HALL.stalls.sell.at[2] - 1.6], [.12, 1.35, .12]);
   // In the spare stall's place (this layer has no shop): a big obsidian cluster between two basalt stubs.
   {
     const [x, , z] = HALL.spare;
-    for (const [dx, dz, name, scale, solid] of [[0, 0, 'Obsidian_Cluster', 2.1, [.45, .55]], [-2.1, .5, 'Basalt_Stub', 1.4, [.55, .45]], [2.2, -.3, 'Basalt_Stub', 1.1, [.55, .45]]] as const) {
+    for (const [dx, dz, name, scale] of [[0, 0, 'Obsidian_Cluster', 2.1], [-2.1, .5, 'Basalt_Stub', 1.4], [2.2, -.3, 'Basalt_Stub', 1.1]] as const)
       place(name, [x + dx, 0, z + dz], r() * 6.3, scale);
-      box([x + dx, solid[1] * scale, z + dz], [solid[0] * scale, solid[1] * scale, solid[0] * scale]);
-    }
   }
-  kit.wallFoot(30, () => {
-    const pick = r();
-    return pick < .45 ? { name: 'Obsidian_Cluster', scale: () => .9 + r() * .8, solid: [.45, .55] as const }
-      : { name: 'Basalt_Stub', scale: () => .8 + r() * .9, solid: [.55, .45] as const };
-  });
+  kit.wallFoot(30, () => r() < .45
+    ? { name: 'Obsidian_Cluster', scale: () => .9 + r() * .8 }
+    : { name: 'Basalt_Stub', scale: () => .8 + r() * .9 });
   return { group: kit.group, solids: kit.solids, lights: HALL.lights };
 }

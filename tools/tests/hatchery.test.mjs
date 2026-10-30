@@ -6,7 +6,7 @@ import { TECH_BASE } from '../../src/game/content/world2/techBase.ts';
 import { STAR_BASE } from '../../src/game/content/world3/starBase.ts';
 import techBase from '../../src/game/content/underground/tech-base.json' with { type: 'json' };
 import starBase from '../../src/game/content/underground/star-base.json' with { type: 'json' };
-import { journeySurfacePlan } from '../../src/game/presentation/WorldBorders.ts';
+import { baseSurfacePlan } from '../../src/game/content/baseSurfaces.ts';
 
 /** Is (x, z) within `margin` of a box collider's footprint (turned by its yaw)? */
 const near = (solid, x, z, margin) => {
@@ -14,7 +14,7 @@ const near = (solid, x, z, margin) => {
   const lx = dx * c - dz * s, lz = dx * s + dz * c;
   return Math.abs(lx) < solid.half[0] + margin && Math.abs(lz) < solid.half[2] + margin;
 };
-for (const [world, base, solids] of [[2, TECH_BASE, techBase.solids], [3, STAR_BASE, journeySurfacePlan(STAR_BASE.worldZ).solids.map(s => ({ ...s, at: [s.at[0], s.at[1], s.at[2] - STAR_BASE.worldZ] }))]]) {
+for (const [world, base, solids] of [[2, TECH_BASE, techBase.solids], [3, STAR_BASE, baseSurfacePlan(3).solids.map(s => ({ ...s, at: [s.at[0], s.at[1], s.at[2] - STAR_BASE.worldZ] }))]]) {
   test(`world ${world}'s eggs stand round its hatchery: cheapest first, apart, each reachable and clear of the base`, () => {
     assert.deepEqual(base.stands.map(s => s.eggId), eggsOfWorld(world));
     const [cx, cz] = base.hatchery.centre;

@@ -5,7 +5,7 @@
 // ore buyer and the gear shop facing the lanes, the world portal on its dais at the far end; palms, cacti, crates,
 // a yard with tanks and containers, the silo and its conveyor; world 2's eggs on their pad east of the spawn. The drill bit, the turbine rotors on the mesa tops
 // and the conveyor's cleats move in the game (Spin_* / Slide_* nodes). Baked with the daytime sun, so large flat
-// surfaces are subdivided.
+// surfaces are subdivided. The props bring their colliders (build_tech_base.py); the base adds its own shapes'.
 import * as THREE from 'three';
 import { colour, matte, rockMass, type GetProp, type HallSolid } from './caveKit.ts';
 import { rng } from '../terrain/kit.ts';
@@ -89,11 +89,6 @@ export function buildHall(getProp: GetProp) {
     const p = getProp(name); p.position.set(at[0], at[1], at[2]); p.rotation.y = yaw; p.scale.setScalar(scale); parent.add(p);
     p.traverse(o => { if (o instanceof THREE.Mesh) { let g = fine.get(o.geometry); if (!g) { g = tessellate(o.geometry, 1.8); fine.set(o.geometry, g); } o.geometry = g; } });
     return p;
-  };
-  // A box collider given in a prop's own frame (turned by its yaw round its origin, scaled by k).
-  const solidAt = (at: readonly number[], yaw: number, local: readonly number[], half: readonly number[], k = 1) => {
-    const c = Math.cos(yaw), s = Math.sin(yaw);
-    box([at[0] + (local[0] * c + local[2] * s) * k, at[1] + local[1] * k, at[2] + (-local[0] * s + local[2] * c) * k], half.map(v => v * k), yaw);
   };
   const M = { ground: matte('Base ground'), apron: matte('Base apron'), paint: matte('Base paint'), rock: matte('Base cliff rock'), deck: matte('Base deck'), pipe: matte('Base pipes'), rail: matte('Base rail') };
   const tint = (g: THREE.BufferGeometry, hex: string | ((y: number) => THREE.Color)) => colour(g, typeof hex === 'string' ? () => new THREE.Color(hex) : hex);
@@ -217,37 +212,24 @@ export function buildHall(getProp: GetProp) {
   // THE DRILL TOWER over the shaft, its bit spinning below the column.
   const F = BASE.rig.feet;
   place('Drill_Rig', [0, 0, 0]);
-  for (const sx of [-1, 1]) for (const sz of [-1, 1]) { box([sx * F, .6, sz * F], [1.1, .6, 1.1]); box([sx * (F - .7), 2.4, sz * (F - .7)], [.7, 1.2, .7]); }
   const bit = new THREE.Group(); bit.name = 'Spin_y_160'; bit.position.set(0, 11.4, 0); place('Drill_Bit', [0, 0, 0], 0, bit, 1.3); group.add(bit);
 
   // THE DOME HALLS: the ore buyer and the gear shop, fronts to the lanes.
-  for (const [name, k] of [['Ore_Buyer', BASE.kiosks.sell], ['Gear_Workshop', BASE.kiosks.shop]] as const) {
-    place(name, k.at, k.yaw, group, k.scale);
-    solidAt(k.at, k.yaw, [0, 4.4, -.95], [6.1, 4.4, 4.15], k.scale);
-  }
+  for (const [name, k] of [['Ore_Buyer', BASE.kiosks.sell], ['Gear_Workshop', BASE.kiosks.shop]] as const) place(name, k.at, k.yaw, group, k.scale);
 
   // THE WORLD PORTAL on its dais, and THE TELEPORT STATION.
   const pt = BASE.portal, fl = pt.floor;
   place('Portal_Dais', pt.at, pt.yaw);
-  solidAt(pt.at, pt.yaw, [0, .45, 1.0], [5.2, .45, 4.4]);
-  solidAt(pt.at, pt.yaw, [0, .3, 5.8], [4.0, .3, .4]);
-  solidAt(pt.at, pt.yaw, [0, .15, 6.6], [4.0, .15, .4]);
-  for (const s of [-1, 1]) { solidAt(pt.at, pt.yaw, [s * 5.0, 1.2, 1.0], [.2, .3, 4.4]); solidAt(pt.at, pt.yaw, [s * 4.6, 2.1, 5.0], [.35, 2.1, .35]); }
-  solidAt(pt.at, pt.yaw, [0, 1.2, -3.2], [5.2, .3, .2]);
   place('Portal_Frame', [pt.at[0], fl, pt.at[2]], pt.yaw);
-  for (const s of [-1, 1]) solidAt([pt.at[0], fl, pt.at[2]], pt.yaw, [s * 3.7, 3.0, 0], [.5, 3.0, .55]);
-  solidAt([pt.at[0], fl, pt.at[2]], pt.yaw, [0, 2.9, 0], [3.2, 2.9, .5]);
   const st = BASE.station;
   place('Tech_Station', [st.x, 0, st.z], st.yaw);
-  for (const side of [-1, 1]) box([st.x + Math.cos(st.yaw) * 1.9 * side, 2.6, st.z - Math.sin(st.yaw) * 1.9 * side], [.45, 2.6, .45], st.yaw);
-  // Round the station, the layers below (their halls' props); by the portal, world 3 ahead. Each in its anchor's
-  // frame (x across, +Z toward the spawn), on the ground, with one collider.
+  // Round the station, the layers below (their halls' props, colliders and all); by the portal, world 3 ahead. Each
+  // in its anchor's frame (x across, +Z toward the spawn), on the ground.
   const decor = (list: typeof BASE.stationDecor, ax: number, ay: number, az: number, yaw: number) => {
     const c = Math.cos(yaw), s = Math.sin(yaw);
     for (const d of list) {
       const at: [number, number, number] = [ax + d.x * c + d.z * s, ay + (d.y ?? 0), az - d.x * s + d.z * c];
       place(d.prop, at, yaw + d.yaw, group, d.scale);
-      box([at[0], ay + d.half[1], at[2]], d.half, yaw + d.yaw);
     }
   };
   decor(BASE.stationDecor, st.x, 0, st.z, st.yaw);
@@ -272,9 +254,9 @@ export function buildHall(getProp: GetProp) {
   }
   for (const [x, z] of BASE.tanks) {
     const y = inside(x, z, dk.x, dk.z) ? dh : 0;
-    place('Storage_Tank', [x, y, z], r() * 6); box([x, y + 2.9, z], [1.6, 2.9, 1.6]);
+    place('Storage_Tank', [x, y, z], r() * 6);
   }
-  place('Antenna_Mast', BASE.beacon); box([BASE.beacon[0], BASE.beacon[1] + .4, BASE.beacon[2]], [1.1, .4, 1.1]); box([BASE.beacon[0], BASE.beacon[1] + 7, BASE.beacon[2]], [.4, 7, .4]);
+  place('Antenna_Mast', BASE.beacon);
   for (const [y, hex] of [[2.2, '#e8782a'], [3.0, '#eceeef']] as const) pipe([-33.2, y, basin.z[0]], [-33.2, y, 14], .3, hex);
   for (let z = basin.z[0] + 2; z < 14; z += 6) { cuboid([-33.2, 1.6, z], [.3, 3.2, .3], '#2c2e33', M.pipe, 'Base pipe support'); }
   // North tanks feed the rig: pipes from each tank toward the tower and a header pipe on two A-frames.
@@ -285,41 +267,29 @@ export function buildHall(getProp: GetProp) {
 
   // SILO AND CONVEYOR: the tower's ore rides to the silo in the north-east.
   place('Ore_Silo', BASE.silo.at);
-  for (const yaw of [0, Math.PI / 4]) box([BASE.silo.at[0], 7.5, BASE.silo.at[2]], [3.2, 7.5, 3.2], yaw);
   const cv = BASE.conveyor;
   place('Conveyor_Frame', [cv.from, 0, cv.z]);
-  for (const x of [8, 13.5]) box([cv.from + x, 1.4, cv.z], [.25, 1.4, .75]);
   const slide = new THREE.Group(), length = cv.to - cv.from; slide.name = `Slide_x_${length * 100}_140`;
   slide.position.set(cv.from, cv.height, cv.z);
   for (let x = .2; x < length; x += .8) place('Conveyor_Cleat', [x, 0, 0], 0, slide);
   for (let x = 1.4; x < length; x += 2.4) place('Conveyor_Ore', [x, 0, (r() - .5) * .3], r() * 6, slide);
   group.add(slide);
-  for (const z of BASE.solar.rows) { place('Solar_Row', [BASE.solar.x, 0, z]); box([BASE.solar.x, 1.1, z], [6.1, 1.1, 1.1]); }
+  for (const z of BASE.solar.rows) place('Solar_Row', [BASE.solar.x, 0, z]);
 
   // THE HATCHERY: white concrete, a teal rim, a yellow ring at its centre.
   buildHatchery(BASE.hatchery, BASE.stands, { pad: '#e6e2d8', rim: '#1fb0b8', mark: '#f5c02a' },
-    { place: (name, at, yaw) => place(name, at, yaw), paint: (g, hex, name, max) => paint(g, hex, name, M.paint, max), box });
+    { place: (name, at, yaw) => place(name, at, yaw), paint: (g, hex, name, max) => paint(g, hex, name, M.paint, max) });
 
   // HABITATS round the plaza, CONTAINERS, THE MECH, LAMPS.
-  for (const [x, z, k, yaw] of BASE.domes) {
-    place('Habitat_Dome', [x, 0, z], yaw, group, k);
-    for (const turn of [0, Math.PI / 4]) box([x, 3.6 * k, z], [6.1 * k, 3.6 * k, 6.1 * k], turn);
-  }
-  for (const [x, y, z, yaw, colour] of BASE.containers) { place(`Container_${colour}`, [x, y, z], yaw); box([x, y + 1.25, z], [3, 1.25, 1.25], yaw); }
+  for (const [x, z, k, yaw] of BASE.domes) place('Habitat_Dome', [x, 0, z], yaw, group, k);
+  for (const [x, y, z, yaw, colour] of BASE.containers) place(`Container_${colour}`, [x, y, z], yaw);
   place('Mining_Mech', BASE.mech.at, BASE.mech.yaw);
-  solidAt(BASE.mech.at, BASE.mech.yaw, [0, 2.5, .3], [1.9, 2.5, 1.5]);
-  for (const [x, z, yaw] of BASE.lamps) { place('Lamp_Post', [x, 0, z], yaw); box([x, 2.6, z], [.3, 2.6, .3]); }
+  for (const [x, z, yaw] of BASE.lamps) place('Lamp_Post', [x, 0, z], yaw);
 
   // PALMS, CACTI AND CRATES on the sand.
-  for (const [x, z, k, yaw] of BASE.palms) { place('Palm_Tree', [x, 0, z], yaw, group, k); box([x, 2 * k, z], [.45 * k, 2 * k, .45 * k]); }
-  BASE.cacti.forEach(([x, z, k, yaw], i) => {
-    place(i % 2 ? 'Cactus_B' : 'Cactus_A', [x, 0, z], yaw, group, k);
-    if (i % 2) box([x, .45 * k, z], [.9 * k, .45 * k, .9 * k], yaw); else box([x, 1.6 * k, z], [.5 * k, 1.6 * k, .5 * k]);
-  });
-  for (const [x, z, yaw, kind] of BASE.crates) {
-    place(kind === 'barrel' ? 'Barrel' : kind === 'red' ? 'Crate_Red' : 'Crate_Blue', [x, 0, z], yaw);
-    box([x, .5, z], kind === 'barrel' ? [.45, .5, .45] : [.55, .5, .55], yaw);
-  }
+  for (const [x, z, k, yaw] of BASE.palms) place('Palm_Tree', [x, 0, z], yaw, group, k);
+  BASE.cacti.forEach(([x, z, k, yaw], i) => place(i % 2 ? 'Cactus_B' : 'Cactus_A', [x, 0, z], yaw, group, k));
+  for (const [x, z, yaw, kind] of BASE.crates) place(kind === 'barrel' ? 'Barrel' : kind === 'red' ? 'Crate_Red' : 'Crate_Blue', [x, 0, z], yaw);
 
   // WIND TURBINES on three of the tall mesas, rotors facing the basin and turning.
   const picks = [tops.reduce((a, b) => (b.z < a.z - 4 || (Math.abs(b.z - a.z) < 4 && b.x < a.x)) ? b : a), tops.reduce((a, b) => (b.z < a.z - 4 || (Math.abs(b.z - a.z) < 4 && b.x > a.x)) ? b : a),

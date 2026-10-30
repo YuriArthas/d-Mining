@@ -28,7 +28,8 @@ const built=buildLandscape(name=>{const node=nature.getObjectByName(name);if(!no
 // Cliff columns collide as their own convex hulls (world-space points from the landscape builder).
 const hullSolid=points=>{const bounds=new THREE.Box3().setFromPoints(points.map(p=>new THREE.Vector3(...p))),center=bounds.getCenter(new THREE.Vector3()),half=bounds.getSize(new THREE.Vector3()).multiplyScalar(.5);
  return {at:center.toArray(),half:half.toArray(),yaw:0,hull:points.flatMap(p=>[p[0]-center.x,p[1]-center.y,p[2]-center.z].map(v=>+v.toFixed(4)))};};
-const colliders=[];built.group.traverse(o=>{if(!o.isMesh)return;if(o.userData.hull)colliders.push(hullSolid(o.userData.hull));else if(o.userData.surfaceGround||/trunk/i.test(o.name))colliders.push(solid(o));});
+// The ground is marked as such (the collider view leaves it out); trunks and cliff columns are not.
+const colliders=[];built.group.traverse(o=>{if(!o.isMesh)return;if(o.userData.hull)colliders.push(hullSolid(o.userData.hull));else if(o.userData.surfaceGround)colliders.push({...solid(o),ground:true});else if(/trunk/i.test(o.name))colliders.push(solid(o));});
 
 // Light bake casters: every static model except the distant mountains (far beyond any shadow) and the two
 // gate doors (they swing open, so they must not leave a door-shaped shadow behind). The open meadow and
@@ -85,6 +86,8 @@ writeFileSync(`${dir}/landscape.glb`,Buffer.from(glb));
 const encodePng=async(image,size)=>{const canvas=createCanvas(size,size);const data=canvas.getContext('2d').createImageData(size,size);data.data.set(image);canvas.getContext('2d').putImageData(data,0,0);return canvas.encode('png');};
 const io=new NodeIO().registerExtensions(ALL_EXTENSIONS);
 const doc=await io.read(`${dir}/architecture.glb`);
+// The game reads the models' collision from authored.json, not from the shipped art.
+for(const node of doc.getRoot().listNodes()){const {collision,...extras}=node.getExtras();node.setExtras(extras);}
 const lightPng=await encodePng(baked.lightImage,LIGHT_BAKE.lightmapSize);
 const lightTexture=doc.createTexture('Pinewind baked building light').setImage(lightPng).setMimeType('image/png');
 for(const material of doc.getRoot().listMaterials()){
@@ -99,9 +102,22 @@ const standingPng=await encodePng(baked.standingImage,LIGHT_BAKE.standing.resolu
 writeFileSync('src/game/assets/scene/pinewind-standing-light.png',standingPng);
 writeFileSync('surface-game-art/artifacts/light-bake/building-light.png',lightPng);
 
-const roots=architecture.children.map(node=>({node:node.name,at:node.position.toArray(),rotation:node.quaternion.toArray(),scale:node.scale.toArray()}));
-// The bridge deck and its rails are separate colliders: a character brushing a post must still find the deck.
-for(const name of ['Creek_Bridge','Creek_Bridge_Rails','Mine_Headframe']){const node=architecture.getObjectByName(name);if(!node)throw Error(name);colliders.push(solid(node));}
+// Each model with the collision its Blender function gave it (collision.py), in its own frame: the game places
+// it with the model (pinewindSurface.ts). A model colliding with its own triangles carries them.
+const ownTriangles=root=>{
+ const toRoot=root.matrixWorld.clone().invert(),vertices=[],indices=[];
+ root.traverse(o=>{if(!o.isMesh)return;const p=o.geometry.attributes.position,base=vertices.length/3,m=toRoot.clone().multiply(o.matrixWorld);
+  for(let i=0;i<p.count;i++)vertices.push(...new THREE.Vector3().fromBufferAttribute(p,i).applyMatrix4(m).toArray().map(x=>+x.toFixed(6)));
+  if(o.geometry.index)for(const i of o.geometry.index.array)indices.push(base+i);else for(let i=0;i<p.count;i++)indices.push(base+i);});
+ const bounds=new THREE.Box3();for(let i=0;i<vertices.length;i+=3)bounds.expandByPoint(new THREE.Vector3(vertices[i],vertices[i+1],vertices[i+2]));
+ const c=bounds.getCenter(new THREE.Vector3()),half=bounds.getSize(new THREE.Vector3()).multiplyScalar(.5);
+ return {at:c.toArray(),half:[half.x,Math.max(.01,half.y),half.z],yaw:0,triangles:{vertices:vertices.map((v,i)=>+(v-c.getComponent(i%3)).toFixed(6)),indices}};
+};
+const roots=architecture.children.map(node=>{
+ if(typeof node.userData.collision!=='string')throw Error(`${node.name}: no collision (rebuild build_architecture.py)`);
+ const {solids=[],mesh,passable}=JSON.parse(node.userData.collision);
+ return {node:node.name,at:node.position.toArray(),rotation:node.quaternion.toArray(),scale:node.scale.toArray(),collision:passable?{passable}:{solids:[...solids,...mesh?[ownTriangles(node)]:[]]}};
+});
 const light={version:LIGHT_BAKE.version,sun:LIGHT_BAKE.sun,sunRadiusDeg:LIGHT_BAKE.sunRadiusDeg,aoRadius:LIGHT_BAKE.aoRadius,ground:G,lightmapSize:LIGHT_BAKE.lightmapSize,standing:{...LIGHT_BAKE.standing,sha256:createHash('sha256').update(standingPng).digest('hex')}};
 mkdirSync('src/game/content/pinewind',{recursive:true});
 writeFileSync('src/game/content/pinewind/authored.json',JSON.stringify({version:1,roots,solids:colliders,landscape:batched.stats,light},null,0)+'\n');

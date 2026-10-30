@@ -3,9 +3,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { initPhysics, CharacterPhysics, RAPIER } from '../../src/game/validation/physics.ts';
 import { SceneryCollision } from '../../src/game/presentation/SceneryCollision.ts';
-import { createScenerySites } from '../../src/game/world/createScenerySites.ts';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
-import { FEEDBACK_COLLISION_SITE, CAPSULE_MACHINE_ZONE } from '../../src/game/content/feedbackFacilities.ts';
+import { CAPSULE_MACHINE_AT, CAPSULE_MACHINE_ZONE } from '../../src/game/content/feedbackFacilities.ts';
 import { ZoneDetector } from '../../src/game/logic/ZoneDetector.ts';
 import { buildRegion } from '../../src/game/terrain/meshing.ts';
 import { COLLISION_SIZE, CELL } from '../../src/game/terrain/SparseWorld.ts';
@@ -33,8 +32,9 @@ function setup({ floor = true, feedback = true, floorFirst = false, scenery = tr
     ));
   }
   if (floorFirst) installFloor();
-  const sites = scenery ? createScenerySites(GAME_CONTENT.rooms, plan) : [];
-  if (feedback) sites.push(FEEDBACK_COLLISION_SITE);
+  // Without `feedback`, the machine's own colliders (its model's) are taken out of the plan.
+  const own = s => Math.hypot(s.at[0] - CAPSULE_MACHINE_AT[0], s.at[2] - CAPSULE_MACHINE_AT[2]) < 1 && s.half[1] > 1;
+  const sites = scenery ? [{ id: 'surface', depth: 0, plan: feedback ? plan : { ...plan, solids: plan.solids.filter(s => !own(s)) } }] : [];
   const collisions = new SceneryCollision(physics, sites);
   collisions.sync(at);
   if (!floorFirst) installFloor();

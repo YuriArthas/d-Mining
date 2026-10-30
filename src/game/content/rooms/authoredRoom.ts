@@ -1,5 +1,9 @@
 import type { V3, Solid } from '../../world/sceneryKit.ts';
 
+/** A rest room's scene definition (*.scene.json: reference size, facilities, signs, rings), and for the kit rooms
+ *  (world 3's rest layers, `asset`) the Blender kit and its layout (*.layout.json: instances, colliders, lamps).
+ *  "Authored room" here means a kit room; the authored halls (`hall`) bring their own art and colliders. */
+
 export type RoomAnchor = 'room' | 'spawn' | 'sell' | 'shop';
 export type RoomZone = {at: number[]; radius: number; heightTolerance: number; hysteresis: number};
 type RoomFacilities = {spawn: {at: number[]; clearance: number}; sell: RoomZone; shop: RoomZone | null};

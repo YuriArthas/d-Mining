@@ -2,9 +2,12 @@
 Run: blender -b --python tools/blender/build_architecture.py
 The authoring helpers use Three's (x,y,z); P maps into Blender's Z-up system.
 Geometry and texture together carry the style; no screen pixelation is involved.
+Each model says how it collides right after its parts (solid, solid_of, mesh_solid or passable, collision.py).
 """
-import bpy, bmesh, math, json, hashlib, struct, zlib, pathlib
+import bpy, bmesh, math, json, hashlib, struct, zlib, pathlib, sys
 from mathutils import Vector, Matrix
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import collision
 
 ROOT=pathlib.Path(__file__).resolve().parents[2]
 OUT=ROOT/'public/assets/pinewind'
@@ -132,10 +135,18 @@ def halo(ob,at,size,color): HALOS.append({'object':ob,'node':ACTIVE.name,'at':[r
 
 def model(name,at=(0,0,0),yaw=0):
     global ACTIVE
+    taken=bpy.data.objects.get(name)
+    if taken: assert name not in MODELS,'two models named '+name; taken.name=name+'_Part'
     o=bpy.data.objects.new(name,None); bpy.context.collection.objects.link(o)
     o.location=P(at); o.rotation_euler[2]=yaw
     o['authorship']='New Blender toy architecture with restrained hand-authored pixel accents'
     MODELS[name]=o; ACTIVE=o; return o
+
+# The active model's collision (collision.py): boxes and hulls in its own frame, its triangles, or nothing.
+def solid(at,size,yaw=0): collision.solid(ACTIVE,at,size,yaw)
+def solid_of(parts=None,hull=False): collision.solid_of(ACTIVE,parts,hull)
+def mesh_solid(): collision.mesh_solid(ACTIVE)
+def passable(reason): collision.passable(ACTIVE,reason)
 
 def mesh(name,verts,faces,tiles=0):
     me=bpy.data.meshes.new(name+'_Mesh'); me.from_pydata([P(v) for v in verts],[],faces); me.update()
@@ -258,9 +269,12 @@ def decor_mushroom(name,at,spin=0):
     x,y,z=at
     for k,(dx,dz,s,turn) in enumerate(((0,0,1,0),(1.15,.85,.38,.6),(-.95,1.05,.3,1.3),(.9,-.95,.26,2.1))):
         base=(x+dx,y-.1,z+dz)
-        loft(name+'_Stem',[(0,ngon(.62*s,8)),(.35*s,ngon(.55*s,8)),(1.9*s,ngon(.42*s,8)),(2.25*s,ngon(.5*s,8))],[4],at=base,spin=spin+turn)
-        loft(name+'_Cap',[(2.15*s,ngon(.45*s,10)),(2.05*s,ngon(1.55*s,10)),(2.45*s,ngon(1.68*s,10)),(2.95*s,ngon(1.35*s,10)),(3.3*s,ngon(.75*s,10))],
+        stem=loft(name+'_Stem',[(0,ngon(.62*s,8)),(.35*s,ngon(.55*s,8)),(1.9*s,ngon(.42*s,8)),(2.25*s,ngon(.5*s,8))],[4],at=base,spin=spin+turn)
+        cap=loft(name+'_Cap',[(2.15*s,ngon(.45*s,10)),(2.05*s,ngon(1.55*s,10)),(2.45*s,ngon(1.68*s,10)),(2.95*s,ngon(1.35*s,10)),(3.3*s,ngon(.75*s,10))],
              [GILL_TILE,CAP_TILE,SPOT_TILE,SPOT_TILE],bottom=GILL_TILE,top=CAP_TILE,apex=(0,3.42*s,0),at=base,spin=spin+turn)
+        # The big one's cap is over the head; the small ones' caps are at body height.
+        solid_of([stem],hull=True)
+        if s<.5: solid_of([cap],hull=True)
 
 def decor_crystals(name,at,spin=0):
     x,y,z=at; wob=[.05,-.08,.1,-.04,.07,-.1,0]
@@ -269,6 +283,7 @@ def decor_crystals(name,at,spin=0):
     for (dx,dy,dz),h,r,tilt,t in (((0,.2,-.1),2.5,.36,(-.08,.06),BLUE_TILE),((.5,.15,.25),1.75,.3,(.3,-.35),TEAL_TILE),((-.55,.15,.2),1.4,.27,(.32,.4),PURPLE_TILE),
                                   ((.2,.15,-.55),1.15,.24,(-.4,-.2),TEAL_TILE),((-.4,.15,-.45),.85,.2,(-.35,.45),BLUE_TILE)):
         crystal(name+'_Crystal',tuple(Vector((x,y,z))+turn@Vector((dx,dy,dz))),h,r,tilt,spin,t)
+    solid_of(name,hull=True)
 
 def decor_ice(name,at,spin=0):
     x,y,z=at; turn=Matrix.Rotation(spin,3,'Y')
@@ -278,6 +293,7 @@ def decor_ice(name,at,spin=0):
         loft(name+'_Spike',[(0,ngon(.8*w,6,phase)),(.18*h,ngon(.64*w,6,phase))],[ICE_TILE],apex=(0,.62*h,0),at=base,spin=spin)
         loft(name+'_SpikeTop',[(.4*h,ngon(.58*w,6,phase+.5)),(.52*h,ngon(.45*w,6,phase+.5))],[ICE_TILE],apex=(0,h,0),at=base,spin=spin)
     crystal(name+'_Shard',tuple(Vector((x,y+.1,z))+turn@Vector((.65,0,-.75))),.85,.16,(-.3,-.3),spin,ICE_TILE)
+    solid_of(name,hull=True)
 
 def decor_lava(name,at,spin=0):
     x,y,z=at; turn=Matrix.Rotation(spin,3,'Y'); wob=[.06,-.07,.09,-.05,.04,-.09,.02]
@@ -286,6 +302,7 @@ def decor_lava(name,at,spin=0):
     for (dx,dz),h,r,tilt in (((.95,.5),.9,.18,(.3,-.35)),((1.1,-.25),.6,.15,(-.2,-.4)),((-1.0,.35),.7,.16,(.3,.35))):
         crystal(name+'_Ember',tuple(Vector((x,y,z))+turn@Vector((dx,0,dz))),h,r,tilt,spin,MAGMA_TILE)
     loft(name+'_Pebble',[(-.05,ngon(.42,6,.3,1,1,[.1,-.1,.05])),(.3,ngon(.25,6,.6))],[BASALT_TILE],at=tuple(Vector((x,y,z))+turn@Vector((-.85,0,-.85))),spin=spin)
+    solid_of([name+'_Basalt',name+'_Ember'],hull=True)
 
 def decor_desert(name,at):
     x,y,z=at; k=1.35; wob=[.04,-.06,.08,-.03,.05,-.07,.03,-.05,.06]
@@ -304,6 +321,9 @@ def decor_desert(name,at):
     halo(box(name+'_BeaconLight',(bx,y+2.45,bz),(.6,.55,.6),BEACON_TILE),(bx,y+2.45,bz),1.5,'8ff6ff')
     box(name+'_BeaconCap',(bx,y+2.8,bz),(.7,.16,.7),8)
     box(name+'_BeaconAerial',(bx,y+3.2,bz),(.08,.7,.08),9)
+    # The dune is a low hump to walk over; the cacti and the beacon stand in the way.
+    solid_of(name+'_Dune',hull=True); solid_of([name+'_Beacon'])
+    for o in [o for o in ACTIVE.children if o.name.startswith(name+'_Cactus') and not o.name.startswith(name+'_CactusArm')]: solid_of([o],hull=True)
 
 def decor_meteor(name,at):
     x,y,z=at
@@ -313,6 +333,7 @@ def decor_meteor(name,at):
         crystal(name+'_Crystal',(x+dx,y+dy,z+dz),h,r,tilt,0,PURPLE_TILE)
     star=[(math.cos(math.pi/2+i*math.pi/5)*(.85 if i%2==0 else .37),math.sin(math.pi/2+i*math.pi/5)*(.85 if i%2==0 else .37)+y+2.8) for i in range(10)]
     prism(name+'_Star',[(x+u,v) for u,v in star],z-.15,z+.15,8)
+    solid_of([name+'_Rock',name+'_Crystal'],hull=True)  # the star floats overhead
 
 def window(name,at,w,h,side=False):
     # Author on the front, then transform vertices for an east-facing window.
@@ -422,9 +443,11 @@ box('Shop_CanopyFascia',(0,3.77,5.80),(9.08,.38,.28),0)
 for xx in (-3.4,-1.13,1.13,3.4):
     beam('Shop_CanopyPanelRib',(xx,4.36,3.18),(xx,3.82,5.78),.15,.13,13)
 for xx in (-3.82,3.82):
-    box('Shop_PorchPost',(xx,2.28,5.22),(.52,3.55,.52),10)
-    box('Shop_PorchFoot',(xx,.95,5.22),(.76,.48,.76),3)
+    post=[box('Shop_PorchPost',(xx,2.28,5.22),(.52,3.55,.52),10),box('Shop_PorchFoot',(xx,.95,5.22),(.76,.48,.76),3)]
+    solid_of(post)
     beam('Shop_PorchBracket',(xx,3.02,5.22),(xx-math.copysign(.75,xx),3.65,5.22),.35,.35,2)
+# The porch floor and its two steps stay walkable through: the sale ring reaches the lower step, and standing on it
+# would lift a player out of the ring (a trip there landed against it and crept up its edge).
 for z,y in ((6.12,.14),(5.65,.32)): box('Shop_EntryStep',(0,y,z),(3.5,.28,.70),11)
 door('Shop_Door',(0,.76,3.39),1.76,2.76)
 lamp('Shop_Lantern',(-1.30,3.30,3.85),.90)
@@ -441,6 +464,8 @@ crate('Shop_CrateA',(4.33,.15,1.80),1.12); crate('Shop_CrateB',(4.33,1.27,1.80),
 barrel('Shop_Barrel',(-4.60,.10,2.40),1)
 box('Shop_BenchSeat',(2.40,1.15,4.75),(2.40,.24,.70),2)
 for xx in (1.5,3.3): box('Shop_BenchFoot',(xx,.84,4.75),(.27,.60,.56),10)
+# Every service building: an 8.6 x 6 x 6.8 m body; the crates, barrels and benches round it are their own.
+solid((0,3,0),(8.6,6,6.8)); solid_of('Shop_Crate'); solid_of('Shop_Barrel',hull=True); solid_of('Shop_Bench')
 
 # BACKPACK SHOP: the chamfered pavilion with continuous red hips, a big backpack badge over the door and
 # packs on show either side of the steps.
@@ -491,8 +516,8 @@ box('Pack_FrontLedger',(0,3.80,3.34),(6.65,.29,.33),1)
 door('Pack_Door',(0,.65,3.30),1.76,2.74,14)
 for xx in (-2.18,2.18): window('Pack_FrontWindow',(xx,2.52,3.32),1.48,1.60)
 window('Pack_EastWindow',(4.15,2.40,0),2.35,2.25,True)
-box('Pack_FirstStep',(0,.14,4.73),(3.55,.28,.80),3)
-box('Pack_UpperStep',(0,.37,4.02),(3.25,.30,1.0),11)
+solid_of([box('Pack_FirstStep',(0,.14,4.73),(3.55,.28,.80),3)])
+solid_of([box('Pack_UpperStep',(0,.37,4.02),(3.25,.30,1.0),11)])
 lamp('Pack_Lantern',(1.25,3.26,3.72),.80)
 # Badge: a big backpack on a walnut plate above the door, read from across the plaza.
 prism('Pack_BadgeBacking',[(x,y+5.10) for x,y in stepped_outline(1.55,1.70,.28)],3.74,3.95,0)
@@ -503,12 +528,15 @@ prism('Pack_BadgeBuckle',[(x,y+5.22) for x,y in stepped_outline(.18,.18,.04)],4.
 prism('Pack_BadgeHandle',[(x,y+5.72) for x,y in stepped_outline(.40,.16,.05)],3.96,4.06,10)
 # Packs on show: a crate with a pack each side of the steps, and a row hanging under the east eave.
 for side in (-1,1):
-    crate('Pack_ShowCrate',(side*3.05,.10,4.45),.86)
-    backpack('Pack_ShowPack',(side*3.05,.96,4.45),.92,side*-.25)
+    crate('Pack_ShowCrate'+'LR'[side>0],(side*3.05,.10,4.45),.86)
+    backpack('Pack_ShowPack'+'LR'[side>0],(side*3.05,.96,4.45),.92,side*-.25)
 for i,zz in enumerate((-1.75,-.05,1.65)):
     box('Pack_HangPeg',(4.55,3.05,zz),(.5,.12,.12),10)
     backpack('Pack_HangPack',(4.62,1.72,zz),.78,math.pi/2)
 crate('Pack_SideCrate',(-4.65,.10,1.7),.9); backpack('Pack_SidePack',(-4.65,1.0,1.7),.8,-math.pi/2)
+solid((0,3,0),(8.6,6,6.8))
+for side in 'LR': solid_of(['Pack_ShowCrate'+side,'Pack_ShowPack'+side])
+solid_of(['Pack_SideCrate','Pack_SidePack'])
 
 def egg(name,at,h,t,plain=None):
     # A connected, solid eight-sided egg with four broad faceted bands. Atlas
@@ -565,10 +593,12 @@ box('Forge_HammerHandle',(1.10,2.10,1.48),(.61,.12,.14),2)
 box('Forge_HammerHead',(.83,2.15,1.48),(.29,.30,.40),0)
 lamp('Forge_Lantern',(2.82,3.76,2.77),.90)
 barrel('Forge_Barrel',(3.75,.10,-.25),.93); crate('Forge_Crate',(3.55,.10,1.38),.95)
+solid((0,3,0),(8.6,6,6.8)); solid_of('Forge_Barrel',hull=True); solid_of('Forge_Crate')
 
 # OPEN MINE: strong diagonal timber is the Roblox half of the fusion. The roof,
 # wheel silhouette, footings and joinery provide the more Minecraft-like steps.
 model('Mine_Headframe',(0,0,-11))
+mesh_solid()  # its legs and piers as they are: the shaft between them stays open
 for side in (-1,1):
     for end in (-1,1):
         bx,bz=side*6.8,end*4.65; tx,tz=side*3.72,end*2.15
@@ -647,6 +677,7 @@ def arch_band(name,x0,x1,top,bottom,z0,z1,n,t):
         faces+=[(a,a+1,b+1,b),(b+3,b+2,a+2,a+3),(a,b,b+3,a+3),(a+2,b+2,b+1,a+1)]
     return mesh(name,verts,faces,t)
 model('Creek_Bridge',(bridge['x'],0,bridge['z']))
+mesh_solid()  # the deck the character walks on
 BOARDS=21; pitch=2*BL/BOARDS; seam=.035; board=.2
 for i in range(BOARDS):
     za,zb=-BL+i*pitch,-BL+(i+1)*pitch; ya,yb=deck(za),deck(zb)
@@ -668,6 +699,7 @@ for sx in (-1,1):
         slab('Bridge_Footing',[(fx+a,fz+b) for a,b in stepped_outline(.70,1.30,.18)],-1.1,.40,19)
         slab('Bridge_FootingCap',[(fx+a,fz+b) for a,b in stepped_outline(.80,1.40,.20)],.40,.50,11)
 model('Creek_Bridge_Rails',(bridge['x'],0,bridge['z']))
+mesh_solid()  # apart from the deck: a character brushing a post still finds the deck
 RX=2.42; RAIL_END=BL-.06
 for sx in (-1,1):
     x=sx*RX
@@ -705,8 +737,10 @@ for x,z,s in ((-.55,-.62,.64),(.40,-.58,.74),(-.46,.51,.78),(.54,.45,.60),(0,0,.
     box('Cart_OreBlock',(x,1.68+s*.22,z),(s,s*.64,s),19)
 box('Cart_GoldOre',(0,2.08,0),(.54,.60,.58),8)
 box('Cart_GoldOreStep',(.13,2.45,.04),(.30,.18,.34),8)
+solid_of()
 model('Ore_Crates',(10.8,.03,-5.9),.18)
 crate('Plaza_CrateA',(0,0,0),.90); crate('Plaza_CrateB',(.10,.90,.06),.65)
+solid_of('Plaza_CrateA'); solid_of('Plaza_CrateB')
 model('Plaza_Signpost',(-3.7,.04,13.1),-.15)
 box('Signpost_Timber',(0,1.57,0),(.40,3.14,.40),0)
 box('Signpost_Cap',(0,3.22,0),(.68,.18,.68),21)
@@ -715,6 +749,7 @@ prism('Signpost_PetArrow',[(1.22,1.38),(-.75,1.38),(-1.08,1.65),(-.75,1.92),(1.2
 beam('Signpost_PickHandle',(-.40,2.25,.23),(.08,2.68,.23),.15,.13,0)
 beam('Signpost_PickHead',(-.25,2.66,.24),(.28,2.35,.24),.20,.14,0)
 prism('Signpost_Egg',[(xx,yy+1.65) for xx,yy in stepped_outline(.29,.37,.07)],.17,.29,16)
+solid_of('Signpost_Timber')  # the arrows point out over the head
 for i,(x,z,yaw) in enumerate(((-9.8,7.4,.1),(8.5,10.3,-.4))):
     model('Plaza_Lamp_%d'%i,(x,0,z),yaw)
     box('Lamp_Post',(0,1.80,0),(.41,3.60,.41),0)
@@ -722,6 +757,7 @@ for i,(x,z,yaw) in enumerate(((-9.8,7.4,.1),(8.5,10.3,-.4))):
     box('Lamp_Arm',(.39,3.52,0),(1.17,.31,.31),1)
     beam('Lamp_Bracket',(0,2.92,0),(.66,3.52,0),.26,.26,2)
     lamp('Lamp_Lantern',(.78,3.13,0),1.05)
+    solid_of('Lamp_Foot'); solid_of('Lamp_Post')
 
 # Adapt the approved Pinewind authoring method to the real playable mine.
 # No imported legacy meshes, Decimate, or decorative shaft floor.
@@ -747,6 +783,7 @@ for i,p in enumerate(layout['eggs']):
     slab('Egg_Nest',stepped_outline(1.95,1.95,.26),.49,.66,23)
     spotted,plain=EGG_TILES[p['id']]
     egg('Egg_Display',(0,.66,0),2.25,spotted,plain)
+    solid((0,1.5,0),(1.9,3,1.9))  # the egg and its nest; the plinth's lip stays a step
 # Timber planters with grass tops and a honey-timber front lip. Small risers keep every tier walkable.
 terrace=layout['terrace']; tz=(terrace['minZ']+terrace['maxZ'])/2; tl=terrace['maxZ']-terrace['minZ']; tw=terrace['width']
 for tier in layout['tiers']:
@@ -754,9 +791,11 @@ for tier in layout['tiers']:
     box('Terrace_Timber',(0,(tier['y']-.16)/2,0),(tw,tier['y']-.16,tl),1)
     box('Terrace_Grass',(0,tier['y']-.08,0),(tw,.16,tl),GRASS_TILE)
     box('Terrace_Lip',(-tw/2+.12,tier['y']-.095,0),(.24,.21,tl),2)
+    solid_of()
 for i,p in enumerate(layout['steps']):
     model('TerraceStep_'+str(i),(p['x'],0,p['z']))
     box('Terrace_Step',(0,p['y']/2,0),(p['width'],p['y'],p['depth']),2)
+    solid_of()
 # TELEPORT STATION: one per world, replacing the ring of layer portals. A stepped octagonal platform, two
 # chunky stone pillars with gold bands, a teal-roofed lintel with a crest, and a broad teal ring in the opening
 # (the swirling portal disc inside it is a runtime effect). Its front (+Z) faces the spawn.
@@ -789,6 +828,9 @@ ring('Station_RingGold',[(x*1.05,y*1.05) for x,y in circle],.93,.17,.24,2.75,8)
 for side in (-1,1): box('Station_RingStrut',(side*1.42,2.75,0),(.5,.34,.3),0)
 DECOR={'mushroom':decor_mushroom,'crystal':decor_crystals,'ice':decor_ice,'lava':decor_lava}
 for i,d in enumerate(layout['stationDecor']): DECOR[d['kind']]('Station_'+d['kind'].title(),(d['x'],d['y'],d['z']),.5+i*1.1)
+# The platform in its two steps (each low enough to step up), the two pillars; the pad in front is flush.
+solid_of('Station_Plinth',hull=True); solid_of(['Station_Deck','Station_GoldRim','Station_Inlay'],hull=True)
+for side in (-1,1): solid((side*1.9,2.4,0),(.9,4.8,.9))
 
 # Functional furniture: a newly authored shell; its live label is attached in-game.
 # A faceted teal toy cabinet with a recessed capsule display and bold roof/collars.
@@ -804,6 +846,7 @@ roof('Capsule_Roof',2.7,2.4,4.12,.45,6,1)
 box('Capsule_PrizeSlot',(0,.88,.96),(.92,.48,.13),0)
 box('Capsule_PrizeTray',(0,.60,1.00),(1.10,.12,.20),8)
 box('Capsule_Dial',(.66,1.55,1.00),(.38,.38,.18),8)
+solid((0,2.15,0),(2.5,4.3,2.2))
 
 # Gate to the next world, standing in the pass of the south ridge at house scale: chamfered stone
 # pillars, a timber lintel with a sign board under a small gable, lamps on the pillar fronts and
@@ -830,8 +873,15 @@ for sz in (-1,1): tilted_box('Gate_RoofPlane',(0,gh+.15,sz*.72),(lw+.9,.32,1.75)
 box('Gate_RoofRidge',(0,gh+.62,0),(lw+1.1,.3,.42),21)
 gp=layout['gatePad']; teleport_pad('Gate_Pad',gp['x']-gate['x'],gp['z']-gate['z'],gp['radius'])
 for d in layout['gateDecor']: {'desert':decor_desert,'meteor':decor_meteor}[d['kind']]('Gate_'+d['kind'].title(),(d['x'],d['y'],d['z']))
+# The pillars on their plinths, the side walls to the slopes and the lintel; the opening stays open (the game
+# closes it with the portal sheet), the pad in it is flush.
+for sx in (-1,1):
+    px=sx*(half_open+1.0); ww=wall_to-half_open-2.0
+    solid((px,.4,0),(2.6,.8,3.0)); solid((px,gh/2,0),(2.0,gh,2.4)); solid((sx*(half_open+2.0+ww/2),1.85,0),(ww,3.7,1.4))
+solid((0,gh-1.6,0),(lw,1.3,1.6))
 for side,sx in (('L',-1),('R',1)):
     model('World_Gate_Door'+side,(gate['x']+sx*half_open,0,gate['z']))
+    passable('left out by the game: the portal sheet closes the opening')
     w=half_open-.05; cx=-sx*w/2
     box('GateDoor_Leaf',(cx,3.65,0),(w,7.2,.36),14)
     for y in (1.0,3.65,6.3): box('GateDoor_Band',(cx,y,0),(w-.1,.34,.5),20)
@@ -903,6 +953,9 @@ for name,root in MODELS.items():
 assert not geometry_checks['negativeVolumes'],geometry_checks
 assert geometry_checks['zeroAreaTriangles']==0,geometry_checks
 assert geometry_checks['nonFinitePositions']==0,geometry_checks
+collisions=collision.write(list(MODELS.values()))
+uncovered={name:collision.uncovered(root) for name,root in MODELS.items()}
+uncovered={k:v for k,v in uncovered.items() if v}
 bpy.context.preferences.filepaths.save_version=0
 source=ROOT/'source-art/architecture.blend'
 bpy.ops.wm.save_as_mainfile(filepath=str(source))
@@ -947,6 +1000,7 @@ for ob in joined:
 glb=OUT/'architecture.glb'
 bpy.ops.export_scene.gltf(filepath=str(glb),export_format='GLB',export_yup=True,export_texcoords=True,export_normals=True,export_materials='EXPORT',export_cameras=False,export_lights=False,export_extras=True)
 def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
-report={'schema':1,'authorship':'Pinewind playable adaptation, regenerated from approved authoring scripts; open 16m square mine, gameplay-aligned services and egg terraces; no legacy model import or decimation','blenderVersion':bpy.app.version_string,'coordinateConvention':'Source helpers Three Y-up -> Blender (x,-z,y), exported glTF Y-up','atlas':{'file':str(ATLAS.relative_to(ROOT)),'size':[256,256],'usedTiles':len(recipes),'tilePixels':32,'filter':'Closest / glTF NEAREST','pixelArt':'Low contrast sparse grouped marks; large calm toy-color areas, limited plank/glass/egg accents; no random noise','sha256':sha(ATLAS)},'geometryChecks':geometry_checks,'lightmapUv':{'layer':'Lightmap','gltf':'TEXCOORD_1','method':'smart_project 45 deg, average island scale, pack (margin 0.0016, 2.5 texels at 1536)','hiddenGroundFaces':hidden_faces},'models':stats,'triangles':sum(s['triangles'] for s in stats),'vertices':sum(s['vertices'] for s in stats),'meshCount':sum(s['meshes'] for s in stats),'worldBounds':{'min':[round(min(v[a] for v in all_bounds),4) for a in range(3)],'max':[round(max(v[a] for v in all_bounds),4) for a in range(3)]},'files':{str(p.relative_to(ROOT)):{'bytes':p.stat().st_size,'sha256':sha(p)} for p in (pathlib.Path(__file__).resolve(),source,glb,ATLAS)}}
+report={'schema':1,'collision':collisions,'uncoveredParts':uncovered,'authorship':'Pinewind playable adaptation, regenerated from approved authoring scripts; open 16m square mine, gameplay-aligned services and egg terraces; no legacy model import or decimation','blenderVersion':bpy.app.version_string,'coordinateConvention':'Source helpers Three Y-up -> Blender (x,-z,y), exported glTF Y-up','atlas':{'file':str(ATLAS.relative_to(ROOT)),'size':[256,256],'usedTiles':len(recipes),'tilePixels':32,'filter':'Closest / glTF NEAREST','pixelArt':'Low contrast sparse grouped marks; large calm toy-color areas, limited plank/glass/egg accents; no random noise','sha256':sha(ATLAS)},'geometryChecks':geometry_checks,'lightmapUv':{'layer':'Lightmap','gltf':'TEXCOORD_1','method':'smart_project 45 deg, average island scale, pack (margin 0.0016, 2.5 texels at 1536)','hiddenGroundFaces':hidden_faces},'models':stats,'triangles':sum(s['triangles'] for s in stats),'vertices':sum(s['vertices'] for s in stats),'meshCount':sum(s['meshes'] for s in stats),'worldBounds':{'min':[round(min(v[a] for v in all_bounds),4) for a in range(3)],'max':[round(max(v[a] for v in all_bounds),4) for a in range(3)]},'files':{str(p.relative_to(ROOT)):{'bytes':p.stat().st_size,'sha256':sha(p)} for p in (pathlib.Path(__file__).resolve(),source,glb,ATLAS)}}
 (ROOT/'artifacts/architecture-asset.json').write_text(json.dumps(report,indent=2)+'\n')
 print('ARCHITECTURE_ASSET '+json.dumps({k:report[k] for k in ('triangles','vertices','meshCount','worldBounds')}))
+print('ARCHITECTURE_UNCOVERED '+json.dumps(uncovered))
