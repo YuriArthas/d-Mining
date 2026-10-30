@@ -89,7 +89,7 @@ const dir = path.resolve(process.env.ARTIFACT_DIR || 'output/ui-v2-u9-desktop');
       await at(await zone('stations', 1)); await page.locator('.station-sheet').waitFor(); await shot('07-station'); await click(page.locator('.ui-sheet-close'));
       await at(await zone('portals', 1)); await page.locator('.portal-sheet').waitFor(); await shot('08-portal'); await click(page.locator('.ui-sheet-close'));
       await at([0, .1, 46]);
-      await click(page.locator('.hud-rail-row .ui-tile').last()); await page.locator('.rewards-sheet').waitFor(); await shot('09-rewards'); await page.keyboard.press('Escape');
+      await click(page.locator('.hud-rail [data-kind=rewards]')); await page.locator('.rewards-sheet').waitFor(); await shot('09-rewards'); await page.keyboard.press('Escape');
       await click(page.locator('.hud-menu')); await click(page.locator('.hud-menu-help')); await page.locator('.help-sheet').waitFor(); await shot('10-help');
       await check(`${w}×${h} ${lang}: HUD, menu, pets, ores, egg stand, shop, station, portal, rewards and help — nothing past its box, sheets inside the window.`);
       await context.close();

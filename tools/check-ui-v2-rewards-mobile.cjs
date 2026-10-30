@@ -79,7 +79,7 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
       await check(`${lang}: the loading screen is flat style A, its exit a small link.`);
 
       await seed(`d.onboarding.status = 'skipped'; d.rewards.onlineSeconds = 420; d.rewards.balance = 30;`);
-      await tap(page.locator('.hud-rail-row .ui-tile').last());
+      await tap(page.locator('.hud-rail [data-kind=rewards]'));
       await page.locator('.rewards-sheet').waitFor();
       await tap(page.locator('.ui-tab').nth(1));
       assert.equal(await page.locator('.reward-card[data-state=ready]').count(), 1);

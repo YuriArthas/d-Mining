@@ -36,13 +36,18 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
     const boxes = await page.evaluate(() => {
       const box = s => { const e = document.querySelector(s); if (!e) return null; const r = e.getBoundingClientRect(); return r.width ? { x: r.left, y: r.top, r: r.right, b: r.bottom } : null; };
       return { left: box('.hud-left'), where: box('.hud-where'), menu: box('.hud-system'), rail: box('.hud-rail'), jump: box('.jump-button'), stick: box('.joystick'), perf: box('.hud-perf'), bottom: box('.hud-bottom'),
-        w: innerWidth, h: innerHeight };
+        w: innerWidth, h: innerHeight,
+        tiles: [...document.querySelectorAll('.hud-rail .ui-tile')].map(e => { const r = e.getBoundingClientRect(); return { w: r.width, h: r.height, cx: r.left + r.width / 2 }; }),
+        gear: (r => r.left + r.width / 2)(document.querySelector('.hud-menu').getBoundingClientRect()) };
     });
+    // The right column (2026-10-30): equal tiles on one axis, the menu centred over them.
+    for (const t of boxes.tiles) assert.ok(Math.abs(t.w - boxes.tiles[0].w) < .5 && Math.abs(t.h - t.w) < .5 && Math.abs(t.cx - boxes.tiles[0].cx) < .5, `${label}: rail tiles equal and aligned ${JSON.stringify(boxes.tiles)}`);
+    assert.ok(Math.abs(boxes.gear - boxes.tiles[0].cx) < 1, `${label}: the menu over the column (${boxes.gear} / ${boxes.tiles[0].cx})`);
     const hit = (a, b) => a && b && a.x < b.r && b.x < a.r && a.y < b.b && b.y < a.b;
     for (const [a, b] of [['left', 'where'], ['where', 'menu'], ['where', 'rail'], ['left', 'rail'], ['rail', 'jump'], ['left', 'stick'], ['menu', 'rail'], ['perf', 'left'], ['perf', 'stick'], ['perf', 'jump'], ['perf', 'rail'], ['perf', 'bottom']])
       assert.ok(!hit(boxes[a], boxes[b]), `${label}: ${a} overlaps ${b} ${JSON.stringify([boxes[a], boxes[b]])}`);
     for (const k of ['left', 'where', 'menu', 'rail', 'perf']) { const b = boxes[k]; assert.ok(b && b.x >= 0 && b.y >= 0 && b.r <= boxes.w && b.b <= boxes.h, `${label}: ${k} on screen`); }
-    await check(`${label}: wallet, whereabouts, menu, rail, joystick, jump button and the performance button do not overlap at ${boxes.w}×${boxes.h}.`);
+    await check(`${label}: wallet, whereabouts, menu, rail, joystick, jump button and the performance button do not overlap at ${boxes.w}×${boxes.h}; ${boxes.tiles.length} equal ${Math.round(boxes.tiles[0].w)} px tiles in one column under the menu.`);
   };
   const seed = async mutate => {
     await page.evaluate(() => window.__miningSave.flush());
@@ -112,9 +117,9 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
     assert.equal(await page.getByRole('button', { name: /^重生/ }).count(), 1);
     assert.ok(await page.locator('.hud-coin-mult').count());
     await shot('05-full-buffs-rebirth'); await layout('Full bag, buffs, rebirth');
-    await check('A full bag pulses the sell button in a gold ring; two buffs show with their clocks; the rebirth tile sits beside rewards; the coin pill carries the rebirth multiplier.');
+    await check('A full bag pulses the sell button in a gold ring; two buffs show with their clocks; the rebirth tile sits under rewards, the same size; the coin pill carries the rebirth multiplier.');
 
-    for (const [w, h, name] of [[640, 320, '06-small-640'], [932, 430, '07-wide-932'], [1280, 720, '08-desktop-1280']]) {
+    for (const [w, h, name] of [[640, 320, '06-small-640'], [667, 375, '06-se-667'], [932, 430, '07-wide-932'], [1280, 720, '08-desktop-1280']]) {
       await page.setViewportSize({ width: w, height: h }); await page.waitForTimeout(1200);
       await shot(name); await layout(`${w}×${h}`);
     }

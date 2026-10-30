@@ -128,7 +128,7 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
       await tap(page.locator('.shop-next')); clippedAll.push(...await english(`${lang}/11-shop-next`, 1500));
       await tap(page.locator('.shop-top-actions .ui-close'));
 
-      await tap(page.locator('.hud-rail-row .ui-tile').last()); await page.getByRole('dialog').first().waitFor(); clippedAll.push(...await english(`${lang}/12-rewards`));
+      await tap(page.locator('.hud-rail [data-kind=rewards]')); await page.getByRole('dialog').first().waitFor(); clippedAll.push(...await english(`${lang}/12-rewards`));
       await tap(page.locator('.ui-sheet-close'));
       await tap(page.locator('.hud-menu')); await tap(page.locator('.hud-menu-help')); clippedAll.push(...await english(`${lang}/13-help`)); await tap(page.locator('.ui-sheet-close'));
 

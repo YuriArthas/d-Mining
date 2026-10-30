@@ -3,7 +3,11 @@
    outlines, no shadows. The middle of the screen stays clear for the miner and the pit. */
 .game-shell { container: game / size; }
 .ui-hud {
-  --hud-edge: 10px; --hud-pill: 32px; --hud-tile: 52px; --hud-big: 64px; --hud-menu: 40px; --hud-gap: 8px;
+  --hud-edge: 10px; --hud-pill: 32px; --hud-tile: 52px; --hud-menu: 40px; --hud-gap: 8px;
+  /* The right column's tiles: --hud-tile, or smaller where four of them would not end above the jump button (the
+     menu, its gap, four tiles and three gaps, a gap, then the jump button with its margin). */
+  --hud-rail-tile: min(var(--hud-tile), calc((100cqh - var(--safe-top) - var(--safe-bottom) - var(--hud-edge) - var(--hud-menu) - 4px
+    - 5 * var(--hud-gap) - var(--hud-jump-margin) - var(--hud-jump)) / 4));
   position: absolute; inset: 0; z-index: 2; pointer-events: none;
   font-family: var(--ui-font); color: var(--ui-ink);
 }
@@ -53,8 +57,8 @@
 .hud-buff .ui-icon { width: 20px; height: 20px; }
 .hud-buff b { margin-left: 2px; color: var(--ui-ink-soft); }
 
-/* Top right: the menu in the corner; under it pets and shop large, rebirth and rewards small in one row. */
-.hud-system { position: absolute; top: calc(var(--hud-edge) + var(--safe-top)); right: calc(var(--hud-edge) + var(--safe-right)); }
+/* Top right: the menu, then one column of equal tiles centred under it (pets, shop, rewards, rebirth). */
+.hud-system { position: absolute; top: calc(var(--hud-edge) + var(--safe-top)); right: calc(var(--hud-edge) + var(--safe-right) + (var(--hud-rail-tile) - var(--hud-menu)) / 2); }
 .ui-hud .hud-menu { --tile: var(--hud-menu); }
 .ui-hud .hud-menu > .ui-icon { left: 14%; top: 14%; width: 72%; height: 72%; }
 .ui-hud .hud-menu .ui-tile-label { display: none; }
@@ -69,11 +73,9 @@
 .hud-menu-panel .ui-btn { width: 100%; }
 .hud-rail {
   position: absolute; top: calc(var(--hud-edge) + var(--safe-top) + var(--hud-menu) + var(--hud-gap) + 4px); right: calc(var(--hud-edge) + var(--safe-right));
-  display: grid; gap: calc(var(--hud-gap) + 2px); justify-items: end;
+  display: grid; gap: var(--hud-gap);
 }
-.ui-hud .hud-rail .ui-tile { --tile: var(--hud-tile); }
-.ui-hud .hud-rail .hud-big { --tile: var(--hud-big); }
-.hud-rail-row { display: flex; gap: var(--hud-gap); }
+.ui-hud .hud-rail .ui-tile { --tile: var(--hud-rail-tile); }
 
 /* Bottom centre: what the spot offers (egg, capsule machine) and short notices. */
 .hud-bottom {
@@ -108,15 +110,17 @@
   .hud-perf[data-state=idle] span { display: none; }
 }
 
-/* Touch controls: Roblox-style thumbstick ring and jump button, translucent so the scene shows through. */
+/* Touch controls: Roblox-style thumbstick ring and jump button, translucent so the scene shows through. The jump
+   button's size and margin are shared with the HUD (the right column ends above it). */
+.session-ui { --hud-jump: 70px; --hud-jump-margin: 18px; }
 .game-shell .joystick {
   left: calc(16px + var(--safe-left)); bottom: calc(14px + var(--safe-bottom)); width: 120px; height: 120px;
   border: 3px solid #ffffffa6; background: #1b234026;
 }
 .game-shell .joystick-knob { width: 48px; height: 48px; left: 33px; top: 33px; background: #ffffffe6; border: 3px solid var(--ui-ink); }
-.game-shell .action-buttons { right: calc(18px + var(--safe-right)); bottom: calc(18px + var(--safe-bottom)); }
+.game-shell .action-buttons { right: calc(var(--hud-jump-margin) + var(--safe-right)); bottom: calc(var(--hud-jump-margin) + var(--safe-bottom)); }
 .game-shell .jump-button {
-  display: grid; place-items: center; width: 70px; height: 70px; padding: 14px;
+  display: grid; place-items: center; width: var(--hud-jump); height: var(--hud-jump); padding: 14px;
   border: 3px solid #ffffffa6; background: #1b234033;
 }
 .game-shell .action-buttons button[aria-pressed=true] { background: #ffc61a99; border-color: #fff; }
@@ -125,7 +129,7 @@
 
 /* Desktop and tablets: larger bodies. */
 @container game (min-width: 1000px) and (min-height: 620px) {
-  .ui-hud { --hud-edge: 18px; --hud-pill: 42px; --hud-tile: 64px; --hud-big: 80px; --hud-menu: 50px; --hud-gap: 12px; }
+  .ui-hud { --hud-edge: 18px; --hud-pill: 42px; --hud-tile: 64px; --hud-menu: 50px; --hud-gap: 12px; }
   .hud-center { top: calc(10px + var(--safe-top)); width: 340px; }
   .hud-place b { font-size: 28px; }
   .hud-place small { font-size: 14px; }
@@ -141,7 +145,8 @@
 }
 /* Small phones (≤ 360px tall): tighter plates and tiles, smaller controls. */
 @container game (max-height: 360px) {
-  .ui-hud { --hud-edge: 8px; --hud-pill: 28px; --hud-tile: 46px; --hud-big: 54px; --hud-menu: 36px; --hud-gap: 6px; }
+  .ui-hud { --hud-edge: 8px; --hud-pill: 28px; --hud-tile: 46px; --hud-menu: 36px; --hud-gap: 6px; }
+  .session-ui { --hud-jump: 62px; }
   .hud-place b { font-size: 17px; padding: 1px 14px; }
   .hud-depth b { font-size: 23px; }
   .hud-goal { height: 16px; }
@@ -149,7 +154,7 @@
   .hud-trips .ui-btn { min-width: 100px; }
   .game-shell .joystick { width: 108px; height: 108px; }
   .game-shell .joystick-knob { left: 27px; top: 27px; }
-  .game-shell .jump-button { width: 62px; height: 62px; padding: 12px; }
+  .game-shell .jump-button { padding: 12px; }
 }
 @container game (max-height: 360px) {
   @media (pointer: coarse), (any-pointer: coarse) { .hud-perf { left: calc(16px + 108px + 10px + var(--safe-left)); } }

@@ -25,7 +25,8 @@ type HudActions = {
  *  - top left: the world's money and the bag, with the two trips (sell, back to the surface) small underneath;
  *  - top centre: where you are (the world's name on the surface; the layer and depth below it) over one thin bar
  *    to the next layer, then buffs and a one-time tip (the block being mined has its plate over it, MiningOverlay);
- *  - top right: one menu (help and settings), then pets and shop large, rebirth and rewards small;
+ *  - top right: one menu (help and settings), then one column of equal tiles: pets, shop, rewards, and rebirth
+ *    once it shows (last, so the others never move);
  *  - bottom centre: what the spot you stand on offers (an egg, the capsule machine) and short notices;
  *  - bottom left: a small button that reports performance (on touch screens a round icon beside the thumbstick). */
 export function Hud({ session, actions, system, prompts, tipHidden = false }: {
@@ -77,12 +78,10 @@ export function Hud({ session, actions, system, prompts, tipHidden = false }: {
     <SystemMenu system={system} onHelp={run(actions.openHelp)} />
 
     <nav className="hud-rail" aria-label={tr('游戏功能')}>
-      <Tile icon="paw" label={tr('宠物')} tone="orange" className="hud-big" aria-label={tr('打开我的宠物')} data-tip-target="pets" badge={teamCanImprove(pets) ? '!' : undefined} onPress={run(actions.openPets)} />
-      <Tile icon="chest" label={tr('商店')} tone="blue" className="hud-big" aria-label={tr('商店')} data-kind="upgrade" data-tip-target="shop" onPress={run(actions.openShop)} />
-      <div className="hud-rail-row">
-        {state.rebirth.shown && <Tile icon="rebirth" label={tr('重生')} tone="green" aria-label={state.rebirth.ready ? tr('重生，可以重生了') : tr('重生')} badge={state.rebirth.ready ? '!' : undefined} onPress={run(actions.openRebirth)} />}
-        <Tile icon="gift" label={tr('奖励')} tone="purple" aria-label={claimable ? tr('奖励，{claimable} 个可领取', { claimable: claimable }) : tr('奖励')} badge={claimable || undefined} onPress={run(actions.openRewards)} />
-      </div>
+      <Tile icon="paw" label={tr('宠物')} tone="orange" aria-label={tr('打开我的宠物')} data-tip-target="pets" badge={teamCanImprove(pets) ? '!' : undefined} onPress={run(actions.openPets)} />
+      <Tile icon="chest" label={tr('商店')} tone="blue" aria-label={tr('商店')} data-kind="upgrade" data-tip-target="shop" onPress={run(actions.openShop)} />
+      <Tile icon="gift" label={tr('奖励')} tone="purple" aria-label={claimable ? tr('奖励，{claimable} 个可领取', { claimable: claimable }) : tr('奖励')} data-kind="rewards" badge={claimable || undefined} onPress={run(actions.openRewards)} />
+      {state.rebirth.shown && <Tile icon="rebirth" label={tr('重生')} tone="green" aria-label={state.rebirth.ready ? tr('重生，可以重生了') : tr('重生')} data-kind="rebirth" badge={state.rebirth.ready ? '!' : undefined} onPress={run(actions.openRebirth)} />}
     </nav>
 
     <div className="hud-bottom">

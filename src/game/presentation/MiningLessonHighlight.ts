@@ -34,7 +34,8 @@ export class MiningLessonHighlight {
       if(terrain.cell(cell.map((v,i)=>v+face[i]) as unknown as Coord))continue;
       this.point.set(...center.map((v,i)=>v+face[i]*(CELL*.5-.015)) as [number,number,number]);
       this.projected.copy(this.point).project(camera);
-      if(this.projected.z < -1 || this.projected.z > 1 || Math.abs(this.projected.x)>.8 || this.projected.y<-.78 || this.projected.y>.35)continue;
+      // In the lower half of the screen: the caption over the ring stays clear of the place plate at the top.
+      if(this.projected.z < -1 || this.projected.z > 1 || Math.abs(this.projected.x)>.8 || this.projected.y<-.78 || this.projected.y>0)continue;
       this.direction.copy(this.point).sub(camera.position).normalize();
       const hit=selectCell(camera.position.toArray(),this.direction.toArray(),[feet[0],feet[1]+1,feet[2]],c=>terrain.cell(c));
       if(!hit||hit.some((v,i)=>v!==cell[i]))continue;

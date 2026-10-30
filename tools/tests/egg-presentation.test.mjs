@@ -148,7 +148,9 @@ test('the mine label shows only while the mine is in view; off screen the ground
   const projector = new GuideMarkerProjector(), element = { style: {}, dataset: {} };
   const camera = new PerspectiveCamera(60, 16 / 9, .1, 100); camera.updateMatrixWorld();
   projector.update(camera, [0, 0, -10], element);
-  assert.equal(element.style.visibility, 'visible'); assert.equal(element.style.left, '50%'); assert.equal(element.style.top, '50%');
+  assert.equal(element.style.visibility, 'visible'); assert.equal(element.style.left, '50%');
+  // Never higher than --guide-min-top: under the place plate at the top of the screen.
+  assert.equal(element.style.top, 'max(var(--guide-min-top, 0px), 50%)');
   for (const anchor of [[0, 0, 10], [100, 0, -10], null]) {
     projector.update(camera, anchor, element); assert.equal(element.style.visibility, 'hidden');
   }

@@ -2,6 +2,8 @@
 // one with its depth), the world portal (the next world's ticket on its card, unlocking with one confirmation) and the
 // rebirth panel (multiplier, checklist, reset/kept, confirm, celebration). Chinese first, then Vietnamese (the
 // longest words) for the same screens: no Chinese left and no text spilling out.
+// World 2's ticket from the economy (it moves with each calibration).
+const TICKET2 = require('../src/game/content/economy.json').worlds[1].ticket.price;
 const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
 const fs = require('node:fs/promises'), path = require('node:path'), assert = require('node:assert/strict');
 const base = 'https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html';
@@ -105,7 +107,7 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
       await tap(page.locator('.ui-sheet-close')); await away();
 
       // Everything for world 2: unlock it with one confirmation.
-      await seed(`d.wallet.balances = { gold: 5400000, tech: 0, star: 0 }; d.pickaxe.level = 10; d.equipment.toolLevel = 10;
+      await seed(`d.wallet.balances = { gold: ${TICKET2}, tech: 0, star: 0 }; d.pickaxe.level = 10; d.equipment.toolLevel = 10;
         d.materials = { version: 1, items: { 'journey.amethyst': 20, 'journey.sapphire': 15, 'journey.obsidian': 10 } };`);
       await standAt('portals', 1);
       await page.locator('.portal-sheet').waitFor();
@@ -123,7 +125,7 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
         d.worldExploration['3'] = { version: 1, maxDepth: 900, unlockedDestinationIds: [] };`);
       await page.evaluate(() => { window.__miningValidation.teleport([0, .1, 46]); });
       await settle();
-      await tap(page.locator('.hud-rail-row .ui-tile').first());
+      await tap(page.locator('.hud-rail [data-kind=rebirth]'));
       await page.locator('.rebirth-sheet').waitFor();
       assert.ok(await page.locator('.rebirth-go').isDisabled());
       assert.equal(await page.locator('.rebirth-needs li[data-done]').count(), 0);
@@ -133,7 +135,7 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
       const finalLayer = 'world3.6';
       await seed(`d.pickaxe.level = 30; d.equipment.toolLevel = 30; d.worldExploration['3'] = { version: 1, maxDepth: 2400, unlockedDestinationIds: ['${finalLayer}'] };`);
       await page.evaluate(() => { window.__miningValidation.teleport([0, .1, 46]); }); await settle();
-      await tap(page.locator('.hud-rail-row .ui-tile').first()); await page.locator('.rebirth-sheet').waitFor();
+      await tap(page.locator('.hud-rail [data-kind=rebirth]')); await page.locator('.rebirth-sheet').waitFor();
       assert.equal(await page.locator('.rebirth-needs li[data-done]').count(), 2);
       await shot('06-rebirth-ready');
       await tap(page.locator('.rebirth-go')); await page.locator('.rebirth-confirm').waitFor(); await shot('07-rebirth-confirm');
