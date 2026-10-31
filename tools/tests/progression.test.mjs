@@ -53,7 +53,8 @@ test('locked eggs consume neither currency nor RNG; access changes refresh the s
  assert.equal(s.pets.hatch('pebble-egg').status,'hatched');assert.equal(rolls,1);
  assert.equal(s.getSnapshot().coins,coins-SESSION_CONTENT.petContent.eggs.find(e=>e.id==='pebble-egg').price);
 });
-test('every layer has a pickaxe gate for all its blocks, dense rock included; pets cannot bypass it',()=>{
+// 2026-10-31: the levels gate only what pays (the ores); a layer's rock and its cap need no pickaxe level.
+test('every layer\'s ores have a pickaxe gate, its rock and cap none; pets cannot bypass it',()=>{
  const initial=new GameSession(SESSION_CONTENT).exportProgress();
  initial.pets.inventory.pets=[{id:'strong',speciesId:'core-guardian',level:1}];initial.pets.equipment.slots=['strong',null,null];
  let kind=94,now=0,queued=0;
@@ -65,13 +66,16 @@ test('every layer has a pickaxe gate for all its blocks, dense rock included; pe
  assert.equal(s.getSnapshot().target.locked,true);
  for(const [i,layer] of LAYERS.entries()){
   const gate=ECONOMY.layers[i].gate;
-  for(const k of [layer.base,layer.deepKind,...layer.ores.map(o=>o.kind)])assert.equal(resourceByKind(k).requiredLevel,gate);
+  for(const k of layer.ores.map(o=>o.kind))assert.equal(resourceByKind(k).requiredLevel,gate);
+  for(const k of [layer.base,layer.deepKind])assert.equal(resourceByKind(k).requiredLevel,0);
   if(gate===1)continue;
   const data=s.exportProgress();data.pickaxe.level=data.equipment.toolLevel=gate-1;
-  const low=GameSession.fromData(data,SESSION_CONTENT);low.attach({cell:()=>layer.deepKind,pending:()=>false,mine:()=>true,cancelMining(){}});
+  const low=GameSession.fromData(data,SESSION_CONTENT);low.attach({cell:()=>layer.ores[0].kind,pending:()=>false,mine:()=>true,cancelMining(){}});
   assert.deepEqual(low.hit(cell),{status:'locked',requiredLevel:gate});
+  const rock=GameSession.fromData(data,SESSION_CONTENT);rock.attach({cell:()=>layer.deepKind,pending:()=>false,mine:()=>true,cancelMining(){}});
+  assert.notEqual(rock.hit(cell).status,'locked','its cap digs with the pickaxe before');
   data.pickaxe.level=data.equipment.toolLevel=gate;
-  const ok=GameSession.fromData(data,SESSION_CONTENT);ok.attach({cell:()=>layer.deepKind,pending:()=>false,mine:()=>true,cancelMining(){}});
+  const ok=GameSession.fromData(data,SESSION_CONTENT);ok.attach({cell:()=>layer.ores[0].kind,pending:()=>false,mine:()=>true,cancelMining(){}});
   assert.notEqual(ok.hit(cell).status,'locked');
  }
 });

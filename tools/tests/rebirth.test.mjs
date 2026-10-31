@@ -55,6 +55,7 @@ test('重生：三种货币、镐子（含强化）、背包、材料仓、世�
   assert.equal(after.rebirth.count, 1); assert.equal(after.rebirth.ready, false); assert.equal(after.rebirth.shown, true);
   assert.equal(JSON.stringify(s.exportProgress().pets), pets, 'pets stay');
   assert.deepEqual(s.exportProgress().materials.items, {}, 'the material store empties');
+  assert.deepEqual(after.inventory.locked, [], 'and the locks go with it (the store\'s coal was locked)');
   assert.equal(commits, 1); assert.deepEqual(events, ['reborn']);
   // The multiplier applies to every sale, and survives a reload.
   const saved = s.exportProgress(); saved.inventory.items = { 'journey.coal': 4 };

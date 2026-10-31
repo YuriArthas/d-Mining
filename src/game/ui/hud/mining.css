@@ -1,5 +1,6 @@
 /* The mining overlay (MiningOverlay, docs/draft-ui-v2.md U3): the plate over the block being mined, damage numbers,
-   ore flying to the bag. Flat style A; it sits over the scene and under the HUD, and never takes a touch. */
+   ore flying to the bag, a sale's coins flying into the money counter. Flat style A; it sits over the scene and under
+   the HUD, and never takes a touch. */
 .mining-overlay { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; font-family: var(--ui-font); color: var(--ui-ink); }
 .game-shell:has(.session-ui:not([data-panel=none])) .mining-overlay { display: none; }
 
@@ -24,8 +25,6 @@
 .mine-plate[data-state=locked] .mine-plate-head { color: var(--ui-ink-soft); }
 .mine-plate[data-state=locked] .mine-plate-note { display: flex; color: var(--ui-red-lo); }
 .mine-plate[data-state=full] .mine-plate-note { display: flex; color: var(--ui-orange-lo); }
-/* A layer's cap under its recommended pickaxe: the health bar stays, the line under it says which pickaxe. */
-.mine-plate[data-under=true] .mine-plate-note { display: flex; color: var(--ui-orange-lo); }
 .mine-plate:is([data-state=locked], [data-state=full]) .mine-plate-bar { display: none; }
 /* The last blow: the plate swells and goes. */
 .mine-plate.mine-plate-on[data-state=broken] { opacity: 0; scale: 1.18; transition: opacity .25s ease, scale .25s ease; }
@@ -43,7 +42,19 @@
 }
 .mine-chip.mine-chip-in { opacity: 1; translate: 0 0; }
 
+/* A sale: the money it made over the miner's head, gold like the breaking blow's number, and the coins (the world's
+   currency icon) turning as they fly into the counter. */
+.sale-gain { position: absolute; left: 0; top: 0; display: flex; align-items: center; gap: 4px; opacity: 0; white-space: nowrap; }
+.sale-gain .ui-icon { width: 34px; height: 34px; }
+.sale-gain b { font: 900 34px/1 var(--ui-font); color: var(--ui-gold); -webkit-text-stroke: 6px var(--ui-ink); paint-order: stroke fill; }
+.sale-coin { position: absolute; left: 0; top: 0; width: 30px; height: 30px; opacity: 0; }
+.sale-coin .ui-icon { display: block; width: 100%; height: 100%; animation: sale-coin-turn var(--spin, .4s) linear infinite; }
+@keyframes sale-coin-turn { 50% { transform: scaleX(.3); } }
+
 @container game (min-width: 1000px) and (min-height: 620px) {
+  .sale-gain .ui-icon { width: 42px; height: 42px; }
+  .sale-gain b { font-size: 42px; }
+  .sale-coin { width: 38px; height: 38px; }
   .mine-plate { min-width: 150px; }
   .mine-plate-head { font-size: 16px; }
   .mine-plate-bar { height: 15px; }
@@ -53,4 +64,5 @@
 @media (prefers-reduced-motion: reduce) {
   .mine-shake { animation: none; }
   .mine-plate-lag, .mine-plate-hp, .mine-chip { transition: none; }
+  .sale-coin .ui-icon { animation: none; }
 }

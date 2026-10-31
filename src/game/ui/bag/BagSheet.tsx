@@ -200,23 +200,37 @@ function OresTab({ session, common, onClose }: Props & { common: Common }) {
       <span className="bag-sell-value" aria-label={tr('可卖 {coins} {currency}', { coins: sale ? number(sale.coins) : 0, currency: currencyName(state.currency) })}>{tr('可卖')}<Icon kind={currencyIcon(state.currency)} /><b className="ui-num">{sale ? number(sale.coins) : 0}</b></span>
       {state.inSellZone
         ? <UiButton size="s" tone="green" icon={currencyIcon(state.currency)} disabled={!sale?.count} onPress={() => { session.sellAvailable(); }}>{tr('全部出售')}</UiButton>
-        : <UiButton size="s" tone="green" icon={currencyIcon(state.currency)} disabled={!bag.used} onPress={() => { if (session.goTo('sale') === 'travelling') onClose(); }}>{tr('传送出售')}</UiButton>}
+        : <UiButton size="s" tone="green" icon={currencyIcon(state.currency)} disabled={!sale?.count} onPress={() => { if (session.goTo('sale') === 'travelling') onClose(); }}>{tr('传送出售')}</UiButton>}
     </div>
+    {/* Each mineral a ticket asks for, with its lock (the same as its cell's below): locked ones go into the store as
+        they are dug (and what the bag holds of them moves in), never sold; unlocking puts them back in the bag to sell.
+        Nothing is locked at first. */}
     {state.materials.length > 0 && <section className="bag-ticket" aria-label={tr('材料仓')}>
-      <header><Icon kind="portal" /><b>{tr('材料仓')}</b><span>{tr('{worlds}门票要用 · 挖到自动存入，不占背包、不会卖掉', { worlds: ticketWorlds.map(w => w.name).join(tr('、')) })}</span></header>
-      <div className="bag-ticket-items" role="list">{state.materials.map(m => <div key={m.itemId} role="listitem" className="bag-ticket-item" data-done={m.stored >= m.needed ? '' : undefined}
-        aria-label={`${m.name} ${m.stored} / ${m.needed}`}>
+      <header><Icon kind="portal" /><b>{tr('材料仓')}</b><span>{tr('{worlds}门票要用 · 锁定的不会卖掉，挖到存进这里，不占背包', { worlds: ticketWorlds.map(w => w.name).join(tr('、')) })}</span></header>
+      <div className="bag-ticket-items">{state.materials.map(m => <GameButton key={m.itemId} className="bag-ticket-item" data-done={m.stored >= m.needed ? '' : undefined}
+        aria-pressed={m.locked} aria-label={m.locked ? tr('{name} 已锁定 {stored}/{needed}，点一下解锁，存着的放回背包', { name: m.name, stored: m.stored, needed: m.needed })
+          : tr('{name} 没锁定，会卖掉，点一下锁定', { name: m.name })}
+        onPress={() => { if (m.locked) session.unlockItem(m.itemId); else session.lockItem(m.itemId); }}>
+        <Icon kind={m.locked ? 'lock' : 'unlock'} className="ui-icon bag-ticket-lock" />
         <OreIcon color={itemDefinition(m.itemId).color} className="bag-ticket-icon" /><span>{m.name}</span>
         <Bar value={m.stored} max={m.needed} size="s">{number(Math.min(m.stored, m.needed))}/{number(m.needed)}</Bar>
         {m.stored >= m.needed && <i className="ui-cell-check">✓</i>}
-      </div>)}</div>
+      </GameButton>)}</div>
     </section>}
-    {rows.length ? <div className="ui-grid bag-ores" role="list" aria-label={tr('矿物')}>{rows.map(row => <div key={row.id} role="listitem" className="ui-cell"
-      aria-label={tr('{name} {count} 个，单价 {price}', { name: row.item.name, count: row.count, price: row.item.price })}>
-      <span className="ui-cell-name ui-outline">{row.item.name}</span><OreIcon color={row.item.color} className="bag-ore-art" />
-      <span className="bag-ore-price"><Icon kind={currencyIcon(state.currency)} />{number(row.item.price)}</span>
-      <span className="ui-cell-stat ui-outline">×{number(row.count)}</span>
-    </div>)}</div> : <div className="bag-empty"><Icon kind="pickaxe" className="ui-icon bag-empty-art" /><b>{tr('背包是空的')}</b><span className="ui-hint">{tr('下矿井挖矿，矿石会自动装进来')}</span></div>}
+    {/* Every cell is a lock toggle (2026-10-31: any ore, rock too): a locked kind stays in the bag when it sells. */}
+    {rows.length > 0 && <small className="ui-hint bag-ores-hint">{tr('点矿物锁定，出售时留下')}</small>}
+    {rows.length ? <div className="ui-grid bag-ores" aria-label={tr('矿物')}>{rows.map(row => {
+      const locked = bag.locked.includes(row.id);
+      return <GameButton key={row.id} className="ui-cell" aria-pressed={locked}
+        aria-label={locked ? tr('{name} {count} 个，已锁定，出售时留下；点一下解锁', { name: row.item.name, count: row.count })
+          : tr('{name} {count} 个，单价 {price}；点一下锁定', { name: row.item.name, count: row.count, price: row.item.price })}
+        onPress={() => { if (locked) session.unlockItem(row.id); else session.lockItem(row.id); }}>
+        <span className="ui-cell-name ui-outline">{row.item.name}</span><OreIcon color={row.item.color} className="bag-ore-art" />
+        <Icon kind={locked ? 'lock' : 'unlock'} className="ui-icon bag-ore-lock" />
+        <span className="bag-ore-price"><Icon kind={currencyIcon(state.currency)} />{number(row.item.price)}</span>
+        <span className="ui-cell-stat ui-outline">×{number(row.count)}</span>
+      </GameButton>;
+    })}</div> : <div className="bag-empty"><Icon kind="pickaxe" className="ui-icon bag-empty-art" /><b>{tr('背包是空的')}</b><span className="ui-hint">{tr('下矿井挖矿，矿石会自动装进来')}</span></div>}
   </Sheet>;
 }
 

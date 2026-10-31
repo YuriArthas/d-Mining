@@ -1,7 +1,9 @@
-import { useEffect, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react';
 import type { GameSession } from '../../application/GameSession.ts';
 import { selectDepthGoal } from '../../application/Tips.ts';
 import { formatNumber as number } from '../../presentation/formatNumber.ts';
+import { uiTimeScale } from '../../presentation/MiningOverlay.ts';
+import { SALE_FLIGHT } from '../../presentation/saleFlight.ts';
 import { CountUp, Pill, Tile, UiButton } from '../kit/controls.tsx';
 import { Icon } from '../kit/icons.tsx';
 import { teamCanImprove } from '../bag/BagSheet.tsx';
@@ -44,13 +46,19 @@ export function Hud({ session, actions, system, prompts, tipHidden = false }: {
   const { speed, luck, sell } = state.rewards.timed;
   // HUD tips name a control on screen; the first-dig tip is drawn in the world instead.
   const tip = !tipHidden && state.tip && state.tip.anchor !== 'mine' && state.tip.anchor !== 'dig' ? state.tip : null;
-  const showSell = bag.used > 0 && !state.inSellZone;
+  // Something to sell: locked ore stays in the bag and does not count.
+  const showSell = state.sale.status === 'quoted' && state.sale.count > 0 && !state.inSellZone;
+  // A sale's money rolls in as its coins land in the counter (MiningOverlay), not the moment it is made.
+  const soldAt = useRef(-Infinity);
+  useEffect(() => session.onFeedback(event => { if (event.type === 'sold') soldAt.current = performance.now(); }), [session]);
+  const selling = performance.now() - soldAt.current < 250;
   return <div className="ui-hud" data-location={state.location ?? 'surface'} data-tip={tip?.id}>
     <section className="hud-left" aria-label={tr('资源')}>
       <div className="hud-wallet">
         <Pill icon={currencyIcon(state.currency)} className="hud-coins">
           {/* Keyed by currency: a new world's money appears at once instead of rolling from the last world's. */}
-          <span data-testid="coins" aria-label={`${currencyName(state.currency)} ${number(state.coins)}`}><CountUp key={state.currency} value={state.coins} format={number} /></span>
+          <span data-testid="coins" aria-label={`${currencyName(state.currency)} ${number(state.coins)}`}><CountUp key={state.currency} value={state.coins} format={number}
+            {...selling && { delay: SALE_FLIGHT.first * uiTimeScale(), ms: SALE_FLIGHT.stream * uiTimeScale() }} /></span>
           {state.rebirth.multiplier > 1 && <b className="hud-coin-mult" aria-label={tr('重生卖矿收入 ×{multiplier}', { multiplier: state.rebirth.multiplier })}>×{state.rebirth.multiplier}</b>}
         </Pill>
         <Pill icon="backpack" className="hud-bag" meter={bag.capacity > 0 ? bag.used / bag.capacity : 0} state={bag.isFull ? 'full' : undefined}

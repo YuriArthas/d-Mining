@@ -30,7 +30,7 @@ function useToast() {
 
 /** The world portal (docs/draft-ui-v2.md, U7): the three worlds side by side, each with its place name and the
  *  currency it pays in. Open worlds travel; the next world carries its ticket right on its card (the pickaxe level,
- *  minerals from earlier worlds kept in the material store, and the previous world's money) and unlocks there, with
+ *  minerals from earlier worlds, locked into the material store or still in the bag, and the previous world's money) and unlocks there, with
  *  one confirmation since it spends; worlds beyond it stay ???. */
 export function PortalSheet({ session, onClose }: { session: GameSession; onClose(): void }) {
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot);
@@ -71,7 +71,7 @@ export function PortalSheet({ session, onClose }: { session: GameSession; onClos
               <Need icon={<Icon kind={currencyIcon(ticket.currency)} />} label={currencyName(ticket.currency)} have={world.ticketBalance} need={ticket.price}
                 text={`${number(Math.min(world.ticketBalance, ticket.price))}/${number(ticket.price)}`} />
             </ul>
-            {!confirm && <small className="portal-note">{tr('（矿物挖到后自动进材料仓）')}</small>}
+            {!confirm && <small className="portal-note">{tr('（在背包的材料仓里锁定，挖到就存起来）')}</small>}
             {confirm
               ? <div className="portal-confirm"><span>{tr('扣除上面的矿物和 {price} {unit}？', { price: number(ticket.price), unit: currencyName(ticket.currency) })}</span>
                 <UiButton size="s" tone="white" onPress={() => setConfirm(false)}>{tr('取消')}</UiButton><UiButton size="s" tone="orange" disabled={!ready} onPress={unlock}>{tr('确认解锁')}</UiButton></div>

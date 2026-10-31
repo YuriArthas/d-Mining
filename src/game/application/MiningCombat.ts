@@ -5,8 +5,7 @@ type CombatPorts<Target> = {
   isFull(): boolean;
   stats(): { power: number; speed: number };
   level?(): number;
-  /** `damageScale`: what share of a hit's damage the block takes (a cap under its recommended pickaxe: less). */
-  read(target: Target): { key: string; maximum: number; requiredLevel?: number; damageScale?: number } | null;
+  read(target: Target): { key: string; maximum: number; requiredLevel?: number } | null;
   pending(target: Target): boolean;
   destroy(target: Target): boolean;
 };
@@ -22,7 +21,7 @@ export class MiningCombat<Target> {
     if ((block.requiredLevel ?? 0) > (this.ports.level?.() ?? 1)) return { status: 'locked', requiredLevel: block.requiredLevel! };
     if (this.ports.pending(target)) return { status: 'pending' };
     if (!this.cooldown.ready(now)) return { status: 'cooldown' };
-    const { speed } = this.ports.stats(), power = Math.max(1, Math.floor(this.ports.stats().power * (block.damageScale ?? 1)));
+    const { power, speed } = this.ports.stats();
     const hp = this.health.get(block.key, block.maximum);
     // Queue rejection must not consume a final hit. A cancelled zero-HP cell
     // keeps its damage and can be resubmitted, without granting a second hit/reward.

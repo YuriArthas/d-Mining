@@ -34,22 +34,26 @@ export function PriceButton({ verb, price, currency, tone = 'green', size = 'm',
   </GameButton>;
 }
 
-/** A number that rolls to its new value instead of jumping (coins, counts). */
-export function CountUp({ value, format = String, ms = 450 }: { value: number; format?(value: number): string; ms?: number }) {
+/** A number that rolls to its new value instead of jumping (coins, counts), over `ms` after holding the old value for
+ *  `delay` (a sale's coins land first). The roll keeps the timing in force when the value changed. */
+export function CountUp({ value, format = String, ms = 450, delay = 0 }: { value: number; format?(value: number): string; ms?: number; delay?: number }) {
   const [shown, setShown] = useState(value);
   const from = useRef(value);
   useEffect(() => {
-    const start = performance.now(), a = from.current, reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const a = from.current, reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce || a === value) { from.current = value; setShown(value); return; }
-    let frame = 0;
+    // The clock starts with the next frame, as the page's animations (the coins) do: a long frame after a trip
+    // delays both alike.
+    let frame = 0, start = -1;
     const step = (now: number) => {
-      const t = Math.min(1, (now - start) / ms), v = a + (value - a) * (1 - (1 - t) ** 3);
+      if (start < 0) start = now + delay;
+      const t = Math.max(0, Math.min(1, (now - start) / ms)), v = a + (value - a) * (1 - (1 - t) ** 3);
       from.current = v; setShown(t < 1 ? Math.round(v) : value);
       if (t < 1) frame = requestAnimationFrame(step);
     };
     frame = requestAnimationFrame(step);
     return () => cancelAnimationFrame(frame);
-  }, [value, ms]);
+  }, [value]);
   return <>{format(shown)}</>;
 }
 

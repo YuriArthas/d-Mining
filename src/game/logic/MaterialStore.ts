@@ -3,7 +3,8 @@ import { integer } from './numbers.ts';
 import type { ItemBatch } from './Inventory.ts';
 export type MaterialStoreData = { version: 1; items: Record<string, number> };
 /** 材料仓: the minerals the world tickets ask for, kept apart from the bag (they take no space and are never sold)
- *  until a ticket is paid. Ore comes in only while a ticket still lacks it; the rest goes to the bag. */
+ *  until a ticket is paid. Only the ones the player locked in the bag come in (2026-10-31: early on they are worth
+ *  selling), and only while a ticket still lacks them; the rest goes to the bag. A full one stays until paid. */
 export class MaterialStore {
   private items = new Map<string, number>();
   constructor(items: Readonly<Record<string, number>> = {}) {
@@ -16,7 +17,11 @@ export class MaterialStore {
   }
   exportData(): MaterialStoreData { return { version: 1, items: Object.fromEntries(this.items) }; }
   count(id: string) { return this.items.get(id) ?? 0; }
-  /** Splits a batch: up to `wanted(id)` more of each mineral goes into the store, the rest is returned for the bag. */
+  /** What is stored, by mineral. */
+  kinds() { return [...this.items.keys()]; }
+  /** Gives back everything stored of a mineral (unlocked: back to the bag). */
+  release(id: string) { const released = this.count(id); this.items.delete(id); return released; }
+  /** Splits a batch: up to `wanted(id)` in all of each mineral goes into the store, the rest is returned for the bag. */
   take(batch: ItemBatch, wanted: (id: string) => number) {
     const stored: { itemId: string; count: number }[] = [], rest: { itemId: string; count: number }[] = [];
     for (const { itemId, count } of batch) {
@@ -26,11 +31,13 @@ export class MaterialStore {
     }
     return { stored, rest };
   }
-  /** Pays a ticket's minerals: all of them, or nothing when one falls short. */
+  /** Pays as much of a ticket's minerals as the store holds; returns what is left to pay (from the bag). */
   pay(materials: ItemBatch) {
-    if (materials.some(m => this.count(m.itemId) < m.count)) return false;
-    for (const { itemId, count } of materials) { const left = this.count(itemId) - count; if (left) this.items.set(itemId, left); else this.items.delete(itemId); }
-    return true;
+    return materials.map(({ itemId, count }) => {
+      const paid = Math.min(count, this.count(itemId)), left = this.count(itemId) - paid;
+      if (left) this.items.set(itemId, left); else this.items.delete(itemId);
+      return { itemId, count: count - paid };
+    }).filter(m => m.count > 0);
   }
   /** Rebirth: the store empties with the worlds. */
   clear() { this.items.clear(); }

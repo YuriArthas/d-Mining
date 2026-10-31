@@ -26,7 +26,7 @@ import { Mining } from "./Mining.ts";
 import { quoteSale, sellItems } from "./Sale.ts";
 import { Pickaxe, pickaxeStats } from "../logic/Pickaxe.ts";
 import { MiningCombat } from "./MiningCombat.ts";
-import { oreDrops, oreDefinition, itemDefinition, itemVolume, itemPrice } from "./items.ts";
+import { oreDrops, oreDefinition, itemDefinition, itemVolume, itemPrice, ORE_ITEMS } from "./items.ts";
 import type { Coord } from "../terrain/SparseWorld.ts";
 import { tr } from '../i18n/i18n.ts';
 type WorldCommands = {
@@ -40,6 +40,7 @@ type WorldCommands = {
   /** Teleport; `lookAt` turns the camera toward what the player came to use. */
   travelTo?(feet: Coord, lookAt?: Coord): void;
 };
+const knownItem = (itemId: string) => ORE_ITEMS.some(item => item.itemId === itemId);
 export type SessionFeedback =
   | Readonly<{ type: 'sold'; coins: number; count: number }>
   | Readonly<{ type: 'purchased' }>
@@ -227,9 +228,6 @@ export class GameSession {
     price: number;
     requiredLevel: number;
     locked: boolean;
-    /** A layer's cap below its recommended pickaxe (`recommendedLevel`): mined at a fraction of the damage. */
-    recommendedLevel: number;
-    underLevel: boolean;
   }> | null = null;
   private lastHit = 0;
   private clock: () => number;
@@ -256,6 +254,8 @@ export class GameSession {
     this.wallet = data ? Wallet.fromData(data.wallet) : new Wallet({ gold: content.initialCoins });
     this.pickaxe = data ? Pickaxe.fromData(data.pickaxe) : new Pickaxe();
     this.inventory = data ? Inventory.fromData(data.inventory, itemVolume) : new Inventory(capacity, itemVolume);
+    // A save from before the locks: what the store was still gathering stays locked, so it goes on being kept.
+    for (const id of this.materials.kinds()) if (this.materials.count(id) < this.ticketNeed(id)) this.inventory.setLocked(id, true);
     this.equipment = new EquipmentCollection(this.pickaxe.getSnapshot().level,this.inventory.capacity,data?.equipment);
     { const worn=this.pickaxe.getSnapshot();
       if(worn.enhance&&(worn.level!==this.equipment.toolLevel||worn.enhance!==this.equipment.enhance))throw Error('镐子强化与已购记录不一致'); }
@@ -298,9 +298,9 @@ export class GameSession {
       detector: new ZoneDetector(p.zone),
     }));
     this.clock = clock;
-    // Ore a ticket still lacks goes to the material store; the rest to the bag.
+    // Locked ore a ticket still lacks goes to the material store; the rest to the bag.
     this.mining = new Mining(
-      { isFull: () => this.bagFull(), add: batch => { const { stored, rest } = this.materials.take(batch, id => this.ticketNeed(id)); this.inventory.add(rest); this.stored = stored; } },
+      { isFull: () => this.bagFull(), add: batch => { const { stored, rest } = this.materials.take(batch, id => this.storeWants(id)); this.inventory.add(rest); this.stored = stored; this.storeFilled(stored); } },
       (targets) => this.world?.mine(targets) ?? false,
       oreDrops,
     );
@@ -310,10 +310,9 @@ export class GameSession {
       level: () => this.pickaxe.getSnapshot().level,
       read: (cell) => {
         const kind = this.mineableKind(cell);
-        if (!kind) return null;
-        // A layer's cap under its recommended pickaxe takes only part of each hit (a soft gate, economy.json capPenalty).
-        const block = oreDefinition(kind), under = this.pickaxe.getSnapshot().level < block.recommendedLevel;
-        return { key: cell.join(","), maximum: block.maxHp, requiredLevel: block.requiredLevel, damageScale: under ? ECONOMY.capPenalty : 1 };
+        return kind
+          ? { key: cell.join(","), maximum: oreDefinition(kind).maxHp, requiredLevel: oreDefinition(kind).requiredLevel }
+          : null;
       },
       pending: (cell) => this.world?.pending(cell) ?? false,
       destroy: (cell) => this.world?.mine([cell]) ?? false,
@@ -379,8 +378,9 @@ export class GameSession {
       // Worlds past the next one to unlock stay unknown: no name, no price (the portal shows ???).
       worlds:WORLD_REQUIREMENTS.map(w=>({...w,open:this.worldProgress.isOpen(w.id),known:this.worldProgress.isOpen(w.id)||this.worldProgress.unlockable(w.id),
         ticketBalance:w.ticket?this.wallet.getBalance(w.ticket.currency):0,toolLevel:this.equipment.toolLevel,
-        materials:w.materials.map(m=>({...m,name:itemDefinition(m.itemId).name,owned:this.materials.count(m.itemId)}))})),
-      /** 材料仓: what the tickets of the worlds not open yet ask for, and how much of it is stored. */
+        // The ticket takes the store's first, then the bag's (a mineral not locked but still in the bag counts too).
+        materials:w.materials.map(m=>({...m,name:itemDefinition(m.itemId).name,owned:this.materials.count(m.itemId)+(bag.items[m.itemId]??0)}))})),
+      /** 材料仓: what the tickets of the worlds not open yet ask for, how much of it is stored, and which are locked. */
       materials:this.storeView(),
       onboarding: this.onboarding.getSnapshot(), tip,
       // The first-dig tip points across the map at the mine until the player gets there.
@@ -400,7 +400,8 @@ export class GameSession {
       coins: this.wallet.getBalance(this.currency),
       balances: this.wallet.getBalances(),
       saleMultiplier: this.saleMultiplier(),
-      sale: quoteSale(bag.items, itemPrice, this.saleMultiplier()),
+      /** What the bag sells for: every kind but the locked ones. */
+      sale: quoteSale(this.inventory.sellable(), itemPrice, this.saleMultiplier()),
       inSellZone: this.inSellZone,
       atHome: this.atHome,
       /** Standing on the current world's teleport station pad. */
@@ -468,9 +469,8 @@ export class GameSession {
       this.targetView = null;
       return true;
     }
-    const level = this.pickaxe.getSnapshot().level, requiredLevel = item.requiredLevel ?? 0, locked = level < requiredLevel;
-    const recommendedLevel = item.recommendedLevel ?? 0, underLevel = !locked && level < recommendedLevel;
-    if (this.targetView?.key === key && this.targetView.hp === hp && this.targetView.locked === locked && this.targetView.underLevel === underLevel) return false;
+    const requiredLevel = item.requiredLevel ?? 0, locked = this.pickaxe.getSnapshot().level < requiredLevel;
+    if (this.targetView?.key === key && this.targetView.hp === hp && this.targetView.locked === locked) return false;
     this.targetView = Object.freeze({
       key,
       name: item.name,
@@ -478,7 +478,7 @@ export class GameSession {
       maximum: item.maxHp,
       volume: item.volume,
       price: item.price,
-      requiredLevel, locked, recommendedLevel, underLevel,
+      requiredLevel, locked,
     });
     return true;
   }
@@ -631,8 +631,35 @@ export class GameSession {
     const closed=WORLD_REQUIREMENTS.filter(w=>!this.worldProgress.isOpen(w.id));
     const ids=[...new Set(closed.flatMap(w=>w.materials.map(m=>m.itemId)))]
       .filter(id=>this.materials.count(id)>0||closed.some(w=>this.worldProgress.unlockable(w.id)&&w.materials.some(m=>m.itemId===id)));
-    return ids.map(itemId=>({itemId,name:itemDefinition(itemId).name,stored:this.materials.count(itemId),needed:this.ticketNeed(itemId)}));
+    return ids.map(itemId=>({itemId,name:itemDefinition(itemId).name,stored:this.materials.count(itemId),needed:this.ticketNeed(itemId),locked:this.inventory.isLocked(itemId)}));
   }
+  /** How many more of a mineral the store takes: what the tickets lack, once the player locked it. */
+  private storeWants(itemId: string) { return this.inventory.isLocked(itemId)?this.ticketNeed(itemId):0; }
+  /** A mineral whose store this just filled unlocks: the tickets have all of it, so more of it sells like any ore
+   *  (kept locked, it would pile up in the bag, and unlocking it would give back the store's). */
+  private storeFilled(stored: readonly { itemId: string }[]) {
+    for (const { itemId } of stored) if (this.materials.count(itemId) >= this.ticketNeed(itemId)) this.inventory.setLocked(itemId, false);
+  }
+  /** Locks a kind of ore (2026-10-31: any kind, rock too): a sale leaves it in the bag. A mineral a ticket still lacks
+   *  goes into the material store instead (what the bag holds of it at once, and every one dug from now on), where it
+   *  takes no space, until the store has all the tickets need; then it unlocks by itself. */
+  lockItem = (itemId: string) => {
+    if(this.suspended||!knownItem(itemId))return {status:'unavailable'} as const;
+    this.inventory.setLocked(itemId,true);
+    const held=this.inventory.getSnapshot().items[itemId]??0;
+    const {stored}=held?this.materials.take([{itemId,count:held}],id=>this.storeWants(id)):{stored:[]};
+    if(stored.length&&!this.inventory.remove(stored))throw Error('背包矿物发生变化');
+    this.storeFilled(stored);
+    this.committed(true);this.publish();return {status:'locked',stored:stored[0]?.count??0} as const;
+  };
+  /** Unlocks a kind: the next sale sells it, what the material store kept of it back in the bag first. */
+  unlockItem = (itemId: string) => {
+    if(this.suspended||!this.inventory.isLocked(itemId))return {status:'unavailable'} as const;
+    this.inventory.setLocked(itemId,false);
+    const released=this.materials.release(itemId);
+    if(released)this.inventory.add([{itemId,count:released}]);
+    this.committed(true);this.publish();return {status:'unlocked',released} as const;
+  };
   // Called once, after terrain has actually removed these cells. Never checks isFull.
   collected = (resources: readonly { kind: number; cell?: Coord }[]) => {
     const wasFull=this.inventory.isFull();
@@ -807,14 +834,7 @@ export class GameSession {
     this.inSellZone = this.zones.some((zone) => zone.isInside);
     if (entered) {
       this.world?.cancelMining();
-      const result = this.executeSale();
-      if (result.status === 'sold') { this.onboarding.record('soldOnce'); this.committed(true); this.feedback({ type: 'sold', coins: result.coins, count: result.count }); }
-      this.notice =
-        result.status === "sold"
-          ? tr('出售 {count} 件，获得 {coins} {currency}', { count: result.count, coins: result.coins, currency: currencyName(this.currency) })
-          : result.status === "empty"
-            ? tr('没有可出售的矿物')
-            : tr('货币数值超出范围');
+      this.executeSale();
     }
     if (changed) this.publish();
   }
@@ -903,6 +923,7 @@ export class GameSession {
     this.world?.cancelMining();
     this.wallet.clear();
     this.inventory.remove(Object.entries(this.inventory.getSnapshot().items).map(([itemId,count])=>({itemId,count})));
+    for(const id of this.inventory.getSnapshot().locked)this.inventory.setLocked(id,false);
     const starter=ECONOMY.bags[0].capacity;
     this.inventory.setCapacity(starter);this.equipment.backpackCapacity=starter;
     this.pickaxe.setLevel(1);this.equipment.toolLevel=1;this.equipment.enhance=0;
@@ -960,14 +981,18 @@ export class GameSession {
     this.world?.travelTo?.(worldSpawn(1));this.resetPosition();
     this.refreshTarget();this.committed(true);this.publish();
   };
-  /** Sells the whole bag (ticket minerals wait in the material store, never in the bag). */
+  /** Sells the whole bag (ticket minerals wait in the material store, never in the bag), stepping into the sell ring
+   *  or with 全部出售 standing in it: the same save, coins flying into the counter and notice either way. */
   private executeSale() {
-    return sellItems(this.inventory,this.till(),itemPrice,this.inventory.getSnapshot().items,this.saleMultiplier());
+    const result=sellItems(this.inventory,this.till(),itemPrice,this.inventory.sellable(),this.saleMultiplier());
+    if(result.status==='sold'){this.onboarding.record('soldOnce');this.committed(true);this.feedback({ type: 'sold', coins: result.coins, count: result.count });}
+    this.notice=result.status==='sold'?tr('出售 {count} 件，获得 {coins} {currency}', { count: result.count, coins: result.coins, currency: currencyName(this.currency) })
+      :result.status==='empty'?(this.inventory.getSnapshot().totalCount?tr('锁定的矿物不会卖掉'):tr('没有可出售的矿物')):tr('货币数值超出范围');
+    return result;
   }
   sellAvailable = () => {
     if(this.suspended||!this.inSellZone)return {status:'unavailable'} as const;
     const result=this.executeSale();
-    if(result.status==='sold'){this.onboarding.record('soldOnce');this.committed(true);this.notice=tr('出售 {count} 件，获得 {coins} {currency}', { count: result.count, coins: result.coins, currency: currencyName(this.currency) });}else this.notice=result.status==='empty'?tr('没有可出售的矿物'):tr('货币数值超出范围');
     this.publish();return result;
   };
   /** Pays a world's price at a portal and opens it for good. */
@@ -978,10 +1003,12 @@ export class GameSession {
     if(!this.atPortal)return {status:'away'} as const;
     const requirement=worldRequirement(id),ticket=requirement.ticket!;
     if(this.equipment.toolLevel<ticket.toolLevel)return {status:'insufficient-level'} as const;
-    if(requirement.materials.some(m=>this.materials.count(m.itemId)<m.count))return {status:'insufficient-materials'} as const;
+    const bag=this.inventory.getSnapshot().items;
+    if(requirement.materials.some(m=>this.materials.count(m.itemId)+(bag[m.itemId]??0)<m.count))return {status:'insufficient-materials'} as const;
     if(this.wallet.getBalance(ticket.currency)<ticket.price)return {status:'insufficient-coins'} as const;
-    // All checks precede this synchronous transfer: the minerals come out of the material store.
-    if(!this.materials.pay(requirement.materials))throw Error('缴纳矿产发生变化');
+    // All checks precede this synchronous transfer: the minerals come out of the material store, the rest the bag.
+    const rest=this.materials.pay(requirement.materials);
+    if(rest.length&&!this.inventory.remove(rest))throw Error('缴纳矿产发生变化');
     if(!this.wallet.debit(ticket.currency,ticket.price))throw Error('缴纳货币发生变化');
     this.worldProgress.unlock(id);
     this.notice=tr('{name}已开放，可以传送过去了！', { name: requirement.name });

@@ -2,6 +2,7 @@
  *  so the game ships no audio files. Recipes only schedule nodes on a BaseAudioContext, which lets
  *  tests and offline renders reuse them. Levels are per cue; the bus adds a gentle compressor. */
 import { hiss, makeNoise, tone, vary, type Voice } from './synth.ts';
+import { SALE_FLIGHT, saleLanding } from '../presentation/saleFlight.ts';
 
 export type HitMaterial = 'rock' | 'ore' | 'gem';
 export type SfxCue =
@@ -70,13 +71,21 @@ function pickup(v: Voice, tier: number) {
   if (tier >= 2) sparkle(v, 0.1, 3, 0.045);
 }
 
+/** The till's ring as the bag empties, then a light clink for each coin that lands in the counter, climbing a
+ *  little in pitch (saleFlight.ts: the coins' timetable). */
 function sell(v: Voice) {
   hiss(v, { filter: 'bandpass', from: 2600, q: 1.5, peak: 0.24, attack: 0.001, decay: 0.03 });
   tone(v, { wave: 'square', from: 1047, peak: 0.06, attack: 0.002, decay: 0.06 });
   tone(v, { wave: 'triangle', from: 1568, peak: 0.16, decay: 0.5, start: 0.06 });
   tone(v, { wave: 'triangle', from: 2093, peak: 0.1, decay: 0.45, start: 0.06 });
   for (let i = 0; i < 8; i++) tone(v, { from: 2600 + v.random() * 1800, peak: 0.03 + v.random() * 0.03, attack: 0.001, decay: 0.06 + v.random() * 0.04, start: 0.08 + v.random() * 0.3 });
+  for (let i = 0; i < CLINKS; i++) {
+    const at = saleLanding(i, CLINKS) / 1000, d = vary(v, 0.03), up = 1 + i * 0.025;
+    tone(v, { from: 2350 * up * d, peak: 0.07, attack: 0.001, decay: 0.07, start: at });
+    tone(v, { from: 3520 * up * d, peak: 0.035, attack: 0.001, decay: 0.05, start: at });
+  }
 }
+const CLINKS = 8;
 
 function hatch(v: Voice, tier: number, auto?: boolean) {
   if (auto) {
@@ -196,5 +205,5 @@ export function playCue(v: Voice, cue: SfxCue) {
 
 /** Seconds a cue keeps sounding after it starts (for tests and offline renders). */
 export const CUE_LENGTH: Readonly<Record<CueType, number>> = {
-  hit: 0.4, break: 0.5, pickup: 0.5, sell: 0.65, jump: 0.25, land: 0.2, ui: 0.08, purchase: 0.45, reward: 0.7, hatch: 1.7, unlock: 1.05, travel: 0.6, denied: 0.25, step: 0.2,
+  hit: 0.4, break: 0.5, pickup: 0.5, sell: (SALE_FLIGHT.first + SALE_FLIGHT.stream) / 1000 + 0.1, jump: 0.25, land: 0.2, ui: 0.08, purchase: 0.45, reward: 0.7, hatch: 1.7, unlock: 1.05, travel: 0.6, denied: 0.25, step: 0.2,
 };

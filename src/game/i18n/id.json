@@ -11,7 +11,6 @@
  "{goldenNeed} 只{name}合成了金色{name2}！": "{goldenNeed} {name} jadi {name2} Emas!",
  "{kicker}，{name}，深度 {metres} 米": "{kicker}, {name}, kedalaman {metres} m",
  "{kicker}，{title}，地表": "{kicker}, {title}, permukaan",
- "{name} {count} 个，单价 {price}": "{name} ×{count}, {price}/buah",
  "{name} 替换了 {name2}": "{name} menggantikan {name2}",
  "{name}已开放，可以传送过去了！": "{name} sudah buka — bisa teleport ke sana!",
  "{name}已经拥有，换成了{unit}": "Sudah punya {name}, jadi dapat {unit}",
@@ -27,7 +26,7 @@
  "{title}分类": "Kategori {title}",
  "{unit}已到账": "{unit} diterima",
  "{unit}已达上限，这次没扣幸运币": "{unit} sudah maksimal — Koin Hoki tidak terpakai",
- "{worlds}门票要用 · 挖到自动存入，不占背包、不会卖掉": "Untuk tiket {worlds} · Tersimpan otomatis, tidak makan tempat tas, tidak terjual",
+ "{worlds}门票要用 · 锁定的不会卖掉，挖到存进这里，不占背包": "Untuk tiket {worlds} · Yang dikunci tidak terjual dan tersimpan di sini saat digali, tidak makan tempat tas",
  "{world}传送站": "Teleporter {world}",
  "{world}矿场": "Tambang {world}",
  "↑ 比队伍强": "↑ Lebih kuat",
@@ -255,7 +254,6 @@
  "幸运币": "Koin Hoki",
  "幸运币在地表扭蛋机抽奖：货币、加速、永久挖矿加速、双倍出售……": "Pakai Koin Hoki di mesin kapsul permukaan: uang, boost kecepatan, boost gali permanen, jual ganda…",
  "幸运扭蛋机": "Mesin Kapsul Hoki",
- "建议 Lv.{level} 镐子": "Disarankan beliung Lv.{level}",
  "开到最大档，矿石也能打发。": "Di kecepatan penuh, bijih pun bisa jadi krim.",
  "开放的世界和地下层": "Dunia & lapisan terbuka",
  "开蛋": "Tetas",
@@ -765,5 +763,11 @@
  "齿轮蛋": "Telur Gir",
  "龙蛋": "Telur Naga",
  "龙骨镰": "Sabit Tulang Naga",
- "（矿物挖到后自动进材料仓）": "(bijih masuk Gudang Bahan saat digali)"
+ "（在背包的材料仓里锁定，挖到就存起来）": "(kunci di Gudang Bahan pada tas, maka tersimpan saat digali)",
+ "{name} 已锁定 {stored}/{needed}，点一下解锁，存着的放回背包": "{name} dikunci {stored}/{needed}; ketuk untuk membuka dan kembalikan yang tersimpan ke tas",
+ "{name} 没锁定，会卖掉，点一下锁定": "{name} tidak dikunci, akan terjual; ketuk untuk mengunci",
+ "锁定的矿物不会卖掉": "Bijih yang dikunci tidak dijual",
+ "点矿物锁定，出售时留下": "Ketuk bijih untuk menguncinya agar tidak ikut terjual",
+ "{name} {count} 个，已锁定，出售时留下；点一下解锁": "{name} ×{count}, dikunci, tidak ikut terjual; ketuk untuk membuka",
+ "{name} {count} 个，单价 {price}；点一下锁定": "{name} ×{count}, {price} per buah; ketuk untuk mengunci"
 }

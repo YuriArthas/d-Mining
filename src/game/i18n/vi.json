@@ -11,7 +11,6 @@
  "{goldenNeed} 只{name}合成了金色{name2}！": "{goldenNeed} {name} đã ghép thành {name2} Vàng!",
  "{kicker}，{name}，深度 {metres} 米": "{kicker}, {name}, độ sâu {metres} m",
  "{kicker}，{title}，地表": "{kicker}, {title}, mặt đất",
- "{name} {count} 个，单价 {price}": "{name} ×{count}, {price} mỗi cái",
  "{name} 替换了 {name2}": "{name} đã thay {name2}",
  "{name}已开放，可以传送过去了！": "{name} đã mở — giờ có thể dịch chuyển tới!",
  "{name}已经拥有，换成了{unit}": "Đã có {name}, nên nhận {unit} thay thế",
@@ -27,7 +26,7 @@
  "{title}分类": "Danh mục {title}",
  "{unit}已到账": "Đã nhận {unit}",
  "{unit}已达上限，这次没扣幸运币": "{unit} đã đạt tối đa — không trừ Xu May Mắn",
- "{worlds}门票要用 · 挖到自动存入，不占背包、不会卖掉": "Dùng làm vé {worlds} · Tự cất khi đào, không chiếm ba lô, không bị bán",
+ "{worlds}门票要用 · 锁定的不会卖掉，挖到存进这里，不占背包": "Dùng làm vé {worlds} · Quặng đã khóa không bị bán, đào được sẽ cất vào đây, không chiếm ba lô",
  "{world}传送站": "Trạm dịch chuyển {world}",
  "{world}矿场": "Mỏ {world}",
  "↑ 比队伍强": "↑ Mạnh hơn",
@@ -255,7 +254,6 @@
  "幸运币": "Xu May Mắn",
  "幸运币在地表扭蛋机抽奖：货币、加速、永久挖矿加速、双倍出售……": "Dùng Xu May Mắn ở máy Gacha trên mặt đất: tiền, tăng tốc, tăng tốc đào vĩnh viễn, bán ×2…",
  "幸运扭蛋机": "Máy Gacha May Mắn",
- "建议 Lv.{level} 镐子": "Nên dùng cuốc Lv.{level}",
  "开到最大档，矿石也能打发。": "Bật số max, đánh quặng bông như kem.",
  "开放的世界和地下层": "Thế giới và tầng đã mở",
  "开蛋": "Ấp",
@@ -765,5 +763,11 @@
  "齿轮蛋": "Trứng Bánh Răng",
  "龙蛋": "Trứng Rồng",
  "龙骨镰": "Lưỡi Hái Cốt Rồng",
- "（矿物挖到后自动进材料仓）": "(quặng đào được sẽ tự vào Kho nguyên liệu)"
+ "（在背包的材料仓里锁定，挖到就存起来）": "(khóa trong Kho nguyên liệu ở ba lô, đào được sẽ được cất lại)",
+ "{name} 已锁定 {stored}/{needed}，点一下解锁，存着的放回背包": "{name} đã khóa {stored}/{needed}; chạm để mở khóa và trả số đã cất về ba lô",
+ "{name} 没锁定，会卖掉，点一下锁定": "{name} chưa khóa, sẽ bị bán; chạm để khóa",
+ "锁定的矿物不会卖掉": "Quặng đã khóa sẽ không bị bán",
+ "点矿物锁定，出售时留下": "Chạm vào quặng để khóa, khi bán sẽ được giữ lại",
+ "{name} {count} 个，已锁定，出售时留下；点一下解锁": "{name} ×{count}, đã khóa, giữ lại khi bán; chạm để mở khóa",
+ "{name} {count} 个，单价 {price}；点一下锁定": "{name} ×{count}, {price} mỗi viên; chạm để khóa"
 }

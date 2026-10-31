@@ -35,17 +35,20 @@ const gate=(i:number)=>GATES[world(i)][local(i)];
 const DEPTHS=[[0,60,140,260,420,620,860],[0,400,800,1200,1600,2000,2400],[0,400,800,1200,1600,2000,2400]];
 // Each layer's way down ends in a cap over the next hall's ceiling (2026-10-29: the first layer was dug through in
 // half a minute with the first pickaxe; the old dense 30 % lay mostly inside the hall below): CAP_CELLS of hard
-// rock across the layer, the next layer's pickaxe recommended. With it a cap takes CAP_SECONDS; below it every hit
-// does CAP_PENALTY of its damage (a soft gate: world 1's first cap then takes about 12 minutes with the first pickaxe).
-const CAP_CELLS=8, CAP_SECONDS=200, CAP_PENALTY=.5;
+// rock across the layer. Any pickaxe digs it, at its own damage (2026-10-31: the levels gate only the ores). It was
+// timed on a one-block shaft; a player digs down a hole of HOLE columns (2×2), four times the blocks, and
+// ten minutes in had not got through world 1's first cap. Now that hole through a cap takes CAP_SECONDS with the
+// pickaxe a player carries down (the next layer's, for its ores).
+const CAP_CELLS=8, CAP_SECONDS=200, HOLE=4;
 /** Metres from a layer's top to the ceiling of the hall under it (the halls' rooms, in the game's content). */
 const hallCeiling=(i:number)=>DEPTHS[world(i)][local(i)+1]-DEPTHS[world(i)][local(i)]-GAME_CONTENT.worlds[world(i)].rooms[local(i)].height*2;
 // rock value restarts every world (own currency); HP = 5 swings of the layer's gate tool
 const VALS=[1,2,3,5,8,12,20];
 const V=(i:number)=>VALS[local(i)];
 const HP=(i:number)=>i===0?20:nice(5*toolPower(gate(i)));
-// a cap block: CAP_SECONDS / CAP_CELLS of the recommended pickaxe's damage per second (no cap on a world's last layer)
-const capHp=(i:number)=>local(i)<6?nice(CAP_SECONDS/CAP_CELLS*toolPower(gate(i+1))*toolSpeed(gate(i+1))):nice(5*HP(i));
+// a cap block: CAP_SECONDS / (CAP_CELLS · HOLE) of the next layer's pickaxe's damage per second (no cap on a world's
+// last layer)
+const capHp=(i:number)=>local(i)<6?nice(CAP_SECONDS/(CAP_CELLS*HOLE)*toolPower(gate(i+1))*toolSpeed(gate(i+1))):nice(5*HP(i));
 const blocks=(i:number)=>({rock:{hp:HP(i),v:V(i)},a:{hp:nice(2*HP(i)),v:3*V(i)},b:{hp:nice(3*HP(i)),v:6*V(i)},deep:{hp:capHp(i),v:Math.max(1,Math.round(V(i)/4))}});
 const ORE_CHANCE=(i:number)=>Math.round((.18+.1*local(i)/6)*1000)/1000, ORE_WEIGHTS=[12,10];
 // eggs: one per layer; long layers of worlds 2 and 3 add a premium egg (pets x2, price x4)
@@ -105,7 +108,7 @@ export function build(K:number[]){
     worlds:[1,2,3].map(id=>({id,currency:currency(id-1),ticket:id===1?null:{currency:currency(id-2),price:portal[id],toolLevel:(id-1)*10,
       materials:TICKET_MATERIALS[id].map(m=>({itemId:LAYER_ITEMS[m.layer].ores[m.ore].itemId,count:m.count,world:world(m.layer)+1,layer:local(m.layer)}))}})),
     layers:Array.from({length:N},(_,i)=>{const b=blocks(i),items=LAYER_ITEMS[i],from=DEPTHS[world(i)][local(i)],cells=local(i)<6?(DEPTHS[world(i)][local(i)+1]-from)/2:0;
-      return {world:world(i)+1,layer:local(i),from,deepAt:cells?hallCeiling(i)-CAP_CELLS*2:null,capLevel:cells?gate(i+1):null,gate:gate(i),oreChance:ORE_CHANCE(i),
+      return {world:world(i)+1,layer:local(i),from,deepAt:cells?hallCeiling(i)-CAP_CELLS*2:null,gate:gate(i),oreChance:ORE_CHANCE(i),
         capsuleCoins:nice(CAPSULE_SECONDS*arrivalIncome(i)),
         rock:{itemId:items.rock.itemId,hp:b.rock.hp,price:b.rock.v},deep:{itemId:items.deep.itemId,hp:b.deep.hp,price:b.deep.v},
         ores:[b.a,b.b].map((o,j)=>({itemId:items.ores[j].itemId,hp:o.hp,price:o.v,weight:ORE_WEIGHTS[j]}))};}),
@@ -118,7 +121,6 @@ export function build(K:number[]){
     eggs:SLOTS.map((s,k)=>{const d=eggDefinition(s);return {id:d?.id??null,world:world(s.layer)+1,layer:local(s.layer),premium:s.premium,currency:currency(world(s.layer)),price:egg[k],
       pets:WT.map((weight,r)=>({id:d?.pets[r][0]??null,weight,bonusPct:bonusPct(s,r),miningPct:miningPct(s,r)}))};}),
     golden:GOLD,
-    capPenalty:CAP_PENALTY,
     rebirth:{world:3,layer:6,toolLevel:30,stepPct:50},
     capsule:{spinCost:1,timedSeconds:300,movementMultiplier:2,miningSpeedMultiplier:1.5,luckMultiplier:2,sellMultiplier:2,
       prizes:[{id:'coins',weight:65},{id:'speed',weight:10},{id:'mining',weight:5},{id:'sell',weight:5},{id:'autoHatch',weight:5},{id:'luck',weight:10}]},
@@ -178,10 +180,9 @@ export function simulate(E:Economy,plan:Plan,seed:number,trace=false,keep:Pet[]=
   const mining=()=>(boosted?E.capsule.miningSpeedMultiplier:1)*(1+equipped().reduce((a,p)=>a+p.m,0));
   const power=()=>enh?E.tools[lv-1].enhance[enh-1].power:E.tools[lv-1].power;
   const CAP=4*E.tools[0].speed;
-  // a block: its swings, and whatever of the re-aim and MOVE outlasts one swing (none re-aims digging straight down)
-  // below a cap's recommended pickaxe every hit does capPenalty of its damage (at least 1)
-  const bt=(hp:number,aim=AIM,recommended=0)=>{const base=E.tools[lv-1].speed,m=mining(),speed=Math.min(CAP,base*m),hit=power()*base*m/speed;
-    return Math.ceil(hp/(lv<recommended?Math.max(1,Math.floor(hit*E.capPenalty)):hit))/speed+Math.max(0,aim+MOVE-1/speed);};
+  // a block: its swings, and whatever of the re-aim and MOVE outlasts one swing
+  const bt=(hp:number,aim=AIM)=>{const base=E.tools[lv-1].speed,m=mining(),speed=Math.min(CAP,base*m),hit=power()*base*m/speed;
+    return Math.ceil(hp/hit)/speed+Math.max(0,aim+MOVE-1/speed);};
   const rate=(i:number,aim=AIM)=>{const l=L[i],c=l.oreChance,wt=l.ores.reduce((a,o)=>a+o.weight,0);let v=0,t=0;
     for(const [x,q] of [[l.rock,1-c],...l.ores.map(o=>[o,c*o.weight/wt] as const)] as const){v+=q*x.price;t+=q*bt(x.hp,aim);}return {v:v*team()*mult,t};};
   /** Income from mining that starts now and lasts dt: the capsule's double sale pays for the part of it inside. */
@@ -235,11 +236,11 @@ export function simulate(E:Economy,plan:Plan,seed:number,trace=false,keep:Pet[]=
     const slotDone=!slotLayer.includes(layer)||slots>3+slotLayer.indexOf(layer);
     if(done&&lv>=exitLevel(layer)&&slotDone){
       if(local(layer)===6){if(w()===2){arrive.push(T);break;}const price=E.worlds[w()+1].ticket!.price;if(cur[w()]>=price){farmTicket();pay(price);layer++;arrive.push(T);imp('portal');continue;}}
-      else{// the shaft down: the layer's rock and ores, then its cap (to the hall's ceiling); each bagful sold, then back
-        // down the shaft
+      else{// the hole down (HOLE columns): the layer's rock and ores, then its cap (to the hall's ceiling); each
+        // bagful sold, then back down the hole
         const l=L[layer],ceiling=L[layer+1].from-l.from-GAME_CONTENT.worlds[w()].rooms[local(layer)].height*2;
-        const d=(ceiling-l.deepAt!)/2,n=l.deepAt!/2+d,cap=E.bags[bag].capacity,r=rate(layer,0);
-        const dt=(n-d)*r.t+d*bt(l.deep.hp,0,l.capLevel??0)+Math.ceil(n/cap)*(descentTrip(w())+fall((L[layer+1].from-l.from)/2));
+        const d=(ceiling-l.deepAt!)/2*HOLE,n=l.deepAt!/2*HOLE+d,cap=E.bags[bag].capacity,r=rate(layer);
+        const dt=(n-d)*r.t+d*bt(l.deep.hp)+Math.ceil(n/cap)*(descentTrip(w())+fall((L[layer+1].from-l.from)/2));
         cur[w()]+=earn((n-d)*r.v+d*l.deep.price*team()*mult,dt);collect(layer,n-d);add('descend',dt);layer++;arrive.push(T);imp('arrive');continue;}}
     let best=layer,br=-1;for(let i=w()*7;i<=layer;i++)if(gateOf(i)<=lv){const r=rate(i),cap=E.bags[bag].capacity,c=cap*r.v/(cap*r.t+sellTrip(w()));if(c>br){br=c;best=i;}}
     // a player heads to sell once the next thing they want is paid for, or the bag is full

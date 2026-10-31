@@ -86,13 +86,27 @@ html:not([lang^=zh]) .bag-egg-name { font-size: 12px; }
 .bag-ticket header .ui-icon { width: 22px; height: 22px; }
 .bag-ticket header b { font-size: 15px; }
 .bag-ticket header span { color: var(--ui-ink-soft); font-size: 11px; }
-.bag-ticket-items { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px 14px; }
-.bag-ticket-item { position: relative; display: grid; grid-template-columns: 22px auto minmax(40px, 1fr); align-items: center; gap: 5px; font-size: 12px; white-space: nowrap; }
+.bag-ticket-items { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px 10px; }
+/* A lock toggle, the whole row: a grey open lock while the mineral sells like any ore; locked, a gold lock on a gold
+   tint. */
+.bag-ticket-item {
+  position: relative; display: grid; grid-template-columns: 22px 22px auto minmax(40px, 1fr); align-items: center; gap: 5px; min-height: 36px; padding: 0 8px 0 5px;
+  border: 2.5px solid var(--ui-line); border-radius: 10px; background: var(--ui-paper); color: var(--ui-ink-soft);
+  font: 700 12px/1.2 var(--ui-font); white-space: nowrap; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+}
+.bag-ticket-item[aria-pressed=true] { border-color: var(--ui-ink); background: #fff3c4; color: var(--ui-ink); }
+.bag-ticket-item:active { transform: scale(.97); }
+.bag-ticket-item .bag-ticket-lock { width: 22px; height: 22px; }
 .bag-ticket-item .bag-ticket-icon { width: 22px; height: 22px; color: var(--ui-ink); }
 .bag-ticket-item .ui-bar { height: 18px; }
 .bag-ticket-item[data-done] .ui-bar > i { background: var(--ui-green); }
 .bag-ticket-item .ui-cell-check { position: absolute; right: -8px; top: -6px; left: auto; }
 .bag-ores { --cell: 76px; grid-auto-rows: 88px; }
+.bag-ores-hint { flex: none; margin: 0 0 -4px 2px; }
+/* Every ore cell is a lock toggle: a faint open lock in the corner; locked, a gold lock on a gold tint. */
+.bag-ores .bag-ore-lock { position: absolute; right: 4px; top: 18px; width: 20px; height: 20px; opacity: .45; }
+.bag-ores .ui-cell[aria-pressed=true] { outline: none; background: #fff3c4; }
+.bag-ores .ui-cell[aria-pressed=true] .bag-ore-lock { opacity: 1; }
 .bag-ores .bag-ore-art { position: absolute; left: 32%; top: 18px; width: 36%; height: 30px; color: var(--ui-ink); }
 .bag-ore-price { position: absolute; left: 0; right: 0; bottom: 23px; display: flex; align-items: center; justify-content: center; gap: 2px; font-size: 11px; color: var(--ui-ink-soft); }
 .bag-ore-price .ui-icon { width: 13px; height: 13px; }

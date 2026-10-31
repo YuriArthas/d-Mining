@@ -44,6 +44,9 @@ if (FIRST > 1) {
 }
 const g = await createHeadlessGame(start, { random: rnd, day: dayOf });
 const s = () => g.session.getSnapshot() as any;
+// The world tickets' minerals locked from the start, as a player saving them for the next world does (2026-10-31:
+// nothing is kept unless locked); each unlocks once the store has all of it, and the rest sells.
+for (const w of E.worlds) for (const m of w.ticket?.materials ?? []) g.session.lockItem(m.itemId);
 const events: { t: number; type: string; [k: string]: unknown }[] = [];
 const log = (type: string, detail: Record<string, unknown> = {}) => { const e = { t: +(g.clock.now / 60).toFixed(2), type, ...detail }; events.push(e); if (process.env.TRACE) console.error(JSON.stringify(e)); };
 const minutes = () => g.clock.now / 60;
@@ -160,10 +163,23 @@ function mineStep(w: number, k: number) {
   if (!walkTo([(face[0] + .5) * 2, g.feet()[1], (face[2] + .5) * 2], .9, 20, true) || !visible(inLayer)) bad.add(key(face));
   return true;
 }
-/** Down the shaft: the next solid cell under the feet (struck while falling, the pick held). */
+/** Down a hole of 2×2 columns, as a player digs down around themselves (2026-10-31: one block's shaft had a quarter of
+ *  the blocks and set the caps four times too hard): the highest blocks left in it first, down to the one under the
+ *  feet. The hole is fixed where the descent of a layer starts. */
+let hole: { site: string; columns: [number, number][] } | null = null;
 function digDownStep(until: number) {
   if (-g.feet()[1] >= until - .5) return false;
-  let c = below(); for (let k = 0; k < 4 && air(c); k++) c = [c[0], c[1] - 1, c[2]];
+  const under = below();
+  if (hole?.site !== site) hole = { site, columns: [[0, 0], [1, 0], [0, 1], [1, 1]].map(([dx, dz]) => [under[0] + dx, under[2] + dz]) };
+  for (let y = under[1] + 1; y >= under[1] - 1; y--) {
+    const left = hole.columns.map(([x, z]) => [x, y, z] as Coord).filter(c => solid(c) && !bad.has(key(c)) && depthOf(c) < until);
+    if (!left.length) continue;
+    const f = g.feet(), c = left.sort((a, b) => Math.hypot(a[0] * 2 + 1 - f[0], a[2] * 2 + 1 - f[2]) - Math.hypot(b[0] * 2 + 1 - f[0], b[2] * 2 + 1 - f[2]))[0];
+    if (g.select(c)) { mine(c, c[1] < under[1] + 1 && c[0] === under[0] && c[2] === under[2] ? 0 : AIM); return true; }
+    if (walkTo([(c[0] + .5) * 2, f[1], (c[2] + .5) * 2], .4, 3) && g.select(c)) return true;
+    bad.add(key(c)); return true;
+  }
+  let c = under; for (let k = 0; k < 4 && air(c); k++) c = [c[0], c[1] - 1, c[2]];
   if (solid(c) && !bad.has(key(c)) && g.select(c)) { mine(c, 0); return true; }
   if (air(c)) { walkTo([(c[0] + .5) * 2, g.feet()[1], (c[2] + .5) * 2], .25, 3); wait(.1); return true; }
   // on a protected floor: over to the pit first

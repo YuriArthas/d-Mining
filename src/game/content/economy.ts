@@ -7,10 +7,10 @@ import { tr } from '../i18n/i18n.ts';
 export type CurrencyId = 'gold' | 'tech' | 'star';
 export type WorldNumber = 1 | 2 | 3;
 type Block = Readonly<{ itemId: string; hp: number; price: number }>;
-/** `deepAt`: metres under the layer's top where its cap starts (hard rock down to the next hall); `capLevel`: the
- *  pickaxe recommended for the cap (the next layer's gate): below it a hit does `capPenalty` of its damage. */
+/** `deepAt`: metres under the layer's top where its cap starts (hard rock down to the next hall, any pickaxe digs it);
+ *  `gate`: the pickaxe the layer's ores need. */
 export type LayerEconomy = Readonly<{
-  world: WorldNumber; layer: number; from: number; deepAt: number | null; capLevel: number | null; gate: number; oreChance: number; capsuleCoins: number;
+  world: WorldNumber; layer: number; from: number; deepAt: number | null; gate: number; oreChance: number; capsuleCoins: number;
   rock: Block; deep: Block; ores: readonly Readonly<Block & { weight: number }>[];
 }>;
 /** `shop`: the layer of its world whose shop sells it, 0 (the surface), 2 or 4 (those halls); each shop its own shelf. */
@@ -34,7 +34,6 @@ export type Economy = Readonly<{
   petSlots: readonly Readonly<{ slot: number; currency: CurrencyId; price: number; world: WorldNumber; layer: number }>[];
   eggs: readonly EggEconomy[];
   golden: Readonly<{ need: number; bonusMultiplier: number }>;
-  capPenalty: number;
   rebirth: Readonly<{ world: WorldNumber; layer: number; toolLevel: number; stepPct: number }>;
   capsule: Readonly<{ spinCost: number; timedSeconds: number; movementMultiplier: number; miningSpeedMultiplier: number;
     luckMultiplier: number; sellMultiplier: number; prizes: readonly Readonly<{ id: string; weight: number }>[] }>;
@@ -69,13 +68,11 @@ export function validateEconomy(e: Economy): Economy {
     }
   }
   check(e.layers.length === 21, '每个世界 7 层，共 21 层');
-  check(e.capPenalty > 0 && e.capPenalty < 1, '岩盖的伤害系数应在 0 和 1 之间');
   e.layers.forEach((l, i) => {
     const local = i % 7, next = local < 6 ? e.layers[i + 1] : null;
     check(l.world === Math.floor(i / 7) + 1 && l.layer === local, `第 ${i} 层的世界或层号错`);
     check(local === 0 ? l.from === 0 : l.from > e.layers[i - 1].from && l.from % 2 === 0, `第 ${i} 层深度错`);
     check(next ? l.deepAt !== null && l.deepAt % 2 === 0 && l.deepAt > 0 && l.deepAt < next.from - l.from : l.deepAt === null, `第 ${i} 层岩盖深度错`);
-    check(next ? l.capLevel === next.gate : l.capLevel === null, `第 ${i} 层岩盖建议等级应是下一层的门槛`);
     check(i === 0 || l.gate >= e.layers[i - 1].gate, `第 ${i} 层门槛倒退`);
     check(l.oreChance > 0 && l.oreChance < 1, `第 ${i} 层矿石概率错`);
     round(l.capsuleCoins, '扭蛋金币');

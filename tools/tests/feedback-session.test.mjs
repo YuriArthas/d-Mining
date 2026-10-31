@@ -101,3 +101,15 @@ test('the double-sale boost doubles the quote and the coins of a sale while it r
   assert.ok(plain.coins>0);assert.equal(plain.quoted,plain.coins);
   assert.equal(doubled.quoted,plain.quoted*2);assert.equal(doubled.coins,plain.coins*2);
 });
+// 2026-10-31: a sale's coins fly into the money counter (MiningOverlay) on the sold event; 全部出售 in the bag never sent it.
+test('stepping into the sell ring and 全部出售 both send one sold event with the coins it made; an empty bag sends none',()=>{
+  const sell=SESSION_CONTENT.sales[0],s=fixture(0,p=>{p.wallet.balances.gold=0;}),events=[];
+  s.onFeedback(e=>{if(e.type==='sold')events.push(e);});
+  s.collected(Array.from({length:4},()=>({kind:64})));at(s,sell);
+  const first=s.getSnapshot().coins;
+  assert.deepEqual(events,[{type:'sold',coins:first,count:4}]);
+  s.collected(Array.from({length:3},()=>({kind:64})));
+  assert.equal(s.sellAvailable().status,'sold');
+  assert.deepEqual(events.at(-1),{type:'sold',coins:s.getSnapshot().coins-first,count:3});
+  assert.equal(s.sellAvailable().status,'empty');assert.equal(events.length,2);
+});

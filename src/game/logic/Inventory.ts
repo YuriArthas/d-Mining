@@ -1,8 +1,8 @@
 import { integer } from './numbers.ts';
 export type ItemBatch = readonly Readonly<{ itemId: string; count: number }>[];
 type UnitVolume = (itemId: string) => number;
-export type InventoryDataV1 = { version: 1; capacity: number; items: Record<string, number> };
-type InventorySnapshot = Readonly<{ capacity: number; used: number; totalCount: number; isFull: boolean; items: Readonly<Record<string, number>> }>;
+export type InventoryDataV1 = { version: 1; capacity: number; items: Record<string, number>; locked?: string[] };
+type InventorySnapshot = Readonly<{ capacity: number; used: number; totalCount: number; isFull: boolean; items: Readonly<Record<string, number>>; locked: readonly string[] }>;
 const oneUnit: UnitVolume = () => 1;
 function counts(batch: ItemBatch) {
   const result = new Map<string, number>();
@@ -14,6 +14,8 @@ function counts(batch: ItemBatch) {
 }
 export class Inventory {
   private items = new Map<string, number>();
+  /** Kinds the player locked (2026-10-31): a sale leaves them in the bag. Any kind, held or not. */
+  private readonly locks = new Set<string>();
   private snapshot: InventorySnapshot;
   private capacityValue: number;
   // Item definitions are fixed for this inventory's lifetime; no mineral/price dependency.
@@ -38,7 +40,7 @@ export class Inventory {
       used = integer(used + integer(count * volume, '占用体积'), '占用体积');
       totalCount = integer(totalCount + count, '物品总数');
     }
-    return Object.freeze({ capacity, used, totalCount, isFull: used >= capacity, items: Object.freeze(Object.fromEntries(items)) });
+    return Object.freeze({ capacity, used, totalCount, isFull: used >= capacity, items: Object.freeze(Object.fromEntries(items)), locked: Object.freeze([...this.locks]) });
   }
   private commit(items: Map<string, number>) {
     // Resolve/validate the entire batch before changing either contents or snapshot.
@@ -47,6 +49,18 @@ export class Inventory {
   }
   getSnapshot = () => this.snapshot;
   isFull() { return this.snapshot.isFull; }
+  isLocked(itemId: string) { return this.locks.has(itemId); }
+  /** Locks or unlocks a kind; false when it already was. */
+  setLocked(itemId: string, locked: boolean) {
+    if (typeof itemId !== 'string' || !itemId) throw new Error('物品 ID 不能为空');
+    if (locked === this.locks.has(itemId)) return false;
+    if (locked) this.locks.add(itemId); else this.locks.delete(itemId);
+    this.snapshot = this.makeSnapshot(this.items, this.capacity); return true;
+  }
+  /** What a sale may take: every kind not locked. */
+  sellable(): Readonly<Record<string, number>> {
+    return Object.fromEntries([...this.items].filter(([id]) => !this.locks.has(id)));
+  }
   // Capacity is information, never an admission rule. Every valid batch is added.
   add(batch: ItemBatch) {
     const incoming = counts(batch);
@@ -67,12 +81,14 @@ export class Inventory {
     this.commit(next); return true;
   }
   // Save quantities and capacity, never derived used/count/full or copied item definitions.
-  exportData(): InventoryDataV1 { return { version: 1, capacity: this.capacity, items: { ...this.snapshot.items } }; }
+  exportData(): InventoryDataV1 { return { version: 1, capacity: this.capacity, items: { ...this.snapshot.items }, ...this.locks.size && { locked: [...this.locks] } }; }
   static fromData(value: unknown, unitVolume: UnitVolume = oneUnit) {
     if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('背包数据格式错误');
     const data = value as InventoryDataV1;
     if (data.version !== 1 || !data.items || typeof data.items !== 'object' || Array.isArray(data.items)) throw new Error('背包版本或物品数据错误');
-    const inventory = new Inventory(data.capacity, unitVolume);
+    const inventory = new Inventory(data.capacity, unitVolume), locked = data.locked ?? [];
+    if (!Array.isArray(locked)) throw new Error('背包锁定数据错误');
+    for (const id of locked) inventory.setLocked(id, true);
     inventory.add(Object.entries(data.items).map(([itemId, count]) => ({ itemId, count })));
     return inventory;
   }

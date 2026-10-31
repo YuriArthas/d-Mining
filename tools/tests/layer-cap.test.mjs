@@ -8,8 +8,8 @@ import { SparseWorld } from '../../src/game/terrain/SparseWorld.ts';
 import { worldRequirement } from '../../src/game/content/worldJourney.ts';
 
 // Each layer's way down ends in a cap (2026-10-29: the first layer was dug through in half a minute with the first
-// pickaxe, its dense rock lying inside the hall below): hard rock right over the next hall's ceiling, the next
-// layer's pickaxe recommended, and below it a hit does only part of its damage.
+// pickaxe, its dense rock lying inside the hall below): hard rock right over the next hall's ceiling. 2026-10-31: any
+// pickaxe digs it at its own damage (the levels gate only the ores); its health is what makes it slow.
 
 test('every layer\'s cap is solid rock right over the next hall\'s ceiling, all through the pit\'s column', () => {
   const world = new SparseWorld(GAME_GENERATION);
@@ -23,15 +23,12 @@ test('every layer\'s cap is solid rock right over the next hall\'s ceiling, all 
       assert.equal(world.cell(cell), layer.deepKind, `world ${w.id} layer ${k}: cap at ${depth} m (${cell})`);
       assert.ok(world.canMine(cell), `world ${w.id} layer ${k}: the cap can be mined at ${cell}`);
     }
-    const cap = resourceByKind(layer.deepKind);
-    assert.equal(cap.recommendedLevel, next.gate ?? ECONOMY.layers[(w.id - 1) * 7 + k + 1].gate);
-    assert.equal(cap.requiredLevel, ECONOMY.layers[(w.id - 1) * 7 + k].gate, 'the cap itself needs only its own layer\'s pickaxe');
+    assert.equal(resourceByKind(layer.deepKind).requiredLevel, 0, 'any pickaxe digs the cap');
   }
 });
 
-test('below its recommended pickaxe a cap takes capPenalty of each hit; at it, the whole hit; plain rock never', () => {
-  const content = GAME_CONTENT.session, cap = resourceByKind(65), rock = resourceByKind(64);
-  assert.equal(cap.recommendedLevel, 2); assert.equal(rock.recommendedLevel, 0);
+test('the first pickaxe digs a cap and a deeper layer\'s rock at its whole damage, with no line under the plate', () => {
+  const content = GAME_CONTENT.session, deeper = GAME_CONTENT.worlds[0].layers[3];
   const play = (level, kind) => {
     const d = new GameSession(content).exportProgress(); d.pickaxe = { version: 1, level, enhance: 0 }; d.equipment = { ...d.equipment, toolLevel: level };
     const s = GameSession.fromData(d, content); let now = 0;
@@ -39,9 +36,9 @@ test('below its recommended pickaxe a cap takes capPenalty of each hit; at it, t
     s.selectTarget([0, -13, 0]);
     return { hit: s.hit([0, -13, 0]), target: s.getSnapshot().target, power: s.getSnapshot().pickaxe.power, now };
   };
-  const under = play(1, 65), at = play(2, 65), plain = play(1, 64);
-  assert.equal(under.hit.damage, Math.max(1, Math.floor(under.power * ECONOMY.capPenalty)));
-  assert.ok(under.target.underLevel && !under.target.locked && under.target.recommendedLevel === 2, 'the plate says which pickaxe');
-  assert.equal(at.hit.damage, at.power); assert.equal(at.target.underLevel, false);
-  assert.equal(plain.hit.damage, plain.power); assert.equal(plain.target.underLevel, false);
+  for (const [level, kind] of [[1, 65], [2, 65], [1, 64], [1, deeper.base], [1, deeper.deepKind]]) {
+    const { hit, target, power } = play(level, kind);
+    assert.equal(hit.damage, power, `Lv.${level} on kind ${kind}: the whole hit`);
+    assert.equal(target.locked, false); assert.equal('underLevel' in target, false);
+  }
 });

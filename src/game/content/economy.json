@@ -32,7 +32,7 @@
    "currency": "tech",
    "ticket": {
     "currency": "gold",
-    "price": 5800000,
+    "price": 6300000,
     "toolLevel": 10,
     "materials": [
      {
@@ -61,7 +61,7 @@
    "currency": "star",
    "ticket": {
     "currency": "tech",
-    "price": 36000000,
+    "price": 39000000,
     "toolLevel": 20,
     "materials": [
      {
@@ -92,7 +92,6 @@
    "layer": 0,
    "from": 0,
    "deepAt": 24,
-   "capLevel": 2,
    "gate": 1,
    "oreChance": 0.18,
    "capsuleCoins": 100,
@@ -103,7 +102,7 @@
    },
    "deep": {
     "itemId": "journey.rock.0.deep",
-    "hp": 940,
+    "hp": 230,
     "price": 1
    },
    "ores": [
@@ -126,7 +125,6 @@
    "layer": 1,
    "from": 60,
    "deepAt": 44,
-   "capLevel": 3,
    "gate": 2,
    "oreChance": 0.197,
    "capsuleCoins": 320,
@@ -137,7 +135,7 @@
    },
    "deep": {
     "itemId": "journey.rock.1.deep",
-    "hp": 1700,
+    "hp": 430,
     "price": 1
    },
    "ores": [
@@ -160,7 +158,6 @@
    "layer": 2,
    "from": 140,
    "deepAt": 84,
-   "capLevel": 5,
    "gate": 3,
    "oreChance": 0.213,
    "capsuleCoins": 1000,
@@ -171,7 +168,7 @@
    },
    "deep": {
     "itemId": "journey.rock.2.deep",
-    "hp": 5100,
+    "hp": 1300,
     "price": 1
    },
    "ores": [
@@ -194,7 +191,6 @@
    "layer": 3,
    "from": 260,
    "deepAt": 124,
-   "capLevel": 6,
    "gate": 5,
    "oreChance": 0.23,
    "capsuleCoins": 4800,
@@ -205,7 +201,7 @@
    },
    "deep": {
     "itemId": "journey.rock.3.deep",
-    "hp": 9500,
+    "hp": 2400,
     "price": 1
    },
    "ores": [
@@ -228,7 +224,6 @@
    "layer": 4,
    "from": 420,
    "deepAt": 164,
-   "capLevel": 8,
    "gate": 6,
    "oreChance": 0.247,
    "capsuleCoins": 25000,
@@ -239,7 +234,7 @@
    },
    "deep": {
     "itemId": "journey.rock.4.deep",
-    "hp": 30000,
+    "hp": 7400,
     "price": 2
    },
    "ores": [
@@ -262,7 +257,6 @@
    "layer": 5,
    "from": 620,
    "deepAt": 204,
-   "capLevel": 9,
    "gate": 8,
    "oreChance": 0.263,
    "capsuleCoins": 120000,
@@ -273,7 +267,7 @@
    },
    "deep": {
     "itemId": "journey.rock.5.deep",
-    "hp": 52000,
+    "hp": 13000,
     "price": 3
    },
    "ores": [
@@ -296,7 +290,6 @@
    "layer": 6,
    "from": 860,
    "deepAt": null,
-   "capLevel": null,
    "gate": 9,
    "oreChance": 0.28,
    "capsuleCoins": 570000,
@@ -330,7 +323,6 @@
    "layer": 0,
    "from": 0,
    "deepAt": 364,
-   "capLevel": 11,
    "gate": 10,
    "oreChance": 0.18,
    "capsuleCoins": 140,
@@ -341,7 +333,7 @@
    },
    "deep": {
     "itemId": "journey.rock.7.deep",
-    "hp": 120000,
+    "hp": 29000,
     "price": 1
    },
    "ores": [
@@ -364,7 +356,6 @@
    "layer": 1,
    "from": 400,
    "deepAt": 364,
-   "capLevel": 12,
    "gate": 11,
    "oreChance": 0.197,
    "capsuleCoins": 820,
@@ -375,7 +366,7 @@
    },
    "deep": {
     "itemId": "journey.rock.8.deep",
-    "hp": 170000,
+    "hp": 43000,
     "price": 1
    },
    "ores": [
@@ -398,7 +389,6 @@
    "layer": 2,
    "from": 800,
    "deepAt": 364,
-   "capLevel": 13,
    "gate": 12,
    "oreChance": 0.213,
    "capsuleCoins": 2500,
@@ -409,7 +399,7 @@
    },
    "deep": {
     "itemId": "journey.rock.9.deep",
-    "hp": 260000,
+    "hp": 65000,
     "price": 1
    },
    "ores": [
@@ -432,7 +422,6 @@
    "layer": 3,
    "from": 1200,
    "deepAt": 364,
-   "capLevel": 14,
    "gate": 13,
    "oreChance": 0.23,
    "capsuleCoins": 9200,
@@ -443,7 +432,7 @@
    },
    "deep": {
     "itemId": "journey.rock.10.deep",
-    "hp": 380000,
+    "hp": 95000,
     "price": 1
    },
    "ores": [
@@ -466,7 +455,6 @@
    "layer": 4,
    "from": 1600,
    "deepAt": 364,
-   "capLevel": 16,
    "gate": 14,
    "oreChance": 0.247,
    "capsuleCoins": 36000,
@@ -477,7 +465,7 @@
    },
    "deep": {
     "itemId": "journey.rock.11.deep",
-    "hp": 880000,
+    "hp": 220000,
     "price": 2
    },
    "ores": [
@@ -500,7 +488,6 @@
    "layer": 5,
    "from": 2000,
    "deepAt": 364,
-   "capLevel": 18,
    "gate": 16,
    "oreChance": 0.263,
    "capsuleCoins": 140000,
@@ -511,7 +498,7 @@
    },
    "deep": {
     "itemId": "journey.rock.12.deep",
-    "hp": 2000000,
+    "hp": 500000,
     "price": 3
    },
    "ores": [
@@ -534,7 +521,6 @@
    "layer": 6,
    "from": 2400,
    "deepAt": null,
-   "capLevel": null,
    "gate": 18,
    "oreChance": 0.28,
    "capsuleCoins": 520000,
@@ -568,7 +554,6 @@
    "layer": 0,
    "from": 0,
    "deepAt": 364,
-   "capLevel": 21,
    "gate": 20,
    "oreChance": 0.18,
    "capsuleCoins": 140,
@@ -579,7 +564,7 @@
    },
    "deep": {
     "itemId": "journey.rock.14.deep",
-    "hp": 6600000,
+    "hp": 1700000,
     "price": 1
    },
    "ores": [
@@ -602,7 +587,6 @@
    "layer": 1,
    "from": 400,
    "deepAt": 364,
-   "capLevel": 22,
    "gate": 21,
    "oreChance": 0.197,
    "capsuleCoins": 740,
@@ -613,7 +597,7 @@
    },
    "deep": {
     "itemId": "journey.rock.15.deep",
-    "hp": 10000000,
+    "hp": 2500000,
     "price": 1
    },
    "ores": [
@@ -636,7 +620,6 @@
    "layer": 2,
    "from": 800,
    "deepAt": 364,
-   "capLevel": 23,
    "gate": 22,
    "oreChance": 0.213,
    "capsuleCoins": 2600,
@@ -647,7 +630,7 @@
    },
    "deep": {
     "itemId": "journey.rock.16.deep",
-    "hp": 15000000,
+    "hp": 3800000,
     "price": 1
    },
    "ores": [
@@ -670,7 +653,6 @@
    "layer": 3,
    "from": 1200,
    "deepAt": 364,
-   "capLevel": 24,
    "gate": 23,
    "oreChance": 0.23,
    "capsuleCoins": 8500,
@@ -681,7 +663,7 @@
    },
    "deep": {
     "itemId": "journey.rock.17.deep",
-    "hp": 22000000,
+    "hp": 5500000,
     "price": 1
    },
    "ores": [
@@ -704,7 +686,6 @@
    "layer": 4,
    "from": 1600,
    "deepAt": 364,
-   "capLevel": 26,
    "gate": 24,
    "oreChance": 0.247,
    "capsuleCoins": 36000,
@@ -715,7 +696,7 @@
    },
    "deep": {
     "itemId": "journey.rock.18.deep",
-    "hp": 50000000,
+    "hp": 13000000,
     "price": 2
    },
    "ores": [
@@ -738,7 +719,6 @@
    "layer": 5,
    "from": 2000,
    "deepAt": 364,
-   "capLevel": 28,
    "gate": 26,
    "oreChance": 0.263,
    "capsuleCoins": 130000,
@@ -749,7 +729,7 @@
    },
    "deep": {
     "itemId": "journey.rock.19.deep",
-    "hp": 110000000,
+    "hp": 29000000,
     "price": 3
    },
    "ores": [
@@ -772,7 +752,6 @@
    "layer": 6,
    "from": 2400,
    "deepAt": null,
-   "capLevel": null,
    "gate": 28,
    "oreChance": 0.28,
    "capsuleCoins": 520000,
@@ -834,15 +813,15 @@
    "speed": 2.5,
    "enhance": [
     {
-     "price": 160,
+     "price": 140,
      "power": 17
     },
     {
-     "price": 230,
+     "price": 200,
      "power": 19
     },
     {
-     "price": 310,
+     "price": 270,
      "power": 20
     }
    ]
@@ -851,20 +830,20 @@
    "level": 3,
    "currency": "gold",
    "shop": 0,
-   "price": 520,
+   "price": 450,
    "power": 23,
    "speed": 3,
    "enhance": [
     {
-     "price": 570,
+     "price": 390,
      "power": 25
     },
     {
-     "price": 860,
+     "price": 590,
      "power": 28
     },
     {
-     "price": 1100,
+     "price": 780,
      "power": 31
     }
    ]
@@ -873,20 +852,20 @@
    "level": 4,
    "currency": "gold",
    "shop": 2,
-   "price": 1900,
+   "price": 1300,
    "power": 34,
    "speed": 3.5,
    "enhance": [
     {
-     "price": 720,
+     "price": 480,
      "power": 38
     },
     {
-     "price": 1100,
+     "price": 720,
      "power": 42
     },
     {
-     "price": 1400,
+     "price": 960,
      "power": 46
     }
    ]
@@ -895,20 +874,20 @@
    "level": 5,
    "currency": "gold",
    "shop": 2,
-   "price": 2400,
+   "price": 1600,
    "power": 51,
    "speed": 4,
    "enhance": [
     {
-     "price": 11000,
+     "price": 9300,
      "power": 57
     },
     {
-     "price": 16000,
+     "price": 14000,
      "power": 63
     },
     {
-     "price": 21000,
+     "price": 19000,
      "power": 69
     }
    ]
@@ -917,20 +896,20 @@
    "level": 6,
    "currency": "gold",
    "shop": 2,
-   "price": 35000,
+   "price": 31000,
    "power": 76,
    "speed": 5,
    "enhance": [
     {
-     "price": 33000,
+     "price": 27000,
      "power": 85
     },
     {
-     "price": 50000,
+     "price": 41000,
      "power": 94
     },
     {
-     "price": 66000,
+     "price": 54000,
      "power": 100
     }
    ]
@@ -939,20 +918,20 @@
    "level": 7,
    "currency": "gold",
    "shop": 4,
-   "price": 110000,
+   "price": 90000,
    "power": 110,
    "speed": 6,
    "enhance": [
     {
-     "price": 42000,
+     "price": 33000,
      "power": 130
     },
     {
-     "price": 63000,
+     "price": 50000,
      "power": 140
     },
     {
-     "price": 84000,
+     "price": 66000,
      "power": 150
     }
    ]
@@ -961,20 +940,20 @@
    "level": 8,
    "currency": "gold",
    "shop": 4,
-   "price": 140000,
+   "price": 110000,
    "power": 170,
    "speed": 7,
    "enhance": [
     {
-     "price": 660000,
+     "price": 510000,
      "power": 190
     },
     {
-     "price": 990000,
+     "price": 770000,
      "power": 210
     },
     {
-     "price": 1300000,
+     "price": 1000000,
      "power": 230
     }
    ]
@@ -983,20 +962,20 @@
    "level": 9,
    "currency": "gold",
    "shop": 4,
-   "price": 2200000,
+   "price": 1700000,
    "power": 260,
    "speed": 8,
    "enhance": [
     {
-     "price": 3600000,
+     "price": 4200000,
      "power": 290
     },
     {
-     "price": 5400000,
+     "price": 6300000,
      "power": 320
     },
     {
-     "price": 7200000,
+     "price": 8400000,
      "power": 350
     }
    ]
@@ -1005,20 +984,20 @@
    "level": 10,
    "currency": "gold",
    "shop": 4,
-   "price": 12000000,
+   "price": 14000000,
    "power": 380,
    "speed": 8,
    "enhance": [
     {
-     "price": 5400000,
+     "price": 6300000,
      "power": 430
     },
     {
-     "price": 8100000,
+     "price": 9500000,
      "power": 480
     },
     {
-     "price": 11000000,
+     "price": 13000000,
      "power": 520
     }
    ]
@@ -1027,20 +1006,20 @@
    "level": 11,
    "currency": "tech",
    "shop": 0,
-   "price": 730,
+   "price": 10,
    "power": 580,
    "speed": 8,
    "enhance": [
     {
-     "price": 2300,
+     "price": 810,
      "power": 650
     },
     {
-     "price": 3400,
+     "price": 1200,
      "power": 720
     },
     {
-     "price": 4600,
+     "price": 1600,
      "power": 780
     }
    ]
@@ -1049,20 +1028,20 @@
    "level": 12,
    "currency": "tech",
    "shop": 0,
-   "price": 7600,
+   "price": 2700,
    "power": 860,
    "speed": 8,
    "enhance": [
     {
-     "price": 27000,
+     "price": 19000,
      "power": 970
     },
     {
-     "price": 41000,
+     "price": 28000,
      "power": 1100
     },
     {
-     "price": 55000,
+     "price": 38000,
      "power": 1200
     }
    ]
@@ -1071,20 +1050,20 @@
    "level": 13,
    "currency": "tech",
    "shop": 2,
-   "price": 91000,
+   "price": 63000,
    "power": 1300,
    "speed": 8,
    "enhance": [
     {
-     "price": 190000,
+     "price": 170000,
      "power": 1500
     },
     {
-     "price": 280000,
+     "price": 260000,
      "power": 1600
     },
     {
-     "price": 370000,
+     "price": 350000,
      "power": 1800
     }
    ]
@@ -1093,12 +1072,12 @@
    "level": 14,
    "currency": "tech",
    "shop": 2,
-   "price": 620000,
+   "price": 580000,
    "power": 1900,
    "speed": 8,
    "enhance": [
     {
-     "price": 750000,
+     "price": 720000,
      "power": 2200
     },
     {
@@ -1106,7 +1085,7 @@
      "power": 2400
     },
     {
-     "price": 1500000,
+     "price": 1400000,
      "power": 2600
     }
    ]
@@ -1115,12 +1094,12 @@
    "level": 15,
    "currency": "tech",
    "shop": 4,
-   "price": 2500000,
+   "price": 2400000,
    "power": 2900,
    "speed": 8,
    "enhance": [
     {
-     "price": 930000,
+     "price": 900000,
      "power": 3300
     },
     {
@@ -1128,7 +1107,7 @@
      "power": 3600
     },
     {
-     "price": 1900000,
+     "price": 1800000,
      "power": 4000
     }
    ]
@@ -1137,20 +1116,20 @@
    "level": 16,
    "currency": "tech",
    "shop": 4,
-   "price": 3100000,
+   "price": 3000000,
    "power": 4400,
    "speed": 8,
    "enhance": [
     {
-     "price": 4200000,
+     "price": 3900000,
      "power": 4900
     },
     {
-     "price": 6300000,
+     "price": 5900000,
      "power": 5400
     },
     {
-     "price": 8400000,
+     "price": 7800000,
      "power": 6000
     }
    ]
@@ -1159,20 +1138,20 @@
    "level": 17,
    "currency": "tech",
    "shop": 4,
-   "price": 14000000,
+   "price": 13000000,
    "power": 6600,
    "speed": 8,
    "enhance": [
     {
-     "price": 5400000,
+     "price": 5100000,
      "power": 7400
     },
     {
-     "price": 8100000,
+     "price": 7700000,
      "power": 8100
     },
     {
-     "price": 11000000,
+     "price": 10000000,
      "power": 8900
     }
    ]
@@ -1181,20 +1160,20 @@
    "level": 18,
    "currency": "tech",
    "shop": 4,
-   "price": 18000000,
+   "price": 17000000,
    "power": 9900,
    "speed": 8,
    "enhance": [
     {
-     "price": 14000000,
+     "price": 15000000,
      "power": 11000
     },
     {
-     "price": 20000000,
+     "price": 22000000,
      "power": 12000
     },
     {
-     "price": 27000000,
+     "price": 29000000,
      "power": 13000
     }
    ]
@@ -1203,20 +1182,20 @@
    "level": 19,
    "currency": "tech",
    "shop": 4,
-   "price": 45000000,
+   "price": 49000000,
    "power": 15000,
    "speed": 8,
    "enhance": [
     {
-     "price": 17000000,
+     "price": 18000000,
      "power": 17000
     },
     {
-     "price": 25000000,
+     "price": 27000000,
      "power": 18000
     },
     {
-     "price": 34000000,
+     "price": 37000000,
      "power": 20000
     }
    ]
@@ -1225,20 +1204,20 @@
    "level": 20,
    "currency": "tech",
    "shop": 4,
-   "price": 56000000,
+   "price": 61000000,
    "power": 22000,
    "speed": 8,
    "enhance": [
     {
-     "price": 25000000,
+     "price": 27000000,
      "power": 25000
     },
     {
-     "price": 38000000,
+     "price": 41000000,
      "power": 27000
     },
     {
-     "price": 50000000,
+     "price": 55000000,
      "power": 30000
     }
    ]
@@ -1247,12 +1226,12 @@
    "level": 21,
    "currency": "star",
    "shop": 0,
-   "price": 6500,
+   "price": 1400,
    "power": 33000,
    "speed": 8,
    "enhance": [
     {
-     "price": 13000,
+     "price": 14000,
      "power": 37000
     },
     {
@@ -1260,7 +1239,7 @@
      "power": 41000
     },
     {
-     "price": 26000,
+     "price": 27000,
      "power": 45000
     }
    ]
@@ -1269,20 +1248,20 @@
    "level": 22,
    "currency": "star",
    "shop": 0,
-   "price": 44000,
+   "price": 45000,
    "power": 50000,
    "speed": 8,
    "enhance": [
     {
-     "price": 130000,
+     "price": 120000,
      "power": 56000
     },
     {
-     "price": 190000,
+     "price": 180000,
      "power": 62000
     },
     {
-     "price": 260000,
+     "price": 250000,
      "power": 68000
     }
    ]
@@ -1291,12 +1270,12 @@
    "level": 23,
    "currency": "star",
    "shop": 2,
-   "price": 430000,
+   "price": 410000,
    "power": 75000,
    "speed": 8,
    "enhance": [
     {
-     "price": 990000,
+     "price": 1000000,
      "power": 84000
     },
     {
@@ -1313,20 +1292,20 @@
    "level": 24,
    "currency": "star",
    "shop": 2,
-   "price": 3300000,
+   "price": 3400000,
    "power": 110000,
    "speed": 8,
    "enhance": [
     {
-     "price": 2700000,
+     "price": 2600000,
      "power": 130000
     },
     {
-     "price": 4100000,
+     "price": 3900000,
      "power": 140000
     },
     {
-     "price": 5400000,
+     "price": 5200000,
      "power": 150000
     }
    ]
@@ -1335,7 +1314,7 @@
    "level": 25,
    "currency": "star",
    "shop": 4,
-   "price": 9000000,
+   "price": 8700000,
    "power": 170000,
    "speed": 8,
    "enhance": [
@@ -1366,11 +1345,11 @@
      "power": 280000
     },
     {
-     "price": 16000000,
+     "price": 17000000,
      "power": 310000
     },
     {
-     "price": 21000000,
+     "price": 23000000,
      "power": 340000
     }
    ]
@@ -1379,20 +1358,20 @@
    "level": 27,
    "currency": "star",
    "shop": 4,
-   "price": 35000000,
+   "price": 38000000,
    "power": 380000,
    "speed": 8,
    "enhance": [
     {
-     "price": 13000000,
+     "price": 14000000,
      "power": 420000
     },
     {
-     "price": 20000000,
+     "price": 22000000,
      "power": 470000
     },
     {
-     "price": 26000000,
+     "price": 29000000,
      "power": 520000
     }
    ]
@@ -1401,20 +1380,20 @@
    "level": 28,
    "currency": "star",
    "shop": 4,
-   "price": 44000000,
+   "price": 48000000,
    "power": 570000,
    "speed": 8,
    "enhance": [
     {
-     "price": 48000000,
+     "price": 57000000,
      "power": 640000
     },
     {
-     "price": 72000000,
+     "price": 86000000,
      "power": 700000
     },
     {
-     "price": 96000000,
+     "price": 110000000,
      "power": 770000
     }
    ]
@@ -1423,20 +1402,20 @@
    "level": 29,
    "currency": "star",
    "shop": 4,
-   "price": 160000000,
+   "price": 190000000,
    "power": 850000,
    "speed": 8,
    "enhance": [
     {
-     "price": 60000000,
+     "price": 72000000,
      "power": 950000
     },
     {
-     "price": 90000000,
+     "price": 110000000,
      "power": 1100000
     },
     {
-     "price": 120000000,
+     "price": 140000000,
      "power": 1200000
     }
    ]
@@ -1445,7 +1424,7 @@
    "level": 30,
    "currency": "star",
    "shop": 4,
-   "price": 200000000,
+   "price": 240000000,
    "power": 1300000,
    "speed": 8,
    "enhance": []
@@ -1470,161 +1449,161 @@
    "tier": 3,
    "currency": "gold",
    "shop": 0,
-   "price": 78,
+   "price": 68,
    "capacity": 35
   },
   {
    "tier": 4,
    "currency": "gold",
    "shop": 2,
-   "price": 290,
+   "price": 200,
    "capacity": 40
   },
   {
    "tier": 5,
    "currency": "gold",
    "shop": 2,
-   "price": 360,
+   "price": 240,
    "capacity": 50
   },
   {
    "tier": 6,
    "currency": "gold",
    "shop": 2,
-   "price": 5300,
+   "price": 4700,
    "capacity": 60
   },
   {
    "tier": 7,
    "currency": "gold",
    "shop": 4,
-   "price": 17000,
+   "price": 14000,
    "capacity": 70
   },
   {
    "tier": 8,
    "currency": "gold",
    "shop": 4,
-   "price": 21000,
+   "price": 17000,
    "capacity": 80
   },
   {
    "tier": 9,
    "currency": "gold",
    "shop": 4,
-   "price": 330000,
+   "price": 260000,
    "capacity": 90
   },
   {
    "tier": 10,
    "currency": "gold",
    "shop": 4,
-   "price": 1800000,
+   "price": 2100000,
    "capacity": 100
   },
   {
    "tier": 11,
    "currency": "tech",
    "shop": 0,
-   "price": 370,
+   "price": 5,
    "capacity": 110
   },
   {
    "tier": 12,
    "currency": "tech",
    "shop": 0,
-   "price": 1100,
+   "price": 410,
    "capacity": 120
   },
   {
    "tier": 13,
    "currency": "tech",
    "shop": 2,
-   "price": 14000,
+   "price": 9500,
    "capacity": 140
   },
   {
    "tier": 14,
    "currency": "tech",
    "shop": 2,
-   "price": 93000,
+   "price": 87000,
    "capacity": 160
   },
   {
    "tier": 15,
    "currency": "tech",
    "shop": 4,
-   "price": 380000,
+   "price": 360000,
    "capacity": 180
   },
   {
    "tier": 16,
    "currency": "tech",
    "shop": 4,
-   "price": 470000,
+   "price": 450000,
    "capacity": 200
   },
   {
    "tier": 17,
    "currency": "tech",
    "shop": 4,
-   "price": 2100000,
+   "price": 2000000,
    "capacity": 220
   },
   {
    "tier": 18,
    "currency": "tech",
    "shop": 4,
-   "price": 2700000,
+   "price": 2600000,
    "capacity": 240
   },
   {
    "tier": 19,
    "currency": "tech",
    "shop": 4,
-   "price": 6800000,
+   "price": 7400000,
    "capacity": 260
   },
   {
    "tier": 20,
    "currency": "tech",
    "shop": 4,
-   "price": 8400000,
+   "price": 9200000,
    "capacity": 280
   },
   {
    "tier": 21,
    "currency": "star",
    "shop": 0,
-   "price": 3300,
+   "price": 700,
    "capacity": 300
   },
   {
    "tier": 22,
    "currency": "star",
    "shop": 0,
-   "price": 6600,
+   "price": 6800,
    "capacity": 320
   },
   {
    "tier": 23,
    "currency": "star",
    "shop": 2,
-   "price": 65000,
+   "price": 62000,
    "capacity": 340
   },
   {
    "tier": 24,
    "currency": "star",
    "shop": 2,
-   "price": 500000,
+   "price": 510000,
    "capacity": 360
   },
   {
    "tier": 25,
    "currency": "star",
    "shop": 4,
-   "price": 1400000,
+   "price": 1300000,
    "capacity": 380
   },
   {
@@ -1638,28 +1617,28 @@
    "tier": 27,
    "currency": "star",
    "shop": 4,
-   "price": 5300000,
+   "price": 5700000,
    "capacity": 420
   },
   {
    "tier": 28,
    "currency": "star",
    "shop": 4,
-   "price": 6600000,
+   "price": 7200000,
    "capacity": 450
   },
   {
    "tier": 29,
    "currency": "star",
    "shop": 4,
-   "price": 24000000,
+   "price": 29000000,
    "capacity": 480
   },
   {
    "tier": 30,
    "currency": "star",
    "shop": 4,
-   "price": 30000000,
+   "price": 36000000,
    "capacity": 500
   }
  ],
@@ -1667,14 +1646,14 @@
   {
    "slot": 4,
    "currency": "tech",
-   "price": 140000,
+   "price": 130000,
    "world": 2,
    "layer": 3
   },
   {
    "slot": 5,
    "currency": "star",
-   "price": 720000,
+   "price": 730000,
    "world": 3,
    "layer": 3
   }
@@ -2845,7 +2824,6 @@
   "need": 5,
   "bonusMultiplier": 2.5
  },
- "capPenalty": 0.5,
  "rebirth": {
   "world": 3,
   "layer": 6,
