@@ -51,7 +51,8 @@ const BRIDGE_EXIT = { x: 0, z: 30 } as const;
  *  front walls so the two neighbouring shops never swap words in a view along the row), `signY` high. */
 const BUILDING = {
   sale: { forward: 1.1, signForward: 6.7, signY: 5.6 },
-  shop: { forward: 0, signForward: 3.2, signY: 6.9 },
+  // 2026-10-31: 6.9 m sat on the roof's peak and ran into the chimney; it now floats clear over both.
+  shop: { forward: 0, signForward: 3.6, signY: 8.6 },
   bags: { forward: .8, signForward: 3.6, signY: 7.1 },
 } as const;
 
