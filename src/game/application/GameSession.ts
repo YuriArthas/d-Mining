@@ -166,10 +166,14 @@ export class GameSession {
     this.feedback({ type: 'denied', reason });
   }
   private petTier(pet: { speciesId: string }) { return ['common', 'rare', 'epic', 'legendary'].indexOf(this.petService.catalog.pet(pet.speciesId).rarity); }
-  /** The one tip on screen, when it appeared, and the quiet time before another may follow. */
+  /** The one tip on screen, when it appeared, and the quiet time before another may follow, on the tips' clock: it
+   *  stands still while a panel or the loading screen covers the game (since when, and for how long in all). */
   private tip: TipId | null = null;
   private tipSince = 0;
   private tipQuietUntil = 0;
+  private tipsCovered: number | null = null;
+  private tipsCoveredFor = 0;
+  private tipClock() { return (this.tipsCovered ?? this.clock()) - this.tipsCoveredFor; }
   readonly pets: PetUiAdapter;
   private readonly onboarding: Onboarding;
   private guideLocation: 'surface'|'mine'|'room'|null = null;
@@ -332,11 +336,11 @@ export class GameSession {
    *  level, pets) and ride along with the next save; only a tip that merely timed out saves at once. */
   private updateTips() {
     if (this.suspended) return;
-    const state=this.tipState(), now=this.clock();
+    const state=this.tipState(), now=this.tipClock();
     for (const id of TIP_IDS) if (id!==this.tip && tipLearned(id,state)) this.onboarding.markSeen(id);
     if (this.tip && tipLearned(this.tip,state)) this.endTip(now);
     else if (this.tip && now-this.tipSince>=TIP_SECONDS[this.tip] && this.endTip(now)) this.committed(false);
-    if (!this.tip && now>=this.tipQuietUntil) {
+    if (!this.tip && this.tipsCovered===null && now>=this.tipQuietUntil) {
       const next=nextTip(state);
       if (next) { this.tip=next; this.tipSince=now; }
     }
@@ -353,7 +357,18 @@ export class GameSession {
   /** The player tapped the tip away, or used the control it points at. */
   dismissTip = (id?: TipId) => {
     if (!this.tip || (id && id !== this.tip)) return;
-    if (this.endTip(this.clock())) this.committed(false);
+    if (this.endTip(this.tipClock())) this.committed(false);
+    this.publish();
+  };
+  /** The UI covers the game (a panel, the loading screen, the page in the background) or shows it again. While it is
+   *  covered no tip starts and a tip's seconds stand still; a cover that comes during the quiet after a tip restarts
+   *  the quiet when it goes: closing the shop a tip led to does not bring the next tip straight away. */
+  coverTips = (covered: boolean) => {
+    if (covered === (this.tipsCovered !== null)) return;
+    if (covered) { this.tipsCovered = this.clock(); return; }
+    this.tipsCoveredFor += this.clock() - this.tipsCovered!; this.tipsCovered = null;
+    const now = this.tipClock();
+    if (this.tipQuietUntil > now) this.tipQuietUntil = now + TIP_GAP;
     this.publish();
   };
   private makeSnapshot() {

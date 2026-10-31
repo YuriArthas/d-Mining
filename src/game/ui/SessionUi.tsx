@@ -94,6 +94,7 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
 
   const panel = modal?.kind ?? (shopOpen ? 'shop' : stationOpen ? 'station' : portalOpen ? 'portal' : 'none');
   const tipHidden = !!modal || shopOpen || stationOpen || portalOpen || blocked || !focused;
+  useEffect(() => session.coverTips(tipHidden), [tipHidden, session]);
   useEffect(() => { if (stationOpen || portalOpen) input.reset(); }, [stationOpen, portalOpen, input]);
   const prompts = <>
     {state.atMachine && <GameButton className="ui-btn capsule-world-prompt" data-tone="purple" data-size="m" onPress={() => open({ kind: 'capsule' })}><Icon kind="gift" /><span className="ui-outline"><span className="desktop-hint">E · </span>{tr('幸运扭蛋机')}</span></GameButton>}
@@ -101,7 +102,7 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
   </>;
   return <div className="session-ui" data-panel={panel}>
     <TipMarker tip={state.tip} anchor={state.tipAnchor} marker={guideMarker} hidden={tipHidden} />
-    {!modal && !shopOpen && <Hud session={session} system={system} prompts={prompts} tipHidden={blocked || !focused}
+    {!modal && !shopOpen && <Hud session={session} system={system} prompts={prompts} tipHidden={tipHidden}
       actions={{
         openPets: () => { session.dismissTip('pets'); open({ kind: 'bag', tab: 'pets' }); }, openMinerals: () => open({ kind: 'bag', tab: 'ores' }),
         openShop: () => { session.dismissTip('shop'); openShop('tools'); }, openBackpacks: () => openShop('backpacks', 'next'),

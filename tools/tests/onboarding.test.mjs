@@ -82,6 +82,31 @@ test('镐子和宠物提示各一次、一次只显示一个、中间留出安�
   assert.equal(tip(s), null);
 });
 
+// 2026-10-31: 商店 ended its tip as the shop opened, so the quiet time ran out inside the shop and the 宠物 tip came
+// the moment the shop closed.
+test('面板或加载画面盖住游戏时不出新提示、提示不计时；安静时间里打开的面板，关掉后重新安静一整段，关掉商店不会马上接下一条', () => {
+  const upgrade = new GameSession(SESSION_CONTENT).getSnapshot().pickaxeUpgrade.price;
+  const egg = SESSION_CONTENT.petContent.eggs.find(e => e.id === 'meadow-egg').price;
+  now = 0;
+  const s = restore(learnedSave(data => { data.wallet.balances.gold = Math.max(upgrade, egg) + 10; }));
+  s.coverTips(true);
+  s.updatePosition(farFromMine, true);
+  assert.equal(tip(s), null, 'nothing under the loading screen');
+  now += 30; s.coverTips(false);
+  assert.equal(tip(s)?.id, 'shop', 'it comes when the game shows');
+  s.coverTips(true); now += TIP_SECONDS.shop + 5; s.updatePosition(atMine, true);
+  assert.equal(tip(s)?.id, 'shop', 'a covered tip does not run out');
+  s.coverTips(false);
+  // 商店 ends the tip, then the trip there takes a few seconds in view before the shop opens.
+  s.dismissTip('shop'); now += TIP_GAP - 1; s.updatePosition(atMine, true); s.coverTips(true);
+  now += 60; s.updatePosition(farFromMine, true);
+  assert.equal(tip(s), null, 'nothing while in the shop');
+  s.coverTips(false); now += TIP_GAP - .1; s.updatePosition(atMine, true);
+  assert.equal(tip(s), null, 'a whole quiet after the shop closes');
+  now += .2; s.updatePosition(farFromMine, true);
+  assert.equal(tip(s)?.id, 'pets');
+});
+
 test('玩家已经做过的事不再提示：先升级了镐子或已有宠物，就直接记为已提示', () => {
   now = 0;
   const s = restore(learnedSave(data => { data.wallet.balances.gold = 1e6; data.pickaxe.level = 3; delete data.equipment; }));
