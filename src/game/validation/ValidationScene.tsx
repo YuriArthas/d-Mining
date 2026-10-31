@@ -206,6 +206,8 @@ export function ValidationScene({
       const current = runtime.current;
       let drewWorld = false;
       const submitted = submission.current?.draw(() => {
+        // Queued warmup draws first, outside the frame's statistics; the world drawn next covers their pixel.
+        runtime.current?.beforeDraw();
         runtime.current?.facilities.beginSurfaceDraw();
         const autoReset = gl.info.autoReset;
         gl.info.autoReset = false;

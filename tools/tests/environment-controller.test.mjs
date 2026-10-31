@@ -19,18 +19,21 @@ test('prewarm and the first surface frame use the same daylight',()=>{
  const before=[c.ambient.color.getHex(),c.ambient.intensity,c.key.color.getHex(),c.key.intensity,...c.key.position.toArray()];
  c.env.update(surface,.016);
  assert.deepEqual([c.ambient.color.getHex(),c.ambient.intensity,c.key.color.getHex(),c.key.intensity,...c.key.position.toArray()],before);
- assert.equal(c.scene.fog,null);assert.equal(c.scene.background,null);assert.equal(c.sky.active,true);
+ assert.ok(c.scene.fog.near>=1e4,'a fog beyond anything drawn');assert.equal(c.scene.background,null);assert.equal(c.sky.active,true);
  assert.equal(c.key.intensity,DAY.sunIntensity);assert.equal(c.ambient.intensity,DAY.ambientIntensity);
  assert.deepEqual(c.key.position.toArray(),[...DAY.sunPosition]);assert.equal(c.env.surfaceBlend,1);
 });
+// The same fog object on the surface and underground, only its distances change: adding or removing scene.fog
+// switches every material's shader (2026-10-31: twelve programs compiled entering the first hall).
 test('underground detaches the surface environment and tracks the configured depth; returning restores it',()=>{
- const c=setup();c.env.prepare(surface);
+ const c=setup();c.env.prepare(surface);const fog=c.scene.fog;
  c.env.update({...surface,surface:false,surfaceLightStrength:0,depth:400,sky:'#414e55'},.1);
+ assert.equal(c.scene.fog,fog);
  assert.equal(c.sky.active,false);assert.equal(c.env.surfaceBlend,0);
  assert.equal(c.key.position.y,42-400);assert.equal(c.key.target.position.y,-400);
  assert.equal(c.scene.fog.near,38);assert.equal(c.scene.fog.far,74);
  assert.equal(c.key.castShadow,false);
- c.env.update(surface,.1);assert.equal(c.scene.fog,null);assert.equal(c.sky.active,true);
+ c.env.update(surface,.1);assert.equal(c.scene.fog,fog);assert.ok(fog.near>=1e4);assert.equal(c.sky.active,true);
 });
 test('a layer with its own cave mood uses it underground',()=>{
  const c=setup(),cave={sky:'#8a90e0',ground:'#3d3560',ambient:1.05,key:'#b4c0ff',keyIntensity:.9,fog:'#211f3c'};
@@ -86,7 +89,7 @@ test('30m, 32m and 100m down the first mine keep the underground baseline under 
    c.env.update(frame,.016);
    assert.equal(c.sky.active,true);assert.equal(c.sky.lightingStrength,0);assert.equal(c.env.surfaceBlend,0);
    assert.deepEqual(baseLighting(c),baseline);assert.equal(c.env.updates,updates);
-   assert.equal(c.scene.fog,null,'retaining the visible sky must not introduce a fog switch at 30m');
+   assert.ok(c.scene.fog.near>=1e4,'retaining the visible sky must not bring the cave fog in at 30m');
   }
   c.env.dispose();
  }

@@ -125,6 +125,8 @@ export function attachGameDebug(
           spawn: r.spawn,
           layout: r.layout,
         })),
+        /** Every world's halls (rooms above is world 1's). */
+        worldRooms: current.content.worlds.flatMap((w) => w.rooms.map((r) => ({ id: r.id, world: w.id, spawn: r.spawn }))),
         /** Where to stand to use each egg (checks walk up to a locked one). */
         eggStations: current.content.session.eggStations.map((s) => ({ eggId: s.eggId, zone: s.zone })),
         /** Where to stand for each world's portal and teleport station. */

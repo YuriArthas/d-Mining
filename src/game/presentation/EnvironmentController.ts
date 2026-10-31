@@ -39,6 +39,8 @@ type Sky = Pick<
   "setEnabled" | "setLightingStrength" | "prepareDraw" | "markSubmitted" | "dispose" | "diagnostics" | "active"
 > & Partial<Pick<SurfaceEnvironment, "setEnvironmentOverride">>;
 
+const CLEAR_FOG = 1e4;
+
 // Owns the sky. Scene and React-owned ambient/key lights are borrowed. The surface is always in daylight;
 // down the shaft the light fades into the layer's own dark mood. It knows environment parameters, never
 // layer IDs, facilities, input or terrain.
@@ -53,6 +55,7 @@ export class EnvironmentController {
   private readonly blended: Color;
   private readonly target = new Color();
   private readonly colorTarget = new Color();
+  private readonly fog = new Fog("#000000", CLEAR_FOG, 2 * CLEAR_FOG);
   private surfaceStrength = 0;
   private lastKey = "";
   private disposed = false;
@@ -125,15 +128,17 @@ export class EnvironmentController {
       );
     this.sky.setLightingStrength(strength);
     this.sky.setEnabled(frame.surface);
-    if (frame.surface) scene.fog = null;
+    // One fog throughout, beyond anything drawn on the surface: adding and removing scene.fog switches every
+    // material's shader, and each was compiled the first time it was seen in the fog (twelve programs in the first
+    // hall, 2026-10-31). 1e4 m stays inside a phone's mediump range.
+    scene.fog = this.fog;
+    if (frame.surface) { this.fog.near = CLEAR_FOG; this.fog.far = 2 * CLEAR_FOG; }
     else {
       const color = delta === undefined ? this.target : this.blended;
       scene.background = color;
-      if (!(scene.fog instanceof Fog))
-        scene.fog = new Fog(color, config.fog.near, config.fog.far);
-      scene.fog.color.copy(color);
-      scene.fog.near = config.fog.near;
-      scene.fog.far = config.fog.far;
+      this.fog.color.copy(color);
+      this.fog.near = config.fog.near;
+      this.fog.far = config.fog.far;
     }
     ambient.color.set(underground.skyColor).lerp(this.colorTarget.set(day.skyColor), strength);
     ambient.groundColor.set(groundLight).lerp(this.colorTarget.set(day.groundColor), strength);

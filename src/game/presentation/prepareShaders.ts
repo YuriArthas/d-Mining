@@ -24,15 +24,21 @@ function warmable(object:Object3D){
 // programs on the spawn (teleport pads, water, labels), each a hitch on Windows (report 2026-10-28).
 // Draw just one loading-screen pixel on the default framebuffer: offscreen targets
 // can change tone-mapping/output-space defines and warm the wrong shader variant.
-export async function prepareShaders(renderer:WebGLRenderer,source:Scene,camera:Camera,signal:AbortSignal,onProgress:(done:number,total:number)=>void){
+// In play (a later world's scene, loaded on the trip there): `only` warms just the meshes under it, under the whole
+// scene's lights, and `inFrame` runs each one-pixel draw inside the game's next drawn frame, before the world: drawn
+// between frames, a frame the game skips would show the canvas cleared but for that pixel.
+export async function prepareShaders(renderer:WebGLRenderer,source:Scene,camera:Camera,signal:AbortSignal,onProgress:(done:number,total:number)=>void,
+ {only=source,inFrame}:{only?:Object3D;inFrame?:(draw:()=>void)=>Promise<void>}={}){
  const started=performance.now(),warm=new Scene();
  warm.environment=source.environment;warm.environmentIntensity=source.environmentIntensity;warm.environmentRotation.copy(source.environmentRotation);warm.fog=source.fog;
  source.updateMatrixWorld(true);camera.updateMatrixWorld(true);
  const meshes:Mesh[]=[],seen=new Set<string>();
  source.traverse(object=>{
-  if(!warmable(object))return;
-  if('isLight' in object){const light=object.clone();warm.add(light);if(light instanceof DirectionalLight||light instanceof SpotLight){light.target.updateMatrixWorld(true);warm.add(light.target);}return;}
-  if(!(object instanceof Mesh)||!camera.layers.test(object.layers))return;
+  if(!warmable(object)||!('isLight' in object))return;
+  const light=object.clone();warm.add(light);if(light instanceof DirectionalLight||light instanceof SpotLight){light.target.updateMatrixWorld(true);warm.add(light.target);}
+ });
+ only.traverse(object=>{
+  if(!warmable(object)||!(object instanceof Mesh)||!camera.layers.test(object.layers))return;
   const material=Array.isArray(object.material)?object.material:[object.material];
   const key=[...material.map(m=>m.uuid),'isInstancedMesh' in object,object.geometry.morphAttributes.position?.length??0,...Object.keys(object.geometry.attributes).map(k=>k+':'+object.geometry.getAttribute(k).itemSize)].join('|');
   if(seen.has(key))return;seen.add(key);meshes.push(object);
@@ -57,7 +63,11 @@ export async function prepareShaders(renderer:WebGLRenderer,source:Scene,camera:
    onProgress(i,first.length);await yieldLoadingTask(signal);warm.add(...part);
    try{
     if(!parallel){renderer.compile(warm,camera);await yieldLoadingTask(signal);}
-    renderer.setScissor(0,0,1,1);renderer.setScissorTest(true);renderer.render(warm,camera);
+    const draw=()=>{
+     renderer.setScissor(0,0,1,1);renderer.setScissorTest(true);
+     try{renderer.render(warm,camera);}finally{renderer.setScissor(scissor);renderer.setScissorTest(scissorTest);}
+    };
+    if(inFrame){await inFrame(draw);signal.throwIfAborted();}else draw();
    }
    finally{warm.remove(...part);}
   }

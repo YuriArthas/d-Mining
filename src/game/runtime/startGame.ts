@@ -9,6 +9,7 @@ import type {
   Group,
   HemisphereLight,
   DirectionalLight,
+  Object3D,
   PerspectiveCamera,
   Scene,
   WebGLRenderer,
@@ -58,6 +59,8 @@ function createStartupStats() {
     warmupPrograms: 0,
     warmupObjects: 0,
     parallelShaderCompile: false,
+    /** Each later world's warmup on the trip there; `programs` is the renderer's count when it finished. */
+    worldWarmups: [] as { world: WorldId; ms: number; objects: number; newPrograms: number; programs: number }[],
   };
 }
 export type PreparedGame = Awaited<ReturnType<typeof startGame>>;
@@ -218,6 +221,7 @@ export async function startGame(options: StartGameOptions) {
         // A later world's scene starts loading when the player sets off for it; the arrival waits for it. If it
         // fails, the player arrives anyway (its colliders are in place) and the next trip there tries again.
         const world = worldAtFeet(feet);
+        if (warming.has(world)) return false;
         if (surface.worldReady?.(world) ?? true) return true;
         if (failed.delete(world)) return true;
         if (!requested.has(world)) {
@@ -226,13 +230,25 @@ export async function startGame(options: StartGameOptions) {
           const going = tr('正在前往{name}…', { name: worldRequirement(world).name });
           session.announce(going);
           surface.loadWorld!(world, (done, total) => { if (done < total) session.announce(`${going} ${done}/${total}`); }).then(
-            (part) => { if (part) { motion.add(part); lockedEggs.attach(part); } },
+            (part) => { if (part) { motion.add(part); lockedEggs.attach(part); warm(world, part); } },
             (error) => { requested.delete(world); failed.add(world); console.error(error); },
           );
         }
         return false;
       });
-    const requested = new Set<WorldId>(), failed = new Set<WorldId>();
+    const requested = new Set<WorldId>(), failed = new Set<WorldId>(), warming = new Set<WorldId>();
+    // A later world's scene compiles and draws once before the player arrives, behind the travel notice, as the loading
+    // screen does for the first one; otherwise its materials compiled at first sight there (five programs over world
+    // 2's base and halls, 2026-10-31). Its draws go into the game's own frames (beforeDraw).
+    const frameWork: (() => void)[] = [];
+    const inFrame = (draw: () => void) => new Promise<void>((resolve, reject) => frameWork.push(() => { try { draw(); resolve(); } catch (error) { reject(error); } }));
+    const warm = (world: WorldId, part: Object3D) => {
+      warming.add(world);
+      prepareShaders(renderer, scene, camera, abort.signal, () => {}, { only: part, inFrame })
+        .then(({ ms, objects, newPrograms }) => { startup.worldWarmups.push({ world, ms, objects, newPrograms, programs: renderer.info.programs?.length ?? 0 }); })
+        .catch((error) => { if (!abort.signal.aborted) console.error(error); })
+        .finally(() => warming.delete(world));
+    };
     const feedback = new MiningFeedback(session, {
       cell: (cell) => terrain.cell(cell),
       layers: (cell) => generationAtZ(terrain.world.generation, cell[2]).layers,
@@ -365,6 +381,8 @@ export async function startGame(options: StartGameOptions) {
       feedback,
       startup,
       timing,
+      /** Draws queued for the next frame, run inside it just before the world is drawn. */
+      beforeDraw: () => { for (const work of frameWork.splice(0)) work(); },
       dispose: () => {
         abort.abort();
         scope.dispose();

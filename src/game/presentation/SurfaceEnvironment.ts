@@ -69,10 +69,12 @@ export class SurfaceEnvironment {
     this.dome.visible=false;scene.add(this.dome);
     this.bakeMs=performance.now()-start;
   }
+  // The image-based light stays attached, at zero where it does not reach (down the shaft, underground): attaching
+  // and detaching scene.environment switches every standard material's shader, and each one was compiled the first
+  // time it was seen without it, in play (ten programs at 30 m, 2026-10-31).
   private applyEnvironment(){
-    if(this.lightingStrength===0){this.scene.environment=null;this.scene.environmentIntensity=0;return;}
     this.scene.environment=this.filtered.texture;
-    this.scene.environmentIntensity=(this.environmentOverride??this.config.environmentIntensity)*this.lightingStrength;
+    this.scene.environmentIntensity=this.enabled?(this.environmentOverride??this.config.environmentIntensity)*this.lightingStrength:0;
   }
   /** Verification only: image-based light strength (undefined keeps the config). */
   setEnvironmentOverride(intensity:number|undefined){
@@ -94,8 +96,8 @@ export class SurfaceEnvironment {
   setEnabled(enabled: boolean) {
     if(this.disposed)throw new Error('SurfaceEnvironment has been disposed');
     this.enabled=enabled;this.dome.visible=enabled;
-    if(enabled){this.scene.background=null;this.applyEnvironment();}
-    else{this.scene.environment=this.previous;this.scene.environmentIntensity=this.intensity;}
+    if(enabled)this.scene.background=null;
+    this.applyEnvironment();
   }
   // The runtime calls this only after its render gate admits a frame, before drawing any world geometry.
   prepareDraw(){

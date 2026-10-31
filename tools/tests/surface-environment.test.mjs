@@ -41,7 +41,8 @@ test('the daytime sky is baked once, lights the scene and releases everything it
   assert.equal(scene.background,null);assert.equal(scene.getObjectByName('surface-sky').visible,true);
   sky.prepareDraw();sky.markSubmitted();sky.prepareDraw();sky.markSubmitted();
   assert.equal(counters.draws,6,'admitted frames never rebake the sky');
-  sky.setEnabled(false);assert.equal(scene.environment,null);assert.equal(scene.getObjectByName('surface-sky').visible,false);
+  // Underground the light stays attached at zero: detaching it would switch every standard material's shader.
+  const map=scene.environment;sky.setEnabled(false);assert.equal(scene.environment,map);assert.equal(scene.environmentIntensity,0);assert.equal(scene.getObjectByName('surface-sky').visible,false);
   sky.dispose();assert.equal(scene.environment,null);assert.equal(scene.background,background);assert.equal(scene.getObjectByName('surface-sky'),undefined);
   assert.equal(counters.targetDisposals,1);assert.equal(counters.generatorDisposals,1);assert.equal(cubes.size,1);assert.equal(counters.cubeDisposals,1);
   sky.dispose();assert.equal(counters.targetDisposals,1);
@@ -87,7 +88,7 @@ test('image-based light fades independently of the visible sky down the first sh
   sky.setLightingStrength(surfaceLightStrength(29.99));
   assert.ok(scene.environmentIntensity>0&&scene.environmentIntensity<.000001);
   sky.setLightingStrength(0);
-  assert.equal(scene.environment,null);assert.equal(scene.environmentIntensity,0);
+  assert.equal(scene.environment,map,'still attached, so no shader changes');assert.equal(scene.environmentIntensity,0);
   assert.equal(sky.active,true);assert.equal(scene.getObjectByName('surface-sky').visible,true);
   assert.equal(sky.diagnostics().environmentLightingActive,false);
   sky.setLightingStrength(1);assert.equal(scene.environment,map);assert.equal(scene.environmentIntensity,IBL);
