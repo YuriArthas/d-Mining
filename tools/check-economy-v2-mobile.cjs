@@ -1,8 +1,9 @@
+const localTools = require('./local-tools.cjs');
 // Public phone-landscape check for economy v2 P1: three currencies on the HUD, shop, eggs and pets; world 1's
 // shallower rest halls; world 2 in tech coins and the world 3 ticket. Seeds only an isolated acceptance database.
-const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const { chromium } = localTools.playwright();
 const fs = require('node:fs/promises'), path = require('node:path'), assert = require('node:assert/strict');
-const base = 'https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html';
+const base = localTools.gameUrl();
 const dir = path.resolve(process.env.ARTIFACT_DIR || 'output/economy-v2-p1');
 const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36';
 
@@ -38,7 +39,7 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
     await check('A fresh save starts at 0 gold.');
     await page.evaluate(() => window.__miningSave.flush());
     const namespace = await page.evaluate(() => window.__miningSave.namespace); assert.match(namespace, /acceptance/);
-    await page.goto('https://w-sunjun-public.dev.clock-p.com/', { waitUntil: 'domcontentloaded' });
+    await page.goto(localTools.publicRoot(), { waitUntil: 'domcontentloaded' });
     await page.evaluate(async ({ name }) => {
       const db = await new Promise((resolve, reject) => { const q = indexedDB.open(name); q.onsuccess = () => resolve(q.result); q.onerror = () => reject(q.error); });
       await new Promise((resolve, reject) => {

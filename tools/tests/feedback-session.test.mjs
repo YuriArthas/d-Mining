@@ -74,16 +74,20 @@ test('teleporting from a mine never bypasses a locked layer; movement reward act
 });
 test('failed copy awards nothing; successful platform copies share one reward; invite only awards recipient',async()=>{
   const s=fixture(),old=Object.getOwnPropertyDescriptor(globalThis,'navigator');let text='';
+  const oldLocation=Object.getOwnPropertyDescriptor(globalThis,'location');
+  delete globalThis.location;
+  await assert.rejects(s.shareReward('wechat'),/current browser page URL/);
+  Object.defineProperty(globalThis,'location',{configurable:true,value:{origin:'https://mining.example',pathname:'/games/mining/index.html'}});
   try{
     Object.defineProperty(globalThis,'navigator',{configurable:true,value:{clipboard:{writeText:async()=>{throw Error('denied');}}}});
     const before=s.getSnapshot().rewards.balance;assert.equal((await s.shareReward('wechat')).status,'clipboard-failed');assert.equal(s.getSnapshot().rewards.balance,before);
     Object.defineProperty(globalThis,'navigator',{configurable:true,value:{clipboard:{writeText:async value=>{text=value;}}}});
-    assert.equal((await s.shareReward('wechat')).status,'claimed');assert.match(text,/MINING:1:/);assert.equal((await s.shareReward('douyin')).status,'already-claimed');
+    assert.equal((await s.shareReward('wechat')).status,'claimed');assert.match(text,/MINING:1:/);assert.ok(text.includes('https://mining.example/games/mining/index.html'));assert.equal((await s.shareReward('douyin')).status,'already-claimed');
     assert.equal(s.getSnapshot().rewards.balance,before+1);
     assert.equal(s.redeemInvite(s.getSnapshot().rewards.inviteCode).status,'self-invite');
     assert.equal(s.redeemInvite(createInviteCode('other-miner-123')).status,'claimed');assert.equal(s.getSnapshot().rewards.balance,before+3);
     assert.equal(s.redeemInvite(createInviteCode('third-miner-456')).status,'already-claimed');
-  }finally{if(old)Object.defineProperty(globalThis,'navigator',old);else delete globalThis.navigator;}
+  }finally{if(oldLocation)Object.defineProperty(globalThis,'location',oldLocation);else delete globalThis.location;if(old)Object.defineProperty(globalThis,'navigator',old);else delete globalThis.navigator;}
 });
 test('the double-sale boost doubles the quote and the coins of a sale while it runs, and only then',()=>{
   const sell=SESSION_CONTENT.sales[0];

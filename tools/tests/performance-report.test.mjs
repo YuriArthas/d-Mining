@@ -4,7 +4,7 @@ import { PerformanceRecorder } from '../../src/game/presentation/PerformanceReco
 
 // The browser bits the report reads (the device and the page).
 Object.assign(globalThis, {
-  location: { href: 'https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html' },
+  location: { href: 'https://mining.example/games/mining-surface-play/index.html' },
   screen: { width: 1920, height: 1080 }, devicePixelRatio: 2, innerWidth: 1600, innerHeight: 900,
   matchMedia: () => ({ matches: false }),
 });

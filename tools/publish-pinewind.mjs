@@ -1,3 +1,4 @@
+import localTools from './local-tools.cjs';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import {
@@ -10,14 +11,14 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const source = join(root, 'dist');
-const host = '/root/threejs_space/d-game1';
+const host = resolve(localTools.required('MINING_HOST_ROOT'));
 const served = join(host, 'dist');
 // --formal publishes the same build to the formal entry, games/mining (only when the user has authorised it); the
 // test entry, games/mining-surface-play, is the default. The save store follows the path (SaveBootstrap.saveNamespace).
 const formal = process.argv.includes('--formal');
 const slug = formal ? 'mining' : 'mining-surface-play';
 const destination = join(served, 'games', slug);
-const publicRoot = 'https://w-sunjun-public.dev.clock-p.com/';
+const publicRoot = localTools.publicRoot();
 const publicGame = `${publicRoot}games/${slug}/`;
 const withLauncher = process.argv.includes('--launcher');
 const unknownArgs = process.argv.slice(2).filter(arg => arg !== '--launcher' && arg !== '--formal');

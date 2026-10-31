@@ -1,7 +1,7 @@
 import { REVISION, type WebGLRenderer } from 'three';
 
-/** What the "report performance" button (bottom left, PerformanceReportButton) sends to the public host, which keeps
- *  it in d-game1/data/mining-reports/ (docs/phase-performance-report-20261028.md):
+/** What the "report performance" button (bottom left, PerformanceReportButton) sends to the configured host API:
+ *  The host is responsible for storing the report. Contents:
  *  - every animation frame of the last 1800 (30 s at 60 Hz): time, interval, update CPU, drawn or not, draws, triangles;
  *  - one row per second for the last 3 minutes: frame rate, worst frame, CPU, GPU waits, where the player stood, JS heap;
  *  - the browser's long tasks and long animation frames (Chromium), with the scripts that ran in them;

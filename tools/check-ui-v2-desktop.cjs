@@ -1,9 +1,10 @@
+const localTools = require('./local-tools.cjs');
 // Public desktop spot check for UI v2 U9 (docs/draft-ui-v2.md): the phone-first UI must not break on a PC. At
 // 1280×720 and 1920×1080, in English and Chinese, with a mouse: HUD, menu, pets, ores, egg stand, shop, station,
 // portal, rewards, help. Every screen: no text past its box, the open sheet inside the window, HUD zones apart.
-const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const { chromium } = localTools.playwright();
 const fs = require('node:fs/promises'), path = require('node:path'), assert = require('node:assert/strict');
-const base = 'https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html';
+const base = localTools.gameUrl();
 const dir = path.resolve(process.env.ARTIFACT_DIR || 'output/ui-v2-u9-desktop');
 
 (async () => {
@@ -44,7 +45,7 @@ const dir = path.resolve(process.env.ARTIFACT_DIR || 'output/ui-v2-u9-desktop');
   const seed = async mutate => {
     await page.evaluate(() => window.__miningSave.flush());
     const namespace = await page.evaluate(() => window.__miningSave.namespace);
-    await page.goto('https://w-sunjun-public.dev.clock-p.com/', { waitUntil: 'commit', timeout: 120000 });
+    await page.goto(localTools.publicRoot(), { waitUntil: 'commit', timeout: 120000 });
     await page.evaluate(async ({ name, mutate }) => {
       const db = await new Promise((resolve, reject) => { const q = indexedDB.open(name); q.onsuccess = () => resolve(q.result); q.onerror = () => reject(q.error); });
       await new Promise((resolve, reject) => {

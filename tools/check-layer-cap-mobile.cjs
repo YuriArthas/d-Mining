@@ -1,10 +1,11 @@
+const localTools = require('./local-tools.cjs');
 // Public phone-landscape check (2026-10-29): a layer's cap under its recommended pickaxe still breaks, at half the
 // damage, and its plate says which pickaxe it is meant for. World 1's first cap (24-40 m) with the first pickaxe:
 // a small pocket dug into it away from the hall, then a tap on its floor.
 // node tools/check-layer-cap-mobile.cjs
-const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const { chromium } = localTools.playwright();
 const fs = require('node:fs/promises'), path = require('node:path'), assert = require('node:assert/strict');
-const base = 'https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html';
+const base = localTools.gameUrl();
 const dir = path.resolve(process.env.ARTIFACT_DIR || 'output/layer-cap');
 const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36';
 const AIM = { x: 560, y: 230 };

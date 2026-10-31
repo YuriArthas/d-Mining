@@ -1,8 +1,9 @@
+const localTools = require('../local-tools.cjs');
 // Authoring aid for the procedural sound cues (src/game/audio/sfx.ts): renders each cue offline,
 // writes a waveform/spectrogram sheet, level metrics and WAV files.
 //   npx vite --port 5199 --strictPort --host 127.0.0.1      (from the repository root)
 //   node tools/sfx-preview/render.cjs artifacts/sfx
-const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const { chromium } = localTools.playwright();
 const fs = require('node:fs/promises'), path = require('node:path');
 (async () => {
   const dir = path.resolve(process.argv[2] || 'artifacts/sfx');

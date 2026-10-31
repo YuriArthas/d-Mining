@@ -1,5 +1,6 @@
+const localTools = require('./local-tools.cjs');
 // Render docs/ui-mockups/mockups.html frames to PNG (phone landscape, DPR 2).
-const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const { chromium } = localTools.playwright();
 const path = require('node:path'), fs = require('node:fs/promises');
 const source = path.resolve(__dirname, '../docs/ui-mockups/mockups.html');
 const out = path.resolve(process.argv[2] || path.join(__dirname, '../artifacts/ui-mockups'));

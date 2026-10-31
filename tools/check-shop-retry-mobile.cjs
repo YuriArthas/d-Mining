@@ -1,4 +1,5 @@
-const {chromium}=require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const localTools = require('./local-tools.cjs');
+const {chromium}=localTools.playwright();
 const fs=require('node:fs/promises'),assert=require('node:assert/strict'),path=require('node:path');
 (async()=>{
  const dir=path.resolve('artifacts/shop-mobile-retry');await fs.mkdir(dir,{recursive:true});
@@ -7,7 +8,7 @@ const fs=require('node:fs/promises'),assert=require('node:assert/strict'),path=r
  const p=await b.newPage({viewport:{width:640,height:320},isMobile:true,hasTouch:true,deviceScaleFactor:1,userAgent:'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36'});p.setDefaultTimeout(90000);p.on('pageerror',e=>report.errors.push(e.message));
  let interrupted=false;await p.route(/\/showroom-[^/]+\.glb/,async route=>{if(!interrupted){interrupted=true;await route.abort('failed');}else await route.continue();});
  try{
-  await p.goto('https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html?lang=zh&debug=1&submission=fenced&framesInFlight=1&saveTest=shop-retry-'+Date.now(),{waitUntil:'domcontentloaded'});
+  await p.goto(localTools.gameUrl()+'?lang=zh&debug=1&submission=fenced&framesInFlight=1&saveTest=shop-retry-'+Date.now(),{waitUntil:'domcontentloaded'});
   await p.waitForFunction(()=>window.__miningValidation?.snapshot().ready&&!document.querySelector('.loading-screen'),null,{timeout:240000});
   await p.locator('.game-shell').evaluate(e=>{e.style.setProperty('--safe-left','24px');e.style.setProperty('--safe-right','18px');e.style.setProperty('--safe-top','4px');e.style.setProperty('--safe-bottom','8px');});
   await p.evaluate(()=>window.__miningValidation.teleport([-20,.1,-6.3]));await p.getByRole('dialog',{name:'商店分类',exact:true}).waitFor();

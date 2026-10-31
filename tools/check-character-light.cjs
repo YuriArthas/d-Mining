@@ -1,13 +1,14 @@
+const localTools = require('./local-tools.cjs');
 // How bright the player and the pets read from every side, on the public build (characterFill.ts, 2026-10-29).
 // The player with two pets stands on open sand at the spawn; the camera goes round in 8 steps (135° looks straight
 // into the sun). Each view is shot three times: as is, the player's material black, the pets' black; the pixels
 // that change are the figure's, and their mean value (max RGB) is its brightness. FILLS=off,default,strong picks
 // the fill settings to compare (debug hook characterFill).
 // node tools/check-character-light.cjs <outdir>
-const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const { chromium } = localTools.playwright();
 const { createCanvas, loadImage } = require('../surface-game-art/node_modules/@napi-rs/canvas');
 const fs = require('node:fs'), path = require('node:path');
-const base = 'https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html';
+const base = localTools.gameUrl();
 const out = path.resolve(process.argv[2] || 'artifacts/character-light'); fs.mkdirSync(out, { recursive: true });
 const FILLS = { off: { bounce: 1, view: 0 }, default: null, strong: { bounce: 3.6, view: 1.8 } };
 const pick = (process.env.FILLS || 'off,default').split(',');
@@ -35,7 +36,7 @@ function figure(a, black) {
   // Two pets out (saved in the browser's store, then a reload).
   await page.evaluate(() => window.__miningSave.flush());
   const namespace = await page.evaluate(() => window.__miningSave.namespace);
-  await page.goto('https://w-sunjun-public.dev.clock-p.com/', { waitUntil: 'commit' });
+  await page.goto(localTools.publicRoot(), { waitUntil: 'commit' });
   await page.evaluate(async name => {
     const db = await new Promise((res, rej) => { const q = indexedDB.open(name); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); });
     await new Promise((res, rej) => { const t = db.transaction('progress', 'readwrite'), s = t.objectStore('progress'), q = s.get('main');

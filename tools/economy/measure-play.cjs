@@ -1,3 +1,4 @@
+const localTools = require('../local-tools.cjs');
 // P6 measurements on the public test build (docs/draft-economy-v2.md, P6): what the economy model's player knobs
 // cost in the real game. With real input (mouse held, keys): digging straight down from the pit by the spawn, block
 // by block, against the model's swing time; the sell button's trip (teleport to the ring, which sells on entry); the
@@ -6,9 +7,9 @@
 // 3-core server's SwiftShader (under 1 fps, 2026-10-29) it says nothing, and the model takes the cadence from the
 // code instead (docs/phase-economy-calibration-20261029.md).
 // node tools/economy/measure-play.cjs [outdir]
-const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const { chromium } = localTools.playwright();
 const fs = require('node:fs'), path = require('node:path');
-const base = 'https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html';
+const base = localTools.gameUrl();
 const out = path.resolve(process.argv[2] || 'artifacts/economy-measure'); fs.mkdirSync(out, { recursive: true });
 const report = { startedAt: new Date().toISOString(), base };
 const save = () => fs.writeFileSync(path.join(out, 'report.json'), JSON.stringify(report, null, 2));

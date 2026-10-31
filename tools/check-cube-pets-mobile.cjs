@@ -1,8 +1,9 @@
+const localTools = require('./local-tools.cjs');
 // Public phone-landscape check for the cube pets: followers in the world (looks, sparkles by tier,
 // hopping, facing the camera) and the matching UI portraits. Seeds only an isolated acceptance save.
-const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const { chromium } = localTools.playwright();
 const fs = require('node:fs/promises'), path = require('node:path'), assert = require('node:assert/strict');
-const base = 'https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html';
+const base = localTools.gameUrl();
 const dir = path.resolve(process.env.ARTIFACT_DIR || 'artifacts/cube-pets-mobile');
 const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36';
 const PETS = [['p-dragon', 'moon-dragon'], ['p-core', 'core-friend'], ['p-fox', 'amber-fox'], ['p-moss', 'moss-slime'], ['p-owl', 'crystal-owl'], ['p-tide', 'tide-wing'], ['p-star', 'star-guardian']];
@@ -77,7 +78,7 @@ const PETS = [['p-dragon', 'moon-dragon'], ['p-core', 'core-friend'], ['p-fox', 
     await page.goto(url, { waitUntil: 'domcontentloaded' }); await ready();
     await page.evaluate(() => window.__miningSave.flush());
     const namespace = await page.evaluate(() => window.__miningSave.namespace); assert.match(namespace, /acceptance/);
-    await page.goto('https://w-sunjun-public.dev.clock-p.com/', { waitUntil: 'domcontentloaded' });
+    await page.goto(localTools.publicRoot(), { waitUntil: 'domcontentloaded' });
     await page.evaluate(async ([name, pets]) => {
       const db = await new Promise((resolve, reject) => { const q = indexedDB.open(name); q.onsuccess = () => resolve(q.result); q.onerror = () => reject(q.error); });
       await new Promise((resolve, reject) => {

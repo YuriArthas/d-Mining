@@ -1,7 +1,8 @@
-const {chromium} = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const localTools = require('./local-tools.cjs');
+const {chromium} = localTools.playwright();
 const fs=require('node:fs/promises'), path=require('node:path'), assert=require('node:assert/strict');
 const {worldGateZ}=require('../src/game/content/worldJourney.ts');
-const url='https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html';
+const url=localTools.gameUrl();
 const dir=path.resolve(process.env.ARTIFACT_DIR||'artifacts/pinewind-public');
 (async()=>{
  await fs.mkdir(dir,{recursive:true});
@@ -111,8 +112,8 @@ const dir=path.resolve(process.env.ARTIFACT_DIR||'artifacts/pinewind-public');
   await page.evaluate(()=>window.__miningSave.flush());await page.reload({waitUntil:'domcontentloaded'});await ready();
   const saved=await snap();assert.equal(saved.economy.minedVolume,sold.economy.minedVolume);assert.equal(saved.economy.coins,sold.economy.coins);
   check('Mined volume and sale currency survive reload in an isolated IndexedDB save');
-  const launcher=await page.request.get('https://w-sunjun-public.dev.clock-p.com/');assert.ok(launcher.ok());
-  const main=(await launcher.text()).match(/src="([^"]+\.js)"/)[1];const js=await(await page.request.get(new URL(main,'https://w-sunjun-public.dev.clock-p.com/').href)).text();
+  const launcher=await page.request.get(localTools.publicRoot());assert.ok(launcher.ok());
+  const main=(await launcher.text()).match(/src="([^"]+\.js)"/)[1];const js=await(await page.request.get(new URL(main,localTools.publicRoot()).href)).text();
   for(const route of ['mining','mining-test','mining-surface','mining-surface-play'])assert.ok(js.includes('/games/'+route+'/index.html'));
   check('Public launcher retains Mining, mining-test and reference and lists the new playable route');
   report.loadedParts=[...loadedParts];assert.ok(report.loadedParts.length>=2);assert.ok(report.loadedParts.every(n=>n.startsWith('pinewind-')));

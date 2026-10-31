@@ -5,12 +5,12 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {createLogReceiver} from '../../server/logs/receiver.mjs';
 
-const origin='https://w-sunjun-public.dev.clock-p.com';
+const origin='https://mining.example';
 const day=()=>new Date().toISOString().slice(0,10);
 function batch(sessionId,seq=1){return {version:1,sessionId,events:[{seq,elapsedMs:5,type:'test.event',data:{seq}}]};}
 async function fixture(t,options={}){
  const directory=await mkdtemp(join(tmpdir(),'mining-log-test-'));
- const receiver=createLogReceiver({directory,...options});await receiver.ready;
+ const receiver=createLogReceiver({directory,origins:[origin],...options});await receiver.ready;
  await new Promise(resolve=>receiver.server.listen(0,'127.0.0.1',resolve));
  t.after(async()=>{receiver.server.closeAllConnections();await new Promise(resolve=>receiver.server.close(resolve));await receiver.drain();await rm(directory,{recursive:true,force:true});});
  return {...receiver,directory,post:(body,headers={Origin:origin})=>fetch(`http://127.0.0.1:${receiver.server.address().port}/ingest`,{method:'POST',headers,body:typeof body==='string'?body:JSON.stringify(body)})};
@@ -53,4 +53,9 @@ test('daily limit accounts for existing logs after restart',async t=>{
  await mkdir(join(f.directory,day()),{recursive:true});await writeFile(join(f.directory,day(),'previous.jsonl'),'x'.repeat(999));
  assert.equal((await f.post(batch('quota-session-0001'))).status,429);
  assert.equal(f.metrics.events,0);
+});
+
+test('receiver requires explicit origins before creating a log directory',()=>{
+ assert.throws(()=>createLogReceiver({directory:'/unused'}),/Explicit HTTP/);
+ assert.throws(()=>createLogReceiver({directory:'/unused',origins:['*']}),/Explicit HTTP/);
 });

@@ -330,7 +330,7 @@ for clip_name, source_name in [('Idle','idle'), ('Walk','walk'), ('Run','move'),
     strip.action_frame_start = 0
     strip.action_frame_end = count
     track.mute = True
-    sources.append({'clip':clip_name,'animationId':source['animationId'],'animationVersionId':source['currentVersion']['animationVersionId'],'name':source['name'],'source':source['meta'],'duration':count/fps,'sourceRange':[source_start,source_end],'url':'https://rab-sunjun-public.dev.clock-p.com/animations/'+source['animationId']})
+    sources.append({'clip':clip_name,'animationId':source['animationId'],'animationVersionId':source['currentVersion']['animationVersionId'],'name':source['name'],'source':source['meta'],'duration':count/fps,'sourceRange':[source_start,source_end],'service': 'RAB', 'serviceLocation': 'Private deployment; resolve animationId against the configured service'})
 rig.animation_data.action = None
 for bone in rig.pose.bones:
     bone.location=(0,0,0)

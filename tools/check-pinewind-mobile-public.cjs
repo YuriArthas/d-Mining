@@ -1,7 +1,8 @@
-const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const localTools = require('./local-tools.cjs');
+const { chromium } = localTools.playwright();
 const { PerspectiveCamera, Vector3 } = require('../node_modules/three');
 const fs = require('node:fs/promises'), path = require('node:path'), assert = require('node:assert/strict');
-const url = 'https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html';
+const url = localTools.gameUrl();
 const dir = path.resolve(process.env.ARTIFACT_DIR || 'artifacts/pinewind-mobile-public');
 (async () => {
   await fs.mkdir(dir, { recursive: true });

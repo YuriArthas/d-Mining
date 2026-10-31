@@ -1,7 +1,8 @@
+const localTools = require('../local-tools.cjs');
 // Authoring aid for the pet art: 3D model sheet and UI portrait sheet, one egg per row (progression order).
 //   npx vite --port 5199 --strictPort --host 127.0.0.1      (from the repository root)
 //   node tools/pet-preview/render.cjs artifacts/pets
-const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const { chromium } = localTools.playwright();
 const fs = require('node:fs'), path = require('node:path');
 (async () => {
   const dir = path.resolve(process.argv[2] || 'artifacts/pets'); fs.mkdirSync(dir, { recursive: true });

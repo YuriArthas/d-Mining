@@ -2,11 +2,7 @@
 
 Roblox 风格的挖矿游戏，移植到 Web（Three.js r186 / WebGL，React，Rapier）。三个世界，每个世界是地表加六层地下休整层；第一世界的地表是松风矿谷。
 
-- 游戏列表：<https://w-sunjun-public.dev.clock-p.com/>
-- 正式 Mining：<https://w-sunjun-public.dev.clock-p.com/games/mining/index.html>（未经授权不要覆盖）
-- 主线测试入口：<https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html>
-
-所有可试玩改动先发布到公开测试入口，再做场景、交互与截图验证；不用只有开发者能看到的本地预览。
+可将构建产物部署到自己的静态服务器。测试入口与正式入口分开管理，不覆盖正式游戏或其他游戏。
 
 ## 构建、测试与发布
 
@@ -17,10 +13,40 @@ npm ci --ignore-scripts
 npm test                 # 单元与集成测试（node --test tools/tests/*.test.mjs）
 npx tsc --noEmit -p .    # 类型检查（含未使用变量检查）
 npx vite build
-PINEWIND_RELEASE_RECORD=artifacts/<名字>-release.json node tools/publish-pinewind.mjs   # 发布到主线测试入口并核对公网哈希
+# 仅在配置好自己的发布目标、并确认发布范围后执行：
+node tools/publish-pinewind.mjs   # 发布到 games/mining-surface-play/ 并核对公网哈希
 ```
 
 `dist/` 是独立的静态产物，可放进任意静态服务（支持子目录），运行时不需要 Node、后端或外部 CDN。
+
+## 本地工具与部署配置
+
+机器专用路径、部署域名放在仓库根目录的 `.local-tools.json`（已忽略，不随交付提供）。键名与环境变量相同，环境变量优先；`MINING_LOCAL_TOOLS_FILE` 可指定另一份 JSON 配置，显式指定的文件不存在或格式错误会报错。不要将密钥或内部地址写进源码。
+
+| 配置 | 用途 |
+| --- | --- |
+| `MINING_HOST_ROOT` | 发布宿主项目的绝对目录，其 `dist/` 是已配置的静态服务根目录 |
+| `MINING_PUBLIC_ROOT` | 宿主公开根 URL；发布前必须与上方目录对应 |
+| `MINING_GAME_URL` | 浏览器检查使用的完整游戏页面 URL，不带 query/hash |
+| `MINING_PLAYWRIGHT_MODULE` | 可选 Playwright 模块路径；默认使用本项目安装的 `playwright`，缺少则报错 |
+| `MINING_REPORT_DIR` | 宿主保存性能报告的目录，用于读取/验证工具 |
+| `MINING_LOG_ENDPOINT` | 启动遥测接收 URL；独立默认未配置、不发遥测请求 |
+| `MINING_LOG_ENABLED` | `true`/`false` 或 `1`/`0`；配置 endpoint 后默认启用，显式启用而缺少 endpoint 会报错 |
+| `MINING_LOG_PATH_PREFIX` | 启用遥测的页面路径前缀，默认 `/`；可将遥测限制在一个测试入口 |
+| `MINING_LOG_ORIGINS` | 日志接收器允许的 HTTP(S) origin，逗号分隔，必填 |
+| `MINING_LOG_DIR` | 日志接收器存储目录，必填 |
+| `MINING_ANIMATION_SERVICE_ROOT` | 私有 RAB 服务的位置，仅供维护者按 manifest 中真实 animationId 查找；不写入交付 manifest |
+| `TRIPO_API_KEY` / `TRIPO_CONFIG_PATH` | 生成工具凭据；未设置 key 时读取指定配置或用户目录下 `.tripo/config.json` |
+
+Vite 只将遥测配置注入页面，不会注入整份本地配置。`MINING_LOG_ENABLED=false npm run build` 可生成明确关闭启动遥测的独立产物。本机原部署参数保存在忽略配置中，构建时按原测试路径启用。源码的独立默认不包含任何私有 endpoint。性能报告按钮仍使用同源 `/api/mining/performance-reports`，需要部署方提供该接口；接口失败会报告失败，不声称提交成功。
+
+`npm run publish:preview` 发布到 `games/mining-test/`；`node tools/publish-pinewind.mjs` 默认发布到 `games/mining-surface-play/`。后者的 `--launcher` 更新宿主列表，`--formal` 发布正式入口，须分别确认对应授权。发布工具缺少宿主路径或公开 URL 时直接报错。浏览器工具使用本地 Playwright 或显式配置的模块，不固定依赖兄弟项目。
+
+## 交付与历史记录边界
+
+运行交付内容是 `dist/`；源码交付应保留运行源码、依赖清单、构建及必要工具、真实素材来源与许可证。`.local-tools.json`、`.env*.local`、`AGENTS.md`、`docs/` 的阶段报告、`output/`、`artifacts/`、`assets-source/` 的历史任务响应和日志不作为公开交付内容。历史报告未改写，其中可能保留原部署域名、机器路径与内部服务信息；**不要直接将整个工作目录打包交付**。源码素材审计需要原始记录时，应单独审查后提供，不能用脱敏文字替代真实来源或许可。
+
+矿工 manifest 保留真实 Tripo task ID、动作 animation/version ID、原始 provider/externalId、资源哈希。仅移除了私有 RAB 服务 URL；服务名称与来源元数据保留，不据此新增作者或许可声明。rig 工具仍从现有 `assets-source/miner-a/rab-*.json` 读取固定动作数据，不重新生成资产。
 
 ## 美术管线
 

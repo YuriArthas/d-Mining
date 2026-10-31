@@ -1,3 +1,4 @@
+import localTools from '../../tools/local-tools.cjs';
 import {createServer} from 'node:http';
 import {appendFile,mkdir,readdir,rm,stat} from 'node:fs/promises';
 import {resolve,join} from 'node:path';
@@ -5,8 +6,9 @@ import {pathToFileURL} from 'node:url';
 
 const SESSION=/^[a-zA-Z0-9_-]{16,80}$/;
 const MAX_BODY=64*1024,MAX_PENDING=8*1024*1024;
-export function createLogReceiver({directory,origins=['https://w-sunjun-public.dev.clock-p.com'],retentionDays=7,maxDailyBytes=256*1024*1024}={}){
+export function createLogReceiver({directory,origins,retentionDays=7,maxDailyBytes=256*1024*1024}={}){
  if(!directory)throw Error('Log directory is required');
+ if(!Array.isArray(origins)||!origins.length||origins.some(origin=>{try{return new URL(origin).origin!==origin||!/^https?:/.test(origin);}catch{return true;}}))throw Error('Explicit HTTP(S) log origins are required');
  const root=resolve(directory),writers=new Map(),usage=new Map();
  const metrics={requests:0,events:0,rejected:0,pendingBytes:0,writeErrors:0};
  const ready=mkdir(root,{recursive:true,mode:0o700});
@@ -80,7 +82,7 @@ export function createLogReceiver({directory,origins=['https://w-sunjun-public.d
  return {server,metrics,ready:ready.then(cleanup),drain:()=>Promise.allSettled([...writers.values()])};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
- const receiver=createLogReceiver({directory:process.env.MINING_LOG_DIR??'/var/lib/mining-log',origins:(process.env.MINING_LOG_ORIGINS??'https://w-sunjun-public.dev.clock-p.com').split(',')});
+ const receiver=createLogReceiver({directory:localTools.required('MINING_LOG_DIR'),origins:localTools.required('MINING_LOG_ORIGINS').split(',').map(origin=>origin.trim())});
  await receiver.ready;
  receiver.server.listen(Number(process.env.PORT??4186),'127.0.0.1',()=>console.log('Mining log receiver listening on 127.0.0.1:'+receiver.server.address().port));
  for(const signal of ['SIGTERM','SIGINT'])process.once(signal,()=>receiver.server.close(async()=>{await receiver.drain();process.exit(0);}));

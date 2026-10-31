@@ -1,3 +1,4 @@
+import localTools from './local-tools.cjs';
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -5,8 +6,8 @@ import { tmpdir } from 'node:os';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const project=fileURLToPath(new URL('..',import.meta.url));
-const source=join(project,'dist'),host=resolve(project,'../d-game1/dist'),destination=join(host,'games/mining-test');
-const url='https://w-sunjun-public.dev.clock-p.com/games/mining-test/';
+const source=join(project,'dist'),host=resolve(localTools.required('MINING_HOST_ROOT'),'dist'),destination=join(host,'games/mining-test');
+const url=new URL('games/mining-test/',localTools.publicRoot()).href;
 function files(dir){return readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.isDirectory()?files(join(dir,e.name)):[join(dir,e.name)]);}
 const hash=p=>createHash('sha256').update(readFileSync(p)).digest('hex');
 const stable=()=>Object.fromEntries(files(join(host,'games/mining')).sort().map(p=>[relative(host,p),hash(p)]));

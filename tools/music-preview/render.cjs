@@ -1,8 +1,9 @@
+const localTools = require('../local-tools.cjs');
 // Authoring aid for the music, ambience and footsteps (src/game/audio): renders everything offline
 // through the game's mixer and writes spectrogram sheets, level metrics and WAV excerpts.
 //   npx vite --port 5199 --strictPort --host 127.0.0.1      (from the repository root)
 //   node tools/music-preview/render.cjs artifacts/music [songs|ambience|steps|all]
-const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const { chromium } = localTools.playwright();
 const fs = require('node:fs/promises'), path = require('node:path');
 const SONGS = ['meadow', 'timber', 'mushroom', 'crystal', 'ruins', 'ice', 'lava', 'fossil', 'machine', 'core'];
 const ZONES = ['meadow', 'shallow', 'timber', 'mushroom', 'crystal', 'ruins', 'ice', 'lava', 'fossil', 'machine', 'core'];

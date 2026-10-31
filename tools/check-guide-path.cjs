@@ -1,7 +1,8 @@
+const localTools = require('./local-tools.cjs');
 // Public check (desktop, 2026-10-29): the first-dig guide, white chevrons with a dark-blue rim along the way to the
 // mine over the bridge (riding its arch), and the arrow bobbing over the mine. Fresh save, its first tip showing.
 // node tools/check-guide-path.cjs [outdir]
-const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const { chromium } = localTools.playwright();
 const fs = require('node:fs'), path = require('node:path'), assert = require('node:assert/strict');
 const out = path.resolve(process.argv[2] || 'output/guide-path'); fs.mkdirSync(out, { recursive: true });
 const report = { startedAt: new Date().toISOString(), shots: [] };
@@ -10,7 +11,7 @@ const report = { startedAt: new Date().toISOString(), shots: [] };
   const page = await (await browser.newContext({ viewport: { width: 1280, height: 720 } })).newPage();
   const errors = []; page.on('pageerror', e => errors.push(String(e)));
   try {
-    await page.goto(`https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html?lang=zh&debug=1&submission=fenced&framesInFlight=1&saveTest=guidepath-${Date.now()}`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${localTools.gameUrl()}?lang=zh&debug=1&submission=fenced&framesInFlight=1&saveTest=guidepath-${Date.now()}`, { waitUntil: 'domcontentloaded' });
     const ready = () => page.waitForFunction(() => { const s = window.__miningValidation?.snapshot(); return s?.ready && !s.travelling && !document.querySelector('.loading-screen'); }, null, { timeout: 300000, polling: 200 });
     await ready();
     await page.addStyleTag({ content: '.hud-debug-tools{display:none!important}' });

@@ -1,11 +1,12 @@
+const localTools = require('./local-tools.cjs');
 // Public check for the bottom-left "report performance" button (docs/phase-performance-report-20261028.md): on the
 // public build, press it and read the file the public host saved; the saved report is exactly what the browser sent.
 // Pressing again while sending saves nothing extra; a failed send says so and a second press succeeds. Desktop
 // 1600×900 in Chinese, then a touch phone in landscape in English: a round icon beside the thumbstick's foot.
-const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const { chromium } = localTools.playwright();
 const fs = require('node:fs/promises'), path = require('node:path'), assert = require('node:assert/strict');
-const base = 'https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html';
-const reports = '/root/threejs_space/d-game1/data/mining-reports';
+const base = localTools.gameUrl();
+const reports = localTools.required('MINING_REPORT_DIR');
 const dir = path.resolve(process.env.ARTIFACT_DIR || 'artifacts/performance-report');
 const saved = async () => (await fs.readdir(reports).catch(() => [])).filter(n => n.endsWith('.json'));
 

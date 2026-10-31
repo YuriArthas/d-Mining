@@ -121,6 +121,8 @@ test('travel works from a mine for everyone, while locked floors stay rejected',
 
 test('failed clipboard does not award; copied WeChat and Douyin text redeem and share one daily reward', async () => {
   const descriptor = Object.getOwnPropertyDescriptor(navigator, 'clipboard');
+  const oldLocation=Object.getOwnPropertyDescriptor(globalThis,'location');
+  Object.defineProperty(globalThis,'location',{configurable:true,value:{origin:'https://mining.example',pathname:'/games/mining/index.html'}});
   try {
     const session = sessionWith(), captures = [];
     Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async () => { throw Error('denied'); } } });
@@ -137,6 +139,7 @@ test('failed clipboard does not award; copied WeChat and Douyin text redeem and 
     assert.equal(redeemer.getSnapshot().rewards.balance, 2);
     assert.equal(session.getSnapshot().rewards.balance, 1);
   } finally {
+    if(oldLocation)Object.defineProperty(globalThis,'location',oldLocation);else delete globalThis.location;
     if (descriptor) Object.defineProperty(navigator, 'clipboard', descriptor);
     else delete navigator.clipboard;
   }

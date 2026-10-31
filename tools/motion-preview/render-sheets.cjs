@@ -1,3 +1,4 @@
+const localTools = require('../local-tools.cjs');
 // Authoring aid for the code-authored miner motions (src/game/presentation/minerMotions.ts).
 // Renders the real MinerAvatar frame by frame into contact sheets; final acceptance still happens on
 // the public build (tools/check-miner-motion-mobile.cjs).
@@ -5,7 +6,7 @@
 //   node tools/motion-preview/render-sheets.cjs artifacts/motion/v1 '[["swing",{"speed":2}],["jump",{"run":6}]]'
 // swing options: speed, every, count, columns, viewNames (side/front/game/back), target, hold (frames of repeated hits)
 // jump options: every, count, columns, viewNames, run (m/s)
-const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const { chromium } = localTools.playwright();
 (async () => {
   const [prefix, specJson] = process.argv.slice(2);
   const specs = JSON.parse(specJson);

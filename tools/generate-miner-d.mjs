@@ -1,6 +1,8 @@
+import { homedir } from 'node:os';
+import localTools from './local-tools.cjs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { resolve } from 'node:path';
+import { resolve, relative } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
 const output = resolve(root, 'assets-source/miner-d');
@@ -9,7 +11,7 @@ const reference = resolve(root, 'output/imagegen/character-d-reference-20261029/
 await mkdir(output, { recursive: true });
 let key = process.env.TRIPO_API_KEY;
 if (!key) {
-  const config = JSON.parse(await readFile('/root/.tripo/config.json', 'utf8'));
+  const config = JSON.parse(await readFile(localTools.setting('TRIPO_CONFIG_PATH', resolve(homedir(), '.tripo/config.json')), 'utf8'));
   key = config.profiles[config.active_profile]?.api_key;
 }
 if (!key) throw Error('Missing Tripo credential');
@@ -38,7 +40,7 @@ if (!record) {
   };
   const task = await request('/task', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(recipe) });
   if (!task.task_id) throw Error('Missing task ID');
-  record = { taskId: task.task_id, createdAt: new Date().toISOString(), reference, referenceSha256: createHash('sha256').update(bytes).digest('hex'), recipe: { ...recipe, file: { type: 'png', source: reference } } };
+  record = { taskId: task.task_id, createdAt: new Date().toISOString(), reference: relative(root, reference), referenceSha256: createHash('sha256').update(bytes).digest('hex'), recipe: { ...recipe, file: { type: 'png', source: relative(root, reference) } } };
   await writeFile(resolve(output, 'task.json'), JSON.stringify(record, null, 2));
 }
 console.log('Tripo miner D:', record.taskId);

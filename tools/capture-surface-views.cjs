@@ -1,8 +1,9 @@
+const localTools = require('./local-tools.cjs');
 // Scene-only shots of Pinewind from fixed angles (no UI), for before/after colour comparisons.
-const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const { chromium } = localTools.playwright();
 const fs = require('fs'), path = require('path');
 const out = process.argv[2]; fs.mkdirSync(out, { recursive: true });
-const base = 'https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html';
+const base = localTools.gameUrl();
 const VIEWS = [
   ['portal', [0, .1, 46], Math.PI, .18],        // spawn looking south: world portal and teleport station
   ['user', [0, .1, 52], 0, .14],                // the user's original angle: spawn looking north to the mine

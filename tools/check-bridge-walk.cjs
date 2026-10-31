@@ -1,10 +1,11 @@
+const localTools = require('./local-tools.cjs');
 // Public desktop check of the creek bridge: walk the character across with the keyboard on several lanes in
 // both directions, sample the feet every few frames and compare them with the deck profile (the raised-cosine
 // arch in surface-game-art/layout.json `bridge`). Saves a screenshot at the south end of the deck, where the
 // old bridge let the feet sink into its slab. Seeds only an isolated acceptance save.
-const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const { chromium } = localTools.playwright();
 const fs = require('node:fs/promises'), path = require('node:path'), assert = require('node:assert/strict');
-const base = 'https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html';
+const base = localTools.gameUrl();
 const dir = path.resolve(process.env.ARTIFACT_DIR || 'artifacts/bridge-walk');
 const bridge = require('../surface-game-art/layout.json').bridge;
 // Board tops follow chords of this curve (within 7 mm) 0.012 m above the path at the ends.

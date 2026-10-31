@@ -1,9 +1,10 @@
+import localTools from './local-tools.cjs';
 // Reads a report sent by the bottom-left "report performance" button (docs/phase-performance-report-20261028.md).
 // node tools/read-performance-report.mjs [id prefix]   — without a prefix, the newest report.
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
-const dir = '/root/threejs_space/d-game1/data/mining-reports';
+const dir = localTools.required('MINING_REPORT_DIR');
 const names = readdirSync(dir).filter(n => n.endsWith('.json') && n.startsWith(process.argv[2] ?? ''))
   .sort((a, b) => statSync(join(dir, b)).mtimeMs - statSync(join(dir, a)).mtimeMs);
 if (!names.length) { console.error('no report'); process.exit(1); }

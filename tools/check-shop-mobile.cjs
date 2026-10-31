@@ -1,6 +1,7 @@
-const {chromium}=require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const localTools = require('./local-tools.cjs');
+const {chromium}=localTools.playwright();
 const fs=require('node:fs/promises'),path=require('node:path'),assert=require('node:assert/strict');
-const url='https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html';
+const url=localTools.gameUrl();
 const dir=path.resolve(process.env.ARTIFACT_DIR||'artifacts/shop-mobile');
 (async()=>{
  await fs.mkdir(dir,{recursive:true});
@@ -48,7 +49,7 @@ const dir=path.resolve(process.env.ARTIFACT_DIR||'artifacts/shop-mobile');
   await check('Close has no click-through or ghost mining, remains dismissed while standing inside, and leaving/re-entering reopens the shop.');
   // Seed only this unique acceptance database while its game tab is unloaded.
   await p.evaluate(()=>window.__miningSave.flush());const namespace=await p.evaluate(()=>window.__miningSave.namespace);assert.match(namespace,/acceptance/);
-  await p.goto('https://w-sunjun-public.dev.clock-p.com/',{waitUntil:'domcontentloaded'});
+  await p.goto(localTools.publicRoot(),{waitUntil:'domcontentloaded'});
   await p.evaluate(async name=>{const db=await new Promise((r,j)=>{const q=indexedDB.open(name);q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error);});await new Promise((r,j)=>{const t=db.transaction('progress','readwrite'),s=t.objectStore('progress'),q=s.get('main');q.onsuccess=()=>{const v=q.result;v.data.wallet.coins=1000;v.data.onboarding.status='skipped';s.put(v,'main');};t.oncomplete=r;t.onabort=()=>j(t.error);});db.close();},namespace);
   await p.goto(testUrl,{waitUntil:'domcontentloaded'});await ready();await enter();await open('tools');await p.getByRole('button',{name:'下一件商品',exact:true}).tap();await p.getByTestId('shop-buy').tap();
   assert.equal((await gear()).wallet.coins,950);assert.equal((await gear()).pickaxe.level,2);await p.getByTestId('shop-buy').tap({force:true});assert.equal((await gear()).wallet.coins,950);
@@ -63,7 +64,7 @@ const dir=path.resolve(process.env.ARTIFACT_DIR||'artifacts/shop-mobile');
   report.shop=await shop();report.gear=await gear();
   // Reopen an actual purchased bag with mineral contents exceeding the starter bag.
   await p.getByRole('button',{name:'关闭商店',exact:true}).tap();await p.evaluate(()=>window.__miningSave.flush());
-  await p.goto('https://w-sunjun-public.dev.clock-p.com/',{waitUntil:'domcontentloaded'});
+  await p.goto(localTools.publicRoot(),{waitUntil:'domcontentloaded'});
   await p.evaluate(async name=>{const db=await new Promise((r,j)=>{const q=indexedDB.open(name);q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error);});await new Promise((r,j)=>{const t=db.transaction('progress','readwrite'),s=t.objectStore('progress'),q=s.get('main');q.onsuccess=()=>{const v=q.result;v.data.inventory.capacity=150;v.data.inventory.items={'journey.rock.0':51};s.put(v,'main');};t.oncomplete=r;t.onabort=()=>j(t.error);});db.close();},namespace);
   await p.goto(testUrl,{waitUntil:'domcontentloaded'});await ready();await enter();await open('backpacks');await p.getByRole('button',{name:'上一件商品',exact:true}).tap();
   assert.match(await p.getByTestId('shop-buy').innerText(),/请先出售矿石/);assert.equal(await p.getByTestId('shop-buy').isDisabled(),true);assert.equal((await gear()).inventory.items['journey.rock.0'],51);await shot('09-phone-small-bag-protection');

@@ -553,7 +553,8 @@ export class GameSession {
     if(this.suspended)return {status:'unavailable' as const};
     if(platform!=='wechat'&&platform!=='douyin')throw Error('未知分享平台');
     const name=platform==='wechat'?tr('微信'):tr('抖音');
-    const url=typeof location==='undefined'?'https://w-sunjun-public.dev.clock-p.com/games/mining-test/index.html':new URL(location.pathname,location.origin).href;
+    if(typeof location==='undefined')throw Error('Sharing requires the current browser page URL');
+    const url=new URL(location.pathname,location.origin).href;
     const text=tr('我在 Mining 挖到了 {maxDepth} 米！一起来挑战深度纪录。\n{url}\n邀请码：{inviteCode}\n进入游戏，在“奖励”中粘贴口令领取幸运币。分享至{name}。', { maxDepth: Math.floor(this.exploration.maxDepth), url: url, inviteCode: this.rewards.getSnapshot().inviteCode, name: name });
     try { await navigator.clipboard.writeText(text); }
     catch { return {status:'clipboard-failed' as const}; }

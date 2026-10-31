@@ -1,10 +1,11 @@
+const localTools = require('./local-tools.cjs');
 // Public check (desktop, 2026-10-29): portals no longer show what is behind them; each world's shops sell their own
 // shelf (surface, halls of layers 2 and 4) and the HUD shop button goes to the furthest one open; the halls of layer
 // 6 have no shop stall any more (world 1 obsidian, world 2 crates, world 3 the station without its shop counter).
 // node tools/check-shop-layers.cjs [outdir]
-const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const { chromium } = localTools.playwright();
 const fs = require('node:fs'), path = require('node:path'), assert = require('node:assert/strict');
-const base = 'https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html';
+const base = localTools.gameUrl();
 const out = path.resolve(process.argv[2] || 'output/shop-layers'); fs.mkdirSync(out, { recursive: true });
 const report = { url: base, startedAt: new Date().toISOString(), checks: [] };
 const save = () => fs.writeFileSync(path.join(out, 'report.json'), JSON.stringify(report, null, 2));

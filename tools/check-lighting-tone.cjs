@@ -1,9 +1,10 @@
+const localTools = require('./local-tools.cjs');
 // Public phone-landscape comparison of surface lighting tones. Renders the same daytime views with
 // several light settings (applied live through the debug hook, no reload) and writes one image per
 // view and variant plus colour statistics. Seeds only an isolated acceptance save.
-const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const { chromium } = localTools.playwright();
 const fs = require('node:fs/promises'), path = require('node:path'), assert = require('node:assert/strict');
-const base = 'https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html';
+const base = localTools.gameUrl();
 const dir = path.resolve(process.env.ARTIFACT_DIR || 'artifacts/lighting-tone');
 const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36';
 // Desktop by default (the current art checks are desktop only); DEVICE=mobile keeps the phone emulation.

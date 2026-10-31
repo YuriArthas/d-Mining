@@ -1,9 +1,10 @@
+const localTools = require('./local-tools.cjs');
 // Fixed views of world 2's and world 3's surfaces on the public build, UI hidden (the world 2/3 look work, like
 // capture-surface-views.cjs for world 1). Opens every world through the debug unlock page first.
 // node tools/capture-world-views.cjs <outdir>   WORLDS=2 or 3 limits the run; ONLY=w2-spawn,w3-eggs picks views.
-const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const { chromium } = localTools.playwright();
 const path = require('node:path'), fs = require('node:fs');
-const base = 'https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html';
+const base = localTools.gameUrl();
 const out = path.resolve(process.argv[2] || 'artifacts/world-look/now');
 fs.mkdirSync(out, { recursive: true });
 // Each world's local frame: origin at its mine shaft (world z 224 / 448), +Z toward the spawn (local z 46), the

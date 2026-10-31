@@ -1,10 +1,11 @@
+const localTools = require('./local-tools.cjs');
 // Public phone-landscape check for the music, ambience and footsteps. Seeds only an isolated
 // acceptance save; every action uses touch. Sound is verified by the game's own counters, the scene
 // it reports and the measured level of the final audio output, and a short recording of that output
 // is saved (headless Chromium renders audio but nobody listens).
-const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const { chromium } = localTools.playwright();
 const fs = require('node:fs/promises'), path = require('node:path'), assert = require('node:assert/strict');
-const base = 'https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html';
+const base = localTools.gameUrl();
 const dir = path.resolve(process.env.ARTIFACT_DIR || 'artifacts/audio-mobile');
 const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36';
 

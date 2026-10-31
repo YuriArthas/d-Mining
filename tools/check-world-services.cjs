@@ -1,9 +1,10 @@
+const localTools = require('./local-tools.cjs');
 // Public check for worlds 2 and 3 (docs/phase-world-look-20261028.md): standing in each world's sell ring, shop ring,
 // teleport station pad, world portal pad and before one of its eggs turns the matching service on, and nothing
 // blocks the way to them (the player ends up standing there, not pushed off by a collider).
-const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const { chromium } = localTools.playwright();
 const fs = require('node:fs'), path = require('node:path'), assert = require('node:assert/strict');
-const base = 'https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html';
+const base = localTools.gameUrl();
 const dir = path.resolve(process.env.ARTIFACT_DIR || 'artifacts/world-look/services');
 fs.mkdirSync(dir, { recursive: true });
 

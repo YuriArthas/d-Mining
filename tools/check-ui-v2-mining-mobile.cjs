@@ -1,9 +1,10 @@
+const localTools = require('./local-tools.cjs');
 // Public phone-landscape check for UI v2 U3 (docs/draft-ui-v2.md): the plate over the block being mined (name, price,
 // health), damage numbers, the last blow, ore flying to the bag, a full bag and a block the pickaxe cannot dig said
 // on the plate, the plate hidden when the block leaves the screen, and a burst of frames while holding to mine.
-const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const { chromium } = localTools.playwright();
 const fs = require('node:fs/promises'), path = require('node:path'), assert = require('node:assert/strict');
-const base = 'https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html';
+const base = localTools.gameUrl();
 const dir = path.resolve(process.env.ARTIFACT_DIR || 'output/ui-v2-u3');
 const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36';
 const AIM = { x: 560, y: 230 };
@@ -44,7 +45,7 @@ const AIM = { x: 560, y: 230 };
   const seed = async mutate => {
     await page.evaluate(() => window.__miningSave.flush());
     const namespace = await page.evaluate(() => window.__miningSave.namespace);
-    await page.goto('https://w-sunjun-public.dev.clock-p.com/', { waitUntil: 'commit', timeout: 120000 });
+    await page.goto(localTools.publicRoot(), { waitUntil: 'commit', timeout: 120000 });
     await page.evaluate(async ({ name, mutate }) => {
       const db = await new Promise((resolve, reject) => { const q = indexedDB.open(name); q.onsuccess = () => resolve(q.result); q.onerror = () => reject(q.error); });
       await new Promise((resolve, reject) => {

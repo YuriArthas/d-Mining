@@ -14,8 +14,9 @@
   // One line in each language: [zh, en, id, vi].
   var say = function (zh, en, id, vi) { return { zh: zh, en: en, id: id, vi: vi }[lang] || en; };
   var config = window.__MINING_LOG_CONFIG__ || {};
-  var endpoint = config.enabled === false ? '' : (config.endpoint !== undefined ? config.endpoint :
-    (/^\/games\/mining-test\//.test(location.pathname) ? 'https://mining-log-sunjun-public.dev.clock-p.com/ingest' : ''));
+  if (config.enabled === true && !config.endpoint) throw new Error('Mining telemetry requires an endpoint when enabled');
+  var endpoint = config.enabled === false || (config.pathPrefix && location.pathname.indexOf(config.pathPrefix) !== 0)
+    ? '' : (config.endpoint || '');
   var bytes = new Uint8Array(16);
   if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(bytes);
   else for (var i=0;i<bytes.length;i++) bytes[i]=Math.floor(Math.random()*256);

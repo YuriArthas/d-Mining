@@ -5,15 +5,17 @@ import {runInNewContext} from 'node:vm';
 import {webcrypto} from 'node:crypto';
 const source=readFileSync(new URL('../../src/boot/telemetry.js',import.meta.url),'utf8');
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
-function boot({config={},fetcher=async()=>({ok:true}),path='/games/mining-test/index.html'}={}){
+function boot({config={endpoint:'https://logs.example/ingest',pathPrefix:'/games/mining-test/'},fetcher=async()=>({ok:true}),path='/games/mining-test/index.html'}={}){
  const calls=[],listeners={},nodes=Object.fromEntries(['boot-status','boot-detail','boot-session','boot-retry'].map(id=>[id,{}]));
  const window={__MINING_LOG_CONFIG__:config,crypto:webcrypto,addEventListener:(type,cb)=>listeners[type]=cb};
- const ctx={window,crypto:webcrypto,Uint8Array,Blob,AbortController,URL,console:{warn(){},error(){}},location:{pathname:path,origin:'https://w-sunjun-public.dev.clock-p.com'},navigator:{userAgent:'test-agent'},document:{documentElement:{getAttribute:()=> 'test-build'},getElementById:id=>nodes[id],addEventListener(){},visibilityState:'visible'},innerWidth:960,innerHeight:540,devicePixelRatio:1,setInterval(){},setTimeout:()=>0,clearTimeout(){},fetch:(url,options)=>{calls.push({url,body:JSON.parse(options.body)});return fetcher();}};
+ const ctx={window,crypto:webcrypto,Uint8Array,Blob,AbortController,URL,console:{warn(){},error(){}},location:{pathname:path,origin:'https://mining.example'},navigator:{userAgent:'test-agent'},document:{documentElement:{getAttribute:()=> 'test-build'},getElementById:id=>nodes[id],addEventListener(){},visibilityState:'visible'},innerWidth:960,innerHeight:540,devicePixelRatio:1,setInterval(){},setTimeout:()=>0,clearTimeout(){},fetch:(url,options)=>{calls.push({url,body:JSON.parse(options.body)});return fetcher();}};
  runInNewContext(source,ctx);return {log:window.__MINING_LOG__,calls,listeners,nodes};
 }
 test('each tab is independent; disabled and production entries send no requests',async()=>{
  const a=boot(),b=boot();assert.notEqual(a.log.sessionId,b.log.sessionId);
  assert.equal(a.calls[0].body.events[0].type,'boot.start');
+ const standalone=boot({config:{}});assert.equal(standalone.calls.length,0);
+ assert.throws(()=>boot({config:{enabled:true}}),/requires an endpoint/);
  const off=boot({config:{enabled:false}}),production=boot({path:'/games/mining/index.html'});
  off.log.write('test');off.log.flush();assert.equal(off.calls.length,0);assert.equal(production.calls.length,0);
  const injected=boot({config:{endpoint:'https://logs.example/ingest'},path:'/another-game/'});

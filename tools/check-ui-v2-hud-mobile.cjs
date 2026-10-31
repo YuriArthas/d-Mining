@@ -1,9 +1,10 @@
+const localTools = require('./local-tools.cjs');
 // Public phone-landscape check for UI v2 U2 (docs/draft-ui-v2.md): the new HUD on the surface, while mining, in a
 // rest hall, with a full bag, buffs and the rebirth button, at four screen sizes; the HUD zones never overlap each
 // other or the jump button, and the testing unlock and performance report buttons show only with ?debug=1.
-const { chromium } = require('/root/threejs_space/d-Block-Blast/node_modules/playwright');
+const { chromium } = localTools.playwright();
 const fs = require('node:fs/promises'), path = require('node:path'), assert = require('node:assert/strict');
-const base = 'https://w-sunjun-public.dev.clock-p.com/games/mining-surface-play/index.html';
+const base = localTools.gameUrl();
 const dir = path.resolve(process.env.ARTIFACT_DIR || 'output/ui-v2-u2');
 const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36';
 
@@ -52,7 +53,7 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
   const seed = async mutate => {
     await page.evaluate(() => window.__miningSave.flush());
     const namespace = await page.evaluate(() => window.__miningSave.namespace);
-    await page.goto('https://w-sunjun-public.dev.clock-p.com/', { waitUntil: 'commit', timeout: 120000 });
+    await page.goto(localTools.publicRoot(), { waitUntil: 'commit', timeout: 120000 });
     await page.evaluate(async ({ name, mutate }) => {
       const db = await new Promise((resolve, reject) => { const q = indexedDB.open(name); q.onsuccess = () => resolve(q.result); q.onerror = () => reject(q.error); });
       await new Promise((resolve, reject) => {

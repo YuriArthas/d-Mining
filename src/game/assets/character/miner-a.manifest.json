@@ -54,7 +54,8 @@
         0,
         1.9
       ],
-      "url": "https://rab-sunjun-public.dev.clock-p.com/animations/4748"
+      "service": "RAB",
+      "serviceLocation": "Private deployment; resolve animationId against the configured service"
     },
     {
       "clip": "Walk",
@@ -74,7 +75,8 @@
         0,
         1.367
       ],
-      "url": "https://rab-sunjun-public.dev.clock-p.com/animations/4768"
+      "service": "RAB",
+      "serviceLocation": "Private deployment; resolve animationId against the configured service"
     },
     {
       "clip": "Run",
@@ -94,7 +96,8 @@
         0,
         0.567
       ],
-      "url": "https://rab-sunjun-public.dev.clock-p.com/animations/4472"
+      "service": "RAB",
+      "serviceLocation": "Private deployment; resolve animationId against the configured service"
     },
     {
       "clip": "Mine",
@@ -114,7 +117,8 @@
         0.1,
         1.95
       ],
-      "url": "https://rab-sunjun-public.dev.clock-p.com/animations/4698"
+      "service": "RAB",
+      "serviceLocation": "Private deployment; resolve animationId against the configured service"
     }
   ],
   "blend": "assets-source/miner-a/miner-a-rigged.blend",
