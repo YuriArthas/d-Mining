@@ -58,11 +58,11 @@ export function updateGame(
     const currentFeet = player.travelling ?? physics.feet();
     const sceneryStart = performance.now();
     current.sceneryCollision.sync(currentFeet);
-    current.colliderView.update();
     terrain.measurements.add(
       "sceneResidencyMs",
       performance.now() - sceneryStart,
     );
+    current.colliderView.update();
     const layer = stratumAtDepth(
         environmentDepthAtFeet(currentFeet, !player.travelling && physics.grounded, current.content.session.destinations),
         generationAtZ(terrain.world.generation,currentFeet[2]/2).layers,

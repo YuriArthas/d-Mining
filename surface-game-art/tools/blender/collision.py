@@ -11,7 +11,7 @@ the prop's own frame (three's x, y, z, metres), its own triangles, or nothing. E
   mesh_solid(root)                  the prop's own triangles (a bridge deck to walk on)
   passable(root, reason)            nothing: decor the character walks through or never reaches
 """
-import json, bmesh
+import json, math, bmesh
 from mathutils import Vector
 
 _DECISIONS = {}
@@ -79,8 +79,8 @@ def uncovered(root, low=.35, high=1.6):
     if not d or d.get('passable') or d.get('mesh'): return []
     boxes = []
     for s in d['solids']:
-        r = max(s['half'][0], s['half'][2]) if s['yaw'] else 0
-        h = [max(s['half'][0], r), s['half'][1], max(s['half'][2], r)]
+        c, n = abs(math.cos(s['yaw'])), abs(math.sin(s['yaw']))  # a turned box's footprint
+        h = [c * s['half'][0] + n * s['half'][2], s['half'][1], n * s['half'][0] + c * s['half'][2]]
         boxes.append([[s['at'][k] - h[k] for k in range(3)], [s['at'][k] + h[k] for k in range(3)]])
     out = []
     for ob in [o for o in root.children_recursive if o.type == 'MESH']:

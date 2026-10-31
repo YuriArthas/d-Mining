@@ -346,16 +346,15 @@ export function caveKit(hall: HallDefinition, seed: number, palette: CavePalette
     },
 
     /** Small props along the wall feet: `pick` chooses the prop and its scale (drawn after the turn); the prop
-     *  brings its collider, unless `passable` says why this one is left out (a small one). */
-    wallFoot(count: number, pick: () => Readonly<{ name: string; scale: () => number; passable?: string }>) {
+     *  brings its collider. */
+    wallFoot(count: number, pick: () => Readonly<{ name: string; scale: () => number }>) {
       for (let i = 0; i < count; i++) {
         const side = Math.floor(r() * 4), d = (r() - .5) * 34, inset = HALF - 2.9 - r() * .8;
         const [x, z] = alongWall(side, d, inset);
         if (!clearOf(x, z, .8)) continue;
         const choice = pick();
         const yaw = r() * 6.3;
-        const prop = place(choice.name, [x, 0, z], yaw, choice.scale());
-        if (choice.passable) prop.userData.passable = choice.passable;
+        place(choice.name, [x, 0, z], yaw, choice.scale());
       }
     },
   };

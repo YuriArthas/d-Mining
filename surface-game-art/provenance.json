@@ -3,7 +3,7 @@
   "files": [
     {
       "file": "tools/blender/build_architecture.py",
-      "sha256": "15af5e182dddfb5b3f90dee5a2b3d831b31922e3c7e30eaeaee0d2c4f6f1eec6"
+      "sha256": "bc3760d447f91a12b91325aeabeb7d168741a536a9deb9e707585cf4c19b4237"
     },
     {
       "file": "tools/blender/build_nature.py",
@@ -35,7 +35,7 @@
     },
     {
       "file": "source-art/architecture.blend",
-      "sha256": "bba09ba2424f65a1a5cd1fb3c146eb2afb3185086a3daf1de54e1030a780be37"
+      "sha256": "078684e2a2d1919debfcc7e60ce3a979b75a563125ddc058ce4f2ef9a5683875"
     },
     {
       "file": "source-art/nature.blend",
@@ -67,7 +67,7 @@
     },
     {
       "file": "../src/game/content/pinewind/authored.json",
-      "sha256": "838d4d1dd9efefa4f9c7c1c1f50d6c635ee62ce803a137f426223555bdd9fca2"
+      "sha256": "3ca4ecc9262b08fe90b3937ca775524f9374b44998d1e3604d9f7a28c15aa1ca"
     },
     {
       "file": "public/assets/pinewind/architecture-atlas.png",
@@ -79,7 +79,7 @@
     },
     {
       "file": "artifacts/architecture-asset.json",
-      "sha256": "b288b7f2f03e002f7e190a32cce0cdf1edfbbefa63c63072830286a5415aa4b7"
+      "sha256": "2dd76c44120304045336e957caeb63836d35d6b13d3384a23c1db188fa07c624"
     },
     {
       "file": "artifacts/nature-asset.json",
@@ -91,7 +91,7 @@
     },
     {
       "file": "artifacts/light-bake.json",
-      "sha256": "72d80ccffc1737c1fa37cf6a39e9ba4fc200ad3efd9d2c22c2079e248dbf5150"
+      "sha256": "233e95d972f9c174b7593c4d88fd9121043508a007b5db824f42a6f30b63790c"
     },
     {
       "file": "../src/game/assets/scene/pinewind-standing-light.png",
@@ -106,7 +106,7 @@
       "bytes": 2143469,
       "decodedBytes": 2441192,
       "sha256": "4c722dc4f43fb3dcdfac5160704874424ffd6c0942d62ca78d0b519098962e36",
-      "sourceSha256": "5ca0d93355d15c77056a641e9bee72248a057eabd055bb0d3e79aadf1767a716",
+      "sourceSha256": "ce0c21e219f3b66d98b90ff851577e1d16cd90457239d8f4e53d77e2a0b6b4c5",
       "triangles": 18920,
       "source": "Authored Pinewind; Blender architecture and offline procedural landscape; offline baked sun visibility and sky occlusion",
       "materialProfile": "authored-color",

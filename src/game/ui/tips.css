@@ -2,9 +2,9 @@
    first block with its caption. Both labels are the tips' gold (as the HUD tip line), large, with a tail pointing at
    what they name, bobbing gently; the ring pulses. HUD tips are a single gold line under the depth while the control
    they name pulses. Nothing here blocks play. */
-/* The label's tail tip is its anchor; it never rises past --guide-min-top (under the place plate and the bar). */
-.guide-marker { --guide-min-top: calc(var(--safe-top) + 150px); position: absolute; z-index: 2; transform: translate(-50%, -100%); pointer-events: none; padding-bottom: 12px; }
-@container game (min-width: 1000px) and (min-height: 620px) { .guide-marker { --guide-min-top: calc(var(--safe-top) + 190px); } }
+/* The label's tail tip is its anchor: over the mine, or under it (data-below) when the mine is high on the screen. */
+.guide-marker { position: absolute; z-index: 2; transform: translate(-50%, -100%); pointer-events: none; padding-bottom: 12px; }
+.guide-marker[data-below=true] { transform: translate(-50%, 0); padding: 12px 0 0; }
 .guide-marker b, .guide-dig-caption {
   position: relative; display: block; white-space: nowrap; padding: 6px 16px; border: 3.5px solid var(--ui-ink); border-radius: 14px;
   background: var(--ui-gold); color: var(--ui-ink); font: 900 19px/1.25 var(--ui-font);
@@ -21,6 +21,9 @@
   outline: 2.5px solid var(--ui-ink); outline-offset: 0; box-sizing: border-box; animation: tip-ring 1s ease-in-out infinite;
 }
 .guide-dig-caption { position: absolute; bottom: 56px; left: 50%; transform: translateX(-50%); }
+/* Under the target instead, the tail on top pointing up (the target high on the screen, by the place plate). */
+.guide-dig-marker[data-below=true] .guide-dig-caption { bottom: auto; top: 56px; }
+.guide-marker[data-below=true] b::after, .guide-dig-marker[data-below=true] .guide-dig-caption::after { bottom: auto; top: -10px; border-width: 3.5px 0 0 3.5px; }
 .guide-dig-marker[data-has-target=false] .guide-dig-ring,
 .guide-dig-marker[data-has-target=false] .guide-dig-caption::after { display: none; }
 

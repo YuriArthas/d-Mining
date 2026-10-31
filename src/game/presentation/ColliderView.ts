@@ -22,9 +22,11 @@ export class ColliderView {
   }
   update() {
     if (!shown || this.frame++ % 12) return;
-    const { vertices, colors } = this.world.debugRender(undefined, this.shows), geometry = this.lines.geometry;
+    // Copied out of Rapier's memory into a fresh geometry; the old one's GPU buffers are released.
+    const { vertices, colors } = this.world.debugRender(undefined, this.shows), geometry = new BufferGeometry(), old = this.lines.geometry;
     geometry.setAttribute('position', new BufferAttribute(vertices.slice(), 3));
     geometry.setAttribute('color', new BufferAttribute(colors.slice(), 4));
+    this.lines.geometry = geometry; old.dispose();
   }
   dispose() {
     listeners.delete(this.onToggle);

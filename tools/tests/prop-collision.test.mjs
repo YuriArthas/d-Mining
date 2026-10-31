@@ -34,6 +34,10 @@ test('a prop\'s box moves, turns round Y and scales with the prop; any other tur
   const points = [];
   for (let i = 0; i < hull.hull.length; i += 3) points.push(hull.hull.slice(i, i + 3).map((v, k) => v + hull.at[k]));
   assert.ok(points.some(p => close(p, [6, 0, 0])) && points.some(p => close(p, [5, 2, -1])), JSON.stringify(points));
+  // A hull's own yaw turns it before the placement (as SceneryCollision turns it unplaced).
+  const turnedHull = placeSolid({ at: [0, 0, 0], half: [1, 1, 1], yaw: Math.PI / 2, hull: [1, 0, 0, 0, 1, 0, 0, 0, 0] }, placement([0, 0, 0], [0, 0, 0, 1], [1, 1, 1]));
+  assert.equal(turnedHull.yaw, 0);
+  assert.ok(close(turnedHull.half, [0, .5, .5], .02) && close(turnedHull.at, [0, .5, -.5]), JSON.stringify(turnedHull));
   assert.throws(() => placeProp('Mystery', {}, new Matrix4()), /no collision decision/);
   assert.deepEqual(placeProp('Rug', { passable: 'flat on the floor' }, new Matrix4()), []);
 });
@@ -127,6 +131,8 @@ test('every sale, shop and egg zone\'s middle is clear of everything but the gro
   for (const [id, zone] of zones) for (const site of sites) for (const x of site.solids) {
     const bottom = x.at[1] - x.half[1], top = x.at[1] + x.half[1];
     if (top <= zone.y + .1 || bottom >= zone.y + 1.85) continue; // under the feet, or over the head
+    // Anywhere in the ring, nothing low enough to step onto: it would lift a player out of the ring's height.
+    if (top - zone.y > zone.heightTolerance && top - zone.y < .5) assert.ok(gap(x, [zone.x, 0, zone.z]) >= zone.radius, `${id}: a ${(top - zone.y).toFixed(2)} m step at ${x.at.map(v => v.toFixed(2))} inside the ring (${site.id})`);
     assert.ok(gap(x, [zone.x, 0, zone.z]) > reach, `${id} at ${zone.x.toFixed(2)},${zone.z.toFixed(2)}: a collider ${x.half[1] * 2 > 0 ? (top - zone.y).toFixed(2) : ''} m high at ${x.at.map(v => v.toFixed(2))} (${site.id})`);
   }
 });

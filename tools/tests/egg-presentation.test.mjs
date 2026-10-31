@@ -149,8 +149,10 @@ test('the mine label shows only while the mine is in view; off screen the ground
   const camera = new PerspectiveCamera(60, 16 / 9, .1, 100); camera.updateMatrixWorld();
   projector.update(camera, [0, 0, -10], element);
   assert.equal(element.style.visibility, 'visible'); assert.equal(element.style.left, '50%');
-  // Never higher than --guide-min-top: under the place plate at the top of the screen.
-  assert.equal(element.style.top, 'max(var(--guide-min-top, 0px), 50%)');
+  assert.equal(element.style.top, '50%'); assert.equal(element.dataset.below, 'false');
+  // High on the screen the label hangs under the mine (its tail up); behind the place plate at the top, not at all.
+  projector.update(camera, [0, 2.5, -10], element); assert.equal(element.style.visibility, 'visible'); assert.equal(element.dataset.below, 'true');
+  projector.update(camera, [0, 4.6, -10], element); assert.equal(element.style.visibility, 'hidden');
   for (const anchor of [[0, 0, 10], [100, 0, -10], null]) {
     projector.update(camera, anchor, element); assert.equal(element.style.visibility, 'hidden');
   }

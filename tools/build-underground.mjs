@@ -6,8 +6,8 @@
 // prop kits it places, default [<id>]: <kit>-props.glb each). Nodes named Spin_* / Slide_* stay out of the static
 // batches and move in the game (SceneMotion.ts); Egg_* (egg stands) keep their own node too, so the game can find
 // each stand by name (LockedEggs.ts), and cast their shadows like the static scene. Every placed prop brings the
-// colliders its Blender function gave it (collision.py, placed with it by propCollision.ts; a placement may set
-// `userData.passable` to leave a small one out); the hall's own shapes add theirs with the kit's box() and hull().
+// colliders its Blender function gave it (collision.py, placed with it by propCollision.ts); the hall's own shapes
+// add theirs with the kit's box() and hull().
 // Output:
 // surface-game-art/public/assets/underground/<asset>.glb, the packed runtime asset in src/game/assets/scene
 // (<asset>.*), and its colliders in src/game/content/underground/<asset>.json.
@@ -48,25 +48,18 @@ const built = buildHall(prop => {
   copy.userData = { prop, collision: JSON.parse(node.userData.collision) }; return copy;
 });
 
-// The props' colliders where they stand (moving parts at rest); their own triangles for a `mesh` prop.
+// The props' colliders where they stand (moving parts at rest). Their own triangles (mesh_solid) are for Pinewind's
+// models only (export-pinewind-scene.mjs).
 const placed = { solids: 0, passable: 0, props: 0 };
 built.group.updateMatrixWorld(true);
 const toHall = built.group.matrixWorld.clone().invert();
 built.group.traverse(o => {
   if (!o.userData.prop) return;
-  const { prop, collision, passable } = o.userData, matrix = new THREE.Matrix4().multiplyMatrices(toHall, o.matrixWorld);
+  const { prop, collision } = o.userData, matrix = new THREE.Matrix4().multiplyMatrices(toHall, o.matrixWorld);
   o.userData = {}; placed.props++;
-  if (passable || collision.passable) { placed.passable++; return; }
-  if (!collision.solids?.length && !collision.mesh) throw Error(`Prop ${prop} decided no collision`);
-  if (collision.mesh) {
-    const vertices = [], indices = [];
-    o.traverse(m => { if (!m.isMesh) return; const g = m.geometry, p = g.attributes.position, base = vertices.length / 3, to = new THREE.Matrix4().multiplyMatrices(toHall, m.matrixWorld);
-      for (let i = 0; i < p.count; i++) vertices.push(...new THREE.Vector3().fromBufferAttribute(p, i).applyMatrix4(to).toArray());
-      for (let i = 0; i < (g.index?.count ?? p.count); i++) indices.push(base + (g.index ? g.index.getX(i) : i)); });
-    built.solids.push(...placeProp(prop, { solids: [{ at: [0, 0, 0], half: [1, 1, 1], yaw: 0, triangles: { vertices, indices } }] }, new THREE.Matrix4()));
-    placed.solids++;
-  }
-  const solids = collision.solids?.length ? placeProp(prop, { solids: collision.solids }, matrix) : [];
+  if (collision.mesh) throw Error(`Prop ${prop}: mesh_solid is for Pinewind's models, not the halls`);
+  const solids = placeProp(prop, collision, matrix);
+  if (!solids.length) placed.passable++;
   built.solids.push(...solids); placed.solids += solids.length;
 });
 

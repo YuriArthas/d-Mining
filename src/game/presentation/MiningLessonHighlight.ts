@@ -34,8 +34,7 @@ export class MiningLessonHighlight {
       if(terrain.cell(cell.map((v,i)=>v+face[i]) as unknown as Coord))continue;
       this.point.set(...center.map((v,i)=>v+face[i]*(CELL*.5-.015)) as [number,number,number]);
       this.projected.copy(this.point).project(camera);
-      // In the lower half of the screen: the caption over the ring stays clear of the place plate at the top.
-      if(this.projected.z < -1 || this.projected.z > 1 || Math.abs(this.projected.x)>.8 || this.projected.y<-.78 || this.projected.y>0)continue;
+      if(this.projected.z < -1 || this.projected.z > 1 || Math.abs(this.projected.x)>.8 || this.projected.y<-.78 || this.projected.y>.35)continue;
       this.direction.copy(this.point).sub(camera.position).normalize();
       const hit=selectCell(camera.position.toArray(),this.direction.toArray(),[feet[0],feet[1]+1,feet[2]],c=>terrain.cell(c));
       if(!hit||hit.some((v,i)=>v!==cell[i]))continue;
@@ -67,7 +66,7 @@ export class MiningLessonHighlight {
     const caption=element.querySelector('.guide-dig-caption');
     const touch=element.dataset.input==='touch';
     if(!this.cell){
-      element.style.left='50%';element.style.top='70%';
+      element.style.left='50%';element.style.top='70%';element.dataset.below='false';
       if(caption)caption.textContent=touch?tr('拖动观察，寻找可挖方块'):tr('按住右键向下看，寻找可挖方块');
       return;
     }
@@ -77,6 +76,8 @@ export class MiningLessonHighlight {
     this.projected.set(...this.anchor!).project(camera);
     element.style.left=`${(this.projected.x+1)*50}%`;element.style.top=`${(1-this.projected.y)*50}%`;
     element.dataset.cell=this.cell.join(',');
+    // In the upper half of the screen the caption goes under the ring, clear of the place plate at the top.
+    element.dataset.below=String(this.projected.y>0);
     if(caption)caption.textContent=touch?tr('长按这里挖矿'):tr('鼠标移到这里 · 按住左键');
   }
   dispose(){this.fill.geometry.dispose();this.fill.material.dispose();this.outline.geometry.dispose();this.outline.material.dispose();this.group.removeFromParent();}

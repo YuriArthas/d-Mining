@@ -48,10 +48,10 @@ KTX_BIN=/opt/ktx/bin node tools/build-underground.mjs crystal           # 在仓
 每个模型怎么碰撞，写在 Blender 里建它的那个函数中，紧跟在零件后面（`tools/blender/collision.py`）。四种写法：
 - `solid(at, size, yaw)`：盒子；
 - `solid_of(零件或名字前缀, hull=True)`：按零件生成盒子或凸包；
-- `mesh_solid()`：用模型自己的三角形（桥面）；
+- `mesh_solid()`：用模型自己的三角形（松风谷的桥面、矿架；大厅和基地不支持）；
 - `passable(原因)`：不挡人（头顶上的、贴地的）。
 
-没写的模型，导出时报错。场景构建按模型的位置、朝向和缩放换算碰撞（`src/game/world/propCollision.ts`）：大厅和基地在 `build-underground.mjs` 里换算；松风谷在游戏里按 `authored.json` 换算。场景脚本里只给自己生成的形状（洞壁、地面、坑沿）写 `box()`/`hull()`；个别小摆件可以在摆放时设 `userData.passable` 跳过。
+没写的模型，导出时报错。场景构建按模型的位置、朝向和缩放换算碰撞（`src/game/world/propCollision.ts`）：大厅和基地在 `build-underground.mjs` 里换算；松风谷在游戏里按 `authored.json` 换算。场景脚本里只给自己生成的形状（洞壁、地面、坑沿）写 `box()`/`hull()`。
 
 `tools/tests/prop-collision.test.mjs` 检查每个道具都有碰撞设定。游戏里用 `?debug=1` 打开解锁页，点"显示碰撞"可以看到附近的碰撞体线框。
 
@@ -65,4 +65,4 @@ ARTIFACT_DIR=artifacts/pinewind-public-new node tools/check-pinewind-public.cjs
 
 发布到独立 `/games/mining-surface-play/index.html`，保护其他游戏文件。发布器使用 `/root/threejs_space/d-game1`，不会执行 host 的全量游戏构建。首次加入首页需先准备首页入口，再传 `--launcher`；现已列出，不必重复。
 
-公开检查使用本机仓库既有 Playwright：`/root/threejs_space/d-Block-Blast/node_modules/playwright`。它需要可用的 Chromium，采用 SwiftShader 和独立测试存档；不是手机或物理 GPU 性能测试。每次选新 `ARTIFACT_DIR`，不要覆盖历史证据。
+公开检查使用本项目安装的 Playwright（`package.json` 的开发依赖，版本要和本机已装的浏览器对应；也可用 `MINING_PLAYWRIGHT_MODULE` 另指）。它需要可用的 Chromium，采用 SwiftShader 和独立测试存档；不是手机或物理 GPU 性能测试。每次选新 `ARTIFACT_DIR`，不要覆盖历史证据。

@@ -516,8 +516,9 @@ box('Pack_FrontLedger',(0,3.80,3.34),(6.65,.29,.33),1)
 door('Pack_Door',(0,.65,3.30),1.76,2.74,14)
 for xx in (-2.18,2.18): window('Pack_FrontWindow',(xx,2.52,3.32),1.48,1.60)
 window('Pack_EastWindow',(4.15,2.40,0),2.35,2.25,True)
-solid_of([box('Pack_FirstStep',(0,.14,4.73),(3.55,.28,.80),3)])
-solid_of([box('Pack_UpperStep',(0,.37,4.02),(3.25,.30,1.0),11)])
+# The steps stay walkable through, as the sale house's: the backpack ring reaches the first step.
+box('Pack_FirstStep',(0,.14,4.73),(3.55,.28,.80),3)
+box('Pack_UpperStep',(0,.37,4.02),(3.25,.30,1.0),11)
 lamp('Pack_Lantern',(1.25,3.26,3.72),.80)
 # Badge: a big backpack on a walnut plate above the door, read from across the plaza.
 prism('Pack_BadgeBacking',[(x,y+5.10) for x,y in stepped_outline(1.55,1.70,.28)],3.74,3.95,0)

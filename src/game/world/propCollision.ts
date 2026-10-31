@@ -14,20 +14,21 @@ const fromPoints = (points: readonly Vector3[], extra: Partial<Solid> = {}): Sol
 
 /** A solid (in a prop's frame) where the prop stands: `matrix` takes the prop's frame into the scene's. A box keeps
  *  its shape while the turn is round Y only (and the scale keeps it square, if the box is turned in the prop);
- *  otherwise it becomes the hull of its corners. Hulls and triangles move point by point. */
+ *  otherwise it becomes the hull of its corners. Hulls and triangles move point by point, turned by their own yaw
+ *  first (as SceneryCollision turns them unplaced); the result carries no yaw of its own. */
 export function placeSolid(solid: Solid, matrix: Matrix4): Solid {
   const position = new Vector3(), turn = new Quaternion(), scale = new Vector3();
   matrix.decompose(position, turn, scale);
-  const at = new Vector3(...solid.at);
+  const at = new Vector3(...solid.at), own = new Matrix4().makeRotationY(solid.yaw);
   if (solid.triangles) {
     const { vertices, indices } = solid.triangles, points: Vector3[] = [];
-    for (let i = 0; i < vertices.length; i += 3) points.push(new Vector3(vertices[i], vertices[i + 1], vertices[i + 2]).add(at).applyMatrix4(matrix));
+    for (let i = 0; i < vertices.length; i += 3) points.push(new Vector3(vertices[i], vertices[i + 1], vertices[i + 2]).applyMatrix4(own).add(at).applyMatrix4(matrix));
     const placed = fromPoints(points), c = new Vector3(...placed.at);
     return { ...placed, triangles: { vertices: points.flatMap(p => p.sub(c).toArray().map(round)), indices: [...indices] } };
   }
   if (solid.hull) {
     const points: Vector3[] = [];
-    for (let i = 0; i < solid.hull.length; i += 3) points.push(new Vector3(solid.hull[i], solid.hull[i + 1], solid.hull[i + 2]).add(at).applyMatrix4(matrix));
+    for (let i = 0; i < solid.hull.length; i += 3) points.push(new Vector3(solid.hull[i], solid.hull[i + 1], solid.hull[i + 2]).applyMatrix4(own).add(at).applyMatrix4(matrix));
     const placed = fromPoints(points), c = new Vector3(...placed.at);
     return { ...placed, hull: points.flatMap(p => p.sub(c).toArray().map(round)) };
   }
@@ -37,7 +38,7 @@ export function placeSolid(solid: Solid, matrix: Matrix4): Solid {
     return { at: at.applyMatrix4(matrix).toArray().map(round) as V3, half: solid.half.map((v, i) => round(v * Math.abs(scale.getComponent(i)))) as V3,
       yaw: round(Math.atan2(Math.sin(yaw), Math.cos(yaw))) };
   }
-  const corners: Vector3[] = [], own = new Matrix4().makeRotationY(solid.yaw);
+  const corners: Vector3[] = [];
   for (const x of [-1, 1]) for (const y of [-1, 1]) for (const z of [-1, 1])
     corners.push(new Vector3(x * solid.half[0], y * solid.half[1], z * solid.half[2]).applyMatrix4(own).add(at).applyMatrix4(matrix));
   const placed = fromPoints(corners), c = new Vector3(...placed.at);
