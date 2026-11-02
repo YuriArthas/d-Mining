@@ -1,0 +1,3847 @@
+{
+  "revision": "r3",
+  "status": "Current runtime snapshot; authorization document collection excluded by user request",
+  "runtimeAssetFiles": [
+    {
+      "file": "src/game/assets/AssetPrefetch.ts",
+      "bytes": 3847,
+      "sha256": "abcac3e5eab17bacf3fa72dfe508cf062048ae88c197b42926ebe873679b067f"
+    },
+    {
+      "file": "src/game/assets/character/miner-a.glb",
+      "bytes": 1255392,
+      "sha256": "4c48bf96764ab7b5b8ebb98b0b3726dc7e1103c9a508c097f6f9a13c92f3bed6"
+    },
+    {
+      "file": "src/game/assets/character/miner-a.manifest.json",
+      "bytes": 5066,
+      "sha256": "fdbdbd96f9e9e9377b148dd5f28788cb8914a7768892f04087195dac715cedf7"
+    },
+    {
+      "file": "src/game/assets/character/miner-d.glb",
+      "bytes": 1168316,
+      "sha256": "6c864fe990d2f2be9bdebb7dd3d1465a417554d13ef9b998157d550b85336ee5"
+    },
+    {
+      "file": "src/game/assets/character/miner-d.manifest.json",
+      "bytes": 6886,
+      "sha256": "4ccb24355ebd6f523772c34c15427af9d3ad0056c948928133db3b12c5c74930"
+    },
+    {
+      "file": "src/game/assets/downloadModel.ts",
+      "bytes": 3589,
+      "sha256": "da3b7595c10364a8779f439eab116dc9b72e15553b39697486473a31e375ef40"
+    },
+    {
+      "file": "src/game/assets/fetchAssetParts.ts",
+      "bytes": 1285,
+      "sha256": "3ab293c64d383aa0d60c84d5f39364fa2cd2c30136cb45d4ec1ac3e7b6595aa6"
+    },
+    {
+      "file": "src/game/assets/fonts/licenses/fredoka-OFL.txt",
+      "bytes": 4388,
+      "sha256": "5c9e7eee5c6b25f4b05b8d53b2e470ea4962f9ced742d044a98f7d95d1375bab"
+    },
+    {
+      "file": "src/game/assets/fonts/licenses/noto-OFL.txt",
+      "bytes": 4388,
+      "sha256": "1c05c68c34f9708415aada51f17e1b0092d2cea709bf4a94cd38114f9e73d7d9"
+    },
+    {
+      "file": "src/game/assets/fonts/licenses/vi-OFL.txt",
+      "bytes": 4388,
+      "sha256": "1c05c68c34f9708415aada51f17e1b0092d2cea709bf4a94cd38114f9e73d7d9"
+    },
+    {
+      "file": "src/game/assets/fonts/manifest.json",
+      "bytes": 12556,
+      "sha256": "63a30a30b72a7daded6f00bf321257dc751a95fc3f32dd475ed053b1fdf6c407"
+    },
+    {
+      "file": "src/game/assets/fonts/mining-cjk-noto.woff2",
+      "bytes": 146472,
+      "sha256": "60eb3849dd7599d373af333541914293f804eaf8518c366ddb1e6adb00550919"
+    },
+    {
+      "file": "src/game/assets/fonts/mining-digits.woff2",
+      "bytes": 11280,
+      "sha256": "9f59b7710edc6bd766c9fe62431d24105d7facbf839869dc2602ceeaf42a75d7"
+    },
+    {
+      "file": "src/game/assets/fonts/mining-vi-noto.woff2",
+      "bytes": 10764,
+      "sha256": "c82b22dc724515b5d0465818743d1a0549c0f42729cb00f64c8bf1abcaa48017"
+    },
+    {
+      "file": "src/game/assets/pets/pet-cube.glb",
+      "bytes": 9368,
+      "sha256": "d421b3c2a281ce1161418f24298073c8162516fc2d1bbff19656c4a9061fd576"
+    },
+    {
+      "file": "src/game/assets/pets/pet-cube.manifest.json",
+      "bytes": 596,
+      "sha256": "2ce0c9de7aa41ef76e01ca5652d3c0d9261c61a667d8330bb3f4ea7c593e90cb"
+    },
+    {
+      "file": "src/game/assets/rooms/core-v1.json",
+      "bytes": 245311,
+      "sha256": "c8e4ef73f463cd13fb1f9a50755931d76461268f8623811539a4830da09dd7b4"
+    },
+    {
+      "file": "src/game/assets/rooms/crystal-v1.json",
+      "bytes": 113784,
+      "sha256": "6e65dc0434d89835b704f40e7b0713abcabaf25b02909442bd662a7ddb0dc93d"
+    },
+    {
+      "file": "src/game/assets/rooms/fossil-v1.json",
+      "bytes": 163030,
+      "sha256": "0e201dcd286b51fa5c1bdc6f4806ba5f69f97bbd2d4464dd107e2b0c595645d1"
+    },
+    {
+      "file": "src/game/assets/rooms/frozen-v1.json",
+      "bytes": 43191,
+      "sha256": "25fdeb468d77e6d6e179a1466f09eaf8257e700e35b2548bbc229b7ee68ddb4d"
+    },
+    {
+      "file": "src/game/assets/rooms/machinery-v1.json",
+      "bytes": 271565,
+      "sha256": "6998c4ba12b79b783909c4e9937b2424406618d09f7dc3db167cbdd728a4a312"
+    },
+    {
+      "file": "src/game/assets/rooms/ruins-v1.json",
+      "bytes": 70114,
+      "sha256": "ab619c8f002d82fac5d3c7e24c9f96a117a94b3a31ef42c982430247f2d4a74b"
+    },
+    {
+      "file": "src/game/assets/scene/automine-hall.000.part",
+      "bytes": 266558,
+      "sha256": "410b42696ef1a3f57fd312a921fa2e63a8d758b212457f536354b6e121878783"
+    },
+    {
+      "file": "src/game/assets/scene/automine-hall.manifest.json",
+      "bytes": 689,
+      "sha256": "adbe6b61f0ee807e7375e1e059370f5688d2b39b6ddff865c4e01689e47fe1bd"
+    },
+    {
+      "file": "src/game/assets/scene/cryo-hall.000.part",
+      "bytes": 257811,
+      "sha256": "d597893ebf31c610d18330c57e678f8262d69dc71827a5b685aa29222d7cd773"
+    },
+    {
+      "file": "src/game/assets/scene/cryo-hall.manifest.json",
+      "bytes": 677,
+      "sha256": "c357cd36b4318b235dbf8d66cb5c68909878aafc771b1a52fefbc6f7430b8b30"
+    },
+    {
+      "file": "src/game/assets/scene/crystal-hall.000.part",
+      "bytes": 452860,
+      "sha256": "36b94260ba6879bfc46acfa3a7e518fcbbffb32e441b30b13c3ec481cc65c5dc"
+    },
+    {
+      "file": "src/game/assets/scene/crystal-hall.manifest.json",
+      "bytes": 685,
+      "sha256": "2e4a3b0b715b377af2a8c51600855c44ecc03eacd77b4a0bfa5318e370dae15e"
+    },
+    {
+      "file": "src/game/assets/scene/frozen-hall.000.part",
+      "bytes": 299894,
+      "sha256": "be3f948c554b0c6f4ebdf8141310a43ba52ddc70b470770167af7dfce9e826f7"
+    },
+    {
+      "file": "src/game/assets/scene/frozen-hall.manifest.json",
+      "bytes": 681,
+      "sha256": "8e4a07d399730cd3a2365018c9ff2b767b1ec78cdebe61155013667abe53695c"
+    },
+    {
+      "file": "src/game/assets/scene/fungal-hall.000.part",
+      "bytes": 381554,
+      "sha256": "28d6cc28d40d8c773efb13d9c986924964e3a73a02ca33b7895f4289ba91c754"
+    },
+    {
+      "file": "src/game/assets/scene/fungal-hall.manifest.json",
+      "bytes": 681,
+      "sha256": "802a788146ff842e68de208e16fd137aa8eb65a060e37680118a761abf38e846"
+    },
+    {
+      "file": "src/game/assets/scene/gear-hall.000.part",
+      "bytes": 284502,
+      "sha256": "0b207f02cc50b4be9fc445c3b5f0eeb4ef9e063c7561c6039926f7aa1bd944fb"
+    },
+    {
+      "file": "src/game/assets/scene/gear-hall.manifest.json",
+      "bytes": 677,
+      "sha256": "b13a6575401042750b1a70fb00b7fbd3841d0f8cc09ac20554af8d959dcea56a"
+    },
+    {
+      "file": "src/game/assets/scene/old-mine-hall.000.part",
+      "bytes": 284657,
+      "sha256": "e5dce4cb96a9bde26a186c29707cd89045817552219cf5b42a1699adc3bf07f6"
+    },
+    {
+      "file": "src/game/assets/scene/old-mine-hall.manifest.json",
+      "bytes": 688,
+      "sha256": "321fb24d5a8a348df9ea427dae2cc5669948c9a9d95554fe6459aa6f73062c62"
+    },
+    {
+      "file": "src/game/assets/scene/pinewind-architecture.000.part",
+      "bytes": 2142805,
+      "sha256": "0ad3ebed1bacf53d33c9bf73c9f8318f931b5664854f6cbf6bf0620b6ee2ba88"
+    },
+    {
+      "file": "src/game/assets/scene/pinewind-architecture.manifest.json",
+      "bytes": 625,
+      "sha256": "5095aaa09bfc89460b6bb0d71bcda894db51314a420354d1c73b5f3f79e8f809"
+    },
+    {
+      "file": "src/game/assets/scene/pinewind-landscape.000.part",
+      "bytes": 2598249,
+      "sha256": "d2384b3c9fb691641b4e39704185148ca38922712f4ee03cc07a8b120e551864"
+    },
+    {
+      "file": "src/game/assets/scene/pinewind-landscape.manifest.json",
+      "bytes": 623,
+      "sha256": "e27ada1ecfd1a46002bbe6db79f5de7e2ed36d4630fb0dd33f5e7b2e53c848a9"
+    },
+    {
+      "file": "src/game/assets/scene/pinewind-standing-light.png",
+      "bytes": 57457,
+      "sha256": "ff0bbfa876939e6024f423368be9e7a746186ba01525b4a7282642fb05cc0667"
+    },
+    {
+      "file": "src/game/assets/scene/reactor-hall.000.part",
+      "bytes": 235796,
+      "sha256": "c9142a40e675ee64d9b6d97253c2a0d1d9d772f25f17dcce70e450b036684e9d"
+    },
+    {
+      "file": "src/game/assets/scene/reactor-hall.manifest.json",
+      "bytes": 686,
+      "sha256": "7e017fa11d016c10d372bf2c812f844dd27cb88229f585d410d07c343b417f4f"
+    },
+    {
+      "file": "src/game/assets/scene/refinery-hall.000.part",
+      "bytes": 296384,
+      "sha256": "ee4817e64de0c1f45c1303af0dc2522d688f29d2419d374817ced159169a5a88"
+    },
+    {
+      "file": "src/game/assets/scene/refinery-hall.manifest.json",
+      "bytes": 689,
+      "sha256": "e7a8f9011e0590b8534565bd9ec1204e357a3cf16ea345d89b7ac4cd45a00e5a"
+    },
+    {
+      "file": "src/game/assets/scene/ruins-hall.000.part",
+      "bytes": 274916,
+      "sha256": "9fe72b2c5f6e3d836e0399665f568ceab8fbeebe05d68f830c411865adfcc50a"
+    },
+    {
+      "file": "src/game/assets/scene/ruins-hall.manifest.json",
+      "bytes": 677,
+      "sha256": "abd5f8a19b702c00574e0ddf502adba1af448a138e8e8b9adc170397a8447072"
+    },
+    {
+      "file": "src/game/assets/scene/star-base.000.part",
+      "bytes": 666270,
+      "sha256": "bed37ce2a6e3f00c6d7b26f90d2faad6444c8e61ccc58c6792b301edd3b09c95"
+    },
+    {
+      "file": "src/game/assets/scene/star-base.manifest.json",
+      "bytes": 976,
+      "sha256": "e5244ce4bff1e8c62504589449b0a17e79c88232596eee18eadec7d5515bf589"
+    },
+    {
+      "file": "src/game/assets/scene/survey-hall.000.part",
+      "bytes": 262953,
+      "sha256": "79e08e4ea439e17abc938cf8c780adc66e3e0e437bd3b6f1aec9c67b6808cfbb"
+    },
+    {
+      "file": "src/game/assets/scene/survey-hall.manifest.json",
+      "bytes": 683,
+      "sha256": "d01aa2c4d5c9b19544164af2eccde203708cf535da138f02bbcd24dade9958ce"
+    },
+    {
+      "file": "src/game/assets/scene/tech-base.000.part",
+      "bytes": 813361,
+      "sha256": "e8fc6fa1b6f3a38831f0c746dee7069811913d6db3dd6fd3ff93450dcfcce6cc"
+    },
+    {
+      "file": "src/game/assets/scene/tech-base.manifest.json",
+      "bytes": 927,
+      "sha256": "cf8b44ff50578ad76ae4aac0c829793a393a9536b23e09e9f6b260531c74ee45"
+    },
+    {
+      "file": "src/game/assets/scene/volcanic-hall.000.part",
+      "bytes": 299400,
+      "sha256": "1bd90edc6b055e5f985100d0972976818149cc2a4ef632c21c14de9d2a51c7bd"
+    },
+    {
+      "file": "src/game/assets/scene/volcanic-hall.manifest.json",
+      "bytes": 689,
+      "sha256": "2f34cbbc09fc4586415966925991c394e0a952a0e1832673c92cdc901a55ec9a"
+    },
+    {
+      "file": "src/game/assets/shop/equipment-manifest.json",
+      "bytes": 4469,
+      "sha256": "ae6629b3020d1cf4baf274e671a6b2f1440471490ce06841078f97fd80e184fa"
+    },
+    {
+      "file": "src/game/assets/shop/equipment.glb",
+      "bytes": 2264868,
+      "sha256": "3d1f18d875d0067972543d8895d9416135c3f63e7e6ec845e4545f0977d6db95"
+    },
+    {
+      "file": "src/game/assets/shop/manifest.json",
+      "bytes": 921,
+      "sha256": "0c6568ce8d9802b8f111e6e72c836f7eb9f47ae5182bb2bb0396f9e8ab29ab7b"
+    },
+    {
+      "file": "src/game/assets/shop/showroom.glb",
+      "bytes": 638936,
+      "sha256": "1378fe0152e99ea5869200fd1c7624d06fce02d5707f00ed99dc36d8856ac979"
+    },
+    {
+      "file": "src/game/assets/sign-font-license.txt",
+      "bytes": 14712,
+      "sha256": "849f4ea9c214fa4ac3593b770c699f387534b11ce671264c1b10d85bdcb5997b"
+    },
+    {
+      "file": "src/game/assets/sign-font.json",
+      "bytes": 286994,
+      "sha256": "b58a82ad57f70169b6e73b2d3d29240079d2a35510d26951070f558db8ea0d60"
+    }
+  ],
+  "assetGroups": [
+    {
+      "category": "authored scene",
+      "manifest": "src/game/assets/scene/automine-hall.manifest.json",
+      "production": {
+        "parts": [
+          "automine-hall.000.part"
+        ],
+        "bytes": 266558,
+        "decodedBytes": 564620,
+        "sha256": "410b42696ef1a3f57fd312a921fa2e63a8d758b212457f536354b6e121878783",
+        "sourceSha256": "fc3b3a268ea15004a8029ddc998daa7034f5b7de09b0079f11cfdaf823987462",
+        "triangles": 31634,
+        "source": "world2.1 hall: Blender props (surface-game-art/tools/blender/build_automine.py) and an offline procedural cave shell (surface-game-art/tools/underground/automineHall.ts on caveKit.ts); baked occlusion per vertex",
+        "materialProfile": "authored-color",
+        "coordinateSpace": "authored",
+        "geometryEdits": false,
+        "textureEncoding": "KTX2 UASTC",
+        "reference": "tools/build-underground.mjs"
+      },
+      "textures": [
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            128
+          ]
+        }
+      ],
+      "authorization": "authored production records retained"
+    },
+    {
+      "category": "authored scene",
+      "manifest": "src/game/assets/scene/cryo-hall.manifest.json",
+      "production": {
+        "parts": [
+          "cryo-hall.000.part"
+        ],
+        "bytes": 257811,
+        "decodedBytes": 458272,
+        "sha256": "d597893ebf31c610d18330c57e678f8262d69dc71827a5b685aa29222d7cd773",
+        "sourceSha256": "ae61c659961e5d4c9dc012ba018dd652e1746d3168139dd4787f906bf4cffd73",
+        "triangles": 32828,
+        "source": "world2.5 hall: Blender props (surface-game-art/tools/blender/build_cryo.py) and an offline procedural cave shell (surface-game-art/tools/underground/cryoHall.ts on caveKit.ts); baked occlusion per vertex",
+        "materialProfile": "authored-color",
+        "coordinateSpace": "authored",
+        "geometryEdits": false,
+        "textureEncoding": "KTX2 UASTC",
+        "reference": "tools/build-underground.mjs"
+      },
+      "textures": [
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            128
+          ]
+        }
+      ],
+      "authorization": "authored production records retained"
+    },
+    {
+      "category": "authored scene",
+      "manifest": "src/game/assets/scene/crystal-hall.manifest.json",
+      "production": {
+        "parts": [
+          "crystal-hall.000.part"
+        ],
+        "bytes": 452860,
+        "decodedBytes": 717472,
+        "sha256": "36b94260ba6879bfc46acfa3a7e518fcbbffb32e441b30b13c3ec481cc65c5dc",
+        "sourceSha256": "113693ec9e037404467c246dd1b7c1379d201a77e151ad9f9826735ace9a241d",
+        "triangles": 31592,
+        "source": "crystal hall: Blender props (surface-game-art/tools/blender/build_crystal.py) and an offline procedural cave shell (surface-game-art/tools/underground/crystalHall.ts on caveKit.ts); baked occlusion per vertex",
+        "materialProfile": "authored-color",
+        "coordinateSpace": "authored",
+        "geometryEdits": false,
+        "textureEncoding": "KTX2 UASTC",
+        "reference": "tools/build-underground.mjs"
+      },
+      "textures": [
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            128
+          ]
+        }
+      ],
+      "authorization": "authored production records retained"
+    },
+    {
+      "category": "authored scene",
+      "manifest": "src/game/assets/scene/frozen-hall.manifest.json",
+      "production": {
+        "parts": [
+          "frozen-hall.000.part"
+        ],
+        "bytes": 299894,
+        "decodedBytes": 468512,
+        "sha256": "be3f948c554b0c6f4ebdf8141310a43ba52ddc70b470770167af7dfce9e826f7",
+        "sourceSha256": "41d8c22462e86f5cfab858e8430c96ec9cdfaa342f889d46b14850939c18fcc8",
+        "triangles": 19079,
+        "source": "frozen hall: Blender props (surface-game-art/tools/blender/build_frozen.py) and an offline procedural cave shell (surface-game-art/tools/underground/frozenHall.ts on caveKit.ts); baked occlusion per vertex",
+        "materialProfile": "authored-color",
+        "coordinateSpace": "authored",
+        "geometryEdits": false,
+        "textureEncoding": "KTX2 UASTC",
+        "reference": "tools/build-underground.mjs"
+      },
+      "textures": [
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            128
+          ]
+        }
+      ],
+      "authorization": "authored production records retained"
+    },
+    {
+      "category": "authored scene",
+      "manifest": "src/game/assets/scene/fungal-hall.manifest.json",
+      "production": {
+        "parts": [
+          "fungal-hall.000.part"
+        ],
+        "bytes": 381554,
+        "decodedBytes": 686388,
+        "sha256": "28d6cc28d40d8c773efb13d9c986924964e3a73a02ca33b7895f4289ba91c754",
+        "sourceSha256": "20f8033b2c88afa30a2fe043654a0aa691f09b54f0902642987f92a8f311a579",
+        "triangles": 30931,
+        "source": "fungal hall: Blender props (surface-game-art/tools/blender/build_fungal.py) and an offline procedural cave shell (surface-game-art/tools/underground/fungalHall.ts on caveKit.ts); baked occlusion per vertex",
+        "materialProfile": "authored-color",
+        "coordinateSpace": "authored",
+        "geometryEdits": false,
+        "textureEncoding": "KTX2 UASTC",
+        "reference": "tools/build-underground.mjs"
+      },
+      "textures": [
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            128
+          ]
+        }
+      ],
+      "authorization": "authored production records retained"
+    },
+    {
+      "category": "authored scene",
+      "manifest": "src/game/assets/scene/gear-hall.manifest.json",
+      "production": {
+        "parts": [
+          "gear-hall.000.part"
+        ],
+        "bytes": 284502,
+        "decodedBytes": 588992,
+        "sha256": "0b207f02cc50b4be9fc445c3b5f0eeb4ef9e063c7561c6039926f7aa1bd944fb",
+        "sourceSha256": "d30bed69a0e33f1393d782690a5eb06ce8c440232bb907c288a0b5af0810feff",
+        "triangles": 32981,
+        "source": "world2.2 hall: Blender props (surface-game-art/tools/blender/build_gear.py) and an offline procedural cave shell (surface-game-art/tools/underground/gearHall.ts on caveKit.ts); baked occlusion per vertex",
+        "materialProfile": "authored-color",
+        "coordinateSpace": "authored",
+        "geometryEdits": false,
+        "textureEncoding": "KTX2 UASTC",
+        "reference": "tools/build-underground.mjs"
+      },
+      "textures": [
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            128
+          ]
+        }
+      ],
+      "authorization": "authored production records retained"
+    },
+    {
+      "category": "authored scene",
+      "manifest": "src/game/assets/scene/old-mine-hall.manifest.json",
+      "production": {
+        "parts": [
+          "old-mine-hall.000.part"
+        ],
+        "bytes": 284657,
+        "decodedBytes": 563292,
+        "sha256": "e5dce4cb96a9bde26a186c29707cd89045817552219cf5b42a1699adc3bf07f6",
+        "sourceSha256": "05bd595a05f873d4d84434244025bd1120ebf5a24fc75547eee0370ed4081ba8",
+        "triangles": 28130,
+        "source": "old_mine hall: Blender props (surface-game-art/tools/blender/build_old_mine.py) and an offline procedural cave shell (surface-game-art/tools/underground/oldMineHall.ts on caveKit.ts); baked occlusion per vertex",
+        "materialProfile": "authored-color",
+        "coordinateSpace": "authored",
+        "geometryEdits": false,
+        "textureEncoding": "KTX2 UASTC",
+        "reference": "tools/build-underground.mjs"
+      },
+      "textures": [
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            128
+          ]
+        }
+      ],
+      "authorization": "authored production records retained"
+    },
+    {
+      "category": "authored scene",
+      "manifest": "src/game/assets/scene/pinewind-architecture.manifest.json",
+      "production": {
+        "parts": [
+          "pinewind-architecture.000.part"
+        ],
+        "bytes": 2142805,
+        "decodedBytes": 2440584,
+        "sha256": "0ad3ebed1bacf53d33c9bf73c9f8318f931b5664854f6cbf6bf0620b6ee2ba88",
+        "sourceSha256": "64237336112ca65d0a485742b7cc159d13aecec1c531909d7c2a215279e434d8",
+        "triangles": 18920,
+        "source": "Authored Pinewind; Blender architecture and offline procedural landscape; offline baked sun visibility and sky occlusion",
+        "materialProfile": "authored-color",
+        "coordinateSpace": "authored",
+        "geometryEdits": false,
+        "textureEncoding": "KTX2 UASTC",
+        "reference": "surface-study final 2026-10-19T16:13:15.123Z"
+      },
+      "textures": [
+        {
+          "name": "architecture-atlas",
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            256
+          ]
+        },
+        {
+          "name": "Pinewind baked building light",
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            1536,
+            1536
+          ]
+        }
+      ],
+      "authorization": "authored production records retained"
+    },
+    {
+      "category": "authored scene",
+      "manifest": "src/game/assets/scene/pinewind-landscape.manifest.json",
+      "production": {
+        "parts": [
+          "pinewind-landscape.000.part"
+        ],
+        "bytes": 2598249,
+        "decodedBytes": 4276940,
+        "sha256": "d2384b3c9fb691641b4e39704185148ca38922712f4ee03cc07a8b120e551864",
+        "sourceSha256": "95f4b8a938597cd035e08eb8d9a93a3b61f3a86d9f618c1029369c88a0215170",
+        "triangles": 166019,
+        "source": "Authored Pinewind; Blender architecture and offline procedural landscape; offline baked sun visibility and sky occlusion",
+        "materialProfile": "authored-color",
+        "coordinateSpace": "authored",
+        "geometryEdits": false,
+        "textureEncoding": "KTX2 UASTC",
+        "reference": "surface-study final 2026-10-19T16:13:15.123Z"
+      },
+      "textures": [
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            512,
+            512
+          ]
+        },
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            1536,
+            1536
+          ]
+        },
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            64,
+            64
+          ]
+        },
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            64,
+            64
+          ]
+        },
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            256
+          ]
+        }
+      ],
+      "authorization": "authored production records retained"
+    },
+    {
+      "category": "authored scene",
+      "manifest": "src/game/assets/scene/reactor-hall.manifest.json",
+      "production": {
+        "parts": [
+          "reactor-hall.000.part"
+        ],
+        "bytes": 235796,
+        "decodedBytes": 435168,
+        "sha256": "c9142a40e675ee64d9b6d97253c2a0d1d9d772f25f17dcce70e450b036684e9d",
+        "sourceSha256": "2aa7b3e69d854c72bd94db9c5ec03f0ed4dcc2bc99530e0d0005eb28eb546c55",
+        "triangles": 29919,
+        "source": "world2.6 hall: Blender props (surface-game-art/tools/blender/build_reactor.py) and an offline procedural cave shell (surface-game-art/tools/underground/reactorHall.ts on caveKit.ts); baked occlusion per vertex",
+        "materialProfile": "authored-color",
+        "coordinateSpace": "authored",
+        "geometryEdits": false,
+        "textureEncoding": "KTX2 UASTC",
+        "reference": "tools/build-underground.mjs"
+      },
+      "textures": [
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            128
+          ]
+        }
+      ],
+      "authorization": "authored production records retained"
+    },
+    {
+      "category": "authored scene",
+      "manifest": "src/game/assets/scene/refinery-hall.manifest.json",
+      "production": {
+        "parts": [
+          "refinery-hall.000.part"
+        ],
+        "bytes": 296384,
+        "decodedBytes": 536536,
+        "sha256": "ee4817e64de0c1f45c1303af0dc2522d688f29d2419d374817ced159169a5a88",
+        "sourceSha256": "219b13afce181b55d388c2ca85426531f7c9b5d50cce56b4fb5665fdc3215742",
+        "triangles": 42879,
+        "source": "world2.3 hall: Blender props (surface-game-art/tools/blender/build_refinery.py) and an offline procedural cave shell (surface-game-art/tools/underground/refineryHall.ts on caveKit.ts); baked occlusion per vertex",
+        "materialProfile": "authored-color",
+        "coordinateSpace": "authored",
+        "geometryEdits": false,
+        "textureEncoding": "KTX2 UASTC",
+        "reference": "tools/build-underground.mjs"
+      },
+      "textures": [
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            128
+          ]
+        }
+      ],
+      "authorization": "authored production records retained"
+    },
+    {
+      "category": "authored scene",
+      "manifest": "src/game/assets/scene/ruins-hall.manifest.json",
+      "production": {
+        "parts": [
+          "ruins-hall.000.part"
+        ],
+        "bytes": 274916,
+        "decodedBytes": 489680,
+        "sha256": "9fe72b2c5f6e3d836e0399665f568ceab8fbeebe05d68f830c411865adfcc50a",
+        "sourceSha256": "237365eda45edf9a1d4949e63f9fc3aecc85a0b72935fb3a44b0352a37f50560",
+        "triangles": 21177,
+        "source": "ruins hall: Blender props (surface-game-art/tools/blender/build_ruins.py) and an offline procedural cave shell (surface-game-art/tools/underground/ruinsHall.ts on caveKit.ts); baked occlusion per vertex",
+        "materialProfile": "authored-color",
+        "coordinateSpace": "authored",
+        "geometryEdits": false,
+        "textureEncoding": "KTX2 UASTC",
+        "reference": "tools/build-underground.mjs"
+      },
+      "textures": [
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            128
+          ]
+        }
+      ],
+      "authorization": "authored production records retained"
+    },
+    {
+      "category": "authored scene",
+      "manifest": "src/game/assets/scene/star-base.manifest.json",
+      "production": {
+        "parts": [
+          "star-base.000.part"
+        ],
+        "bytes": 666270,
+        "decodedBytes": 1177840,
+        "sha256": "bed37ce2a6e3f00c6d7b26f90d2faad6444c8e61ccc58c6792b301edd3b09c95",
+        "sourceSha256": "198150e339aeff093067900e46eeb8a5e98fd6e6f437107f31d043eb54502b11",
+        "triangles": 70687,
+        "source": "star base: Blender props (surface-game-art/tools/blender/build_star_base.py, surface-game-art/tools/blender/build_egg_stands.py, surface-game-art/tools/blender/build_tech_base.py, surface-game-art/tools/blender/build_gear.py, surface-game-art/tools/blender/build_crystal.py, surface-game-art/tools/blender/build_ruins.py, surface-game-art/tools/blender/build_frozen.py) and an offline procedural cave shell (surface-game-art/tools/underground/starBaseHall.ts on caveKit.ts); baked occlusion per vertex",
+        "materialProfile": "authored-color",
+        "coordinateSpace": "authored",
+        "geometryEdits": false,
+        "textureEncoding": "KTX2 UASTC",
+        "reference": "tools/build-underground.mjs"
+      },
+      "textures": [
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            128
+          ]
+        },
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            160
+          ]
+        },
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            128
+          ]
+        },
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            128
+          ]
+        },
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            128
+          ]
+        },
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            128
+          ]
+        },
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            256
+          ]
+        }
+      ],
+      "authorization": "authored production records retained"
+    },
+    {
+      "category": "authored scene",
+      "manifest": "src/game/assets/scene/survey-hall.manifest.json",
+      "production": {
+        "parts": [
+          "survey-hall.000.part"
+        ],
+        "bytes": 262953,
+        "decodedBytes": 513204,
+        "sha256": "79e08e4ea439e17abc938cf8c780adc66e3e0e437bd3b6f1aec9c67b6808cfbb",
+        "sourceSha256": "6aad2f15d8423dcc85440cd0258adb797b79c9f3d84499db2f6bea789091549f",
+        "triangles": 38439,
+        "source": "world2.4 hall: Blender props (surface-game-art/tools/blender/build_survey.py) and an offline procedural cave shell (surface-game-art/tools/underground/surveyHall.ts on caveKit.ts); baked occlusion per vertex",
+        "materialProfile": "authored-color",
+        "coordinateSpace": "authored",
+        "geometryEdits": false,
+        "textureEncoding": "KTX2 UASTC",
+        "reference": "tools/build-underground.mjs"
+      },
+      "textures": [
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            128
+          ]
+        }
+      ],
+      "authorization": "authored production records retained"
+    },
+    {
+      "category": "authored scene",
+      "manifest": "src/game/assets/scene/tech-base.manifest.json",
+      "production": {
+        "parts": [
+          "tech-base.000.part"
+        ],
+        "bytes": 813361,
+        "decodedBytes": 1528816,
+        "sha256": "e8fc6fa1b6f3a38831f0c746dee7069811913d6db3dd6fd3ff93450dcfcce6cc",
+        "sourceSha256": "94d8bec7907ded6e658fbe802200ff89a6bc196055108b8502faa276c91f3713",
+        "triangles": 109721,
+        "source": "tech base: Blender props (surface-game-art/tools/blender/build_tech_base.py, surface-game-art/tools/blender/build_egg_stands.py, surface-game-art/tools/blender/build_gear.py, surface-game-art/tools/blender/build_refinery.py, surface-game-art/tools/blender/build_cryo.py, surface-game-art/tools/blender/build_reactor.py) and an offline procedural cave shell (surface-game-art/tools/underground/techBaseHall.ts on caveKit.ts); baked occlusion per vertex",
+        "materialProfile": "authored-color",
+        "coordinateSpace": "authored",
+        "geometryEdits": false,
+        "textureEncoding": "KTX2 UASTC",
+        "reference": "tools/build-underground.mjs"
+      },
+      "textures": [
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            160
+          ]
+        },
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            128
+          ]
+        },
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            128
+          ]
+        },
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            128
+          ]
+        },
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            128
+          ]
+        },
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            256
+          ]
+        }
+      ],
+      "authorization": "authored production records retained"
+    },
+    {
+      "category": "authored scene",
+      "manifest": "src/game/assets/scene/volcanic-hall.manifest.json",
+      "production": {
+        "parts": [
+          "volcanic-hall.000.part"
+        ],
+        "bytes": 299400,
+        "decodedBytes": 627524,
+        "sha256": "1bd90edc6b055e5f985100d0972976818149cc2a4ef632c21c14de9d2a51c7bd",
+        "sourceSha256": "16e5d42bfc877ecbbb35fbe77161e9a20041edb483a6db9e67331e97a6d95b37",
+        "triangles": 32098,
+        "source": "volcanic hall: Blender props (surface-game-art/tools/blender/build_volcanic.py) and an offline procedural cave shell (surface-game-art/tools/underground/volcanicHall.ts on caveKit.ts); baked occlusion per vertex",
+        "materialProfile": "authored-color",
+        "coordinateSpace": "authored",
+        "geometryEdits": false,
+        "textureEncoding": "KTX2 UASTC",
+        "reference": "tools/build-underground.mjs"
+      },
+      "textures": [
+        {
+          "name": null,
+          "mimeType": "image/ktx2",
+          "dimensions": [
+            256,
+            128
+          ]
+        }
+      ],
+      "authorization": "authored production records retained"
+    },
+    {
+      "category": "Tripo character and converted animation",
+      "manifest": "src/game/assets/character/miner-a.manifest.json",
+      "production": {
+        "taskId": "b054bf79-1490-4bf9-8774-287dd54f35f2",
+        "vertices": 5841,
+        "triangles": 11678,
+        "bones": 16,
+        "weights": "Blender bone-heat weights from authored anatomical skeleton; rigid head/helmet; normalized max 4 influences",
+        "dominantVertexCounts": {
+          "LowerTorso": 201,
+          "UpperTorso": 881,
+          "Head": 1365,
+          "LeftUpperArm": 243,
+          "LeftLowerArm": 43,
+          "LeftHand": 354,
+          "LeftUpperLeg": 418,
+          "LeftLowerLeg": 180,
+          "LeftFoot": 454,
+          "RightUpperArm": 291,
+          "RightLowerArm": 57,
+          "RightHand": 476,
+          "RightUpperLeg": 294,
+          "RightLowerLeg": 140,
+          "RightFoot": 444
+        },
+        "loopQuaternionError": {
+          "Idle": 8.940696716308594e-7,
+          "Walk": 8.940696716308594e-7,
+          "Run": 7.152557373046875e-7,
+          "Mine": 8.940696716308594e-7
+        },
+        "height": 1.85,
+        "textures": [
+          [
+            "Color_b054bf79-1490-4bf9-8774-287dd54f35f2",
+            2048,
+            2048
+          ]
+        ],
+        "sources": [
+          {
+            "clip": "Idle",
+            "animationId": "4748",
+            "animationVersionId": "4748",
+            "name": "RoMixamo · 徒手站立待机 · c9ceea07",
+            "source": {
+              "source": {
+                "name": "Unarmed Idle",
+                "provider": "ROMIXAMO",
+                "conversion": "ROMIXAMO_R15_SOURCE_V1",
+                "externalId": "c9ceea07-b96c-11e4-a802-0aaa78deedf9"
+              }
+            },
+            "duration": 1.9,
+            "sourceRange": [
+              0,
+              1.9
+            ]
+          },
+          {
+            "clip": "Walk",
+            "animationId": "4768",
+            "animationVersionId": "4768",
+            "name": "RoMixamo · 徒手向前走",
+            "source": {
+              "source": {
+                "name": "Unarmed Walk Forward",
+                "provider": "ROMIXAMO",
+                "conversion": "ROMIXAMO_R15_SOURCE_V1",
+                "externalId": "c9cef1a4-b96c-11e4-a802-0aaa78deedf9"
+              }
+            },
+            "duration": 1.3666666666666667,
+            "sourceRange": [
+              0,
+              1.367
+            ]
+          },
+          {
+            "clip": "Run",
+            "animationId": "4472",
+            "animationVersionId": "4472",
+            "name": "RoMixamo · 中速跑步",
+            "source": {
+              "source": {
+                "name": "Medium Run",
+                "provider": "ROMIXAMO",
+                "conversion": "ROMIXAMO_R15_SOURCE_V1",
+                "externalId": "c9ce78f7-b96c-11e4-a802-0aaa78deedf9"
+              }
+            },
+            "duration": 0.5666666666666667,
+            "sourceRange": [
+              0,
+              0.567
+            ]
+          },
+          {
+            "clip": "Mine",
+            "animationId": "4698",
+            "animationVersionId": "4698",
+            "name": "RoMixamo · 持斧下劈",
+            "source": {
+              "source": {
+                "name": "Standing Melee Attack Downward",
+                "provider": "ROMIXAMO",
+                "conversion": "ROMIXAMO_R15_SOURCE_V1",
+                "externalId": "c9ced340-b96c-11e4-a802-0aaa78deedf9"
+              }
+            },
+            "duration": 1.85,
+            "sourceRange": [
+              0.1,
+              1.95
+            ]
+          }
+        ],
+        "blend": "assets-source/miner-a/miner-a-rigged.blend",
+        "glb": "src/game/assets/character/miner-a.glb",
+        "sha256": "4c48bf96764ab7b5b8ebb98b0b3726dc7e1103c9a508c097f6f9a13c92f3bed6",
+        "bytes": 1255392,
+        "footBinding": {
+          "Left": {
+            "restForward": [
+              -0.4161924896455928,
+              0,
+              -0.9092765319541702
+            ],
+            "restYawDegrees": 24.594435708578054,
+            "yawRadians": 0.42925388078475163
+          },
+          "Right": {
+            "restForward": [
+              0.440825719127113,
+              0,
+              -0.8975927168577426
+            ],
+            "restYawDegrees": -26.156577136771524,
+            "yawRadians": -0.45651839208853423
+          }
+        },
+        "jointPivots": {
+          "LeftLowerLeg": {
+            "before": [
+              -0.22007830440998077,
+              -0.04623493552207947,
+              0.416215181350708
+            ],
+            "after": [
+              -0.18764284253120422,
+              -0.04308714717626572,
+              0.416215181350708
+            ]
+          },
+          "LeftFoot": {
+            "before": [
+              -0.2348734736442566,
+              -0.05178312957286835,
+              0.2497694045305252
+            ],
+            "after": [
+              -0.21604056656360626,
+              -0.08216764032840729,
+              0.2497694045305252
+            ]
+          },
+          "RightLowerLeg": {
+            "before": [
+              0.22007830440998077,
+              -0.04623493552207947,
+              0.416215181350708
+            ],
+            "after": [
+              0.18741236627101898,
+              -0.04405573010444641,
+              0.416215181350708
+            ]
+          },
+          "RightFoot": {
+            "before": [
+              0.2348734736442566,
+              -0.05178312957286835,
+              0.2497694045305252
+            ],
+            "after": [
+              0.2153424173593521,
+              -0.08215463161468506,
+              0.2497694045305252
+            ]
+          }
+        },
+        "kneeRetarget": {
+          "Idle": {
+            "maxLateralBefore": 0,
+            "maxLateralAfter": 0,
+            "maxAnkleDrift": 0
+          },
+          "Walk": {
+            "maxLateralBefore": 0.03654846432618797,
+            "maxLateralAfter": 8.440110832452774e-9,
+            "maxAnkleDrift": 4.828528090125218e-8
+          },
+          "Run": {
+            "maxLateralBefore": 0.059501778800040483,
+            "maxLateralAfter": 1.0710209608078003e-8,
+            "maxAnkleDrift": 4.2146848510894035e-8
+          },
+          "Mine": {
+            "maxLateralBefore": 0,
+            "maxLateralAfter": 0,
+            "maxAnkleDrift": 0
+          }
+        }
+      },
+      "generation": {
+        "taskId": "b054bf79-1490-4bf9-8774-287dd54f35f2",
+        "createdAt": "2026-10-21T12:57:58.582Z",
+        "referenceSha256": "efa8c6ce24408a9b21facdd03618152d95915ef279b3fdd66f8521ed9201f137",
+        "recipe": {
+          "type": "image_to_model",
+          "model_version": "v3.0-20250812",
+          "file": {
+            "type": "png",
+            "source": "assets-source/miner-a/reference.png"
+          },
+          "face_limit": 12000,
+          "texture": true,
+          "pbr": false,
+          "texture_quality": "standard"
+        },
+        "status": "success",
+        "triangles": 11678,
+        "bytes": 1045892,
+        "meshes": 1,
+        "materials": 1,
+        "sha256": "882a286c62d7f8c88f5d5ace5f1ea9682c531b25caa208bb34c8f9a26fbe7bb4",
+        "reference": "assets-source/miner-a/reference.png"
+      },
+      "authorization": "authorization documents excluded by explicit user request; production records retained"
+    },
+    {
+      "category": "Tripo character and converted animation",
+      "manifest": "src/game/assets/character/miner-d.manifest.json",
+      "production": {
+        "taskId": "84856ff3-6c37-4b7f-a198-5f7d00dc3443",
+        "vertices": 5956,
+        "triangles": 11912,
+        "bones": 16,
+        "weights": "Transferred from Miner A (miner-a.glb) through a bone-wise deformation of its mesh to D proportions and the nearest surface point; rigid head and helmet, knee, forearm and sole repainted, normalized max 4 influences",
+        "landmarks": {
+          "A": {
+            "crotch": 0.7700000000000007,
+            "neck": 1.4660000000000013,
+            "armpit": 1.146000000000001,
+            "fingertip": 0.60826
+          },
+          "D": {
+            "crotch": 0.7380000000000007,
+            "neck": 1.3860000000000012,
+            "armpit": 1.082000000000001,
+            "fingertip": 0.5831940174102783
+          }
+        },
+        "transferMaxDistance": 0.13313865661621094,
+        "dominantVertexCounts": {
+          "LowerTorso": 162,
+          "UpperTorso": 1290,
+          "Head": 1504,
+          "LeftUpperArm": 191,
+          "LeftLowerArm": 105,
+          "LeftHand": 340,
+          "RightUpperArm": 188,
+          "RightLowerArm": 81,
+          "RightHand": 256,
+          "LeftUpperLeg": 247,
+          "LeftLowerLeg": 128,
+          "LeftFoot": 500,
+          "RightUpperLeg": 264,
+          "RightLowerLeg": 152,
+          "RightFoot": 548
+        },
+        "loopQuaternionError": {
+          "Idle": 8.940696716308594e-7,
+          "Walk": 9.5367431640625e-7,
+          "Run": 7.748603820800781e-7,
+          "Mine": 8.940696716308594e-7
+        },
+        "height": 1.85,
+        "textures": [
+          [
+            "Color_84856ff3-6c37-4b7f-a198-5f7d00dc3443",
+            2048,
+            2048
+          ],
+          [
+            "Color_b054bf79-1490-4bf9-8774-287dd54f35f2",
+            2048,
+            2048
+          ],
+          [
+            "miner-d-color-lifted.jpg",
+            2048,
+            2048
+          ]
+        ],
+        "sources": [
+          {
+            "clip": "Idle",
+            "animationId": "4748",
+            "animationVersionId": "4748",
+            "name": "RoMixamo · 徒手站立待机 · c9ceea07",
+            "source": {
+              "source": {
+                "name": "Unarmed Idle",
+                "provider": "ROMIXAMO",
+                "conversion": "ROMIXAMO_R15_SOURCE_V1",
+                "externalId": "c9ceea07-b96c-11e4-a802-0aaa78deedf9"
+              }
+            },
+            "duration": 1.9,
+            "sourceRange": [
+              0,
+              1.9
+            ]
+          },
+          {
+            "clip": "Walk",
+            "animationId": "4768",
+            "animationVersionId": "4768",
+            "name": "RoMixamo · 徒手向前走",
+            "source": {
+              "source": {
+                "name": "Unarmed Walk Forward",
+                "provider": "ROMIXAMO",
+                "conversion": "ROMIXAMO_R15_SOURCE_V1",
+                "externalId": "c9cef1a4-b96c-11e4-a802-0aaa78deedf9"
+              }
+            },
+            "duration": 1.3666666666666667,
+            "sourceRange": [
+              0,
+              1.367
+            ]
+          },
+          {
+            "clip": "Run",
+            "animationId": "4472",
+            "animationVersionId": "4472",
+            "name": "RoMixamo · 中速跑步",
+            "source": {
+              "source": {
+                "name": "Medium Run",
+                "provider": "ROMIXAMO",
+                "conversion": "ROMIXAMO_R15_SOURCE_V1",
+                "externalId": "c9ce78f7-b96c-11e4-a802-0aaa78deedf9"
+              }
+            },
+            "duration": 0.5666666666666667,
+            "sourceRange": [
+              0,
+              0.567
+            ]
+          },
+          {
+            "clip": "Mine",
+            "animationId": "4698",
+            "animationVersionId": "4698",
+            "name": "RoMixamo · 持斧下劈",
+            "source": {
+              "source": {
+                "name": "Standing Melee Attack Downward",
+                "provider": "ROMIXAMO",
+                "conversion": "ROMIXAMO_R15_SOURCE_V1",
+                "externalId": "c9ced340-b96c-11e4-a802-0aaa78deedf9"
+              }
+            },
+            "duration": 1.85,
+            "sourceRange": [
+              0.1,
+              1.95
+            ]
+          }
+        ],
+        "blend": "assets-source/miner-d/miner-d-rigged.blend",
+        "glb": "src/game/assets/character/miner-d.glb",
+        "sha256": "6c864fe990d2f2be9bdebb7dd3d1465a417554d13ef9b998157d550b85336ee5",
+        "bytes": 1168316,
+        "footBinding": {
+          "Left": {
+            "restForward": [
+              -0.3656961791661951,
+              0,
+              -0.9307342824583428
+            ],
+            "restYawDegrees": 21.4504330347909,
+            "yawRadians": 0.3743806824356606
+          },
+          "Right": {
+            "restForward": [
+              0.3541717267754045,
+              0,
+              -0.935180403961144
+            ],
+            "restYawDegrees": -20.742689972293622,
+            "yawRadians": -0.36202823573693504
+          }
+        },
+        "jointPivots": {
+          "LeftLowerLeg": {
+            "before": [
+              -0.18045753240585327,
+              -0.006615562364459038,
+              0.39891794323921204
+            ],
+            "after": [
+              -0.18045753877622056,
+              -0.006615562420799567,
+              0.39891794323921204
+            ]
+          },
+          "LeftFoot": {
+            "before": [
+              -0.18391172587871552,
+              0.0000379611665266566,
+              0.23938938975334167
+            ],
+            "after": [
+              -0.18391172727224758,
+              0.00003796116605788574,
+              0.23938938975334167
+            ]
+          },
+          "RightLowerLeg": {
+            "before": [
+              0.18163590133190155,
+              -0.00566483847796917,
+              0.39891794323921204
+            ],
+            "after": [
+              0.18163590810387617,
+              -0.00566483868417067,
+              0.39891794323921204
+            ]
+          },
+          "RightFoot": {
+            "before": [
+              0.18314503133296967,
+              -0.00008856763452058658,
+              0.23938938975334167
+            ],
+            "after": [
+              0.18314503549882605,
+              -0.00008856763212417018,
+              0.23938938975334167
+            ]
+          }
+        },
+        "kneeRetarget": {
+          "Idle": {
+            "maxLateralBefore": 0,
+            "maxLateralAfter": 0,
+            "maxAnkleDrift": 0
+          },
+          "Walk": {
+            "maxLateralBefore": 0.034561770502477884,
+            "maxLateralAfter": 9.778887033462524e-9,
+            "maxAnkleDrift": 4.280032699210963e-8
+          },
+          "Run": {
+            "maxLateralBefore": 0.055962019599974155,
+            "maxLateralAfter": 7.450580596923828e-9,
+            "maxAnkleDrift": 4.485843546238652e-8
+          },
+          "Mine": {
+            "maxLateralBefore": 0,
+            "maxLateralAfter": 0,
+            "maxAnkleDrift": 0
+          }
+        },
+        "joints": {
+          "Root": [
+            0,
+            0,
+            0.7002
+          ],
+          "LowerTorso": [
+            0,
+            0,
+            0.7002
+          ],
+          "UpperTorso": [
+            0,
+            0.0277,
+            0.8735
+          ],
+          "Head": [
+            0,
+            0.0148,
+            1.3126
+          ],
+          "LeftUpperArm": [
+            -0.2495,
+            0.0092,
+            1.2265
+          ],
+          "LeftLowerArm": [
+            -0.2747,
+            -0.0701,
+            1.0618
+          ],
+          "LeftHand": [
+            -0.3758,
+            -0.0272,
+            0.9058
+          ],
+          "RightUpperArm": [
+            0.2495,
+            0.0092,
+            1.2265
+          ],
+          "RightLowerArm": [
+            0.2753,
+            -0.0697,
+            1.0618
+          ],
+          "RightHand": [
+            0.3763,
+            -0.0262,
+            0.9058
+          ],
+          "LeftUpperLeg": [
+            -0.1391,
+            0.026,
+            0.6559
+          ],
+          "LeftLowerLeg": [
+            -0.1805,
+            -0.0066,
+            0.3989
+          ],
+          "LeftFoot": [
+            -0.1839,
+            0,
+            0.2394
+          ],
+          "RightUpperLeg": [
+            0.1387,
+            0.026,
+            0.6559
+          ],
+          "RightLowerLeg": [
+            0.1816,
+            -0.0057,
+            0.3989
+          ],
+          "RightFoot": [
+            0.1831,
+            -0.0001,
+            0.2394
+          ]
+        },
+        "textureLift": {
+          "gamma": 0.7,
+          "gain": 1.15
+        }
+      },
+      "generation": {
+        "taskId": "84856ff3-6c37-4b7f-a198-5f7d00dc3443",
+        "createdAt": "2026-10-29T06:40:24.891Z",
+        "referenceSha256": "99933312e6d8ad59248732220943d80659a9081b999ca3f4e58cd0754f2a62b2",
+        "recipe": {
+          "type": "image_to_model",
+          "model_version": "v3.0-20250812",
+          "file": {
+            "type": "png",
+            "source": "assets-source/miner-d/reference.png"
+          },
+          "face_limit": 12000,
+          "texture": true,
+          "pbr": false,
+          "texture_quality": "standard"
+        },
+        "status": "success",
+        "triangles": 11912,
+        "bytes": 1144484,
+        "meshes": 1,
+        "materials": 1,
+        "sha256": "8f470436b823a07b4fb7af5dddd0f1d35f63815aa673b881b563a296a153705d",
+        "reference": "assets-source/miner-d/reference.png"
+      },
+      "authorization": "authorization documents excluded by explicit user request; production records retained"
+    },
+    {
+      "category": "Blender authored model",
+      "manifest": "src/game/assets/shop/manifest.json",
+      "production": {
+        "maker": "Blender",
+        "script": "tools/build-shop-showroom.py",
+        "source": [
+          "assets-source/shop-showroom/shop-showroom.blend"
+        ],
+        "texture": [
+          128,
+          128
+        ],
+        "showroomTriangles": 6700,
+        "files": [
+          {
+            "file": "src/game/assets/shop/showroom.glb",
+            "bytes": 638936,
+            "sha256": "1378fe0152e99ea5869200fd1c7624d06fce02d5707f00ed99dc36d8856ac979"
+          },
+          {
+            "file": "assets-source/shop-showroom/shop-palette.png",
+            "bytes": 1083,
+            "sha256": "d0e7bc76038e26fde195c1ec6f96967d7a5c16be41707ff6a1b9472498859a10"
+          },
+          {
+            "file": "assets-source/shop-showroom/shop-showroom.blend",
+            "bytes": 167989,
+            "sha256": "1305579a0f05041524cdac6ef73607b0b10137ef2bbc21ddd0d9219cd2d0959b"
+          },
+          {
+            "file": "tools/build-shop-showroom.py",
+            "bytes": 6092,
+            "sha256": "18b8bababa807d06853eb99d2f92a0cb973e96c0fc0d51b8b175e760b97d3b45"
+          }
+        ]
+      },
+      "authorization": "authored production records; no blanket license grant asserted"
+    },
+    {
+      "category": "Blender authored model",
+      "manifest": "src/game/assets/shop/equipment-manifest.json",
+      "production": {
+        "maker": "Blender",
+        "script": "tools/build-equipment.py",
+        "source": "assets-source/shop-showroom/equipment.blend",
+        "texture": [
+          256,
+          256
+        ],
+        "models": [
+          {
+            "node": "Tool01",
+            "triangles": 656
+          },
+          {
+            "node": "Tool02",
+            "triangles": 752
+          },
+          {
+            "node": "Tool03",
+            "triangles": 720
+          },
+          {
+            "node": "Tool04",
+            "triangles": 764
+          },
+          {
+            "node": "Tool05",
+            "triangles": 460
+          },
+          {
+            "node": "Tool06",
+            "triangles": 984
+          },
+          {
+            "node": "Tool07",
+            "triangles": 1108
+          },
+          {
+            "node": "Tool08",
+            "triangles": 452
+          },
+          {
+            "node": "Tool09",
+            "triangles": 948
+          },
+          {
+            "node": "Tool10",
+            "triangles": 704
+          },
+          {
+            "node": "Tool11",
+            "triangles": 316
+          },
+          {
+            "node": "Tool12",
+            "triangles": 582
+          },
+          {
+            "node": "Tool13",
+            "triangles": 648
+          },
+          {
+            "node": "Tool14",
+            "triangles": 304
+          },
+          {
+            "node": "Tool15",
+            "triangles": 552
+          },
+          {
+            "node": "Tool16",
+            "triangles": 228
+          },
+          {
+            "node": "Tool17",
+            "triangles": 612
+          },
+          {
+            "node": "Tool18",
+            "triangles": 632
+          },
+          {
+            "node": "Tool19",
+            "triangles": 512
+          },
+          {
+            "node": "Tool20",
+            "triangles": 682
+          },
+          {
+            "node": "Tool21",
+            "triangles": 896
+          },
+          {
+            "node": "Tool22",
+            "triangles": 1940
+          },
+          {
+            "node": "Tool23",
+            "triangles": 1252
+          },
+          {
+            "node": "Tool24",
+            "triangles": 572
+          },
+          {
+            "node": "Tool25",
+            "triangles": 386
+          },
+          {
+            "node": "Tool26",
+            "triangles": 888
+          },
+          {
+            "node": "Tool27",
+            "triangles": 890
+          },
+          {
+            "node": "Tool28",
+            "triangles": 556
+          },
+          {
+            "node": "Tool29",
+            "triangles": 908
+          },
+          {
+            "node": "Tool30",
+            "triangles": 1072
+          },
+          {
+            "node": "Bag01",
+            "triangles": 660
+          },
+          {
+            "node": "Bag02",
+            "triangles": 456
+          },
+          {
+            "node": "Bag03",
+            "triangles": 804
+          },
+          {
+            "node": "Bag04",
+            "triangles": 1016
+          },
+          {
+            "node": "Bag05",
+            "triangles": 532
+          },
+          {
+            "node": "Bag06",
+            "triangles": 656
+          },
+          {
+            "node": "Bag07",
+            "triangles": 464
+          },
+          {
+            "node": "Bag08",
+            "triangles": 952
+          },
+          {
+            "node": "Bag09",
+            "triangles": 1430
+          },
+          {
+            "node": "Bag10",
+            "triangles": 970
+          },
+          {
+            "node": "Bag11",
+            "triangles": 704
+          },
+          {
+            "node": "Bag12",
+            "triangles": 944
+          },
+          {
+            "node": "Bag13",
+            "triangles": 1100
+          },
+          {
+            "node": "Bag14",
+            "triangles": 556
+          },
+          {
+            "node": "Bag15",
+            "triangles": 736
+          },
+          {
+            "node": "Bag16",
+            "triangles": 752
+          },
+          {
+            "node": "Bag17",
+            "triangles": 396
+          },
+          {
+            "node": "Bag18",
+            "triangles": 516
+          },
+          {
+            "node": "Bag19",
+            "triangles": 660
+          },
+          {
+            "node": "Bag20",
+            "triangles": 684
+          },
+          {
+            "node": "Bag21",
+            "triangles": 1444
+          },
+          {
+            "node": "Bag22",
+            "triangles": 560
+          },
+          {
+            "node": "Bag23",
+            "triangles": 720
+          },
+          {
+            "node": "Bag24",
+            "triangles": 1132
+          },
+          {
+            "node": "Bag25",
+            "triangles": 808
+          },
+          {
+            "node": "Bag26",
+            "triangles": 580
+          },
+          {
+            "node": "Bag27",
+            "triangles": 768
+          },
+          {
+            "node": "Bag28",
+            "triangles": 768
+          },
+          {
+            "node": "Bag29",
+            "triangles": 848
+          },
+          {
+            "node": "Bag30",
+            "triangles": 976
+          }
+        ],
+        "files": [
+          {
+            "file": "src/game/assets/shop/equipment.glb",
+            "bytes": 2264868,
+            "sha256": "3d1f18d875d0067972543d8895d9416135c3f63e7e6ec845e4545f0977d6db95"
+          },
+          {
+            "file": "assets-source/shop-showroom/equipment-atlas.png",
+            "bytes": 2494,
+            "sha256": "98c3c7b38df52f121314ca8282f7d0e043bed9f8f1d947b2a43b3bdb7b97e36d"
+          },
+          {
+            "file": "assets-source/shop-showroom/equipment.blend",
+            "bytes": 571154,
+            "sha256": "b70ff65512d072be14e256644ab37f64f6ac12bc5fc5f6ba17e51fe5c2b6fc12"
+          },
+          {
+            "file": "tools/build-equipment.py",
+            "bytes": 66604,
+            "sha256": "f0c7cf0df1be80b8456af6b68e693005894bda1e2137f555b94a5b3c581393fe"
+          }
+        ]
+      },
+      "authorization": "authored production records; no blanket license grant asserted"
+    },
+    {
+      "category": "Blender authored model",
+      "manifest": "src/game/assets/pets/pet-cube.manifest.json",
+      "production": {
+        "maker": "Blender",
+        "script": "tools/build-pet-cube.py",
+        "blend": "assets-source/pets/pet-cube.blend",
+        "glb": "src/game/assets/pets/pet-cube.glb",
+        "triangles": 300,
+        "vertices": 152,
+        "edge": 1,
+        "bevel": 0.17,
+        "segments": 4,
+        "origin": "bottom centre, +Z (glTF) is the face side",
+        "uvRange": [
+          0.0497918426990509,
+          0.0497918426990509,
+          0.9502081871032715,
+          0.9502081871032715
+        ],
+        "textures": "none; colour, pattern and face are drawn at runtime per species",
+        "sha256": "d421b3c2a281ce1161418f24298073c8162516fc2d1bbff19656c4a9061fd576",
+        "bytes": 9368
+      },
+      "authorization": "authored production records; no blanket license grant asserted"
+    },
+    {
+      "category": "fonts",
+      "manifest": "src/game/assets/fonts/manifest.json",
+      "production": {
+        "generator": "tools/build-ui-fonts.py",
+        "charset": " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~§·ÀÁÂÔ×àáâãèéêìíòóôõùúýĂăĐđĩũơƯưạảẤấẦầẩẫậẮắằẳẵặẹẻẽẾếỀềểễệỉịọỏỐốồổỗộớờỞởỡợụủỨứừửữựỳỷỹ–—‘’“”…›↑↗≤▶◀✓、。「」【】一万三上下不与世东丝丢两个中串为主久么之乐也书买了二于云井交产享亮人亿什仅今从仓他仙代令以件价任份伍休会伞传伤位低住体何余作你佳使例依侧便保信修倍倒候借值停偶偷储像允元先光免兑兔入全共关其具兼兽内再写冰冲决况冷冻准凝几凰凸出击刀分切列刚创初删利别到制刷前剑剩剪副劈力功加动助励勘包化匹区十升单卖南占卡卫印即卵卸厂厅历压原去叉友双反发取变叠口古只叮可台史右号各合同名后向吗否吧含启吸和咚咸品响售唯商啦喷嗡嘎器回团围固图圈土在地场均坐坑块垂型域基堆境增墨声壳处备复外多够大天太失头奖奶好如始娃子字存孢它守安完定宝实宠室害家容密寒察寸对寻导封射将小少尔尘尚尝就尺尽尾局层屏展属山岗岩巢工左巨己已币布带帧帮常幕干平并幸幼序库应底店度建开式引张弦强归当录彗形彩影往待徒得微心必快怀态怎怕性总恒恢息情意慢戏成我或战戟房所手才扎打扣扭扰扳批找技把抓投抖报抽拆拉拍拖拥拧择拿持挂指按挑挖挡挤挥换据掉掌排掘探接提握揭搋携摇撞撤操支收改攻放效数敲整文斑料斧断新方施旁旅无日旧早时明星是显晓晚晨普景晴晶暂暗暴曜曲更替最月有朋朝期木未本朵机权杆材杖束条来松板极构枚果枭染查标栏样核格案档桶械检棍棒棱楼概槛槽模次欧款止正此步武殊段母每比气氮水永汐池沉沙没河油治沿泊法泡波泥洗洞流浆测浏浪浮海消液淇淋淡深清温渲游源滚满漂漏潮激火灯灰炉炭点炼炽烘热焙焰煤照熊熔熟爪爷片版牌牙牛物特状狂狐独狮猪猫獠玄率王玩环现玺珀珊球理琥琶瑚瓜瓤甜生用电画界留白的皮益盖盗目直相看真着知短石矿码砂础硫硬确碎碧碰磁磐磺示票离种科秒秘积移稀程稍穴空穿立站章笑符第等筒签简算箭箱篮簇米类粉粘精糊糖系素索紧紫累红约级纪纯纳纸纹线组经绒结绕绘给络继绪续绿缩缴缸缺罐网置羽翅翠翡翻翼耀老而耗耳聚背能脉脚腐自至致舔舱船色节花苔范草荧获菇菜营落蒙蓝藏蘑虚虫虹蛋蛙蜂蜜蜡蜥蝠蝶融螺蟹血行衣表袋被装西要覆观规视览角解触言计认议记许论设证识诊试诗话询详语误说请读调谷豆负责败账货质购贴费资赚赤走赶起超越趟足跃跑距跟跨路跳蹄身轨转轮软轻载辉辑输边达过运近返还这进远连迷迹退送逃选透逐递途通速造逻遇道遗避邀那邮部都配采释里重野量金钛钟钢钮钱钴钻铁铂铜铬铱银铺链销锁锅锆锋锌错锡锤键锯镍镐镜镰镶长门闪闭问间队防阴阻附际降限除陨随隐雀集雨雪零雷雾需霓霜霸青静非靠面音页项须顿预领频颗题风飘飞餐首香马验骨骼高魔鱼鲜鲸鸟鸭鹤鹰鹿麻黄黑鼓鼠鼹齐齿龙龟！（），：；？",
+        "faces": [
+          {
+            "id": "digits",
+            "source": "Fredoka",
+            "url": "https://raw.githubusercontent.com/google/fonts/45e3d5269e4a17d823f6d84470bc084dc5ae46f6/ofl/fredoka/Fredoka%5Bwdth,wght%5D.ttf",
+            "sourceSha256": "2ba02e68b152868aef9ba28e24b3648c7d457fe6f25c761f2c2c53fb61a73fc8",
+            "axes": {
+              "wght": 600,
+              "wdth": 100
+            },
+            "license": "SIL OFL 1.1",
+            "glyphs": 125,
+            "unicodeRange": "U+20-7E,U+A7,U+B7,U+C0-C2,U+D4,U+D7,U+E0-E3,U+E8-EA,U+EC-ED,U+F2-F5,U+F9-FA,U+FD,U+2013-2014,U+2018-2019,U+201C-201D,U+2026",
+            "bytes": 11280,
+            "sha256": "9f59b7710edc6bd766c9fe62431d24105d7facbf839869dc2602ceeaf42a75d7"
+          },
+          {
+            "id": "noto",
+            "source": "Noto Sans SC Black",
+            "url": "https://raw.githubusercontent.com/google/fonts/45e3d5269e4a17d823f6d84470bc084dc5ae46f6/ofl/notosanssc/NotoSansSC%5Bwght%5D.ttf",
+            "sourceSha256": "a3041811a78c361b1de50f953c805e0244951c21c5bd412f7232ef0d899af0da",
+            "axes": {
+              "wght": 900
+            },
+            "license": "SIL OFL 1.1",
+            "glyphs": 1064,
+            "missing": "",
+            "unicodeRange": "U+102-103,U+110-111,U+129,U+169,U+1A1,U+1AF-1B0,U+1EA1,U+1EA3-1EA7,U+1EA9,U+1EAB,U+1EAD-1EAF,U+1EB1,U+1EB3,U+1EB5,U+1EB7,U+1EB9,U+1EBB,U+1EBD-1EC1,U+1EC3,U+1EC5,U+1EC7,U+1EC9,U+1ECB,U+1ECD,U+1ECF-1ED1,U+1ED3,U+1ED5,U+1ED7,U+1ED9,U+1EDB,U+1EDD-1EDF,U+1EE1,U+1EE3,U+1EE5,U+1EE7-1EE9,U+1EEB,U+1EED,U+1EEF,U+1EF1,U+1EF3,U+1EF7,U+1EF9,U+203A,U+2191,U+2197,U+2264,U+25B6,U+25C0,U+2713,U+3001-3002,U+300C-300D,U+3010-3011,U+4E00,U+4E07,U+4E09-4E0B,U+4E0D-4E0E,U+4E16,U+4E1C-4E1D,U+4E22,U+4E24,U+4E2A,U+4E2D,U+4E32,U+4E3A-4E3B,U+4E45,U+4E48,U+4E4B,U+4E50,U+4E5F,U+4E66,U+4E70,U+4E86,U+4E8C,U+4E8E,U+4E91,U+4E95,U+4EA4,U+4EA7,U+4EAB,U+4EAE,U+4EBA,U+4EBF-4EC0,U+4EC5,U+4ECA,U+4ECE,U+4ED3,U+4ED6,U+4ED9,U+4EE3-4EE5,U+4EF6-4EF7,U+4EFB,U+4EFD,U+4F0D,U+4F11,U+4F1A,U+4F1E,U+4F20,U+4F24,U+4F4D-4F4F,U+4F53,U+4F55,U+4F59,U+4F5C,U+4F60,U+4F73,U+4F7F,U+4F8B,U+4F9D,U+4FA7,U+4FBF,U+4FDD,U+4FE1,U+4FEE,U+500D,U+5012,U+5019,U+501F,U+503C,U+505C,U+5076-5077,U+50A8,U+50CF,U+5141,U+5143,U+5148-5149,U+514D,U+5151,U+5154,U+5165,U+5168,U+5171,U+5173,U+5176-5177,U+517C-517D,U+5185,U+518D,U+5199,U+51B0,U+51B2-51B3,U+51B5,U+51B7,U+51BB,U+51C6,U+51DD,U+51E0,U+51F0,U+51F8,U+51FA-51FB,U+5200,U+5206-5207,U+5217,U+521A-521B,U+521D,U+5220,U+5229,U+522B,U+5230,U+5236-5237,U+524D,U+5251,U+5269-526A,U+526F,U+5288,U+529B,U+529F-52A0,U+52A8-52A9,U+52B1,U+52D8,U+5305,U+5316,U+5339-533A,U+5341,U+5347,U+5355-5357,U+5360-5361,U+536B,U+5370,U+5373,U+5375,U+5378,U+5382,U+5385-5386,U+538B,U+539F,U+53BB,U+53C9,U+53CB-53CD,U+53D1,U+53D6,U+53D8,U+53E0,U+53E3-53E4,U+53EA,U+53EE-53F0,U+53F2-53F3,U+53F7,U+5404,U+5408,U+540C-540E,U+5411,U+5417,U+5426-5427,U+542B,U+542F,U+5438,U+548C,U+549A,U+54B8,U+54C1,U+54CD,U+552E-552F,U+5546,U+5566,U+55B7,U+55E1,U+560E,U+5668,U+56DE,U+56E2,U+56F4,U+56FA,U+56FE,U+5708,U+571F,U+5728,U+5730,U+573A,U+5747,U+5750-5751,U+5757,U+5782,U+578B,U+57DF,U+57FA,U+5806,U+5883,U+589E,U+58A8,U+58F0,U+58F3,U+5904,U+5907,U+590D,U+5916,U+591A,U+591F,U+5927,U+5929-592A,U+5931,U+5934,U+5956,U+5976,U+597D,U+5982,U+59CB,U+5A03,U+5B50,U+5B57-5B58,U+5B62,U+5B83,U+5B88-5B89,U+5B8C,U+5B9A,U+5B9D-5B9E,U+5BA0,U+5BA4,U+5BB3,U+5BB6,U+5BB9,U+5BC6,U+5BD2,U+5BDF,U+5BF8-5BF9,U+5BFB-5BFC,U+5C01,U+5C04,U+5C06,U+5C0F,U+5C11,U+5C14,U+5C18,U+5C1A,U+5C1D,U+5C31,U+5C3A,U+5C3D-5C3E,U+5C40,U+5C42,U+5C4F,U+5C55,U+5C5E,U+5C71,U+5C97,U+5CA9,U+5DE2,U+5DE5-5DE6,U+5DE8,U+5DF1-5DF2,U+5E01,U+5E03,U+5E26-5E27,U+5E2E,U+5E38,U+5E55,U+5E72-5E73,U+5E76,U+5E78,U+5E7C,U+5E8F,U+5E93-5E95,U+5E97,U+5EA6,U+5EFA,U+5F00,U+5F0F,U+5F15,U+5F20,U+5F26,U+5F3A,U+5F52-5F53,U+5F55,U+5F57,U+5F62,U+5F69,U+5F71,U+5F80,U+5F85,U+5F92,U+5F97,U+5FAE,U+5FC3,U+5FC5,U+5FEB,U+6000-6001,U+600E,U+6015,U+6027,U+603B,U+6052,U+6062,U+606F,U+60C5,U+610F,U+6162,U+620F-6211,U+6216,U+6218,U+621F,U+623F-6240,U+624B,U+624D-624E,U+6253,U+6263,U+626D,U+6270,U+6273,U+6279,U+627E,U+6280,U+628A,U+6293,U+6295-6296,U+62A5,U+62BD,U+62C6,U+62C9,U+62CD,U+62D6,U+62E5,U+62E7,U+62E9,U+62FF,U+6301-6302,U+6307,U+6309,U+6311,U+6316,U+6321,U+6324-6325,U+6362,U+636E,U+6389,U+638C,U+6392,U+6398,U+63A2,U+63A5,U+63D0,U+63E1,U+63ED,U+640B,U+643A,U+6447,U+649E,U+64A4,U+64CD,U+652F,U+6536,U+6539,U+653B,U+653E,U+6548,U+6570,U+6572,U+6574,U+6587,U+6591,U+6599,U+65A7,U+65AD,U+65B0,U+65B9,U+65BD,U+65C1,U+65C5,U+65E0,U+65E5,U+65E7,U+65E9,U+65F6,U+660E,U+661F,U+662F,U+663E,U+6653,U+665A,U+6668,U+666E-666F,U+6674,U+6676,U+6682,U+6697,U+66B4,U+66DC,U+66F2,U+66F4,U+66FF-6700,U+6708-6709,U+670B,U+671D,U+671F,U+6728,U+672A,U+672C,U+6735,U+673A,U+6743,U+6746,U+6750,U+6756,U+675F,U+6761,U+6765,U+677E-677F,U+6781,U+6784,U+679A,U+679C,U+67AD,U+67D3,U+67E5,U+6807,U+680F,U+6837-6838,U+683C,U+6848,U+6863,U+6876,U+68B0,U+68C0,U+68CD,U+68D2,U+68F1,U+697C,U+6982,U+69DB,U+69FD,U+6A21,U+6B21,U+6B27,U+6B3E,U+6B62-6B66,U+6B8A,U+6BB5,U+6BCD,U+6BCF,U+6BD4,U+6C14,U+6C2E,U+6C34,U+6C38,U+6C50,U+6C60,U+6C89,U+6C99,U+6CA1,U+6CB3,U+6CB9,U+6CBB,U+6CBF,U+6CCA,U+6CD5,U+6CE1-6CE2,U+6CE5,U+6D17,U+6D1E,U+6D41,U+6D46,U+6D4B,U+6D4F,U+6D6A,U+6D6E,U+6D77,U+6D88,U+6DB2,U+6DC7,U+6DCB,U+6DE1,U+6DF1,U+6E05,U+6E29,U+6E32,U+6E38,U+6E90,U+6EDA,U+6EE1,U+6F02,U+6F0F,U+6F6E,U+6FC0,U+706B,U+706F-7070,U+7089,U+70AD,U+70B9,U+70BC-70BD,U+70D8,U+70ED,U+7119,U+7130,U+7164,U+7167,U+718A,U+7194,U+719F,U+722A,U+7237,U+7247-7248,U+724C,U+7259,U+725B,U+7269,U+7279,U+72B6,U+72C2,U+72D0,U+72EC,U+72EE,U+732A-732B,U+7360,U+7384,U+7387,U+738B,U+73A9,U+73AF-73B0,U+73BA,U+73C0,U+73CA,U+7403,U+7406,U+7425,U+7436,U+745A,U+74DC,U+74E4,U+751C,U+751F,U+7528,U+7535,U+753B,U+754C,U+7559,U+767D,U+7684,U+76AE,U+76CA,U+76D6-76D7,U+76EE,U+76F4,U+76F8,U+770B,U+771F,U+7740,U+77E5,U+77ED,U+77F3,U+77FF,U+7801-7802,U+7840,U+786B-786C,U+786E,U+788E,U+78A7,U+78B0,U+78C1,U+78D0,U+78FA,U+793A,U+7968,U+79BB,U+79CD,U+79D1-79D2,U+79D8,U+79EF,U+79FB,U+7A00,U+7A0B,U+7A0D,U+7A74,U+7A7A,U+7A7F,U+7ACB,U+7AD9,U+7AE0,U+7B11,U+7B26,U+7B2C,U+7B49,U+7B52,U+7B7E,U+7B80,U+7B97,U+7BAD,U+7BB1,U+7BEE,U+7C07,U+7C73,U+7C7B,U+7C89,U+7C98,U+7CBE,U+7CCA,U+7CD6,U+7CFB,U+7D20,U+7D22,U+7D27,U+7D2B,U+7D2F,U+7EA2,U+7EA6-7EA7,U+7EAA,U+7EAF,U+7EB3,U+7EB8-7EB9,U+7EBF,U+7EC4,U+7ECF,U+7ED2-7ED3,U+7ED5,U+7ED8-7ED9,U+7EDC,U+7EE7,U+7EEA,U+7EED,U+7EFF,U+7F29,U+7F34,U+7F38,U+7F3A,U+7F50-7F51,U+7F6E,U+7FBD,U+7FC5,U+7FE0-7FE1,U+7FFB-7FFC,U+8000-8001,U+800C,U+8017,U+8033,U+805A,U+80CC,U+80FD,U+8109,U+811A,U+8150,U+81EA,U+81F3-81F4,U+8214,U+8231,U+8239,U+8272,U+8282,U+82B1,U+82D4,U+8303,U+8349,U+8367,U+83B7,U+83C7,U+83DC,U+8425,U+843D,U+8499,U+84DD,U+85CF,U+8611,U+865A,U+866B,U+8679,U+86CB,U+86D9,U+8702,U+871C,U+8721,U+8725,U+8760,U+8776,U+878D,U+87BA,U+87F9,U+8840,U+884C,U+8863,U+8868,U+888B,U+88AB,U+88C5,U+897F,U+8981,U+8986,U+89C2,U+89C4,U+89C6,U+89C8,U+89D2,U+89E3,U+89E6,U+8A00,U+8BA1,U+8BA4,U+8BAE,U+8BB0,U+8BB8,U+8BBA,U+8BBE,U+8BC1,U+8BC6,U+8BCA,U+8BD5,U+8BD7,U+8BDD,U+8BE2,U+8BE6,U+8BED,U+8BEF,U+8BF4,U+8BF7,U+8BFB,U+8C03,U+8C37,U+8C46,U+8D1F,U+8D23,U+8D25-8D28,U+8D2D,U+8D34,U+8D39,U+8D44,U+8D5A,U+8D64,U+8D70,U+8D76-8D77,U+8D85,U+8D8A,U+8D9F,U+8DB3,U+8DC3,U+8DD1,U+8DDD,U+8DDF,U+8DE8,U+8DEF,U+8DF3,U+8E44,U+8EAB,U+8F68,U+8F6C,U+8F6E-8F6F,U+8F7B,U+8F7D,U+8F89,U+8F91,U+8F93,U+8FB9,U+8FBE,U+8FC7,U+8FD0-8FD1,U+8FD4,U+8FD8-8FD9,U+8FDB-8FDC,U+8FDE,U+8FF7,U+8FF9,U+9000-9001,U+9003,U+9009,U+900F-9010,U+9012,U+9014,U+901A,U+901F-9020,U+903B,U+9047,U+9053,U+9057,U+907F-9080,U+90A3,U+90AE,U+90E8,U+90FD,U+914D,U+91C7,U+91CA,U+91CC-91CF,U+91D1,U+949B,U+949F,U+94A2,U+94AE,U+94B1,U+94B4,U+94BB,U+94C1-94C2,U+94DC,U+94EC,U+94F1,U+94F6,U+94FA,U+94FE,U+9500-9501,U+9505-9506,U+950B-950C,U+9519,U+9521,U+9524,U+952E-952F,U+954D,U+9550,U+955C,U+9570,U+9576,U+957F,U+95E8,U+95EA,U+95ED-95EE,U+95F4,U+961F,U+9632,U+9634,U+963B,U+9644-9645,U+964D,U+9650,U+9664,U+9668,U+968F-9690,U+96C0,U+96C6,U+96E8,U+96EA,U+96F6-96F7,U+96FE,U+9700,U+9713,U+971C,U+9738,U+9752,U+9759,U+975E,U+9760,U+9762,U+97F3,U+9875,U+9879,U+987B,U+987F,U+9884,U+9886,U+9891,U+9897-9898,U+98CE,U+98D8,U+98DE,U+9910,U+9996,U+9999,U+9A6C,U+9A8C,U+9AA8,U+9ABC,U+9AD8,U+9B54,U+9C7C,U+9C9C,U+9CB8,U+9E1F,U+9E2D,U+9E64,U+9E70,U+9E7F,U+9EBB,U+9EC4,U+9ED1,U+9F13,U+9F20,U+9F39,U+9F50,U+9F7F,U+9F99,U+9F9F,U+FF01,U+FF08-FF09,U+FF0C,U+FF1A-FF1B,U+FF1F",
+            "bytes": 146472,
+            "sha256": "60eb3849dd7599d373af333541914293f804eaf8518c366ddb1e6adb00550919"
+          },
+          {
+            "id": "vi",
+            "file": "mining-vi-noto.woff2",
+            "source": "Noto Sans SC Black",
+            "url": "https://raw.githubusercontent.com/google/fonts/45e3d5269e4a17d823f6d84470bc084dc5ae46f6/ofl/notosanssc/NotoSansSC%5Bwght%5D.ttf",
+            "sourceSha256": "a3041811a78c361b1de50f953c805e0244951c21c5bd412f7232ef0d899af0da",
+            "axes": {
+              "wght": 900
+            },
+            "license": "SIL OFL 1.1",
+            "glyphs": 183,
+            "unicodeRange": "U+20-7E,U+B7,U+C0-C2,U+D4,U+D7,U+E0-E3,U+E8-EA,U+EC-ED,U+F2-F5,U+F9-FA,U+FD,U+102-103,U+110-111,U+129,U+169,U+1A1,U+1AF-1B0,U+1EA1,U+1EA3-1EA7,U+1EA9,U+1EAB,U+1EAD-1EAF,U+1EB1,U+1EB3,U+1EB5,U+1EB7,U+1EB9,U+1EBB,U+1EBD-1EC1,U+1EC3,U+1EC5,U+1EC7,U+1EC9,U+1ECB,U+1ECD,U+1ECF-1ED1,U+1ED3,U+1ED5,U+1ED7,U+1ED9,U+1EDB,U+1EDD-1EDF,U+1EE1,U+1EE3,U+1EE5,U+1EE7-1EE9,U+1EEB,U+1EED,U+1EEF,U+1EF1,U+1EF3,U+1EF7,U+1EF9,U+2014,U+2026,U+203A,U+2191,U+2713",
+            "bytes": 10764,
+            "sha256": "c82b22dc724515b5d0465818743d1a0549c0f42729cb00f64c8bf1abcaa48017"
+          }
+        ]
+      },
+      "authorization": "SIL OFL and retained sign-font license; original notices in licenses/fonts"
+    }
+  ],
+  "authoringFiles": [
+    {
+      "file": "surface-game-art/DEPENDENCIES.json",
+      "bytes": 33294,
+      "sha256": "5aa0eb5dc8dd2f64776d6a747fa20713dbe8239c7ca4bdee2264cbb6ef3e4603",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/README.md",
+      "bytes": 853,
+      "sha256": "36eac8204fa5d592800e8e7b00c7c83f9cd01e464d3322dbc60cfde56f0e76ae",
+      "originalSha256": "b9e1ff359fe394888f97cb8e2eb976262cca4b80ff058fe0d8054f231ce9c707",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "surface-game-art/THIRD_PARTY_NOTICES.md",
+      "bytes": 7994,
+      "sha256": "b418dd2ed258065c870b2570b403420bf08fdd56c206b224fd7ea7409e4d5579",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/artifacts/architecture-asset.json",
+      "bytes": 16827,
+      "sha256": "2dd76c44120304045336e957caeb63836d35d6b13d3384a23c1db188fa07c624",
+      "originalSha256": "2dd76c44120304045336e957caeb63836d35d6b13d3384a23c1db188fa07c624",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/artifacts/landscape-asset.json",
+      "bytes": 284,
+      "sha256": "c3f4b5b80074c2b90897dfc43d8f5197d5124525bf43a3c34a818c16b555a986",
+      "originalSha256": "c3f4b5b80074c2b90897dfc43d8f5197d5124525bf43a3c34a818c16b555a986",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/layout.json",
+      "bytes": 9963,
+      "sha256": "0d2e960c230dbf546a7d17336193d3dfc17b011756db2c7d0554ace380b27ea6",
+      "originalSha256": "0d2e960c230dbf546a7d17336193d3dfc17b011756db2c7d0554ace380b27ea6",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@colors__colors/LICENSE",
+      "bytes": 1235,
+      "sha256": "58597ded729a5e749cc323e2ae6e533a31be3622737b33e0239ba075ca14b515",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@dabh__diagnostics/LICENSE",
+      "bytes": 1119,
+      "sha256": "77cc8fe282841077c532a9d92bda47add7bd0e1f5f4d7e91a9f91bff69faa86a",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@donmccurdy__caporal/LICENSE",
+      "bytes": 1081,
+      "sha256": "818a2d1e5a044bc80c9cb73b171864ccc9d6ec93a40742667d5480b0e50e47e8",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@gltf-transform__cli/LICENSE.md",
+      "bytes": 1078,
+      "sha256": "2c4f111d00dbf22b10d31a14813c5f5de6a828640f7311f26b9dda89b3fce165",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@gltf-transform__core/LICENSE.md",
+      "bytes": 1078,
+      "sha256": "2c4f111d00dbf22b10d31a14813c5f5de6a828640f7311f26b9dda89b3fce165",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@gltf-transform__extensions/LICENSE.md",
+      "bytes": 1078,
+      "sha256": "2c4f111d00dbf22b10d31a14813c5f5de6a828640f7311f26b9dda89b3fce165",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@gltf-transform__functions/LICENSE.md",
+      "bytes": 1078,
+      "sha256": "2c4f111d00dbf22b10d31a14813c5f5de6a828640f7311f26b9dda89b3fce165",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@img__colour/LICENSE.md",
+      "bytes": 4433,
+      "sha256": "e2eaa4603c14cb26f301e88648c12a853fa3f0f5da6d4b0972958c666e7f2ab8",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@img__sharp-linux-x64/LICENSE",
+      "bytes": 10273,
+      "sha256": "73ba74dfaa520b49a401b5d21459a8523a146f3b7518a833eea5efa85130bf68",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@isaacs__cliui/LICENSE.txt",
+      "bytes": 731,
+      "sha256": "2dc0465729366c3a7890dfa9e972a1ba7048a26c02116fb8b419a6a1ac110149",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@isaacs__cliui__node_modules__emoji-regex/LICENSE-MIT.txt",
+      "bytes": 1077,
+      "sha256": "483acb265f182907d1caf6cff9c16c96f31325ed23792832cc5d8b12d5f88c8a",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@isaacs__cliui__node_modules__string-width/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@napi-rs__canvas/LICENSE",
+      "bytes": 2705,
+      "sha256": "0b8e3b4f0042f33677406344854c1dcce3a2878eb3a3f6baee58c6f5752655ce",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@pkgjs__parseargs/LICENSE",
+      "bytes": 11357,
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@so-ric__colorspace/LICENSE.md",
+      "bytes": 1139,
+      "sha256": "56dbea61ecd8a624c37c7a1c282a2ec4b72a4b2a03fbc6eeb7210bdc4ec25d75",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@types__braces/LICENSE",
+      "bytes": 1141,
+      "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@types__glob/LICENSE",
+      "bytes": 1141,
+      "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@types__lodash/LICENSE",
+      "bytes": 1141,
+      "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@types__micromatch/LICENSE",
+      "bytes": 1141,
+      "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@types__minimatch/LICENSE",
+      "bytes": 1141,
+      "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@types__ndarray/LICENSE",
+      "bytes": 1141,
+      "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@types__node/LICENSE",
+      "bytes": 1141,
+      "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@types__prompts/LICENSE",
+      "bytes": 1141,
+      "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@types__table/LICENSE",
+      "bytes": 1183,
+      "sha256": "dea9265341829002e2c23a7372393eb2ed6e26085fb623f38a4ba0af833f30a6",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@types__tmp/LICENSE",
+      "bytes": 1141,
+      "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@types__triple-beam/LICENSE",
+      "bytes": 1141,
+      "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__@types__wrap-ansi/LICENSE",
+      "bytes": 1141,
+      "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__ajv/LICENSE",
+      "bytes": 1090,
+      "sha256": "e85e131fa4ed25538ff1f4962ced1fb6f68b079bd9164a790597a0f30b8fd030",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__ansi-escapes/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__ansi-regex/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__ansi-styles/license",
+      "bytes": 1109,
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__astral-regex/license",
+      "bytes": 1116,
+      "sha256": "69dee148a2cc470554dfa7142e830662062394d0fe67cddd379aba90dc60d6b3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__async/LICENSE",
+      "bytes": 1063,
+      "sha256": "d9fed24f132985934fca621c4dc1dfb53e03377a24d0568d424383d7eaa9c0ac",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__balanced-match/LICENSE.md",
+      "bytes": 1096,
+      "sha256": "a1bd5deadb6a06dd74efa852c1b8b23f63b67f2214fbe9c8bd591da51da69268",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__brace-expansion/LICENSE",
+      "bytes": 1096,
+      "sha256": "68f12f6e2c33688699249c01d8f9623c534da20aa71989c57b061b7bc1676d14",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__braces/LICENSE",
+      "bytes": 1091,
+      "sha256": "35bdd8a44339719441900fb50fbefc5e2dca1ca662cbaed7a687de842c8b70f2",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__chalk/license",
+      "bytes": 1109,
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__cli-cursor/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__cli-table3/LICENSE",
+      "bytes": 1102,
+      "sha256": "beb6b55bc79e0660b9fd8424c2f65c966991e1a866c23356c1427e146c6cddea",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__cli-truncate/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__cli-truncate__node_modules__emoji-regex/LICENSE-MIT.txt",
+      "bytes": 1077,
+      "sha256": "483acb265f182907d1caf6cff9c16c96f31325ed23792832cc5d8b12d5f88c8a",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__cli-truncate__node_modules__string-width/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__color/LICENSE",
+      "bytes": 1059,
+      "sha256": "4c0844caafd3db9a4b643ea493558873710f4e9c8b257887ba066e5e80557848",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__color-convert/LICENSE",
+      "bytes": 1087,
+      "sha256": "693866fc419c6f61c8570438ec00659d156ec2b4d4a4d04091711f5f11a365d4",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__color-name/LICENSE",
+      "bytes": 1085,
+      "sha256": "c064f7a3e353bc1bc977f3c897941c75ef763f44f41677e0a15370ca0853d6e2",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__color-string/LICENSE",
+      "bytes": 1082,
+      "sha256": "8984783ab2478bbee455f0eb6c375b5b62c57c86d4a55f6bf96dfd08e8d48a10",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__color-string__node_modules__color-name/LICENSE",
+      "bytes": 1078,
+      "sha256": "7357445bac398c76c0aef75a587009fe406d40de6a79789eb5b7ecbbad317ef2",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__color__node_modules__color-convert/LICENSE",
+      "bytes": 1140,
+      "sha256": "fa0eb15e44179d20f3fc2c7bb60835f781c278ae6774ce6ad8e21069d88e4853",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__color__node_modules__color-name/LICENSE",
+      "bytes": 1078,
+      "sha256": "7357445bac398c76c0aef75a587009fe406d40de6a79789eb5b7ecbbad317ef2",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__colorette/LICENSE.md",
+      "bytes": 1080,
+      "sha256": "f101c761d255d0dddc77dd8a9327733b03d381798ec54a1bb718367207b48a8e",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__cross-spawn/LICENSE",
+      "bytes": 1105,
+      "sha256": "aaa78451b6fecd1b9c4594c796c133c0e90cad100372ff8bc6de615e9ef9adf1",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__csv-stringify/LICENSE",
+      "bytes": 1074,
+      "sha256": "032efe3de772e9f85c722ee9ff7ccd5cab01e024296b2b8d25893bf779be9360",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__cwise-compiler/LICENSE",
+      "bytes": 1082,
+      "sha256": "e67aed7df22dc8031e4fcf5338fe91cb33e3817e5c58a99a2a2802eea9069791",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__detect-libc/LICENSE",
+      "bytes": 11357,
+      "sha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__emoji-regex/LICENSE-MIT.txt",
+      "bytes": 1077,
+      "sha256": "483acb265f182907d1caf6cff9c16c96f31325ed23792832cc5d8b12d5f88c8a",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__enabled/LICENSE",
+      "bytes": 1119,
+      "sha256": "77cc8fe282841077c532a9d92bda47add7bd0e1f5f4d7e91a9f91bff69faa86a",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__environment/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__eventemitter3/LICENSE",
+      "bytes": 1082,
+      "sha256": "3aecc12b1cb28832b5f65ab64291de96568c3f236a74d646281b4491f7bcadbf",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__fast-deep-equal/LICENSE",
+      "bytes": 1074,
+      "sha256": "7bf9b2de73a6b356761c948d0e9eeb4be6c1270bd04c79cd489c1e400ffdfc1a",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__fast-json-stable-stringify/LICENSE",
+      "bytes": 1145,
+      "sha256": "a833d366242c298cf1b10263516572fb8dcbe68eb5072cdcac2b4546e2b4eb36",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__fecha/LICENSE",
+      "bytes": 1080,
+      "sha256": "382372d4059c129f65cc19770c463bf3820701e2ff3f8b88666d806cdc803b1c",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__fill-range/LICENSE",
+      "bytes": 1091,
+      "sha256": "35bdd8a44339719441900fb50fbefc5e2dca1ca662cbaed7a687de842c8b70f2",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__fn.name/LICENSE",
+      "bytes": 1120,
+      "sha256": "d12a751f8b027f264c79ae82adfa717be6e78feb57799edf8739667d7a0ef52d",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__foreground-child/LICENSE",
+      "bytes": 775,
+      "sha256": "93f5d82a8d59442fe3275383453a255fef761647fb28265644010ba799806148",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__get-east-asian-width/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__glob/LICENSE",
+      "bytes": 775,
+      "sha256": "cdbc258d13806538e727964c2436a8806e6e2496ccd616224aace6f7bf98dbc1",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__gltf-validator/LICENSE",
+      "bytes": 11560,
+      "sha256": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__has-flag/license",
+      "bytes": 1109,
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__inherits/LICENSE",
+      "bytes": 749,
+      "sha256": "5ffe28e7ade7d8f10d85d5337a73fd793dac5c462fb9a28fbf8c5046c7fbca3b",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__iota-array/LICENSE",
+      "bytes": 1082,
+      "sha256": "e67aed7df22dc8031e4fcf5338fe91cb33e3817e5c58a99a2a2802eea9069791",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__is-buffer/LICENSE",
+      "bytes": 1081,
+      "sha256": "c7cc929b57080f4b9d0c6cf57669f0463fc5b39906344dfc8d3bc43426b30eac",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__is-fullwidth-code-point/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__is-number/LICENSE",
+      "bytes": 1091,
+      "sha256": "35bdd8a44339719441900fb50fbefc5e2dca1ca662cbaed7a687de842c8b70f2",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__is-stream/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__isexe/LICENSE",
+      "bytes": 765,
+      "sha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__jackspeak/LICENSE.md",
+      "bytes": 1550,
+      "sha256": "2c7c5d22ed5a8ee968c64757710979afcd77438c48b4a265b94e615babd8a901",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__json-schema-traverse/LICENSE",
+      "bytes": 1074,
+      "sha256": "7bf9b2de73a6b356761c948d0e9eeb4be6c1270bd04c79cd489c1e400ffdfc1a",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__keyframe-resample/LICENSE.md",
+      "bytes": 1552,
+      "sha256": "8a1af140fdfbf5afd3df27f7e662f989c5b963a300020dfafce42033cae9e004",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__kleur/license",
+      "bytes": 1114,
+      "sha256": "306fa513e39b23a6e8747520de761809d206b99800ef41907b530226574c59ae",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__ktx-parse/LICENSE",
+      "bytes": 1078,
+      "sha256": "79847431f9ecef9cf399085cb863452e71a6dab99738f4f0c1ea06c6484b5692",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__kuler/LICENSE",
+      "bytes": 1055,
+      "sha256": "5a2d5efbffa24832919e9834f4edc11ce027790ee50a47a2c1904bf69c2a5c76",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__listr2/LICENSE",
+      "bytes": 1186,
+      "sha256": "720fefa68004834271efe73165fe64fe18832fe519efc477ac58c486fb6d9549",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__listr2__node_modules__ansi-styles/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__listr2__node_modules__emoji-regex/LICENSE-MIT.txt",
+      "bytes": 1077,
+      "sha256": "483acb265f182907d1caf6cff9c16c96f31325ed23792832cc5d8b12d5f88c8a",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__listr2__node_modules__string-width/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__listr2__node_modules__wrap-ansi/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__lodash/LICENSE",
+      "bytes": 1952,
+      "sha256": "f71e8ed126b46346494aad5486874cd8f0aafe95092ed67d2e3cb6110f939abc",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__log-update/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__log-update__node_modules__ansi-styles/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__log-update__node_modules__emoji-regex/LICENSE-MIT.txt",
+      "bytes": 1077,
+      "sha256": "483acb265f182907d1caf6cff9c16c96f31325ed23792832cc5d8b12d5f88c8a",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__log-update__node_modules__is-fullwidth-code-point/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__log-update__node_modules__slice-ansi/license",
+      "bytes": 1158,
+      "sha256": "c91d87c3bca16ab6d96d82da08edc54377d14b679547a331eecc4adef3c353c8",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__log-update__node_modules__string-width/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__log-update__node_modules__wrap-ansi/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__logform/LICENSE",
+      "bytes": 1092,
+      "sha256": "ccf635c9ede66a9dba49dc14f29fba61bb41149f47d3f5cae1825061c327d1e0",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__logform__node_modules__@colors__colors/LICENSE",
+      "bytes": 1235,
+      "sha256": "58597ded729a5e749cc323e2ae6e533a31be3622737b33e0239ba075ca14b515",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__lru-cache/LICENSE",
+      "bytes": 775,
+      "sha256": "451ec07eeb9c4e1b86de9abdaa426462a8be48f887ec7421cf0bbb9c769555ab",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__meshoptimizer/LICENSE.md",
+      "bytes": 1079,
+      "sha256": "f03037ca7bad1e3eb7f4a63fa6084a8baabd5ba30d3c239a9a7f35705d873e26",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__micromatch/LICENSE",
+      "bytes": 1091,
+      "sha256": "35bdd8a44339719441900fb50fbefc5e2dca1ca662cbaed7a687de842c8b70f2",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__mikktspace/LICENSE",
+      "bytes": 1078,
+      "sha256": "ec5114155d92f326802c964dcf9eb5261e09192c62f14d195d2a8be49eb1d489",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__mimic-function/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__minimatch/LICENSE",
+      "bytes": 775,
+      "sha256": "d11323827fa4edeaafc437cc5b91b6971b335f0127efeeb42bf5122fe8657e8f",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__minipass/LICENSE.md",
+      "bytes": 1552,
+      "sha256": "8a1af140fdfbf5afd3df27f7e662f989c5b963a300020dfafce42033cae9e004",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__ms/license.md",
+      "bytes": 1079,
+      "sha256": "1662fae9b5314d11cf51284e2dcd1f006a354f7343f08712a730fcff9a359801",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__ndarray/LICENSE",
+      "bytes": 1087,
+      "sha256": "f149791eb5101f10b1fb88997310f2b054604106c4bf6050e0aee66a5bd35cc7",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__ndarray-lanczos/LICENSE",
+      "bytes": 1078,
+      "sha256": "ec5114155d92f326802c964dcf9eb5261e09192c62f14d195d2a8be49eb1d489",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__ndarray-ops/LICENSE",
+      "bytes": 1082,
+      "sha256": "e67aed7df22dc8031e4fcf5338fe91cb33e3817e5c58a99a2a2802eea9069791",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__ndarray-pixels/LICENSE",
+      "bytes": 1078,
+      "sha256": "ec5114155d92f326802c964dcf9eb5261e09192c62f14d195d2a8be49eb1d489",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__one-time/LICENSE",
+      "bytes": 1115,
+      "sha256": "3b2a6a268aa815dec121d614245e03b5c68db1f044d5b525e36db7d5dc7fb9c3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__onetime/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__package-json-from-dist/LICENSE.md",
+      "bytes": 1764,
+      "sha256": "a49c9ba464796f65b59fca3f1e6ca40912df1e859f575383223f7ec6c5baae09",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__path-key/license",
+      "bytes": 1109,
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__path-scurry/LICENSE.md",
+      "bytes": 1552,
+      "sha256": "8a1af140fdfbf5afd3df27f7e662f989c5b963a300020dfafce42033cae9e004",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__picomatch/LICENSE",
+      "bytes": 1091,
+      "sha256": "d0cd141b0c322fded5dfad1d4645bb2fedfc05b7321fe1009469638190d59ef9",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__prompts/license",
+      "bytes": 1079,
+      "sha256": "ade66f698fd417addc4d948a85ef33e8abb302daff6453feda18b191d250e54d",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__property-graph/LICENSE",
+      "bytes": 1078,
+      "sha256": "ec5114155d92f326802c964dcf9eb5261e09192c62f14d195d2a8be49eb1d489",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__punycode/LICENSE-MIT.txt",
+      "bytes": 1077,
+      "sha256": "483acb265f182907d1caf6cff9c16c96f31325ed23792832cc5d8b12d5f88c8a",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__readable-stream/LICENSE",
+      "bytes": 2337,
+      "sha256": "ec62dc96da0099b87f4511736c87309335527fb7031639493e06c95728dc8c54",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__restore-cursor/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__rfdc/LICENSE",
+      "bytes": 1101,
+      "sha256": "1ce941682a96c7b898ecd125d0f2e22319758ea6f3adbf498a65d649b0f3f7dd",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__safe-buffer/LICENSE",
+      "bytes": 1081,
+      "sha256": "c7cc929b57080f4b9d0c6cf57669f0463fc5b39906344dfc8d3bc43426b30eac",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__safe-stable-stringify/LICENSE",
+      "bytes": 1079,
+      "sha256": "3a6d6de49d284a36c5d271ef0e62eca1838cc460dd7630e3f2c347c8f5b2232a",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__semver/LICENSE",
+      "bytes": 765,
+      "sha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__sharp/LICENSE",
+      "bytes": 10273,
+      "sha256": "73ba74dfaa520b49a401b5d21459a8523a146f3b7518a833eea5efa85130bf68",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__shebang-command/license",
+      "bytes": 1116,
+      "sha256": "69dee148a2cc470554dfa7142e830662062394d0fe67cddd379aba90dc60d6b3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__shebang-regex/license",
+      "bytes": 1109,
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__signal-exit/LICENSE.txt",
+      "bytes": 790,
+      "sha256": "b173e19b9a78df305577ace0e52ef45a4bcc915ea28b47b256dc3b68dcb1f7e7",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__sisteransi/license",
+      "bytes": 1079,
+      "sha256": "ade66f698fd417addc4d948a85ef33e8abb302daff6453feda18b191d250e54d",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__slice-ansi/license",
+      "bytes": 1158,
+      "sha256": "c91d87c3bca16ab6d96d82da08edc54377d14b679547a331eecc4adef3c353c8",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__slice-ansi__node_modules__ansi-styles/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__stack-trace/License",
+      "bytes": 1101,
+      "sha256": "c5ece09265dbd6335030832335dec72919b9ecfd4db126cb9bb9b8d023970304",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__string-width/license",
+      "bytes": 1109,
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__string-width-cjs/license",
+      "bytes": 1109,
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__string-width-cjs__node_modules__ansi-regex/license",
+      "bytes": 1109,
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__string-width-cjs__node_modules__is-fullwidth-code-point/license",
+      "bytes": 1109,
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__string-width-cjs__node_modules__strip-ansi/license",
+      "bytes": 1109,
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__string-width__node_modules__ansi-regex/license",
+      "bytes": 1109,
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__string-width__node_modules__is-fullwidth-code-point/license",
+      "bytes": 1109,
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__string-width__node_modules__strip-ansi/license",
+      "bytes": 1109,
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__string_decoder/LICENSE",
+      "bytes": 2338,
+      "sha256": "11f2aafb37d06b3ee5bdaf06e9811141d0da05263c316f3d627f45c20d43261b",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__strip-ansi/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__strip-ansi-cjs/license",
+      "bytes": 1109,
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__strip-ansi-cjs__node_modules__ansi-regex/license",
+      "bytes": 1109,
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__supports-color/license",
+      "bytes": 1109,
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__table/LICENSE",
+      "bytes": 1529,
+      "sha256": "37b6932865726cf59cbfb8b32a5c9fd82c834c2deba4d53aa4a6b433ae69cdda",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__table__node_modules__ansi-regex/license",
+      "bytes": 1109,
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__table__node_modules__ansi-styles/license",
+      "bytes": 1109,
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__table__node_modules__color-convert/LICENSE",
+      "bytes": 1087,
+      "sha256": "693866fc419c6f61c8570438ec00659d156ec2b4d4a4d04091711f5f11a365d4",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__table__node_modules__color-name/LICENSE",
+      "bytes": 1085,
+      "sha256": "c064f7a3e353bc1bc977f3c897941c75ef763f44f41677e0a15370ca0853d6e2",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__table__node_modules__emoji-regex/LICENSE-MIT.txt",
+      "bytes": 1077,
+      "sha256": "483acb265f182907d1caf6cff9c16c96f31325ed23792832cc5d8b12d5f88c8a",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__table__node_modules__is-fullwidth-code-point/license",
+      "bytes": 1119,
+      "sha256": "6fb9754611c20f6649f68805e8c990e83261f29316e29de9e6cedae607b8634c",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__table__node_modules__slice-ansi/license",
+      "bytes": 1078,
+      "sha256": "3dc3b3d3a284d871f7f307655c90fb101d73abbf87bbddeefd2f67883353bdbc",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__table__node_modules__string-width/license",
+      "bytes": 1109,
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__table__node_modules__strip-ansi/license",
+      "bytes": 1109,
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__text-hex/LICENSE",
+      "bytes": 1113,
+      "sha256": "544fca830d3b5582e63459cdf81ba2c452aff3b3db6131bd15f46cbb66d3a13c",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__tmp/LICENSE",
+      "bytes": 1082,
+      "sha256": "162413c61e0982abe89a06bf7a02ec760dc49a7364d838bd9f01daebb5b95954",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__to-regex-range/LICENSE",
+      "bytes": 1091,
+      "sha256": "e7d1fee7347ffddccc5fd03327ffdb50f8c112be0d5016d62388a92c4ae6e7a9",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__triple-beam/LICENSE",
+      "bytes": 1066,
+      "sha256": "8774f6f7c9a92be674d3a2bc33c2781032bd932005fff4b9684f02ec2ea27649",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__uniq/LICENSE",
+      "bytes": 1082,
+      "sha256": "e67aed7df22dc8031e4fcf5338fe91cb33e3817e5c58a99a2a2802eea9069791",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__uri-js/LICENSE",
+      "bytes": 1452,
+      "sha256": "0af366eff4c01ec147c9c61ea9e8ffad64a4294754c9d79355f3fd1b97cb2fb9",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__util-deprecate/LICENSE",
+      "bytes": 1102,
+      "sha256": "0154425673db15cdfa80ecba2c9b1f1a867f7197a006764712849bfc3a93cbb7",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__watlas/LICENSE",
+      "bytes": 1075,
+      "sha256": "2c16d5b1c2808277fe975b4f70f0fd9afc9b3bcf04e6c676665a82cb2d5579e3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__which/LICENSE",
+      "bytes": 765,
+      "sha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__winston/LICENSE",
+      "bytes": 1058,
+      "sha256": "e61f2ace04e689d21ba1a7bc54d933bcb6e35ebeb887fb5831b880be5de192a7",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__winston-transport/LICENSE",
+      "bytes": 1103,
+      "sha256": "9108281e9d40182f550b7330b3928f2d82fde8cf213a9e95f565df60bdf417c6",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__wrap-ansi/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__wrap-ansi-cjs/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__wrap-ansi-cjs__node_modules__ansi-regex/license",
+      "bytes": 1109,
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__wrap-ansi-cjs__node_modules__strip-ansi/license",
+      "bytes": 1109,
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__wrap-ansi__node_modules__ansi-styles/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__wrap-ansi__node_modules__emoji-regex/LICENSE-MIT.txt",
+      "bytes": 1077,
+      "sha256": "483acb265f182907d1caf6cff9c16c96f31325ed23792832cc5d8b12d5f88c8a",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/licenses/node_modules__wrap-ansi__node_modules__string-width/license",
+      "bytes": 1117,
+      "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/package-lock.json",
+      "bytes": 97522,
+      "sha256": "6a925fa8444ade735cd022d6dac8bd4aec84ef4831513bf97c6c190d8b32bfdf",
+      "originalSha256": "6a925fa8444ade735cd022d6dac8bd4aec84ef4831513bf97c6c190d8b32bfdf",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/package.json",
+      "bytes": 211,
+      "sha256": "55552e82a9e7e54348a11bb0d9988ff9138acbeee7475e3d89194b1abe4e0ce7",
+      "originalSha256": "55552e82a9e7e54348a11bb0d9988ff9138acbeee7475e3d89194b1abe4e0ce7",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/public/assets/pinewind/architecture-atlas.png",
+      "bytes": 2610,
+      "sha256": "cecb8af127e4f7da6de351b515a88be440457a2d443493997ba78e033b6800d9",
+      "originalSha256": "cecb8af127e4f7da6de351b515a88be440457a2d443493997ba78e033b6800d9",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/public/assets/pinewind/nature-atlas.png",
+      "bytes": 1960,
+      "sha256": "dbc3c05a9ea3e901fc37ce578325b9a1371e8c148e26f43678fc3e242bfd8ae7",
+      "originalSha256": "dbc3c05a9ea3e901fc37ce578325b9a1371e8c148e26f43678fc3e242bfd8ae7",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/source-art/architecture.blend",
+      "bytes": 574436,
+      "sha256": "4e3d085f99a679034c55900955d756b110419a44eb19da46f0a1feca3fa322f9",
+      "originalSha256": "078684e2a2d1919debfcc7e60ce3a979b75a563125ddc058ce4f2ef9a5683875",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "surface-game-art/source-art/automine.blend",
+      "bytes": 303861,
+      "sha256": "608c1cace3ab2998666d8a5d49c86b30709652ee5f4ee6970a165d7932a9ab49",
+      "originalSha256": "7a923fd63fb73c8e840230c75bd2c982a9c56aed23cd9711cc5cd21b441e4dea",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "surface-game-art/source-art/cryo.blend",
+      "bytes": 173494,
+      "sha256": "fc45ef8e3d3f0b33b6ebeedd3eab09a149e7c42896ab65cf70f165e8ca22c62a",
+      "originalSha256": "fec45ff6586e5fb07baaa25a190c708fb16c7a3c614ec5290cc954f3293f3ccf",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "surface-game-art/source-art/crystal.blend",
+      "bytes": 183711,
+      "sha256": "de71d2bf2b12796af5ae8301ee33c1022797fdc94944061d4f6b53495ca14fe0",
+      "originalSha256": "3a436169996d8d96de24f0c8eee2fa3fe06982a3d7e597a066dd060a29e92f41",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "surface-game-art/source-art/egg-stands.blend",
+      "bytes": 138064,
+      "sha256": "3bdb47054ea4362c95cc85acb8f2e638b9728213fe2f8d0e2bd34a2575714762",
+      "originalSha256": "a8f264bfa96a0e59b63f3d8017ee3346eccd31f4ce727bc3a4f00ed1bcc28ea9",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "surface-game-art/source-art/frozen.blend",
+      "bytes": 189118,
+      "sha256": "3c727506a044c80648e327b4cf2e87003d5a952edf7ab5b5d086c8269179f2de",
+      "originalSha256": "ebe3b5fbbb2c608795f495d0de151f39adb1377038e9bf4989f02fbd2394153a",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "surface-game-art/source-art/fungal.blend",
+      "bytes": 169890,
+      "sha256": "2fe2dfd9d01fca79e06017f1b7028e956f619c12b9cef50249f2b5e03d63bc57",
+      "originalSha256": "74cc86cf1efee4952b850e427a0f1b1fbec4c9b601305a2aa2a1642b36a069e0",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "surface-game-art/source-art/gear.blend",
+      "bytes": 390562,
+      "sha256": "b60b8392b988b45e60bae59c2858ca5a5ee828ab88ba3de37a93a14f1049c9e4",
+      "originalSha256": "e8d18dda49e270088b53a3e0ca4cfaa981b29d5f3b05b2d3fa322c40b0c39c37",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "surface-game-art/source-art/nature.blend",
+      "bytes": 114753,
+      "sha256": "0378957ad91ae892557af1b5eb1d1d53e28a5fdd0868a233ae36d6e303f4b48b",
+      "originalSha256": "28cee9133cbec21ec8c5c068fb2577856e8cdfdeebba136d8bd21fe8799871a9",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "surface-game-art/source-art/old-mine.blend",
+      "bytes": 199369,
+      "sha256": "c876ed9132ba9165362989ad0448066bd98d8ed8f1436af5f7eafa2d272499cb",
+      "originalSha256": "2d3e4938f88711873b0c69f25ff0a924017dad93def801e6007a1a90f41a9328",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "surface-game-art/source-art/reactor.blend",
+      "bytes": 231127,
+      "sha256": "7cf35ee1395182f59738b1cd2fd7763e0ab68209522fe8d2d2004bb12ea9d62b",
+      "originalSha256": "688011fd11beefa4c13698f2041564c45b71a8c687b727c358f862713fe6e851",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "surface-game-art/source-art/refinery.blend",
+      "bytes": 234719,
+      "sha256": "d9bbccb39b30f5459e6e2230597824f448a8bd8f1e6d9a582ec27f71cac4b32c",
+      "originalSha256": "759c824ea10d6a997f541eacbd6c1c13ba2c0785acd53b7412332598601a19dc",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "surface-game-art/source-art/ruins.blend",
+      "bytes": 201832,
+      "sha256": "6eab3f81c8fe3a05d909da57f493d0c3c6b7ea3e852e9284c7426364ba83a15c",
+      "originalSha256": "107401f059213576ec16cb03c076dfac72d398d802f08f9a46dc94f095c964db",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "surface-game-art/source-art/star-base.blend",
+      "bytes": 291134,
+      "sha256": "561e58961529939c186c0b22181e1bd0a67d553a7bc9c18727d19015edfc43db",
+      "originalSha256": "56751c21632b8a6e53307630e8a793d7514c9e02bf7757a83a82ab3c9a8bc71d",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "surface-game-art/source-art/survey.blend",
+      "bytes": 296774,
+      "sha256": "503283ee542c982b5df61aa61ed2e050bd0fcece4af1dae5b9c68663640c6043",
+      "originalSha256": "45d11c32e3d2f2301d235edde3713fbc8b53bbccce2c621eef65919c6c9bfe9a",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "surface-game-art/source-art/tech-base.blend",
+      "bytes": 433933,
+      "sha256": "05da1c7ff17e7e008da147e308261e8be08c685b4cfbb33fa9ebfbf6ae593973",
+      "originalSha256": "4d3e85a9270c541dada1e421468f9364ea33fc81a55939aee096c9cbd216d035",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "surface-game-art/source-art/volcanic.blend",
+      "bytes": 181716,
+      "sha256": "8bc2b74f30bd32101e913e074f4da4e9279afdbf39270dad93c7a096e8e56198",
+      "originalSha256": "bb77617f0937e6dfc1af3932c2d44529041d9ee15f32c134e4b3d37f85efb334",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "surface-game-art/tools/blender/build_architecture.py",
+      "bytes": 62794,
+      "sha256": "bc3760d447f91a12b91325aeabeb7d168741a536a9deb9e707585cf4c19b4237",
+      "originalSha256": "bc3760d447f91a12b91325aeabeb7d168741a536a9deb9e707585cf4c19b4237",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/blender/build_automine.py",
+      "bytes": 11186,
+      "sha256": "4fabc0eba7b0a025ecb6aa851ac0390e035d7d72800d9f4d6f5908e2abb97949",
+      "originalSha256": "4fabc0eba7b0a025ecb6aa851ac0390e035d7d72800d9f4d6f5908e2abb97949",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/blender/build_cryo.py",
+      "bytes": 4196,
+      "sha256": "1d4602d7c19b4c5d130394a7fb1ca3ff2e0facd08c2dcc0a8b6ca9336ae46aa6",
+      "originalSha256": "1d4602d7c19b4c5d130394a7fb1ca3ff2e0facd08c2dcc0a8b6ca9336ae46aa6",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/blender/build_crystal.py",
+      "bytes": 10109,
+      "sha256": "45e2a3eb9fa5900ff25c6a7db52d957df81ac835a15e9788a2c4acd2e9ea2752",
+      "originalSha256": "45e2a3eb9fa5900ff25c6a7db52d957df81ac835a15e9788a2c4acd2e9ea2752",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/blender/build_egg_stands.py",
+      "bytes": 4053,
+      "sha256": "c28bac378499f276331313bad7ba1124d70973aad32a910e44fe413101a713cc",
+      "originalSha256": "c28bac378499f276331313bad7ba1124d70973aad32a910e44fe413101a713cc",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/blender/build_frozen.py",
+      "bytes": 8283,
+      "sha256": "0e41d9a3d7ef66d05c90b3de159f116818aff80cfc174256c1fd156f84a34f09",
+      "originalSha256": "0e41d9a3d7ef66d05c90b3de159f116818aff80cfc174256c1fd156f84a34f09",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/blender/build_fungal.py",
+      "bytes": 6290,
+      "sha256": "6918f1f1140bd4529a944991dc7b2e11daf2ad3de44e0616591c5d988f631b1b",
+      "originalSha256": "6918f1f1140bd4529a944991dc7b2e11daf2ad3de44e0616591c5d988f631b1b",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/blender/build_gear.py",
+      "bytes": 7788,
+      "sha256": "174e38dd56aded3ca61b5fd167e8053ee885f6b969328b3fb3dc30a6dd0da9e2",
+      "originalSha256": "174e38dd56aded3ca61b5fd167e8053ee885f6b969328b3fb3dc30a6dd0da9e2",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/blender/build_nature.py",
+      "bytes": 17881,
+      "sha256": "bd758c30e1a97019b206de46e2262bb5cb93838056d5cc2b8d37140e21d92195",
+      "originalSha256": "bd758c30e1a97019b206de46e2262bb5cb93838056d5cc2b8d37140e21d92195",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/blender/build_old_mine.py",
+      "bytes": 11647,
+      "sha256": "7b4d29ce57272ec63249e1dc231a07db4f0a2b12339394597d3ccf5b3604d339",
+      "originalSha256": "7b4d29ce57272ec63249e1dc231a07db4f0a2b12339394597d3ccf5b3604d339",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/blender/build_reactor.py",
+      "bytes": 3882,
+      "sha256": "555bdc5de4467f884d283c8dda8bd3d06c2974e2703e1e7ca3c00bb9cdafbc0a",
+      "originalSha256": "555bdc5de4467f884d283c8dda8bd3d06c2974e2703e1e7ca3c00bb9cdafbc0a",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/blender/build_refinery.py",
+      "bytes": 10452,
+      "sha256": "5da265cde405a97442e2f4a062289c77929636ecad42112b77d43c10857ecad9",
+      "originalSha256": "5da265cde405a97442e2f4a062289c77929636ecad42112b77d43c10857ecad9",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/blender/build_ruins.py",
+      "bytes": 12168,
+      "sha256": "1a210414af52a131c85f1d2f9a5125d2f4679273271ae6072ed8c3110de1b514",
+      "originalSha256": "1a210414af52a131c85f1d2f9a5125d2f4679273271ae6072ed8c3110de1b514",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/blender/build_star_base.py",
+      "bytes": 21208,
+      "sha256": "8b01f7baf6b27ccdaf5ecb47cc00f2fcdc7f4335b4da402a3d0b896fd7680917",
+      "originalSha256": "8b01f7baf6b27ccdaf5ecb47cc00f2fcdc7f4335b4da402a3d0b896fd7680917",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/blender/build_survey.py",
+      "bytes": 10025,
+      "sha256": "782bf5c8365d2d3781b2c10daa865816a4652bc1cc8ec3049881ebe3ffaa7bab",
+      "originalSha256": "782bf5c8365d2d3781b2c10daa865816a4652bc1cc8ec3049881ebe3ffaa7bab",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/blender/build_tech_base.py",
+      "bytes": 39611,
+      "sha256": "2534f16fc2fa86149634ef6cd43bfcae075da68ec0754bfdc0912fb5851a262d",
+      "originalSha256": "2534f16fc2fa86149634ef6cd43bfcae075da68ec0754bfdc0912fb5851a262d",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/blender/build_volcanic.py",
+      "bytes": 7514,
+      "sha256": "96891abaaee76f37f94709a748cc37f0ae558b8995d91acbea95f90572d5b599",
+      "originalSha256": "96891abaaee76f37f94709a748cc37f0ae558b8995d91acbea95f90572d5b599",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/blender/cave_props.py",
+      "bytes": 15402,
+      "sha256": "ee464c913da521b364a81b2b698655f45c4a6cafd8301045f553c6cc453c7652",
+      "originalSha256": "ee464c913da521b364a81b2b698655f45c4a6cafd8301045f553c6cc453c7652",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/blender/collision.py",
+      "bytes": 4839,
+      "sha256": "87ed051acf939915358d1eabe16288974270e616d3fb56af87c9c57825782610",
+      "originalSha256": "87ed051acf939915358d1eabe16288974270e616d3fb56af87c9c57825782610",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/blender/tech_props.py",
+      "bytes": 9731,
+      "sha256": "d610b2fb39dd21ce9ba25f26db4b6e5efccbbdbc743e4c65c756a0bb51d25723",
+      "originalSha256": "d610b2fb39dd21ce9ba25f26db4b6e5efccbbdbc743e4c65c756a0bb51d25723",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/terrain/bakeLight.mjs",
+      "bytes": 21296,
+      "sha256": "17eecc0ed76b6eedbcb24b239d79b1c6cfb86799016f3a64afe6a3810d81045f",
+      "originalSha256": "17eecc0ed76b6eedbcb24b239d79b1c6cfb86799016f3a64afe6a3810d81045f",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/terrain/bakeLightWorker.mjs",
+      "bytes": 5288,
+      "sha256": "c64d6fe2e0cd32b3342d370e0336869306fa5b8d314ed60e5c04b19c41292425",
+      "originalSha256": "c64d6fe2e0cd32b3342d370e0336869306fa5b8d314ed60e5c04b19c41292425",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/terrain/kit.ts",
+      "bytes": 7099,
+      "sha256": "91c42fbbcfcf167999e85ad0f6f51790e18d9c909f14dd908efc1e609292dcfd",
+      "originalSha256": "91c42fbbcfcf167999e85ad0f6f51790e18d9c909f14dd908efc1e609292dcfd",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/terrain/landscape.ts",
+      "bytes": 50891,
+      "sha256": "ce582ee8309daefa4df0f6721c6d98e6aabb804e8ca14191d33d1fb483c2c3bc",
+      "originalSha256": "ce582ee8309daefa4df0f6721c6d98e6aabb804e8ca14191d33d1fb483c2c3bc",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/terrain/rayBvh.mjs",
+      "bytes": 8562,
+      "sha256": "8934603809e65106c859c1412b472b07b9c54a7de33ee5d2daf26704da495559",
+      "originalSha256": "8934603809e65106c859c1412b472b07b9c54a7de33ee5d2daf26704da495559",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/terrain/terrainTexture.ts",
+      "bytes": 4741,
+      "sha256": "17c31d8bd4ad037b2fcb29fa9097853f5f713db020a6475f246951467e493540",
+      "originalSha256": "17c31d8bd4ad037b2fcb29fa9097853f5f713db020a6475f246951467e493540",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/underground/automineHall.ts",
+      "bytes": 9958,
+      "sha256": "01f7dbcc8c15a5b915d2c539a3778cd1e5d59304b82a58333ea35c88c9de344b",
+      "originalSha256": "01f7dbcc8c15a5b915d2c539a3778cd1e5d59304b82a58333ea35c88c9de344b",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/underground/caveKit.ts",
+      "bytes": 25866,
+      "sha256": "5476ad840749a9c0231480cf0c0746667245e93f3ee2e4bd453fa8d33b24a7ae",
+      "originalSha256": "5476ad840749a9c0231480cf0c0746667245e93f3ee2e4bd453fa8d33b24a7ae",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/underground/cryoHall.ts",
+      "bytes": 7212,
+      "sha256": "71e4f5c508d6fcc47c306000173704e36d4054b330d6d29915e02aadd9048a6c",
+      "originalSha256": "71e4f5c508d6fcc47c306000173704e36d4054b330d6d29915e02aadd9048a6c",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/underground/crystalHall.ts",
+      "bytes": 6877,
+      "sha256": "ffda39732c7b1c0add896341794f82be9524ea47a7c0054afd8319955c879c95",
+      "originalSha256": "ffda39732c7b1c0add896341794f82be9524ea47a7c0054afd8319955c879c95",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/underground/frozenHall.ts",
+      "bytes": 5922,
+      "sha256": "e106c14cd4f68244c067989430bd73dc3524aad2bca66e3556389527b7ea27f5",
+      "originalSha256": "e106c14cd4f68244c067989430bd73dc3524aad2bca66e3556389527b7ea27f5",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/underground/fungalHall.ts",
+      "bytes": 2489,
+      "sha256": "0c92ef2510e5aa51c3a45f17470ababb57317d77b1a0ac8d4518dfd4b6683e6c",
+      "originalSha256": "0c92ef2510e5aa51c3a45f17470ababb57317d77b1a0ac8d4518dfd4b6683e6c",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/underground/gearHall.ts",
+      "bytes": 4831,
+      "sha256": "2419f3e47fbb835e5497b8cebf8eb188efb1978bf512d694756f600441bee532",
+      "originalSha256": "2419f3e47fbb835e5497b8cebf8eb188efb1978bf512d694756f600441bee532",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/underground/hatchery.ts",
+      "bytes": 1849,
+      "sha256": "1e68decd2003c1362c61e28911d3a1dd2438869b623c445a762ac2902fd42326",
+      "originalSha256": "1e68decd2003c1362c61e28911d3a1dd2438869b623c445a762ac2902fd42326",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/underground/oldMineHall.ts",
+      "bytes": 3022,
+      "sha256": "93c699ee64c4ad53394886432879e2bc96f6b4a78bb528a1d57a5a8f5921cf12",
+      "originalSha256": "93c699ee64c4ad53394886432879e2bc96f6b4a78bb528a1d57a5a8f5921cf12",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/underground/reactorHall.ts",
+      "bytes": 6383,
+      "sha256": "24ff3fd13c2fefd9e87a1cc9eb3709c47d9f31cd287d961d8ecdc153c4de77de",
+      "originalSha256": "24ff3fd13c2fefd9e87a1cc9eb3709c47d9f31cd287d961d8ecdc153c4de77de",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/underground/refineryHall.ts",
+      "bytes": 8734,
+      "sha256": "762f919b7239fcad1352c25b507bd358d40c76ab66b20e922b252d3c8ed9251b",
+      "originalSha256": "762f919b7239fcad1352c25b507bd358d40c76ab66b20e922b252d3c8ed9251b",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/underground/ruinsHall.ts",
+      "bytes": 3191,
+      "sha256": "5828d5e41c2f6fdced977133fb287b0268bbfcb8e8b80fcb8efcfd98831c68a0",
+      "originalSha256": "5828d5e41c2f6fdced977133fb287b0268bbfcb8e8b80fcb8efcfd98831c68a0",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/underground/starBaseHall.ts",
+      "bytes": 15209,
+      "sha256": "e23aa40403eea1c8b73a513a3fca60ebe1904db9514cbc213752c27a8401730b",
+      "originalSha256": "e23aa40403eea1c8b73a513a3fca60ebe1904db9514cbc213752c27a8401730b",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/underground/surveyHall.ts",
+      "bytes": 5451,
+      "sha256": "50668ae7ddad9a45fe85dafe9d2c5e0253370b8339b848a930c7507ef1e51cc2",
+      "originalSha256": "50668ae7ddad9a45fe85dafe9d2c5e0253370b8339b848a930c7507ef1e51cc2",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/underground/techBaseHall.ts",
+      "bytes": 22039,
+      "sha256": "b77710a91eeec449ecca314e4eb7a78f74f89a42f515378bc62e795094352470",
+      "originalSha256": "b77710a91eeec449ecca314e4eb7a78f74f89a42f515378bc62e795094352470",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/underground/techKit.ts",
+      "bytes": 19151,
+      "sha256": "4ba2bb04d137fe8a81f14d49837d64c622bed33a8bdce6b302062420ebe65dc3",
+      "originalSha256": "4ba2bb04d137fe8a81f14d49837d64c622bed33a8bdce6b302062420ebe65dc3",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "surface-game-art/tools/underground/volcanicHall.ts",
+      "bytes": 5581,
+      "sha256": "1cc00b34aa5ccd4210872c69b1e009827db7ffc5977756be2bb4a32b9599d63a",
+      "originalSha256": "1cc00b34aa5ccd4210872c69b1e009827db7ffc5977756be2bb4a32b9599d63a",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "assets-source/basic-pickaxe/basic-pickaxe.blend",
+      "bytes": 101873,
+      "sha256": "1b0ae776f20e113ad8ae52783f7966e0ffd7870cc24331be77f41b7e18161c1d",
+      "originalSha256": "ebca2e1e0f99477885482df977530ee33f43052d6509e22c91d7c592cbf33f5b",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "assets-source/miner-a/generation.json",
+      "bytes": 700,
+      "sha256": "35b77b71dff69c6aed5a68da811f9fb680913923546428f4bd64cf95ee6658a9",
+      "originalSha256": "5f9117634c63cd3291639a4a1b29ecf991011c3fb317648c483f76c04bad3029",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "assets-source/miner-a/miner-a-original.glb",
+      "bytes": 1045892,
+      "sha256": "882a286c62d7f8c88f5d5ace5f1ea9682c531b25caa208bb34c8f9a26fbe7bb4",
+      "originalSha256": "882a286c62d7f8c88f5d5ace5f1ea9682c531b25caa208bb34c8f9a26fbe7bb4",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "assets-source/miner-a/miner-a-rigged.blend",
+      "bytes": 1722043,
+      "sha256": "385cc91257a5f6413041b3bc6713eccff9e59738c44fd1abdf7444f90d325faf",
+      "originalSha256": "5bcf82b8a150582d685de7319793b027b250af6e08245dedabc2bdf72545e6b5",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "assets-source/miner-a/rab-idle.json",
+      "bytes": 81680,
+      "sha256": "c4d33e2f3e961da06b42de620a17810530c10fa3d29691e323c177c7aee0febe",
+      "originalSha256": "5d8734971ae0ef51716f2e21dadb4b627206b8f13a3ecf22e1b54647e4f46829",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "assets-source/miner-a/rab-mine.json",
+      "bytes": 98330,
+      "sha256": "285ca2c21adc3c2d4264f89de5b88b7e3d8deb9ca89c4b594f706588c797d09b",
+      "originalSha256": "66d29c73eb25c0a5929537f94bbb90600c6c4a8441913d9dd3b157ea24219114",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "assets-source/miner-a/rab-move.json",
+      "bytes": 27964,
+      "sha256": "34279a2772b45b601919046a6f5c75eb79dc35aae582614c7bdd92a968515ce4",
+      "originalSha256": "1b5b61a937a398081fac53e61604d592ba3d43c17c6d8d3b0d856929dafdcbff",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "assets-source/miner-a/rab-walk.json",
+      "bytes": 61406,
+      "sha256": "cd7cddceae90efe19b57bea69a9b226a6dbe192954057d2632ad882132598075",
+      "originalSha256": "9200f8b904cd8fb5e26de5f83a0822d112c16bb7724c7c61994484a3e18e1e78",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "assets-source/miner-a/reference.png",
+      "bytes": 1752029,
+      "sha256": "efa8c6ce24408a9b21facdd03618152d95915ef279b3fdd66f8521ed9201f137",
+      "originalSha256": null,
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "assets-source/miner-a/rig-report.json",
+      "bytes": 5058,
+      "sha256": "5f39e63a484f513bbbf1e74bef238a414457a008bedc41cd5f32e76f282f44d1",
+      "originalSha256": "1a2444e8fffd5b1e14f7de624ce1cbc8ea7e673a1b277716d43e2846846f0539",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "assets-source/miner-a/task.json",
+      "bytes": 522,
+      "sha256": "27725685e06510d1bf3f0b33a47b349515791e07d3a269cfa1a01123757065ea",
+      "originalSha256": "d1989c1afbe6a595bde32f6e574d037687d1a7565bd0b093ec64ab12000cae60",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "assets-source/miner-d/generation.json",
+      "bytes": 700,
+      "sha256": "ded8a1a76d6e5c10dfa6af71bdff904c70cd0e2af33f0d960b88050dca54c2a5",
+      "originalSha256": "015040b8fef34e1a036aefaa3f170b09e252bf579fb773839b07bc63071bc893",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "assets-source/miner-d/miner-d-color-lifted.jpg",
+      "bytes": 563548,
+      "sha256": "da68c0574bd744bf0e4888e7cb2826c574616b0c78e353b47373196828b448cb",
+      "originalSha256": "da68c0574bd744bf0e4888e7cb2826c574616b0c78e353b47373196828b448cb",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "assets-source/miner-d/miner-d-original.glb",
+      "bytes": 1144484,
+      "sha256": "8f470436b823a07b4fb7af5dddd0f1d35f63815aa673b881b563a296a153705d",
+      "originalSha256": "8f470436b823a07b4fb7af5dddd0f1d35f63815aa673b881b563a296a153705d",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "assets-source/miner-d/miner-d-rigged.blend",
+      "bytes": 1612185,
+      "sha256": "3f21d420d5a1fd938f4a7baf87551d84fffe10c5d6ffea27c4e2f5635200144d",
+      "originalSha256": "5aa4e76824182ceb22f246a48b521fa3029c4a4e0df8fd329a2f027cd275b9cf",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "assets-source/miner-d/rig-report.json",
+      "bytes": 6867,
+      "sha256": "08d9fca95d891420ca696e2fd7649798d6134c37bca29187595fea0f3871c1bf",
+      "originalSha256": "46f347bc933efe7d2e70e471335c94575b628f61ac95898d9f684742ea441da3",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "assets-source/miner-d/task.json",
+      "bytes": 522,
+      "sha256": "fe5a090c688b258c87fba4e6fa069bf48039a35cd75f9415a5e5ff121357d285",
+      "originalSha256": "8bf8a113ecafaacf17927f2687056e5f14d73914316cd809af919bdc5bf7f860",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "assets-source/pets/pet-cube.blend",
+      "bytes": 96612,
+      "sha256": "420986d93e087d79ae5e0262f9727807a4b02a8bc1dce209d97367118ca19367",
+      "originalSha256": "b1a01609548244bc923af56a5152fb5be3e385d19c44cb8cca2c31ea456842db",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "assets-source/shop-showroom/equipment-atlas.png",
+      "bytes": 2494,
+      "sha256": "98c3c7b38df52f121314ca8282f7d0e043bed9f8f1d947b2a43b3bdb7b97e36d",
+      "originalSha256": "98c3c7b38df52f121314ca8282f7d0e043bed9f8f1d947b2a43b3bdb7b97e36d",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "assets-source/shop-showroom/equipment.blend",
+      "bytes": 570046,
+      "sha256": "120e89e163ad95faaf2bbd3b40c5cd960baac790e07703b233a0e49e506bce43",
+      "originalSha256": "b70ff65512d072be14e256644ab37f64f6ac12bc5fc5f6ba17e51fe5c2b6fc12",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "assets-source/shop-showroom/shop-palette.png",
+      "bytes": 1083,
+      "sha256": "d0e7bc76038e26fde195c1ec6f96967d7a5c16be41707ff6a1b9472498859a10",
+      "originalSha256": "d0e7bc76038e26fde195c1ec6f96967d7a5c16be41707ff6a1b9472498859a10",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "assets-source/shop-showroom/shop-showroom.blend",
+      "bytes": 164483,
+      "sha256": "d642d40b5e2101bedf823c54c86f0f198b154965e54e98e6e53615571021021f",
+      "originalSha256": "1305579a0f05041524cdac6ef73607b0b10137ef2bbc21ddd0d9219cd2d0959b",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "tools/build-shop-showroom.py",
+      "bytes": 6092,
+      "sha256": "18b8bababa807d06853eb99d2f92a0cb973e96c0fc0d51b8b175e760b97d3b45",
+      "originalSha256": "18b8bababa807d06853eb99d2f92a0cb973e96c0fc0d51b8b175e760b97d3b45",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "tools/build-equipment.py",
+      "bytes": 66604,
+      "sha256": "f0c7cf0df1be80b8456af6b68e693005894bda1e2137f555b94a5b3c581393fe",
+      "originalSha256": "f0c7cf0df1be80b8456af6b68e693005894bda1e2137f555b94a5b3c581393fe",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "tools/build-pet-cube.py",
+      "bytes": 3198,
+      "sha256": "f60e0fc346a8d212448e9b6d9ec8db720d7469d0f552c51db2b58dc7676f4f3c",
+      "originalSha256": "f60e0fc346a8d212448e9b6d9ec8db720d7469d0f552c51db2b58dc7676f4f3c",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "tools/rig-miner-a.py",
+      "bytes": 19744,
+      "sha256": "850dee29227bb2eb225ee7adb4c9d10bb0abd21b206b93aa66eb75131c6e0ea7",
+      "originalSha256": "e5b3d72abfc7c4b2795443b9b5393d3eea925d3b4880ccb45a6e345a8cab7dba",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "tools/rig-miner-d.py",
+      "bytes": 36531,
+      "sha256": "70e2bcf2869bc80884ff950428d057acf62bcbd6b2ba3f20ffa5a757b7909c32",
+      "originalSha256": "4de3eb599e0bdee6c83f1c82603b653f39669dd00fdf141f049b02a0c45b3aa4",
+      "metadataOnlySanitization": true
+    },
+    {
+      "file": "tools/export-pinewind-layout.mjs",
+      "bytes": 1835,
+      "sha256": "0056f2166af278317ba9ba88282655459e81de3863c898c26ba74d74ce79d1f4",
+      "originalSha256": "0056f2166af278317ba9ba88282655459e81de3863c898c26ba74d74ce79d1f4",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "tools/export-pinewind-scene.mjs",
+      "bytes": 12242,
+      "sha256": "eefbb7e1479a4543aaac4f79fefa78a70f6b0d6f3ac007808e027f6cfa8f6187",
+      "originalSha256": "eefbb7e1479a4543aaac4f79fefa78a70f6b0d6f3ac007808e027f6cfa8f6187",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "tools/pack-pinewind.mjs",
+      "bytes": 5363,
+      "sha256": "a4184a9628e2133e80a4781ec04ba2e2b79a58d58dae196932141005ea2efc43",
+      "originalSha256": "a4184a9628e2133e80a4781ec04ba2e2b79a58d58dae196932141005ea2efc43",
+      "metadataOnlySanitization": false
+    },
+    {
+      "file": "tools/build-underground.mjs",
+      "bytes": 10804,
+      "sha256": "3043c7bb463dc5a52e4df76117bd824127a80a486dec2a8586c03f5605fc177e",
+      "originalSha256": "3043c7bb463dc5a52e4df76117bd824127a80a486dec2a8586c03f5605fc177e",
+      "metadataOnlySanitization": false
+    }
+  ],
+  "notes": [
+    "Runtime assets are copied byte-for-byte from the current project snapshot.",
+    "Selected authoring records retain their original and sanitized-copy hashes; no new provenance or license grant is asserted.",
+    "Production records do not establish third-party licensing."
+  ]
+}

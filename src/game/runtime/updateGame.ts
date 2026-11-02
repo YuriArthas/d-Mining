@@ -15,7 +15,7 @@ import { creekDistance } from '../content/pinewindSurface.ts';
 import { Vector3 } from "three";
 import { bakedLightState, bakedSunAlignment, bakedSunDirection, setStandingSun } from '../presentation/bakedLight.ts';
 import { standingSun } from '../presentation/standingLight.ts';
-import { tr } from '../i18n/i18n.ts';
+import { tr, resolveText } from '../i18n/i18n.ts';
 export function updateGame(
   current: PreparedGame,
   elapsed: number,
@@ -129,17 +129,17 @@ export function updateGame(
       onStatus(
         terrain.error ??
           (player.travelling && !player.sceneReady(player.travelling)
-            ? `正在载入${worldRequirement(worldAtFeet(player.travelling)).name}`
+            ? `正在载入${resolveText(worldRequirement(worldAtFeet(player.travelling)).name)}`
             : player.travelling || !terrain.ready(feet)
             ? "正在准备附近地形"
-            : `${current.content.worlds?`世界 ${current.session.getSnapshot().currentWorld} · `:''}深度 ${depth} 米 · ${currentLayer.name}${selected ? " · " + mineralName(terrain.cell(selected) ?? 0) : ""}`),
+            : `${current.content.worlds?`世界 ${current.session.getSnapshot().currentWorld} · `:''}深度 ${depth} 米 · ${resolveText(currentLayer.name)}${selected ? " · " + (()=>{const name=mineralName(terrain.cell(selected) ?? 0);return name?resolveText(name):'';})() : ""}`),
       );
       clock.status = 0.25;
     }
     terrain.measurements.add("frameCpuMs", performance.now() - start);
     terrain.measurements.add("frameIntervalMs", elapsed * 1000);
   } catch (reason) {
-    const error = tr('运行失败：{reason}', { reason: String(reason) });
+    const error = tr("msg.run_failed_reason", { reason: String(reason) });
     onStatus(error);
     onLoading({ error });
     throw reason;

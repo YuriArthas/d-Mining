@@ -1,30 +1,62 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { scanAll } from '../i18n-scan.mjs';
-import { formatNumber } from '../../src/game/presentation/formatNumber.ts';
+import { readFileSync, mkdtempSync, cpSync, writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { loadLocalePacks, localeDirectory } from '../prepare-locales.mjs';
+import { scanAll, scanFile } from '../i18n-scan.mjs';
+import { createTranslator, message } from '../../src/game/i18n/messages.ts';
 import { tr, LANG } from '../../src/game/i18n/i18n.ts';
+import { formatNumber } from '../../src/game/presentation/formatNumber.ts';
+import { EGG_DEFINITIONS } from '../../src/game/content/pets.ts';
+import { LAYER_ITEMS } from '../../src/game/content/journeyResources.ts';
 
-const table = lang => JSON.parse(readFileSync(new URL(`../../src/game/i18n/${lang}.json`, import.meta.url), 'utf8'));
-const TABLES = { en: table('en'), id: table('id'), vi: table('vi') };
-const { keys, stray } = scanAll();
-const holes = text => [...text.matchAll(/\{(\w+)\}/g)].map(m => m[1]).sort().join(',');
-
-test('玩家看得到的中文都包在 tr() 里（开发者报错和调试页除外）', () => {
-  assert.deepEqual(stray.map(s => `${s.rel}:${s.line} ${s.text}${s.why ? ` (${s.why})` : ''}`), []);
-});
-
-for (const [lang, t] of Object.entries(TABLES)) test(`${lang}: 每条 tr() 文案都有译文，参数一一对应，没有用不到的旧文案`, () => {
-  assert.deepEqual(keys.filter(k => !(k in t)), [], '缺译文');
-  assert.deepEqual(Object.keys(t).filter(k => !keys.includes(k)), [], '表里有用不到的文案');
-  assert.deepEqual(keys.filter(k => holes(k) !== holes(t[k])), [], '参数不一致');
-  assert.deepEqual(Object.entries(t).filter(([, v]) => /[\u4e00-\u9fff§]/.test(v) || !v.trim()).map(([k]) => k), [], '译文里混着中文、§ 或是空的');
-  assert.deepEqual(Object.entries(t).filter(([, v]) => v !== v.normalize('NFC')).map(([k]) => k), [], '译文要用 NFC');
-});
-
-test('Node 下默认中文；tr 填参数；数字按中文单位', () => {
+const packs = loadLocalePacks();
+test('visible copy and JSON content use known stable IDs', () => {
+  assert.deepEqual(scanAll().stray, []);
   assert.equal(LANG, 'zh');
-  assert.equal(tr('购买 {price}', { price: 480 }), '购买 480');
-  assert.equal(formatNumber(4800), '4800');
+  assert.equal(tr('msg.n_s', { n: 480 }), '480 次/秒');
   assert.equal(formatNumber(12345), '1.23万');
+});
+test('fifth language is discovered from its resource alone, with all boot and game messages', t => {
+  const dir = mkdtempSync(join(tmpdir(), 'mining-locale-'));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  cpSync(localeDirectory, dir, { recursive: true });
+  const fifth = structuredClone(packs.find(p => p.id === 'en'));
+  Object.assign(fifth, { id: 'fr', label: 'Français', locale: 'fr-FR', order: 4 });
+  fifth.messages['msg.n_s'] = 'Vitesse {n}';
+  writeFileSync(join(dir, 'fr.json'), JSON.stringify(fifth));
+  const found = loadLocalePacks(dir).find(p => p.id === 'fr');
+  assert.equal(found.label, 'Français');
+  assert.ok(found.messages['boot.entering_the_mine']);
+  assert.equal(createTranslator(found)(message('msg.n_s', { n: 1.25 })), 'Vitesse 1,25');
+  delete fifth.messages['msg.n_s'];
+  writeFileSync(join(dir, 'fr.json'), JSON.stringify(fifth));
+  assert.throws(() => loadLocalePacks(dir), /coverage/);
+  fifth.messages['msg.n_s'] = 'Vitesse {wrong}';
+  writeFileSync(join(dir, 'fr.json'), JSON.stringify(fifth));
+  assert.throws(() => loadLocalePacks(dir), /Placeholder mismatch/);
+  fifth.messages['msg.n_s'] = '';
+  writeFileSync(join(dir, 'fr.json'), JSON.stringify(fifth));
+  assert.throws(() => loadLocalePacks(dir), /Placeholder mismatch|Empty translation/);
+});
+test('domain references preserve nested names and numbers until presentation', () => {
+  const ref = message('msg.n_s', { n: 1.25 });
+  assert.equal(ref.params.n, 1.25);
+  assert.equal(typeof EGG_DEFINITIONS[0].name, 'object');
+  assert.equal(typeof LAYER_ITEMS[0].deep.name.params.rock, 'object');
+  for (const id of ['id', 'vi']) {
+    const resolve = createTranslator(packs.find(p => p.id === id));
+    assert.match(resolve(ref), /1,25/);
+    assert.ok(resolve(LAYER_ITEMS[0].deep.name).length > 3);
+  }
+  assert.throws(() => createTranslator(packs[0])(message('msg.n_s')), /Missing parameter/);
+  assert.throws(() => createTranslator(packs[0])({ id: 'msg.does_not_exist' }), /Missing message/);
+});
+test('raw JSX Chinese next to an expression is caught', t => {
+  const dir = mkdtempSync(join(tmpdir(), 'mining-copy-'));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const file = join(dir, 'sample.tsx');
+  writeFileSync(file, 'export const Sample = () => <span>查看{name}</span>;');
+  assert.equal(scanFile(file).stray.length, 1);
 });

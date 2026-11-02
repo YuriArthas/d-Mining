@@ -3,14 +3,14 @@ import assert from 'node:assert/strict';
 import { GameSession } from '../../src/game/application/GameSession.ts';
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
 import { TIP_GAP, TIP_SECONDS, selectDepthGoal } from '../../src/game/application/Tips.ts';
-import { Onboarding, TIP_IDS } from '../../src/game/logic/Onboarding.ts';
+import { Onboarding, TIP_IDS, BASIC_TIP_IDS } from '../../src/game/logic/Onboarding.ts';
 const SESSION_CONTENT = GAME_CONTENT.session;
 
 // One-time tips: a handful of hints, each shown once, never a task chain.
 let now = 0;
 const world = { cell: () => 64, pending: () => false, mine: () => true, cancelMining() {} };
-const fresh = () => { now = 0; const s = new GameSession(SESSION_CONTENT, 50, () => now); s.attach(world); return s; };
-const restore = data => { const s = new GameSession(SESSION_CONTENT, 50, () => now, {}, data); s.attach(world); return s; };
+const fresh = () => { now = 0; const s = new GameSession(SESSION_CONTENT, 25, () => now); s.attach(world); return s; };
+const restore = data => { const s = new GameSession(SESSION_CONTENT, 25, () => now, {}, data); s.attach(world); return s; };
 const tip = s => s.getSnapshot().tip;
 const area = SESSION_CONTENT.onboarding.mineArea, atMine = [(area.minX + area.maxX) / 2, 0, (area.minZ + area.maxZ) / 2];
 const sale = SESSION_CONTENT.sales[0], farFromMine = [0, 0, 46];
@@ -119,7 +119,7 @@ test('玩家已经做过的事不再提示：先升级了镐子或已有宠物�
   assert.equal(hatched.status, 'hatched');
   s.updatePosition(atMine, true);
   assert.equal(tip(s), null);
-  assert.deepEqual(s.getSnapshot().onboarding.seen, [...TIP_IDS]);
+  assert.deepEqual(s.getSnapshot().onboarding.seen, [...BASIC_TIP_IDS]);
 });
 
 test('卖出和采集才记录事实，空卖、失败和锁定方块都不算', () => {
@@ -146,15 +146,17 @@ test('卖出和采集才记录事实，空卖、失败和锁定方块都不算',
   assert.equal(empty.exportProgress().onboarding.minedOnce, false);
 });
 
-test('旧存档：跳过、完成或早于引导的存档不再提示；进行中的旧存档按已做过的事跳过；坏数据报错', () => {
+test('旧存档：跳过或早于引导的存档保持安静；四条已完成不会吞掉新增功能提示；坏数据报错', () => {
   const evidence = { level: 1, pets: 0, equipped: false };
   const old = { version: 1, status: 'active', minedOnce: true, soldOnce: false, equippedOnce: false, longTaskIntroduced: true, minedCount: 12 };
   assert.deepEqual(new Onboarding(old, true, evidence).getSnapshot().seen, ['dig']);
   assert.deepEqual(new Onboarding(old, true, { ...evidence, level: 2, pets: 1 }).getSnapshot().seen, ['dig', 'shop', 'pets']);
-  for (const status of ['skipped', 'completed', 'legacy']) {
+  for (const status of ['skipped', 'legacy']) {
     assert.deepEqual(new Onboarding({ ...old, status }, true, evidence).getSnapshot().seen, [...TIP_IDS]);
     assert.deepEqual(new Onboarding({ ...old, status, seen: ['dig'] }, true, evidence).getSnapshot().seen, [...TIP_IDS], 'an older build skipped it');
   }
+  assert.deepEqual(new Onboarding({ ...old, status: 'completed' }, true, evidence).getSnapshot().seen, [...BASIC_TIP_IDS]);
+  assert.deepEqual(new Onboarding({ ...old, status: 'completed', seen: [...BASIC_TIP_IDS, 'station'] }, true, evidence).getSnapshot().seen, [...BASIC_TIP_IDS, 'station']);
   assert.deepEqual(new Onboarding(undefined, true, evidence).getSnapshot().seen, [...TIP_IDS], 'saves from before tutorials');
   assert.deepEqual(new Onboarding(undefined, false, evidence).getSnapshot().seen, [], 'brand-new player');
   assert.deepEqual(new Onboarding({ ...old, seen: ['sell', 'from-a-newer-build'] }, true, evidence).getSnapshot().seen, ['sell']);

@@ -1,10 +1,11 @@
+import { currencyName } from './currencyName.ts';
 import { formatNumber } from './formatNumber.ts';
 import { MYSTERY_EGG_NAME } from '../content/petAppearance.ts';
 import { Box3, Float32BufferAttribute, Group, Mesh, MeshBasicMaterial, Shape, ShapeGeometry, Sphere, Vector3, type BufferGeometry, type Material } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { createWorldText } from './WorldText.ts';
 import { disposeScenery } from './disposeScenery.ts';
-import { ECONOMY, currencyName, type CurrencyId } from '../content/economy.ts';
+import { ECONOMY, type CurrencyId } from '../content/economy.ts';
 
 type Stand = Readonly<{ id: string; eggId: string; x: number; y: number; z: number }>;
 type Offer = Readonly<{ id: string; name: string; price: number; currency: CurrencyId }>;

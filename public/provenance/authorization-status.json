@@ -1,0 +1,10 @@
+{
+  "productionInventoryComplete": true,
+  "authorizationDocumentsRequested": false,
+  "scope": "User explicitly does not require Tripo3D or Mixamo/ROMIXAMO authorization documents. Keep production provenance and existing open-source licenses.",
+  "excludedAuthorizationDocuments": [
+    "Tripo3D account/plan commercial/client-delivery evidence",
+    "Mixamo/ROMIXAMO acquisition/license evidence"
+  ],
+  "inventedLicenseGrants": false
+}

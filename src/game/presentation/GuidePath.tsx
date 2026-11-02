@@ -1,6 +1,6 @@
 import { useEffect, useMemo, type RefObject } from 'react';
 import { Group, MeshBasicMaterial } from 'three';
-import { chevronGeometry, GUIDE_CHEVRONS, markerGeometry } from './guidePath.ts';
+import { chevronGeometry, GUIDE_CHEVRONS, markerGeometry } from './guidePathGeometry.ts';
 
 /** The first-dig guide's objects (guidePath.ts lays them out each frame). */
 export function GuidePath({ pathRef }: { pathRef: RefObject<Group | null> }) {

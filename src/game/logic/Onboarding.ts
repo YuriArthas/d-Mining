@@ -1,7 +1,8 @@
 import { versionOne } from './data.ts';
 
 /** One-time tips, in the order a new player meets them. Each is shown at most once per save. */
-export const TIP_IDS = ['dig', 'sell', 'shop', 'pets'] as const;
+export const BASIC_TIP_IDS = ['dig', 'sell', 'shop', 'pets'] as const;
+export const TIP_IDS = [...BASIC_TIP_IDS, 'station', 'portal', 'world2', 'world3'] as const;
 export type TipId = (typeof TIP_IDS)[number];
 type Status = 'active' | 'skipped' | 'completed' | 'legacy';
 
@@ -45,11 +46,12 @@ export class Onboarding {
       equippedOnce: d.equippedOnce as boolean, longTaskIntroduced: (d.longTaskIntroduced as boolean | undefined) ?? false,
       minedCount: (d.minedCount as number | undefined) ?? 0,
     };
-    // Skipped or finished in any build (older test builds share this save) means no more tips.
-    // Unknown ids from a newer build are dropped; a save written before tips derives them from facts.
-    const seen = facts.status !== 'active' ? [...TIP_IDS]
+    // Explicitly skipped/legacy saves stay quiet. Completing the original four tips does not hide
+    // newly introduced features: keep the recorded IDs, with the old completion covering the basic four.
+    const seen = facts.status === 'skipped' || facts.status === 'legacy' ? [...TIP_IDS]
+      : facts.status === 'completed' ? TIP_IDS.filter(id => BASIC_TIP_IDS.some(basic => basic === id) || (Array.isArray(d.seen) && d.seen.includes(id)))
       : Array.isArray(d.seen) ? TIP_IDS.filter(id => (d.seen as string[]).includes(id))
-      : TIP_IDS.filter(id => ({ dig: facts.minedOnce, sell: facts.soldOnce, shop: evidence.level >= 2, pets: evidence.pets > 0 || evidence.equipped || facts.equippedOnce })[id]);
+      : BASIC_TIP_IDS.filter(id => ({ dig: facts.minedOnce, sell: facts.soldOnce, shop: evidence.level >= 2, pets: evidence.pets > 0 || evidence.equipped || facts.equippedOnce })[id]);
     this.data = Object.freeze({ version: 1, seen, ...facts });
   }
 
@@ -60,7 +62,7 @@ export class Onboarding {
   markSeen(id: TipId) {
     if (this.has(id)) return false;
     const seen = TIP_IDS.filter(tip => tip === id || this.has(tip));
-    return this.patch({ seen, ...(seen.length === TIP_IDS.length && this.data.status === 'active' ? { status: 'completed' as const } : {}) });
+    return this.patch({ seen, ...(BASIC_TIP_IDS.every(id => seen.includes(id)) && this.data.status === 'active' ? { status: 'completed' as const } : {}) });
   }
 
   record(fact: 'minedOnce' | 'soldOnce' | 'equippedOnce') { return this.patch({ [fact]: true }); }

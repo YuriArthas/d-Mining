@@ -67,7 +67,7 @@ export class MiningLessonHighlight {
     const touch=element.dataset.input==='touch';
     if(!this.cell){
       element.style.left='50%';element.style.top='70%';element.dataset.below='false';
-      if(caption)caption.textContent=touch?tr('拖动观察，寻找可挖方块'):tr('按住右键向下看，寻找可挖方块');
+      if(caption)caption.textContent=touch?tr("msg.drag_to_look_around_and_find_a_block_to_dig"):tr("msg.hold_right_mouse_and_look_down_to_find_a_block_to_dig");
       return;
     }
     this.group.visible=true;
@@ -78,7 +78,7 @@ export class MiningLessonHighlight {
     element.dataset.cell=this.cell.join(',');
     // In the upper half of the screen the caption goes under the ring, clear of the place plate at the top.
     element.dataset.below=String(this.projected.y>0);
-    if(caption)caption.textContent=touch?tr('长按这里挖矿'):tr('鼠标移到这里 · 按住左键');
+    if(caption)caption.textContent=touch?tr("msg.press_and_hold_here_to_dig"):tr("msg.point_here_hold_left_mouse");
   }
   dispose(){this.fill.geometry.dispose();this.fill.material.dispose();this.outline.geometry.dispose();this.outline.material.dispose();this.group.removeFromParent();}
 }

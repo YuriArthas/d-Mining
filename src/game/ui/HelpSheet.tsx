@@ -12,16 +12,16 @@ const subscribeTouch = (notify: () => void) => { touch.addEventListener('change'
 export function HelpSheet({ onClose }: { onClose(): void }) {
   const coarse = useSyncExternalStore(subscribeTouch, () => touch.matches);
   const tips: [IconKind, string, string, string][] = [
-    ['jump', '#2fb4ff', tr('移动'), coarse ? tr('左边摇杆走，右下角跳') : tr('WASD 走，空格跳')],
-    ['pickaxe', '#ff9f1a', tr('挖矿'), coarse ? tr('按住方块一直挖') : tr('按住左键一直挖')],
-    ['coin', '#3fc93a', tr('出售'), tr('背包满了点「出售」')],
-    ['chest', '#2fb4ff', tr('升级'), tr('商店换更强的镐子')],
-    ['paw', '#ff9f1a', tr('宠物'), tr('开蛋得宠物，赚得更多')],
-    ['portal', '#9b6bff', tr('深度'), tr('挖到新层，解锁传送和新蛋')],
-    ['globe', '#3fc93a', tr('世界'), tr('集齐门票，去下一个世界')],
-    ['gift', '#9b6bff', tr('奖励'), tr('在线和签到领幸运币，去扭蛋机抽奖')],
+    ['jump', '#2fb4ff', tr("msg.move"), coarse ? tr("msg.left_stick_to_walk_bottom_right_to_jump") : tr("msg.wasd_to_walk_space_to_jump")],
+    ['pickaxe', '#ff9f1a', tr("msg.mining"), coarse ? tr("msg.hold_a_block_to_dig") : tr("msg.hold_left_mouse_to_dig")],
+    ['coin', '#3fc93a', tr("msg.sell"), tr("msg.bag_full_tap_sell")],
+    ['chest', '#2fb4ff', tr("msg.upgrade"), tr("msg.buy_stronger_pickaxes_in_the_shop")],
+    ['paw', '#ff9f1a', tr("msg.pets"), tr("msg.hatch_eggs_for_pets_that_earn_more")],
+    ['portal', '#9b6bff', tr("msg.depth"), tr("msg.reach_a_new_layer_to_unlock_its_teleport_and_egg")],
+    ['globe', '#3fc93a', tr("msg.worlds"), tr("msg.collect_the_ticket_go_to_the_next_world")],
+    ['gift', '#9b6bff', tr("msg.rewards"), tr("msg.play_and_sign_in_for_lucky_coins_spin_at_the_machine")],
   ];
-  return <Sheet title={tr('怎么玩')} size="m" onClose={onClose} label={tr('操作帮助')} className="help-sheet">
+  return <Sheet title={tr("msg.how_to_play")} size="m" onClose={onClose} label={tr("msg.how_to_play_7a328466")} className="help-sheet">
     <ol className="help-tips">{tips.map(([icon, color, title, text], i) => <li key={title} className="help-tip" style={{ '--c': color } as CSSProperties}>
       <span className="help-tip-num ui-num">{i + 1}</span>
       <Icon kind={icon} className="ui-icon help-tip-art" />

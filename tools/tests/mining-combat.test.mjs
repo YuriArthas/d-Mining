@@ -114,7 +114,7 @@ test('session accepts only one target and credits destroyed results even when al
  s.attach({cell:()=>solid?66:0,pending:()=>pending,mine:()=>{pending=true;return true},cancelMining:()=>{pending=false}});
  const a=[6,-1,-25];assert.equal(s.requestMine([a,[7,-1,-25]]),false);assert.equal(s.combatDebug().damagedCells,0);
  const hits=Math.ceil(resourceByKind(66).maxHp/10);for(let i=0;i<hits-1;i++){now=i*.5;assert.equal(s.hit(a).status,'hit')}now=(hits-1)*.5;assert.equal(s.hit(a).status,'breaking');assert.equal(s.getSnapshot().inventory.used,0);
- s.collected([{kind:64}]);solid=false;s.collected([{cell:a,kind:66}]);assert.equal(s.getSnapshot().inventory.used,1+resourceByKind(66).volume);assert.equal(s.combatDebug().damagedCells,0);
+ s.collected([{kind:64}]);solid=false;s.collected([{cell:a,kind:66}]);assert.equal(s.getSnapshot().inventory.used,resourceByKind(64).volume+resourceByKind(66).volume);assert.equal(s.combatDebug().damagedCells,0);
 });
 test('session pickaxe purchase publishes consistent level/coins without changing running cooldown',()=>{
  let now=0;const s=new GameSession({...SESSION_CONTENT,initialCoins:ECONOMY.tools[1].price}, 50,()=>now);s.attach({cell:()=>67,pending:()=>false,mine:()=>true,cancelMining:()=>{}});

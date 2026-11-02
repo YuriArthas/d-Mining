@@ -3,7 +3,7 @@ import type { PetService, HatchResult, EquipOwnedResult, MergeResult } from './P
 import { petStats } from '../logic/pets/petRules.ts';
 import type { CurrencyId } from '../content/economy.ts';
 
-import { tr } from '../i18n/i18n.ts';
+import { tr, resolveText } from '../i18n/i18n.ts';
 /** A pet's bonuses: extra income in its own currency (`bonusPct`, only in that world) and faster mining
  *  (`miningPct`, every world), both in percent. */
 export type PetCardView = Readonly<{
@@ -65,7 +65,7 @@ export class PetUiAdapter implements PetUiApi {
     const equippedSlots = new Map(equipment.slots.map((id, slot) => [id, slot]));
     const pets = previous && inventory === this.inventory && equipment === this.equipment ? previous.pets : Object.freeze(inventory.pets.map(pet => {
       const definition = petStats(pet, id => catalog.pet(id));
-      return Object.freeze({ pet, name: pet.golden ? tr('金色{name}', { name: definition.name }) : definition.name, rarity: definition.rarity, bonusPct: definition.bonusPct, currency: definition.currency,
+      return Object.freeze({ pet, name: pet.golden ? tr("msg.golden_name", { name: resolveText(definition.name) }) : resolveText(definition.name), rarity: definition.rarity, bonusPct: definition.bonusPct, currency: definition.currency,
         miningPct: definition.miningPct, equippedSlot: equippedSlots.get(pet.id) ?? null, golden: !!pet.golden,
         mergeable: pet.golden ? 0 : inventory.pets.filter(p => p.speciesId === pet.speciesId && !p.golden).length });
     }));
@@ -73,11 +73,11 @@ export class PetUiAdapter implements PetUiApi {
       const egg = this.service.effectiveEgg(original.id)!;
       const total = egg.outcomes.reduce((sum, outcome) => sum + outcome.weight, 0);
       return Object.freeze({
-        id: egg.id, name: egg.name, price: egg.price, currency: egg.currency, canAfford: this.service.isUnlocked(egg.id) && balances[egg.currency] >= egg.price,
-        unlocked: this.service.isUnlocked(egg.id), unlockName: egg.unlockName,
+        id: egg.id, name: resolveText(egg.name), price: egg.price, currency: egg.currency, canAfford: this.service.isUnlocked(egg.id) && balances[egg.currency] >= egg.price,
+        unlocked: this.service.isUnlocked(egg.id), unlockName: egg.unlockName ? resolveText(egg.unlockName) : undefined,
         outcomes: Object.freeze(egg.outcomes.map(outcome => {
           const pet = catalog.pet(outcome.speciesId);
-          return Object.freeze({ speciesId: pet.id, name: pet.name, rarity: pet.rarity, probability: outcome.weight / total, bonusPct: pet.bonusPct, currency: pet.currency, miningPct: pet.miningPct });
+          return Object.freeze({ speciesId: pet.id, name: resolveText(pet.name), rarity: pet.rarity, probability: outcome.weight / total, bonusPct: pet.bonusPct, currency: pet.currency, miningPct: pet.miningPct });
         })),
       });
     }));

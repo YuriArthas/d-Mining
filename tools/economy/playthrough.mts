@@ -3,7 +3,7 @@
 // `simulate`): it mines the deepest layer it has reached, in the pit under its hall (the surface pit on layer 0),
 // sells a full bag by the sell button and comes back by the station; after each sale it buys the cheapest thing it
 // wants and can pay for (this layer's eggs up to plan.json's pulls, the next pickaxe once its shop is open, an
-// enhancement, a pet slot), a backpack costing at most 30 % of its money, claims the reward page's lucky coins and
+// enhancement, a pet slot), a backpack sized for 45 seconds of mining, claims the reward page's lucky coins and
 // spins them at the capsule (at once in world 1, from later worlds once seven have gathered). With this layer's eggs
 // pulled and the pickaxe the next layer asks for, it digs down to the next hall; on layer 6 it pays the ticket at
 // the portal (mining missing ticket minerals where they are found first) and goes on. Human time is waited out:
@@ -37,7 +37,7 @@ const FIRST = +(process.env.START ?? 1) as 1 | 2 | 3;
 if (FIRST > 1) {
   const level = (FIRST - 1) * 10, bag = E.bags[(FIRST - 1) * 10 - 1];
   start.worldProgress = { version: 2, openWorlds: [1, 2, 3].filter(w => w <= FIRST) };
-  start.pickaxe = { version: 1, level, enhance: 0 }; start.equipment = { ...start.equipment, toolLevel: level, backpackCapacity: bag.capacity };
+  start.pickaxe = { version: 1, level, enhance: 0 }; start.equipment = { ...start.equipment, toolLevel: level, backpackTier: bag.tier, equippedBackpackTier: bag.tier };
   start.inventory = { ...start.inventory, capacity: bag.capacity };
   for (let w = 1; w < FIRST; w++) { const rooms = content.destinations.filter(d => d.worldId === w); start.worldExploration[w] = { version: 1, maxDepth: rooms.at(-1)!.depth, unlockedDestinationIds: rooms.map(r => r.id) }; }
   start.exploration = start.worldExploration[1];
@@ -198,7 +198,7 @@ function toSiteNow(w: 1 | 2 | 3, k: number) {
   if (k === 0) {
     toSurface(); surfaceWalk(pitEntrance(w), .9);
   } else {
-    toSurface(); const st = station(w); surfaceWalk([st.x, 0, st.z], .8);
+    // Portable travel works directly from the nearest sale floor.
     wait(UI); if (!teleported(g.session.travelTo(halls(w)[k - 1].id))) return false;
   }
   if (!trail.length) trail.push([...g.feet()]);
@@ -234,13 +234,25 @@ function equipBest() {
   for (const card of pets.pets) if (!card.golden && card.mergeable >= pets.goldenNeed) { if ((g.session.pets.mergeGolden(card.pet.speciesId) as any).status === 'merged') { log('golden', { species: card.pet.speciesId }); return equipBest(); } }
   g.session.pets.equipBest();
 }
-/** The model's buying round: the cheapest wanted thing it can pay for, again and again; then a backpack. */
+/** Match model.mts: buy enough carry time, or the largest currently available shelf bag. */
+function wantedBag(w:number,k:number) {
+  const state=s(),l=E.layers[(w-1)*7+k],stats=state.miningStats,cap=state.inventory.capacity;
+  const wt=l.ores.reduce((a,o)=>a+o.weight,0);let time=0,volume=0;
+  for(const [b,q] of [[l.rock,1-l.oreChance],...l.ores.map(o=>[o,l.oreChance*o.weight/wt] as const)] as const){
+    time+=q*(Math.ceil(b.hp/stats.power)/stats.speed+Math.max(0,AIM+.1-1/stats.speed));volume+=q*b.volume;
+  }
+  if(Math.ceil(cap/volume)*time>=35&&cap>=2*l.deep.volume)return null;
+  const target=Math.max(volume*45/time,2*l.deep.volume),offers=state.shopCatalog.backpacks.filter((b:any)=>b.capacity>state.equipment.backpackCapacity&&b.world===w&&b.shop<=k);
+  return offers.find((b:any)=>b.capacity>=target)??offers.at(-1)??null;
+}
+/** The model's buying round: the cheapest wanted thing it can pay for, again and again; including a needed backpack. */
 function shop() { timed('shop', shopNow); }
 function shopNow() {
   const w = world(), k = reached(w), c = currency(w);
   for (let round = 0; round < 200; round++) {
     const lv = s().equipment.toolLevel, enh = s().equipment.enhance, tools = s().shopCatalog.tools;
     const opts: [string, number, number][] = [];
+    const bag=wantedBag(w,k);if(bag)opts.push(['bag',bag.price,bag.level]);
     E.eggs.forEach((e, j) => { if (wantEgg(j, w, k)) opts.push(['egg', e.price, j]); });
     if (lv < exitLevel(w, k) && E.tools[lv].shop <= k && E.tools[lv].currency === c) opts.push(['tool', E.tools[lv].price, 0]);
     const step = E.tools[lv - 1].enhance[enh]; if (step && E.tools[lv - 1].currency === c) opts.push(['enh', step.price, 0]);
@@ -257,6 +269,10 @@ function shopNow() {
         if (r.status !== 'hatched') return false;
         hatched[j]++; log('egg', { egg: egg.id, n: hatched[j], price }); equipBest(); return true;
       });
+    } else if(what==='bag') {
+      const trip=g.session.goToShop('backpacks','furthest');if(trip==='travelling')teleported(trip);wait(UI);
+      const result=g.session.useShopItem('backpacks',bag!.id);done=result.status==='upgraded';
+      if(done)log('bag',{capacity:bag!.capacity,price});
     } else if (what === 'tool' || what === 'enh') {
       const trip = g.session.goToShop('tools', what === 'tool' ? 'next' : 'furthest'); if (trip === 'travelling') teleported(trip);
       wait(UI);
@@ -270,12 +286,7 @@ function shopNow() {
     if (!done) { log('buy-failed', { what, price }); break; }
     progressed();
   }
-  const next = s().backpackUpgrade.next;
-  if (next && next.world <= w && (next.world < w || next.shop <= k) && next.price <= balance(next.currency) * .3) {
-    const trip = g.session.goToShop('backpacks', 'next'); if (trip === 'travelling') teleported(trip);
-    wait(UI); const r = g.session.useShopItem('backpacks', next.id) as any;
-    if (r.status === 'upgraded') { log('bag', { capacity: next.capacity, price: next.price }); progressed(); }
-  }
+
 }
 /** What the player saves up for next (the model's `want`): the cheapest of the wanted things. */
 function need(w: number, k: number) {
@@ -283,6 +294,7 @@ function need(w: number, k: number) {
   E.eggs.forEach((e, j) => { if (wantEgg(j, w, k)) prices.push(e.price); });
   if (lv < exitLevel(w, k) && E.tools[lv].shop <= k) prices.push(E.tools[lv].price);
   const step = E.tools[lv - 1].enhance[enh]; if (step) prices.push(step.price);
+  const bag=wantedBag(w,k);if(bag)prices.push(bag.price);
   if (k === 6 && w < 3) prices.push(E.worlds[w].ticket!.price);
   return prices.length ? Math.min(...prices) - balance(c) : 0;
 }

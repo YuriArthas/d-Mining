@@ -1,3 +1,4 @@
+import type { MessageId } from '../../i18n/messages.ts';
 import type { V3, Solid } from '../../world/sceneryKit.ts';
 
 /** A rest room's scene definition (*.scene.json: reference size, facilities, signs, rings), and for the kit rooms
@@ -26,7 +27,7 @@ export type RoomSceneDefinition = {
   hall?: string;
   referenceSize: number[];
   facilities: RoomFacilities;
-  signs: {anchor: RoomAnchor; offset: number[]; width: number; title: string; subtitle: string; color: string; background: string; yaw?: number}[];
+  signs: {anchor: RoomAnchor; offset: number[]; width: number; title: MessageId; subtitle: MessageId; color: string; background: string; yaw?: number}[];
   /** The sell and shop pads (ServicePads), at their trigger's radius. */
   rings: {anchor: 'sell' | 'shop'; offset: number[]; color: string}[];
   render?: RoomRenderStyle;

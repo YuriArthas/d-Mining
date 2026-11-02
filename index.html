@@ -19,36 +19,27 @@
   </head>
   <body>
     <div id="root">
-      <section class="loading-screen boot-loading" aria-label="正在加载 Mining" data-en-label="Loading Mining" data-id-label="Memuat Mining" data-vi-label="Đang tải Mining">
-        <div class="loading-topline"><span>MINING <b>·</b> <i data-en="MINE" data-id="TAMBANG" data-vi="MỎ">矿场</i></span><a class="boot-exit" href="../../"><i data-en="Exit" data-id="Keluar" data-vi="Thoát">退出游戏</i> <span aria-hidden="true">↗</span></a></div>
+      <section class="loading-screen boot-loading" aria-label="正在加载 Mining" data-msg-label="boot.loading_mining">
+        <div class="loading-topline"><span>MINING <b>·</b> <i data-msg="boot.mine">矿场</i></span><a class="boot-exit" href="../../"><i data-msg="boot.exit">退出游戏</i> <span aria-hidden="true">↗</span></a></div>
         <div class="loading-content">
           <!-- mining-loading-emblem -->
-          <div class="loading-eyebrow" data-en="DIG DOWN · HAUL IT HOME" data-id="GALI KE BAWAH · BAWA PULANG" data-vi="ĐÀO XUỐNG · MANG VỀ NHÀ">向下探索 · 满载而归</div>
+          <div class="loading-eyebrow" data-msg="boot.dig_down_haul_it_home">向下探索 · 满载而归</div>
           <h1>MINING</h1>
           <div class="loading-status" role="status" aria-live="polite">
-            <h2 id="boot-status" data-en="Entering the mine…" data-id="Masuk ke tambang…" data-vi="Đang vào mỏ…">正在进入矿场…</h2>
+            <h2 id="boot-status" data-msg="boot.entering_the_mine">正在进入矿场…</h2>
             <p id="boot-detail" class="loading-error" hidden></p>
           </div>
           <div id="boot-busy">
-            <div class="loading-track" role="progressbar" aria-label="正在进入矿场" data-en-label="Entering the mine" data-id-label="Masuk ke tambang" data-vi-label="Đang vào mỏ"><span></span></div>
-            <div class="loading-detail"><span data-en="Getting ready" data-id="Bersiap" data-vi="Đang chuẩn bị">准备出发</span><span data-en="One moment" data-id="Tunggu sebentar" data-vi="Chờ một chút">请稍候</span></div>
-            <ol class="loading-steps"><li><span>01</span><i data-en="Mine assets" data-id="Aset tambang" data-vi="Tài nguyên mỏ">矿场资源</i></li><li><span>02</span><i data-en="Nearby ground" data-id="Tanah sekitar" data-vi="Địa hình gần">附近地形</i></li><li><span>03</span><i data-en="Scenery" data-id="Pemandangan" data-vi="Cảnh vật">场景布置</i></li><li><span>04</span><i data-en="Graphics" data-id="Grafis" data-vi="Đồ họa">画面准备</i></li></ol>
+            <div class="loading-track" role="progressbar" aria-label="正在进入矿场" data-msg-label="boot.entering_mine_label"><span></span></div>
+            <div class="loading-detail"><span data-msg="boot.getting_ready">准备出发</span><span data-msg="boot.one_moment">请稍候</span></div>
+            <ol class="loading-steps"><li><span>01</span><i data-msg="boot.mine_assets">矿场资源</i></li><li><span>02</span><i data-msg="boot.nearby_ground">附近地形</i></li><li><span>03</span><i data-msg="boot.scenery">场景布置</i></li><li><span>04</span><i data-msg="boot.graphics">画面准备</i></li></ol>
           </div>
-          <button id="boot-retry" class="loading-retry" type="button" hidden data-en="Reload" data-id="Muat ulang" data-vi="Tải lại">重新加载</button>
+          <button id="boot-retry" class="loading-retry" type="button" hidden data-msg="boot.reload">重新加载</button>
           <noscript><p>Please turn on JavaScript to play. 请开启 JavaScript 后进入游戏。</p></noscript>
         </div>
-        <div class="loading-bottom"><span class="loading-tip" data-en="Tip: when your bag is full, tap Sell to teleport and sell your ore." data-id="Tips: kalau tas penuh, ketuk Jual untuk teleport dan jual bijihmu." data-vi="Mẹo: ba lô đầy thì bấm Bán để dịch chuyển và bán quặng.">小提示：背包满了点「出售」，一键传送去卖矿。</span><span data-en="Explore · Gather · Grow" data-id="Jelajah · Kumpul · Tumbuh" data-vi="Khám phá · Thu thập · Phát triển">探索 · 采集 · 成长</span></div>
+        <div class="loading-bottom"><span class="loading-tip" data-msg="boot.tip_when_your_bag_is_full_tap_sell_to_teleport_and_sell_your_ore">小提示：背包满了点「出售」，一键传送去卖矿。</span><span data-msg="boot.explore_gather_grow">探索 · 采集 · 成长</span></div>
       </section>
     </div>
-    <script>
-      // The boot screen in the page's language (window.__MINING_LANG__, set by the boot script in the head).
-      (function (lang) {
-        if (!lang || lang === 'zh') return;
-        document.documentElement.lang = lang;
-        document.querySelectorAll('[data-en]').forEach(function (e) { e.textContent = e.getAttribute('data-' + lang) || e.getAttribute('data-en'); });
-        document.querySelectorAll('[data-en-label]').forEach(function (e) { e.setAttribute('aria-label', e.getAttribute('data-' + lang + '-label') || e.getAttribute('data-en-label')); });
-      })(window.__MINING_LANG__);
-    </script>
     <script type="module" src="/src/bootstrap.ts"></script>
   </body>
 </html>

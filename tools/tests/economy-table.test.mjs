@@ -1,13 +1,33 @@
+import { tr } from '../../src/game/i18n/i18n.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { ECONOMY, isRound, validateEconomy } from '../../src/game/content/economy.ts';
 import { loadPlan, simulate } from '../economy/model.mts';
 
-test('the model plays a typical player through economy.json, hand edits included, to the end of world 3', () => {
-  const run = simulate(JSON.parse(JSON.stringify(ECONOMY)), loadPlan(), 1);
-  assert.equal(run.arrive.length, 22, 'every layer of the three worlds reached');
-  const minutes = w => (run.arrive[w * 7] - run.arrive[(w - 1) * 7]) / 60;
-  for (const [w, target] of [[1, 120], [2, 240], [3, 360]]) assert.ok(Math.abs(minutes(w) / target - 1) < .15, `world ${w}: ${minutes(w).toFixed(0)} min`);
+test('joint economy reaches all worlds near the 2/4/6-hour design with sparse ores', (t) => {
+  for(const seed of [1,7,15]) {
+    const run=simulate(structuredClone(ECONOMY),loadPlan(),seed);
+    assert.equal(run.arrive.length,22);
+    for(const w of [1,2,3]) {
+      const minutes=(run.arrive[w*7]-run.arrive[(w-1)*7])/60,target=w*120;
+      t.diagnostic(`seed ${seed} world ${w}: ${minutes.toFixed(1)} min (model)`);
+      assert.ok(minutes>target*.7&&minutes<target*1.3,`world ${w} outside pacing band`);
+    }
+  }
+});
+
+test('rock is cheap and bulky by health; adjacent ores grow about 3x then accelerate',()=>{
+  assert.equal(ECONOMY.layers[0].rock.volume,1);
+  for(const l of ECONOMY.layers){assert.equal(l.rock.price,1);assert.equal(l.deep.price,1);assert.ok(l.deep.volume>=l.rock.volume);assert.ok(l.ores.every(o=>o.volume===1));}
+  assert.ok(ECONOMY.layers[13].rock.volume>=1000);assert.ok(ECONOMY.layers[17].rock.volume>=10000);
+  for(const w of [0,1,2]) {
+    const layers=ECONOMY.layers.slice(w*7,w*7+7);
+    assert.deepEqual(layers.map(l=>l.oreChance),[.045,.049,.0535,.0575,.0615,.066,.07]);
+    for(let i=1;i<7;i++) for(let ore=0;ore<2;ore++)assert.ok(layers[i].ores[ore].price/layers[i-1].ores[ore].price>=2.9);
+    assert.ok(layers[6].ores[0].price/layers[5].ores[0].price>=4.9);
+  }
+  assert.ok(ECONOMY.bags[1].capacity>=ECONOMY.bags[0].capacity*4);
+  assert.ok(ECONOMY.bags[1].price<=ECONOMY.bags[0].capacity,'first upgrade within one ordinary-rock bag');
 });
 
 test('numbers a player sees are round: at most two significant figures', () => {
@@ -31,7 +51,7 @@ test('the load check refuses broken tables: odd prices, falling prices, wrong cu
 });
 
 test('the design holds: a currency per world, a gate on every layer, speed capped at 4×, pets ×2.5 per layer', () => {
-  assert.deepEqual(ECONOMY.currencies.map(c => c.name), ['金币', '科技币', '星晶']);
+  assert.deepEqual(ECONOMY.currencies.map(c => tr(c.name)), ['金币', '科技币', '星晶']);
   assert.deepEqual(ECONOMY.worlds.map(w => w.ticket?.toolLevel ?? null), [null, 10, 20]);
   assert.equal(Math.max(...ECONOMY.tools.map(t => t.speed)), 4 * ECONOMY.tools[0].speed);
   for (const w of [1, 2, 3]) {

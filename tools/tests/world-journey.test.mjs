@@ -1,3 +1,4 @@
+import { resolveText } from '../../src/game/i18n/i18n.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { WorldProgress } from '../../src/game/logic/WorldProgress.ts';
@@ -86,11 +87,11 @@ test('ticket ore sells like any ore until the player locks it; locked, it goes t
   assert.deepEqual(s.lockItem(ore.itemId),{status:'locked',stored:3});
   assert.equal(s.getSnapshot().inventory.used,0,'stored ore takes no bag space');
   s.collected(Array.from({length:need.count-4},()=>({kind:ore.kind})));
-  assert.match(s.getSnapshot().notice,new RegExp(`材料仓 \\+${need.count-4}：${ore.name} ${need.count-1}/${need.count}`));
+  assert.match(s.getSnapshot().notice,new RegExp(`材料仓 \\+${need.count-4}：${resolveText(ore.name)} ${need.count-1}/${need.count}`));
   assert.equal(GameSession.fromData(s.exportProgress(),content).getSnapshot().materials.find(m=>m.itemId===ore.itemId).locked,true,'the lock survives a reload');
   // The block that fills the store unlocks it: the tickets have all of it, so the rest sells and the store is untouched.
   s.collected(Array.from({length:6},()=>({kind:ore.kind})));
-  assert.deepEqual(s.getSnapshot().materials.find(m=>m.itemId===ore.itemId),{itemId:ore.itemId,name:ore.name,stored:need.count,needed:need.count,locked:false});
+  assert.deepEqual(s.getSnapshot().materials.find(m=>m.itemId===ore.itemId),{itemId:ore.itemId,name:resolveText(ore.name),stored:need.count,needed:need.count,locked:false});
   assert.equal(s.getSnapshot().inventory.items[ore.itemId],5);
   const sale=content.sales[0];s.updatePosition([sale.x,sale.y,sale.z],true);
   assert.equal(s.getSnapshot().inventory.totalCount,0);assert.equal(s.getSnapshot().coins,5*ore.price);
@@ -112,7 +113,7 @@ test('unlocking a ticket mineral puts what is stored back in the bag to be sold'
   assert.equal(s.getSnapshot().inventory.used,0);
   assert.deepEqual(s.unlockItem(ore.itemId),{status:'unlocked',released:7});
   assert.equal(s.getSnapshot().inventory.items[ore.itemId],7);
-  assert.deepEqual(s.getSnapshot().materials.find(m=>m.itemId===ore.itemId),{itemId:ore.itemId,name:ore.name,stored:0,needed:need.count,locked:false});
+  assert.deepEqual(s.getSnapshot().materials.find(m=>m.itemId===ore.itemId),{itemId:ore.itemId,name:resolveText(ore.name),stored:0,needed:need.count,locked:false});
   s.collected([{kind:ore.kind}]);assert.equal(s.getSnapshot().inventory.items[ore.itemId],8,'unlocked: dug ones go to the bag');
   s.updatePosition([sale.x,sale.y,sale.z],true);assert.equal(s.getSnapshot().coins,8*ore.price);
   assert.equal(s.unlockItem(ore.itemId).status,'unavailable','not locked');
@@ -145,7 +146,7 @@ test('a later ticket\'s ore shows in the store once some is kept; a store saved 
   assert.ok(!s.getSnapshot().materials.some(m=>m.itemId===ore.itemId),'world 3 stays unknown');
   s.collected([{kind:ore.kind}]);assert.equal(s.getSnapshot().inventory.items[ore.itemId],1,'not locked: into the bag');
   s.lockItem(ore.itemId);
-  assert.equal(s.getSnapshot().inventory.used,0);assert.deepEqual(s.getSnapshot().materials.find(m=>m.itemId===ore.itemId),{itemId:ore.itemId,name:ore.name,stored:1,needed:later.count,locked:true});
+  assert.equal(s.getSnapshot().inventory.used,0);assert.deepEqual(s.getSnapshot().materials.find(m=>m.itemId===ore.itemId),{itemId:ore.itemId,name:resolveText(ore.name),stored:1,needed:later.count,locked:true});
   const data=new GameSession(content).exportProgress();data.materials={version:1,items:{[ore.itemId]:2}};
   assert.equal(GameSession.fromData(data,content).getSnapshot().materials.find(m=>m.itemId===ore.itemId).locked,true);
 });

@@ -155,3 +155,7 @@ html:not([lang^=zh]) .bag-egg-name { font-size: 12px; }
   .bag-eggs { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
 }
 @media (prefers-reduced-motion: reduce) { .bag-equip-best[data-better] { animation: none; } }
+
+.bag-ores { --cell: 120px; grid-auto-rows: 130px; }
+.bag-ore-volume { position: absolute; left: 2px; right: 2px; bottom: 40px; font-size: 14px; text-align: center; line-height: 1.1; }
+.bag-ore-price { font-size: 14px; }

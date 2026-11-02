@@ -44,7 +44,7 @@ import { MiningFeedback } from "./MiningFeedback.ts";
 import { worldAtFeet, worldAtZ, worldRequirement, type WorldId } from "../content/worldJourney.ts";
 import { DisposalScope } from "./DisposalScope.ts";
 
-import { tr } from '../i18n/i18n.ts';
+import { message } from '../i18n/messages.ts';
 function createStartupStats() {
   return {
     started: performance.now(),
@@ -227,9 +227,9 @@ export async function startGame(options: StartGameOptions) {
         if (!requested.has(world)) {
           requested.add(world);
           // The count keeps the notice up (it hides a few seconds after its text last changed).
-          const going = tr('正在前往{name}…', { name: worldRequirement(world).name });
+          const going = message("msg.heading_to_name", { name: worldRequirement(world).name });
           session.announce(going);
-          surface.loadWorld!(world, (done, total) => { if (done < total) session.announce(`${going} ${done}/${total}`); }).then(
+          surface.loadWorld!(world, (done, total) => { if (done < total) session.announce(message("msg.heading_progress", { going, done, total })); }).then(
             (part) => { if (part) { motion.add(part); lockedEggs.attach(part); warm(world, part); } },
             (error) => { requested.delete(world); failed.add(world); console.error(error); },
           );
@@ -262,7 +262,7 @@ export async function startGame(options: StartGameOptions) {
         cell: (cell) => terrain.cell(cell),
         canMine: (cell) => terrain.canMine(cell),
         pending: (cell) => terrain.pending(cell),
-        pendingCount: () => terrain.pendingCount(),
+        pendingVolume: volume => terrain.pendingVolume(volume),
         mine: (targets) => terrain.mineMany(targets),
         cancelMining: () => terrain.cancelPending(),
         travelTo: (feet, lookAt) => {

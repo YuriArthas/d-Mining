@@ -2,7 +2,7 @@ import type { ShopView } from '../presentation/ShopView.ts';
 import { GuideMarkerProjector } from '../presentation/GuideMarkerProjector.ts';
 import { attachMiningOverlay } from '../ui/hud/miningOverlay.ts';
 import { GuidePath } from '../presentation/GuidePath.tsx';
-import { updateGuidePath } from '../presentation/guidePath.ts';
+import { updateGuidePath } from '../presentation/guidePathGeometry.ts';
 import type { SavedGame } from '../persistence/SaveBootstrap.ts';
 import type { GameContent } from "../content/gameContent.ts";
 import { useEffect, useRef, type RefObject } from "react";
@@ -30,9 +30,8 @@ import type { LoadingEvent } from "../ui/loadingState.ts";
 import type { GameInput } from "../GameInput.ts";
 import type { GameSession } from "../application/GameSession.ts";
 import { ContactShadow } from "../presentation/ContactShadow.tsx";
-import { performanceRecorder } from "../presentation/PerformanceRecorder.ts";
 
-import { LANG, tr } from '../i18n/i18n.ts';
+import { tr } from '../i18n/i18n.ts';
 export function ValidationScene({
   content,
   shopView,
@@ -63,6 +62,7 @@ export function ValidationScene({
   session: GameSession;
 }) {
   const params = new URLSearchParams(location.search);
+  const debug = params.get("debug") === "1";
   const root = useRef<Group>(null),
     avatar = useRef<Group>(null);
   const runtime = useRef<PreparedGame | null>(null);
@@ -90,7 +90,7 @@ export function ValidationScene({
 
   useEffect(() => {
     const controller = new AbortController();
-    let detachDebug = () => {}, detachRecorder = () => {};
+    let detachDebug = () => {};
     loadingReleased.current = false;
     onLoading({ reset: true });
     startGame({
@@ -119,21 +119,7 @@ export function ValidationScene({
           return;
         }
         runtime.current = game;
-        // The bottom-left "report performance" button reads where the player is and these settings.
-        detachRecorder = performanceRecorder.attach({
-          renderer: gl,
-          where: () => ({ place: session.getSnapshot().location ?? "surface", position: game.physics.feet() }),
-          game: () => {
-            const state = session.getSnapshot();
-            return {
-              world: state.currentWorld, depth: Math.round(state.depth), travelling: !!game.player.travelling,
-              renderRate: activeRate.current, bakedShadows: settings.current.sceneShadowsEnabled, language: LANG,
-              startup: game.startup, terrain: game.terrain.measurements.snapshot(),
-            };
-          },
-          probe: () => activeProbe.current,
-        });
-        if (params.get("debug") === "1")
+        if (debug)
           detachDebug = attachGameDebug(
             game,
             gl,
@@ -155,13 +141,12 @@ export function ValidationScene({
       .catch((reason) => {
         if (controller.signal.aborted) return;
         savedGame.saves.invalidate(reason);
-        const error = tr('初始化失败：{reason}', { reason: String(reason) });
+        const error = tr("msg.failed_to_start_reason", { reason: String(reason) });
         onStatus(error);
         onLoading({ error });
       });
     return () => {
       detachDebug();
-      detachRecorder();
       controller.abort();
       runtime.current?.dispose();
       runtime.current = null;
@@ -183,15 +168,15 @@ export function ValidationScene({
         : "browser",
     );
     submission.current = gate;
-    const profile = new RenderProfiler(
+    const profile = debug ? new RenderProfiler(
       gl,
-      new URLSearchParams(location.search).get("gpuTiming") === "1",
-    );
+      params.get("gpuTiming") === "1",
+    ) : null;
     profiler.current = profile;
     return () => {
       basic.dispose();
       unlit.current = null;
-      profile.dispose();
+      profile?.dispose();
       profiler.current = null;
       gate.dispose();
       if (submission.current === gate) submission.current = null;
@@ -230,7 +215,7 @@ export function ValidationScene({
       });
       if (submitted && drewWorld) current.environment.markSubmitted();
     } catch (reason) {
-      const error = tr('渲染失败：{reason}', { reason: String(reason) });
+      const error = tr("msg.failed_to_draw_reason", { reason: String(reason) });
       onStatus(error);
       onLoading({ error });
       throw reason;
@@ -240,11 +225,11 @@ export function ValidationScene({
   useEffect(() => {
     let id = 0;
     const schedule = new RenderSchedule(),
-      meter = new PerformanceMeter();
+      meter = debug ? new PerformanceMeter() : null;
     const frame = (now: number) => {
       // One RAF owner; render cap is independent from fixed 60 Hz physics.
       const scheduled = schedule.due(now, activeRate.current);
-      meter.recordRaf(scheduled);
+      meter?.recordRaf(scheduled);
       let cpuMs = 0, drawn = false;
       if (scheduled) {
         const before = submission.current?.submitted ?? 0,
@@ -262,8 +247,8 @@ export function ValidationScene({
         const end = performance.now();
         cpuMs = end - start;
         drawn = (submission.current?.submitted ?? 0) > before;
-        runtime.current?.terrain.measurements.add("mainFrameMs", cpuMs);
-        const stats = meter.record(
+        if (debug) runtime.current?.terrain.measurements.add("mainFrameMs", cpuMs);
+        const stats = meter?.record(
           end,
           cpuMs,
           drawn,
@@ -278,7 +263,6 @@ export function ValidationScene({
           onPerformance(stats);
         }
       }
-      performanceRecorder.record(now, scheduled, cpuMs, drawn, gl.info.render.calls, gl.info.render.triangles);
       id = requestAnimationFrame(frame);
     };
     id = requestAnimationFrame(frame);

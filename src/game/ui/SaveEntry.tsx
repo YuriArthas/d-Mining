@@ -20,7 +20,7 @@ export function SaveEntry({
 }) {
   const [game, setGame] = useState<SavedGame | null>(null);
   const [error, setError] = useState<string | null>(null),
-    [message, setMessage] = useState(tr('正在读取存档'));
+    [message, setMessage] = useState(tr("msg.reading_your_save"));
   const [attempt, setAttempt] = useState(0);
   // StrictMode cleanup/retry waits for the previous bootstrap to release ownership.
   const cleanup = useRef<Promise<unknown>>(Promise.resolve());
@@ -83,11 +83,11 @@ export function SaveEntry({
     <main className="game-shell" onContextMenu={(e) => e.preventDefault()}>
       <section className="save-boot" role={error ? "alert" : "status"}>
         <span className="save-boot-mark ui-outline">MINING</span>
-        <h2 className="ui-outline">{error ? tr('暂时无法读取进度') : message}</h2>
+        <h2 className="ui-outline">{error ? tr("msg.couldn_t_read_your_progress_right_now") : message}</h2>
         {error && <p className="save-boot-error">{error}</p>}
         <div className="save-boot-actions">
-          {error && <UiButton size="m" tone="orange" onPress={() => setAttempt((n) => n + 1)}>{tr('重试')}</UiButton>}
-          <UiButton size="m" tone="steel" onPress={() => location.replace(new URL("../../", location.href).href)}>{tr('返回游戏列表')}</UiButton>
+          {error && <UiButton size="m" tone="orange" onPress={() => setAttempt((n) => n + 1)}>{tr("msg.retry")}</UiButton>}
+          <UiButton size="m" tone="steel" onPress={() => location.replace(new URL("../../", location.href).href)}>{tr("msg.back_to_the_game_list")}</UiButton>
         </div>
       </section>
     </main>

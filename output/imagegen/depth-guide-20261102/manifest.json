@@ -1,0 +1,48 @@
+{
+  "model": "gpt-image-2.5",
+  "mode": "authorized imagegen CLI API",
+  "prompt": "prompt.txt",
+  "sourceSha256": "cc755e2aca28b285f45237e4ff3246de57d516254719648c31c134d0f2cabf5d",
+  "assets": [
+    {
+      "path": "src/game/assets/hud/depth-chest.webp",
+      "size": [
+        96,
+        96
+      ],
+      "sha256": "886621079f1938f4b903867fb1526ab80c89271157d87f2d5a60c45aa94793cb"
+    },
+    {
+      "path": "src/game/assets/hud/depth-coin.webp",
+      "size": [
+        96,
+        96
+      ],
+      "sha256": "ab83a3c36167b04dabaf9fe4b8ae66b42bc7daebdc7428743af7392196f0b3e8"
+    },
+    {
+      "path": "src/game/assets/hud/depth-crystal.webp",
+      "size": [
+        96,
+        96
+      ],
+      "sha256": "2480b493d0eb36f0d8cc4817d63afecce151a954d48255ce7f22e41eca6f8b62"
+    },
+    {
+      "path": "src/game/assets/hud/depth-ember.webp",
+      "size": [
+        96,
+        96
+      ],
+      "sha256": "fc5118de0e8e1c966004f328a7fdb0b7c63e03fa6d641a6623611f153591e2ca"
+    },
+    {
+      "path": "src/game/assets/hud/depth-amethyst.webp",
+      "size": [
+        96,
+        96
+      ],
+      "sha256": "7a1d47cabdd920b8118bff744e8dac133ad1caff3cf2b5ab97cf8e9cbe8d753f"
+    }
+  ]
+}

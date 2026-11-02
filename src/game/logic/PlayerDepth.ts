@@ -34,7 +34,8 @@ export function playerDepthAtFeet(feet: readonly number[], grounded: boolean, de
 }
 
 // A room keeps its theme throughout its volume, including during a jump.
-// This visual depth must never be used to grant progression or travel access.
+// This visual depth must never be used to grant progression or travel to a place not reached; Sell uses it only to
+// pick the counter of the hall the player is already inside.
 export function environmentDepthAtFeet(feet: readonly number[], grounded: boolean, destinations: readonly DepthDestination[]) {
   let depth = playerDepthAtFeet(feet, grounded, destinations);
   for (const destination of destinations) {

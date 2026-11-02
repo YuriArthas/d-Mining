@@ -1,3 +1,4 @@
+import { resolveText } from '../../src/game/i18n/i18n.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { PetCatalog } from '../../src/game/logic/pets/PetCatalog.ts';
@@ -29,7 +30,7 @@ const setup = (coins = 100, overrides = {}) => {
 test('pet catalog validates references and owns immutable copies of content', () => {
   const input = structuredClone(PET_CONTENT), catalog = new PetCatalog(input);
   input.eggs[0].outcomes[0].weight = 0; input.pets[0].name = 'changed';
-  assert.equal(catalog.pet('moss-slime').name, '苔团');
+  assert.equal(resolveText(catalog.pet('moss-slime').name), '苔团');
   assert.equal(catalog.egg('meadow-egg').outcomes[0].weight, 40);
   assert.throws(() => { catalog.egg('meadow-egg').outcomes[0].weight = 4; });
   for (const mutate of [
@@ -188,7 +189,7 @@ test('UI adapter publishes coherent snapshots, filters unrelated frames, release
 
 test('equipped pets raise what ore sells for in their currency and mine faster in every world', () => {
   let now = 0, serial = 0;
-  const session = new GameSession(SESSION_CONTENT, 50, () => now, { random: () => 0, createPetId: () => `p${++serial}` });
+  const session = new GameSession(SESSION_CONTENT, 25, () => now, { random: () => 0, createPetId: () => `p${++serial}` });
   // The surface layer's plain rock (its cap, kind 65, takes part of the first pickaxe's damage).
   session.attach({ cell: () => 64, pending: () => false, mine: () => true, cancelMining() {} });
   goToEgg(session);

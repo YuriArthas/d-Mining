@@ -1,3 +1,4 @@
+import type { TextRef } from "../i18n/messages.ts";
 import type { PetContent } from "../logic/pets/types.ts";
 import type { ZoneConfig } from "../logic/ZoneDetector.ts";
 import type { Coord } from "../terrain/SparseWorld.ts";
@@ -12,7 +13,7 @@ export type EggStation = Readonly<{
 export type Destination = Readonly<{
   worldId: import('../content/worldJourney.ts').WorldId;
   id: string;
-  name: string;
+  name: TextRef;
   depth: number;
   /** The layer's look (themes.ts), which also colours its card. */
   theme?: string;

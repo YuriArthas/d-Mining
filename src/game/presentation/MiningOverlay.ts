@@ -5,7 +5,7 @@ import { SALE_FLIGHT, saleCoinCount, saleLanding } from './saleFlight.ts';
 
 import { tr } from '../i18n/i18n.ts';
 /** What the session says about the block under the pick (GameSession snapshot `target`). */
-export type OverlayTarget = Readonly<{ key: string; name: string; hp: number; maximum: number; price: number; requiredLevel: number; locked: boolean }>;
+export type OverlayTarget = Readonly<{ key: string; name: string; hp: number; maximum: number; price: number; volume: number; requiredLevel: number; requiredToolName: string; locked: boolean }>;
 /** A swing that reached its block this frame (MiningFeedback): the damage it did, and whether it broke the block. */
 export type LandedHit = Readonly<{ cell: Coord; damage: number; final: boolean }>;
 type Refusal = 'locked' | 'full';
@@ -13,6 +13,7 @@ type Refusal = 'locked' | 'full';
 export type OverlayIcons = Readonly<{ currency(): string; lock: string; bag: string; ore(color: string): string }>;
 
 const PLATE_SECONDS = 1.5, MAX_NUMBERS = 6, NUMBER_MS = 700, FLY_MS = 480, FLY_GAP_MS = 160, TOP_CLEAR = 72, EDGE = 8;
+const escapeText = (text: string) => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 const keyOf = (cell: Coord) => cell.join(',');
 const SPREAD = [-26, 20, -8, 30, -20, 8];
 /** Stretches the overlay's timings (1 = normal) so screenshots on a slow renderer can catch them (debug only). */
@@ -35,6 +36,7 @@ export class MiningOverlay {
   private readonly plate: HTMLElement;
   private readonly plateName: HTMLElement;
   private readonly platePrice: HTMLElement;
+  private readonly plateVolume: HTMLElement;
   private readonly lag: HTMLElement;
   private readonly hp: HTMLElement;
   private readonly note: HTMLElement;
@@ -66,9 +68,10 @@ export class MiningOverlay {
     this.root = root; this.icons = icons;
     root.innerHTML = '';
     this.plate = el('div', 'mine-plate');
-    this.plate.innerHTML = '<div class="mine-plate-head"><b></b><span class="mine-plate-price"></span></div><div class="mine-plate-bar"><i class="mine-plate-lag"></i><i class="mine-plate-hp"></i></div><div class="mine-plate-note"></div>';
+    this.plate.innerHTML = '<div class="mine-plate-head"><b></b><span class="mine-plate-price"></span></div><div class="mine-plate-volume"></div><div class="mine-plate-bar"><i class="mine-plate-lag"></i><i class="mine-plate-hp"></i></div><div class="mine-plate-note"></div>';
     this.plateName = this.plate.querySelector('b')!;
     this.platePrice = this.plate.querySelector('.mine-plate-price')!;
+    this.plateVolume = this.plate.querySelector('.mine-plate-volume')!;
     this.lag = this.plate.querySelector('.mine-plate-lag')!;
     this.hp = this.plate.querySelector('.mine-plate-hp')!;
     this.note = this.plate.querySelector('.mine-plate-note')!;
@@ -108,7 +111,7 @@ export class MiningOverlay {
       run.onfinish = () => { fly.remove(); bounce(bag!); };
     } else if (bag) bounce(bag);
     // Two kinds at most; a wide break names the first two and says there was more.
-    this.chip.textContent = items.slice(0, 2).map(i => `+${i.count} ${i.name}${i.note ? ` · ${i.note}` : ''}`).join('  ') + (items.length > 2 ? tr(' 等') : '');
+    this.chip.textContent = items.slice(0, 2).map(i => `+${i.count} ${i.name}${i.note ? ` · ${i.note}` : ''}`).join('  ') + (items.length > 2 ? tr("msg.more") : '');
     if (target) { this.chip.style.left = `${target.left - box.left}px`; this.chip.style.top = `${target.bottom - box.top + 6}px`; }
     this.chip.classList.remove('mine-chip-in'); void this.chip.offsetWidth; this.chip.classList.add('mine-chip-in');
     clearTimeout(this.chipTimer);
@@ -139,13 +142,14 @@ export class MiningOverlay {
     const info = this.seen?.key === keyOf(this.cell) ? this.seen : null;
     if (info) {
       this.write(this.plateName, info.name, 'text');
+      this.write(this.plateVolume, `${this.icons.bag}<span>${escapeText(tr('msg.block_capacity', { volume: formatNumber(info.volume) }))}</span>`);
       this.write(this.platePrice, `${this.icons.currency()}<i class="ui-num">${formatNumber(info.price)}</i>`);
     }
     const locked = this.refusal === 'locked' || !!info?.locked;
     const state = this.broken ? 'broken' : locked ? 'locked' : this.refusal === 'full' ? 'full' : 'hit';
     if (this.shown.get('state') !== state) { this.shown.set('state', state); this.plate.dataset.state = state; }
-    this.write(this.note, state === 'locked' ? `${this.icons.lock}<span>${tr('需要 Lv.{level} 镐子', { level: info?.requiredLevel ?? '' })}</span>`
-      : state === 'full' ? `${this.icons.bag}<span>${tr('背包满了，去出售')}</span>` : '');
+    this.write(this.note, state === 'locked' ? `${this.icons.lock}<span>${escapeText(tr("msg.needs_named_pickaxe", { name: info?.requiredToolName ?? '' }))}</span>`
+      : state === 'full' ? `${this.icons.bag}<span>${tr("msg.bag_full_go_sell")}</span>` : '');
     const ratio = `${(Math.max(0, Math.min(1, this.shownHp / Math.max(1, this.shownMax))) * 100).toFixed(1)}%`;
     if (this.shown.get('ratio') !== ratio) { this.shown.set('ratio', ratio); this.hp.style.width = ratio; this.lag.style.width = ratio; }
     if (!this.size || this.shown.get('size') !== `${state}|${this.plateName.textContent}`) {

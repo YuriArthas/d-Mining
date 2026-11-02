@@ -18,7 +18,7 @@ import './bag.css';
 import { currencyIcon, currencyName } from '../currency.ts';
 import { WORLD_REQUIREMENTS } from '../../content/worldJourney.ts';
 
-import { tr } from '../../i18n/i18n.ts';
+import { tr , resolveText } from '../../i18n/i18n.ts';
 const WORLD_OF = Object.fromEntries(WORLD_REQUIREMENTS.map(w => [w.currency, w])) as Record<CurrencyId, (typeof WORLD_REQUIREMENTS)[number]>;
 
 export type BagTab = 'pets' | 'ores' | 'gear';
@@ -37,12 +37,12 @@ export function teamCanImprove(pets: PetPanelSnapshot) {
 export function BagSheet(props: Props) {
   const pets = useSyncExternalStore(props.session.pets.subscribe, props.session.pets.getSnapshot);
   const tabs: SheetTab<BagTab>[] = [
-    { id: 'pets', label: tr('宠物'), icon: 'paw', badge: teamCanImprove(pets) ? '!' : undefined },
-    { id: 'ores', label: tr('矿物'), icon: 'gem' },
-    { id: 'gear', label: tr('装备§gear'), icon: 'pickaxe' },
+    { id: 'pets', label: tr("msg.pets"), icon: 'paw', badge: teamCanImprove(pets) ? '!' : undefined },
+    { id: 'ores', label: tr("msg.ores"), icon: 'gem' },
+    { id: 'gear', label: tr("msg.gear"), icon: 'pickaxe' },
   ];
   // The title names the open tab: “背包” is already the bag capacity, a shop counter and an item.
-  const common = { title: { pets: tr('宠物'), ores: tr('矿物'), gear: tr('装备§gear') }[props.tab], tabs, tab: props.tab, onTab: props.onTab, onClose: props.onClose, className: `bag-sheet bag-tab-${props.tab}` };
+  const common = { title: { pets: tr("msg.pets"), ores: tr("msg.ores"), gear: tr("msg.gear") }[props.tab], tabs, tab: props.tab, onTab: props.onTab, onClose: props.onClose, className: `bag-sheet bag-tab-${props.tab}` };
   if (props.tab === 'ores') return <OresTab {...props} common={common} />;
   if (props.tab === 'gear') return <GearTab {...props} common={common} />;
   return <PetsTab {...props} pets={pets} common={common} />;
@@ -71,58 +71,58 @@ function PetsTab({ session, pets, common, onClose }: Props & { pets: PetPanelSna
   if (finding) return <EggFinder session={session} pets={pets} common={common} onBack={() => setFinding(false)} onClose={onClose} />;
   const buySlot = () => {
     const result = session.buyPetSlot(pets.slots.length);
-    const text = result.status === 'bought' ? tr('第 {slots} 格开放了，可以多带一只宠物', { slots: result.slots }) : result.status === 'insufficient' ? '' : result.status === 'locked' ? tr('到达{unlockName}后才能买', { unlockName: slot?.unlockName }) : tr('请稍后再试');
+    const text = result.status === 'bought' ? tr("msg.slot_slots_is_open_you_can_bring_one_more_pet", { slots: result.slots }) : result.status === 'insufficient' ? '' : result.status === 'locked' ? tr("msg.reach_unlockname_to_buy", { unlockName: slot!.unlockName }) : tr("msg.please_try_again_in_a_moment");
     if (text) toast(text);
   };
   const merge = (card: PetCardView) => {
     const result = session.pets.mergeGolden(card.pet.speciesId);
-    if (result.status === 'merged') { setSelectedId(result.pet.id); toast(tr('{goldenNeed} 只{name}合成了金色{name2}！', { goldenNeed: pets.goldenNeed, name: card.name, name2: card.name })); }
-    else toast(tr('需要 {goldenNeed} 只一样的普通{name}', { goldenNeed: pets.goldenNeed, name: card.name }));
+    if (result.status === 'merged') { setSelectedId(result.pet.id); toast(tr("msg.goldenneed_name_merged_into_a_golden_name2", { goldenNeed: pets.goldenNeed, name: card.name, name2: card.name })); }
+    else toast(tr("msg.needs_goldenneed_identical_regular_name", { goldenNeed: pets.goldenNeed, name: card.name }));
   };
   const toggle = (card: PetCardView) => {
-    if (card.equippedSlot !== null) { session.pets.unequip(card.pet.id); toast(tr('已卸下 {name}', { name: card.name })); return; }
+    if (card.equippedSlot !== null) { session.pets.unequip(card.pet.id); toast(tr("msg.unequipped_name", { name: card.name })); return; }
     const result = session.pets.equip(card.pet.id);
-    toast(result.status === 'equipped' ? tr('已装备 {name}', { name: card.name }) : result.status === 'full' ? tr('栏位满了：先卸下一只，或点一键最佳') : tr('这只宠物已不在背包里'));
+    toast(result.status === 'equipped' ? tr("msg.equipped_name", { name: card.name }) : result.status === 'full' ? tr("msg.slots_full_unequip_one_first_or_tap_equip_best") : tr("msg.this_pet_is_no_longer_in_your_bag"));
   };
   const byId = new Map(cards.map(card => [card.pet.id, card]));
   // A species ready for a golden merge is marked once, on its first card.
   const mergeMarked = new Set<string>();
-  const team = <section className="bag-team" aria-label={tr('出战队伍')}>
-    <div className="bag-slots" role="list" aria-label={tr('栏位 {equipped} / {slots}', { equipped: equipped, slots: pets.slots.length })}>
+  const team = <section className="bag-team" aria-label={tr("msg.your_team")}>
+    <div className="bag-slots" role="list" aria-label={tr("msg.slots_equipped_slots", { equipped: equipped, slots: pets.slots.length })}>
       {pets.slots.map((id, i) => {
         const card = id ? byId.get(id) : undefined;
         return <GameButton key={i} role="listitem" className="bag-slot" data-rarity={card?.rarity} data-empty={card ? undefined : ''} blurAfterPress={false}
-          aria-label={card ? tr('第 {i} 格：{name}', { i: i + 1, name: card.name }) : tr('第 {i} 格：空', { i: i + 1 })}
-          onPress={() => card ? setSelectedId(card.pet.id) : toast(tr('选一只宠物，再点「装备」'))}>
+          aria-label={card ? tr("msg.slot_i_name", { i: i + 1, name: card.name }) : tr("msg.slot_i_empty", { i: i + 1 })}
+          onPress={() => card ? setSelectedId(card.pet.id) : toast(tr("msg.pick_a_pet_then_tap_equip"))}>
           {card ? <PetArt speciesId={card.pet.speciesId} rarity={card.rarity} className="bag-slot-art" /> : <Icon kind="plus" />}
         </GameButton>;
       })}
       {slot && (slot.unlocked
-        ? <PriceButton verb={tr('第 {slot} 格', { slot: slot.slot })} price={number(slot.price)} currency={currencyIcon(slot.currency)} size="s" disabled={!slot.canAfford} className="bag-buy-slot"
-            aria-label={tr('购买第 {slot} 格，{price} {currency}', { slot: slot.slot, price: number(slot.price), currency: currencyName(slot.currency) })} onPress={buySlot} />
-        : <GameButton className="bag-slot" data-locked="" aria-label={tr('第 {slot} 格，到达{unlockName}解锁', { slot: slot.slot, unlockName: slot.unlockName })} blurAfterPress={false}
-            onPress={() => toast(tr('到达{unlockName}解锁第 {slot} 格', { unlockName: slot.unlockName, slot: slot.slot }))}><Icon kind="lock" /></GameButton>)}
+        ? <PriceButton verb={tr("msg.slot_slot", { slot: slot.slot })} price={number(slot.price)} currency={currencyIcon(slot.currency)} size="s" disabled={!slot.canAfford} className="bag-buy-slot"
+            aria-label={tr("msg.buy_slot_slot_price_currency", { slot: slot.slot, price: number(slot.price), currency: currencyName(slot.currency) })} onPress={buySlot} />
+        : <GameButton className="bag-slot" data-locked="" aria-label={tr("msg.slot_slot_unlocks_at_unlockname", { slot: slot.slot, unlockName: slot.unlockName })} blurAfterPress={false}
+            onPress={() => toast(tr("msg.reach_unlockname_to_unlock_slot_slot", { unlockName: slot.unlockName, slot: slot.slot }))}><Icon kind="lock" /></GameButton>)}
     </div>
-    <div className="bag-totals" aria-label={tr('队伍总加成')}>
+    <div className="bag-totals" aria-label={tr("msg.team_total_bonus")}>
       <span><Icon kind={currencyIcon(pets.currency)} /><b className="ui-num">{bonusLabel(pets.bonus[pets.currency])}</b></span>
-      <span><Icon kind="pickaxe" /><b className="ui-num">{tr('挖矿 {bonus}', { bonus: bonusLabel(pets.bonus.mining) })}</b></span>
+      <span><Icon kind="pickaxe" /><b className="ui-num">{tr("msg.mining_bonus", { bonus: bonusLabel(pets.bonus.mining) })}</b></span>
     </div>
     <span className="ui-grow" />
-    <UiButton size="s" tone="white" disabled={!equipped} onPress={() => { session.pets.unequipAll(); toast(tr('已卸下全部宠物')); }}>{tr('全部卸下')}</UiButton>
-    <UiButton size="s" tone="orange" className="bag-equip-best" data-better={better || undefined} onPress={() => { session.pets.equipBest(); toast(tr('已装备最强的宠物')); }}>
-      {tr('一键最佳')}{better && <b className="ui-badge ui-outline">!</b>}
+    <UiButton size="s" tone="white" disabled={!equipped} onPress={() => { session.pets.unequipAll(); toast(tr("msg.all_pets_unequipped")); }}>{tr("msg.unequip_all")}</UiButton>
+    <UiButton size="s" tone="orange" className="bag-equip-best" data-better={better || undefined} onPress={() => { session.pets.equipBest(); toast(tr("msg.strongest_pets_equipped")); }}>
+      {tr("msg.equip_best")}{better && <b className="ui-badge ui-outline">!</b>}
     </UiButton>
   </section>;
   return <Sheet {...common}>
     {team}
     <div className="bag-pets">
-      <div className="ui-grid bag-pet-grid" role="list" aria-label={tr('宠物')}>
+      <div className="ui-grid bag-pet-grid" role="list" aria-label={tr("msg.pets")}>
         {cards.map(card => {
           const ready = !card.golden && card.mergeable >= pets.goldenNeed && !mergeMarked.has(card.pet.speciesId);
           if (ready) mergeMarked.add(card.pet.speciesId);
           return <GameButton key={card.pet.id} role="listitem" className="ui-cell" data-rarity={card.rarity}
             data-equipped={card.equippedSlot !== null ? '' : undefined} data-golden={card.golden ? '' : undefined} aria-pressed={card.pet.id === selected?.pet.id} blurAfterPress={false}
-            aria-label={tr('{name}，{income}，挖矿 {mining}，{state}', { name: card.name, income: bonusLabel(card.bonusPct, card.currency), mining: bonusLabel(card.miningPct), state: card.equippedSlot === null ? tr('未装备') : tr('已装备') })}
+            aria-label={tr("msg.name_income_mining_mining_state", { name: card.name, income: bonusLabel(card.bonusPct, card.currency), mining: bonusLabel(card.miningPct), state: card.equippedSlot === null ? tr("msg.not_equipped") : tr("msg.equipped_a68821c6") })}
             onPress={() => setSelectedId(card.pet.id)}>
             <PetArt speciesId={card.pet.speciesId} rarity={card.rarity} /><span className="ui-cell-name ui-outline">{card.name}</span>
             <span className="ui-cell-stat ui-outline"><Icon kind={currencyIcon(card.currency)} className="ui-icon ui-cell-currency" />{bonusLabel(card.bonusPct)}</span>
@@ -130,26 +130,26 @@ function PetsTab({ session, pets, common, onClose }: Props & { pets: PetPanelSna
             {ready && <i className="bag-merge-ready" aria-hidden="true">{pets.goldenNeed}/{pets.goldenNeed}</i>}
           </GameButton>;
         })}
-        <GameButton className="ui-cell bag-get" aria-label={tr('获取宠物')} onPress={() => setFinding(true)}>
-          <EggArt className="bag-get-art" /><span className="ui-cell-name">{tr('获取宠物')}</span><Icon kind="plus" className="ui-icon bag-get-plus" />
+        <GameButton className="ui-cell bag-get" aria-label={tr("msg.get_pets")} onPress={() => setFinding(true)}>
+          <EggArt className="bag-get-art" /><span className="ui-cell-name">{tr("msg.get_pets")}</span><Icon kind="plus" className="ui-icon bag-get-plus" />
         </GameButton>
       </div>
-      {selected ? <aside className="ui-detail bag-detail" data-rarity={selected.rarity} data-golden={selected.golden ? '' : undefined} aria-label={tr('宠物详情')}>
+      {selected ? <aside className="ui-detail bag-detail" data-rarity={selected.rarity} data-golden={selected.golden ? '' : undefined} aria-label={tr("msg.pet_details")}>
         <div className="bag-detail-head">
           <PetArt speciesId={selected.pet.speciesId} rarity={selected.rarity} className="bag-detail-art" />
           <div><RarityTag rarity={selected.rarity} /><h3 className="ui-outline">{selected.name}</h3></div>
         </div>
-        <div className="ui-stat"><span><Icon kind={currencyIcon(selected.currency)} />{tr('{currency}收入', { currency: currencyName(selected.currency) })}</span><b>{bonusLabel(selected.bonusPct)}</b></div>
-        <div className="ui-stat"><span><Icon kind="pickaxe" />{tr('挖矿速度')}</span><b>{bonusLabel(selected.miningPct)}</b></div>
-        {selected.currency !== pets.currency && <small className="bag-detail-note">{tr('在{world}加收入', { world: WORLD_OF[selected.currency].name })}</small>}
+        <div className="ui-stat"><span><Icon kind={currencyIcon(selected.currency)} />{tr("msg.currency_income", { currency: currencyName(selected.currency) })}</span><b>{bonusLabel(selected.bonusPct)}</b></div>
+        <div className="ui-stat"><span><Icon kind="pickaxe" />{tr("msg.mining_speed")}</span><b>{bonusLabel(selected.miningPct)}</b></div>
+        {selected.currency !== pets.currency && <small className="bag-detail-note">{tr("msg.adds_income_in_world", { world: WORLD_OF[selected.currency].name })}</small>}
         {!selected.golden && (selected.mergeable >= pets.goldenNeed
-          ? <UiButton size="s" tone="gold" className="bag-merge" aria-label={tr('合成金色{name}，已有 {mergeable} / {goldenNeed}', { name: selected.name, mergeable: selected.mergeable, goldenNeed: pets.goldenNeed })} onPress={() => merge(selected)}>{tr('合成金色 {n}/{n}', { n: pets.goldenNeed })}</UiButton>
-          : <div className="bag-golden" aria-label={tr('金色 {have}/{need}', { have: selected.mergeable, need: pets.goldenNeed })}><Bar value={selected.mergeable} max={pets.goldenNeed} tone="gold" size="s">{tr('金色 {have}/{need}', { have: selected.mergeable, need: pets.goldenNeed })}</Bar></div>)}
-        <UiButton size="s" tone={selected.equippedSlot !== null ? 'white' : 'green'} className="bag-equip" onPress={() => toggle(selected)}>{selected.equippedSlot !== null ? tr('卸下') : tr('装备')}</UiButton>
-      </aside> : <aside className="ui-detail bag-detail bag-detail-empty" aria-label={tr('宠物详情')}>
-        <PetArt speciesId="moss-slime" className="bag-detail-art" /><h3 className="ui-outline">{tr('还没有宠物')}</h3>
-        <small className="bag-detail-note">{tr('去蛋台开蛋，装备后一起挖矿')}</small>
-        <UiButton size="m" tone="green" icon="paw" className="bag-equip" onPress={() => setFinding(true)}>{tr('去开蛋')}</UiButton>
+          ? <UiButton size="s" tone="gold" className="bag-merge" aria-label={tr("msg.make_golden_name_have_mergeable_goldenneed", { name: selected.name, mergeable: selected.mergeable, goldenNeed: pets.goldenNeed })} onPress={() => merge(selected)}>{tr("msg.make_golden_n_n", { n: pets.goldenNeed })}</UiButton>
+          : <div className="bag-golden" aria-label={tr("msg.golden_have_need", { have: selected.mergeable, need: pets.goldenNeed })}><Bar value={selected.mergeable} max={pets.goldenNeed} tone="gold" size="s">{tr("msg.golden_have_need", { have: selected.mergeable, need: pets.goldenNeed })}</Bar></div>)}
+        <UiButton size="s" tone={selected.equippedSlot !== null ? 'white' : 'green'} className="bag-equip" onPress={() => toggle(selected)}>{selected.equippedSlot !== null ? tr("msg.unequip") : tr("msg.equip")}</UiButton>
+      </aside> : <aside className="ui-detail bag-detail bag-detail-empty" aria-label={tr("msg.pet_details")}>
+        <PetArt speciesId="moss-slime" className="bag-detail-art" /><h3 className="ui-outline">{tr("msg.no_pets_yet")}</h3>
+        <small className="bag-detail-note">{tr("msg.hatch_eggs_at_the_stands_then_equip_pets_to_mine_together")}</small>
+        <UiButton size="m" tone="green" icon="paw" className="bag-equip" onPress={() => setFinding(true)}>{tr("msg.hatch_eggs")}</UiButton>
       </aside>}
     </div>
     {toastView}
@@ -165,10 +165,10 @@ function EggFinder({ session, pets, common, onBack, onClose }: { session: GameSe
   const eggs = pets.eggs.filter(egg => egg.currency === world);
   return <Sheet {...common} className={`${common.className} bag-finder`}>
     <div className="bag-finder-bar">
-      <UiButton size="s" tone="white" onPress={onBack}>{tr('返回宠物')}</UiButton>
-      {open.length > 1 && <div className="ui-seg" role="group" aria-label={tr('世界')}>{open.map(w =>
+      <UiButton size="s" tone="white" onPress={onBack}>{tr("msg.back_to_pets")}</UiButton>
+      {open.length > 1 && <div className="ui-seg" role="group" aria-label={tr("msg.worlds")}>{open.map(w =>
         <button key={w.id} type="button" aria-pressed={w.currency === world} onClick={() => setWorld(w.currency)}>{w.name}</button>)}</div>}
-      <span className="ui-hint ui-grow">{tr('点「前往」传送到蛋台，靠近后看概率、开蛋')}</span>
+      <span className="ui-hint ui-grow">{tr("msg.tap_go_to_teleport_to_a_stand_walk_up_to_see_the_odds_and_ha")}</span>
     </div>
     {/* The whole card is the button (it travels to the stand); a locked egg is a plain card saying where it unlocks. */}
     <div className="bag-eggs" data-count={eggs.length}>{eggs.map(egg => {
@@ -176,11 +176,11 @@ function EggFinder({ session, pets, common, onBack, onClose }: { session: GameSe
         <EggArt className="bag-egg-art" eggId={egg.id} locked={!egg.unlocked} />
         <b className="bag-egg-name">{egg.unlocked ? egg.name : MYSTERY_EGG_NAME}</b>
         <span className="bag-egg-price"><Icon kind={currencyIcon(egg.currency)} /><b className="ui-num">{number(egg.price)}</b></span>
-        <span className="bag-egg-go">{egg.unlocked ? tr('前往') : tr('到达{unlockName}', { unlockName: egg.unlockName ?? tr('更深处') })}</span>
+        <span className="bag-egg-go">{egg.unlocked ? tr("msg.go") : tr("msg.reach_unlockname", { unlockName: egg.unlockName ?? tr("msg.deeper_down") })}</span>
       </>;
       return egg.unlocked
-        ? <GameButton key={egg.id} className="bag-egg" aria-label={tr('前往{name}蛋台', { name: egg.name })} onPress={() => { if (session.goTo({ egg: egg.id }) === 'travelling') onClose(); }}>{face}</GameButton>
-        : <div key={egg.id} className="bag-egg" data-locked="" aria-label={tr('{MYSTERY_EGG_NAME}，到达{unlockName}解锁', { MYSTERY_EGG_NAME: MYSTERY_EGG_NAME, unlockName: egg.unlockName ?? tr('更深处') })}>{face}</div>;
+        ? <GameButton key={egg.id} className="bag-egg" aria-label={tr("msg.go_to_the_name_stand", { name: egg.name })} onPress={() => { if (session.goTo({ egg: egg.id }) === 'travelling') onClose(); }}>{face}</GameButton>
+        : <div key={egg.id} className="bag-egg" data-locked="" aria-label={tr("msg.mystery_egg_name_unlocks_at_unlockname", { MYSTERY_EGG_NAME: MYSTERY_EGG_NAME, unlockName: egg.unlockName ?? tr("msg.deeper_down") })}>{face}</div>;
     })}</div>
   </Sheet>;
 }
@@ -196,20 +196,20 @@ function OresTab({ session, common, onClose }: Props & { common: Common }) {
   const ticketWorlds = state.worlds.filter(w => !w.open && w.materials.some(m => state.materials.some(s => s.itemId === m.itemId)));
   return <Sheet {...common}>
     <div className="bag-sell">
-      <div className="bag-capacity"><Bar value={bag.used} max={bag.capacity} tone={bag.isFull ? 'gold' : undefined}>{tr('背包 {used} / {capacity}', { used: number(bag.used), capacity: number(bag.capacity) })}</Bar></div>
-      <span className="bag-sell-value" aria-label={tr('可卖 {coins} {currency}', { coins: sale ? number(sale.coins) : 0, currency: currencyName(state.currency) })}>{tr('可卖')}<Icon kind={currencyIcon(state.currency)} /><b className="ui-num">{sale ? number(sale.coins) : 0}</b></span>
+      <div className="bag-capacity"><Bar value={bag.used} max={bag.capacity} tone={bag.isFull ? 'gold' : undefined}>{tr("msg.bag_used_capacity", { used: number(bag.used), capacity: number(bag.capacity) })}</Bar></div>
+      <span className="bag-sell-value" aria-label={tr("msg.sells_for_coins_currency", { coins: sale ? number(sale.coins) : 0, currency: currencyName(state.currency) })}>{tr("msg.sells_for")}<Icon kind={currencyIcon(state.currency)} /><b className="ui-num">{sale ? number(sale.coins) : 0}</b></span>
       {state.inSellZone
-        ? <UiButton size="s" tone="green" icon={currencyIcon(state.currency)} disabled={!sale?.count} onPress={() => { session.sellAvailable(); }}>{tr('全部出售')}</UiButton>
-        : <UiButton size="s" tone="green" icon={currencyIcon(state.currency)} disabled={!sale?.count} onPress={() => { if (session.goTo('sale') === 'travelling') onClose(); }}>{tr('传送出售')}</UiButton>}
+        ? <UiButton size="s" tone="green" icon={currencyIcon(state.currency)} disabled={!sale?.count} onPress={() => { session.sellAvailable(); }}>{tr("msg.sell_all")}</UiButton>
+        : <UiButton size="s" tone="green" icon={currencyIcon(state.currency)} disabled={!sale?.count} onPress={() => { if (session.goTo('sale') === 'travelling') onClose(); }}>{tr("msg.teleport_to_sell")}</UiButton>}
     </div>
     {/* Each mineral a ticket asks for, with its lock (the same as its cell's below): locked ones go into the store as
         they are dug (and what the bag holds of them moves in), never sold; unlocking puts them back in the bag to sell.
         Nothing is locked at first. */}
-    {state.materials.length > 0 && <section className="bag-ticket" aria-label={tr('材料仓')}>
-      <header><Icon kind="portal" /><b>{tr('材料仓')}</b><span>{tr('{worlds}门票要用 · 锁定的不会卖掉，挖到存进这里，不占背包', { worlds: ticketWorlds.map(w => w.name).join(tr('、')) })}</span></header>
+    {state.materials.length > 0 && <section className="bag-ticket" aria-label={tr("msg.material_store")}>
+      <header><Icon kind="portal" /><b>{tr("msg.material_store")}</b><span>{tr("msg.for_the_worlds_ticket_locked_ones_are_never_sold_and_go_here", { worlds: ticketWorlds.map(w => w.name).join(tr("msg.label")) })}</span></header>
       <div className="bag-ticket-items">{state.materials.map(m => <GameButton key={m.itemId} className="bag-ticket-item" data-done={m.stored >= m.needed ? '' : undefined}
-        aria-pressed={m.locked} aria-label={m.locked ? tr('{name} 已锁定 {stored}/{needed}，点一下解锁，存着的放回背包', { name: m.name, stored: m.stored, needed: m.needed })
-          : tr('{name} 没锁定，会卖掉，点一下锁定', { name: m.name })}
+        aria-pressed={m.locked} aria-label={m.locked ? tr("msg.name_locked_stored_needed_tap_to_unlock_and_put_the_stored_o", { name: m.name, stored: m.stored, needed: m.needed })
+          : tr("msg.name_not_locked_it_will_be_sold_tap_to_lock", { name: m.name })}
         onPress={() => { if (m.locked) session.unlockItem(m.itemId); else session.lockItem(m.itemId); }}>
         <Icon kind={m.locked ? 'lock' : 'unlock'} className="ui-icon bag-ticket-lock" />
         <OreIcon color={itemDefinition(m.itemId).color} className="bag-ticket-icon" /><span>{m.name}</span>
@@ -218,19 +218,20 @@ function OresTab({ session, common, onClose }: Props & { common: Common }) {
       </GameButton>)}</div>
     </section>}
     {/* Every cell is a lock toggle (2026-10-31: any ore, rock too): a locked kind stays in the bag when it sells. */}
-    {rows.length > 0 && <small className="ui-hint bag-ores-hint">{tr('点矿物锁定，出售时留下')}</small>}
-    {rows.length ? <div className="ui-grid bag-ores" aria-label={tr('矿物')}>{rows.map(row => {
+    {rows.length > 0 && <small className="ui-hint bag-ores-hint">{tr("msg.tap_an_ore_to_lock_it_and_keep_it_when_you_sell")}</small>}
+    {rows.length ? <div className="ui-grid bag-ores" aria-label={tr("msg.ores")}>{rows.map(row => {
       const locked = bag.locked.includes(row.id);
       return <GameButton key={row.id} className="ui-cell" aria-pressed={locked}
-        aria-label={locked ? tr('{name} {count} 个，已锁定，出售时留下；点一下解锁', { name: row.item.name, count: row.count })
-          : tr('{name} {count} 个，单价 {price}；点一下锁定', { name: row.item.name, count: row.count, price: row.item.price })}
+        aria-label={locked ? tr("msg.name_count_locked_kept_when_you_sell_tap_to_unlock", { name: row.item.name, count: row.count })
+          : tr("msg.name_count_price_each_tap_to_lock", { name: row.item.name, count: row.count, price: row.item.price })}
         onPress={() => { if (locked) session.unlockItem(row.id); else session.lockItem(row.id); }}>
-        <span className="ui-cell-name ui-outline">{row.item.name}</span><OreIcon color={row.item.color} className="bag-ore-art" />
+        <span className="ui-cell-name ui-outline">{resolveText(row.item.name)}</span><OreIcon color={row.item.color} className="bag-ore-art" />
         <Icon kind={locked ? 'lock' : 'unlock'} className="ui-icon bag-ore-lock" />
+        <span className="bag-ore-volume">{tr("msg.block_capacity", { volume: number(row.item.volume) })}</span>
         <span className="bag-ore-price"><Icon kind={currencyIcon(state.currency)} />{number(row.item.price)}</span>
         <span className="ui-cell-stat ui-outline">×{number(row.count)}</span>
       </GameButton>;
-    })}</div> : <div className="bag-empty"><Icon kind="pickaxe" className="ui-icon bag-empty-art" /><b>{tr('背包是空的')}</b><span className="ui-hint">{tr('下矿井挖矿，矿石会自动装进来')}</span></div>}
+    })}</div> : <div className="bag-empty"><Icon kind="pickaxe" className="ui-icon bag-empty-art" /><b>{tr("msg.your_bag_is_empty")}</b><span className="ui-hint">{tr("msg.go_mining_ore_goes_straight_into_your_bag")}</span></div>}
   </Sheet>;
 }
 
@@ -252,18 +253,18 @@ function GearTab({ session, common, onShop }: Props & { common: Common }) {
     const current = kind === 'tools' ? tool : bag, next = kind === 'tools' ? nextTool : nextBag;
     return <div className="ui-card-tile bag-gear" data-kind={kind}>
       <div className="bag-gear-art"><Icon kind={kind === 'tools' ? 'pickaxe' : 'backpack'} /><span className="bag-gear-level ui-num">Lv.{current.level}<small>/{kind === 'tools' ? tools.length : bags.length}</small></span></div>
-      <div className="bag-gear-info"><h4 className="ui-outline">{current.name}{kind === 'tools' && state.pickaxe.enhance ? ` +${state.pickaxe.enhance}` : ''}</h4>
-        {kind === 'tools' ? <><div className="ui-stat"><span>{tr('伤害')}</span><b>+{number(state.pickaxe.basePower)}</b></div><div className="ui-stat"><span>{tr('攻速')}</span><b>{tr('{n} 次/秒', { n: current.speed })}</b></div></>
-          : <><div className="ui-stat"><span>{tr('容量')}</span><b>{number(current.capacity!)}</b></div><div className="ui-stat"><span>{tr('已装')}</span><b>{number(state.inventory.used)}</b></div></>}
-        {next ? <div className="bag-gear-next"><small>{tr('下一件')} <b>{next.name}</b> · {kind === 'tools' ? tr('伤害 +{power}', { power: number(next.power!) }) : tr('容量 {capacity}', { capacity: number(next.capacity!) })}</small>
-          {soldAt(next).open ? <PriceButton verb={tr('去商店')} price={number(next.price)} currency={currencyIcon(next.currency)} size="s" tone="orange" onPress={() => onShop(kind)} />
-            : <span className="ui-hint bag-gear-where">{tr('{place}的商店有售', { place: soldAt(next).place })}</span>}</div>
-          : <span className="ui-stamp">{tr('已经是最好的了')}</span>}
+      <div className="bag-gear-info"><h4 className="ui-outline">{resolveText(current.name)}{kind === 'tools' && state.pickaxe.enhance ? ` +${state.pickaxe.enhance}` : ''}</h4>
+        {kind === 'tools' ? <><div className="ui-stat"><span>{tr("msg.damage")}</span><b>+{number(state.pickaxe.basePower)}</b></div><div className="ui-stat"><span>{tr("msg.speed")}</span><b>{tr("msg.n_s", { n: current.speed! })}</b></div></>
+          : <><div className="ui-stat"><span>{tr("msg.capacity")}</span><b>{number(current.capacity!)}</b></div><div className="ui-stat"><span>{tr("msg.carrying")}</span><b>{number(state.inventory.used)}</b></div></>}
+        {next ? <div className="bag-gear-next"><small>{tr("msg.next")} <b>{resolveText(next.name)}</b> · {kind === 'tools' ? tr("msg.damage_power", { power: number(next.power!) }) : tr("msg.capacity_capacity", { capacity: number(next.capacity!) })}</small>
+          {soldAt(next).open ? <PriceButton verb={tr("msg.to_shop")} price={number(next.price)} currency={currencyIcon(next.currency)} size="s" tone="orange" onPress={() => onShop(kind)} />
+            : <span className="ui-hint bag-gear-where">{tr("msg.sold_at_the_place_shop", { place: soldAt(next).place })}</span>}</div>
+          : <span className="ui-stamp">{tr("msg.already_the_best")}</span>}
       </div>
     </div>;
   };
   return <Sheet {...common}>
     <div className="bag-gears">{card('tools')}{card('backpacks')}</div>
-    <span className="ui-hint">{tr('买过的旧装备可以在商店免费换回。')}</span>
+    <span className="ui-hint">{tr("msg.gear_you_ve_bought_can_be_re_equipped_for_free_in_the_shop")}</span>
   </Sheet>;
 }

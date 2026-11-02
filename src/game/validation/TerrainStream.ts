@@ -5,7 +5,7 @@ import { Measurements, type WorkerFactory } from '../terrain/RegionPipeline.ts';
 type ExcavatedCell = Readonly<{ cell: Coord; kind: number }>;
 export class TerrainStream {
   readonly world: SparseWorld;
-  readonly measurements = new Measurements();
+  readonly measurements = new Measurements(new URLSearchParams(globalThis.location?.search ?? "").get("debug") === "1");
   readonly render: RenderTerrain;
   readonly collision: CollisionTerrain;
   private readonly waiting = new Map<string, Coord>();
@@ -79,6 +79,13 @@ export class TerrainStream {
   }
   /** Cells accepted for mining and not removed yet. */
   pendingCount() { return this.waiting.size + (this.transaction?.cells.length ?? 0); }
+  /** Reserve the actual volume of accepted cells until the atomic collection callback delivers them. */
+  pendingVolume(volume: (kind: number) => number) {
+    let used = 0;
+    for (const c of this.waiting.values()) used += volume(this.world.cell(c));
+    for (const c of this.transaction?.cells ?? []) used += volume(this.world.cell(c));
+    return used;
+  }
   pending(cell: Coord) { return this.waiting.has(chunkKey(cell)) || !!this.transaction?.cells.some(c => chunkKey(c) === chunkKey(cell)); }
   mine(cell: Coord) {
     return this.mineMany([cell]);
@@ -93,7 +100,7 @@ export class TerrainStream {
     }
     if (!unique.size || this.waiting.size + unique.size > 32) return false;
     const now = performance.now(), cells = [...unique.values()];
-    for (const cell of cells) { const key = chunkKey(cell); this.waiting.set(key, cell); this.acceptedAt.set(key, now); }
+    for (const cell of cells) { const key = chunkKey(cell); this.waiting.set(key, cell); if (this.measurements.enabled) this.acceptedAt.set(key, now); }
     this.groups.push(cells); return true;
   }
   cancelPending() {

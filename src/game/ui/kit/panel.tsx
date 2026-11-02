@@ -31,8 +31,8 @@ export function Sheet<T extends string>({ title, subtitle, size = 'l', tabs, tab
       className={`ui-sheet ui-panel ${className}`} data-size={size} data-tabs={!!tabs}>
       <h1 className="ui-sheet-title ui-outline">{title}</h1>
       {subtitle && <p className="ui-sheet-sub">{subtitle}</p>}
-      {onClose && <CloseButton className="ui-sheet-close" label={tr('关闭{label}', { label: label ?? title })} onPress={onClose} />}
-      {tabs && <nav className="ui-tabs" role="tablist" aria-label={tr('{title}分类', { title: title })}>{tabs.map(item =>
+      {onClose && <CloseButton className="ui-sheet-close" label={tr("msg.close_label", { label: label ?? title })} onPress={onClose} />}
+      {tabs && <nav className="ui-tabs" role="tablist" aria-label={tr("msg.title_categories", { title: title })}>{tabs.map(item =>
         <GameButton key={item.id} role="tab" className="ui-tab" data-long={item.label.length > 7 || undefined} aria-selected={item.id === tab} blurAfterPress={false} onPress={() => onTab?.(item.id)}>
           {typeof item.icon === 'string' ? <Icon kind={item.icon as IconKind} /> : item.icon}
           <span className="ui-outline">{item.label}</span>
@@ -58,7 +58,7 @@ export function Toggle({ on, label, onPress }: { on: boolean; label: string; onP
   return <GameButton className="ui-toggle" aria-pressed={on} blurAfterPress={false} onPress={onPress}><i aria-hidden="true" /><span className="ui-outline">{label}</span></GameButton>;
 }
 
-const RARITY_LABEL: Record<PetRarity, string> = { common: tr('普通'), rare: tr('稀有'), epic: tr('史诗'), legendary: tr('传说') };
+const RARITY_LABEL: Record<PetRarity, string> = { common: tr("msg.common"), rare: tr("msg.rare"), epic: tr("msg.epic"), legendary: tr("msg.legendary") };
 export function RarityTag({ rarity }: { rarity: PetRarity }) {
   return <span className="ui-rarity" data-rarity={rarity}>{RARITY_LABEL[rarity]}</span>;
 }

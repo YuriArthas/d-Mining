@@ -2,17 +2,17 @@
  "currencies": [
   {
    "id": "gold",
-   "name": "金币",
+   "name": "msg.gold_bbece6f8",
    "world": 1
   },
   {
    "id": "tech",
-   "name": "科技币",
+   "name": "msg.tech_coins",
    "world": 2
   },
   {
    "id": "star",
-   "name": "星晶",
+   "name": "msg.star_crystals",
    "world": 3
   }
  ],
@@ -32,7 +32,7 @@
    "currency": "tech",
    "ticket": {
     "currency": "gold",
-    "price": 6300000,
+    "price": 86000000,
     "toolLevel": 10,
     "materials": [
      {
@@ -61,7 +61,7 @@
    "currency": "star",
    "ticket": {
     "currency": "tech",
-    "price": 39000000,
+    "price": 610000000,
     "toolLevel": 20,
     "materials": [
      {
@@ -93,29 +93,33 @@
    "from": 0,
    "deepAt": 24,
    "gate": 1,
-   "oreChance": 0.18,
-   "capsuleCoins": 100,
+   "oreChance": 0.045,
+   "capsuleCoins": 70,
    "rock": {
     "itemId": "journey.rock.0",
     "hp": 20,
-    "price": 1
+    "price": 1,
+    "volume": 1
    },
    "deep": {
     "itemId": "journey.rock.0.deep",
     "hp": 230,
-    "price": 1
+    "price": 1,
+    "volume": 12
    },
    "ores": [
     {
      "itemId": "journey.coal",
      "hp": 40,
      "price": 3,
+     "volume": 1,
      "weight": 12
     },
     {
      "itemId": "journey.copper",
      "hp": 60,
      "price": 6,
+     "volume": 1,
      "weight": 10
     }
    ]
@@ -126,29 +130,33 @@
    "from": 60,
    "deepAt": 44,
    "gate": 2,
-   "oreChance": 0.197,
-   "capsuleCoins": 320,
+   "oreChance": 0.049,
+   "capsuleCoins": 200,
    "rock": {
     "itemId": "journey.rock.1",
     "hp": 75,
-    "price": 2
+    "price": 1,
+    "volume": 4
    },
    "deep": {
     "itemId": "journey.rock.1.deep",
     "hp": 430,
-    "price": 1
+    "price": 1,
+    "volume": 22
    },
    "ores": [
     {
      "itemId": "journey.iron",
      "hp": 150,
-     "price": 6,
+     "price": 9,
+     "volume": 1,
      "weight": 12
     },
     {
      "itemId": "journey.silver",
      "hp": 230,
-     "price": 12,
+     "price": 18,
+     "volume": 1,
      "weight": 10
     }
    ]
@@ -159,29 +167,33 @@
    "from": 140,
    "deepAt": 84,
    "gate": 3,
-   "oreChance": 0.213,
-   "capsuleCoins": 1000,
+   "oreChance": 0.0535,
+   "capsuleCoins": 790,
    "rock": {
     "itemId": "journey.rock.2",
     "hp": 120,
-    "price": 3
+    "price": 1,
+    "volume": 6
    },
    "deep": {
     "itemId": "journey.rock.2.deep",
     "hp": 1300,
-    "price": 1
+    "price": 1,
+    "volume": 65
    },
    "ores": [
     {
      "itemId": "journey.emerald",
      "hp": 240,
-     "price": 9,
+     "price": 27,
+     "volume": 1,
      "weight": 12
     },
     {
      "itemId": "journey.amber",
      "hp": 360,
-     "price": 18,
+     "price": 54,
+     "volume": 1,
      "weight": 10
     }
    ]
@@ -192,29 +204,33 @@
    "from": 260,
    "deepAt": 124,
    "gate": 5,
-   "oreChance": 0.23,
-   "capsuleCoins": 4800,
+   "oreChance": 0.0575,
+   "capsuleCoins": 6200,
    "rock": {
     "itemId": "journey.rock.3",
     "hp": 260,
-    "price": 5
+    "price": 1,
+    "volume": 13
    },
    "deep": {
     "itemId": "journey.rock.3.deep",
     "hp": 2400,
-    "price": 1
+    "price": 1,
+    "volume": 120
    },
    "ores": [
     {
      "itemId": "journey.crystal",
      "hp": 520,
-     "price": 15,
+     "price": 95,
+     "volume": 1,
      "weight": 12
     },
     {
      "itemId": "journey.amethyst",
      "hp": 780,
-     "price": 30,
+     "price": 190,
+     "volume": 1,
      "weight": 10
     }
    ]
@@ -225,29 +241,33 @@
    "from": 420,
    "deepAt": 164,
    "gate": 6,
-   "oreChance": 0.247,
-   "capsuleCoins": 25000,
+   "oreChance": 0.0615,
+   "capsuleCoins": 79000,
    "rock": {
     "itemId": "journey.rock.4",
     "hp": 380,
-    "price": 8
+    "price": 1,
+    "volume": 19
    },
    "deep": {
     "itemId": "journey.rock.4.deep",
     "hp": 7400,
-    "price": 2
+    "price": 1,
+    "volume": 370
    },
    "ores": [
     {
      "itemId": "journey.gold",
      "hp": 760,
-     "price": 24,
+     "price": 380,
+     "volume": 1,
      "weight": 12
     },
     {
      "itemId": "journey.ruby",
      "hp": 1100,
-     "price": 48,
+     "price": 760,
+     "volume": 1,
      "weight": 10
     }
    ]
@@ -258,29 +278,33 @@
    "from": 620,
    "deepAt": 204,
    "gate": 8,
-   "oreChance": 0.263,
-   "capsuleCoins": 120000,
+   "oreChance": 0.066,
+   "capsuleCoins": 1200000,
    "rock": {
     "itemId": "journey.rock.5",
     "hp": 850,
-    "price": 12
+    "price": 1,
+    "volume": 43
    },
    "deep": {
     "itemId": "journey.rock.5.deep",
     "hp": 13000,
-    "price": 3
+    "price": 1,
+    "volume": 650
    },
    "ores": [
     {
      "itemId": "journey.diamond",
      "hp": 1700,
-     "price": 36,
+     "price": 1700,
+     "volume": 1,
      "weight": 12
     },
     {
      "itemId": "journey.sapphire",
      "hp": 2600,
-     "price": 72,
+     "price": 3400,
+     "volume": 1,
      "weight": 10
     }
    ]
@@ -291,29 +315,33 @@
    "from": 860,
    "deepAt": null,
    "gate": 9,
-   "oreChance": 0.28,
-   "capsuleCoins": 570000,
+   "oreChance": 0.07,
+   "capsuleCoins": 16000000,
    "rock": {
     "itemId": "journey.rock.6",
     "hp": 1300,
-    "price": 20
+    "price": 1,
+    "volume": 65
    },
    "deep": {
     "itemId": "journey.rock.6.deep",
     "hp": 6500,
-    "price": 5
+    "price": 1,
+    "volume": 330
    },
    "ores": [
     {
      "itemId": "journey.sulfur",
      "hp": 2600,
-     "price": 60,
+     "price": 8500,
+     "volume": 1,
      "weight": 12
     },
     {
      "itemId": "journey.obsidian",
      "hp": 3900,
-     "price": 120,
+     "price": 17000,
+     "volume": 1,
      "weight": 10
     }
    ]
@@ -324,29 +352,33 @@
    "from": 0,
    "deepAt": 364,
    "gate": 10,
-   "oreChance": 0.18,
-   "capsuleCoins": 140,
+   "oreChance": 0.045,
+   "capsuleCoins": 110,
    "rock": {
     "itemId": "journey.rock.7",
     "hp": 1900,
-    "price": 1
+    "price": 1,
+    "volume": 95
    },
    "deep": {
     "itemId": "journey.rock.7.deep",
     "hp": 29000,
-    "price": 1
+    "price": 1,
+    "volume": 1500
    },
    "ores": [
     {
      "itemId": "journey.tin",
      "hp": 3800,
      "price": 3,
+     "volume": 1,
      "weight": 12
     },
     {
      "itemId": "journey.nickel",
      "hp": 5700,
      "price": 6,
+     "volume": 1,
      "weight": 10
     }
    ]
@@ -357,29 +389,33 @@
    "from": 400,
    "deepAt": 364,
    "gate": 11,
-   "oreChance": 0.197,
-   "capsuleCoins": 820,
+   "oreChance": 0.049,
+   "capsuleCoins": 440,
    "rock": {
     "itemId": "journey.rock.8",
     "hp": 2900,
-    "price": 2
+    "price": 1,
+    "volume": 150
    },
    "deep": {
     "itemId": "journey.rock.8.deep",
     "hp": 43000,
-    "price": 1
+    "price": 1,
+    "volume": 2200
    },
    "ores": [
     {
      "itemId": "journey.cobalt",
      "hp": 5800,
-     "price": 6,
+     "price": 9,
+     "volume": 1,
      "weight": 12
     },
     {
      "itemId": "journey.zinc",
      "hp": 8700,
-     "price": 12,
+     "price": 18,
+     "volume": 1,
      "weight": 10
     }
    ]
@@ -390,29 +426,33 @@
    "from": 800,
    "deepAt": 364,
    "gate": 12,
-   "oreChance": 0.213,
-   "capsuleCoins": 2500,
+   "oreChance": 0.0535,
+   "capsuleCoins": 1900,
    "rock": {
     "itemId": "journey.rock.9",
     "hp": 4300,
-    "price": 3
+    "price": 1,
+    "volume": 220
    },
    "deep": {
     "itemId": "journey.rock.9.deep",
     "hp": 65000,
-    "price": 1
+    "price": 1,
+    "volume": 3300
    },
    "ores": [
     {
      "itemId": "journey.titanium",
      "hp": 8600,
-     "price": 9,
+     "price": 32,
+     "volume": 1,
      "weight": 12
     },
     {
      "itemId": "journey.chrome",
      "hp": 13000,
-     "price": 18,
+     "price": 64,
+     "volume": 1,
      "weight": 10
     }
    ]
@@ -423,29 +463,33 @@
    "from": 1200,
    "deepAt": 364,
    "gate": 13,
-   "oreChance": 0.23,
-   "capsuleCoins": 9200,
+   "oreChance": 0.0575,
+   "capsuleCoins": 14000,
    "rock": {
     "itemId": "journey.rock.10",
     "hp": 6500,
-    "price": 5
+    "price": 1,
+    "volume": 330
    },
    "deep": {
     "itemId": "journey.rock.10.deep",
     "hp": 95000,
-    "price": 1
+    "price": 1,
+    "volume": 4800
    },
    "ores": [
     {
      "itemId": "journey.fossil",
      "hp": 13000,
-     "price": 15,
+     "price": 130,
+     "volume": 1,
      "weight": 12
     },
     {
      "itemId": "journey.platinum",
      "hp": 20000,
-     "price": 30,
+     "price": 260,
+     "volume": 1,
      "weight": 10
     }
    ]
@@ -456,29 +500,33 @@
    "from": 1600,
    "deepAt": 364,
    "gate": 14,
-   "oreChance": 0.247,
-   "capsuleCoins": 36000,
+   "oreChance": 0.0615,
+   "capsuleCoins": 150000,
    "rock": {
     "itemId": "journey.rock.11",
     "hp": 9500,
-    "price": 8
+    "price": 1,
+    "volume": 480
    },
    "deep": {
     "itemId": "journey.rock.11.deep",
     "hp": 220000,
-    "price": 2
+    "price": 1,
+    "volume": 11000
    },
    "ores": [
     {
      "itemId": "journey.tourmaline",
      "hp": 19000,
-     "price": 24,
+     "price": 590,
+     "volume": 1,
      "weight": 12
     },
     {
      "itemId": "journey.zircon",
      "hp": 29000,
-     "price": 48,
+     "price": 1200,
+     "volume": 1,
      "weight": 10
     }
    ]
@@ -489,29 +537,33 @@
    "from": 2000,
    "deepAt": 364,
    "gate": 16,
-   "oreChance": 0.263,
-   "capsuleCoins": 140000,
+   "oreChance": 0.066,
+   "capsuleCoins": 2100000,
    "rock": {
     "itemId": "journey.rock.12",
     "hp": 22000,
-    "price": 12
+    "price": 1,
+    "volume": 1100
    },
    "deep": {
     "itemId": "journey.rock.12.deep",
     "hp": 500000,
-    "price": 3
+    "price": 1,
+    "volume": 25000
    },
    "ores": [
     {
      "itemId": "journey.aquamarine",
      "hp": 44000,
-     "price": 36,
+     "price": 3000,
+     "volume": 1,
      "weight": 12
     },
     {
      "itemId": "journey.opal",
      "hp": 66000,
-     "price": 72,
+     "price": 6000,
+     "volume": 1,
      "weight": 10
     }
    ]
@@ -522,29 +574,33 @@
    "from": 2400,
    "deepAt": null,
    "gate": 18,
-   "oreChance": 0.28,
-   "capsuleCoins": 520000,
+   "oreChance": 0.07,
+   "capsuleCoins": 29000000,
    "rock": {
     "itemId": "journey.rock.13",
     "hp": 50000,
-    "price": 20
+    "price": 1,
+    "volume": 2500
    },
    "deep": {
     "itemId": "journey.rock.13.deep",
     "hp": 250000,
-    "price": 5
+    "price": 1,
+    "volume": 13000
    },
    "ores": [
     {
      "itemId": "journey.iridium",
      "hp": 100000,
-     "price": 60,
+     "price": 18000,
+     "volume": 1,
      "weight": 12
     },
     {
      "itemId": "journey.energy",
      "hp": 150000,
-     "price": 120,
+     "price": 36000,
+     "volume": 1,
      "weight": 10
     }
    ]
@@ -555,29 +611,33 @@
    "from": 0,
    "deepAt": 364,
    "gate": 20,
-   "oreChance": 0.18,
-   "capsuleCoins": 140,
+   "oreChance": 0.045,
+   "capsuleCoins": 100,
    "rock": {
     "itemId": "journey.rock.14",
     "hp": 110000,
-    "price": 1
+    "price": 1,
+    "volume": 5500
    },
    "deep": {
     "itemId": "journey.rock.14.deep",
     "hp": 1700000,
-    "price": 1
+    "price": 1,
+    "volume": 85000
    },
    "ores": [
     {
      "itemId": "journey.stardust",
      "hp": 220000,
      "price": 3,
+     "volume": 1,
      "weight": 12
     },
     {
      "itemId": "journey.stargold",
      "hp": 330000,
      "price": 6,
+     "volume": 1,
      "weight": 10
     }
    ]
@@ -588,29 +648,33 @@
    "from": 400,
    "deepAt": 364,
    "gate": 21,
-   "oreChance": 0.197,
-   "capsuleCoins": 740,
+   "oreChance": 0.049,
+   "capsuleCoins": 460,
    "rock": {
     "itemId": "journey.rock.15",
     "hp": 170000,
-    "price": 2
+    "price": 1,
+    "volume": 8500
    },
    "deep": {
     "itemId": "journey.rock.15.deep",
     "hp": 2500000,
-    "price": 1
+    "price": 1,
+    "volume": 130000
    },
    "ores": [
     {
      "itemId": "journey.meteorite",
      "hp": 340000,
-     "price": 6,
+     "price": 11,
+     "volume": 1,
      "weight": 12
     },
     {
      "itemId": "journey.moonstone",
      "hp": 510000,
-     "price": 12,
+     "price": 22,
+     "volume": 1,
      "weight": 10
     }
    ]
@@ -621,29 +685,33 @@
    "from": 800,
    "deepAt": 364,
    "gate": 22,
-   "oreChance": 0.213,
+   "oreChance": 0.0535,
    "capsuleCoins": 2600,
    "rock": {
     "itemId": "journey.rock.16",
     "hp": 250000,
-    "price": 3
+    "price": 1,
+    "volume": 13000
    },
    "deep": {
     "itemId": "journey.rock.16.deep",
     "hp": 3800000,
-    "price": 1
+    "price": 1,
+    "volume": 190000
    },
    "ores": [
     {
      "itemId": "journey.brightcobalt",
      "hp": 500000,
-     "price": 9,
+     "price": 44,
+     "volume": 1,
      "weight": 12
     },
     {
      "itemId": "journey.brighttitanium",
      "hp": 750000,
-     "price": 18,
+     "price": 88,
+     "volume": 1,
      "weight": 10
     }
    ]
@@ -654,29 +722,33 @@
    "from": 1200,
    "deepAt": 364,
    "gate": 23,
-   "oreChance": 0.23,
-   "capsuleCoins": 8500,
+   "oreChance": 0.0575,
+   "capsuleCoins": 20000,
    "rock": {
     "itemId": "journey.rock.17",
     "hp": 380000,
-    "price": 5
+    "price": 1,
+    "volume": 19000
    },
    "deep": {
     "itemId": "journey.rock.17.deep",
     "hp": 5500000,
-    "price": 1
+    "price": 1,
+    "volume": 280000
    },
    "ores": [
     {
      "itemId": "journey.star",
      "hp": 760000,
-     "price": 15,
+     "price": 200,
+     "volume": 1,
      "weight": 12
     },
     {
      "itemId": "journey.dark",
      "hp": 1100000,
-     "price": 30,
+     "price": 400,
+     "volume": 1,
      "weight": 10
     }
    ]
@@ -687,29 +759,33 @@
    "from": 1600,
    "deepAt": 364,
    "gate": 24,
-   "oreChance": 0.247,
-   "capsuleCoins": 36000,
+   "oreChance": 0.0615,
+   "capsuleCoins": 270000,
    "rock": {
     "itemId": "journey.rock.18",
     "hp": 550000,
-    "price": 8
+    "price": 1,
+    "volume": 28000
    },
    "deep": {
     "itemId": "journey.rock.18.deep",
     "hp": 13000000,
-    "price": 2
+    "price": 1,
+    "volume": 650000
    },
    "ores": [
     {
      "itemId": "journey.gravity",
      "hp": 1100000,
-     "price": 24,
+     "price": 1000,
+     "volume": 1,
      "weight": 12
     },
     {
      "itemId": "journey.phase",
      "hp": 1700000,
-     "price": 48,
+     "price": 2000,
+     "volume": 1,
      "weight": 10
     }
    ]
@@ -720,29 +796,33 @@
    "from": 2000,
    "deepAt": 364,
    "gate": 26,
-   "oreChance": 0.263,
-   "capsuleCoins": 130000,
+   "oreChance": 0.066,
+   "capsuleCoins": 3900000,
    "rock": {
     "itemId": "journey.rock.19",
     "hp": 1300000,
-    "price": 12
+    "price": 1,
+    "volume": 65000
    },
    "deep": {
     "itemId": "journey.rock.19.deep",
     "hp": 29000000,
-    "price": 3
+    "price": 1,
+    "volume": 1500000
    },
    "ores": [
     {
      "itemId": "journey.core",
      "hp": 2600000,
-     "price": 36,
+     "price": 6000,
+     "volume": 1,
      "weight": 12
     },
     {
      "itemId": "journey.sun",
      "hp": 3900000,
-     "price": 72,
+     "price": 12000,
+     "volume": 1,
      "weight": 10
     }
    ]
@@ -753,29 +833,33 @@
    "from": 2400,
    "deepAt": null,
    "gate": 28,
-   "oreChance": 0.28,
-   "capsuleCoins": 520000,
+   "oreChance": 0.07,
+   "capsuleCoins": 71000000,
    "rock": {
     "itemId": "journey.rock.20",
     "hp": 2900000,
-    "price": 20
+    "price": 1,
+    "volume": 150000
    },
    "deep": {
     "itemId": "journey.rock.20.deep",
     "hp": 15000000,
-    "price": 5
+    "price": 1,
+    "volume": 750000
    },
    "ores": [
     {
      "itemId": "journey.origin",
      "hp": 5800000,
-     "price": 60,
+     "price": 42000,
+     "volume": 1,
      "weight": 12
     },
     {
      "itemId": "journey.eternal",
      "hp": 8700000,
-     "price": 120,
+     "price": 84000,
+     "volume": 1,
      "weight": 10
     }
    ]
@@ -791,15 +875,15 @@
    "speed": 2,
    "enhance": [
     {
-     "price": 36,
+     "price": 24,
      "power": 11
     },
     {
-     "price": 54,
+     "price": 36,
      "power": 12
     },
     {
-     "price": 72,
+     "price": 48,
      "power": 14
     }
    ]
@@ -808,20 +892,20 @@
    "level": 2,
    "currency": "gold",
    "shop": 0,
-   "price": 120,
+   "price": 80,
    "power": 15,
    "speed": 2.5,
    "enhance": [
     {
-     "price": 140,
+     "price": 170,
      "power": 17
     },
     {
-     "price": 200,
+     "price": 260,
      "power": 19
     },
     {
-     "price": 270,
+     "price": 350,
      "power": 20
     }
    ]
@@ -830,20 +914,20 @@
    "level": 3,
    "currency": "gold",
    "shop": 0,
-   "price": 450,
+   "price": 580,
    "power": 23,
    "speed": 3,
    "enhance": [
     {
-     "price": 390,
+     "price": 570,
      "power": 25
     },
     {
-     "price": 590,
+     "price": 860,
      "power": 28
     },
     {
-     "price": 780,
+     "price": 1100,
      "power": 31
     }
    ]
@@ -852,20 +936,20 @@
    "level": 4,
    "currency": "gold",
    "shop": 2,
-   "price": 1300,
+   "price": 1900,
    "power": 34,
    "speed": 3.5,
    "enhance": [
     {
-     "price": 480,
+     "price": 720,
      "power": 38
     },
     {
-     "price": 720,
+     "price": 1100,
      "power": 42
     },
     {
-     "price": 960,
+     "price": 1400,
      "power": 46
     }
    ]
@@ -874,20 +958,20 @@
    "level": 5,
    "currency": "gold",
    "shop": 2,
-   "price": 1600,
+   "price": 2400,
    "power": 51,
    "speed": 4,
    "enhance": [
     {
-     "price": 9300,
+     "price": 6300,
      "power": 57
     },
     {
-     "price": 14000,
+     "price": 9500,
      "power": 63
     },
     {
-     "price": 19000,
+     "price": 13000,
      "power": 69
     }
    ]
@@ -896,20 +980,20 @@
    "level": 6,
    "currency": "gold",
    "shop": 2,
-   "price": 31000,
+   "price": 21000,
    "power": 76,
    "speed": 5,
    "enhance": [
     {
-     "price": 27000,
+     "price": 130000,
      "power": 85
     },
     {
-     "price": 41000,
+     "price": 190000,
      "power": 94
     },
     {
-     "price": 54000,
+     "price": 260000,
      "power": 100
     }
    ]
@@ -918,20 +1002,20 @@
    "level": 7,
    "currency": "gold",
    "shop": 4,
-   "price": 90000,
+   "price": 430000,
    "power": 110,
    "speed": 6,
    "enhance": [
     {
-     "price": 33000,
+     "price": 160000,
      "power": 130
     },
     {
-     "price": 50000,
+     "price": 240000,
      "power": 140
     },
     {
-     "price": 66000,
+     "price": 320000,
      "power": 150
     }
    ]
@@ -940,20 +1024,20 @@
    "level": 8,
    "currency": "gold",
    "shop": 4,
-   "price": 110000,
+   "price": 540000,
    "power": 170,
    "speed": 7,
    "enhance": [
     {
-     "price": 510000,
+     "price": 1600000,
      "power": 190
     },
     {
-     "price": 770000,
+     "price": 2400000,
      "power": 210
     },
     {
-     "price": 1000000,
+     "price": 3200000,
      "power": 230
     }
    ]
@@ -962,20 +1046,20 @@
    "level": 9,
    "currency": "gold",
    "shop": 4,
-   "price": 1700000,
+   "price": 5400000,
    "power": 260,
    "speed": 8,
    "enhance": [
     {
-     "price": 4200000,
+     "price": 42000000,
      "power": 290
     },
     {
-     "price": 6300000,
+     "price": 63000000,
      "power": 320
     },
     {
-     "price": 8400000,
+     "price": 84000000,
      "power": 350
     }
    ]
@@ -984,20 +1068,20 @@
    "level": 10,
    "currency": "gold",
    "shop": 4,
-   "price": 14000000,
+   "price": 140000000,
    "power": 380,
    "speed": 8,
    "enhance": [
     {
-     "price": 6300000,
+     "price": 63000000,
      "power": 430
     },
     {
-     "price": 9500000,
+     "price": 95000000,
      "power": 480
     },
     {
-     "price": 13000000,
+     "price": 130000000,
      "power": 520
     }
    ]
@@ -1011,15 +1095,15 @@
    "speed": 8,
    "enhance": [
     {
-     "price": 810,
+     "price": 720,
      "power": 650
     },
     {
-     "price": 1200,
+     "price": 1100,
      "power": 720
     },
     {
-     "price": 1600,
+     "price": 1400,
      "power": 780
     }
    ]
@@ -1028,20 +1112,20 @@
    "level": 12,
    "currency": "tech",
    "shop": 0,
-   "price": 2700,
+   "price": 2400,
    "power": 860,
    "speed": 8,
    "enhance": [
     {
-     "price": 19000,
+     "price": 17000,
      "power": 970
     },
     {
-     "price": 28000,
+     "price": 26000,
      "power": 1100
     },
     {
-     "price": 38000,
+     "price": 35000,
      "power": 1200
     }
    ]
@@ -1050,20 +1134,20 @@
    "level": 13,
    "currency": "tech",
    "shop": 2,
-   "price": 63000,
+   "price": 58000,
    "power": 1300,
    "speed": 8,
    "enhance": [
     {
-     "price": 170000,
+     "price": 240000,
      "power": 1500
     },
     {
-     "price": 260000,
+     "price": 360000,
      "power": 1600
     },
     {
-     "price": 350000,
+     "price": 490000,
      "power": 1800
     }
    ]
@@ -1072,20 +1156,20 @@
    "level": 14,
    "currency": "tech",
    "shop": 2,
-   "price": 580000,
+   "price": 810000,
    "power": 1900,
    "speed": 8,
    "enhance": [
     {
-     "price": 720000,
+     "price": 300000,
      "power": 2200
     },
     {
-     "price": 1100000,
+     "price": 450000,
      "power": 2400
     },
     {
-     "price": 1400000,
+     "price": 600000,
      "power": 2600
     }
    ]
@@ -1094,20 +1178,20 @@
    "level": 15,
    "currency": "tech",
    "shop": 4,
-   "price": 2400000,
+   "price": 1000000,
    "power": 2900,
    "speed": 8,
    "enhance": [
     {
-     "price": 900000,
+     "price": 390000,
      "power": 3300
     },
     {
-     "price": 1400000,
+     "price": 590000,
      "power": 3600
     },
     {
-     "price": 1800000,
+     "price": 780000,
      "power": 4000
     }
    ]
@@ -1116,20 +1200,20 @@
    "level": 16,
    "currency": "tech",
    "shop": 4,
-   "price": 3000000,
+   "price": 1300000,
    "power": 4400,
    "speed": 8,
    "enhance": [
     {
-     "price": 3900000,
+     "price": 33000000,
      "power": 4900
     },
     {
-     "price": 5900000,
+     "price": 50000000,
      "power": 5400
     },
     {
-     "price": 7800000,
+     "price": 66000000,
      "power": 6000
     }
    ]
@@ -1138,20 +1222,20 @@
    "level": 17,
    "currency": "tech",
    "shop": 4,
-   "price": 13000000,
+   "price": 110000000,
    "power": 6600,
    "speed": 8,
    "enhance": [
     {
-     "price": 5100000,
+     "price": 42000000,
      "power": 7400
     },
     {
-     "price": 7700000,
+     "price": 63000000,
      "power": 8100
     },
     {
-     "price": 10000000,
+     "price": 84000000,
      "power": 8900
     }
    ]
@@ -1160,20 +1244,20 @@
    "level": 18,
    "currency": "tech",
    "shop": 4,
-   "price": 17000000,
+   "price": 140000000,
    "power": 9900,
    "speed": 8,
    "enhance": [
     {
-     "price": 15000000,
+     "price": 170000000,
      "power": 11000
     },
     {
-     "price": 22000000,
+     "price": 260000000,
      "power": 12000
     },
     {
-     "price": 29000000,
+     "price": 350000000,
      "power": 13000
     }
    ]
@@ -1182,20 +1266,20 @@
    "level": 19,
    "currency": "tech",
    "shop": 4,
-   "price": 49000000,
+   "price": 580000000,
    "power": 15000,
    "speed": 8,
    "enhance": [
     {
-     "price": 18000000,
+     "price": 220000000,
      "power": 17000
     },
     {
-     "price": 27000000,
+     "price": 330000000,
      "power": 18000
     },
     {
-     "price": 37000000,
+     "price": 440000000,
      "power": 20000
     }
    ]
@@ -1204,20 +1288,20 @@
    "level": 20,
    "currency": "tech",
    "shop": 4,
-   "price": 61000000,
+   "price": 730000000,
    "power": 22000,
    "speed": 8,
    "enhance": [
     {
-     "price": 27000000,
+     "price": 330000000,
      "power": 25000
     },
     {
-     "price": 41000000,
+     "price": 490000000,
      "power": 27000
     },
     {
-     "price": 55000000,
+     "price": 660000000,
      "power": 30000
     }
    ]
@@ -1226,20 +1310,20 @@
    "level": 21,
    "currency": "star",
    "shop": 0,
-   "price": 1400,
+   "price": 600,
    "power": 33000,
    "speed": 8,
    "enhance": [
     {
-     "price": 14000,
+     "price": 6000,
      "power": 37000
     },
     {
-     "price": 20000,
+     "price": 9000,
      "power": 41000
     },
     {
-     "price": 27000,
+     "price": 12000,
      "power": 45000
     }
    ]
@@ -1248,20 +1332,20 @@
    "level": 22,
    "currency": "star",
    "shop": 0,
-   "price": 45000,
+   "price": 20000,
    "power": 50000,
    "speed": 8,
    "enhance": [
     {
-     "price": 120000,
+     "price": 99000,
      "power": 56000
     },
     {
-     "price": 180000,
+     "price": 150000,
      "power": 62000
     },
     {
-     "price": 250000,
+     "price": 200000,
      "power": 68000
     }
    ]
@@ -1270,20 +1354,20 @@
    "level": 23,
    "currency": "star",
    "shop": 2,
-   "price": 410000,
+   "price": 330000,
    "power": 75000,
    "speed": 8,
    "enhance": [
     {
-     "price": 1000000,
+     "price": 1900000,
      "power": 84000
     },
     {
-     "price": 1500000,
+     "price": 2800000,
      "power": 93000
     },
     {
-     "price": 2000000,
+     "price": 3800000,
      "power": 100000
     }
    ]
@@ -1292,20 +1376,20 @@
    "level": 24,
    "currency": "star",
    "shop": 2,
-   "price": 3400000,
+   "price": 6300000,
    "power": 110000,
    "speed": 8,
    "enhance": [
     {
-     "price": 2600000,
+     "price": 15000000,
      "power": 130000
     },
     {
-     "price": 3900000,
+     "price": 23000000,
      "power": 140000
     },
     {
-     "price": 5200000,
+     "price": 30000000,
      "power": 150000
     }
    ]
@@ -1314,20 +1398,20 @@
    "level": 25,
    "currency": "star",
    "shop": 4,
-   "price": 8700000,
+   "price": 50000000,
    "power": 170000,
    "speed": 8,
    "enhance": [
     {
-     "price": 3300000,
+     "price": 19000000,
      "power": 190000
     },
     {
-     "price": 5000000,
+     "price": 28000000,
      "power": 210000
     },
     {
-     "price": 6600000,
+     "price": 38000000,
      "power": 230000
     }
    ]
@@ -1336,20 +1420,20 @@
    "level": 26,
    "currency": "star",
    "shop": 4,
-   "price": 11000000,
+   "price": 63000000,
    "power": 250000,
    "speed": 8,
    "enhance": [
     {
-     "price": 11000000,
+     "price": 240000000,
      "power": 280000
     },
     {
-     "price": 17000000,
+     "price": 360000000,
      "power": 310000
     },
     {
-     "price": 23000000,
+     "price": 490000000,
      "power": 340000
     }
    ]
@@ -1358,20 +1442,20 @@
    "level": 27,
    "currency": "star",
    "shop": 4,
-   "price": 38000000,
+   "price": 810000000,
    "power": 380000,
    "speed": 8,
    "enhance": [
     {
-     "price": 14000000,
+     "price": 300000000,
      "power": 420000
     },
     {
-     "price": 22000000,
+     "price": 450000000,
      "power": 470000
     },
     {
-     "price": 29000000,
+     "price": 600000000,
      "power": 520000
     }
    ]
@@ -1380,20 +1464,20 @@
    "level": 28,
    "currency": "star",
    "shop": 4,
-   "price": 48000000,
+   "price": 1000000000,
    "power": 570000,
    "speed": 8,
    "enhance": [
     {
-     "price": 57000000,
+     "price": 6000000000,
      "power": 640000
     },
     {
-     "price": 86000000,
+     "price": 9000000000,
      "power": 700000
     },
     {
-     "price": 110000000,
+     "price": 12000000000,
      "power": 770000
     }
    ]
@@ -1402,20 +1486,20 @@
    "level": 29,
    "currency": "star",
    "shop": 4,
-   "price": 190000000,
+   "price": 20000000000,
    "power": 850000,
    "speed": 8,
    "enhance": [
     {
-     "price": 72000000,
+     "price": 7500000000,
      "power": 950000
     },
     {
-     "price": 110000000,
+     "price": 11000000000,
      "power": 1100000
     },
     {
-     "price": 140000000,
+     "price": 15000000000,
      "power": 1200000
     }
    ]
@@ -1424,7 +1508,7 @@
    "level": 30,
    "currency": "star",
    "shop": 4,
-   "price": 240000000,
+   "price": 25000000000,
    "power": 1300000,
    "speed": 8,
    "enhance": []
@@ -1442,218 +1526,218 @@
    "tier": 2,
    "currency": "gold",
    "shop": 0,
-   "price": 18,
-   "capacity": 30
+   "price": 17,
+   "capacity": 130
   },
   {
    "tier": 3,
    "currency": "gold",
    "shop": 0,
-   "price": 68,
-   "capacity": 35
+   "price": 51,
+   "capacity": 190
   },
   {
    "tier": 4,
    "currency": "gold",
    "shop": 2,
    "price": 200,
-   "capacity": 40
+   "capacity": 280
   },
   {
    "tier": 5,
    "currency": "gold",
    "shop": 2,
-   "price": 240,
-   "capacity": 50
+   "price": 250,
+   "capacity": 490
   },
   {
    "tier": 6,
    "currency": "gold",
    "shop": 2,
-   "price": 4700,
-   "capacity": 60
+   "price": 1600,
+   "capacity": 930
   },
   {
    "tier": 7,
    "currency": "gold",
    "shop": 4,
-   "price": 14000,
-   "capacity": 70
+   "price": 20000,
+   "capacity": 1200
   },
   {
    "tier": 8,
    "currency": "gold",
    "shop": 4,
-   "price": 17000,
-   "capacity": 80
+   "price": 25000,
+   "capacity": 2500
   },
   {
    "tier": 9,
    "currency": "gold",
    "shop": 4,
-   "price": 260000,
-   "capacity": 90
+   "price": 300000,
+   "capacity": 3700
   },
   {
    "tier": 10,
    "currency": "gold",
    "shop": 4,
-   "price": 2100000,
-   "capacity": 100
+   "price": 4100000,
+   "capacity": 4600
   },
   {
    "tier": 11,
    "currency": "tech",
    "shop": 0,
-   "price": 5,
-   "capacity": 110
+   "price": 27,
+   "capacity": 8900
   },
   {
    "tier": 12,
    "currency": "tech",
    "shop": 0,
-   "price": 410,
-   "capacity": 120
+   "price": 110,
+   "capacity": 13000
   },
   {
    "tier": 13,
    "currency": "tech",
    "shop": 2,
-   "price": 9500,
-   "capacity": 140
+   "price": 480,
+   "capacity": 19000
   },
   {
    "tier": 14,
    "currency": "tech",
    "shop": 2,
-   "price": 87000,
-   "capacity": 160
+   "price": 3500,
+   "capacity": 28000
   },
   {
    "tier": 15,
    "currency": "tech",
    "shop": 4,
-   "price": 360000,
-   "capacity": 180
+   "price": 38000,
+   "capacity": 35000
   },
   {
    "tier": 16,
    "currency": "tech",
    "shop": 4,
-   "price": 450000,
-   "capacity": 200
+   "price": 48000,
+   "capacity": 64000
   },
   {
    "tier": 17,
    "currency": "tech",
    "shop": 4,
-   "price": 2000000,
-   "capacity": 220
+   "price": 510000,
+   "capacity": 80000
   },
   {
    "tier": 18,
    "currency": "tech",
    "shop": 4,
-   "price": 2600000,
-   "capacity": 240
+   "price": 640000,
+   "capacity": 140000
   },
   {
    "tier": 19,
    "currency": "tech",
    "shop": 4,
-   "price": 7400000,
-   "capacity": 260
+   "price": 7100000,
+   "capacity": 180000
   },
   {
    "tier": 20,
    "currency": "tech",
    "shop": 4,
-   "price": 9200000,
-   "capacity": 280
+   "price": 8900000,
+   "capacity": 230000
   },
   {
    "tier": 21,
    "currency": "star",
    "shop": 0,
-   "price": 700,
-   "capacity": 300
+   "price": 26,
+   "capacity": 500000
   },
   {
    "tier": 22,
    "currency": "star",
    "shop": 0,
-   "price": 6800,
-   "capacity": 320
+   "price": 110,
+   "capacity": 770000
   },
   {
    "tier": 23,
    "currency": "star",
    "shop": 2,
-   "price": 62000,
-   "capacity": 340
+   "price": 650,
+   "capacity": 1100000
   },
   {
    "tier": 24,
    "currency": "star",
    "shop": 2,
-   "price": 510000,
-   "capacity": 360
+   "price": 5000,
+   "capacity": 1600000
   },
   {
    "tier": 25,
    "currency": "star",
    "shop": 4,
-   "price": 1300000,
-   "capacity": 380
+   "price": 68000,
+   "capacity": 2000000
   },
   {
    "tier": 26,
    "currency": "star",
    "shop": 4,
-   "price": 1700000,
-   "capacity": 400
+   "price": 85000,
+   "capacity": 3700000
   },
   {
    "tier": 27,
    "currency": "star",
    "shop": 4,
-   "price": 5700000,
-   "capacity": 420
+   "price": 980000,
+   "capacity": 4600000
   },
   {
    "tier": 28,
    "currency": "star",
    "shop": 4,
-   "price": 7200000,
-   "capacity": 450
+   "price": 1200000,
+   "capacity": 8600000
   },
   {
    "tier": 29,
    "currency": "star",
    "shop": 4,
-   "price": 29000000,
-   "capacity": 480
+   "price": 18000000,
+   "capacity": 11000000
   },
   {
    "tier": 30,
    "currency": "star",
    "shop": 4,
-   "price": 36000000,
-   "capacity": 500
+   "price": 23000000,
+   "capacity": 14000000
   }
  ],
  "petSlots": [
   {
    "slot": 4,
    "currency": "tech",
-   "price": 130000,
+   "price": 190000,
    "world": 2,
    "layer": 3
   },
   {
    "slot": 5,
    "currency": "star",
-   "price": 730000,
+   "price": 1500000,
    "world": 3,
    "layer": 3
   }
@@ -1665,37 +1749,37 @@
    "layer": 0,
    "premium": false,
    "currency": "gold",
-   "price": 12,
+   "price": 10,
    "pets": [
     {
      "id": "moss-slime",
      "weight": 40,
      "bonusPct": 50,
-     "miningPct": 4
+     "miningPct": 15
     },
     {
      "id": "quarry-mole",
      "weight": 30,
      "bonusPct": 60,
-     "miningPct": 5
+     "miningPct": 18
     },
     {
      "id": "amber-fox",
      "weight": 20,
      "bonusPct": 80,
-     "miningPct": 6
+     "miningPct": 24
     },
     {
      "id": "crystal-owl",
      "weight": 8,
      "bonusPct": 110,
-     "miningPct": 9
+     "miningPct": 35
     },
     {
      "id": "moon-dragon",
      "weight": 2,
      "bonusPct": 180,
-     "miningPct": 14
+     "miningPct": 53
     }
    ]
   },
@@ -1705,37 +1789,37 @@
    "layer": 1,
    "premium": false,
    "currency": "gold",
-   "price": 130,
+   "price": 81,
    "pets": [
     {
      "id": "pebble-blob",
      "weight": 40,
      "bonusPct": 130,
-     "miningPct": 4
+     "miningPct": 15
     },
     {
      "id": "pebble-scout",
      "weight": 30,
      "bonusPct": 150,
-     "miningPct": 5
+     "miningPct": 19
     },
     {
      "id": "pebble-friend",
      "weight": 20,
      "bonusPct": 200,
-     "miningPct": 7
+     "miningPct": 25
     },
     {
      "id": "pebble-wing",
      "weight": 8,
      "bonusPct": 290,
-     "miningPct": 10
+     "miningPct": 36
     },
     {
      "id": "pebble-guardian",
      "weight": 2,
      "bonusPct": 440,
-     "miningPct": 16
+     "miningPct": 54
     }
    ]
   },
@@ -1745,37 +1829,37 @@
    "layer": 2,
    "premium": false,
    "currency": "gold",
-   "price": 620,
+   "price": 470,
    "pets": [
     {
      "id": "mushroom-blob",
      "weight": 40,
      "bonusPct": 310,
-     "miningPct": 5
+     "miningPct": 16
     },
     {
      "id": "mushroom-scout",
      "weight": 30,
      "bonusPct": 380,
-     "miningPct": 6
+     "miningPct": 19
     },
     {
      "id": "mushroom-friend",
      "weight": 20,
      "bonusPct": 500,
-     "miningPct": 8
+     "miningPct": 25
     },
     {
      "id": "mushroom-wing",
      "weight": 8,
      "bonusPct": 720,
-     "miningPct": 12
+     "miningPct": 37
     },
     {
      "id": "mushroom-guardian",
      "weight": 2,
      "bonusPct": 1100,
-     "miningPct": 18
+     "miningPct": 56
     }
    ]
   },
@@ -1785,37 +1869,37 @@
    "layer": 3,
    "premium": false,
    "currency": "gold",
-   "price": 3600,
+   "price": 4700,
    "pets": [
     {
      "id": "crystal-blob",
      "weight": 40,
      "bonusPct": 780,
-     "miningPct": 6
+     "miningPct": 16
     },
     {
      "id": "crystal-scout",
      "weight": 30,
      "bonusPct": 940,
-     "miningPct": 7
+     "miningPct": 20
     },
     {
      "id": "crystal-friend",
      "weight": 20,
      "bonusPct": 1300,
-     "miningPct": 9
+     "miningPct": 26
     },
     {
      "id": "crystal-wing",
      "weight": 8,
      "bonusPct": 1800,
-     "miningPct": 13
+     "miningPct": 38
     },
     {
      "id": "crystal-guardian",
      "weight": 2,
      "bonusPct": 2700,
-     "miningPct": 20
+     "miningPct": 57
     }
    ]
   },
@@ -1825,37 +1909,37 @@
    "layer": 4,
    "premium": false,
    "currency": "gold",
-   "price": 19000,
+   "price": 60000,
    "pets": [
     {
      "id": "ruin-blob",
      "weight": 40,
      "bonusPct": 2000,
-     "miningPct": 6
+     "miningPct": 17
     },
     {
      "id": "ruin-scout",
      "weight": 30,
      "bonusPct": 2300,
-     "miningPct": 8
+     "miningPct": 20
     },
     {
      "id": "ruin-friend",
      "weight": 20,
      "bonusPct": 3100,
-     "miningPct": 10
+     "miningPct": 27
     },
     {
      "id": "ruin-wing",
      "weight": 8,
      "bonusPct": 4500,
-     "miningPct": 14
+     "miningPct": 39
     },
     {
      "id": "ruin-guardian",
      "weight": 2,
      "bonusPct": 6800,
-     "miningPct": 22
+     "miningPct": 59
     }
    ]
   },
@@ -1865,37 +1949,37 @@
    "layer": 5,
    "premium": false,
    "currency": "gold",
-   "price": 93000,
+   "price": 890000,
    "pets": [
     {
      "id": "frost-blob",
      "weight": 40,
      "bonusPct": 4900,
-     "miningPct": 7
+     "miningPct": 17
     },
     {
      "id": "frost-scout",
      "weight": 30,
      "bonusPct": 5900,
-     "miningPct": 8
+     "miningPct": 21
     },
     {
      "id": "frost-friend",
      "weight": 20,
      "bonusPct": 7800,
-     "miningPct": 11
+     "miningPct": 28
     },
     {
      "id": "frost-wing",
      "weight": 8,
      "bonusPct": 11000,
-     "miningPct": 16
+     "miningPct": 40
     },
     {
      "id": "frost-guardian",
      "weight": 2,
      "bonusPct": 17000,
-     "miningPct": 25
+     "miningPct": 61
     }
    ]
   },
@@ -1905,37 +1989,37 @@
    "layer": 6,
    "premium": false,
    "currency": "gold",
-   "price": 430000,
+   "price": 12000000,
    "pets": [
     {
      "id": "fire-blob",
      "weight": 40,
      "bonusPct": 12000,
-     "miningPct": 8
+     "miningPct": 18
     },
     {
      "id": "fire-scout",
      "weight": 30,
      "bonusPct": 15000,
-     "miningPct": 9
+     "miningPct": 21
     },
     {
      "id": "fire-friend",
      "weight": 20,
      "bonusPct": 20000,
-     "miningPct": 13
+     "miningPct": 29
     },
     {
      "id": "fire-wing",
      "weight": 8,
      "bonusPct": 28000,
-     "miningPct": 18
+     "miningPct": 41
     },
     {
      "id": "fire-guardian",
      "weight": 2,
      "bonusPct": 43000,
-     "miningPct": 28
+     "miningPct": 63
     }
    ]
   },
@@ -1945,37 +2029,37 @@
    "layer": 0,
    "premium": false,
    "currency": "tech",
-   "price": 86,
+   "price": 65,
    "pets": [
     {
      "id": "copper-blob",
      "weight": 40,
      "bonusPct": 50,
-     "miningPct": 9
+     "miningPct": 18
     },
     {
      "id": "copper-scout",
      "weight": 30,
      "bonusPct": 60,
-     "miningPct": 11
+     "miningPct": 22
     },
     {
      "id": "copper-friend",
      "weight": 20,
      "bonusPct": 80,
-     "miningPct": 14
+     "miningPct": 30
     },
     {
      "id": "copper-wing",
      "weight": 8,
      "bonusPct": 110,
-     "miningPct": 20
+     "miningPct": 42
     },
     {
      "id": "copper-guardian",
      "weight": 2,
      "bonusPct": 180,
-     "miningPct": 31
+     "miningPct": 65
     }
    ]
   },
@@ -1985,37 +2069,37 @@
    "layer": 1,
    "premium": false,
    "currency": "tech",
-   "price": 620,
+   "price": 330,
    "pets": [
     {
      "id": "gear-blob",
      "weight": 40,
      "bonusPct": 130,
-     "miningPct": 10
+     "miningPct": 19
     },
     {
      "id": "gear-scout",
      "weight": 30,
      "bonusPct": 150,
-     "miningPct": 12
+     "miningPct": 23
     },
     {
      "id": "gear-friend",
      "weight": 20,
      "bonusPct": 200,
-     "miningPct": 16
+     "miningPct": 30
     },
     {
      "id": "gear-wing",
      "weight": 8,
      "bonusPct": 290,
-     "miningPct": 23
+     "miningPct": 44
     },
     {
      "id": "gear-guardian",
      "weight": 2,
      "bonusPct": 440,
-     "miningPct": 35
+     "miningPct": 67
     }
    ]
   },
@@ -2025,37 +2109,37 @@
    "layer": 2,
    "premium": false,
    "currency": "tech",
-   "price": 1900,
+   "price": 1400,
    "pets": [
     {
      "id": "silver-blob",
      "weight": 40,
      "bonusPct": 310,
-     "miningPct": 11
+     "miningPct": 20
     },
     {
      "id": "silver-scout",
      "weight": 30,
      "bonusPct": 380,
-     "miningPct": 13
+     "miningPct": 23
     },
     {
      "id": "silver-friend",
      "weight": 20,
      "bonusPct": 500,
-     "miningPct": 18
+     "miningPct": 31
     },
     {
      "id": "silver-wing",
      "weight": 8,
      "bonusPct": 720,
-     "miningPct": 26
+     "miningPct": 45
     },
     {
      "id": "silver-guardian",
      "weight": 2,
      "bonusPct": 1100,
-     "miningPct": 39
+     "miningPct": 69
     }
    ]
   },
@@ -2065,37 +2149,37 @@
    "layer": 3,
    "premium": false,
    "currency": "tech",
-   "price": 6900,
+   "price": 10000,
    "pets": [
     {
      "id": "tide-blob",
      "weight": 40,
      "bonusPct": 780,
-     "miningPct": 12
+     "miningPct": 20
     },
     {
      "id": "tide-scout",
      "weight": 30,
      "bonusPct": 940,
-     "miningPct": 15
+     "miningPct": 24
     },
     {
      "id": "tide-friend",
      "weight": 20,
      "bonusPct": 1300,
-     "miningPct": 20
+     "miningPct": 32
     },
     {
      "id": "tide-wing",
      "weight": 8,
      "bonusPct": 1800,
-     "miningPct": 29
+     "miningPct": 46
     },
     {
      "id": "tide-guardian",
      "weight": 2,
      "bonusPct": 2700,
-     "miningPct": 43
+     "miningPct": 71
     }
    ]
   },
@@ -2105,37 +2189,37 @@
    "layer": 4,
    "premium": false,
    "currency": "tech",
-   "price": 27000,
+   "price": 120000,
    "pets": [
     {
      "id": "amber-blob",
      "weight": 40,
      "bonusPct": 2000,
-     "miningPct": 14
+     "miningPct": 21
     },
     {
      "id": "amber-scout",
      "weight": 30,
      "bonusPct": 2300,
-     "miningPct": 17
+     "miningPct": 25
     },
     {
      "id": "amber-friend",
      "weight": 20,
      "bonusPct": 3100,
-     "miningPct": 22
+     "miningPct": 33
     },
     {
      "id": "amber-wing",
      "weight": 8,
      "bonusPct": 4500,
-     "miningPct": 32
+     "miningPct": 48
     },
     {
      "id": "amber-guardian",
      "weight": 2,
      "bonusPct": 6800,
-     "miningPct": 49
+     "miningPct": 73
     }
    ]
   },
@@ -2145,37 +2229,37 @@
    "layer": 4,
    "premium": true,
    "currency": "tech",
-   "price": 110000,
+   "price": 460000,
    "pets": [
     {
      "id": "probe-blob",
      "weight": 40,
      "bonusPct": 3900,
-     "miningPct": 21
+     "miningPct": 31
     },
     {
      "id": "probe-scout",
      "weight": 30,
      "bonusPct": 4700,
-     "miningPct": 25
+     "miningPct": 37
     },
     {
      "id": "probe-friend",
      "weight": 20,
      "bonusPct": 6300,
-     "miningPct": 33
+     "miningPct": 50
     },
     {
      "id": "probe-wing",
      "weight": 8,
      "bonusPct": 9000,
-     "miningPct": 48
+     "miningPct": 72
     },
     {
      "id": "probe-guardian",
      "weight": 2,
      "bonusPct": 14000,
-     "miningPct": 73
+     "miningPct": 110
     }
    ]
   },
@@ -2185,37 +2269,37 @@
    "layer": 5,
    "premium": false,
    "currency": "tech",
-   "price": 100000,
+   "price": 1500000,
    "pets": [
     {
      "id": "cryo-blob",
      "weight": 40,
      "bonusPct": 4900,
-     "miningPct": 16
+     "miningPct": 21
     },
     {
      "id": "cryo-scout",
      "weight": 30,
      "bonusPct": 5900,
-     "miningPct": 19
+     "miningPct": 26
     },
     {
      "id": "cryo-friend",
      "weight": 20,
      "bonusPct": 7800,
-     "miningPct": 25
+     "miningPct": 34
     },
     {
      "id": "cryo-wing",
      "weight": 8,
      "bonusPct": 11000,
-     "miningPct": 36
+     "miningPct": 49
     },
     {
      "id": "cryo-guardian",
      "weight": 2,
      "bonusPct": 17000,
-     "miningPct": 55
+     "miningPct": 75
     }
    ]
   },
@@ -2225,37 +2309,37 @@
    "layer": 5,
    "premium": true,
    "currency": "tech",
-   "price": 420000,
+   "price": 6200000,
    "pets": [
     {
      "id": "nitro-blob",
      "weight": 40,
      "bonusPct": 9800,
-     "miningPct": 23
+     "miningPct": 32
     },
     {
      "id": "nitro-scout",
      "weight": 30,
      "bonusPct": 12000,
-     "miningPct": 28
+     "miningPct": 38
     },
     {
      "id": "nitro-friend",
      "weight": 20,
      "bonusPct": 16000,
-     "miningPct": 37
+     "miningPct": 51
     },
     {
      "id": "nitro-wing",
      "weight": 8,
      "bonusPct": 22000,
-     "miningPct": 54
+     "miningPct": 74
     },
     {
      "id": "nitro-guardian",
      "weight": 2,
      "bonusPct": 34000,
-     "miningPct": 82
+     "miningPct": 110
     }
    ]
   },
@@ -2265,37 +2349,37 @@
    "layer": 6,
    "premium": false,
    "currency": "tech",
-   "price": 390000,
+   "price": 21000000,
    "pets": [
     {
      "id": "lava-blob",
      "weight": 40,
      "bonusPct": 12000,
-     "miningPct": 17
+     "miningPct": 22
     },
     {
      "id": "lava-scout",
      "weight": 30,
      "bonusPct": 15000,
-     "miningPct": 21
+     "miningPct": 26
     },
     {
      "id": "lava-friend",
      "weight": 20,
      "bonusPct": 20000,
-     "miningPct": 28
+     "miningPct": 35
     },
     {
      "id": "lava-wing",
      "weight": 8,
      "bonusPct": 28000,
-     "miningPct": 40
+     "miningPct": 51
     },
     {
      "id": "lava-guardian",
      "weight": 2,
      "bonusPct": 43000,
-     "miningPct": 61
+     "miningPct": 77
     }
    ]
   },
@@ -2305,37 +2389,37 @@
    "layer": 6,
    "premium": true,
    "currency": "tech",
-   "price": 1600000,
+   "price": 86000000,
    "pets": [
     {
      "id": "fusion-blob",
      "weight": 40,
      "bonusPct": 24000,
-     "miningPct": 26
+     "miningPct": 33
     },
     {
      "id": "fusion-scout",
      "weight": 30,
      "bonusPct": 29000,
-     "miningPct": 31
+     "miningPct": 40
     },
     {
      "id": "fusion-friend",
      "weight": 20,
      "bonusPct": 39000,
-     "miningPct": 42
+     "miningPct": 53
     },
     {
      "id": "fusion-wing",
      "weight": 8,
      "bonusPct": 56000,
-     "miningPct": 60
+     "miningPct": 76
     },
     {
      "id": "fusion-guardian",
      "weight": 2,
      "bonusPct": 85000,
-     "miningPct": 92
+     "miningPct": 120
     }
    ]
   },
@@ -2345,37 +2429,37 @@
    "layer": 0,
    "premium": false,
    "currency": "star",
-   "price": 110,
+   "price": 79,
    "pets": [
     {
      "id": "star-blob",
      "weight": 40,
      "bonusPct": 50,
-     "miningPct": 20
+     "miningPct": 23
     },
     {
      "id": "star-scout",
      "weight": 30,
      "bonusPct": 60,
-     "miningPct": 23
+     "miningPct": 27
     },
     {
      "id": "star-friend",
      "weight": 20,
      "bonusPct": 80,
-     "miningPct": 31
+     "miningPct": 36
     },
     {
      "id": "star-wing",
      "weight": 8,
      "bonusPct": 110,
-     "miningPct": 45
+     "miningPct": 52
     },
     {
      "id": "star-guardian",
      "weight": 2,
      "bonusPct": 180,
-     "miningPct": 68
+     "miningPct": 79
     }
    ]
   },
@@ -2385,37 +2469,37 @@
    "layer": 1,
    "premium": false,
    "currency": "star",
-   "price": 560,
+   "price": 340,
    "pets": [
     {
      "id": "fossil-blob",
      "weight": 40,
      "bonusPct": 130,
-     "miningPct": 22
+     "miningPct": 23
     },
     {
      "id": "fossil-scout",
      "weight": 30,
      "bonusPct": 150,
-     "miningPct": 26
+     "miningPct": 28
     },
     {
      "id": "fossil-friend",
      "weight": 20,
      "bonusPct": 200,
-     "miningPct": 35
+     "miningPct": 37
     },
     {
      "id": "fossil-wing",
      "weight": 8,
      "bonusPct": 290,
-     "miningPct": 50
+     "miningPct": 54
     },
     {
      "id": "fossil-guardian",
      "weight": 2,
      "bonusPct": 440,
-     "miningPct": 77
+     "miningPct": 82
     }
    ]
   },
@@ -2431,7 +2515,7 @@
      "id": "orbit-blob",
      "weight": 40,
      "bonusPct": 310,
-     "miningPct": 25
+     "miningPct": 24
     },
     {
      "id": "orbit-scout",
@@ -2449,13 +2533,13 @@
      "id": "orbit-wing",
      "weight": 8,
      "bonusPct": 720,
-     "miningPct": 56
+     "miningPct": 55
     },
     {
      "id": "orbit-guardian",
      "weight": 2,
      "bonusPct": 1100,
-     "miningPct": 86
+     "miningPct": 84
     }
    ]
   },
@@ -2465,31 +2549,31 @@
    "layer": 2,
    "premium": true,
    "currency": "star",
-   "price": 7700,
+   "price": 7800,
    "pets": [
     {
      "id": "meteor-blob",
      "weight": 40,
      "bonusPct": 630,
-     "miningPct": 37
+     "miningPct": 36
     },
     {
      "id": "meteor-scout",
      "weight": 30,
      "bonusPct": 750,
-     "miningPct": 44
+     "miningPct": 43
     },
     {
      "id": "meteor-friend",
      "weight": 20,
      "bonusPct": 1000,
-     "miningPct": 59
+     "miningPct": 58
     },
     {
      "id": "meteor-wing",
      "weight": 8,
      "bonusPct": 1400,
-     "miningPct": 85
+     "miningPct": 83
     },
     {
      "id": "meteor-guardian",
@@ -2505,37 +2589,37 @@
    "layer": 3,
    "premium": false,
    "currency": "star",
-   "price": 6400,
+   "price": 15000,
    "pets": [
     {
      "id": "geode-blob",
      "weight": 40,
      "bonusPct": 780,
-     "miningPct": 27
+     "miningPct": 25
     },
     {
      "id": "geode-scout",
      "weight": 30,
      "bonusPct": 940,
-     "miningPct": 33
+     "miningPct": 30
     },
     {
      "id": "geode-friend",
      "weight": 20,
      "bonusPct": 1300,
-     "miningPct": 44
+     "miningPct": 40
     },
     {
      "id": "geode-wing",
      "weight": 8,
      "bonusPct": 1800,
-     "miningPct": 63
+     "miningPct": 57
     },
     {
      "id": "geode-guardian",
      "weight": 2,
      "bonusPct": 2700,
-     "miningPct": 96
+     "miningPct": 87
     }
    ]
   },
@@ -2545,37 +2629,37 @@
    "layer": 3,
    "premium": true,
    "currency": "star",
-   "price": 25000,
+   "price": 61000,
    "pets": [
     {
      "id": "aurora-blob",
      "weight": 40,
      "bonusPct": 1600,
-     "miningPct": 41
+     "miningPct": 37
     },
     {
      "id": "aurora-scout",
      "weight": 30,
      "bonusPct": 1900,
-     "miningPct": 49
+     "miningPct": 45
     },
     {
      "id": "aurora-friend",
      "weight": 20,
      "bonusPct": 2500,
-     "miningPct": 66
+     "miningPct": 60
     },
     {
      "id": "aurora-wing",
      "weight": 8,
      "bonusPct": 3600,
-     "miningPct": 95
+     "miningPct": 86
     },
     {
      "id": "aurora-guardian",
      "weight": 2,
      "bonusPct": 5500,
-     "miningPct": 140
+     "miningPct": 130
     }
    ]
   },
@@ -2585,37 +2669,37 @@
    "layer": 4,
    "premium": false,
    "currency": "star",
-   "price": 27000,
+   "price": 200000,
    "pets": [
     {
      "id": "rune-blob",
      "weight": 40,
      "bonusPct": 2000,
-     "miningPct": 31
+     "miningPct": 26
     },
     {
      "id": "rune-scout",
      "weight": 30,
      "bonusPct": 2300,
-     "miningPct": 37
+     "miningPct": 31
     },
     {
      "id": "rune-friend",
      "weight": 20,
      "bonusPct": 3100,
-     "miningPct": 49
+     "miningPct": 41
     },
     {
      "id": "rune-wing",
      "weight": 8,
      "bonusPct": 4500,
-     "miningPct": 71
+     "miningPct": 59
     },
     {
      "id": "rune-guardian",
      "weight": 2,
      "bonusPct": 6800,
-     "miningPct": 110
+     "miningPct": 89
     }
    ]
   },
@@ -2625,37 +2709,37 @@
    "layer": 4,
    "premium": true,
    "currency": "star",
-   "price": 110000,
+   "price": 810000,
    "pets": [
     {
      "id": "nebula-blob",
      "weight": 40,
      "bonusPct": 3900,
-     "miningPct": 46
+     "miningPct": 38
     },
     {
      "id": "nebula-scout",
      "weight": 30,
      "bonusPct": 4700,
-     "miningPct": 55
+     "miningPct": 46
     },
     {
      "id": "nebula-friend",
      "weight": 20,
      "bonusPct": 6300,
-     "miningPct": 74
+     "miningPct": 61
     },
     {
      "id": "nebula-wing",
      "weight": 8,
      "bonusPct": 9000,
-     "miningPct": 110
+     "miningPct": 88
     },
     {
      "id": "nebula-guardian",
      "weight": 2,
      "bonusPct": 14000,
-     "miningPct": 160
+     "miningPct": 130
     }
    ]
   },
@@ -2665,37 +2749,37 @@
    "layer": 5,
    "premium": false,
    "currency": "star",
-   "price": 94000,
+   "price": 2900000,
    "pets": [
     {
      "id": "comet-blob",
      "weight": 40,
      "bonusPct": 4900,
-     "miningPct": 34
+     "miningPct": 26
     },
     {
      "id": "comet-scout",
      "weight": 30,
      "bonusPct": 5900,
-     "miningPct": 41
+     "miningPct": 32
     },
     {
      "id": "comet-friend",
      "weight": 20,
      "bonusPct": 7800,
-     "miningPct": 55
+     "miningPct": 42
     },
     {
      "id": "comet-wing",
      "weight": 8,
      "bonusPct": 11000,
-     "miningPct": 79
+     "miningPct": 60
     },
     {
      "id": "comet-guardian",
      "weight": 2,
      "bonusPct": 17000,
-     "miningPct": 120
+     "miningPct": 92
     }
    ]
   },
@@ -2705,37 +2789,37 @@
    "layer": 5,
    "premium": true,
    "currency": "star",
-   "price": 380000,
+   "price": 12000000,
    "pets": [
     {
      "id": "galaxy-blob",
      "weight": 40,
      "bonusPct": 9800,
-     "miningPct": 52
+     "miningPct": 39
     },
     {
      "id": "galaxy-scout",
      "weight": 30,
      "bonusPct": 12000,
-     "miningPct": 62
+     "miningPct": 47
     },
     {
      "id": "galaxy-friend",
      "weight": 20,
      "bonusPct": 16000,
-     "miningPct": 83
+     "miningPct": 63
     },
     {
      "id": "galaxy-wing",
      "weight": 8,
      "bonusPct": 22000,
-     "miningPct": 120
+     "miningPct": 91
     },
     {
      "id": "galaxy-guardian",
      "weight": 2,
      "bonusPct": 34000,
-     "miningPct": 180
+     "miningPct": 140
     }
    ]
   },
@@ -2745,37 +2829,37 @@
    "layer": 6,
    "premium": false,
    "currency": "star",
-   "price": 390000,
+   "price": 53000000,
    "pets": [
     {
      "id": "core-blob",
      "weight": 40,
      "bonusPct": 12000,
-     "miningPct": 39
+     "miningPct": 27
     },
     {
      "id": "core-scout",
      "weight": 30,
      "bonusPct": 15000,
-     "miningPct": 46
+     "miningPct": 33
     },
     {
      "id": "core-friend",
      "weight": 20,
      "bonusPct": 20000,
-     "miningPct": 62
+     "miningPct": 43
     },
     {
      "id": "core-wing",
      "weight": 8,
      "bonusPct": 28000,
-     "miningPct": 89
+     "miningPct": 62
     },
     {
      "id": "core-guardian",
      "weight": 2,
      "bonusPct": 43000,
-     "miningPct": 140
+     "miningPct": 95
     }
    ]
   },
@@ -2785,37 +2869,37 @@
    "layer": 6,
    "premium": true,
    "currency": "star",
-   "price": 1600000,
+   "price": 210000000,
    "pets": [
     {
      "id": "void-blob",
      "weight": 40,
      "bonusPct": 24000,
-     "miningPct": 58
+     "miningPct": 41
     },
     {
      "id": "void-scout",
      "weight": 30,
      "bonusPct": 29000,
-     "miningPct": 69
+     "miningPct": 49
     },
     {
      "id": "void-friend",
      "weight": 20,
      "bonusPct": 39000,
-     "miningPct": 93
+     "miningPct": 65
     },
     {
      "id": "void-wing",
      "weight": 8,
      "bonusPct": 56000,
-     "miningPct": 130
+     "miningPct": 93
     },
     {
      "id": "void-guardian",
      "weight": 2,
      "bonusPct": 85000,
-     "miningPct": 200
+     "miningPct": 140
     }
    ]
   }

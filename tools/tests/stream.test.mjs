@@ -109,8 +109,8 @@ test('combat damage survives streaming; actual removal alone awards and clears H
   // An independent completed collection fills the bag while this destruction is prepared.
   session.collected([{kind:64}]);
   for(let i=0;i<10;i++){f.workers[1].flush();s.process();}
-  assert.ok(s.cell(c));assert.equal(session.blockHealth(c),0);assert.equal(session.getSnapshot().inventory.used,1);
-  drain(s,f.workers);assert.equal(s.cell(c),0);assert.equal(receipts.length,1);assert.equal(session.getSnapshot().inventory.used,1+block.volume);
+  assert.ok(s.cell(c));assert.equal(session.blockHealth(c),0);assert.equal(session.getSnapshot().inventory.used,resourceByKind(64).volume);
+  drain(s,f.workers);assert.equal(s.cell(c),0);assert.equal(receipts.length,1);assert.equal(session.getSnapshot().inventory.used,resourceByKind(64).volume+block.volume);
   assert.equal(session.combatDebug().damagedCells,0);assert.equal(session.blockHealth(c),null);
  }finally{finish(f)}
 });

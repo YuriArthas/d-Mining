@@ -34,8 +34,8 @@
         -17.05
       ],
       "width": 5.4,
-      "title": "{name}",
-      "subtitle": "{number} / {depth} 米",
+      "title": "msg.name",
+      "subtitle": "msg.number_depth_m",
       "color": "#9ff4ff",
       "background": "#1c2a3a"
     },
@@ -47,8 +47,8 @@
         1.4
       ],
       "width": 3.2,
-      "title": "SELL",
-      "subtitle": "",
+      "title": "msg.sell_e2016fe7",
+      "subtitle": "msg.empty",
       "color": "#ffe08a",
       "background": "#1c2a3a",
       "yaw": 3.14159

@@ -1,3 +1,4 @@
+import { ECONOMY as E } from '../../src/game/content/economy.ts';
 // The way down dug as a player digs it, not as one shaft (2026-10-31). rush.mts digs only the block under the feet, a
 // one-block shaft; the user, digging world 1's first layer, was still above the cap's end after ten minutes. Here the
 // bot clears an N×N hole level by level (always the highest blocks left in it, as a player digging down around
@@ -18,8 +19,8 @@ const sizes = (process.argv[2] ?? '1,2,3').split(',').map(Number), levels = (pro
 async function dig(size: number, level: number) {
   const d = new GameSession(content).exportProgress() as any;
   d.onboarding = { ...d.onboarding, status: 'skipped' };
-  d.pickaxe = { version: 1, level, enhance: 0 }; d.equipment = { ...d.equipment, toolLevel: level, backpackCapacity: 5000 };
-  d.inventory = { ...d.inventory, capacity: 5000 };
+  d.pickaxe = { version: 1, level, enhance: 0 }; d.equipment = { ...d.equipment, toolLevel: level, backpackTier: E.bags.at(-1)!.tier, equippedBackpackTier: E.bags.at(-1)!.tier };
+  d.inventory = { ...d.inventory, capacity: E.bags.at(-1)!.capacity };
   const g = await createHeadlessGame(d);
   const reached = () => g.session.devUnlocks()[0].layers.filter(l => l.unlocked).length;
   g.player.travelTo(worldSpawn(1)); g.settle();

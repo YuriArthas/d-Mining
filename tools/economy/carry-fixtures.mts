@@ -1,0 +1,11 @@
+import {writeFileSync} from 'node:fs';
+import {GameSession} from '../../src/game/application/GameSession.ts';
+import {GAME_CONTENT,GAME_GENERATION} from '../../src/game/content/gameContent.ts';
+import {ECONOMY} from '../../src/game/content/economy.ts';
+import {TIP_IDS} from '../../src/game/logic/Onboarding.ts';
+const quiet=()=>{const d=new GameSession(GAME_CONTENT.session).exportProgress();d.onboarding={...d.onboarding!,status:'completed',seen:[...TIP_IDS],minedOnce:true,soldOnce:true};return d};
+const fixtures={legacy:quiet(),large:quiet(),shop:quiet(),mine:quiet()};
+fixtures.legacy.equipment={version:1,toolLevel:1,backpackCapacity:35,enhance:0,backpacks:[25,35]};fixtures.legacy.inventory.capacity=35;fixtures.legacy.inventory.items={[ECONOMY.layers[3].rock.itemId]:20};
+fixtures.large.equipment={version:2,toolLevel:1,enhance:0,backpackTier:30,equippedBackpackTier:30};fixtures.large.inventory.items={[ECONOMY.layers[20].rock.itemId]:12,[ECONOMY.layers[19].deep.itemId]:3};
+fixtures.shop.wallet.balances.gold=1e9;
+writeFileSync('output/economy-carry/fixtures.json',JSON.stringify({fixtures,generation:GAME_GENERATION,economy:ECONOMY,destinations:GAME_CONTENT.session.destinations},null,2));

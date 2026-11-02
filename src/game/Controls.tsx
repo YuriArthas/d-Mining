@@ -15,16 +15,16 @@ export function Controls({ input, surface }: { input: GameInput; surface: RefObj
   return <>
     <div ref={touchTarget} className="touch-target" hidden aria-hidden="true" />
     <div className="touch-controls">
-      <div ref={stick} className="joystick" role="group" aria-label={tr('移动摇杆')}>
+      <div ref={stick} className="joystick" role="group" aria-label={tr("msg.move_stick")}>
         <span ref={knob} className="joystick-knob" />
       </div>
       <div className="action-buttons">
-        <button ref={jump} className="jump-button" type="button" aria-label={tr('跳跃')} title={tr('跳跃')} aria-pressed="false"><Icon kind="jump" /></button>
+        <button ref={jump} className="jump-button" type="button" aria-label={tr("msg.jump")} title={tr("msg.jump")} aria-pressed="false"><Icon kind="jump" /></button>
       </div>
     </div>
     <div className="control-hint">
-      <span className="desktop-hint">{tr('WASD 移动 · 空格跳跃 · 右键观察 · 鼠标指向 · 按住左键挖掘')}</span>
-      <span className="touch-hint">{tr('左侧移动 · 拖动观察 · 点按敲击 · 长按挖掘')}</span>
+      <span className="desktop-hint">{tr("msg.wasd_move_space_jump_right_mouse_look_point_hold_left_mouse_")}</span>
+      <span className="touch-hint">{tr("msg.left_side_move_drag_to_look_tap_to_strike_hold_to_dig")}</span>
     </div>
   </>;
 }

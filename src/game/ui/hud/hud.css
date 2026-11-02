@@ -29,29 +29,46 @@
 /* Equal widths; the icons share one column on the left and the labels centre in the rest, so the two line up. */
 .hud-trips .ui-btn { display: grid; grid-template-columns: 1.5em 1fr; align-items: center; justify-items: center; gap: 6px; width: 100%; min-width: 112px; padding: 0 14px 0 10px; }
 .hud-trips .ui-btn > .ui-icon { justify-self: center; }
-/* A full bag: the sell button pulses inside a gold ring until the player goes to sell. */
-.hud-sell[data-state=full] { outline: 3px solid var(--ui-gold); outline-offset: 2px; animation: hud-sell-full 1s ease-in-out infinite; }
-@keyframes hud-sell-full { 50% { transform: scale(1.07); } }
-
-/* Top centre: where you are, the bar to the next layer, then buffs and tips. */
-.hud-center {
-  position: absolute; top: calc(6px + var(--safe-top)); left: 50%; transform: translateX(-50%);
-  display: grid; justify-items: center; gap: 6px; pointer-events: none;
-  width: min(280px, calc(100cqw - 2 * (var(--hud-edge) + max(var(--safe-left), var(--safe-right))) - 520px));
-  min-width: 200px;
+/* The full-bag guide is attached to its action, not the timed tip stack. Both targets sell on touch. */
+.hud-sell-group { position: relative; }
+.hud-trips .hud-sell[data-state=full] {
+  min-width: 132px; min-height: 52px; font-size: 19px;
+  outline: 4px solid var(--ui-gold); outline-offset: 3px; animation: hud-sell-full 1s ease-in-out infinite;
 }
-.hud-where { display: grid; justify-items: center; gap: 5px; }
-.hud-place, .hud-depth { display: flex; flex-direction: column; align-items: center; }
-.hud-place small { padding: 1px 12px 2px; border-radius: 8px 8px 0 0; background: var(--ui-ink); color: var(--ui-text-gold); font-size: 11px; line-height: 1.3; }
-.hud-place b { padding: 2px 18px; border: 3px solid var(--ui-ink); border-radius: 12px; background: var(--ui-paper); font-size: 20px; line-height: 1.2; white-space: nowrap; }
-.hud-depth { flex-direction: row; align-items: baseline; gap: 8px; padding: 0 14px; border: 3px solid var(--ui-ink); border-radius: 12px; background: var(--ui-paper); white-space: nowrap; }
-.hud-depth small { font-size: 13px; color: var(--ui-ink-soft); }
-.hud-depth b { font-size: 28px; line-height: 1.1; }
-.hud-depth b u { margin-left: 2px; font-size: .55em; text-decoration: none; }
-.hud-goal { position: relative; width: 220px; height: 18px; overflow: hidden; border: 2.5px solid var(--ui-ink); border-radius: 999px; background: var(--ui-paper); }
-.hud-goal > i { position: absolute; inset: 0 auto 0 0; width: var(--v); min-width: 8px; background: var(--ui-gold); transition: width .3s ease-out; }
-.hud-goal > span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 10.5px; white-space: nowrap; }
-.hud-goal em { font-style: normal; color: var(--ui-ink-soft); }
+.hud-sell-guide {
+  position: absolute; z-index: 3; left: calc(100% + 42px); top: 32px;
+  width: 158px; min-height: 52px; padding: 8px 10px;
+  border: 3px solid var(--ui-ink); border-radius: 12px; background: var(--ui-gold); color: var(--ui-ink);
+  font: 800 16px/1.25 var(--ui-font); text-align: left;
+  pointer-events: auto; touch-action: manipulation; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.hud-sell-guide:active { background: var(--ui-text-gold); }
+.hud-sell-arrow { position: absolute; left: -41px; top: -22px; width: 36px; height: 36px; overflow: visible;
+  fill: var(--ui-gold); stroke: var(--ui-ink); stroke-width: 3px; stroke-linejoin: round;
+  animation: hud-sell-point 1s ease-in-out infinite; pointer-events: none; }
+@keyframes hud-sell-full { 50% { outline-offset: 6px; } }
+@keyframes hud-sell-point { 50% { transform: translateX(-6px); } }
+
+/* Image 2.5 reference: colored route, authored medallions and a separate current-depth pointer. */
+.hud-center {
+  position: absolute; top: calc(6px + var(--safe-top)); left: calc(var(--safe-left) + 210px); right: calc(var(--safe-right) + 90px);
+  display: grid; justify-items: center; gap: 6px; pointer-events: none; min-width: 0;
+}
+.hud-wallet { flex-direction: column; align-items: flex-start; gap: var(--hud-gap); }
+.hud-where { width: min(100%, 510px); padding: 0 18px; box-sizing: border-box; height: 62px; }
+.hud-route { position: relative; margin-top: 10px; height: 16px; }
+.hud-route-track { position: absolute; inset: 0; border-radius: 20px; border: 2px solid #12d4f5;
+  background: linear-gradient(90deg, #48f400 0%, #b8f900 25%, #ffe600 48%, #ff9200 70%, #ff283d 100%);
+  box-shadow: 0 0 0 2px #103454, inset 0 2px 1px #ffffff7a; }
+.hud-route-node { position: absolute; top: 50%; width: 30px; height: 30px; transform: translate(-50%, -50%); }
+.hud-route-node img { width: 100%; height: 100%; display: block; }
+.hud-route-node img[data-kind=layer] { filter: hue-rotate(var(--node-hue)); }
+.hud-route-node[data-unlocked=false] { filter: saturate(.55) brightness(.55); }
+.hud-route-node[data-unlocked=true] { filter: drop-shadow(0 0 2px #17e6ff); }
+.hud-route-pointer { position: absolute; top: 24px; display: grid; justify-items: center; transform: translateX(-50%); color: #fff; }
+.hud-route-pointer i { width: 0; height: 0; border-left: 7px solid transparent; border-right: 7px solid transparent; border-bottom: 10px solid #24d9ff; filter: drop-shadow(0 -1px 1px #102a4a); }
+.hud-route-pointer b { font-size: 18px; line-height: 23px; white-space: nowrap; -webkit-text-stroke: 3px #102a4a; paint-order: stroke fill; }
+.hud-route-pointer u { text-decoration: none; font-size: .8em; margin-left: 1px; }
 .hud-buffs { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
 .hud-buff { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 9px 0 3px; border: 2.5px solid var(--ui-ink); border-radius: 999px; background: var(--ui-paper); font-size: 12px; white-space: nowrap; }
 .hud-buff .ui-icon { width: 20px; height: 20px; }
@@ -130,13 +147,7 @@
 /* Desktop and tablets: larger bodies. */
 @container game (min-width: 1000px) and (min-height: 620px) {
   .ui-hud { --hud-edge: 18px; --hud-pill: 42px; --hud-tile: 64px; --hud-menu: 50px; --hud-gap: 12px; }
-  .hud-center { top: calc(10px + var(--safe-top)); width: 340px; }
-  .hud-place b { font-size: 28px; }
-  .hud-place small { font-size: 14px; }
-  .hud-depth b { font-size: 38px; }
-  .hud-depth small { font-size: 16px; }
-  .hud-goal { width: 280px; height: 22px; }
-  .hud-goal > span { font-size: 13px; }
+  .hud-center { top: calc(10px + var(--safe-top)); left: calc(var(--safe-left) + 210px); right: calc(var(--safe-right) + 120px); }
   .hud-trips .ui-btn { min-width: 140px; }
 }
 /* Narrow phones: money above the bag, so the left column never reaches the centre plate. */
@@ -147,10 +158,6 @@
 @container game (max-height: 360px) {
   .ui-hud { --hud-edge: 8px; --hud-pill: 28px; --hud-tile: 46px; --hud-menu: 36px; --hud-gap: 6px; }
   .session-ui { --hud-jump: 62px; }
-  .hud-place b { font-size: 17px; padding: 1px 14px; }
-  .hud-depth b { font-size: 23px; }
-  .hud-goal { height: 16px; }
-  .hud-goal > span { font-size: 9.5px; }
   .hud-trips .ui-btn { min-width: 100px; }
   .game-shell .joystick { width: 108px; height: 108px; }
   .game-shell .joystick-knob { left: 27px; top: 27px; }
@@ -160,7 +167,20 @@
   @media (pointer: coarse), (any-pointer: coarse) { .hud-perf { left: calc(16px + 108px + 10px + var(--safe-left)); } }
 }
 @media (prefers-reduced-motion: reduce) {
-  .hud-sell[data-state=full] { animation: none; }
+  .hud-trips .hud-sell[data-state=full], .hud-sell-arrow { animation: none; }
 }
 .hud-menu-lang { display: flex; }
 .hud-menu-lang > button { flex: 1; }
+
+@container game (max-width: 620px) {
+  .hud-center { left: calc(var(--safe-left) + 210px); right: calc(var(--safe-right) + 76px); }
+  .hud-route-node { width: 26px; height: 26px; }
+}
+
+.hud-bag-value { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; }
+.hud-bag-label { font-size: 14px; color: var(--ui-ink-soft); }
+/* Two readable lines inside the bag pill, including 320px-high landscape phones. */
+.ui-hud .hud-bag { height: 44px; }
+
+.hud-bag .ui-pill-value { font-size: 16px; }
+.hud-bag .ui-pill-value small { font-size: 14px; }

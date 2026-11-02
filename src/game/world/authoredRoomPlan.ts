@@ -1,3 +1,4 @@
+import type { MessageId } from '../i18n/messages.ts';
 import {roomSceneAsset} from '../content/rooms/sceneAssets.ts';
 import {undergroundHall} from '../content/underground/halls.ts';
 import type {RoomAnchor,RoomSceneAsset} from '../content/rooms/authoredRoom.ts';
@@ -67,7 +68,7 @@ export function authoredRoomPlan(room:RestRoom,providedAsset?:RoomSceneAsset):Sc
   }
   const at=(id:RoomAnchor,offset:readonly number[])=>world(anchor(id).map((v,i)=>v+offset[i]));
   // Sign text from the scene file, in the page's language (tools/i18n-scan.mjs reads the scene files' sign text).
-  const text=(value:string)=>tr(value,{name:room.name,number:String(room.number).padStart(2,'0'),depth:room.depth});
+  const text=(value:MessageId)=>tr(value,{name:room.name,number:String(room.number).padStart(2,'0'),depth:room.depth});
   return {
     shapes:definition.rings.filter(r=>r.anchor!=='shop'||room.shop).map(r=>{
       const zone=r.anchor==='sell'?room.sell:room.shop!;
@@ -88,7 +89,7 @@ function hallPlan(room:RestRoom,hallId:string):SceneryPlan {
   const anchor=(id:RoomAnchor)=>id==='room'?[0,0,0]:definition.facilities[id]!.at;
   const at=(id:RoomAnchor,offset:readonly number[]):V3=>anchor(id).map((v,i)=>[room.x,0,room.z][i]+(v+offset[i])*scale[i]) as V3;
   // Sign text from the scene file, in the page's language (tools/i18n-scan.mjs reads the scene files' sign text).
-  const text=(value:string)=>tr(value,{name:room.name,number:String(room.number).padStart(2,'0'),depth:room.depth});
+  const text=(value:MessageId)=>tr(value,{name:room.name,number:String(room.number).padStart(2,'0'),depth:room.depth});
   return {
     shapes:definition.rings.filter(r=>r.anchor!=='shop'||room.shop).map(r=>{const zone=r.anchor==='sell'?room.sell:room.shop!;return {type:'pad',at:at(r.anchor,r.offset),size:[zone.radius,PAD_CURTAIN,zone.radius],color:r.color,interaction:true};}),
     solids:solids.map(s=>({...s,at:[s.at[0]+room.x,s.at[1],s.at[2]+room.z] as V3})),

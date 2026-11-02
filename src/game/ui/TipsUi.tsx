@@ -17,26 +17,32 @@ export function TipMarker({ tip, anchor, hidden, marker }: { tip: Tip | null; an
   const touch = useTouchControls();
   if (hidden || !tip) return null;
   if (tip.anchor === 'dig') return <div key="dig" ref={marker} className="guide-dig-marker" data-input={touch ? 'touch' : 'mouse'} style={{ visibility: 'hidden' }} aria-hidden="true">
-    <span className="guide-dig-ring" /><b className="guide-dig-caption">{touch ? tr('长按这里挖矿') : tr('鼠标移到这里 · 按住左键')}</b>
+    <span className="guide-dig-ring" /><b className="guide-dig-caption">{touch ? tr("msg.press_and_hold_here_to_dig") : tr("msg.point_here_hold_left_mouse")}</b>
   </div>;
   // Just the label over the mine while it is in view; the ground arrow leads the way otherwise.
   if (tip.anchor === 'mine' && anchor) return <div key="mine" ref={marker} className="guide-marker" style={{ visibility: 'hidden' }} aria-hidden="true">
-    <b>{tr('去矿坑挖矿')}</b>
+    <b>{tr("msg.go_dig_in_the_pit")}</b>
   </div>;
   return null;
 }
 
-const HUD_TIPS: Partial<Record<TipId, [IconKind, string]>> = {
-  sell: ['coin', tr('背包满了，点「出售」卖掉')],
-  shop: ['chest', tr('金币够了，去「商店」升级镐子')],
-  pets: ['paw', tr('点「宠物」开蛋，挖得更快')],
+const HUD_TIPS: Partial<Record<TipId, [IconKind, string, string]>> = {
+  shop: ['chest', tr("msg.enough_gold_upgrade_your_pickaxe_in_the_shop"), tr("msg.tip_go_shop")],
+  pets: ['paw', tr("msg.tip_first_egg"), tr("msg.tip_go_egg")],
+  station: ['portal', tr("msg.tip_station"), tr("msg.tip_go_station")],
+  portal: ['globe', tr("msg.tip_portal"), tr("msg.tip_view_ticket")],
+  world2: ['globe', tr("msg.tip_world_ready", { world: tr("msg.world_2") }), tr("msg.tip_go_portal")],
+  world3: ['globe', tr("msg.tip_world_ready", { world: tr("msg.world_3") }), tr("msg.tip_go_portal")],
 };
-/** A HUD tip: one short line under the depth while the control it names pulses. Tap to put it away. */
+/** One optional suggestion with a direct route to its entrance; closing is a separate touch target. */
 export function TipToast({ session, tip }: { session: GameSession; tip: Tip | null }) {
   const content = tip && HUD_TIPS[tip.id];
   if (!tip || !content) return null;
-  return <GameButton className="ui-tip" data-tip={tip.id} aria-label={tr('提示：{content}（点按收起）', { content: content[1] })} onPress={() => session.dismissTip(tip.id)}>
-    <Icon kind={content[0]} /><span>{content[1]}</span>
-  </GameButton>;
+  return <aside className="ui-tip" data-tip={tip.id}>
+    <GameButton className="ui-tip-go" onPress={() => session.followTip(tip.id)}>
+      <Icon kind={content[0]} /><span>{content[1]}<b>{content[2]} <span aria-hidden="true">→</span></b></span>
+    </GameButton>
+    <GameButton className="ui-tip-close" aria-label={tr("msg.tip_dismiss")} onPress={() => session.dismissTip(tip.id)}><span aria-hidden="true">×</span></GameButton>
+  </aside>;
 }
 

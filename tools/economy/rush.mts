@@ -16,8 +16,8 @@ const halls = (w: number) => content.destinations.filter(d => d.worldId === w);
 async function rush(w: number, k: number, level: number) {
   const d = new GameSession(content).exportProgress() as any;
   d.onboarding = { ...d.onboarding, status: 'skipped' };
-  d.pickaxe = { version: 1, level, enhance: 0 }; d.equipment = { ...d.equipment, toolLevel: level, backpackCapacity: 5000 };
-  d.inventory = { ...d.inventory, capacity: 5000 };
+  d.pickaxe = { version: 1, level, enhance: 0 }; d.equipment = { ...d.equipment, toolLevel: level, backpackTier: E.bags.at(-1)!.tier, equippedBackpackTier: E.bags.at(-1)!.tier };
+  d.inventory = { ...d.inventory, capacity: E.bags.at(-1)!.capacity };
   d.worldProgress = { version: 2, openWorlds: [1, 2, 3].filter(x => x <= w) };
   for (const x of [1, 2, 3]) { const rooms = halls(x).slice(0, x < w ? 6 : k); d.worldExploration[x] = { version: 1, maxDepth: rooms.at(-1)?.depth ?? 0, unlockedDestinationIds: rooms.map(r => r.id) }; }
   d.exploration = d.worldExploration[1];

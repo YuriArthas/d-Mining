@@ -36,6 +36,14 @@ const hallShop = (room: { id: string; shop: ServiceZone | null; worldId: number 
   if (layer !== 2 && layer !== 4) throw Error(`商店只在第 2、4 层: ${room.id}`);
   return { id: room.id, zone: { ...z, lookAt: [z.x, z.y + 1, z.z + 6] as const }, world, layer: layer as 2 | 4 };
 };
+/** A hall's sell ring, facing its counter, the side its SELL sign stands on: past the ring toward +Z in the halls of
+ *  worlds 1 and 2, toward -Z in world 3's stations. Sell from inside a hall arrives there (2026-11-02: facing away,
+ *  the camera stood behind the mushroom cave's counter, in its mushrooms' caps). */
+const hallSale = (room: { sell: ServiceZone; sceneDefinition: { signs: readonly { anchor: string; offset: readonly number[] }[] } }): ServiceZone => {
+  const z = room.sell, sign = room.sceneDefinition.signs.find(s => s.anchor === 'sell');
+  if (!sign) throw Error('a hall without a SELL sign');
+  return { ...z, lookAt: [z.x, z.y + 1, z.z + Math.sign(sign.offset[2]) * 6] as const };
+};
 // Each world's eggs stand in it: world 1's on Pinewind's terrace, the later worlds' in their bases' hatcheries.
 const inBase = (stands: readonly EggStand[], worldZ: number): HubEgg[] => stands.map(s => ({ ...s, tier: 0, y: 0, z: s.z + worldZ }));
 const eggs: readonly HubEgg[] = [...PINEWIND_EGG_DISPLAYS, ...inBase(TECH_BASE.stands, TECH_BASE.worldZ), ...inBase(STAR_BASE.stands, STAR_BASE.worldZ)];
@@ -66,8 +74,8 @@ const session: SessionContent = {
   }))),
   // Each world's surface services first, then its rooms'. Worlds 2 and 3 keep simple counters by their spawns.
   sales: [
-    PINEWIND_SERVICES.sale.trigger, ...first.rooms.map(r => r.sell),
-    ...later.flatMap(w => [serviceZone(w.z, 'sell'), ...w.rooms.map(r => r.sell)]),
+    PINEWIND_SERVICES.sale.trigger, ...first.rooms.map(hallSale),
+    ...later.flatMap(w => [serviceZone(w.z, 'sell'), ...w.rooms.map(hallSale)]),
   ],
   shops: [
     { id: 'surface-upgrade', zone: PINEWIND_SERVICES.shop.trigger, world: 1, layer: 0, category: 'tools' },

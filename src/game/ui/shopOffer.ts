@@ -1,3 +1,4 @@
+import { formatNumber } from '../presentation/formatNumber.ts';
 import type { ShopCategory, ShopItem } from '../content/shopCatalog.ts';
 import type { CurrencyId } from '../content/economy.ts';
 import { pickaxeStats } from '../logic/Pickaxe.ts';
@@ -9,11 +10,11 @@ type Snapshot = Readonly<{
   balances: Readonly<Record<CurrencyId, number>>;
   pickaxe: Readonly<{ level: number }>;
   inventory: Readonly<{ capacity: number; used: number }>;
-  equipment: Readonly<{ toolLevel: number; backpackCapacity: number; enhance?: number }>;
+  equipment: Readonly<{ toolLevel: number; backpackCapacity: number; enhance?: number; tools?: readonly number[]; backpacks?: readonly number[] }>;
   backpackUpgrade: Readonly<{ next?: Readonly<{ id: string }> | null }>;
 }>;
 
-type OfferState = 'equipped' | 'owned' | 'next' | 'locked';
+type OfferState = 'equipped' | 'owned' | 'next';
 /** The world an item belongs to, which colours its name: 1-10 plain, 11-20 cyan, 21-30 gold. */
 type OfferTier = 'plain' | 'fine' | 'star';
 type OfferStat = Readonly<{ key: 'power' | 'speed' | 'capacity'; label: string; value: number; current: number; max: number; unit: string }>;
@@ -24,22 +25,21 @@ export const offerTier = (item: ShopItem): OfferTier => item.level <= 10 ? 'plai
 export function offerState(category: ShopCategory, item: ShopItem, s: Snapshot): OfferState {
   const equipped = category === 'tools' ? item.level === s.pickaxe.level : item.capacity === s.inventory.capacity;
   if (equipped) return 'equipped';
-  const owned = category === 'tools' ? item.level <= s.equipment.toolLevel : item.capacity! <= s.equipment.backpackCapacity;
+  const owned = category === 'tools' ? (s.equipment.tools?.includes(item.level) ?? item.level <= s.equipment.toolLevel) : (s.equipment.backpacks?.includes(item.capacity!) ?? item.capacity! <= s.equipment.backpackCapacity);
   if (owned) return 'owned';
-  const next = category === 'tools' ? item.level === s.equipment.toolLevel + 1 : item.id === s.backpackUpgrade.next?.id;
-  return next ? 'next' : 'locked';
+  return 'next';
 }
 
 /** The item's numbers next to what the player carries now, and the best in the shop (for the bars). */
 export function offerStats(category: ShopCategory, item: ShopItem, items: readonly ShopItem[], s: Snapshot): OfferStat[] {
   const last = items[items.length - 1];
-  if (category === 'backpacks') return [{ key: 'capacity', label: tr('容量'), value: item.capacity!, current: s.inventory.capacity, max: last.capacity!, unit: '' }];
+  if (category === 'backpacks') return [{ key: 'capacity', label: tr("msg.capacity"), value: item.capacity!, current: s.inventory.capacity, max: last.capacity!, unit: '' }];
   const worn = items.find(i => i.level === s.pickaxe.level) ?? items[0];
   // The newest pickaxe counts with its enhancements (+1..+3); older ones were never enhanced.
   const power = (i: ShopItem) => i.level === s.equipment.toolLevel && s.equipment.enhance ? pickaxeStats(i.level, 1, s.equipment.enhance).power : i.power!;
   return [
-    { key: 'power', label: tr('伤害'), value: power(item), current: power(worn), max: last.power!, unit: '' },
-    { key: 'speed', label: tr('攻速'), value: item.speed!, current: worn.speed!, max: last.speed!, unit: tr('/秒') },
+    { key: 'power', label: tr("msg.damage"), value: power(item), current: power(worn), max: last.power!, unit: '' },
+    { key: 'speed', label: tr("msg.speed"), value: item.speed!, current: worn.speed!, max: last.speed!, unit: tr("msg.s") },
   ];
 }
 
@@ -57,16 +57,16 @@ export function toolReach(level: number) {
 export function offerGain(stat: Readonly<{ key: 'power' | 'speed' | 'capacity'; value: number; current: number }>) {
   if (!(stat.value > stat.current) || stat.current <= 0) return null;
   if (stat.key === 'power') { const r = stat.value / stat.current; return `×${r >= 10 ? Math.round(r) : Math.round(r * 10) / 10}`; }
-  return `+${Math.round((stat.value - stat.current) * 100) / 100}`;
+  return `+${formatNumber(Math.round((stat.value - stat.current) * 100) / 100)}`;
 }
 
 /** What the buy button says and whether it works. */
 export function offerAction(category: ShopCategory, item: ShopItem, s: Snapshot, state = offerState(category, item, s)) {
-  const tooSmall = category === 'backpacks' && item.capacity! < s.inventory.used;
+  const tooSmall = category === 'backpacks' && item.capacity! < s.inventory.used && item.capacity! < s.inventory.capacity;
   const balance = s.balances[item.currency], affordable = balance >= item.price;
-  if (state === 'equipped') return { label: tr('已装备'), enabled: false, buy: false };
-  if (state === 'owned') return tooSmall ? { label: tr('先卖掉矿石'), enabled: false, buy: false } : { label: tr('装备'), enabled: true, buy: false };
-  if (state === 'locked') return { label: tr('先买上一件'), enabled: false, buy: false };
+  if (state === 'equipped') return { label: tr("msg.equipped_a68821c6"), enabled: false, buy: false };
+  if (state === 'owned') return tooSmall ? { label: tr("msg.sell_your_ore_first"), enabled: false, buy: false } : { label: tr("msg.equip"), enabled: true, buy: false };
+  if (tooSmall) return { label: tr("msg.sell_your_ore_first"), enabled: false, buy: false };
   // Short of coins: the same button with its price, greyed (never a missing amount).
-  return { label: tr('购买'), enabled: affordable, buy: affordable };
+  return { label: tr("msg.buy"), enabled: affordable, buy: affordable };
 }

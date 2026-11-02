@@ -9,8 +9,10 @@ interface WorkerPort {
 }
 export type WorkerFactory = () => WorkerPort;
 export class Measurements {
+  readonly enabled: boolean;
+  constructor(enabled = true) { this.enabled = enabled; }
   private values = new Map<string, number[]>();
-  add(name: string, value: number) { const list = this.values.get(name) ?? []; list.push(value); if (list.length > 256) list.shift(); this.values.set(name, list); }
+  add(name: string, value: number) { if (!this.enabled) return; const list = this.values.get(name) ?? []; list.push(value); if (list.length > 256) list.shift(); this.values.set(name, list); }
   snapshot() { return Object.fromEntries([...this.values].map(([key, values]) => { const sorted = [...values].sort((a, b) => a - b); return [key, { samples: values.length, p95: sorted[Math.floor((sorted.length - 1) * 0.95)], max: sorted.at(-1) }]; })); }
 }
 export type Resident<T> = { coord: Coord; version: number; resource: T };

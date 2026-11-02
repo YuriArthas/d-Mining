@@ -1,3 +1,4 @@
+import { resolveText } from '../../src/game/i18n/i18n.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -13,11 +14,11 @@ const content=GAME_CONTENT.session;
 const T2=ECONOMY.tools[1].price,T3=ECONOMY.tools[2].price,T4=ECONOMY.tools[3].price,B2=ECONOMY.bags[1].price,[C1,C2,C3]=ECONOMY.bags.map(b=>b.capacity);
 function funded(coins=10000) { const data=new GameSession(content).exportProgress();data.wallet.balances.gold=coins;return GameSession.fromData(data,content); }
 function enter(s) { const {zone}=content.shops[0];s.updatePosition([zone.x,zone.y,zone.z],true);assert.ok(s.getSnapshot().shopId); }
-test('gear is bought at a shop counter, from its shelf: affordability and sequence; repeated touch never double-debits',()=>{
+test('gear is bought at a shop counter, from its shelf: affordability and skipping; repeated touch never double-debits',()=>{
  const away=funded();assert.equal(away.useShopItem('tools','tool-2').status,'away','nothing is bought away from a counter');assert.equal(away.getSnapshot().coins,10000);
  assert.equal(away.enhancePickaxe(1,0).status,'away');
  const s=funded();
- enter(s);assert.equal(s.useShopItem('tools','tool-3').status,'locked');assert.equal(s.useShopItem('backpacks','journey-bag-3').status,'locked');assert.equal(s.getSnapshot().coins,10000);
+ enter(s);assert.equal(s.getSnapshot().coins,10000);
  let commits=0;s.onProgressCommitted(()=>commits++);
  assert.equal(s.useShopItem('tools','tool-2').status,'upgraded');assert.equal(s.getSnapshot().coins,10000-T2);assert.equal(commits,1);
  assert.equal(s.useShopItem('tools','tool-2').status,'equipped');assert.equal(s.getSnapshot().coins,10000-T2);assert.equal(commits,1);
@@ -39,7 +40,7 @@ test('smaller bag never deletes contents',()=>{
  const before=s.exportProgress();assert.equal(s.useShopItem('backpacks','starter-bag').status,'too-small');assert.deepEqual(s.exportProgress(),before);
 });
 test('old saves derive owned tiers; corrupt new collections fail instead of hiding damage',()=>{
- const data=funded().exportProgress();delete data.equipment;data.pickaxe.level=3;data.inventory.capacity=C3;
+ const data=funded().exportProgress();delete data.equipment;data.pickaxe.level=3;data.inventory.capacity=35;
  const s=GameSession.fromData(data,content);assert.deepEqual(s.getSnapshot().equipment,{version:1,toolLevel:3,backpackCapacity:C3,enhance:0});enter(s);assert.equal(s.useShopItem('tools','tool-1').status,'equipped');assert.equal(s.getSnapshot().coins,10000);
  for(const bad of [null,{}, {version:2}, {version:1,toolLevel:2,backpackCapacity:C3}, {version:1,toolLevel:3,backpackCapacity:C1}])assert.throws(()=>new EquipmentCollection(3,C3,bad));
 });
@@ -58,10 +59,10 @@ test('all 60 catalog models exist, real prices/capacities match game progression
 test('三十把工具和三十个背包各有自己的名字和一句介绍；电钻类是打蛋器、冲击电钻、链锯、等离子钻和独角兽角钻',()=>{
   const tools=shopTools(),bags=shopBackpacks();
   for(const list of [tools,bags]){
-    assert.equal(new Set(list.map(i=>i.name)).size,list.length,'every name is different');
+    assert.equal(new Set(list.map(i=>i.name.id)).size,list.length,'every name is different');
     assert.equal(new Set(list.map(i=>i.description)).size,list.length,'every item has its own line');
   }
-  assert.equal(tools[0].name,'老木镐');assert.equal(bags[0].name,'麻布袋');
+  assert.equal(resolveText(tools[0].name),'老木镐');assert.equal(resolveText(bags[0].name),'麻布袋');
   assert.deepEqual(tools.filter(t=>t.motion==='drill').map(t=>t.level),[7,12,13,20,27]);
   assert.ok(tools.every(t=>t.motion==='drill'||t.motion==='swing'));
 });
@@ -112,12 +113,38 @@ test('each world sells its gear in three shops with their own shelves: the surfa
  assert.equal(v.shopId,'surface-upgrade');assert.deepEqual(shelf(v),{tools:[1,2,3],bags:[1,2,3]});assert.equal(s.goToShop(),'here');
  s.devUnlockLayer(halls[1].id);assert.equal(s.goToShop(),'travelling');v=arrive();
  assert.equal(v.shopId,halls[1].id);assert.deepEqual(shelf(v),{tools:[1,4,5,6],bags:[4,5,6]},'its own shelf, and the newest pickaxe to enhance');
- assert.equal(s.useShopItem('tools','tool-4').status,'locked');assert.equal(s.useShopItem('tools','tool-2').status,'unavailable','not on this shelf');
- assert.equal(s.enhancePickaxe(1,0).status,'enhanced','any shop of its world enhances the newest pickaxe');
+ assert.equal(s.useShopItem('tools','tool-4').status,'upgraded');assert.equal(s.useShopItem('tools','tool-2').status,'unavailable','not on this shelf');
+ assert.equal(s.enhancePickaxe(4,0).status,'enhanced','any shop of its world enhances the newest pickaxe');
  // The bag's shortcut goes where the next item is sold: the next pickaxe, L2, is on the surface.
- assert.equal(s.goToShop('tools','next'),'travelling');v=arrive();assert.equal(v.shopId,'surface-upgrade');
- s.useShopItem('tools','tool-2');s.useShopItem('tools','tool-3');assert.equal(s.getSnapshot().equipment.toolLevel,3);
- s.devUnlockLayer(halls[3].id);assert.equal(s.goToShop(),'travelling');v=arrive();assert.equal(v.shopId,halls[3].id);assert.deepEqual(shelf(v),{tools:[3,7,8,9,10],bags:[7,8,9,10]});
+ const surface=content.shops.find(x=>x.id==='surface-upgrade').zone;s.updatePosition([surface.x,surface.y,surface.z],true);
+ s.useShopItem('tools','tool-2');s.useShopItem('tools','tool-3');assert.equal(s.getSnapshot().equipment.toolLevel,4);
+ s.devUnlockLayer(halls[3].id);assert.equal(s.goToShop(),'travelling');v=arrive();assert.equal(v.shopId,halls[3].id);assert.deepEqual(shelf(v),{tools:[4,7,8,9,10],bags:[7,8,9,10]});
  // World 1's surface has a pack shop beside the forge: backpacks go there.
  assert.equal(s.goToShop('backpacks','next'),'travelling');v=arrive();assert.equal(v.shopId,packs.id);
+});
+
+test('skip purchases own only paid gear, survive reload, and never reset a higher tool enhancement',()=>{
+ const s=funded(1e9);enter(s);
+ const before=s.getSnapshot().coins;
+ assert.equal(s.useShopItem('tools','tool-3').status,'upgraded');
+ assert.equal(s.useShopItem('backpacks','journey-bag-3').status,'upgraded');
+ const paid=T3+ECONOMY.bags[2].price;
+ assert.equal(s.getSnapshot().coins,before-paid);
+ assert.deepEqual(s.exportProgress().equipment.tools,[1,3]);assert.deepEqual(s.exportProgress().equipment.backpackTiers,[1,3]);
+ s.useShopItem('tools','tool-3');s.useShopItem('backpacks','journey-bag-3');assert.equal(s.getSnapshot().coins,before-paid);
+ const r=GameSession.fromData(s.exportProgress(),content);enter(r);r.enhancePickaxe(3,0);
+ const money=r.getSnapshot().coins;assert.equal(r.useShopItem('tools','tool-2').status,'upgraded');assert.equal(r.getSnapshot().coins,money-T2);
+ assert.equal(r.getSnapshot().equipment.toolLevel,3);assert.equal(r.getSnapshot().equipment.enhance,1);
+ r.useShopItem('tools','tool-3');assert.equal(r.getSnapshot().pickaxe.enhance,1);
+ assert.equal(r.useShopItem('backpacks','journey-bag-2').status,'upgraded');
+ assert.equal(r.getSnapshot().equipment.backpackCapacity,C3);
+ const bad=s.exportProgress();bad.equipment.tools=[1,2];assert.throws(()=>GameSession.fromData(bad,content));
+});
+
+test('an overfull old save may still buy a larger bag, preserving every block',()=>{
+ const s=funded(1e9);enter(s);s.collected(Array.from({length:C3+1},()=>({kind:64})));
+ const before=s.getSnapshot().inventory;assert.equal(before.used,C3+1);
+ assert.equal(s.useShopItem('backpacks','journey-bag-3').status,'upgraded');
+ assert.equal(s.getSnapshot().inventory.capacity,C3);assert.deepEqual(s.getSnapshot().inventory.items,before.items);
+ assert.equal(s.useShopItem('backpacks','journey-bag-2').status,'too-small');
 });

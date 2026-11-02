@@ -1,0 +1,133 @@
+// Offline: build, bake and pack an authored scene: an underground rest hall or a later world's surface base.
+// Run: node tools/build-underground.mjs <id>   (fungal, old-mine, ..., automine, tech-base; after
+// `blender -b --python tools/blender/build_<id>.py` in surface-game-art, which writes <id>-props.glb)
+// The scene comes from surface-game-art/tools/underground/<camelId>Hall.ts (`buildHall`); a module may export
+// `ASSET` (default <id>-hall), `SUN = true` (bake the daytime sun's shadows too, for the surface) and `PROPS` (the
+// prop kits it places, default [<id>]: <kit>-props.glb each). Nodes named Spin_* / Slide_* stay out of the static
+// batches and move in the game (SceneMotion.ts); Egg_* (egg stands) keep their own node too, so the game can find
+// each stand by name (LockedEggs.ts), and cast their shadows like the static scene. Every placed prop brings the
+// colliders its Blender function gave it (collision.py, placed with it by propCollision.ts); the hall's own shapes
+// add theirs with the kit's box() and hull().
+// Output:
+// surface-game-art/public/assets/underground/<asset>.glb, the packed runtime asset in src/game/assets/scene
+// (<asset>.*), and its colliders in src/game/content/underground/<asset>.json.
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { readFileSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
+import { gzipSync } from 'node:zlib';
+import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
+import { bakeOcclusion, OCCLUDER } from '../surface-game-art/tools/terrain/bakeLight.mjs';
+import { batchStatic } from '../surface-game-art/tools/terrain/kit.ts';
+import { placeProp } from '../src/game/world/propCollision.ts';
+const require = createRequire(new URL('../surface-game-art/package.json', import.meta.url));
+const { createCanvas, loadImage, ImageData, Image } = require('@napi-rs/canvas');
+globalThis.self = globalThis; globalThis.ImageData = ImageData; globalThis.HTMLImageElement = Image;
+globalThis.createImageBitmap = async blob => loadImage(Buffer.from(await blob.arrayBuffer()));
+globalThis.document = { createElement(name) { if (name !== 'canvas') throw Error(name); const c = createCanvas(1, 1); c.toBlob = async (callback, type) => callback(new Blob([await c.encode(type === 'image/jpeg' ? 'jpeg' : 'png')], { type })); return c; } };
+globalThis.FileReader = class { readAsArrayBuffer(blob) { blob.arrayBuffer().then(b => { this.result = b; this.onloadend?.(); }); } readAsDataURL(blob) { blob.arrayBuffer().then(b => { this.result = 'data:' + blob.type + ';base64,' + Buffer.from(b).toString('base64'); this.onloadend?.(); }); } };
+const hash = b => createHash('sha256').update(b).digest('hex');
+
+const id = process.argv[2];
+if (!/^[a-z]+(-[a-z]+)*$/.test(id ?? '')) throw Error('usage: node tools/build-underground.mjs <hall id>');
+const camel = id.replace(/-(\w)/g, (_, c) => c.toUpperCase());
+const { buildHall, ASSET, SUN = false, PROPS = [id] } = await import(`../surface-game-art/tools/underground/${camel}Hall.ts`);
+const name = ASSET ?? `${id}-hall`;
+const art = 'surface-game-art/public/assets/underground', shipped = 'src/game/assets/scene';
+const kits = await Promise.all(PROPS.map(kit => { const buffer = readFileSync(`${art}/${kit}-props.glb`);
+  return new GLTFLoader().parseAsync(buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.length), '').then(g => g.scene); }));
+// A prop is a kit's top-level node of that name (a part deeper in may share it).
+const built = buildHall(prop => {
+  const node = kits.map(kit => kit.children.find(o => o.name === prop)).find(Boolean); if (!node) throw Error(`Missing prop ${prop}`);
+  if (typeof node.userData.collision !== 'string') throw Error(`Prop ${prop} has no collision (rebuild its kit with collision.py)`);
+  const copy = node.clone(true); copy.position.set(0, 0, 0); copy.rotation.set(0, 0, 0); copy.scale.set(1, 1, 1);
+  copy.userData = { prop, collision: JSON.parse(node.userData.collision) }; return copy;
+});
+
+// The props' colliders where they stand (moving parts at rest). Their own triangles (mesh_solid) are for Pinewind's
+// models only (export-pinewind-scene.mjs).
+const placed = { solids: 0, passable: 0, props: 0 };
+built.group.updateMatrixWorld(true);
+const toHall = built.group.matrixWorld.clone().invert();
+built.group.traverse(o => {
+  if (!o.userData.prop) return;
+  const { prop, collision } = o.userData, matrix = new THREE.Matrix4().multiplyMatrices(toHall, o.matrixWorld);
+  o.userData = {}; placed.props++;
+  if (collision.mesh) throw Error(`Prop ${prop}: mesh_solid is for Pinewind's models, not the halls`);
+  const solids = placeProp(prop, collision, matrix);
+  if (!solids.length) placed.passable++;
+  built.solids.push(...solids); placed.solids += solids.length;
+});
+
+// Moving parts and egg stands keep their own nodes (and their own geometry, since each carries its own bake). A
+// spinning part or a stand is merged into one mesh per material in its own frame (a prop's many pieces would each
+// cost a draw call); a sliding part keeps its children, which move one by one.
+const dynamic = built.group.children.filter(o => /^(Spin|Slide|Egg)_/.test(o.name));
+for (const part of dynamic) {
+  if (/^(Spin|Egg)_/.test(part.name)) {
+    part.updateMatrixWorld(true);
+    const toPart = part.matrixWorld.clone().invert(), byMaterial = new Map();
+    part.traverse(o => { if (!o.isMesh) return; const g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone(); g.applyMatrix4(new THREE.Matrix4().multiplyMatrices(toPart, o.matrixWorld));
+      for (const name of Object.keys(g.attributes)) if (!['position', 'normal', 'color', 'uv'].includes(name)) g.deleteAttribute(name);
+      if (!o.material.map) g.deleteAttribute('uv');
+      (byMaterial.get(o.material) ?? byMaterial.set(o.material, []).get(o.material)).push(g); });
+    part.clear();
+    for (const [material, geometries] of byMaterial) {
+      const merged = mergeGeometries(geometries); if (!merged) throw Error(`Cannot merge ${part.name}`);
+      const mesh = new THREE.Mesh(merged, material); mesh.name = `${part.name} body`; part.add(mesh);
+    }
+  }
+  const stand = /^Egg_/.test(part.name);
+  part.traverse(o => { if (o.isMesh) { o.userData.keepDynamic = true; o.userData.casts = stand; o.geometry = o.geometry.clone(); } });
+}
+// Occlusion (and the sun, on the surface): every static mesh casts; every batched or moving mesh receives one
+// value per vertex.
+const casters = [];
+built.group.updateMatrixWorld(true);
+built.group.traverse(o => { if (o.isMesh && (!o.userData.keepDynamic || o.userData.casts) && !/glow/i.test(o.material.name)) casters.push({ mesh: o, kind: OCCLUDER.solid }); });
+const batched = batchStatic(built.group);
+batched.group.add(...dynamic);
+batched.group.updateMatrixWorld(true);
+const receivers = [];
+batched.group.traverse(o => { if (o.isMesh) receivers.push(o); });
+const baked = await bakeOcclusion({ casters, vertex: receivers, aoRadius: SUN ? 6 : 4.5, aoSamples: 32, sun: SUN });
+// The game's material contract: standard materials, matte unless named gloss, baked occlusion per vertex.
+const converted = new Map();
+batched.group.traverse(o => {
+  if (!o.isMesh) return;
+  o.geometry.setAttribute('bake', new THREE.BufferAttribute(baked.vertexBakes.get(o), 4, true));
+  let out = converted.get(o.material);
+  if (!out) {
+    const m = o.material;
+    out = m.isMeshLambertMaterial ? new THREE.MeshStandardMaterial({ color: m.color, map: m.map, vertexColors: m.vertexColors, roughness: 1, metalness: 0 }) : m.clone();
+    // Unlit materials (halos, the molten core) are their own light: no bake.
+    out.name = m.name; if (out.isMeshStandardMaterial) out.userData.bakedLight = 'vertex'; converted.set(o.material, out);
+  }
+  o.material = out;
+});
+mkdirSync(art, { recursive: true });
+const glb = Buffer.from(await new GLTFExporter().parseAsync(batched.group, { binary: true, onlyVisible: true }));
+writeFileSync(`${art}/${name}.glb`, glb);
+mkdirSync('src/game/content/underground', { recursive: true });
+writeFileSync(`src/game/content/underground/${name}.json`, JSON.stringify({ version: 1, solids: built.solids }) + '\n');
+
+// Pack: KTX2 textures, meshopt, gzip into one part beside the surface assets.
+const cli = fileURLToPath(new URL('../surface-game-art/node_modules/@gltf-transform/cli/bin/cli.js', import.meta.url));
+const env = { ...process.env, PATH: process.env.KTX_BIN ? process.env.KTX_BIN + ':' + process.env.PATH : process.env.PATH };
+execFileSync(process.execPath, [cli, 'uastc', `${art}/${name}.glb`, `${art}/${name}.ktx.glb`, '--level', '2', '--zstd', '18', '--jobs', '1'], { env, stdio: 'inherit' });
+execFileSync(process.execPath, [cli, 'meshopt', `${art}/${name}.ktx.glb`, `${art}/${name}.runtime.glb`, '--quantize-position', '16'], { env, stdio: 'inherit' });
+rmSync(`${art}/${name}.ktx.glb`);
+const runtime = readFileSync(`${art}/${name}.runtime.glb`), compressed = gzipSync(runtime, { level: 9 });
+writeFileSync(`${shipped}/${name}.000.part`, compressed);
+const manifest = { parts: [`${name}.000.part`], bytes: compressed.length, decodedBytes: runtime.length, sha256: hash(compressed), sourceSha256: hash(glb), triangles: batched.stats.triangles,
+  source: `${built.group.name}: Blender props (${PROPS.map(kit => `surface-game-art/tools/blender/build_${kit.replace(/-/g, '_')}.py`).join(', ')}) and an offline procedural cave shell (surface-game-art/tools/underground/${camel}Hall.ts on caveKit.ts); baked occlusion per vertex`,
+  materialProfile: 'authored-color', coordinateSpace: 'authored', geometryEdits: false, textureEncoding: 'KTX2 UASTC', reference: 'tools/build-underground.mjs' };
+writeFileSync(`${shipped}/${name}.manifest.json`, JSON.stringify(manifest, null, 2) + '\n');
+const propsReport = Object.fromEntries(PROPS.map(kit => [kit, JSON.parse(readFileSync(`surface-game-art/artifacts/${kit}-props.json`))]));
+const singleKit = PROPS.length === 1 ? propsReport[PROPS[0]] : propsReport;
+writeFileSync(`surface-game-art/artifacts/${name}.json`, JSON.stringify({ hall: { triangles: batched.stats.triangles, batches: batched.stats.batches, colliders: built.solids.length, props: placed, glbSha256: hash(glb), runtimeSha256: hash(runtime) }, props: singleKit, occlusion: baked.stats }, null, 2) + '\n');
+console.log(`${name}:`, batched.stats.triangles, 'triangles,', batched.stats.batches, 'batches,', built.solids.length, 'colliders,', `(${placed.props} props: ${placed.solids} from props, ${placed.passable} passable),`, compressed.length, 'bytes packed');

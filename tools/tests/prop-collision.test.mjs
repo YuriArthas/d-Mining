@@ -43,7 +43,7 @@ test('a prop\'s box moves, turns round Y and scales with the prop; any other tur
 });
 
 const glbJson = file => { const b = readFileSync(file); return JSON.parse(b.subarray(20, 20 + b.readUInt32LE(12))); };
-const KITS = 'surface-game-art/public/assets/underground';
+const KITS = 'tools/tests/fixtures/props';
 test('every prop of every hall and base kit says how it collides', () => {
   const kits = readdirSync(KITS).filter(f => f.endsWith('-props.glb'));
   assert.ok(kits.length >= 15, kits.join());

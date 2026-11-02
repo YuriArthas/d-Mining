@@ -66,3 +66,6 @@
   .mine-plate-lag, .mine-plate-hp, .mine-chip { transition: none; }
   .sale-coin .ui-icon { animation: none; }
 }
+
+.mine-plate-volume { display: flex; align-items: center; gap: 4px; font-size: 14px; line-height: 1.35; }
+.mine-plate-volume .ui-icon { width: 16px; height: 16px; }

@@ -1,0 +1,212 @@
+{
+  "taskId": "b054bf79-1490-4bf9-8774-287dd54f35f2",
+  "vertices": 5841,
+  "triangles": 11678,
+  "bones": 16,
+  "weights": "Blender bone-heat weights from authored anatomical skeleton; rigid head/helmet; normalized max 4 influences",
+  "dominantVertexCounts": {
+    "LowerTorso": 201,
+    "UpperTorso": 881,
+    "Head": 1365,
+    "LeftUpperArm": 243,
+    "LeftLowerArm": 43,
+    "LeftHand": 354,
+    "LeftUpperLeg": 418,
+    "LeftLowerLeg": 180,
+    "LeftFoot": 454,
+    "RightUpperArm": 291,
+    "RightLowerArm": 57,
+    "RightHand": 476,
+    "RightUpperLeg": 294,
+    "RightLowerLeg": 140,
+    "RightFoot": 444
+  },
+  "loopQuaternionError": {
+    "Idle": 8.940696716308594e-7,
+    "Walk": 8.940696716308594e-7,
+    "Run": 7.152557373046875e-7,
+    "Mine": 8.940696716308594e-7
+  },
+  "height": 1.85,
+  "textures": [
+    [
+      "Color_b054bf79-1490-4bf9-8774-287dd54f35f2",
+      2048,
+      2048
+    ]
+  ],
+  "sources": [
+    {
+      "clip": "Idle",
+      "animationId": "4748",
+      "animationVersionId": "4748",
+      "name": "RoMixamo · 徒手站立待机 · c9ceea07",
+      "source": {
+        "source": {
+          "name": "Unarmed Idle",
+          "provider": "ROMIXAMO",
+          "conversion": "ROMIXAMO_R15_SOURCE_V1",
+          "externalId": "c9ceea07-b96c-11e4-a802-0aaa78deedf9"
+        }
+      },
+      "duration": 1.9,
+      "sourceRange": [
+        0,
+        1.9
+      ]
+    },
+    {
+      "clip": "Walk",
+      "animationId": "4768",
+      "animationVersionId": "4768",
+      "name": "RoMixamo · 徒手向前走",
+      "source": {
+        "source": {
+          "name": "Unarmed Walk Forward",
+          "provider": "ROMIXAMO",
+          "conversion": "ROMIXAMO_R15_SOURCE_V1",
+          "externalId": "c9cef1a4-b96c-11e4-a802-0aaa78deedf9"
+        }
+      },
+      "duration": 1.3666666666666667,
+      "sourceRange": [
+        0,
+        1.367
+      ]
+    },
+    {
+      "clip": "Run",
+      "animationId": "4472",
+      "animationVersionId": "4472",
+      "name": "RoMixamo · 中速跑步",
+      "source": {
+        "source": {
+          "name": "Medium Run",
+          "provider": "ROMIXAMO",
+          "conversion": "ROMIXAMO_R15_SOURCE_V1",
+          "externalId": "c9ce78f7-b96c-11e4-a802-0aaa78deedf9"
+        }
+      },
+      "duration": 0.5666666666666667,
+      "sourceRange": [
+        0,
+        0.567
+      ]
+    },
+    {
+      "clip": "Mine",
+      "animationId": "4698",
+      "animationVersionId": "4698",
+      "name": "RoMixamo · 持斧下劈",
+      "source": {
+        "source": {
+          "name": "Standing Melee Attack Downward",
+          "provider": "ROMIXAMO",
+          "conversion": "ROMIXAMO_R15_SOURCE_V1",
+          "externalId": "c9ced340-b96c-11e4-a802-0aaa78deedf9"
+        }
+      },
+      "duration": 1.85,
+      "sourceRange": [
+        0.1,
+        1.95
+      ]
+    }
+  ],
+  "blend": "assets-source/miner-a/miner-a-rigged.blend",
+  "glb": "src/game/assets/character/miner-a.glb",
+  "sha256": "4c48bf96764ab7b5b8ebb98b0b3726dc7e1103c9a508c097f6f9a13c92f3bed6",
+  "bytes": 1255392,
+  "footBinding": {
+    "Left": {
+      "restForward": [
+        -0.4161924896455928,
+        0,
+        -0.9092765319541702
+      ],
+      "restYawDegrees": 24.594435708578054,
+      "yawRadians": 0.42925388078475163
+    },
+    "Right": {
+      "restForward": [
+        0.440825719127113,
+        0,
+        -0.8975927168577426
+      ],
+      "restYawDegrees": -26.156577136771524,
+      "yawRadians": -0.45651839208853423
+    }
+  },
+  "jointPivots": {
+    "LeftLowerLeg": {
+      "before": [
+        -0.22007830440998077,
+        -0.04623493552207947,
+        0.416215181350708
+      ],
+      "after": [
+        -0.18764284253120422,
+        -0.04308714717626572,
+        0.416215181350708
+      ]
+    },
+    "LeftFoot": {
+      "before": [
+        -0.2348734736442566,
+        -0.05178312957286835,
+        0.2497694045305252
+      ],
+      "after": [
+        -0.21604056656360626,
+        -0.08216764032840729,
+        0.2497694045305252
+      ]
+    },
+    "RightLowerLeg": {
+      "before": [
+        0.22007830440998077,
+        -0.04623493552207947,
+        0.416215181350708
+      ],
+      "after": [
+        0.18741236627101898,
+        -0.04405573010444641,
+        0.416215181350708
+      ]
+    },
+    "RightFoot": {
+      "before": [
+        0.2348734736442566,
+        -0.05178312957286835,
+        0.2497694045305252
+      ],
+      "after": [
+        0.2153424173593521,
+        -0.08215463161468506,
+        0.2497694045305252
+      ]
+    }
+  },
+  "kneeRetarget": {
+    "Idle": {
+      "maxLateralBefore": 0,
+      "maxLateralAfter": 0,
+      "maxAnkleDrift": 0
+    },
+    "Walk": {
+      "maxLateralBefore": 0.03654846432618797,
+      "maxLateralAfter": 8.440110832452774e-9,
+      "maxAnkleDrift": 4.828528090125218e-8
+    },
+    "Run": {
+      "maxLateralBefore": 0.059501778800040483,
+      "maxLateralAfter": 1.0710209608078003e-8,
+      "maxAnkleDrift": 4.2146848510894035e-8
+    },
+    "Mine": {
+      "maxLateralBefore": 0,
+      "maxLateralAfter": 0,
+      "maxAnkleDrift": 0
+    }
+  }
+}

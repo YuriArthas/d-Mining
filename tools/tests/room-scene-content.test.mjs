@@ -49,12 +49,12 @@ test('moving the sale anchor moves its models, independent colliders, light mark
 test('another layer can bind the authored kit, custom spawn and shop without hardcoded layer numbers or positions',()=>{
  const definition=scene();definition.facilities.spawn.at=[2,0,12];
  definition.facilities.shop={...definition.facilities.sell,at:[13,0,13]};
- definition.signs.push({...definition.signs[1],anchor:'shop',title:'UPGRADE'});
+ definition.signs.push({...definition.signs[1],anchor:'shop',title:'msg.upgrade'});
  definition.rings.push({...definition.rings[0],anchor:'shop'});
  const layers=KIT_LAYERS.map(l=>l.id==='fungal'?{...l,scene:KIT}:l);
  const room=roomsFor(layers,{...ROOM_SCENES,[KIT]:definition})[1],plan=roomPlan(room);
  assert.deepEqual(room.spawn,[2,-room.depth+.1,12]);assert.equal(plan.signs[0].subtitle,`03 / ${room.depth} 米`);
- assert.equal(plan.signs.at(-1).title,'UPGRADE');assert.equal(plan.shapes.at(-1).at[0],13);
+ assert.equal(plan.signs.at(-1).title,'升级');assert.equal(plan.shapes.at(-1).at[0],13);
  assert.equal(room.shop.radius,1.8);
 });
 test('scene-specific light and atlas uniforms stay independent while sharing one shader program',()=>{

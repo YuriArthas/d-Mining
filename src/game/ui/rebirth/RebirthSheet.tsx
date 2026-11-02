@@ -17,35 +17,35 @@ export function RebirthSheet({ session, onClose, onReborn }: { session: GameSess
     const result = session.rebirth(offer.count);
     setConfirm(false);
     if (result.status === 'reborn') { onReborn(result.count, result.multiplier); onClose(); return; }
-    setMessage(result.status === 'locked' ? tr('条件还没满足，没有任何改变') : tr('请稍后再试'));
+    setMessage(result.status === 'locked' ? tr("msg.not_ready_yet_nothing_changed") : tr("msg.please_try_again_in_a_moment"));
   };
-  return <Sheet title={tr('重生')} subtitle={offer.count ? tr('已重生 {count} 次', { count: offer.count }) : undefined} onClose={onClose} className="rebirth-sheet">
+  return <Sheet title={tr("msg.rebirth")} subtitle={offer.count ? tr("msg.reborn_count_times", { count: offer.count }) : undefined} onClose={onClose} className="rebirth-sheet">
     <div className="rebirth-layout">
-      <section className="rebirth-boost" aria-label={tr('卖矿收入')}>
-        <span className="rebirth-boost-label">{tr('卖矿收入')}</span>
+      <section className="rebirth-boost" aria-label={tr("msg.ore_income")}>
+        <span className="rebirth-boost-label">{tr("msg.ore_income")}</span>
         <div className="rebirth-mults">
           <b className="rebirth-mult ui-outline ui-num" data-now="">×{offer.multiplier}</b>
           <svg className="rebirth-arrow" viewBox="0 0 40 28" aria-hidden="true"><path d="M3 10h20V3l14 11-14 11v-7H3Z" fill="#ffc61a" stroke="#1b2340" strokeWidth="3" strokeLinejoin="round" /></svg>
           <b className="rebirth-mult ui-outline ui-num" data-next="">×{offer.nextMultiplier}</b>
         </div>
-        <small>{tr('走完三个世界后可以重生；之后每个世界卖矿都多拿 {x} 倍', { x: offer.nextMultiplier })}</small>
+        <small>{tr("msg.finish_all_three_worlds_to_be_reborn_after_that_ore_sells_fo", { x: offer.nextMultiplier })}</small>
         <ul className="rebirth-needs">
-          <li data-done={offer.reached || undefined}><i aria-hidden="true">{offer.reached ? '✓' : ''}</i><Icon kind="portal" />{tr('到达{layerName}', { layerName: offer.layerName })}</li>
-          <li data-done={offer.level || undefined}><i aria-hidden="true">{offer.level ? '✓' : ''}</i><Icon kind="pickaxe" />{tr('镐子达到 Lv.{toolLevel}', { toolLevel: offer.toolLevel })}</li>
+          <li data-done={offer.reached || undefined}><i aria-hidden="true">{offer.reached ? '✓' : ''}</i><Icon kind="portal" />{tr("msg.reach_layername", { layerName: offer.layerName })}</li>
+          <li data-done={offer.level || undefined}><i aria-hidden="true">{offer.level ? '✓' : ''}</i><Icon kind="pickaxe" />{tr("msg.pickaxe_at_lv_toollevel", { toolLevel: offer.toolLevel })}</li>
         </ul>
       </section>
       <div className="rebirth-side">
         <div className="rebirth-terms">
-          <section className="rebirth-term" data-kind="lose"><b>{tr('会重置')}</b>
-            <span><Icon kind="coin" />{tr('三种货币')}</span><span><Icon kind="pickaxe" />{tr('镐子和背包（回到第一件）')}</span><span><Icon kind="globe" />{tr('开放的世界和地下层')}</span></section>
-          <section className="rebirth-term" data-kind="keep"><b>{tr('会保留')}</b>
-            <span><Icon kind="paw" />{tr('所有宠物和栏位')}</span><span><Icon kind="gift" />{tr('奖励和加成')}</span></section>
+          <section className="rebirth-term" data-kind="lose"><b>{tr("msg.reset")}</b>
+            <span><Icon kind="coin" />{tr("msg.three_currencies")}</span><span><Icon kind="pickaxe" />{tr("msg.pickaxe_and_backpack_back_to_the_first_ones")}</span><span><Icon kind="globe" />{tr("msg.open_worlds_and_layers")}</span></section>
+          <section className="rebirth-term" data-kind="keep"><b>{tr("msg.kept")}</b>
+            <span><Icon kind="paw" />{tr("msg.all_pets_and_slots")}</span><span><Icon kind="gift" />{tr("msg.rewards_and_boosts")}</span></section>
         </div>
         {confirm
-          ? <div className="rebirth-confirm"><span>{tr('确定要重生吗？重生后无法撤销。')}</span>
-            <div><UiButton size="s" tone="white" onPress={() => setConfirm(false)}>{tr('取消')}</UiButton>
-              <UiButton size="s" tone="green" icon="rebirth" disabled={!offer.ready} onPress={go}>{tr('重生')}</UiButton></div></div>
-          : <UiButton size="l" tone="green" icon="rebirth" className="rebirth-go" disabled={!offer.ready} onPress={() => setConfirm(true)}>{tr('重生')}</UiButton>}
+          ? <div className="rebirth-confirm"><span>{tr("msg.are_you_sure_you_want_to_be_reborn_this_can_t_be_undone")}</span>
+            <div><UiButton size="s" tone="white" onPress={() => setConfirm(false)}>{tr("msg.cancel")}</UiButton>
+              <UiButton size="s" tone="green" icon="rebirth" disabled={!offer.ready} onPress={go}>{tr("msg.rebirth")}</UiButton></div></div>
+          : <UiButton size="l" tone="green" icon="rebirth" className="rebirth-go" disabled={!offer.ready} onPress={() => setConfirm(true)}>{tr("msg.rebirth")}</UiButton>}
         {message && <p className="ui-hint" role="status">{message}</p>}
       </div>
     </div>
@@ -58,7 +58,7 @@ export function RebirthCelebration({ count, multiplier, onDone }: { count: numbe
   return <div className="rebirth-celebration" role="status" onPointerDown={onDone}>
     <div className="rebirth-rays" aria-hidden="true" />
     <Icon kind="rebirth" className="ui-icon rebirth-celebration-icon" />
-    <strong className="ui-outline">{tr('第 {n} 次重生！', { n: count })}</strong>
-    <span className="rebirth-celebration-mult">{tr('卖矿收入')} <b className="ui-outline ui-num">×{multiplier}</b></span>
+    <strong className="ui-outline">{tr("msg.rebirth_n", { n: count })}</strong>
+    <span className="rebirth-celebration-mult">{tr("msg.ore_income")} <b className="ui-outline ui-num">×{multiplier}</b></span>
   </div>;
 }

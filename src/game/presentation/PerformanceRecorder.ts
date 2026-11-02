@@ -1,19 +1,12 @@
 import { REVISION, type WebGLRenderer } from 'three';
 
-/** What the "report performance" button (bottom left, PerformanceReportButton) sends to the configured host API:
- *  The host is responsible for storing the report. Contents:
- *  - every animation frame of the last 1800 (30 s at 60 Hz): time, interval, update CPU, drawn or not, draws, triangles;
- *  - one row per second for the last 3 minutes: frame rate, worst frame, CPU, GPU waits, where the player stood, JS heap;
- *  - the browser's long tasks and long animation frames (Chromium), with the scripts that ran in them;
- *  - the device: browser and model hints, GPU, screen and pixel ratio, cores and memory.
- *  Recording is a few typed-array writes per frame; the report is put together only when the button is pressed. */
+/** Optional local recorder for CPU tests and explicit tooling. The game does not instantiate it or upload reports. */
 const FRAMES = 1800, SECONDS = 180, LONG_TASKS = 300, ANIMATION_FRAMES = 60;
 /** A pause longer than this (tab hidden, a debugger) is a gap between runs, not a slow frame. */
 const GAP_MS = 1000;
 /** A frame interval past this missed at least one 60 Hz refresh. */
 const MISSED_MS = 25;
 const DRAWN = 1, SCHEDULED = 2, GAP = 4;
-export const PERFORMANCE_REPORT_PATH = '/api/mining/performance-reports';
 
 export type ReportSource = {
   renderer: WebGLRenderer;
@@ -229,15 +222,4 @@ function renderInfo(renderer: WebGLRenderer) {
     geometries: renderer.info.memory.geometries, textures: renderer.info.memory.textures, programs: renderer.info.programs?.length ?? 0,
     toneMapping: renderer.toneMapping, shadowMap: renderer.shadowMap.enabled,
   };
-}
-
-/** The one recorder for the page: the scene feeds it, the button reads it. */
-export const performanceRecorder = new PerformanceRecorder();
-
-/** Sends a report to the public host; resolves with the report id. */
-export async function sendPerformanceReport(): Promise<string> {
-  const response = await fetch(PERFORMANCE_REPORT_PATH, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(await performanceRecorder.report()) });
-  const reply = await response.json().catch(() => null) as { ok?: boolean; id?: string; error?: string } | null;
-  if (!response.ok || !reply?.ok || !reply.id) throw new Error(reply?.error ?? `HTTP ${response.status}`);
-  return reply.id;
 }

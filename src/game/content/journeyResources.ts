@@ -1,13 +1,13 @@
-import { tr } from '../i18n/i18n.ts';
+import { message, type TextRef } from '../i18n/messages.ts';
 // Names and looks of every layer's blocks and ores; their health and prices live in economy.json
 // (resources.ts joins the two). No numbers here: this file is also read by tools/economy/model.mts.
-const entries: readonly (readonly [string, ...(readonly [string, string])[]])[] = [
-  [tr('泥土'),['coal',tr('煤')],['copper',tr('铜')]], [tr('岩石'),['iron',tr('铁')],['silver',tr('银')]], [tr('花岗岩'),['emerald',tr('翡翠')],['amber',tr('琥珀')]],
-  [tr('深层岩石'),['crystal',tr('粉晶')],['amethyst',tr('紫水晶')]], [tr('砂岩'),['gold',tr('金')],['ruby',tr('红宝石')]], [tr('冰岩'),['diamond',tr('钻石')],['sapphire',tr('蓝宝石')]], [tr('玄武岩'),['sulfur',tr('硫磺')],['obsidian',tr('黑曜石')]],
-  [tr('赤土'),['tin',tr('锡')],['nickel',tr('镍')]], [tr('铜质岩'),['cobalt',tr('钴')],['zinc',tr('锌')]], [tr('沉积岩'),['titanium',tr('钛')],['chrome',tr('铬')]],
-  [tr('化石岩'),['fossil',tr('化石碎片')],['platinum',tr('铂')]], [tr('层纹岩'),['tourmaline',tr('碧玺')],['zircon',tr('锆石')]], [tr('晶化岩'),['aquamarine',tr('海蓝宝石')],['opal',tr('欧泊')]], [tr('合金岩'),['iridium',tr('铱')],['energy',tr('能源晶石')]],
-  [tr('星尘土'),['stardust',tr('星尘')],['stargold',tr('星金')]], [tr('陨石岩'),['meteorite',tr('陨铁')],['moonstone',tr('月石')]], [tr('辉质岩'),['brightcobalt',tr('辉钴')],['brighttitanium',tr('辉钛')]],
-  [tr('星辉岩'),['star',tr('星辉晶石')],['dark',tr('暗晶')]], [tr('镶晶岩'),['gravity',tr('引力晶石')],['phase',tr('相位晶石')]], [tr('炽核岩'),['core',tr('地心晶石')],['sun',tr('日耀晶石')]], [tr('源质岩'),['origin',tr('源晶')],['eternal',tr('永恒晶石')]],
+const entries: readonly (readonly [TextRef, ...(readonly [string, TextRef])[]])[] = [
+  [message("msg.dirt"),['coal',message("msg.coal")],['copper',message("msg.copper")]], [message("msg.rock"),['iron',message("msg.iron")],['silver',message("msg.silver")]], [message("msg.granite"),['emerald',message("msg.emerald")],['amber',message("msg.amber")]],
+  [message("msg.deep_rock"),['crystal',message("msg.rose_quartz")],['amethyst',message("msg.amethyst")]], [message("msg.sandstone"),['gold',message("msg.gold")],['ruby',message("msg.ruby")]], [message("msg.ice_rock"),['diamond',message("msg.diamond")],['sapphire',message("msg.sapphire")]], [message("msg.basalt"),['sulfur',message("msg.sulfur")],['obsidian',message("msg.obsidian")]],
+  [message("msg.red_clay"),['tin',message("msg.tin")],['nickel',message("msg.nickel")]], [message("msg.cupric_rock"),['cobalt',message("msg.cobalt")],['zinc',message("msg.zinc")]], [message("msg.sedimentary_rock"),['titanium',message("msg.titanium")],['chrome',message("msg.chrome")]],
+  [message("msg.fossil_rock"),['fossil',message("msg.fossil_shard")],['platinum',message("msg.platinum")]], [message("msg.banded_rock"),['tourmaline',message("msg.tourmaline")],['zircon',message("msg.zircon")]], [message("msg.crystalline_rock"),['aquamarine',message("msg.aquamarine")],['opal',message("msg.opal")]], [message("msg.alloy_rock"),['iridium',message("msg.iridium")],['energy',message("msg.energy_crystal")]],
+  [message("msg.stardust_soil"),['stardust',message("msg.stardust")],['stargold',message("msg.stargold")]], [message("msg.meteor_rock"),['meteorite',message("msg.meteoric_iron")],['moonstone',message("msg.moonstone")]], [message("msg.glimmer_rock"),['brightcobalt',message("msg.bright_cobalt")],['brighttitanium',message("msg.bright_titanium")]],
+  [message("msg.starglow_rock"),['star',message("msg.starglow_crystal")],['dark',message("msg.dark_crystal")]], [message("msg.inlaid_rock"),['gravity',message("msg.gravity_crystal")],['phase',message("msg.phase_crystal")]], [message("msg.blazecore_rock"),['core',message("msg.core_crystal")],['sun',message("msg.sunflare_crystal")]], [message("msg.origin_rock"),['origin',message("msg.origin_crystal")],['eternal',message("msg.eternal_crystal")]],
 ];
 const colors = ['#ad8161','#929b91','#868f95','#626e79','#c7a274','#83b5c4','#50535a','#b98066','#af967a','#819394','#a16b58','#8a91a3','#7eb3be','#70838b','#9c8eaa','#7d8591','#758eac','#887ca4','#829ea6','#7a3b2e','#5c647c'];
 /** Each ore's own colour and deposit look: metals glint, gems and crystals are glassy facets, the rest
@@ -24,14 +24,14 @@ export const ORE_LOOKS: Readonly<Record<string, readonly [color: string, pattern
   stardust: ['#f3d6ff', 'vein'], stargold: ['#ffb000', 'metal'], meteorite: ['#4a3b35', 'metal'], moonstone: ['#a9d4ff', 'gem'], brightcobalt: ['#5a95ff', 'metal'], brighttitanium: ['#b8fff0', 'metal'], star: ['#fff6c2', 'gem'],
   dark: ['#3b1366', 'gem'], gravity: ['#8e5cff', 'gem'], phase: ['#3cffd0', 'gem'], core: ['#ff5a1f', 'gem'], sun: ['#ffe23a', 'gem'], origin: ['#f5f8ff', 'gem'], eternal: ['#ff6be6', 'gem'],
 };
-type ItemLook = Readonly<{ itemId: string; name: string; color: string; pattern: string }>;
+type ItemLook = Readonly<{ itemId: string; name: TextRef; color: string; pattern: string }>;
 /** One layer's blocks: its rock, the dense rock deep in the layer, and its two ores (the second is the richer). */
 export type LayerItems = Readonly<{ rock: ItemLook; deep: ItemLook; ores: readonly ItemLook[] }>;
 /** Every layer of the three worlds, in order (world 1's seven, then world 2's, then world 3's). */
 export const LAYER_ITEMS: readonly LayerItems[] = Object.freeze(entries.map(([base,...ores], i) => {
   const rockColor='#'+[1,3,5].map((offset,c)=>(parseInt(colors[i].slice(offset,offset+2),16)+2+(i+c)%3).toString(16).padStart(2,'0')).join('');
   const rock = { itemId:`journey.rock.${i}`, name:base, color:rockColor, pattern:'rock' };
-  const deep = { itemId:rock.itemId+'.deep', name:tr('致密{rock}',{rock:base}), pattern:'rock',
+  const deep = { itemId:rock.itemId+'.deep', name:message("msg.dense_rock",{rock:base}), pattern:'rock',
     color:'#'+[1,3,5].map(offset=>Math.round(parseInt(rockColor.slice(offset,offset+2),16)*.65).toString(16).padStart(2,'0')).join('') };
   return Object.freeze({ rock: Object.freeze(rock), deep: Object.freeze(deep), ores: Object.freeze(ores.map(entry => {
     const [id,name]=entry, look=ORE_LOOKS[id];

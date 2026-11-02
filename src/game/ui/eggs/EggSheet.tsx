@@ -35,7 +35,7 @@ function beatsTeam(pets: Pets, currency: CurrencyId, bonusPct: number) {
   const worst = weakest(pets);
   return !worst || bonusPct > here(pets, worst.currency, worst.bonusPct);
 }
-const RIBBON: Record<PetRarity, string> = { common: tr('普通'), rare: tr('稀有！'), epic: tr('史诗！'), legendary: tr('传说！！') };
+const RIBBON: Record<PetRarity, string> = { common: tr("msg.common"), rare: tr("msg.rare_38b6540b"), epic: tr("msg.epic_f62fd67d"), legendary: tr("msg.legendary_d1c5a656") };
 /** How long the egg shakes before it breaks: longer and brighter for rarer pets. */
 const HATCH_MS: Record<PetRarity, number> = { common: 1000, rare: 1400, epic: 2000, legendary: 2000 };
 
@@ -54,7 +54,7 @@ export function EggSheet({ session, eggId, onClose }: { session: GameSession; eg
     const settled = session.pets.hatch(egg.id);
     if (settled.status === 'hatched') setResult(settled);
   };
-  if (!egg) return <Sheet title={tr('宠物蛋')} size="s" onClose={onClose}><p className="ui-hint">{tr('这个蛋台暂时不可用。')}</p></Sheet>;
+  if (!egg) return <Sheet title={tr("msg.pet_egg")} size="s" onClose={onClose}><p className="ui-hint">{tr("msg.this_egg_stand_isn_t_available_right_now")}</p></Sheet>;
   const autoHatch = state.rewards.permanent.autoHatch, auto = state.autoHatch === eggId;
   const lastAuto = state.lastAutoHatch?.eggId === eggId ? pets.pets.find(card => card.pet.id === state.lastAutoHatch?.pet.id) : null;
   const money = currencyIcon(egg.currency), balance = pets.balances[egg.currency], unit = currencyName(egg.currency);
@@ -64,42 +64,42 @@ export function EggSheet({ session, eggId, onClose }: { session: GameSession; eg
     if (worst) session.pets.unequip(worst.pet.id);
     const done = session.pets.equip(petId).status === 'equipped';
     setResult(null);
-    setToast({ text: done ? (worst ? tr('{name} 替换了 {name2}', { name: name, name2: worst.name }) : tr('已装备 {name}', { name: name })) : tr('没能装备，去宠物页看看'), id: Date.now() });
+    setToast({ text: done ? (worst ? tr("msg.name_replaced_name2", { name: name, name2: worst.name }) : tr("msg.equipped_name", { name: name })) : tr("msg.couldn_t_equip_check_the_pets_page"), id: Date.now() });
   };
   return <>
-    <Sheet title={egg.unlocked ? egg.name : MYSTERY_EGG_NAME} subtitle={egg.unlocked ? tr('每只宠物的真实概率') : tr('解锁后揭晓里面的宠物')} onClose={onClose}
+    <Sheet title={egg.unlocked ? egg.name : MYSTERY_EGG_NAME} subtitle={egg.unlocked ? tr("msg.the_real_odds_of_every_pet") : tr("msg.its_pets_are_revealed_once_it_s_unlocked")} onClose={onClose}
       className="egg-sheet" label={egg.unlocked ? egg.name : MYSTERY_EGG_NAME}>
       <div className="egg-layout" data-locked={egg.unlocked ? undefined : ''}>
         <div className="egg-side">
           <EggArt className="egg-hero-art" eggId={egg.id} locked={!egg.unlocked} />
-          <span className="egg-wallet">{tr('你有')}<Icon kind={money} /><b className="ui-num">{number(balance)}</b></span>
+          <span className="egg-wallet">{tr("msg.you_have")}<Icon kind={money} /><b className="ui-num">{number(balance)}</b></span>
           {egg.unlocked
-            ? <PriceButton verb={tr('开蛋')} price={number(egg.price)} currency={money} tone="orange" size="l" className="egg-buy" disabled={!egg.canAfford || auto}
-                aria-label={tr('开蛋，{price} {unit}', { price: number(egg.price), unit: unit })} onPress={hatch} />
-            : <><span className="egg-wallet">{tr('价格')}<Icon kind={money} /><b className="ui-num">{number(egg.price)}</b></span>
-              <UiButton size="m" className="egg-buy" icon="lock" disabled onPress={() => {}}>{tr('到达{layer}解锁', { layer: egg.unlockName ?? tr('更深处') })}</UiButton></>}
-          {egg.unlocked && autoHatch && <Toggle on={auto} label={tr('自动开蛋')} onPress={() => session.setAutoHatch(!auto)} />}
-          {lastAuto && <div key={lastAuto.pet.id} className="egg-last ui-pop" data-rarity={lastAuto.rarity} role="status" aria-label={tr('刚开出 {name}', { name: lastAuto.name })}>
+            ? <PriceButton verb={tr("msg.hatch")} price={number(egg.price)} currency={money} tone="orange" size="l" className="egg-buy" disabled={!egg.canAfford || auto}
+                aria-label={tr("msg.hatch_price_unit", { price: number(egg.price), unit: unit })} onPress={hatch} />
+            : <><span className="egg-wallet">{tr("msg.price")}<Icon kind={money} /><b className="ui-num">{number(egg.price)}</b></span>
+              <UiButton size="m" className="egg-buy" icon="lock" disabled onPress={() => {}}>{tr("msg.unlocks_at_layer", { layer: egg.unlockName ?? tr("msg.deeper_down") })}</UiButton></>}
+          {egg.unlocked && autoHatch && <Toggle on={auto} label={tr("msg.auto_hatch")} onPress={() => session.setAutoHatch(!auto)} />}
+          {lastAuto && <div key={lastAuto.pet.id} className="egg-last ui-pop" data-rarity={lastAuto.rarity} role="status" aria-label={tr("msg.just_hatched_name", { name: lastAuto.name })}>
             <PetArt speciesId={lastAuto.pet.speciesId} rarity={lastAuto.rarity} className="egg-last-art" />
-            <span><small>{tr('刚开出')}</small><b>{lastAuto.name}</b></span>
+            <span><small>{tr("msg.just_hatched")}</small><b>{lastAuto.name}</b></span>
           </div>}
         </div>
         {/* Before it is unlocked nothing tells what the egg holds: only its price and where it unlocks. */}
-        {!egg.unlocked ? <div className="egg-mystery"><strong>?</strong><span>{tr('到达{layer}后揭晓', { layer: egg.unlockName ?? tr('更深处') })}</span><small>{tr('在宠物页「获取宠物」里可以前往能开的蛋')}</small></div>
-          : <div className="egg-outcomes" role="list" aria-label={tr('可能获得的宠物')} style={{ '--n': egg.outcomes.length } as CSSProperties}>{egg.outcomes.map(outcome => {
+        {!egg.unlocked ? <div className="egg-mystery"><strong>?</strong><span>{tr("msg.revealed_at_layer", { layer: egg.unlockName ?? tr("msg.deeper_down") })}</span><small>{tr("msg.in_pets_get_pets_you_can_go_to_any_egg_you_can_open")}</small></div>
+          : <div className="egg-outcomes" role="list" aria-label={tr("msg.pets_you_can_get")} style={{ '--n': egg.outcomes.length } as CSSProperties}>{egg.outcomes.map(outcome => {
             const count = owned(outcome.speciesId), better = beatsTeam(pets, outcome.currency, outcome.bonusPct);
             return <div key={outcome.speciesId} role="listitem" className="egg-outcome" data-rarity={outcome.rarity}
-              aria-label={tr('{name}，{probability}%，{currency}，挖矿 {miningPct}', { name: outcome.name, probability: Number((outcome.probability * 100).toFixed(2)), currency: bonusLabel(outcome.bonusPct, outcome.currency), miningPct: bonusLabel(outcome.miningPct) })}>
+              aria-label={tr("msg.name_probability_currency_mining_miningpct", { name: outcome.name, probability: Number((outcome.probability * 100).toFixed(2)), currency: bonusLabel(outcome.bonusPct, outcome.currency), miningPct: bonusLabel(outcome.miningPct) })}>
               <div className="egg-card">
                 <strong className="egg-odds ui-outline ui-num">{Number((outcome.probability * 100).toFixed(2))}%</strong>
                 <PetArt speciesId={outcome.speciesId} rarity={outcome.rarity} className="egg-card-art" />
                 <span className="egg-card-name">{outcome.name}</span>
                 <span className="egg-card-band ui-outline"><Icon kind={currencyIcon(outcome.currency)} />{bonusLabel(outcome.bonusPct)}</span>
               </div>
-              <small className="egg-mining">{tr('挖矿 {bonus}', { bonus: bonusLabel(outcome.miningPct) })}</small>
+              <small className="egg-mining">{tr("msg.mining_bonus", { bonus: bonusLabel(outcome.miningPct) })}</small>
               <span className="egg-tags">
-                {better && <span className="egg-tag egg-better ui-outline">{tr('↑ 比队伍强')}</span>}
-                {!better && count > 0 && <span className="egg-tag egg-owned">{tr('已有 {n}', { n: count })}</span>}
+                {better && <span className="egg-tag egg-better ui-outline">{tr("msg.better")}</span>}
+                {!better && count > 0 && <span className="egg-tag egg-owned">{tr("msg.have_n", { n: count })}</span>}
               </span>
             </div>;
           })}</div>}
@@ -130,7 +130,7 @@ function HatchReveal({ result, eggId, pets, price, money, canAgain, onDone, onEq
   const ms = HATCH_MS[rarity] * uiTimeScale();
   const [done, setDone] = useState(false);
   useEffect(() => { const timer = setTimeout(() => setDone(true), ms); return () => clearTimeout(timer); }, [ms]);
-  return <div className="hatch" data-rarity={rarity} data-done={done} role="dialog" aria-modal="true" aria-label={tr('开蛋结果：{name}', { name: name })}
+  return <div className="hatch" data-rarity={rarity} data-done={done} role="dialog" aria-modal="true" aria-label={tr("msg.hatch_result_name", { name: name })}
     style={{ '--hatch-ms': `${ms}ms` } as CSSProperties} onPointerDown={() => setDone(true)}>
     <div className="hatch-rays" />
     <div className="hatch-stage">
@@ -142,19 +142,19 @@ function HatchReveal({ result, eggId, pets, price, money, canAgain, onDone, onEq
         <PetArt speciesId={speciesId} rarity={rarity} className="hatch-pet" />
         <h2 className="ui-outline">{name}</h2>
         <div className="hatch-tags">
-          <span className="hatch-chip"><Icon kind={currencyIcon(currency)} />{tr('{currency}收入 {bonus}', { currency: currencyName(currency), bonus: bonusLabel(bonusPct) })}</span>
-          <span className="hatch-chip"><Icon kind="pickaxe" />{tr('挖矿 {bonus}', { bonus: bonusLabel(miningPct) })}</span>
-          {first && <span className="hatch-chip hatch-new ui-outline">{tr('新宠物')}</span>}
-          {better && <span className="hatch-chip hatch-better ui-outline">{tr('↑ 比队伍强')}</span>}
-          {!first && <span className="hatch-chip">{tr('已有 {n} 只 · 金色 {have}/{need}', { n: same, have: Math.min(same, pets.goldenNeed), need: pets.goldenNeed })}</span>}
+          <span className="hatch-chip"><Icon kind={currencyIcon(currency)} />{tr("msg.currency_income_bonus", { currency: currencyName(currency), bonus: bonusLabel(bonusPct) })}</span>
+          <span className="hatch-chip"><Icon kind="pickaxe" />{tr("msg.mining_bonus", { bonus: bonusLabel(miningPct) })}</span>
+          {first && <span className="hatch-chip hatch-new ui-outline">{tr("msg.new_pet")}</span>}
+          {better && <span className="hatch-chip hatch-better ui-outline">{tr("msg.better")}</span>}
+          {!first && <span className="hatch-chip">{tr("msg.have_n_golden_have_need", { n: same, have: Math.min(same, pets.goldenNeed), need: pets.goldenNeed })}</span>}
         </div>
         <div className="hatch-actions">
-          <UiButton size="m" tone="white" onPress={onDone}>{tr('完成')}</UiButton>
-          {better && <UiButton size="m" tone="green" className="hatch-equip" onPress={() => onEquip(result.pet.id, name)}>{tr('立即装备')}</UiButton>}
-          <PriceButton verb={tr('再开一个')} price={number(price)} currency={money} tone="orange" disabled={!canAgain} onPress={onAgain} />
+          <UiButton size="m" tone="white" onPress={onDone}>{tr("msg.done")}</UiButton>
+          {better && <UiButton size="m" tone="green" className="hatch-equip" onPress={() => onEquip(result.pet.id, name)}>{tr("msg.equip_now")}</UiButton>}
+          <PriceButton verb={tr("msg.open_another")} price={number(price)} currency={money} tone="orange" disabled={!canAgain} onPress={onAgain} />
         </div>
       </div>
     </div>
-    {!done && <GameButton className="hatch-skip" aria-label={tr('跳过动画')} onPress={() => setDone(true)} />}
+    {!done && <GameButton className="hatch-skip" aria-label={tr("msg.skip_animation")} onPress={() => setDone(true)} />}
   </div>;
 }

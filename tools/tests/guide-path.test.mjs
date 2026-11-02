@@ -4,7 +4,7 @@ import { Group, InstancedMesh, Matrix4, Mesh, MeshBasicMaterial, Vector3 } from 
 import { GAME_CONTENT } from '../../src/game/content/gameContent.ts';
 import { PINEWIND_BRIDGE } from '../../src/game/content/pinewind/hubLayout.ts';
 import { guideRoute, routeLength } from '../../src/game/world/guideRoute.ts';
-import { chevronGeometry, markerGeometry, updateGuidePath } from '../../src/game/presentation/guidePath.ts';
+import { chevronGeometry, markerGeometry, updateGuidePath } from '../../src/game/presentation/guidePathGeometry.ts';
 import { CharacterPhysics, initPhysics } from '../../src/game/validation/physics.ts';
 import { SceneryCollision } from '../../src/game/presentation/SceneryCollision.ts';
 

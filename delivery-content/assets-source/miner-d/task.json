@@ -1,0 +1,18 @@
+{
+  "taskId": "84856ff3-6c37-4b7f-a198-5f7d00dc3443",
+  "createdAt": "2026-10-29T06:40:24.891Z",
+  "referenceSha256": "99933312e6d8ad59248732220943d80659a9081b999ca3f4e58cd0754f2a62b2",
+  "recipe": {
+    "type": "image_to_model",
+    "model_version": "v3.0-20250812",
+    "file": {
+      "type": "png",
+      "source": "assets-source/miner-d/reference.png"
+    },
+    "face_limit": 12000,
+    "texture": true,
+    "pbr": false,
+    "texture_quality": "standard"
+  },
+  "reference": "assets-source/miner-d/reference.png"
+}

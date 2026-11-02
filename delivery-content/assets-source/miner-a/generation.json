@@ -1,0 +1,24 @@
+{
+  "taskId": "b054bf79-1490-4bf9-8774-287dd54f35f2",
+  "createdAt": "2026-10-21T12:57:58.582Z",
+  "referenceSha256": "efa8c6ce24408a9b21facdd03618152d95915ef279b3fdd66f8521ed9201f137",
+  "recipe": {
+    "type": "image_to_model",
+    "model_version": "v3.0-20250812",
+    "file": {
+      "type": "png",
+      "source": "assets-source/miner-a/reference.png"
+    },
+    "face_limit": 12000,
+    "texture": true,
+    "pbr": false,
+    "texture_quality": "standard"
+  },
+  "status": "success",
+  "triangles": 11678,
+  "bytes": 1045892,
+  "meshes": 1,
+  "materials": 1,
+  "sha256": "882a286c62d7f8c88f5d5ace5f1ea9682c531b25caa208bb34c8f9a26fbe7bb4",
+  "reference": "assets-source/miner-a/reference.png"
+}

@@ -1,0 +1,10 @@
+{
+  "name": "mining-pinewind-authoring",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24 <25" },
+  "dependencies": {
+    "@gltf-transform/cli": "4.5.1",
+    "@napi-rs/canvas": "1.0.13"
+  }
+}

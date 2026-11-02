@@ -1,3 +1,4 @@
+import { resolveText } from '../../src/game/i18n/i18n.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {roomPlan} from '../../src/game/world/scenery.ts';
@@ -45,7 +46,7 @@ for(const [layer,id] of Object.entries({...HALLS,...LATER}).filter(([layer])=>la
 
 test('world 2: its first layer is the automine hall, lit and placed under the tech base; the base carries its own colliders, rings and signs',async()=>{
  const room=GAME_CONTENT.worlds[1].rooms[0],{hall}=undergroundHall('automine-hall');
- assert.equal(room.id,'world2.1');assert.equal(room.sceneDefinition.hall,'automine-hall');assert.equal(room.name,'自动化矿道');
+ assert.equal(room.id,'world2.1');assert.equal(room.sceneDefinition.hall,'automine-hall');assert.equal(resolveText(room.name),'自动化矿道');
  assert.equal(room.shop,null);assert.ok(hall.lights.length<=6);
  assert.deepEqual(GAME_CONTENT.surface.authored.instances.find(i=>i.asset==='automine-hall').at,[room.x,-room.depth,room.z]);
  assert.deepEqual(GAME_CONTENT.surface.authored.instances.find(i=>i.asset==='tech-base').at,[0,0,224]);

@@ -80,7 +80,7 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
   };
   const pets = useSyncExternalStore(session.pets.subscribe, session.pets.getSnapshot);
   const standEgg = state.eggId ? pets.eggs.find(egg => egg.id === state.eggId) : undefined;
-  const eggName = state.eggId ? standEgg ? standEgg.unlocked ? standEgg.name : MYSTERY_EGG_NAME : tr('宠物蛋') : null;
+  const eggName = state.eggId ? standEgg ? standEgg.unlocked ? standEgg.name : MYSTERY_EGG_NAME : tr("msg.pet_egg") : null;
 
   useEffect(() => {
     if (modal || shopOpen || (!state.eggStation && !state.atMachine) || blocked || !focused) return;
@@ -97,8 +97,8 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
   useEffect(() => session.coverTips(tipHidden), [tipHidden, session]);
   useEffect(() => { if (stationOpen || portalOpen) input.reset(); }, [stationOpen, portalOpen, input]);
   const prompts = <>
-    {state.atMachine && <GameButton className="ui-btn capsule-world-prompt" data-tone="purple" data-size="m" onPress={() => open({ kind: 'capsule' })}><Icon kind="gift" /><span className="ui-outline"><span className="desktop-hint">E · </span>{tr('幸运扭蛋机')}</span></GameButton>}
-    {state.eggStation && eggName && <GameButton className="ui-btn egg-world-prompt" data-tone="orange" data-size="m" aria-label={tr('查看{eggName}', { eggName: eggName })} onPress={() => open({ kind: 'egg' })}><Icon kind="paw" /><span className="ui-outline"><span className="desktop-hint">E · </span>查看{eggName}</span></GameButton>}
+    {state.atMachine && <GameButton className="ui-btn capsule-world-prompt" data-tone="purple" data-size="m" onPress={() => open({ kind: 'capsule' })}><Icon kind="gift" /><span className="ui-outline"><span className="desktop-hint">E · </span>{tr("msg.lucky_capsule_machine")}</span></GameButton>}
+    {state.eggStation && eggName && <GameButton className="ui-btn egg-world-prompt" data-tone="orange" data-size="m" aria-label={tr("msg.view_eggname", { eggName: eggName })} onPress={() => open({ kind: 'egg' })}><Icon kind="paw" /><span className="ui-outline"><span className="desktop-hint">E · </span>{tr("msg.view_eggname", { eggName })}</span></GameButton>}
   </>;
   return <div className="session-ui" data-panel={panel}>
     <TipMarker tip={state.tip} anchor={state.tipAnchor} marker={guideMarker} hidden={tipHidden} />
@@ -120,7 +120,7 @@ export function SessionUi({ shopView, session, input, surface, guideMarker, syst
     {modal?.kind === 'rebirth' && <RebirthSheet session={session} onClose={close} onReborn={(count, multiplier) => setReborn({ count, multiplier })} />}
     {reborn && <RebirthCelebration count={reborn.count} multiplier={reborn.multiplier} onDone={endCelebration} />}
     {shopOpen && shop.mode !== 'closed' && <ShopPanel session={session} view={shopView} onClose={closeShop} />}
-    {DEBUG && !blocked && <button className="dev-unlock-button" onClick={() => { input.reset(); setDevUnlock(v => !v); }}>{tr('解锁')}</button>}
+    {DEBUG && !blocked && <button className="dev-unlock-button" onClick={() => { input.reset(); setDevUnlock(v => !v); }}>{tr("msg.unlock_70fba17f")}</button>}
     {devUnlock && <DevUnlockPage session={session} onClose={() => { setDevUnlock(false); surface.current?.focus(); }} />}
   </div>;
 }

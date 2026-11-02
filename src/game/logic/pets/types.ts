@@ -1,3 +1,4 @@
+import type { TextRef } from "../../i18n/messages.ts";
 import type { CurrencyId } from '../../content/economy.ts';
 type PetId = string;
 type PetSpeciesId = string;
@@ -5,7 +6,7 @@ type EggId = string;
 export type PetRarity = 'common' | 'rare' | 'epic' | 'legendary';
 export type PetDefinition = Readonly<{
   id: PetSpeciesId;
-  name: string;
+  name: TextRef;
   rarity: PetRarity;
   /** Extra income in `currency` (the currency of the world its egg comes from), in percent: 50 = +50 %. */
   bonusPct: number;
@@ -15,13 +16,13 @@ export type PetDefinition = Readonly<{
 }>;
 export type EggDefinition = Readonly<{
   id: EggId;
-  name: string;
+  name: TextRef;
   price: number;
   currency: CurrencyId;
   /** The egg's world must be open, and (below its surface) its layer's rest room reached. */
   requiredWorld?: number;
   requiredDestination?: string;
-  unlockName?: string;
+  unlockName?: TextRef;
   outcomes: readonly Readonly<{ speciesId: PetSpeciesId; weight: number }>[];
 }>;
 export type PetContent = Readonly<{

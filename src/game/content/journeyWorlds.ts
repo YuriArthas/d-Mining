@@ -5,14 +5,14 @@ import { roomsFor } from '../world/rooms.ts';
 import { WORLD_REQUIREMENTS } from './worldJourney.ts';
 import { layerEconomy } from './economy.ts';
 
-import { tr } from '../i18n/i18n.ts';
+import { message } from '../i18n/messages.ts';
 export const JOURNEY_WORLDS = WORLD_REQUIREMENTS.map(world => {
   const T = LAYER_TEMPLATES, templates = world.id===1 ? T.slice(0,7) : world.id===2 ? [T[0],T[10],T[12],T[13],T[14],T[15],T[11]] : [T[0],T[7],T[8],T[3],T[4],T[5],T[9]];
   const layers: readonly Layer[] = templates.map(({laterScene,...source},local) => {
     const index=(world.id-1)*7+local, base=64+index*4, numbers=layerEconomy(world.id,local);
     return {...source,scene:world.id===1?source.scene:laterScene??source.scene,id:world.id===1?source.id:`world${world.id}.${local}`,
       from:numbers.from,base,deepKind:base+1,deepAt:numbers.deepAt,oreChance:numbers.oreChance,
-      name:local===0?tr('{world}矿场',{world:world.name}):source.name,
+      name:local===0?message("msg.world_mine",{world:world.name}):source.name,
       ores:numbers.ores.map((ore,j)=>({kind:base+2+j,weight:ore.weight})),shop:local===2||local===4};
   });
   validateLayers(layers);

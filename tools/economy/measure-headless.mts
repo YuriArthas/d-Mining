@@ -1,3 +1,4 @@
+import {tierForCapacity} from '../../src/game/logic/EquipmentSave.ts';
 // P6, measured with the real game logic and no rendering (headless.mts): a bot plays a stretch of a layer the way a
 // player would, and what it makes is set against the economy model for the same pickaxe and bag
 // (docs/phase-economy-calibration-20261029.md).
@@ -27,7 +28,7 @@ type Plan = { world: 1 | 2 | 3; layer: number; tool: number; bag: number; mode: 
 function saveFor(p: Plan) {
   const d = new GameSession(content).exportProgress() as any;
   d.onboarding = { ...d.onboarding, status: 'skipped' };
-  d.pickaxe = { version: 1, level: p.tool, enhance: 0 }; d.equipment = { ...d.equipment, toolLevel: p.tool, backpackCapacity: p.bag };
+  d.pickaxe = { version: 1, level: p.tool, enhance: 0 }; d.equipment = { ...d.equipment, toolLevel: p.tool, backpackTier: tierForCapacity(p.bag), equippedBackpackTier: tierForCapacity(p.bag) };
   d.inventory = { ...d.inventory, capacity: p.bag };
   d.worldProgress = { version: 2, openWorlds: [1, 2, 3].filter(w => w <= p.world) };
   for (const w of [1, 2, 3]) {
@@ -117,8 +118,7 @@ async function play(p: Plan) {
   const sell = () => {
     const c0 = coins();
     extra += TAP + SOLD; g.session.goTo('sale'); g.settle(); g.run(.3);
-    surfaceWalk([station.x, station.y, station.z]); g.run(.3);
-    if (!s().atStation) return false;
+    // Portable travel returns to the unlocked hall from its local sale floor.
     extra += UI + TELEPORT; g.session.travelTo(room.id); g.settle();
     // back the way it came; where the way drops, to the middle of the hole so it falls in
     for (const w of trail.slice(1)) walkTo(w, w[1] < g.feet()[1] - 1 ? .25 : .9, 20, false);
@@ -206,23 +206,24 @@ function model(p: Plan, trip: number) {
     const wt = l.ores.reduce((a, o) => a + o.weight, 0), c = l.oreChance;
     const mixed = [[l.rock, 1 - c], ...l.ores.map(o => [o, c * o.weight / wt] as const)].reduce((a, [x, q]) => a + (q as number) * bt((x as { hp: number }).hp), 0);
     const fall = (h: number) => h <= 28 * 28 / 48 ? Math.sqrt(2 * h / 24) : 28 / 24 + (h - 28 * 28 / 48) / 28;
-    return { minutes: +(((n - d) * mixed + d * bt(l.deep.hp) + Math.ceil(n / p.bag) * (trip + fall(next.from - l.from) / 2)) / 60).toFixed(1), blocks: n };
+    return { minutes: +(((n - d) * mixed + d * bt(l.deep.hp) + Math.ceil((n-d)/Math.max(1,Math.ceil(p.bag/((1-c)*l.rock.volume+c)))+d/Math.max(1,Math.ceil(p.bag/l.deep.volume))) * (trip + fall(next.from - l.from) / 2)) / 60).toFixed(1), blocks: n };
   }
   const wt = l.ores.reduce((a, o) => a + o.weight, 0), c = l.oreChance;
   // as the model had it (swings + AIM), and as it has it now (AIM and MOVE overlap the wait for the next swing)
-  let v = 0, before = 0, now = 0;
+  let v = 0, before = 0, now = 0, volume = 0;
   for (const [x, q] of [[l.rock, 1 - c], ...l.ores.map(o => [o, c * o.weight / wt] as const)] as const) {
     const swings = Math.ceil(x.hp / tool.power) / tool.speed;
-    v += q * x.price; before += q * (swings + AIM); now += q * (swings + Math.max(0, AIM + .1 - 1 / tool.speed));
+    volume += q * x.volume; v += q * x.price; before += q * (swings + AIM); now += q * (swings + Math.max(0, AIM + .1 - 1 / tool.speed));
   }
-  return { perHour: Math.round(p.bag * v / (p.bag * now + trip) * 3600), perBlock: +now.toFixed(3), perBlockBefore: +before.toFixed(3) };
+  const count=Math.max(1,Math.ceil(p.bag/volume));
+  return { perHour: Math.round(count * v / (count * now + trip) * 3600), perBlock: +now.toFixed(3), perBlockBefore: +before.toFixed(3) };
 }
 
 const only = process.env.ONLY?.split(',');
 const plans: Plan[] = [
-  { world: 1, layer: 1, tool: 2, bag: 35, mode: 'layer' }, { world: 1, layer: 4, tool: 6, bag: 60, mode: 'layer' },
-  { world: 2, layer: 3, tool: 13, bag: 160, mode: 'layer' }, { world: 3, layer: 5, tool: 27, bag: 400, mode: 'layer' },
-  { world: 1, layer: 1, tool: 3, bag: 35, mode: 'descent' }, { world: 2, layer: 3, tool: 14, bag: 160, mode: 'descent' },
+  { world: 1, layer: 1, tool: 2, bag: ECONOMY.bags[2].capacity, mode: 'layer' }, { world: 1, layer: 4, tool: 6, bag: ECONOMY.bags[5].capacity, mode: 'layer' },
+  { world: 2, layer: 3, tool: 13, bag: ECONOMY.bags[13].capacity, mode: 'layer' }, { world: 3, layer: 5, tool: 27, bag: ECONOMY.bags[25].capacity, mode: 'layer' },
+  { world: 1, layer: 1, tool: 3, bag: ECONOMY.bags[2].capacity, mode: 'descent' }, { world: 2, layer: 3, tool: 14, bag: ECONOMY.bags[13].capacity, mode: 'descent' },
 ].filter((_, k) => !only || only.includes(String(k)));
 const results = [];
 for (const p of plans) {

@@ -1,14 +1,14 @@
 import { ECONOMY, type CurrencyId, type TicketEconomy } from './economy.ts';
-import { tr } from '../i18n/i18n.ts';
+import { message, type TextRef } from '../i18n/messages.ts';
 // Each world's ticket, paid at a world portal: the previous world's currency, a pickaxe level (the new world's
 // first gate) and minerals from earlier worlds (economy.json). `currency` is what the world's own ore sells for.
 export type WorldId = 1 | 2 | 3;
 /** `name` is the world's number (第一世界), `title` its place name shown on arrival (松风矿谷). */
-type WorldRequirement = Readonly<{ id: WorldId; name: string; title: string; z: number; currency: CurrencyId; ticket: TicketEconomy | null;
+type WorldRequirement = Readonly<{ id: WorldId; name: TextRef; title: TextRef; z: number; currency: CurrencyId; ticket: TicketEconomy | null;
   /** The ticket's minerals (none for world 1). */
   materials: TicketEconomy['materials'] }>;
-const PLACES: Readonly<Record<WorldId, { name: string; title: string; z: number }>> = {
-  1: { name: tr('第一世界'), title: tr('松风矿谷'), z: 0 }, 2: { name: tr('第二世界'), title: tr('沙海基地'), z: 224 }, 3: { name: tr('第三世界'), title: tr('星陨秘境'), z: 448 } };
+const PLACES: Readonly<Record<WorldId, { name: TextRef; title: TextRef; z: number }>> = {
+  1: { name: message("msg.world_1"), title: message("msg.pinewind_valley"), z: 0 }, 2: { name: message("msg.world_2"), title: message("msg.sandsea_base"), z: 224 }, 3: { name: message("msg.world_3"), title: message("msg.fallen_star_realm"), z: 448 } };
 export const WORLD_REQUIREMENTS: readonly WorldRequirement[] = Object.freeze(ECONOMY.worlds.map(w =>
   Object.freeze({ id: w.id, ...PLACES[w.id], currency: w.currency, ticket: w.ticket, materials: w.ticket?.materials ?? [] })));
 export function worldRequirement(id: WorldId) {

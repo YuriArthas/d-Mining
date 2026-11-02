@@ -9,12 +9,12 @@ import { initPhysics, CharacterPhysics, RAPIER } from '../../src/game/validation
 const SESSION_CONTENT = GAME_CONTENT.session, EGG = SESSION_CONTENT.petContent.eggs.find(e => e.id === 'meadow-egg').price;
 
 const DAY = '2026-10-18';
-const origin = new GameSession(SESSION_CONTENT, 50, undefined, { rewards: { day: () => DAY, createInviteId: () => 'review-player-own' } }).exportProgress();
+const origin = new GameSession(SESSION_CONTENT, 25, undefined, { rewards: { day: () => DAY, createInviteId: () => 'review-player-own' } }).exportProgress();
 function sessionWith(change = () => {}, dependencies = {}) {
   const data = structuredClone(origin);
   change(data);
   delete data.equipment; // Legacy fixture sets the active gear directly.
-  return new GameSession(SESSION_CONTENT, 50, undefined, {
+  return new GameSession(SESSION_CONTENT, 25, undefined, {
     ...dependencies,
     rewards: { day: () => DAY, random: () => 0, ...dependencies.rewards },
   }, data);

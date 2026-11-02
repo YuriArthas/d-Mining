@@ -1,3 +1,4 @@
+import { resolveText } from '../i18n/i18n.ts';
 import type { RenderRate } from '../movement.ts';
 import type { ProbeMode } from '../presentation/PerformanceProbe.ts';
 import type { PerformanceSnapshot } from '../presentation/PerformanceMeter.ts';
@@ -48,12 +49,12 @@ export function ValidationPanel() {
   }, []);
   return <aside className="validation-panel">
     <output>{summary}</output>
-    <details><summary>矿物图例 · {MINERALS.length} 种</summary><div className="mineral-legend">{MINERALS.map(m => <span key={m.id}><i style={{ background: m.color }} />{m.name}</span>)}</div></details>
+    <details><summary>矿物图例 · {MINERALS.length} 种</summary><div className="mineral-legend">{MINERALS.map(m => <span key={m.id}><i style={{ background: m.color }} />{resolveText(m.name)}</span>)}</div></details>
     <div><button type="button" onClick={() => window.__miningValidation?.teleport('surface')}>定位地表</button><button type="button" onClick={() => window.__miningValidation?.teleport('deep')}>定位最深层</button></div>
     <select aria-label="预览场景" defaultValue="" onChange={event => {
       const room=GAME_CONTENT.session.destinations.find(r=>r.id===event.target.value);
       if(room)window.__miningValidation?.teleport(room.spawn);
       else if(event.target.value==='surface')window.__miningValidation?.teleport('surface');
-    }}><option value="" disabled>选择主题场景</option><option value="surface">松风矿谷 · 地表</option>{GAME_CONTENT.session.destinations.map(r=><option key={r.id} value={r.id}>世界 {r.worldId} · {r.name} · {r.depth} 米</option>)}</select>
+    }}><option value="" disabled>选择主题场景</option><option value="surface">松风矿谷 · 地表</option>{GAME_CONTENT.session.destinations.map(r=><option key={r.id} value={r.id}>世界 {r.worldId} · {resolveText(r.name)} · {r.depth} 米</option>)}</select>
   </aside>;
 }

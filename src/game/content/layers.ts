@@ -1,32 +1,32 @@
 import {ROOM_LAYOUT,type RoomLayout} from './roomLayout.ts';
 import { resourceByKind } from './resources.ts';
 import { themeById } from './themes.ts';
-import { tr } from '../i18n/i18n.ts';
+import { message, type TextRef } from '../i18n/messages.ts';
 /** `deepAt`: metres below `from` where the rock turns dense (`deepKind`); `oreChance`: the share of cells that are ore. */
-export type Layer = Readonly<{ id: string; name: string; from: number; theme: string; scene?:string; base: number; deepKind?: number; deepAt?: number | null;
+export type Layer = Readonly<{ id: string; name: TextRef; from: number; theme: string; scene?:string; base: number; deepKind?: number; deepAt?: number | null;
   oreChance: number; ores: readonly Readonly<{kind:number;weight:number}>[]; shop: boolean; room?:RoomLayout }>;
 export const WORLD_DEPTH = 4000;
 /** The ten layer looks the worlds are built from: name, theme and rest-room scene. Each world picks seven
  *  (surface plus six rest layers) and gives them their own depths, blocks and ores (journeyWorlds.ts). */
 /** `scene`: world 1's room scene (an authored hall); `laterScene`: the kit scene worlds 2 and 3 use instead. */
-type LayerTemplate = Readonly<{ id: string; name: string; theme: string; scene?: string; laterScene?: string }>;
+type LayerTemplate = Readonly<{ id: string; name: TextRef; theme: string; scene?: string; laterScene?: string }>;
 export const LAYER_TEMPLATES: readonly LayerTemplate[] = Object.freeze([
-  {id:'surface',name:tr('草地矿场'),theme:'meadow_mine'},
-  {id:'old_mine',name:tr('老矿井'),theme:'timber_mine',scene:'old-mine-hall'},
-  {id:'fungal',name:tr('蘑菇洞穴'),theme:'mushroom_cave',scene:'fungal-hall'},
-  {id:'crystal',name:tr('水晶洞穴'),theme:'crystal_cave',scene:'crystal-hall',laterScene:'crystal-station-v1'},
-  {id:'ruins',name:tr('地下遗迹'),theme:'buried_ruins',scene:'ruins-hall',laterScene:'ruins-station-v1'},
-  {id:'frozen',name:tr('冰封矿洞'),theme:'frozen_cave',scene:'frozen-hall',laterScene:'frozen-station-v1'},
-  {id:'volcanic',name:tr('熔岩矿洞'),theme:'lava_cave',scene:'volcanic-hall'},
-  {id:'fossil',name:tr('巨型化石'),theme:'fossil_cave',scene:'fossil-station-v1'},
-  {id:'machinery',name:tr('古代机械'),theme:'ancient_machine',scene:'machinery-station-v1'},
-  {id:'core',name:tr('地心秘境'),theme:'core_sanctum',scene:'core-station-v1'},
-  {id:'automine',name:tr('自动化矿道'),theme:'ancient_machine',scene:'automine-hall'},
-  {id:'reactor',name:tr('地心反应堆'),theme:'core_sanctum',scene:'reactor-hall'},
-  {id:'gear',name:tr('巨齿工厂'),theme:'ancient_machine',scene:'gear-hall'},
-  {id:'refinery',name:tr('水晶精炼厂'),theme:'crystal_cave',scene:'refinery-hall'},
-  {id:'survey',name:tr('遗迹勘探站'),theme:'buried_ruins',scene:'survey-hall'},
-  {id:'cryo',name:tr('冰封实验室'),theme:'frozen_cave',scene:'cryo-hall'},
+  {id:'surface',name:message("msg.meadow_mine"),theme:'meadow_mine'},
+  {id:'old_mine',name:message("msg.old_mine"),theme:'timber_mine',scene:'old-mine-hall'},
+  {id:'fungal',name:message("msg.mushroom_cave"),theme:'mushroom_cave',scene:'fungal-hall'},
+  {id:'crystal',name:message("msg.crystal_cave"),theme:'crystal_cave',scene:'crystal-hall',laterScene:'crystal-station-v1'},
+  {id:'ruins',name:message("msg.buried_ruins"),theme:'buried_ruins',scene:'ruins-hall',laterScene:'ruins-station-v1'},
+  {id:'frozen',name:message("msg.frozen_mine"),theme:'frozen_cave',scene:'frozen-hall',laterScene:'frozen-station-v1'},
+  {id:'volcanic',name:message("msg.lava_mine"),theme:'lava_cave',scene:'volcanic-hall'},
+  {id:'fossil',name:message("msg.giant_fossils"),theme:'fossil_cave',scene:'fossil-station-v1'},
+  {id:'machinery',name:message("msg.ancient_machines"),theme:'ancient_machine',scene:'machinery-station-v1'},
+  {id:'core',name:message("msg.core_sanctum"),theme:'core_sanctum',scene:'core-station-v1'},
+  {id:'automine',name:message("msg.automated_mineway"),theme:'ancient_machine',scene:'automine-hall'},
+  {id:'reactor',name:message("msg.core_reactor"),theme:'core_sanctum',scene:'reactor-hall'},
+  {id:'gear',name:message("msg.giant_gear_works"),theme:'ancient_machine',scene:'gear-hall'},
+  {id:'refinery',name:message("msg.crystal_refinery"),theme:'crystal_cave',scene:'refinery-hall'},
+  {id:'survey',name:message("msg.ruins_survey_station"),theme:'buried_ruins',scene:'survey-hall'},
+  {id:'cryo',name:message("msg.cryo_lab"),theme:'frozen_cave',scene:'cryo-hall'},
 ].map(l => Object.freeze(l)));
 export function validateLayers(layers: readonly Layer[]) {
   const ids = new Set<string>(), bases = new Set<number>();

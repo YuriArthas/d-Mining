@@ -1,3 +1,4 @@
+import { resolveText } from '../../src/game/i18n/i18n.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { ORE_LOOKS } from '../../src/game/content/journeyResources.ts';
@@ -35,7 +36,7 @@ test('every ore has its own colour: within a world any two ores differ clearly, 
 });
 
 test('ore colours follow their names; metals glint and gems are glassy', () => {
-  const byName = Object.fromEntries(ores.map(r => [r.name, r]));
+  const byName = Object.fromEntries(ores.map(r => [resolveText(r.name), r]));
   const within = (name, from, to) => { const h = hue(byName[name].color); assert.ok(from < to ? h >= from && h <= to : h >= from || h <= to, `${name} hue ${h.toFixed(0)}`); };
   within('翡翠', 130, 180); within('红宝石', 340, 30); within('蓝宝石', 270, 310); within('金', 70, 100); within('紫水晶', 290, 330); within('铜', 40, 70);
   assert.ok(lab(byName['煤'].color)[0] < 25, 'coal is dark');

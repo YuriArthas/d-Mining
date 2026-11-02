@@ -2,7 +2,6 @@ import { ShopView } from './game/presentation/ShopView.ts';
 import {GAME_CONTENT,GAME_GENERATION} from './game/content/gameContent.ts';
 import {LoadingScreen,LoadingBoundary} from './game/ui/LoadingScreen.tsx';
 import {initialLoading,updateLoading,type LoadingEvent} from './game/ui/loadingState.ts';
-import type {RenderRate} from './game/movement.ts';
 import {SURFACE_EXPOSURE} from './game/world/SceneLighting.ts';
 import {applyToneGrade} from './game/presentation/toneGrade.ts';
 import { lazy, Suspense, useCallback, useReducer, useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react';
@@ -52,16 +51,12 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
   const exiting = useRef(false);
   const [exited, setExited] = useState(false);
   const [shadowsEnabled,setShadowsEnabled]=useState(true);
-  const [renderRate,setRenderRate]=useState<RenderRate>('display');
+  const renderRate = '60' as const;
   const [loading,dispatchLoading]=useReducer(updateLoading,undefined,initialLoading);
   const onLoading=useCallback((event:LoadingEvent)=>{
     dispatchLoading(event);
-    const log=window.__MINING_LOG__;
-    if('error' in event)log?.write('loading.error',event.error);
-    else if('ready' in event)log?.ready();
-    else if('stage' in event)log?.phase(event.stage,{...event,bucket:event.complete?'complete':Math.floor(event.done/Math.max(1,event.total)*10)});
+    if ('ready' in event) window.__MINING_BOOT__?.ready();
   },[]);
-  useEffect(()=>{window.__MINING_LOG__?.write('game.ui-mounted');},[]);
   const [loadingVisible,setLoadingVisible]=useState(true);
   const showLoading=!loading.ready||loadingVisible;
   useEffect(()=>{
@@ -138,7 +133,6 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
 
   const settle = () => { input.reset(); surface.current?.focus(); };
   const system: SystemControls = {
-    renderRate, toggleRenderRate: () => { settle(); setRenderRate(r => r === 'display' ? '60' : 'display'); },
     shadows: shadowsEnabled, toggleShadows: () => { settle(); setShadowsEnabled(v => !v); },
     music, toggleMusic: () => { settle(); gameAudio.toggleMusic(); },
     sound, toggleSound: () => { settle(); gameAudio.toggle(); },
@@ -148,7 +142,7 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
       settle();
       void savedGame.saves.flush().catch(() => {}).finally(() => {
         saveLanguage(lang);
-        const url = new URL(location.href); url.searchParams.delete('lang'); location.replace(url.toString());
+        const url = new URL(location.href); url.searchParams.set('lang', lang); location.replace(url.toString());
       });
     },
     hosted, exit: () => void exit(),
@@ -156,17 +150,17 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
 
   if (exited) {
     return (
-      <main onContextMenuCapture={event => event.preventDefault()} className="game-shell" aria-label={tr('Mining 游戏')}>
+      <main onContextMenuCapture={event => event.preventDefault()} className="game-shell" aria-label={tr("msg.mining_game")}>
         <section className="placeholder" role="status">
-          <h1>{tr('已退出游戏')}</h1>
+          <h1>{tr("msg.you_ve_left_the_game")}</h1>
         </section>
       </main>
     );
   }
 
   return (
-    <main onPointerDownCapture={beginGameTouch} onClickCapture={blockGameCompatibilityClick} onContextMenuCapture={event => event.preventDefault()} className="game-shell game-shell--active game-shell--roblox-hud" aria-label={tr('Mining 游戏')} style={{ '--scene-background': GAME_CONFIG.background } as CSSProperties}>
-      <div inert={showLoading || !!exitState || saveStatus.state === 'conflicted'} ref={surface} className="scene" tabIndex={0} aria-label={tr('游戏视角，拖动观察，点按敲击，长按方块挖掘')}>
+    <main onPointerDownCapture={beginGameTouch} onClickCapture={blockGameCompatibilityClick} onContextMenuCapture={event => event.preventDefault()} className="game-shell game-shell--active game-shell--roblox-hud" aria-label={tr("msg.mining_game")} style={{ '--scene-background': GAME_CONFIG.background } as CSSProperties}>
+      <div inert={showLoading || !!exitState || saveStatus.state === 'conflicted'} ref={surface} className="scene" tabIndex={0} aria-label={tr("msg.game_view_drag_to_look_tap_to_strike_press_and_hold_a_block_")}>
         <LoadingBoundary onFailure={failLoading}><Canvas
           ref={canvas}
           onCreated={state => { scene.current = state; applyToneGrade(state.gl); state.gl.toneMappingExposure=SURFACE_EXPOSURE; }}
@@ -176,7 +170,7 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
           dpr={probeMode==='low-resolution'?Math.min(Math.max(window.devicePixelRatio,1),GAME_CONFIG.pixelRatioMax)*.5:[1,GAME_CONFIG.pixelRatioMax]}
           camera={{ fov: GAME_CONFIG.camera.fov, near: GAME_CONFIG.camera.near, far: 10000 }}
           gl={{ antialias: true }}
-          fallback={<p>{tr('当前浏览器无法启动 3D 画面，请使用支持 WebGL2 的浏览器。')}</p>}
+          fallback={<p>{tr("msg.this_browser_can_t_start_the_3d_view_please_use_a_browser_th")}</p>}
         >
           <ValidationScene shopView={shopView} guideMarker={guideMarker} miningLayer={miningLayer} savedGame={savedGame} content={GAME_CONTENT} renderRate={renderRate} shadowsEnabled={shadowsEnabled} probeMode={probeMode} input={input} onStatus={setStatus} onLoading={onLoading} onPerformance={setPerformanceStats} session={session} />
         </Canvas></LoadingBoundary>
@@ -188,15 +182,15 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
       </header>
       {!showLoading&&<div inert={!!exitState || saveStatus.state === 'conflicted'}><SessionUi shopView={shopView} system={system} guideMarker={guideMarker} blocked={saveStatus.state === 'failed' || saveStatus.state === 'conflicted'} session={session} input={input} surface={surface} /></div>}
       {!exitState && (saveStatus.state === 'failed' || saveStatus.state === 'conflicted') && <aside className="save-warning ui-card" role="alert">
-        <span>{saveStatus.state === 'conflicted' ? saveStatus.error : tr('进度暂未保存，请重试')}</span>
-        {saveStatus.state === 'failed' ? <UiButton size="s" tone="orange" onPress={() => void savedGame.saves.flush().catch(() => {})}>{tr('重试保存')}</UiButton> : <UiButton size="s" tone="orange" onPress={() => location.reload()}>{tr('重新进入')}</UiButton>}
+        <span>{saveStatus.state === 'conflicted' ? saveStatus.error : tr("msg.progress_isn_t_saved_yet_please_retry")}</span>
+        {saveStatus.state === 'failed' ? <UiButton size="s" tone="orange" onPress={() => void savedGame.saves.flush().catch(() => {})}>{tr("msg.retry_saving")}</UiButton> : <UiButton size="s" tone="orange" onPress={() => location.reload()}>{tr("msg.re_enter")}</UiButton>}
       </aside>}
-      {exitState && <Sheet title={exitState === 'saving' ? tr('正在保存进度') : tr('进度尚未保存')} size="s" label={tr('保存进度')} footer={exitState === 'failed' ? <>
-        <UiButton size="s" tone="red" onPress={() => void exit(true)}>{tr('不保存退出')}</UiButton>
-        {saveStatus.state !== 'conflicted' && <UiButton size="s" tone="steel" onPress={() => { input.reset(); setExitState(null); session.setSuspended(false); surface.current?.focus(); }}>{tr('返回游戏')}</UiButton>}
-        <span className="ui-grow" /><UiButton size="s" tone="orange" onPress={() => void exit()}>{tr('重试保存')}</UiButton>
+      {exitState && <Sheet title={exitState === 'saving' ? tr("msg.saving_progress_f8b1c858") : tr("msg.progress_not_saved_yet")} size="s" label={tr("msg.saving_progress")} footer={exitState === 'failed' ? <>
+        <UiButton size="s" tone="red" onPress={() => void exit(true)}>{tr("msg.quit_without_saving")}</UiButton>
+        {saveStatus.state !== 'conflicted' && <UiButton size="s" tone="steel" onPress={() => { input.reset(); setExitState(null); session.setSuspended(false); surface.current?.focus(); }}>{tr("msg.back_to_game")}</UiButton>}
+        <span className="ui-grow" /><UiButton size="s" tone="orange" onPress={() => void exit()}>{tr("msg.retry_saving")}</UiButton>
       </> : undefined}>
-        {exitState === 'saving' ? <p className="ui-hint">{tr('请稍候，马上就好…')}</p> : <div className="ui-well save-error"><span className="ui-hint">{exitError || tr('网络或存储暂时不可用，重试一次通常就能保存。')}</span></div>}
+        {exitState === 'saving' ? <p className="ui-hint">{tr("msg.one_moment_almost_there")}</p> : <div className="ui-well save-error"><span className="ui-hint">{exitError || tr("msg.network_or_storage_is_briefly_unavailable_one_more_try_usual")}</span></div>}
       </Sheet>}
       {showLoading&&<LoadingScreen state={loading} onExit={() => void exit()} />}
     </main>

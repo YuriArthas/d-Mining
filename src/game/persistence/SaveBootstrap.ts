@@ -27,7 +27,7 @@ export async function openSavedGame(
       saves?.invalidate(error);
     });
     signal.throwIfAborted();
-    onProgress(tr('正在读取存档'));
+    onProgress(tr("msg.reading_your_save"));
     const read = await store.read();
     signal.throwIfAborted();
     const head: SaveHeadV1 =
@@ -54,7 +54,7 @@ export async function openSavedGame(
       for (let i = 0; i < read.regions.length; i++) {
         world.restoreRegion(read.regions[i]);
         if (performance.now() - slice > 8) {
-          onProgress(tr('正在恢复矿坑 {i}/{regions}', { i: i + 1, regions: read.regions.length }));
+          onProgress(tr("msg.restoring_the_pit_i_regions", { i: i + 1, regions: read.regions.length }));
           await new Promise<void>((resolve) => setTimeout(resolve, 0));
           signal.throwIfAborted();
           slice = performance.now();

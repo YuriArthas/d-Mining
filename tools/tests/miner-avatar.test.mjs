@@ -33,7 +33,7 @@ test('实际鞋底的前后轴跟随 RAB 动作，不能叠加模型静止姿势
   try{
     for(const clip of gltf.animations.filter(c=>c.name!=='Mine')){
       const file={Idle:'idle',Walk:'walk',Run:'move'}[clip.name];
-      const motion=JSON.parse(readFileSync(new URL(`../../assets-source/miner-a/rab-${file}.json`,import.meta.url))).currentVersion.motion;
+      const motion=JSON.parse(readFileSync(new URL(`./fixtures/motions/rab-${file}.json`,import.meta.url))).currentVersion.motion;
       const byPart=new Map(motion.joints.map(j=>[j.childPartName,j]));
       mixer.stopAllAction();mixer.clipAction(clip).reset().play();
       const maximum={Left:0,Right:0};

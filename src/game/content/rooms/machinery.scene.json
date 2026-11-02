@@ -44,8 +44,8 @@
         -12.9
       ],
       "width": 4.7,
-      "title": "{name}",
-      "subtitle": "{number} / {depth} 米",
+      "title": "msg.name",
+      "subtitle": "msg.number_depth_m",
       "color": "#b9c9c6",
       "background": "#32495a"
     },
@@ -57,8 +57,8 @@
         -1.9
       ],
       "width": 3.2,
-      "title": "SELL",
-      "subtitle": "",
+      "title": "msg.sell_e2016fe7",
+      "subtitle": "msg.empty",
       "color": "#ffe5a3",
       "background": "#374653"
     },
@@ -70,8 +70,8 @@
         -1.9
       ],
       "width": 3.2,
-      "title": "UPGRADE",
-      "subtitle": "",
+      "title": "msg.upgrade_16617654",
+      "subtitle": "msg.empty",
       "color": "#b8ffe8",
       "background": "#374653"
     }

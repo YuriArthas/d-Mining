@@ -23,10 +23,10 @@ test('session publishes one coherent purchase snapshot and mining immediately us
  const first=JOURNEY_BACKPACKS[0],ore=resourceByKind(64+3),rock=resourceByKind(64),count=Math.ceil(first.price/ore.price);
  session.collected(Array.from({length:count},()=>({kind:ore.kind})));session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);session.resetPosition();
  const starter=session.getSnapshot().inventory.capacity;
- session.collected(Array.from({length:starter/rock.volume+3},()=>({kind:rock.kind})));assert.equal(session.requestMine([[0,-1,0]]),false);
+ session.collected(Array.from({length:starter/rock.volume},()=>({kind:rock.kind})));assert.equal(session.requestMine([[0,-1,0]]),false);
  const unsub=session.subscribe(()=>observed.push(session.getSnapshot()));
  assert.equal(session.upgradeBackpack(first.id).status,'upgraded');assert.equal(observed.length,1);
- assert.equal(observed[0].inventory.capacity,first.capacity);assert.equal(observed[0].inventory.used,starter+3*rock.volume);assert.equal(observed[0].coins,count*ore.price-first.price);
+ assert.equal(observed[0].inventory.capacity,first.capacity);assert.equal(observed[0].inventory.used,starter);assert.equal(observed[0].coins,count*ore.price-first.price);
  assert.equal(session.upgradeBackpack(first.id).status,'stale');assert.equal(observed.length,1);assert.equal(session.requestMine([[0,-1,0]]),true);
  unsub();
 });

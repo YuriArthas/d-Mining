@@ -9,11 +9,12 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "node tools/prepare-locales.mjs && node tools/check-module-paths.mjs && node tools/i18n-scan.mjs && tsc --noEmit && vite build",
     "serve": "node server/serve.mjs",
     "preview": "vite preview",
     "test": "node --test tools/tests/*.test.mjs",
-    "publish:preview": "npm run build && node tools/publish-preview.mjs"
+    "publish:preview": "npm run build && node tools/publish-preview.mjs",
+    "pretest": "node tools/prepare-locales.mjs"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "0.19.3",
@@ -30,6 +31,6 @@
     "@vitejs/plugin-react": "6.1.1",
     "playwright": "1.64.1",
     "typescript": "7.0.2",
-    "vite": "8.3.2"
+    "vite": "8.3.5"
   }
 }

@@ -1,9 +1,11 @@
-// Finds the player-facing text in src (tools/tests/i18n.test.mjs): every tr('…') source text, and any Chinese left
-// outside tr(). Chinese inside developer-facing calls (validation errors, save checks) stays as it is.
+// Validate stable message references and detect untranslated visible Chinese.
+// Developer diagnostics are excluded from player-facing copy checks.
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { loadLocalePacks } from './prepare-locales.mjs';
 
-export const SRC = new URL('../src/', import.meta.url).pathname;
+export const SRC = fileURLToPath(new URL('../src/', import.meta.url));
 const CJK = /[　-〿一-鿿＀-￯]/;
 /** Calls whose text only developers see. */
 export const DEV_CALLS = new Set(['Error', 'check', 'assert', 'integer', 'record', 'seconds', 'round', 'rising', 'warn', 'log', 'error', 'phase', 'onStatus', 'setStatus']);
@@ -97,28 +99,36 @@ export function enclosingCall(s, pos) {
   return null;
 }
 
-/** tr() texts and stray Chinese in one file. */
+/** Stable message IDs and untranslated visible Chinese in one file. */
 export function scanFile(path) {
-  const rel = relative(SRC, path), raw = readFileSync(path, 'utf8'), s = stripComments(raw);
+  const rel = relative(SRC, path).replaceAll('\\', '/'), raw = readFileSync(path, 'utf8'), s = stripComments(raw);
   const keys = [], stray = [];
   const dev = DEV_FILES.some(re => re.test(rel));
   for (const [start, , text, own] of literals(s)) {
-    if (!CJK.test(own)) continue;
     const call = enclosingCall(s, start);
-    if (call === 'tr') {
-      if (text[0] === '`' && text.includes('${')) stray.push({ rel, line: s.slice(0, start).split('\n').length, text, why: 'tr() 里不能用 ${}，改用 {参数}' });
-      else keys.push(text.slice(1, -1).replace(/\\'/g, "'").replace(/\\"/g, '"').replace(/\\n/g, '\n'));
+    if (call === 'tr' || call === 'message') {
+      const key = text.slice(1, -1);
+      if (/^(msg|boot)\.[a-z0-9_]+$/.test(key)) keys.push(key);
+      else stray.push({ rel, line: s.slice(0, start).split('\n').length, text, why: 'use a stable message ID' });
       continue;
     }
+    if (!CJK.test(own)) continue;
     if (dev || DEV_CALLS.has(call)) continue;
     stray.push({ rel, line: s.slice(0, start).split('\n').length, text });
   }
-  if (!dev) for (const m of s.matchAll(/>([^<>{}\n]*[一-鿿][^<>{}\n]*)</g))
-    stray.push({ rel, line: s.slice(0, m.index).split('\n').length, text: m[1].trim(), why: 'JSX 文本' });
+  // A tag must precede JSX text. Bare `>` also occurs in comparisons and
+  // translated strings; scanning it directly mistakes code for visible copy.
+  if (!dev && path.endsWith('.tsx')) {
+    const spans = literals(s).sort((a, b) => b[0] - a[0]);
+    let markup = s;
+    for (const [start, end] of spans) markup = markup.slice(0, start) + markup.slice(start, end).replace(/[^\n]/g, ' ') + markup.slice(end);
+    for (const m of markup.matchAll(/<\/?[A-Za-z][\w.:-]*(?:\s[^<>]*?)?>([^<>{}\n]*[一-鿿][^<>{}\n]*)(?=[<{])/g))
+      stray.push({ rel, line: s.slice(0, m.index).split('\n').length, text: m[1].trim(), why: 'JSX 文本' });
+  }
   return { keys, stray };
 }
 
-/** Text that data files hand to tr(): currency names (economy.json) and the rest halls' sign text (scene files). */
+/** Stable message IDs stored by currency and room-sign data files. */
 function dataKeys() {
   const keys = [];
   const economy = JSON.parse(readFileSync(join(SRC, 'game/content/economy.json'), 'utf8'));
@@ -126,21 +136,26 @@ function dataKeys() {
   const rooms = join(SRC, 'game/content/rooms');
   for (const name of readdirSync(rooms).filter(n => n.endsWith('.scene.json')))
     for (const sign of JSON.parse(readFileSync(join(rooms, name), 'utf8')).signs ?? [])
-      for (const text of [sign.title, sign.subtitle]) if (text && CJK.test(text)) keys.push(text);
+      for (const text of [sign.title, sign.subtitle]) keys.push(text);
   return keys;
 }
 
 export function scanAll() {
   const keys = new Set(dataKeys()), stray = [];
   for (const file of sourceFiles()) { const r = scanFile(file); r.keys.forEach(k => keys.add(k)); stray.push(...r.stray); }
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  for (const m of html.matchAll(/data-msg(?:-label)?="([^"]+)"/g)) keys.add(m[1]);
+  const source = loadLocalePacks().find(p => p.id === 'zh').messages;
+  for (const key of keys) if (!(key in source)) stray.push({ rel: 'resources', line: 1, text: key, why: 'unknown message ID' });
   return { keys: [...keys].sort(), stray };
 }
 
-if (process.argv[1] === new URL(import.meta.url).pathname) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const { keys, stray } = scanAll();
   const byFile = new Map();
   for (const s of stray) byFile.set(s.rel, (byFile.get(s.rel) ?? 0) + 1);
   console.log(JSON.stringify({ keys: keys.length, stray: stray.length, byFile: Object.fromEntries([...byFile].sort((a, b) => b[1] - a[1])) }, null, 1));
   if (process.argv[2] === 'keys') console.log(JSON.stringify(keys, null, 1));
+  if (stray.length) process.exitCode = 1;
   if (process.argv[2] === 'stray') for (const s of stray) console.log(`${s.rel}:${s.line}  ${s.text}${s.why ? '  (' + s.why + ')' : ''}`);
 }

@@ -53,9 +53,7 @@
       "sourceRange": [
         0,
         1.9
-      ],
-      "service": "RAB",
-      "serviceLocation": "Private deployment; resolve animationId against the configured service"
+      ]
     },
     {
       "clip": "Walk",
@@ -74,9 +72,7 @@
       "sourceRange": [
         0,
         1.367
-      ],
-      "service": "RAB",
-      "serviceLocation": "Private deployment; resolve animationId against the configured service"
+      ]
     },
     {
       "clip": "Run",
@@ -95,9 +91,7 @@
       "sourceRange": [
         0,
         0.567
-      ],
-      "service": "RAB",
-      "serviceLocation": "Private deployment; resolve animationId against the configured service"
+      ]
     },
     {
       "clip": "Mine",
@@ -116,9 +110,7 @@
       "sourceRange": [
         0.1,
         1.95
-      ],
-      "service": "RAB",
-      "serviceLocation": "Private deployment; resolve animationId against the configured service"
+      ]
     }
   ],
   "blend": "assets-source/miner-a/miner-a-rigged.blend",

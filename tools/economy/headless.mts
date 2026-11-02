@@ -49,7 +49,7 @@ export async function createHeadlessGame(saved?: unknown, options: { random?: ()
   const scenery = new SceneryCollision(physics, sites);
   const borders = new WorldBorders(physics);
   const detach = session.attach({
-    cell: c => terrain.cell(c), canMine: c => terrain.canMine(c), pending: c => terrain.pending(c), pendingCount: () => terrain.pendingCount(),
+    cell: c => terrain.cell(c), canMine: c => terrain.canMine(c), pending: c => terrain.pending(c), pendingCount: () => terrain.pendingCount(), pendingVolume: volume => terrain.pendingVolume(volume),
     mine: targets => terrain.mineMany(targets), cancelMining: () => terrain.cancelPending(), travelTo: feet => player.travelTo(feet),
   });
   let yaw = 0, aimAt: Coord | null = null, mining = false;

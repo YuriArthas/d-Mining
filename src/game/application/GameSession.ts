@@ -1,3 +1,4 @@
+import { restoreEquipment, saveEquipment } from '../logic/EquipmentSave.ts';
 import { TIP_IDS, type TipId, Onboarding } from '../logic/Onboarding.ts';
 import { EquipmentCollection } from '../logic/EquipmentCollection.ts';
 import { shopTools, shopBackpacks, type ShopCategory, type ShopItem } from '../content/shopCatalog.ts';
@@ -7,10 +8,10 @@ import { WORLD_REQUIREMENTS, worldRequirement, worldAtZ, worldAtFeet, worldSpawn
 import { Rewards, type RewardOptions, type RewardClaimResult } from '../logic/Rewards.ts';
 import { RebirthRecord, rebirthMultiplier } from '../logic/Rebirth.ts';
 import { REWARD_CONFIG, type OnlineRewardMinutes } from '../content/rewards.ts';
-import { ECONOMY, currencyName, layerEconomy, type CurrencyId } from '../content/economy.ts';
+import { ECONOMY, currencyText, layerEconomy, type CurrencyId } from '../content/economy.ts';
 import { CAPSULE_MACHINE_ZONE } from '../content/feedbackFacilities.ts';
 import { CELL } from '../terrain/grid.ts';
-import { TIP_GAP, TIP_SECONDS, nextTip, tipLearned, tipView, type TipState } from './Tips.ts';
+import { TIP_GAP, TIP_SECONDS, nextTip, tipLearned, tipRelevant, tipView, type TipState } from './Tips.ts';
 import type { ProgressDataV1 } from './SessionProgress.ts';
 import { record } from '../logic/data.ts';
 import { PetCommands } from './PetCommands.ts';
@@ -18,7 +19,7 @@ import type { SessionContent, Destination, EggStation } from "./SessionContent.t
 import { PetService } from "./PetService.ts";
 import { PetUiAdapter } from "./PetUiAdapter.ts";
 import { Exploration } from "../logic/Exploration.ts";
-import { playerDepthAtFeet } from "../logic/PlayerDepth.ts";
+import { environmentDepthAtFeet, playerDepthAtFeet } from "../logic/PlayerDepth.ts";
 import { Inventory } from "../logic/Inventory.ts";
 import { Wallet } from "../logic/Wallet.ts";
 import { ZoneDetector } from "../logic/ZoneDetector.ts";
@@ -28,7 +29,8 @@ import { Pickaxe, pickaxeStats } from "../logic/Pickaxe.ts";
 import { MiningCombat } from "./MiningCombat.ts";
 import { oreDrops, oreDefinition, itemDefinition, itemVolume, itemPrice, ORE_ITEMS } from "./items.ts";
 import type { Coord } from "../terrain/SparseWorld.ts";
-import { tr } from '../i18n/i18n.ts';
+import { tr, resolveText } from '../i18n/i18n.ts';
+import { message, type TextRef } from '../i18n/messages.ts';
 type WorldCommands = {
   cell(target: Coord): number | null;
   canMine?(target: Coord): boolean;
@@ -36,7 +38,7 @@ type WorldCommands = {
   mine(targets: readonly Coord[]): boolean;
   cancelMining(): void;
   /** Blocks broken but not collected yet (their ore is on its way to the bag). */
-  pendingCount?(): number;
+  pendingVolume?(volume: (kind: number) => number): number;
   /** Teleport; `lookAt` turns the camera toward what the player came to use. */
   travelTo?(feet: Coord, lookAt?: Coord): void;
 };
@@ -86,7 +88,7 @@ export class GameSession {
     if(!slot)return null;
     const room=this.content.destinations.filter(d=>d.worldId===slot.world)[slot.layer-1];
     const unlocked=!!room&&this.worldProgress.isOpen(slot.world as WorldId)&&!!this.explorations.get(slot.world as WorldId)?.has(room.id);
-    return Object.freeze({slot:slot.slot,price:slot.price,currency:slot.currency,unlocked,unlockName:tr('{name}的{name2}', { name: worldRequirement(slot.world as WorldId).name, name2: room?.name??'' }),
+    return Object.freeze({slot:slot.slot,price:slot.price,currency:slot.currency,unlocked,unlockName:tr("msg.name2_in_name", { name: worldRequirement(slot.world as WorldId).name, name2: room?.name??'' }),
       canAfford:unlocked&&this.wallet.getBalance(slot.currency)>=slot.price});
   }
   /** Buys the next pet slot; `expectedSlots` guards against a stale panel. */
@@ -132,7 +134,7 @@ export class GameSession {
     const count=this.rebirthRecord.count,r=ECONOMY.rebirth,final=this.finalLayer();
     const reached=!!final&&this.worldProgress.isOpen(r.world)&&!!this.explorations.get(r.world)?.has(final), level=this.equipment.toolLevel>=r.toolLevel;
     return Object.freeze({count,multiplier:rebirthMultiplier(count),nextMultiplier:rebirthMultiplier(count+1),
-      toolLevel:r.toolLevel,layerName:this.content.destinations.find(d=>d.id===final)?.name??'',reached,level,
+      toolLevel:r.toolLevel,layerName:(()=>{const name=this.content.destinations.find(d=>d.id===final)?.name;return name?resolveText(name):'';})(),reached,level,
       ready:reached&&level,shown:this.worldProgress.isOpen(r.world)||count>0});
   }
   getMovementMultiplier = () => this.rewardEffects.speed ? 2 : 1;
@@ -193,7 +195,7 @@ export class GameSession {
     if (this.petService.getEquipment().slots.some(id=>id!==null)) this.onboarding.record('equippedOnce');
     for (const listener of this.progressListeners) listener({ urgent }); }
   exportProgress(): ProgressDataV1 {
-    return { version: 2 as const, equipment:this.equipment.exportData(), rewards:this.rewards.exportData(), wallet: this.wallet.exportData(), inventory: this.inventory.exportData(),
+    return { version: 2 as const, equipment:saveEquipment(this.equipment.exportData(),this.inventory.capacity), rewards:this.rewards.exportData(), wallet: this.wallet.exportData(), inventory: this.inventory.exportData(),
       onboarding: this.onboarding.getSnapshot(), rebirth: this.rebirthRecord.exportData(), pickaxe: this.pickaxe.exportData(), pets: this.petService.exportData(), exploration: this.explorations.get(1)!.exportData(),
       worldProgress:this.worldProgress.exportData(),materials:this.materials.exportData(),worldExploration:Object.fromEntries([...this.explorations].map(([id,e])=>[id,e.exportData()])) };
   }
@@ -212,8 +214,9 @@ export class GameSession {
   private atHome = false;
   private shopId: string | null = null;
   private depth = 0;
+  private positionDepth = 0;
   private inSellZone = false;
-  private notice = "";
+  private notice: TextRef | null = null;
   private listeners = new Set<() => void>();
   private mining: Mining<Coord, { kind: number }>;
   private pickaxe = new Pickaxe();
@@ -227,6 +230,7 @@ export class GameSession {
     volume: number;
     price: number;
     requiredLevel: number;
+    requiredToolName: string;
     locked: boolean;
   }> | null = null;
   private lastHit = 0;
@@ -253,10 +257,11 @@ export class GameSession {
     this.syncRewardEffects();
     this.wallet = data ? Wallet.fromData(data.wallet) : new Wallet({ gold: content.initialCoins });
     this.pickaxe = data ? Pickaxe.fromData(data.pickaxe) : new Pickaxe();
-    this.inventory = data ? Inventory.fromData(data.inventory, itemVolume) : new Inventory(capacity, itemVolume);
+    const restored=data?restoreEquipment(data.inventory,data.equipment,this.pickaxe.getSnapshot().level):null;
+    this.inventory = restored ? Inventory.fromData(restored.inventory, itemVolume) : new Inventory(capacity, itemVolume);
     // A save from before the locks: what the store was still gathering stays locked, so it goes on being kept.
     for (const id of this.materials.kinds()) if (this.materials.count(id) < this.ticketNeed(id)) this.inventory.setLocked(id, true);
-    this.equipment = new EquipmentCollection(this.pickaxe.getSnapshot().level,this.inventory.capacity,data?.equipment);
+    this.equipment = new EquipmentCollection(this.pickaxe.getSnapshot().level,this.inventory.capacity,restored?.equipment);
     { const worn=this.pickaxe.getSnapshot();
       if(worn.enhance&&(worn.level!==this.equipment.toolLevel||worn.enhance!==this.equipment.enhance))throw Error('镐子强化与已购记录不一致'); }
     this.toolCatalog = shopTools();
@@ -324,10 +329,22 @@ export class GameSession {
   }
   private tipState(): TipState {
     const bag=this.inventory.getSnapshot(), facts=this.onboarding.getSnapshot();
-    const egg=this.content.petContent.eggs.find(e=>e.id===this.content.onboarding.eggId);
+    const egg=this.firstEggOffer();
+    const nextWorld=WORLD_REQUIREMENTS.find(w=>!this.worldProgress.isOpen(w.id)&&this.worldProgress.unlockable(w.id));
+    const ticket=nextWorld?.ticket;
+    const ready=!!ticket&&this.equipment.toolLevel>=ticket.toolLevel&&this.wallet.getBalance(ticket.currency)>=ticket.price
+      &&nextWorld!.materials.every(m=>this.materials.count(m.itemId)+(bag.items[m.itemId]??0)>=m.count);
     return {seen:id=>this.onboarding.has(id),location:this.guideLocation,atMine:this.atMine,minedOnce:facts.minedOnce,soldOnce:facts.soldOnce,
       full:bag.isFull,items:bag.totalCount,coins:this.wallet.getBalance(this.currency),level:this.equipment.toolLevel,upgradePrice:this.toolOffer().price,
-      pets:this.petService.getInventory().count,eggPrice:egg?.price??null};
+      pets:this.petService.getInventory().count,eggPrice:egg?.price??null,
+      layerUnlocked:this.content.destinations.some(d=>d.worldId===this.currentWorld&&this.exploration.has(d.id)),
+      atStation:this.atStation,atPortal:this.atPortal,highestWorld:Math.max(...WORLD_REQUIREMENTS.filter(w=>this.worldProgress.isOpen(w.id)).map(w=>w.id)),
+      readyWorld:ready&&nextWorld!.id!==1?nextWorld!.id as 2|3:null};
+  }
+  /** An available egg in this world's currency, cheapest first; a tutorial never advertises a locked offer. */
+  private firstEggOffer() {
+    return this.content.petContent.eggs.filter(e=>e.currency===this.currency&&this.petService.isUnlocked(e.id))
+      .sort((a,b)=>a.price-b.price)[0];
   }
   /** At most one tip on screen, each shown once per save. It ends when the player does the thing,
    *  taps it away, or after a few seconds; something the player already did never gets a tip.
@@ -338,6 +355,8 @@ export class GameSession {
     const state=this.tipState(), now=this.tipClock();
     for (const id of TIP_IDS) if (id!==this.tip && tipLearned(id,state)) this.onboarding.markSeen(id);
     if (this.tip && tipLearned(this.tip,state)) this.endTip(now);
+    // A full bag or a spent balance can interrupt advice. Retry it later, without recording it as seen.
+    else if (this.tip && (state.full && this.tip!=='sell' || !tipRelevant(this.tip,state))) this.tip=null;
     else if (this.tip && now-this.tipSince>=TIP_SECONDS[this.tip] && this.endTip(now)) this.committed(false);
     if (!this.tip && this.tipsCovered===null && now>=this.tipQuietUntil) {
       const next=nextTip(state);
@@ -350,7 +369,7 @@ export class GameSession {
     return changed;
   }
   /** A transient notice from the runtime (e.g. a world's scene still loading on the way there). */
-  announce = (text: string) => {
+  announce = (text: TextRef) => {
     if (this.notice !== text) { this.notice = text; this.publish(); }
   };
   /** The player tapped the tip away, or used the control it points at. */
@@ -376,10 +395,10 @@ export class GameSession {
       equipment: this.equipment.exportData(), shopCatalog:{tools:this.toolCatalog,backpacks:this.bagCatalog}, shopStock:this.shopStock(),
       currentWorld: this.currentWorld,
       // Worlds past the next one to unlock stay unknown: no name, no price (the portal shows ???).
-      worlds:WORLD_REQUIREMENTS.map(w=>({...w,open:this.worldProgress.isOpen(w.id),known:this.worldProgress.isOpen(w.id)||this.worldProgress.unlockable(w.id),
+      worlds:WORLD_REQUIREMENTS.map(w=>({...w,name:resolveText(w.name),title:resolveText(w.title),open:this.worldProgress.isOpen(w.id),known:this.worldProgress.isOpen(w.id)||this.worldProgress.unlockable(w.id),
         ticketBalance:w.ticket?this.wallet.getBalance(w.ticket.currency):0,toolLevel:this.equipment.toolLevel,
         // The ticket takes the store's first, then the bag's (a mineral not locked but still in the bag counts too).
-        materials:w.materials.map(m=>({...m,name:itemDefinition(m.itemId).name,owned:this.materials.count(m.itemId)+(bag.items[m.itemId]??0)}))})),
+        materials:w.materials.map(m=>({...m,name:resolveText(itemDefinition(m.itemId).name),owned:this.materials.count(m.itemId)+(bag.items[m.itemId]??0)}))})),
       /** 材料仓: what the tickets of the worlds not open yet ask for, how much of it is stored, and which are locked. */
       materials:this.storeView(),
       onboarding: this.onboarding.getSnapshot(), tip,
@@ -418,13 +437,14 @@ export class GameSession {
       location: this.guideLocation,
       destinations: this.content.destinations.filter(r=>r.worldId===this.currentWorld).map((r) => ({
         id: r.id,
-        name: r.name,
+        name: resolveText(r.name),
         depth: r.depth,
         theme: r.theme,
         hasShop: !!r.shop,
         unlocked: this.exploration.has(r.id),
       })),
-      notice: this.notice,
+      notice: this.notice ? resolveText(this.notice) : '',
+      noticeKind: this.notice?.id === 'msg.material_store_count_name_itemid_itemid2' ? 'materials' : null,
       target: this.targetView,
       hitSerial: this.lastHit,
       pickaxe: this.pickaxe.getSnapshot(),
@@ -473,12 +493,12 @@ export class GameSession {
     if (this.targetView?.key === key && this.targetView.hp === hp && this.targetView.locked === locked) return false;
     this.targetView = Object.freeze({
       key,
-      name: item.name,
+      name: resolveText(item.name),
       hp,
       maximum: item.maxHp,
       volume: item.volume,
       price: item.price,
-      requiredLevel, locked,
+      requiredLevel, requiredToolName: requiredLevel ? resolveText(this.toolCatalog[requiredLevel - 1].name) : "", locked,
     });
     return true;
   }
@@ -491,7 +511,7 @@ export class GameSession {
     const result = this.combat.hit(cell, this.clock());
     if (result.status === "hit" || result.status === "breaking") {
       if (result.damage) this.lastHit++;
-      this.notice = "";
+      this.notice = null;
       this.refreshTarget();
       this.publish();
     } else if (result.status === 'locked') {
@@ -567,10 +587,10 @@ export class GameSession {
   shareReward = async (platform: 'wechat'|'douyin') => {
     if(this.suspended)return {status:'unavailable' as const};
     if(platform!=='wechat'&&platform!=='douyin')throw Error('未知分享平台');
-    const name=platform==='wechat'?tr('微信'):tr('抖音');
+    const name=platform==='wechat'?tr("msg.wechat"):tr("msg.douyin");
     if(typeof location==='undefined')throw Error('Sharing requires the current browser page URL');
     const url=new URL(location.pathname,location.origin).href;
-    const text=tr('我在 Mining 挖到了 {maxDepth} 米！一起来挑战深度纪录。\n{url}\n邀请码：{inviteCode}\n进入游戏，在“奖励”中粘贴口令领取幸运币。分享至{name}。', { maxDepth: Math.floor(this.exploration.maxDepth), url: url, inviteCode: this.rewards.getSnapshot().inviteCode, name: name });
+    const text=tr("msg.i_dug_down_maxdepth_m_in_mining_come_beat_my_depth_record_ur", { maxDepth: Math.floor(this.exploration.maxDepth), url: url, inviteCode: this.rewards.getSnapshot().inviteCode, name: name });
     try { await navigator.clipboard.writeText(text); }
     catch { return {status:'clipboard-failed' as const}; }
     if(this.suspended)return {status:'unavailable' as const};
@@ -610,17 +630,16 @@ export class GameSession {
         this.autoHatchElapsed=0;
         const hatched=this.petService.hatch(this.autoHatchEgg);
         if(hatched.status==='hatched'){this.lastAutoHatch=hatched;this.committed(true);this.feedback({type:'hatched',tier:this.petTier(hatched.pet),auto:true});}
-        else {this.stopAutoHatch();this.notice=tr('自动开蛋已停止');}
+        else {this.stopAutoHatch();this.notice=message("msg.auto_hatch_stopped");}
       }
     }
     if(result.changed)this.committed(false);
     this.publish();
   };
-  /** Full: the bag, counting the blocks already broken whose ore is still on its way, so a block broken just as
-   *  the bag fills never pushes it past its size. */
+  /** Full: the bag, counting the blocks already broken whose ore is still on its way, so subsequent swings stop at capacity. The last admitted whole block may overflow; its yield is never truncated. */
   private bagFull() {
     const bag=this.inventory.getSnapshot();
-    return bag.used+(this.world?.pendingCount?.()??0)>=bag.capacity;
+    return bag.used+(this.world?.pendingVolume?.(kind => oreDefinition(kind).volume)??0)>=bag.capacity;
   }
   /** How many of a mineral the tickets of the worlds not open yet ask for. */
   private ticketNeed(itemId: string) {
@@ -631,7 +650,7 @@ export class GameSession {
     const closed=WORLD_REQUIREMENTS.filter(w=>!this.worldProgress.isOpen(w.id));
     const ids=[...new Set(closed.flatMap(w=>w.materials.map(m=>m.itemId)))]
       .filter(id=>this.materials.count(id)>0||closed.some(w=>this.worldProgress.unlockable(w.id)&&w.materials.some(m=>m.itemId===id)));
-    return ids.map(itemId=>({itemId,name:itemDefinition(itemId).name,stored:this.materials.count(itemId),needed:this.ticketNeed(itemId),locked:this.inventory.isLocked(itemId)}));
+    return ids.map(itemId=>({itemId,name:resolveText(itemDefinition(itemId).name),stored:this.materials.count(itemId),needed:this.ticketNeed(itemId),locked:this.inventory.isLocked(itemId)}));
   }
   /** How many more of a mineral the store takes: what the tickets lack, once the player locked it. */
   private storeWants(itemId: string) { return this.inventory.isLocked(itemId)?this.ticketNeed(itemId):0; }
@@ -669,10 +688,10 @@ export class GameSession {
     for (const resource of resources)
       if (resource.cell) this.combat.destroyed(resource.cell.join(","));
     this.refreshTarget();
-    this.notice = this.inventory.isFull() ? tr('背包满了，去出售') : "";
+    this.notice = this.inventory.isFull() ? message("msg.bag_full_go_sell") : null;
     // Ticket ore says where it went: the store, and how much of it the tickets still lack.
     const kept=this.stored.at(-1);
-    if (kept) this.notice = tr('材料仓 +{count}：{name} {itemId}/{itemId2}', { count: this.stored.reduce((n,s)=>n+s.count,0), name: itemDefinition(kept.itemId).name, itemId: this.materials.count(kept.itemId), itemId2: this.ticketNeed(kept.itemId) });
+    if (kept) this.notice = message("msg.material_store_count_name_itemid_itemid2", { count: this.stored.reduce((n,s)=>n+s.count,0), name: itemDefinition(kept.itemId).name, itemId: this.materials.count(kept.itemId), itemId2: this.ticketNeed(kept.itemId) });
     this.publish();
     if (resources.length) for (const listener of this.pickupListeners) listener(oreDrops(resources), this.stored);
     if (!wasFull && this.inventory.isFull()) this.refuse('full');
@@ -682,7 +701,7 @@ export class GameSession {
     const offer=this.toolOffer();
     if(!offer.next)return {status:'limit'} as const;
     if(!this.wallet.debit(offer.currency,offer.price)){this.feedback({type:'denied',reason:'coins'});return {status:'insufficient'} as const;}
-    this.pickaxe.setLevel(offer.next.level);this.equipment.toolLevel=offer.next.level;this.equipment.enhance=0;
+    this.pickaxe.setLevel(offer.next.level);this.equipment.buyTool(offer.next.level);
     this.committed(true);this.refreshTarget();this.publish();this.feedback({type:'purchased'});
     return {status:'upgraded',level:offer.next.level,spent:offer.price} as const;
   };
@@ -703,7 +722,7 @@ export class GameSession {
     if(!next)return {status:'max'} as const;
     if(next.id!==tierId)return {status:'stale'} as const;
     if(!this.wallet.debit(next.currency,next.price)){this.feedback({type:'denied',reason:'coins'});return {status:'insufficient'} as const;}
-    this.inventory.setCapacity(next.capacity!);this.equipment.backpackCapacity=next.capacity!;
+    this.inventory.setCapacity(next.capacity!);this.equipment.buyBackpack(next.capacity!);
     this.committed(true);this.publish();this.feedback({type:'purchased'});
     return {status:'upgraded',capacity:next.capacity!,spent:next.price} as const;
   };
@@ -748,10 +767,14 @@ export class GameSession {
     if(!stock)return {status:'away'} as const;
     const item=stock[category].find(x=>x.id===id);
     if(!item)return {status:'unavailable'} as const;
-    const owned=category==='tools'?item.level<=this.equipment.toolLevel:item.capacity!<=this.equipment.backpackCapacity;
+    const owned=category==='tools'?this.equipment.ownsTool(item.level):this.equipment.ownsBackpack(item.capacity!);
     if(!owned) {
-      if(category==='tools')return item.level===this.equipment.toolLevel+1?this.upgradePickaxe(this.equipment.toolLevel):{status:'locked'} as const;
-      return item.id===this.bagOffer().next?.id?this.upgradeBackpack(item.id):{status:'locked'} as const;
+      if(category==='backpacks'&&item.capacity!<this.inventory.getSnapshot().used&&item.capacity!<this.inventory.capacity)return {status:'too-small'} as const;
+      if(!this.wallet.debit(item.currency,item.price)){this.feedback({type:'denied',reason:'coins'});return {status:'insufficient'} as const;}
+      if(category==='tools') {this.equipment.buyTool(item.level);this.pickaxe.setLevel(item.level,item.level===this.equipment.toolLevel?this.equipment.enhance:0);this.refreshTarget();}
+      else {this.equipment.buyBackpack(item.capacity!);this.inventory.setCapacity(item.capacity!);}
+      this.committed(true);this.publish();this.feedback({type:'purchased'});
+      return category==='tools'?{status:'upgraded',level:item.level,spent:item.price} as const:{status:'upgraded',capacity:item.capacity!,spent:item.price} as const;
     }
     if(category==='tools') {
       if(this.pickaxe.getSnapshot().level===item.level)return {status:'equipped'} as const;
@@ -772,6 +795,9 @@ export class GameSession {
     const machineEvent=this.machineZone.update(feet,grounded);
     if(machineEvent){this.atMachine=machineEvent==='enter';changed=true;}
     const sampledDepth = playerDepthAtFeet(feet, grounded, this.content.destinations);
+    // Sell's floor: anywhere inside a hall is on its floor, on a step or a crate, mid-jump or just arrived and not yet
+    // landed (2026-11-02: a player in the mushroom cave stood on something and Sell sent them up to the old mine).
+    this.positionDepth = environmentDepthAtFeet(feet, grounded, this.content.destinations);
     const depth = Math.floor(sampledDepth);
     if (depth !== this.depth) {
       this.depth = depth;
@@ -795,7 +821,7 @@ export class GameSession {
     const added = this.exploration.visit(sampledDepth);
     if (this.exploration.maxDepth !== oldMaximum || added.length) { changed=true; this.committed(added.length > 0); }
     if (added.length) {
-      this.notice = tr('已解锁 {name}，回到地表可传送；对应宠物蛋已解锁', { name: this.content.destinations.find((r) => r.id === added.at(-1))!.name });
+      this.notice = message("msg.name_unlocked_teleport_there_from_the_surface_its_pet_egg_is", { name: this.content.destinations.find((r) => r.id === added.at(-1))!.name });
       changed = true;
       this.feedback({ type: 'unlocked' });
     }
@@ -804,10 +830,10 @@ export class GameSession {
     if(inside!==this.atHome){this.atHome=inside;changed=true;}
     for(const st of this.stations)st.detector.update(feet,grounded);
     const onPad=this.stations.some(st=>st.worldId===this.currentWorld&&st.detector.isInside);
-    if(onPad!==this.atStation){this.atStation=onPad;changed=true;}
+    if(onPad!==this.atStation){this.atStation=onPad;changed=true;if(onPad&&this.onboarding.markSeen('station'))this.committed(false);}
     for(const p of this.portals)p.detector.update(feet,grounded);
     const atPortal=this.portals.some(p=>p.worldId===this.currentWorld&&p.detector.isInside);
-    if(atPortal!==this.atPortal){this.atPortal=atPortal;changed=true;}
+    if(atPortal!==this.atPortal){this.atPortal=atPortal;changed=true;if(atPortal&&this.onboarding.markSeen('portal'))this.committed(false);}
     for (const shop of this.shops) shop.detector.update(feet, grounded);
     const activeShop =
       this.shops.find((shop) => shop.detector.isInside)?.id ?? null;
@@ -870,7 +896,7 @@ export class GameSession {
     this.world!.travelTo!(room.spawn);
     this.resetPosition();
     // Pad detectors keep their entry latch until feet actually leave the pad.
-    this.notice = tr('前往 {name}', { name: room.name });
+    this.notice = message("msg.go_to_name", { name: room.name });
     this.publish();
     return "travelling" as const;
   }
@@ -879,7 +905,7 @@ export class GameSession {
     this.world.cancelMining();
     this.world.travelTo?.(worldSpawn(this.currentWorld));
     this.resetPosition();
-    this.notice = "";
+    this.notice = null;
     this.publish();
   };
   /** The surface hub doubles as the teleport station; portable travel works anywhere. */
@@ -891,28 +917,54 @@ export class GameSession {
     if (!this.sunken) { const keys = new Set<string>(); for (let i = 0; i + 1 < cells.length; i += 2) keys.add(cells[i] + ',' + cells[i + 1]); this.sunken = keys; }
     return this.sunken.has(Math.floor(feet[0] / CELL) + ',' + Math.floor(feet[2] / CELL));
   }
-  private surfaceSpot(target: 'shop' | 'sale' | 'capsule' | { egg: string }): { feet: Coord; look: Coord } | null {
+  private serviceSpot(target: 'shop' | 'sale' | 'capsule' | 'station' | 'portal' | { egg: string }): { feet: Coord; look: Coord } | null {
     const worldZ = worldRequirement(this.currentWorld).z;
     const near = (zone: { y: number; z: number }) => zone.y >= -.1 && Math.abs(zone.z - worldZ) < 100;
     // Arrive facing the counter: zones may name their building; older content faces +Z buildings.
     const facingBuilding = (zone: { x: number; y: number; z: number; lookAt?: readonly [number, number, number] }) =>
       ({ feet: [zone.x, zone.y + .1, zone.z] as Coord, look: (zone.lookAt ?? [zone.x, zone.y + 1, zone.z - 6]) as Coord });
     if (target === 'shop') { const zone = this.content.shops.find(s => near(s.zone))?.zone; return zone ? facingBuilding(zone) : null; }
-    if (target === 'sale') { const zone = this.content.sales.find(near); return zone ? facingBuilding(zone) : null; }
+    if (target === 'sale') {
+      // Go upward from the current position, including the floor being stood on; past exploration is irrelevant.
+      const zone = this.content.sales
+        .filter(zone => worldAtZ(zone.z) === this.currentWorld && zone.y >= -this.positionDepth)
+        .sort((a, b) => a.y - b.y)[0];
+      return zone ? facingBuilding(zone) : null;
+    }
     if (target === 'capsule') return this.currentWorld === 1 ? facingBuilding(CAPSULE_MACHINE_ZONE) : null;
+    if (target === 'station' || target === 'portal') {
+      const zone=(target==='station'?this.content.stations:this.content.portals).find(s=>s.worldId===this.currentWorld)?.zone;
+      return zone?facingBuilding(zone):null;
+    }
     if (!this.petService.isUnlocked(target.egg)) return null;
     const station = this.content.eggStations.find(s => s.eggId === target.egg);
     return station ? { feet: [station.zone.x, station.zone.y + .1, station.zone.z], look: station.promptAnchor as Coord } : null;
   }
-  /** Instant trip to a surface service, the way Roblox simulators offer Sell / Shop buttons. */
-  goTo = (target: 'shop' | 'sale' | 'capsule' | { egg: string }) => {
+  /** Instant trip to a service; Sell uses the first sale floor upward in the current world. */
+  goTo = (target: 'shop' | 'sale' | 'capsule' | 'station' | 'portal' | { egg: string }) => {
     if (this.suspended || !this.world?.travelTo) return 'unavailable' as const;
-    const spot = this.surfaceSpot(target);
+    const spot = this.serviceSpot(target);
     if (!spot) return 'unavailable' as const;
     this.world.cancelMining();
     this.world.travelTo(spot.feet, spot.look);
     this.resetPosition();
     return 'travelling' as const;
+  };
+  /** Tips only take the player to an entrance. Buying an egg and paying a world ticket remain explicit actions. */
+  followTip = (id: TipId) => {
+    const state=this.tipState();
+    if(this.suspended||id!==this.tip||tipLearned(id,state)||!tipRelevant(id,state)||id==='dig'||id==='sell')return false;
+    const egg=id==='pets'?this.firstEggOffer():null;
+    if(id==='pets'&&!egg)return false;
+    const result=id==='shop'?this.goToShop('tools'):this.goTo(egg?{egg:egg.id}:id==='station'?'station':'portal');
+    if(result!=='travelling'&&result!=='here')return false;
+    // Travel resets the location and may already have hidden the active tip. Persist the action by its ID.
+    const changed=this.onboarding.markSeen(id);
+    if(this.tip===id)this.tip=null;
+    this.tipQuietUntil=this.tipClock()+TIP_GAP;
+    if(changed)this.committed(false);
+    this.publish();
+    return true;
   };
   /** Rebirth, once the journey is complete: every currency, the tool, the backpack and the ore in it, the worlds
    *  past the first, every layer reached and the kept minerals go; pets and pet slots stay. Ore then sells for the
@@ -925,8 +977,7 @@ export class GameSession {
     this.inventory.remove(Object.entries(this.inventory.getSnapshot().items).map(([itemId,count])=>({itemId,count})));
     for(const id of this.inventory.getSnapshot().locked)this.inventory.setLocked(id,false);
     const starter=ECONOMY.bags[0].capacity;
-    this.inventory.setCapacity(starter);this.equipment.backpackCapacity=starter;
-    this.pickaxe.setLevel(1);this.equipment.toolLevel=1;this.equipment.enhance=0;
+    this.inventory.setCapacity(starter);this.pickaxe.setLevel(1);this.equipment.reset(1,starter);
     this.worldProgress.reset();this.materials.clear();
     for(const w of WORLD_REQUIREMENTS)this.explorations.set(w.id,new Exploration(this.content.destinations.filter(d=>d.worldId===w.id)));
     this.currentWorld=1;
@@ -949,8 +1000,8 @@ export class GameSession {
   };
   /** The test unlock page: every world and layer with its state. */
   devUnlocks = () => {
-    return WORLD_REQUIREMENTS.map(w=>({id:w.id,name:w.name,open:this.worldProgress.isOpen(w.id),
-      layers:this.content.destinations.filter(d=>d.worldId===w.id).map(d=>({id:d.id,name:d.name,depth:d.depth,unlocked:!!this.explorations.get(w.id)?.has(d.id)}))}));
+    return WORLD_REQUIREMENTS.map(w=>({id:w.id,name:resolveText(w.name),open:this.worldProgress.isOpen(w.id),
+      layers:this.content.destinations.filter(d=>d.worldId===w.id).map(d=>({id:d.id,name:resolveText(d.name),depth:d.depth,unlocked:!!this.explorations.get(w.id)?.has(d.id)}))}));
   };
   /** Test shortcut: adds the current world's currency (debug page only). */
   devGrantCoins = (coins: number) => {
@@ -986,8 +1037,8 @@ export class GameSession {
   private executeSale() {
     const result=sellItems(this.inventory,this.till(),itemPrice,this.inventory.sellable(),this.saleMultiplier());
     if(result.status==='sold'){this.onboarding.record('soldOnce');this.committed(true);this.feedback({ type: 'sold', coins: result.coins, count: result.count });}
-    this.notice=result.status==='sold'?tr('出售 {count} 件，获得 {coins} {currency}', { count: result.count, coins: result.coins, currency: currencyName(this.currency) })
-      :result.status==='empty'?(this.inventory.getSnapshot().totalCount?tr('锁定的矿物不会卖掉'):tr('没有可出售的矿物')):tr('货币数值超出范围');
+    this.notice=result.status==='sold'?message("msg.sold_count_items_for_coins_currency", { count: result.count, coins: result.coins, currency: currencyText(this.currency) })
+      :result.status==='empty'?(this.inventory.getSnapshot().totalCount?message("msg.locked_ore_is_never_sold"):message("msg.nothing_to_sell")):message("msg.amount_out_of_range");
     return result;
   }
   sellAvailable = () => {
@@ -1011,7 +1062,7 @@ export class GameSession {
     if(rest.length&&!this.inventory.remove(rest))throw Error('缴纳矿产发生变化');
     if(!this.wallet.debit(ticket.currency,ticket.price))throw Error('缴纳货币发生变化');
     this.worldProgress.unlock(id);
-    this.notice=tr('{name}已开放，可以传送过去了！', { name: requirement.name });
+    this.notice=message("msg.name_is_open_you_can_teleport_there_now", { name: requirement.name });
     this.committed(true);this.publish();return {status:'opened'} as const;
   };
 }

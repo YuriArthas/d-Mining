@@ -69,26 +69,29 @@ test('resource quantities remain stable and definitions are immutable',()=>{
  for(const r of ORE_ITEMS){assert.ok(r.volume>0&&r.maxHp>0&&r.price>0);assert.ok(Object.isFrozen(r));assert.equal(itemVolume(r.itemId),r.volume);assert.equal(itemPrice(r.itemId),r.price);}
  assert.throws(()=>{ORE_ITEMS[0].volume=99});assert.throws(()=>itemDefinition('unknown'));
 });
-test('every block takes one place in the bag; a full bag refuses the next block and sells once at each price',()=>{
- let now=0,solid=true;const initial=new GameSession(SESSION_CONTENT).exportProgress(); initial.pickaxe.level=28;initial.equipment.toolLevel=28;const session=new GameSession(SESSION_CONTENT,50,()=>now,{},initial);
- session.attach({cell:()=>solid?71:0,pending:()=>false,mine:()=>true,cancelMining:()=>{}});
- assert.ok(ORE_ITEMS.every(r=>r.volume===1));
- const cap=session.getSnapshot().inventory.capacity;session.collected(Array.from({length:cap-1},()=>({kind:64})));const cell=[11,-1,-25];session.selectTarget(cell);
- assert.equal(session.getSnapshot().target.price,resourceByKind(71).price);
- const hits=Math.ceil(resourceByKind(71).maxHp/pickaxeStats(28).power); for(let i=0;i<hits;i++){now=i*.5;assert.equal(session.hit(cell).status,i===hits-1?'breaking':'hit')}
- solid=false;session.collected([{cell,kind:71}]);let s=session.getSnapshot();assert.equal(s.inventory.used,cap);assert.equal(s.inventory.totalCount,cap);assert.deepEqual(s.sale,{status:'quoted',count:cap,coins:cap-1+resourceByKind(71).price});
- solid=true;now+=.5;assert.equal(session.hit([12,-1,-25]).status,'full');assert.equal(session.blockHealth([12,-1,-25]),resourceByKind(71).maxHp);
- session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);s=session.getSnapshot();assert.equal(s.coins,SESSION_CONTENT.initialCoins+cap-1+resourceByKind(71).price);assert.equal(s.inventory.totalCount,0);assert.match(s.notice,new RegExp(`${cap} 件.*金币`));
- session.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);assert.equal(session.getSnapshot().coins,SESSION_CONTENT.initialCoins+cap-1+resourceByKind(71).price);
+
+test('base rock occupies many units; quantities, prices and saves still count whole blocks',()=>{
+ const s=new GameSession(SESSION_CONTENT),rock=resourceByKind(64),deep=resourceByKind(65);
+ assert.equal(rock.volume,1);assert.equal(deep.volume,12);
+ assert.ok(ORE_ITEMS.filter(r=>r.base).every(r=>r.volume>=1));assert.ok(ORE_ITEMS.filter(r=>!r.base).every(r=>r.volume===1));
+ s.collected([{kind:64},{kind:65}]);assert.equal(s.getSnapshot().inventory.used,13);assert.equal(s.getSnapshot().inventory.totalCount,2);
+ assert.equal(s.getSnapshot().sale.coins,rock.price+deep.price);
+ const saved=s.exportProgress(),r=GameSession.fromData(saved,SESSION_CONTENT);assert.equal(r.getSnapshot().inventory.used,13);
+ r.collected([{kind:65}]);assert.equal(r.getSnapshot().inventory.isFull,true);
+ const quote=r.getSnapshot().sale;r.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);
+ assert.equal(r.getSnapshot().coins,SESSION_CONTENT.initialCoins+quote.coins);assert.equal(r.getSnapshot().inventory.used,0);
+ r.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);assert.equal(r.getSnapshot().coins,SESSION_CONTENT.initialCoins+quote.coins);
+ // Old save quantities survive the new volume even if the bag is now over capacity.
+ saved.inventory.items[rock.itemId]=30;
+ const legacy=GameSession.fromData(saved,SESSION_CONTENT);assert.equal(legacy.getSnapshot().inventory.totalCount,31);assert.equal(legacy.getSnapshot().inventory.used,42);
 });
-test('a block broken as the bag fills counts as already in it: the next block is refused, nothing goes past the size',()=>{
- let now=0,pending=0;const initial=new GameSession(SESSION_CONTENT).exportProgress();initial.pickaxe.level=28;initial.equipment.toolLevel=28;
- const session=new GameSession(SESSION_CONTENT,50,()=>now,{},initial);
- session.attach({cell:()=>71,pending:()=>false,mine:()=>{pending++;return true;},pendingCount:()=>pending,cancelMining:()=>{pending=0;}});
- const cap=session.getSnapshot().inventory.capacity;session.collected(Array.from({length:cap-1},()=>({kind:64})));
- const hits=Math.ceil(resourceByKind(71).maxHp/pickaxeStats(28).power),a=[11,-1,-25],b=[12,-1,-25];
- for(let i=0;i<hits;i++){now+=.5;session.hit(a);}
- assert.equal(pending,1,'the last free place is taken by the block on its way');
- now+=.5;assert.equal(session.hit(b).status,'full');assert.equal(session.blockHealth(b),resourceByKind(71).maxHp);
- pending=0;session.collected([{cell:a,kind:71}]);assert.equal(session.getSnapshot().inventory.used,cap);
+test('pending base blocks reserve their volume; final oversize yield is delivered once, subsequent mining refuses',()=>{
+ let now=0,pending=0;
+ const initial=new GameSession(SESSION_CONTENT).exportProgress();initial.pickaxe.level=28;initial.equipment.toolLevel=28;
+ const s=new GameSession(SESSION_CONTENT,25,()=>now,{},initial);
+ s.attach({cell:()=>64,pending:()=>false,mine:()=>{pending++;return true;},pendingVolume:volume=>pending*volume(64),cancelMining(){}});
+ s.collected(Array.from({length:24},()=>({kind:64})));
+ const a=[11,-1,-25],b=[12,-1,-25];assert.equal(s.hit(a).status,'breaking');assert.equal(pending,1);
+ now+=1;assert.equal(s.hit(b).status,'full');assert.equal(s.getSnapshot().inventory.used,24);
+ pending=0;s.collected([{cell:a,kind:64}]);assert.equal(s.getSnapshot().inventory.used,25);assert.equal(s.getSnapshot().inventory.totalCount,25);
 });
