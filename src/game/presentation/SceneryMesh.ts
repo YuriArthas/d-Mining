@@ -1,4 +1,5 @@
 import {addAuthoredRoom} from './AuthoredRoomView.ts';
+import {servicePads} from './ServicePads.ts';
 import {createWorldText} from './WorldText.ts';
 import { compactSceneryGeometry } from './compactSceneryGeometry.ts';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
@@ -17,6 +18,7 @@ export function sceneryShapeGeometry(s:Shape,plastic=false) {
     case 'cap':g=new SphereGeometry(1,96,48,0,Math.PI*2,0,Math.PI/2).scale(...s.size);break;
     case 'torus':g=new TorusGeometry(s.size[0],s.size[1],32,160,s.size[2]);break;
     case 'ring':g=new RingGeometry(s.size[0]-s.size[1],s.size[0],160).rotateX(-Math.PI/2);break;
+    case 'pad':throw Error('pads are drawn by servicePads');
   }
   // Faceted rocks shade each face a little differently, so their triangle corners are separate.
   const faceted=!plastic&&s.type==='rock';
@@ -34,7 +36,7 @@ export function sceneryShapeGeometry(s:Shape,plastic=false) {
 }
 export function createScenery(plan:SceneryPlan):Group {
   const group=new Group(),plastic=plan.style==='plastic';
-  const prepared=plan.shapes.map(shape=>({shape,geometry:sceneryShapeGeometry(shape,plastic)}));
+  const prepared=plan.shapes.filter(s=>s.type!=='pad').map(shape=>({shape,geometry:sceneryShapeGeometry(shape,plastic)}));
   for(const glow of [false,true]){
     const pieces=prepared.filter(p=>!!p.shape.glow===glow).map(p=>p.geometry);
     if(!pieces.length)continue;
@@ -44,6 +46,8 @@ export function createScenery(plan:SceneryPlan):Group {
     const mesh=new Mesh(merged,glow?new MeshBasicMaterial({vertexColors:true}):new MeshStandardMaterial({vertexColors:true,roughness:plastic?.48:1,metalness:0,flatShading:!plastic}));
     mesh.castShadow=!glow;mesh.receiveShadow=!glow;group.add(mesh);
   }
+  const pads=servicePads(plan.shapes.filter(s=>s.type==='pad'));
+  if(pads)group.add(pads);
   if(plan.authored)addAuthoredRoom(group,plan.authored);
   for(const sign of plan.signs)group.add(createWorldText(sign));
   return group;

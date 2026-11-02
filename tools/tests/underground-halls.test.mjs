@@ -54,7 +54,7 @@ test('world 2: its first layer is the automine hall, lit and placed under the te
  assert.deepEqual(plan.signs.map(s=>s.title),['世界传送门','SELL','UPGRADE','传送站','第二世界']);
  // The service rings are the session's zones, clear of every collider; nothing solid in the shaft.
  for(const [i,zone] of [GAME_CONTENT.session.sales.find(z=>z.z>200),GAME_CONTENT.session.shops.find(s=>s.id==='world2.shop').zone].entries()){
-  assert.deepEqual([plan.shapes[i*2].at[0],plan.shapes[i*2].at[2]],[zone.x,zone.z]);
+  assert.deepEqual([plan.shapes[i].at[0],plan.shapes[i].at[2]],[zone.x,zone.z]);
   for(const s of plan.solids)assert.ok(Math.abs(zone.x-s.at[0])>s.half[0]+.3||Math.abs(zone.z-s.at[2])>s.half[2]+.3,`ring blocked by ${s.at}`);
  }
  for(const s of plan.solids)assert.ok(Math.abs(s.at[0])-s.half[0]>=8-1e-6||Math.abs(s.at[2]-224)-s.half[2]>=8-1e-6,`solid in the shaft at ${s.at}`);

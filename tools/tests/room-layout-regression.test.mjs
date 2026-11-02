@@ -36,7 +36,7 @@ test('authored room scales rotated instances and colliders together while preser
 
 test('scaled rooms keep the sale ring and actual trigger radius aligned',()=>{
  const room=oldMineWith({centerX:0,centerZ:0,widthCells:40,depthCells:24,heightCells:12});
- const ring=roomPlan(room).shapes.find(s=>s.interaction&&s.size[1]===.12);
+ const ring=roomPlan(room).shapes.find(s=>s.type==='pad');
  assert.equal(ring.size[0],room.sell.radius);
  assert.equal(ring.worldScale,undefined);
  assert.deepEqual([ring.at[0],ring.at[2]],[room.sell.x,room.sell.z]);

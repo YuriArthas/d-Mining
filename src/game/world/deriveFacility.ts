@@ -1,4 +1,4 @@
-import type { Sign, Shape } from "./sceneryKit.ts";
+import { PAD_CURTAIN, type Sign, type Shape } from "./sceneryKit.ts";
 /** A surface service building: where it stands (`anchor`), and in its own frame the ring players step into and
  *  its floating word (its collider is its model's). */
 export type SurfaceFacility = Readonly<{
@@ -39,11 +39,12 @@ export function deriveFacility(config: SurfaceFacility) {
       background: s.background,
     } as Sign,
     ring: {
-      type: "ring",
-      at: [trigger.x, 0.055, trigger.z],
-      size: [t.radius, 0.08, t.radius],
+      type: "pad",
+      // Just over the plaza's sand (3.5 cm up).
+      at: [trigger.x, 0.06, trigger.z],
+      size: [t.radius, PAD_CURTAIN, t.radius],
       color: config.ringColor,
-      glow: true,
+      interaction: true,
     } as Shape,
   };
 }

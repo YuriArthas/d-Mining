@@ -2,7 +2,7 @@ import {roomSceneAsset} from '../content/rooms/sceneAssets.ts';
 import {undergroundHall} from '../content/underground/halls.ts';
 import type {RoomAnchor,RoomSceneAsset} from '../content/rooms/authoredRoom.ts';
 import type {RestRoom} from './rooms.ts';
-import type {SceneryPlan,V3,Solid} from './sceneryKit.ts';
+import {PAD_CURTAIN,type SceneryPlan,type V3,type Solid} from './sceneryKit.ts';
 import {ENTRANCE_WORLD} from './entrance.ts';
 import {CELL} from '../terrain/grid.ts';
 
@@ -71,7 +71,7 @@ export function authoredRoomPlan(room:RestRoom,providedAsset?:RoomSceneAsset):Sc
   return {
     shapes:definition.rings.filter(r=>r.anchor!=='shop'||room.shop).map(r=>{
       const zone=r.anchor==='sell'?room.sell:room.shop!;
-      return {type:'ring',at:at(r.anchor,r.offset),size:[zone.radius,r.height,zone.radius],color:r.color,glow:r.glow,interaction:true};
+      return {type:'pad',at:at(r.anchor,r.offset),size:[zone.radius,PAD_CURTAIN,zone.radius],color:r.color,interaction:true};
     }),
     solids,
     signs:definition.signs.filter(s=>s.anchor!=='shop'||room.shop).map(s=>({at:at(s.anchor,s.offset),width:s.width,title:text(s.title),subtitle:text(s.subtitle),color:s.color,background:s.background})),
@@ -90,7 +90,7 @@ function hallPlan(room:RestRoom,hallId:string):SceneryPlan {
   // Sign text from the scene file, in the page's language (tools/i18n-scan.mjs reads the scene files' sign text).
   const text=(value:string)=>tr(value,{name:room.name,number:String(room.number).padStart(2,'0'),depth:room.depth});
   return {
-    shapes:definition.rings.filter(r=>r.anchor!=='shop'||room.shop).map(r=>{const zone=r.anchor==='sell'?room.sell:room.shop!;return {type:'ring',at:at(r.anchor,r.offset),size:[zone.radius,r.height,zone.radius],color:r.color,glow:r.glow,interaction:true};}),
+    shapes:definition.rings.filter(r=>r.anchor!=='shop'||room.shop).map(r=>{const zone=r.anchor==='sell'?room.sell:room.shop!;return {type:'pad',at:at(r.anchor,r.offset),size:[zone.radius,PAD_CURTAIN,zone.radius],color:r.color,interaction:true};}),
     solids:solids.map(s=>({...s,at:[s.at[0]+room.x,s.at[1],s.at[2]+room.z] as V3})),
     signs:definition.signs.filter(s=>s.anchor!=='shop'||room.shop).map(s=>({at:at(s.anchor,s.offset),width:s.width,title:text(s.title),subtitle:text(s.subtitle),color:s.color,background:s.background,...(s.yaw===undefined?{}:{yaw:s.yaw})})),
   };

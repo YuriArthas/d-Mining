@@ -19,16 +19,17 @@ export const PINEWIND_PLAZA = { x: 0, z: 20, radius: 15 } as const;
 // south toward the arriving player so a walkway stays open past the terrace stairs to the capsule machine.
 // The two shops stand side by side on the west, each facing the plaza centre: the forge sells pickaxes, the
 // pack shop next to it backpacks. From the spawn the sell house and the shops read either side of the headframe.
-// Every building: its ring 6.7 m in front of the anchor and its word on a dark plate.
-const facility = (id: string, type: 'sell' | 'shop', anchor: SurfaceFacility['anchor'], title: string, color: string, ringColor: string): SurfaceFacility => ({
+// Every building: its ring `ahead` metres in front of the anchor, on open ground clear of its entry steps (2026-11-01:
+// the sell house's porch and steps reached 6.5 m and covered a third of its pad), and its word on a dark plate.
+const facility = (id: string, type: 'sell' | 'shop', anchor: SurfaceFacility['anchor'], title: string, color: string, ringColor: string, ahead: number): SurfaceFacility => ({
   id, type, anchor, ringColor,
-  trigger: { x: 0, z: 6.7, radius: 1.7, heightTolerance: 0.25, hysteresis: 0.25 },
+  trigger: { x: 0, z: ahead, radius: 1.7, heightTolerance: 0.25, hysteresis: 0.25 },
   sign: { title, color, background: '#18283d', width: 3.6, y: 4.5 },
 });
 export const PINEWIND_FACILITIES = {
-  sale: facility('surface-sale', 'sell', { x: 18.8, z: 9.58, yaw: -44 * DEG }, 'SELL', '#ffe35c', '#ffe77d'),
-  shop: facility('surface-upgrade', 'shop', { x: -18.87, z: 10.79, yaw: 64 * DEG }, 'PICKAXE', '#40deff', '#44cfff'),
-  bags: facility('surface-bags', 'shop', { x: -19.18, z: 28.54, yaw: 114 * DEG }, 'BACKPACK', '#ffb44a', '#ffbf5e'),
+  sale: facility('surface-sale', 'sell', { x: 18.8, z: 9.58, yaw: -44 * DEG }, 'SELL', '#ffe35c', '#ffb21e', 8.4),
+  shop: facility('surface-upgrade', 'shop', { x: -18.87, z: 10.79, yaw: 64 * DEG }, 'PICKAXE', '#40deff', '#44cfff', 6.7),
+  bags: facility('surface-bags', 'shop', { x: -19.18, z: 28.54, yaw: 114 * DEG }, 'BACKPACK', '#ffb44a', '#ff9a2e', 7),
 } as const;
 /** The footbridge over the creek, along the main path (local Z runs along the deck). The deck is one smooth
  *  raised-cosine arch, `rise` metres high in the middle, meeting the path at ground level `halfSpan` metres
@@ -47,7 +48,7 @@ export const PINEWIND_CREEK = {
 /** Where the bridge lands on the plaza. */
 const BRIDGE_EXIT = { x: 0, z: 30 } as const;
 /** Forward offset of each building's visual centre from its anchor (authored GLB bounds), and where its big
- *  word floats: `signForward` metres in front of the anchor (over the sell house's ring, against the shops'
+ *  word floats: `signForward` metres in front of the anchor (over the sell house's porch, before its ring, against the shops'
  *  front walls so the two neighbouring shops never swap words in a view along the row), `signY` high. */
 const BUILDING = {
   sale: { forward: 1.1, signForward: 6.7, signY: 5.6 },
@@ -151,7 +152,8 @@ export const PINEWIND_GROUNDS = {
     { width: 1.9, points: [[22, 21], [22, 44.5], [27, 44.5]] },
     { width: 1.7, points: [[PINEWIND_SPAWN.x, PINEWIND_SPAWN.z], [PINEWIND_STATION.pad.x, PINEWIND_STATION.pad.z]] },
   ],
-  pads: [[0, 16], ...Object.values(PINEWIND_SERVICES).map(s => [s.trigger.x, s.trigger.z] as const), [22, 29], [0, 47]],
+  // The sell and shop rings have no paving: their pads (ServicePads) mark them.
+  pads: [[0, 16], [22, 29], [0, 47]],
   keepClear: [
     { kind: 'rect', minX: -10, maxX: 10, minZ: -10, maxZ: 10 },
     { kind: 'rect', minX: 20, maxX: 40, minZ: 12, maxZ: 48 },

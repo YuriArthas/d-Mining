@@ -27,7 +27,8 @@ export type RoomSceneDefinition = {
   referenceSize: number[];
   facilities: RoomFacilities;
   signs: {anchor: RoomAnchor; offset: number[]; width: number; title: string; subtitle: string; color: string; background: string; yaw?: number}[];
-  rings: {anchor: 'sell' | 'shop'; offset: number[]; height: number; color: string; glow: boolean}[];
+  /** The sell and shop pads (ServicePads), at their trigger's radius. */
+  rings: {anchor: 'sell' | 'shop'; offset: number[]; color: string}[];
   render?: RoomRenderStyle;
 };
 type RoomInstance = {

@@ -1,4 +1,4 @@
-import type { SceneryPlan, V3 } from '../world/sceneryKit.ts';
+import { PAD_CURTAIN, type SceneryPlan, type V3 } from '../world/sceneryKit.ts';
 import { worldRequirement } from './worldJourney.ts';
 import { TECH_BASE } from './world2/techBase.ts';
 import techBaseSolids from './underground/tech-base.json' with { type: 'json' };
@@ -18,9 +18,7 @@ type Base = Readonly<{
  *  world's name (world 2: on the drill tower's screen; world 3: on the crater arch's keystone). */
 function basePlan(base: Base, solids: SceneryPlan['solids'], name: { at: readonly number[]; title: string }, colors: { sell: string; shop: string }): SceneryPlan {
   const z=base.worldZ,at=(v:readonly number[],y=v[1]):V3=>[v[0],y,v[2]+z];
-  const rings=(ring:readonly number[],color:string)=>[
-    {type:'ring' as const,at:at(ring,.045),size:[3,.12,3] as V3,color,glow:true,interaction:true},
-    {type:'ring' as const,at:at(ring,.035),size:[3.25,.025,3.25] as V3,color,glow:true,interaction:true}];
+  const rings=(ring:readonly number[],color:string)=>[{type:'pad' as const,at:at(ring,.12),size:[3,PAD_CURTAIN,3] as V3,color,interaction:true}];
   const {sell,shop}=base.kiosks,st=base.station,pt=base.portal;
   const sign=(v:readonly number[],yaw:number,width:number,title:string,color:string)=>({at:at(v),width,title,subtitle:'',color,background:'#16283a',yaw});
   return {
@@ -34,6 +32,6 @@ function basePlan(base: Base, solids: SceneryPlan['solids'], name: { at: readonl
 /** World 2's or world 3's surface plan, in world coordinates. */
 export function baseSurfacePlan(world: 2 | 3): SceneryPlan {
   return world === 2
-    ? basePlan(TECH_BASE,techBaseSolids.solids as SceneryPlan['solids'],{at:TECH_BASE.rig.sign,title:worldRequirement(2).name},{sell:'#ffd387',shop:'#80efd0'})
-    : basePlan(STAR_BASE,starBaseSolids.solids as SceneryPlan['solids'],{at:STAR_BASE.arch.sign,title:worldRequirement(3).name},{sell:'#ffd387',shop:'#c9b4ff'});
+    ? basePlan(TECH_BASE,techBaseSolids.solids as SceneryPlan['solids'],{at:TECH_BASE.rig.sign,title:worldRequirement(2).name},{sell:'#ffb21e',shop:'#80efd0'})
+    : basePlan(STAR_BASE,starBaseSolids.solids as SceneryPlan['solids'],{at:STAR_BASE.arch.sign,title:worldRequirement(3).name},{sell:'#ffb21e',shop:'#c9b4ff'});
 }

@@ -50,7 +50,7 @@ function validateRoomScene(id:string,scene:RoomSceneDefinition){
   for(const zone of [f.sell,f.shop])if(zone&&(!vector(zone.at)||![zone.radius,zone.heightTolerance,zone.hysteresis].every(Number.isFinite)||zone.radius<=0||zone.heightTolerance<0||zone.hysteresis<0))fail('zone');
   const anchor=(a:string)=>['room','spawn','sell','shop'].includes(a)&&(a!=='shop'||!!f.shop);
   for(const sign of scene.signs)if(!anchor(sign.anchor)||!vector(sign.offset)||!(sign.width>0)||!Number.isFinite(sign.width)||/\{(?!name\}|number\}|depth\})/.test(sign.title+sign.subtitle))fail('sign');
-  for(const ring of scene.rings)if(!['sell','shop'].includes(ring.anchor)||!anchor(ring.anchor)||!vector(ring.offset)||!Number.isFinite(ring.height)||ring.height<=0)fail('ring');
+  for(const ring of scene.rings)if(!['sell','shop'].includes(ring.anchor)||!anchor(ring.anchor)||!vector(ring.offset))fail('ring');
   if(!scene.render)return;
   const {atlas,surface,lighting:l}=scene.render;
   if(!Number.isInteger(atlas.columns)||!Number.isInteger(atlas.rows)||atlas.columns<1||atlas.rows<1||!Number.isFinite(atlas.gutter)||atlas.gutter<0||!Number.isFinite(atlas.repeat)||atlas.repeat<=0)fail('atlas');

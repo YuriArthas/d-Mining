@@ -1,4 +1,4 @@
-import {readFileSync,writeFileSync,mkdirSync,rmSync} from 'node:fs';
+import {readFileSync,writeFileSync,mkdirSync,rmSync,existsSync} from 'node:fs';
 import {gzipSync} from 'node:zlib';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
@@ -49,4 +49,8 @@ for(const name of provenanceOnly?[]:['architecture','landscape']){
  writeFileSync(`${directory}/${asset}.manifest.json`,JSON.stringify(manifest,null,2)+'\n');console.log(asset,manifest.triangles,manifest.bytes);
 }
 const files=['tools/blender/build_architecture.py','tools/blender/build_nature.py','tools/terrain/kit.ts','tools/terrain/landscape.ts','tools/terrain/terrainTexture.ts','tools/terrain/bakeLight.mjs','tools/terrain/bakeLightWorker.mjs','tools/terrain/rayBvh.mjs','source-art/architecture.blend','source-art/nature.blend','layout.json','package.json','package-lock.json','../tools/export-pinewind-layout.mjs','../tools/export-pinewind-scene.mjs','../tools/pack-pinewind.mjs','../src/game/content/pinewind/authored.json','public/assets/pinewind/architecture-atlas.png','public/assets/pinewind/nature-atlas.png','artifacts/architecture-asset.json','artifacts/nature-asset.json','artifacts/landscape-asset.json','artifacts/light-bake.json','../src/game/assets/scene/pinewind-standing-light.png'];
-writeFileSync('surface-game-art/provenance.json',JSON.stringify({method:'Blender and offline Three authoring; no Tripo',files:files.map(file=>({file,sha256:hash(readFileSync('surface-game-art/'+file))})),runtimeAssets:['architecture','landscape'].map(n=>JSON.parse(readFileSync(`${directory}/pinewind-${n}.manifest.json`)))},null,2)+'\n');
+// The artifacts/ build records are not in Git: one this checkout has not built (the nature kit's, unless Blender ran
+// here) keeps the hash recorded when it was.
+const recorded=new Map(JSON.parse(readFileSync('surface-game-art/provenance.json','utf8')).files.map(f=>[f.file,f.sha256]));
+const sha=file=>existsSync('surface-game-art/'+file)?hash(readFileSync('surface-game-art/'+file)):file.startsWith('artifacts/')&&recorded.get(file)||(()=>{throw Error(`missing ${file}`);})();
+writeFileSync('surface-game-art/provenance.json',JSON.stringify({method:'Blender and offline Three authoring; no Tripo',files:files.map(file=>({file,sha256:sha(file)})),runtimeAssets:['architecture','landscape'].map(n=>JSON.parse(readFileSync(`${directory}/pinewind-${n}.manifest.json`)))},null,2)+'\n');

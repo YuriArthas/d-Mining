@@ -1,7 +1,10 @@
 import type { Theme } from '../content/themes.ts';
 import type { AuthoredRoom } from '../content/rooms/authoredRoom.ts';
 export type V3 = [number,number,number];
-export type Shape = { type:'box'|'rock'|'cylinder'|'ring'|'cap'|'torus'; at:V3; size:V3; color:string; interaction?:boolean; rotation?:V3; glow?:boolean };
+/** Height of the light curtain round a sell or shop pad, metres. */
+export const PAD_CURTAIN = 1;
+/** `pad`: a sell or shop pad players step into (ServicePads): `size` is [radius, PAD_CURTAIN, radius]. */
+export type Shape = { type:'box'|'rock'|'cylinder'|'ring'|'cap'|'torus'|'pad'; at:V3; size:V3; color:string; interaction?:boolean; rotation?:V3; glow?:boolean };
 /** A collider: a box (centre, half size, turn round Y), or a convex hull or triangles round `at`. `ground`: the
  *  landscape's walkable ground (the collider view leaves it out). */
 export type Solid = { at:V3; half:V3; yaw:number; hull?:number[]; triangles?:{vertices:number[];indices:number[]}; ground?:boolean };
@@ -55,8 +58,7 @@ export class Planner {
     this.box([x,y+3.82,rear+1.42],[4.2,.38,.12],shop?'#659e96':'#bf7955');
     this.sign([x,y+3,rear+.85],3.6,shop?'SHOP':'SELL','',t);
     for(const dx of [-1.25,1.25])this.lantern(x+dx,y+3,rear+1,t);
-    this.shape('ring',[x,y+.045,z],[radius,.12,radius],shop?'#95d9c6':'#f1ca76',[0,0,0],true).interaction=true;
-    this.shape('ring',[x,y+.035,z],[radius+.25,.025,radius+.25],shop?'#95d9c6':'#f1ca76',[0,0,0],true).interaction=true;
+    this.shape('pad',[x,y+.045,z],[radius,PAD_CURTAIN,radius],shop?'#95d9c6':'#f1ca76').interaction=true;
     for(let i=0;i<3;i++)this.shape('rock',[x-.8+i*.7,y+2.3,rear],[.4,.35,.35],shop?METAL:['#e6b956','#bcdce0','#c4774d'][i]);
     this.crate(x-3,y,rear,.95);
     this.barrel(x+3,y,rear);

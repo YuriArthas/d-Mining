@@ -19,12 +19,14 @@ test('one translated and rotated facility descriptor aligns placement, the model
  // The building's body collider comes with its model, placed where the facility puts it.
  const model=authored.roots.find(r=>r.node==='Merchant_Store'),body=placeProp('Merchant_Store',model.collision,placement([20,0,30],[0,Math.sin(Math.PI/4),0,Math.cos(Math.PI/4)],[1,1,1])).find(s=>s.half[1]===3);
  assert.deepEqual(body.at,[20,3,30]);assert.ok(Math.abs(body.yaw-Math.PI/2)<1e-4);
- assert.equal(moved.trigger.x,26.7);assert.equal(moved.trigger.z,30);
+ // Its ring stands its own distance ahead of the anchor (along +X once turned a quarter).
+ const ahead=20+PINEWIND_FACILITIES.sale.trigger.z;
+ assert.equal(moved.trigger.x,ahead);assert.equal(moved.trigger.z,30);
  assert.equal(moved.sign.at[0],moved.trigger.x);assert.equal(moved.ring.at[2],moved.trigger.z);
  const session=new GameSession({...GAME_CONTENT.session,sales:[moved.trigger]});
- session.collected([{kind:71}]);session.updatePosition([26.7,0,30],true);
+ session.collected([{kind:71}]);session.updatePosition([ahead,0,30],true);
  assert.equal(session.getSnapshot().inventory.used,0);assert.equal(session.getSnapshot().coins,resourceByKind(71).price);
- session.collected([{kind:71}]);session.updatePosition([26.7,0,30],true);
+ session.collected([{kind:71}]);session.updatePosition([ahead,0,30],true);
  assert.equal(session.getSnapshot().coins,resourceByKind(71).price); // no second entry
 });
 // A kit room (the crystal cave) follows changed dimensions; authored halls keep their own fixed size.
