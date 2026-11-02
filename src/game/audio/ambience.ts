@@ -5,12 +5,17 @@ import { hiss, tone, type Voice } from './synth.ts';
 export type AmbienceId = 'meadow' | 'shallow' | 'timber' | 'mushroom' | 'crystal' | 'ruins' | 'ice' | 'lava' | 'fossil' | 'machine' | 'core';
 
 type Ports = Readonly<{ ctx: BaseAudioContext; dry: AudioNode; wet: AudioNode; noise: AudioBuffer; loop: AudioBuffer; random: () => number }>;
-type Bed = Readonly<{ output: GainNode; sources: readonly AudioScheduledSourceNode[]; nodes: readonly AudioNode[]; update?: (now: number) => void }>;
+/** `update` gets how much of the bed is heard now (0..1), so a far-off bed can skip its detail. */
+type Bed = Readonly<{ output: GainNode; sources: readonly AudioScheduledSourceNode[]; nodes: readonly AudioNode[]; update?: (now: number, heard: number) => void }>;
 type Emitter = Readonly<{
   name: string; every: readonly [number, number];
   play: (v: Voice, ports: Ports) => void;
 }>;
-type Zone = Readonly<{ beds: readonly ((p: Ports, out: AudioNode) => Bed)[]; emitters: readonly Emitter[] }>;
+type MakeBed = (p: Ports, out: AudioNode) => Bed;
+/** `beds` belong to the place's open space (the valley, a layer's hall) and fade as the player digs into the rock
+ *  under it (`setLevels`); `creek` is the valley's water, heard only near it. Plain rock has no bed: a steady
+ *  noise there sounded like a river that followed the player down (2026-11-01). */
+type Zone = Readonly<{ beds: readonly MakeBed[]; creek?: MakeBed; emitters: readonly Emitter[] }>;
 
 const LOOKAHEAD = 0.4;
 const FADE = 2.5;
@@ -28,30 +33,38 @@ function biquad(p: Ports, type: BiquadFilterType, frequency: number, q = 0.7) {
 }
 function level(p: Ports, value: number) { const g = p.ctx.createGain(); g.gain.value = value; return g; }
 
-/** Wind: pink noise through a band-pass whose level and colour drift in slow gusts. */
-const wind = (gain: number, center: number, q: number, gusts = 0.5) => (p: Ports, out: AudioNode): Bed => {
-  const s = source(p, p.loop, 0.9 + p.random() * 0.2), band = biquad(p, 'bandpass', center, q), g = level(p, gain), output = level(p, 1);
+/** Wind: pink noise through a band-pass, in gusts with calm spells between them (a steady band of noise reads
+ *  as running water); the colour drifts too. */
+const wind = (gain: number, center: number, q: number) => (p: Ports, out: AudioNode): Bed => {
+  const s = source(p, p.loop, 0.9 + p.random() * 0.2), band = biquad(p, 'bandpass', center, q), g = level(p, gain * 0.1), output = level(p, 1);
   s.connect(band).connect(g).connect(output).connect(out);
   let next = 0;
   return {
     output, sources: [s], nodes: [band, g, output],
     update: now => {
       if (now < next) return;
-      const strength = 1 - gusts + gusts * 2 * p.random();
-      g.gain.setTargetAtTime(gain * strength, now, 1.4 + p.random() * 1.6);
+      const gust = p.random() < 0.5, strength = gust ? 0.55 + 0.6 * p.random() : 0.04 + 0.08 * p.random();
+      g.gain.setTargetAtTime(gain * strength, now, gust ? 1 + p.random() : 1.6 + p.random() * 1.4);
       band.frequency.setTargetAtTime(center * (0.75 + 0.5 * p.random()), now, 2 + p.random() * 2);
-      next = now + 2.5 + p.random() * 4;
+      next = now + (gust ? 2.5 + p.random() * 3 : 4 + p.random() * 7);
     },
   };
 };
-/** Cave air: a low rumble (headphones) and a quiet midrange room tone (phone speakers). */
-const caveAir = (gain: number, tint = 520) => (p: Ports, out: AudioNode): Bed => {
-  const low = source(p, p.loop, 0.5), room = source(p, p.loop, 1), output = level(p, 1);
-  const lp = biquad(p, 'lowpass', 170), lowGain = level(p, gain * 0.6), band = biquad(p, 'bandpass', tint, 0.8), roomGain = level(p, gain * 0.7);
-  low.connect(lp).connect(lowGain).connect(output);
-  room.connect(band).connect(roomGain).connect(output);
-  output.connect(out);
-  return { output, sources: [low, room], nodes: [lp, lowGain, band, roomGain, output] };
+/** A creek: bright rushing water and a babble of small bubbles over it, both shaking a little. */
+const brook = (gain: number) => (p: Ports, out: AudioNode): Bed => {
+  const s = source(p, p.loop, 1.3), hp = biquad(p, 'highpass', 350), band = biquad(p, 'bandpass', 1400, 0.5), body = level(p, gain);
+  const bubbles = level(p, 1), output = level(p, 1);
+  s.connect(hp).connect(band).connect(body).connect(output).connect(out);
+  bubbles.connect(output);
+  let next = 0;
+  return {
+    output, sources: [s], nodes: [hp, band, body, bubbles, output],
+    update: (now, heard) => {
+      if (heard < 0.02) return;
+      body.gain.setTargetAtTime(gain * (0.75 + 0.5 * p.random()), now, 0.08);
+      for (next = Math.max(next, now); next < now + LOOKAHEAD; next += 0.05 + p.random() * 0.22) bubble({ ctx: p.ctx, out: bubbles, t: next, noise: p.noise, random: p.random });
+    },
+  };
 };
 /** A steady tone bed (machine hum, core pulse) with slow amplitude movement. */
 const hum = (gain: number, frequency: number, wave: OscillatorType, pulse: number, cutoff: number) => (p: Ports, out: AudioNode): Bed => {
@@ -88,6 +101,10 @@ const shimmer = (gain: number, frequency: number) => (p: Ports, out: AudioNode):
 
 const pick = <T,>(r: () => number, list: readonly T[]) => list[Math.floor(r() * list.length) % list.length];
 
+function bubble(v: Voice) {
+  const f = 500 + v.random() * 900;
+  tone(v, { from: f, to: f * (1.4 + v.random() * 0.6), sweep: 0.03, peak: 0.004 + v.random() * 0.008, attack: 0.003, decay: 0.03 + v.random() * 0.04 });
+}
 function bird(v: Voice) {
   const r = v.random, kind = Math.floor(r() * 3), base = 2600 + r() * 1200, peak = 0.02 + r() * 0.02;
   if (kind === 0) {
@@ -193,26 +210,29 @@ const UNDER: readonly Emitter[] = [
 
 export const ZONES: Readonly<Record<AmbienceId, Zone>> = {
   meadow: {
-    beds: [wind(0.05, 650, 0.6, 0.6)],
+    beds: [wind(0.04, 650, 0.6)],
+    creek: brook(0.04),
     emitters: [
       { name: 'bird', every: [1.8, 6], play: bird },
       { name: 'leaves', every: [4, 10], play: leaves },
     ],
   },
-  shallow: { beds: [caveAir(0.05)], emitters: [...UNDER, { name: 'taps', every: [14, 30], play: taps }] },
-  timber: { beds: [caveAir(0.05, 460)], emitters: [...UNDER, { name: 'creak', every: [9, 22], play: creak }, { name: 'taps', every: [16, 32], play: taps }] },
-  mushroom: { beds: [caveAir(0.045, 600)], emitters: [{ name: 'drip', every: [0.9, 3], play: drip }, { name: 'blorp', every: [3, 8], play: blorp }, { name: 'rumble', every: [30, 60], play: rumble }] },
-  crystal: { beds: [caveAir(0.04, 700), shimmer(0.004, 2637)], emitters: [...UNDER, { name: 'tinkle', every: [3, 7], play: tinkle }] },
-  ruins: { beds: [caveAir(0.04, 560), wind(0.035, 900, 3, 0.7)], emitters: [...UNDER, { name: 'chime', every: [12, 26], play: chime }, { name: 'grind', every: [18, 40], play: grind }] },
-  ice: { beds: [wind(0.045, 1000, 2.5, 0.7), caveAir(0.03, 760)], emitters: [{ name: 'tinkle', every: [4, 9], play: tinkle }, { name: 'crack', every: [14, 32], play: crack }, { name: 'drip', every: [3, 8], play: drip }] },
-  lava: { beds: [roar(0.03), caveAir(0.03, 420)], emitters: [{ name: 'pop', every: [1.5, 4], play: lavaPop }, { name: 'crackle', every: [0.8, 2.6], play: crackle }, { name: 'rumble', every: [20, 45], play: rumble }] },
-  fossil: { beds: [wind(0.035, 520, 1, 0.6), caveAir(0.035, 480)], emitters: [{ name: 'trickle', every: [7, 16], play: trickle }, ...UNDER] },
-  machine: { beds: [hum(0.008, 55, 'sawtooth', 0.23, 420), caveAir(0.03, 620)], emitters: [{ name: 'steam', every: [10, 22], play: steam }, { name: 'clank', every: [5, 12], play: clank }, ...UNDER] },
-  core: { beds: [hum(0.006, 98, 'sine', 0.5, 400), shimmer(0.003, 3136), caveAir(0.03, 540)], emitters: [{ name: 'surge', every: [8, 16], play: surge }, { name: 'chime', every: [10, 22], play: chime }, { name: 'rumble', every: [30, 60], play: rumble }] },
+  shallow: { beds: [], emitters: [...UNDER, { name: 'taps', every: [14, 30], play: taps }] },
+  timber: { beds: [], emitters: [...UNDER, { name: 'creak', every: [9, 22], play: creak }, { name: 'taps', every: [16, 32], play: taps }] },
+  mushroom: { beds: [], emitters: [{ name: 'drip', every: [0.9, 3], play: drip }, { name: 'blorp', every: [3, 8], play: blorp }, { name: 'rumble', every: [30, 60], play: rumble }] },
+  crystal: { beds: [shimmer(0.004, 2637)], emitters: [...UNDER, { name: 'tinkle', every: [3, 7], play: tinkle }] },
+  ruins: { beds: [wind(0.035, 900, 3)], emitters: [...UNDER, { name: 'chime', every: [12, 26], play: chime }, { name: 'grind', every: [18, 40], play: grind }] },
+  ice: { beds: [wind(0.045, 1000, 2.5)], emitters: [{ name: 'tinkle', every: [4, 9], play: tinkle }, { name: 'crack', every: [14, 32], play: crack }, { name: 'drip', every: [3, 8], play: drip }] },
+  lava: { beds: [roar(0.03)], emitters: [{ name: 'pop', every: [1.5, 4], play: lavaPop }, { name: 'crackle', every: [0.8, 2.6], play: crackle }, { name: 'rumble', every: [20, 45], play: rumble }] },
+  fossil: { beds: [wind(0.035, 520, 1)], emitters: [{ name: 'trickle', every: [7, 16], play: trickle }, ...UNDER] },
+  machine: { beds: [hum(0.008, 55, 'sawtooth', 0.23, 420)], emitters: [{ name: 'steam', every: [10, 22], play: steam }, { name: 'clank', every: [5, 12], play: clank }, ...UNDER] },
+  core: { beds: [hum(0.006, 98, 'sine', 0.5, 400), shimmer(0.003, 3136)], emitters: [{ name: 'surge', every: [8, 16], play: surge }, { name: 'chime', every: [10, 22], play: chime }, { name: 'rumble', every: [30, 60], play: rumble }] },
 };
 
 const PANS = [-0.65, 0, 0.65] as const;
-type Active = { id: AmbienceId; beds: Bed[]; slots: GainNode[]; nodes: AudioNode[]; next: number[]; output: GainNode };
+type Active = { id: AmbienceId; beds: Bed[]; open: GainNode; creek: Bed | null; creekLevel: GainNode; slots: GainNode[]; nodes: AudioNode[]; next: number[]; output: GainNode };
+/** How fast the beds follow the player's place (seconds, time constant). */
+const FOLLOW = 0.5;
 
 /** Background sound for the current place: beds that loop for as long as the player stays, and
  *  occasional events at random times and sides. Changing place cross-fades the beds. */
@@ -221,6 +241,7 @@ export class Ambience {
   private id: AmbienceId | null = null;
   private active: Active | null = null;
   private fading: { zone: Active; until: number }[] = [];
+  private levels = { open: 1, creek: 0 };
   readonly played: Record<string, number> = {};
 
   constructor(ctx: BaseAudioContext, dry: AudioNode, wet: AudioNode, noise: AudioBuffer, loop: AudioBuffer, random: () => number = Math.random) {
@@ -234,12 +255,23 @@ export class Ambience {
     this.active = id ? this.start(id) : null;
   }
 
+  /** How much is heard of the place's beds (`open`: 1 in the valley or a hall, 0 a few blocks into the rock under
+   *  it) and of the creek (0 away from the water). */
+  setLevels(open: number, creek: number) {
+    this.levels = { open, creek };
+    const zone = this.active, now = this.ports.ctx.currentTime;
+    if (!zone) return;
+    zone.open.gain.setTargetAtTime(open, now, FOLLOW);
+    zone.creekLevel.gain.setTargetAtTime(creek, now, FOLLOW);
+  }
+
   tick() {
     const { ctx, random } = this.ports, now = ctx.currentTime;
     this.fading = this.fading.filter(f => { if (now < f.until) return true; release(f.zone); return false; });
     const zone = this.active;
     if (!zone) return;
-    for (const bed of zone.beds) bed.update?.(now);
+    for (const bed of zone.beds) bed.update?.(now, this.levels.open);
+    zone.creek?.update?.(now, this.levels.creek);
     ZONES[zone.id].emitters.forEach((emitter, i) => {
       while (zone.next[i] < now + LOOKAHEAD) {
         const t = Math.max(now, zone.next[i]);
@@ -257,7 +289,7 @@ export class Ambience {
   }
 
   diagnostics() {
-    return { id: this.active?.id ?? null, beds: this.active?.beds.length ?? 0, fading: this.fading.length, played: { ...this.played } };
+    return { id: this.active?.id ?? null, beds: this.active?.beds.length ?? 0, creek: !!this.active?.creek, levels: { ...this.levels }, fading: this.fading.length, played: { ...this.played } };
   }
 
   private start(id: AmbienceId): Active {
@@ -274,11 +306,14 @@ export class Ambience {
       nodes.push(slot, wet);
       return slot;
     });
-    const zone = ZONES[id];
-    const beds = zone.beds.map(make => make(p, output));
+    const zone = ZONES[id], open = ctx.createGain(), creekLevel = ctx.createGain();
+    open.gain.value = this.levels.open; creekLevel.gain.value = this.levels.creek;
+    open.connect(output); creekLevel.connect(output);
+    nodes.push(open, creekLevel);
+    const beds = zone.beds.map(make => make(p, open)), creek = zone.creek?.(p, creekLevel) ?? null;
     // First events come soon but not all at once.
     const next = zone.emitters.map(e => now + 0.5 + p.random() * Math.min(4, e.every[1]));
-    return { id, beds, slots, nodes, next, output };
+    return { id, beds, open, creek, creekLevel, slots, nodes, next, output };
   }
 
   private fadeOut(zone: Active) {
@@ -289,7 +324,7 @@ export class Ambience {
 }
 
 function release(zone: Active) {
-  for (const bed of zone.beds) {
+  for (const bed of zone.creek ? [...zone.beds, zone.creek] : zone.beds) {
     for (const s of bed.sources) { try { s.stop(); } catch { /* already stopped */ } s.disconnect(); }
     for (const node of bed.nodes) node.disconnect();
   }

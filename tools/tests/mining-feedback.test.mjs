@@ -160,6 +160,8 @@ test('每帧报告所在位置：地表是山谷的曲子和风声，下到矿�
   assert.equal(h.scenes.at(-1).muffle, 1);
   h.feedback.place({ theme: 'lava_cave', surfaceLight: 0 });
   assert.deepEqual([h.scenes.at(-1).song, h.scenes.at(-1).ambience], ['lava', 'lava']);
+  h.feedback.place({ theme: 'lava_cave', surfaceLight: 0, dug: 20, creek: 1 });
+  assert.deepEqual([h.scenes.at(-1).beds, h.scenes.at(-1).creek], [0, 1], 'how deep in the rock and how near the creek reach the audio');
   h.feedback.dispose();
   assert.equal(h.scenes.at(-1).song, null);
   assert.equal(h.scenes.at(-1).ambience, null);

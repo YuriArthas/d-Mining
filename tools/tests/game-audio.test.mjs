@@ -110,7 +110,7 @@ test('音乐和音效分开开关，各自记住；两个都关掉才暂停声�
 test('场景决定曲目和环境声；开蛋、解锁这些大时刻会把音乐压低一下', () => withAudioContext(() => {
   const audio = new GameAudio(store());
   audio.random = seeded(4);
-  audio.setScene({ song: 'meadow', rhythm: 1, lead: 1, muffle: 0, ambience: 'meadow', cave: 0 });
+  audio.setScene({ song: 'meadow', rhythm: 1, lead: 1, muffle: 0, ambience: 'meadow', cave: 0, beds: 1, creek: 0 });
   audio.unlock();
   const context = audio['context'];
   for (let i = 0; i < 20; i++) { context.currentTime += 0.1; audio.tick(); }
@@ -118,6 +118,16 @@ test('场景决定曲目和环境声；开蛋、解锁这些大时刻会把音�
   assert.equal(d.player.playing, 'meadow');
   assert.ok(d.player.scheduled > 0, 'notes scheduled');
   assert.equal(d.ambience.id, 'meadow');
+  // Walking toward the creek only turns its level up; the music is not touched.
+  const music = audio['music'], setMusic = music.setScene.bind(music);
+  let musicCalls = 0;
+  music.setScene = scene => { musicCalls++; setMusic(scene); };
+  audio.setScene({ song: 'meadow', rhythm: 1, lead: 1, muffle: 0, ambience: 'meadow', cave: 0, beds: 1, creek: 0.6 });
+  assert.deepEqual([audio.diagnostics().ambience.levels.creek, musicCalls], [0.6, 0]);
+  audio.setScene({ song: 'meadow', rhythm: 1, lead: 1, muffle: 0, ambience: 'meadow', cave: 0, beds: 1, creek: 0.61 });
+  audio.setScene({ song: 'meadow', rhythm: 1, lead: 1, muffle: 0, ambience: 'meadow', cave: 0, beds: 1, creek: 0.01 });
+  audio.setScene({ song: 'meadow', rhythm: 1, lead: 1, muffle: 0, ambience: 'meadow', cave: 0, beds: 1, creek: 0 });
+  assert.equal(audio.diagnostics().ambience.levels.creek, 0, 'out of reach the creek goes fully quiet');
   const duck = audio['mixer'].duck.gain;
   audio.play({ type: 'unlock' });
   assert.ok(duck.events.some(e => e[0] === 'target' && e[1] < 0.6), 'music ducks under the fanfare');

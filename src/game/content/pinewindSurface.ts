@@ -40,6 +40,17 @@ export function pinewindSurface(rooms:readonly RestRoom[],eggs:readonly HubEgg[]
   shaft:ENTRANCE_WORLD,
  };
 }
+/** Metres from a point to the creek's water (its sunken surface, out to the usual bank line); for the creek's sound. */
+export function creekDistance(x:number,y:number,z:number){
+ const line=creekLine??=new CatmullRomCurve3(PINEWIND_CREEK.points.map(([px,pz])=>new Vector3(px,0,pz))).getPoints(220);
+ let across=Infinity;
+ for(let i=0;i<line.length-1;i++){
+  const a=line[i],b=line[i+1],dx=b.x-a.x,dz=b.z-a.z,t=Math.max(0,Math.min(1,((x-a.x)*dx+(z-a.z)*dz)/(dx*dx+dz*dz||1)));
+  across=Math.min(across,Math.hypot(x-a.x-dx*t,z-a.z-dz*t));
+ }
+ return Math.hypot(Math.max(0,across-PINEWIND_CREEK.width.base),y-PINEWIND_CREEK.water);
+}
+let creekLine:Vector3[]|undefined;
 /** The creek's floor cells: cut from the voxel meshes, and counted as surface when standing in the creek. */
 export const CREEK_CELLS=creekFloorCells();
 /** Surface floor cells under the sunken creek and its banks: every cell whose square reaches the corridor,

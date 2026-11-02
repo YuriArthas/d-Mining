@@ -14,16 +14,18 @@ const DUCK: Partial<Record<CueType, number>> = { unlock: 1.6, hatch: 1.3, reward
 /** How often the music and ambience schedulers look ahead. */
 const TICK_MS = 100;
 
-/** What the place should sound like: the piece and its arrangement, the ambience, and how much the
- *  surface music is muffled (heard down the shaft) and effects echo (underground). */
+/** What the place should sound like: the piece and its arrangement, the ambience, how much the
+ *  surface music is muffled (heard down the shaft) and effects echo (underground), and how much is heard of the
+ *  ambience's beds and of the creek (Ambience.setLevels; both change smoothly as the player moves). */
 export type AudioScene = Readonly<{
   song: SongId | null; rhythm: number; lead: number; muffle: number;
-  ambience: AmbienceId | null; cave: number;
+  ambience: AmbienceId | null; cave: number; beds: number; creek: number;
 }>;
-export const QUIET_SCENE: AudioScene = { song: null, rhythm: 1, lead: 1, muffle: 0, ambience: null, cave: 0 };
+export const QUIET_SCENE: AudioScene = { song: null, rhythm: 1, lead: 1, muffle: 0, ambience: null, cave: 0, beds: 1, creek: 0 };
+const close = (a: number, b: number) => Math.abs(a - b) < 0.02;
 const sameScene = (a: AudioScene, b: AudioScene) =>
-  a.song === b.song && a.ambience === b.ambience && Math.abs(a.rhythm - b.rhythm) < 0.02 && Math.abs(a.lead - b.lead) < 0.02 &&
-  Math.abs(a.muffle - b.muffle) < 0.02 && Math.abs(a.cave - b.cave) < 0.02;
+  a.song === b.song && a.ambience === b.ambience && close(a.rhythm, b.rhythm) && close(a.lead, b.lead) && close(a.muffle, b.muffle) && close(a.cave, b.cave);
+const sameLevels = (a: AudioScene, b: AudioScene) => close(a.beds, b.beds) && close(a.creek, b.creek) && (a.creek > 0 || b.creek === 0);
 
 type SettingStore = Pick<Storage, 'getItem' | 'setItem'>;
 function settingStore(): SettingStore | null {
@@ -114,9 +116,11 @@ export class GameAudio {
 
   /** Called by the game every frame; only real changes reach the players. */
   setScene(scene: AudioScene) {
-    if (sameScene(scene, this.scene)) return;
+    const same = sameScene(scene, this.scene);
+    if (same && sameLevels(scene, this.scene)) return;
     this.scene = scene;
-    this.apply(false);
+    if (same) this.ambience?.setLevels(scene.beds, scene.creek);
+    else this.apply(false);
   }
 
   play = (cue: SfxCue) => {
@@ -208,6 +212,7 @@ export class GameAudio {
     const context = this.context, mixer = this.mixer, scene = this.scene;
     if (!context || !mixer) return;
     this.music?.setScene({ song: scene.song, rhythm: scene.rhythm, lead: scene.lead });
+    this.ambience?.setLevels(scene.beds, scene.creek);
     this.ambience?.setScene(this.sound ? scene.ambience : null);
     const now = context.currentTime, smooth = immediate ? 0.01 : 0.6;
     // Muffled: heard from up the shaft, darker (log-interpolated cut-off down to ~900 Hz) and quieter.

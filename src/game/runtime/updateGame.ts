@@ -11,6 +11,7 @@ import { HALL_BY_LAYER, undergroundHall } from "../content/underground/halls.ts"
 import { mineralName } from "../terrain/minerals.ts";
 import { generationAtZ } from '../terrain/SparseWorld.ts';
 import { worldAtFeet, worldRequirement } from '../content/worldJourney.ts';
+import { creekDistance } from '../content/pinewindSurface.ts';
 import { Vector3 } from "three";
 import { bakedLightState, bakedSunAlignment, bakedSunDirection, setStandingSun } from '../presentation/bakedLight.ts';
 import { standingSun } from '../presentation/standingLight.ts';
@@ -63,13 +64,12 @@ export function updateGame(
       performance.now() - sceneryStart,
     );
     current.colliderView.update();
-    const layer = stratumAtDepth(
-        environmentDepthAtFeet(currentFeet, !player.travelling && physics.grounded, current.content.session.destinations),
-        generationAtZ(terrain.world.generation,currentFeet[2]/2).layers,
-      ),
+    const depth = environmentDepthAtFeet(currentFeet, !player.travelling && physics.grounded, current.content.session.destinations),
+      layer = stratumAtDepth(depth, generationAtZ(terrain.world.generation,currentFeet[2]/2).layers),
       theme = themeById(layer.theme);
     const lightStrength = surfaceLightStrengthAtFeet(currentFeet[1]);
-    current.feedback.place({ theme: layer.theme, surfaceLight: lightStrength });
+    // Each layer's hall (the valley for the first) sits at the layer's top: below it is the rock dug through.
+    current.feedback.place({ theme: layer.theme, surfaceLight: lightStrength, dug: Math.max(0, depth - layer.from), creek: creekDistance(currentFeet[0], currentFeet[1], currentFeet[2]) });
     gl.shadowMap.enabled = false;
     environment.update(
       {
