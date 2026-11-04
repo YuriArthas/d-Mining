@@ -197,10 +197,12 @@ function OresTab({ session, common, onClose }: Props & { common: Common }) {
   return <Sheet {...common}>
     <div className="bag-sell">
       <div className="bag-capacity"><Bar value={bag.used} max={bag.capacity} tone={bag.isFull ? 'gold' : undefined}>{tr("msg.bag_used_capacity", { used: number(bag.used), capacity: number(bag.capacity) })}</Bar></div>
-      <span className="bag-sell-value" aria-label={tr("msg.sells_for_coins_currency", { coins: sale ? number(sale.coins) : 0, currency: currencyName(state.currency) })}>{tr("msg.sells_for")}<Icon kind={currencyIcon(state.currency)} /><b className="ui-num">{sale ? number(sale.coins) : 0}</b></span>
+      <div className="bag-sell-values"><span>{tr("msg.sells_for")}</span>{(sale?.payouts.length ? sale.payouts : [{currency: state.currency, coins: 0}]).map(p =>
+        <span key={p.currency} className="bag-sell-value" data-currency={p.currency} aria-label={tr("msg.sells_for_coins_currency", { coins: number(p.coins), currency: currencyName(p.currency) })}><Icon kind={currencyIcon(p.currency)} /><b className="ui-num">{number(p.coins)}</b></span>
+      )}</div>
       {state.inSellZone
-        ? <UiButton size="s" tone="green" icon={currencyIcon(state.currency)} disabled={!sale?.count} onPress={() => { session.sellAvailable(); }}>{tr("msg.sell_all")}</UiButton>
-        : <UiButton size="s" tone="green" icon={currencyIcon(state.currency)} disabled={!sale?.count} onPress={() => { if (session.goTo('sale') === 'travelling') onClose(); }}>{tr("msg.teleport_to_sell")}</UiButton>}
+        ? <UiButton size="s" tone="green" icon="backpack" disabled={!sale?.count} onPress={() => { session.sellAvailable(); }}>{tr("msg.sell_all")}</UiButton>
+        : <UiButton size="s" tone="green" icon="portal" disabled={!sale?.count} onPress={() => { if (session.goTo('sale') === 'travelling') onClose(); }}>{tr("msg.teleport_to_sell")}</UiButton>}
     </div>
     {/* Each mineral a ticket asks for, with its lock (the same as its cell's below): locked ones go into the store as
         they are dug (and what the bag holds of them moves in), never sold; unlocking puts them back in the bag to sell.
@@ -228,7 +230,7 @@ function OresTab({ session, common, onClose }: Props & { common: Common }) {
         <span className="ui-cell-name ui-outline">{resolveText(row.item.name)}</span><OreIcon color={row.item.color} className="bag-ore-art" />
         <Icon kind={locked ? 'lock' : 'unlock'} className="ui-icon bag-ore-lock" />
         <span className="bag-ore-volume">{tr("msg.block_capacity", { volume: number(row.item.volume) })}</span>
-        <span className="bag-ore-price"><Icon kind={currencyIcon(state.currency)} />{number(row.item.price)}</span>
+        <span className="bag-ore-price" data-currency={row.item.currency}><Icon kind={currencyIcon(row.item.currency)} />{number(row.item.price)}</span>
         <span className="ui-cell-stat ui-outline">×{number(row.count)}</span>
       </GameButton>;
     })}</div> : <div className="bag-empty"><Icon kind="pickaxe" className="ui-icon bag-empty-art" /><b>{tr("msg.your_bag_is_empty")}</b><span className="ui-hint">{tr("msg.go_mining_ore_goes_straight_into_your_bag")}</span></div>}
@@ -252,7 +254,7 @@ function GearTab({ session, common, onShop }: Props & { common: Common }) {
   const card = (kind: 'tools' | 'backpacks') => {
     const current = kind === 'tools' ? tool : bag, next = kind === 'tools' ? nextTool : nextBag;
     return <div className="ui-card-tile bag-gear" data-kind={kind}>
-      <div className="bag-gear-art"><Icon kind={kind === 'tools' ? 'pickaxe' : 'backpack'} /><span className="bag-gear-level ui-num">Lv.{current.level}<small>/{kind === 'tools' ? tools.length : bags.length}</small></span></div>
+      <div className="bag-gear-art"><Icon kind={kind === 'tools' ? 'pickaxe' : 'backpack'} /></div>
       <div className="bag-gear-info"><h4 className="ui-outline">{resolveText(current.name)}{kind === 'tools' && state.pickaxe.enhance ? ` +${state.pickaxe.enhance}` : ''}</h4>
         {kind === 'tools' ? <><div className="ui-stat"><span>{tr("msg.damage")}</span><b>+{number(state.pickaxe.basePower)}</b></div><div className="ui-stat"><span>{tr("msg.speed")}</span><b>{tr("msg.n_s", { n: current.speed! })}</b></div></>
           : <><div className="ui-stat"><span>{tr("msg.capacity")}</span><b>{number(current.capacity!)}</b></div><div className="ui-stat"><span>{tr("msg.carrying")}</span><b>{number(state.inventory.used)}</b></div></>}

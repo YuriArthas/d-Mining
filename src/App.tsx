@@ -14,6 +14,7 @@ import { SaveEntry } from './game/ui/SaveEntry.tsx';
 import type { SavedGame } from './game/persistence/SaveBootstrap.ts';
 import { SessionUi } from './game/ui/SessionUi.tsx';
 import { DebugTools } from './game/ui/DebugTools.tsx';
+import { debugOptions } from './game/runtime/debugOptions.ts';
 import type {ProbeMode} from './game/presentation/PerformanceProbe.ts';
 import type {PerformanceSnapshot} from './game/presentation/PerformanceMeter.ts';
 import {beginGameTouch, blockGameCompatibilityClick} from './game/ui/GameButton.tsx';
@@ -36,10 +37,10 @@ declare global {
   }
 }
 
-// ?kit=1 shows the UI kit sample page instead of the game (docs/draft-ui-v2.md, U1).
+// ?debug=1&kit=1 shows the UI kit sample page instead of the game.
 const KitSample = lazy(() => import('./game/ui/kit/KitSample.tsx').then(m => ({ default: m.KitSample })));
 export function App() {
-  if (new URLSearchParams(window.location.search).get('kit') === '1') return <Suspense><KitSample /></Suspense>;
+  if (debugOptions().kit) return <Suspense><KitSample /></Suspense>;
   return <SaveEntry content={GAME_CONTENT.session} generation={GAME_GENERATION}>{game => <GameView savedGame={game} />}</SaveEntry>;
 }
 function GameView({ savedGame }: { savedGame: SavedGame }) {
@@ -82,7 +83,7 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
   const [probeMode,setProbeMode]=useState<ProbeMode>('normal');
   const changeProbeMode=useCallback((mode:ProbeMode)=>{input.reset();setProbeMode(mode);},[input]);
   const surface = useRef<HTMLDivElement>(null);
-  const debug = new URLSearchParams(window.location.search).get('debug') === '1';
+  const debug = debugOptions().enabled;
 
   useEffect(() => {
     if (!debug || exited) return;

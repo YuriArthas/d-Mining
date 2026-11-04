@@ -41,7 +41,7 @@ export function updateGame(
   const onlineElapsed = document.hidden || current.timing.skipElapsed ? 0 : Math.min(Math.max(elapsed,0),1);
   current.timing.skipElapsed=false;
   if(current.startup.firstPlayableMs && onlineElapsed) current.session.advanceOnline(onlineElapsed);
-  const start = performance.now(),
+  const start = current.terrain.measurements.enabled ? performance.now() : 0,
     {
       physics,
       terrain,
@@ -57,13 +57,13 @@ export function updateGame(
   clock.status -= delta;
   try {
     const currentFeet = player.travelling ?? physics.feet();
-    const sceneryStart = performance.now();
+    const sceneryStart = terrain.measurements.enabled ? performance.now() : 0;
     current.sceneryCollision.sync(currentFeet);
-    terrain.measurements.add(
+    if (terrain.measurements.enabled) terrain.measurements.add(
       "sceneResidencyMs",
       performance.now() - sceneryStart,
     );
-    current.colliderView.update();
+    current.colliderView?.update();
     const depth = environmentDepthAtFeet(currentFeet, !player.travelling && physics.grounded, current.content.session.destinations),
       layer = stratumAtDepth(depth, generationAtZ(terrain.world.generation,currentFeet[2]/2).layers),
       theme = themeById(layer.theme);
@@ -136,8 +136,10 @@ export function updateGame(
       );
       clock.status = 0.25;
     }
-    terrain.measurements.add("frameCpuMs", performance.now() - start);
-    terrain.measurements.add("frameIntervalMs", elapsed * 1000);
+    if (terrain.measurements.enabled) {
+      terrain.measurements.add("frameCpuMs", performance.now() - start);
+      terrain.measurements.add("frameIntervalMs", elapsed * 1000);
+    }
   } catch (reason) {
     const error = tr("msg.run_failed_reason", { reason: String(reason) });
     onStatus(error);

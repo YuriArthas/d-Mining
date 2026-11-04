@@ -1,7 +1,10 @@
 import { GameSession } from "../application/GameSession.ts";
 import type { SessionContent } from "../application/SessionContent.ts";
 import { SparseWorld, type WorldGeneration } from "../terrain/SparseWorld.ts";
-import { IndexedDbSaveStore } from "./IndexedDbSaveStore.ts";
+import { LocalStorageSaveStore } from "./LocalStorageSaveStore.ts";
+import { MemorySaveStore } from './MemorySaveStore.ts';
+import type { SaveStore } from './SaveStore.ts';
+import { debugOptions } from '../runtime/debugOptions.ts';
 import { acquireSaveOwnership } from "./SaveOwnership.ts";
 import { SaveCoordinator } from "./SaveCoordinator.ts";
 import { compatibleHead } from "./saveMigrations.ts";
@@ -14,18 +17,15 @@ export async function openSavedGame(
   generation: WorldGeneration,
   signal: AbortSignal,
   onProgress: (text: string) => void = () => {},
+  transient = false,
 ) {
-  const release = await acquireSaveOwnership(namespace, signal);
-  let store: IndexedDbSaveStore | undefined, saves: SaveCoordinator | undefined;
+  const release = transient ? () => {} : await acquireSaveOwnership(namespace, signal);
+  let store: SaveStore | undefined, saves: SaveCoordinator | undefined;
   let closing: Promise<void> | undefined;
-  let connectionError: Error | null = null;
   let unsubscribe = () => {};
   try {
     signal.throwIfAborted();
-    store = await IndexedDbSaveStore.open(namespace, (error) => {
-      connectionError = error;
-      saves?.invalidate(error);
-    });
+    store = transient ? new MemorySaveStore() : await LocalStorageSaveStore.open(namespace);
     signal.throwIfAborted();
     onProgress(tr("msg.reading_your_save"));
     const read = await store.read();
@@ -69,7 +69,6 @@ export async function openSavedGame(
       });
     }
     signal.throwIfAborted();
-    if (connectionError) throw connectionError;
     const coordinator = (saves = new SaveCoordinator(
       store,
       head,
@@ -85,6 +84,7 @@ export async function openSavedGame(
     });
     return {
       namespace,
+      transient,
       session,
       world,
       saves: coordinator,
@@ -110,9 +110,9 @@ export async function openSavedGame(
  *  (`journey-v1`) are simply not read any more. */
 export function saveNamespace(
   location: Pick<Location, "pathname" | "search">,
-): { name: string } {
+): { name: string; transient: boolean } {
   const params = new URLSearchParams(location.search),
-    debug = params.get("debug") === "1";
+    debug = debugOptions(location.search).enabled;
   const testId = debug ? params.get("saveTest") : null;
   if (testId && !/^[a-zA-Z0-9_-]{1,80}$/.test(testId))
     throw Error("存档验收标识错误");
@@ -122,6 +122,8 @@ export function saveNamespace(
   return {
     name: testId
       ? `mining:acceptance:${testId}`
+      : debug ? `mining:debug:${mode}:economy-v2`
       : `mining:${mode}:economy-v2`,
+    transient: debug && !testId,
   };
 }

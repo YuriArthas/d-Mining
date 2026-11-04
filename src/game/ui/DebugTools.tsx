@@ -1,4 +1,4 @@
-import { resolveText } from '../i18n/i18n.ts';
+import { resolveText, tr } from '../i18n/i18n.ts';
 import type { RenderRate } from '../movement.ts';
 import type { ProbeMode } from '../presentation/PerformanceProbe.ts';
 import type { PerformanceSnapshot } from '../presentation/PerformanceMeter.ts';
@@ -15,7 +15,7 @@ export function DebugTools({ status, performanceStats, renderRate, shadowsEnable
   status: string; performanceStats: PerformanceSnapshot | null; renderRate: RenderRate; shadowsEnabled: boolean;
   changeProbeMode(mode: ProbeMode): void; input: GameInput;
 }) {
-  return <details className="hud-debug-tools"><summary>调试</summary><div className="hud-debug-content"><span className="wordmark">MINING</span><span className="stage-label">{status}</span>
+  return <details className="hud-debug-tools"><summary>调试</summary><div className="hud-debug-content"><span className="wordmark">{tr("boot.game_name")}</span><span className="stage-label">{status}</span>
           <div className="performance-hud" aria-label="实时性能" title="帧率模式可切换60帧上限或跟随屏幕回调；FPS 按实际提交的主画面计数；CPU 是每次逻辑更新均值，提交是实际绘制的主线程均值（含反射）。RAF 是浏览器回调频率，调度是游戏限帧的跳过比例；GPU 计时需显式开启；绘制次数拆为主画面 / 反射，三角面含两个通道。">
             <div>{performanceStats?`${performanceStats.fps.toFixed(1)} FPS · ${performanceStats.frameMs?.toFixed(1)??'—'} ms`:'FPS — · — ms'}</div>
             <details className="performance-details"><summary>详情</summary><div className="performance-expanded">

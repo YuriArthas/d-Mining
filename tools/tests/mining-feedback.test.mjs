@@ -124,7 +124,7 @@ test('会话发出出售、购买、余额不足和满包拒绝事件', () => {
   const [first, second] = JOURNEY_BACKPACKS, ore = resourceByKind(67), count = Math.ceil(first.price / ore.price);
   session.collected(Array.from({ length: count }, () => ({ kind: ore.kind })));
   session.updatePosition([SELL_ZONE.x, SELL_ZONE.y, SELL_ZONE.z], true); session.resetPosition();
-  assert.deepEqual(events.shift(), { type: 'sold', coins: count * ore.price, count });
+  assert.deepEqual(events.shift(), { type: 'sold', payouts: [{currency:'gold',coins:count * ore.price}], count });
   assert.equal(session.upgradeBackpack(first.id).status, 'upgraded');
   assert.deepEqual(events.shift(), { type: 'purchased' });
   assert.equal(session.upgradeBackpack(second.id).status, 'insufficient');

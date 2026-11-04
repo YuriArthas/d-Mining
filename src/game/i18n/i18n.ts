@@ -14,10 +14,13 @@ function detect(): Lang {
 }
 export const LANG = detect();
 export const LOCALE = packs.find(p => p.id === LANG)!;
-if (typeof document !== 'undefined' && document.documentElement) document.documentElement.lang = LOCALE.locale;
 export const resolveText = createTranslator(LOCALE);
 /** Presentation boundary: domain data carries message() references, never translated strings. */
 export function tr(id: MessageId, params?: TextParams): string { return resolveText(message(id, params)); }
+if (typeof document !== 'undefined' && document.documentElement) {
+  document.documentElement.lang = LOCALE.locale;
+  document.title = tr('boot.game_name');
+}
 export function saveLanguage(lang: Lang) {
   if (!known(lang)) throw Error(`Unknown language: ${lang}`);
   try { window.localStorage.setItem(STORAGE_KEY, lang); } catch { /* caller also updates the URL */ }

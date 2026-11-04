@@ -1,3 +1,5 @@
+import type { SalePayout } from '../application/Sale.ts';
+import type { CurrencyId } from '../content/economy.ts';
 import { Vector3, type Camera } from 'three';
 import { CELL, type Coord } from '../terrain/SparseWorld.ts';
 import { formatNumber } from './formatNumber.ts';
@@ -10,7 +12,7 @@ export type OverlayTarget = Readonly<{ key: string; name: string; hp: number; ma
 export type LandedHit = Readonly<{ cell: Coord; damage: number; final: boolean }>;
 type Refusal = 'locked' | 'full';
 /** SVG markup for the icons the overlay draws (the kit's icons, without React). */
-export type OverlayIcons = Readonly<{ currency(): string; lock: string; bag: string; ore(color: string): string }>;
+export type OverlayIcons = Readonly<{ currency(currency?: CurrencyId): string; currentCurrency(): CurrencyId; lock: string; bag: string; ore(color: string): string }>;
 
 const PLATE_SECONDS = 1.5, MAX_NUMBERS = 6, NUMBER_MS = 700, FLY_MS = 480, FLY_GAP_MS = 160, TOP_CLEAR = 72, EDGE = 8;
 const escapeText = (text: string) => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
@@ -44,7 +46,7 @@ export class MiningOverlay {
   private readonly chip: HTMLElement;
   private readonly gain: HTMLElement;
   /** A sale waiting for the next frame, when the camera has caught up with a trip to the sell ring. */
-  private sale: number | null = null;
+  private sale: readonly SalePayout[] | null = null;
   private nextNumber = 0;
   private readonly point = new Vector3();
   private readonly view = new Vector3();
@@ -82,8 +84,8 @@ export class MiningOverlay {
     this.gain = el('div', 'sale-gain'); root.append(this.gain);
   }
 
-  /** A sale went through for `coins`: its coins burst out of the miner on the next frame. */
-  sold(coins: number) { this.sale = coins; }
+  /** A sale settled by currency: show every payout; fly only the currency of the visible counter. */
+  sold(payouts: readonly SalePayout[]) { this.sale = payouts; }
 
   /** The player swung at a block the pickaxe cannot dig, or with a full bag: the plate says so over that block. */
   refuse(reason: Refusal, cell: Coord | null, now: number) {
@@ -223,12 +225,13 @@ export class MiningOverlay {
   /** "+1234" rises over the miner's head; the coins fan out of the chest, hang a moment and fly one after another
    *  along a curve into the money counter's icon, which jumps as each lands; the last makes the number jump too.
    *  Off screen (or no miner), from the middle of the screen. */
-  private coinBurst(camera: Camera, coins: number, feet: readonly number[] | null, width: number, height: number) {
+  private coinBurst(camera: Camera, payouts: readonly SalePayout[], feet: readonly number[] | null, width: number, height: number) {
     const onScreen = (p: { x: number; y: number } | null) => p && p.x > 0 && p.x < width && p.y > 0 && p.y < height ? p : null;
     const chest = onScreen(feet && this.overFeet(camera, feet, 1.1, width, height)) ?? { x: width / 2, y: height / 2 };
     const head = onScreen(feet && this.overFeet(camera, feet, 2.3, width, height)) ?? { x: chest.x, y: chest.y - 50 };
     const s = timeScale, still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    this.gain.innerHTML = `${this.icons.currency()}<b class="ui-num">+${formatNumber(coins)}</b>`;
+    this.gain.innerHTML = payouts.map(p => `<span data-currency="${p.currency}">${this.icons.currency(p.currency)}<b class="ui-num">+${formatNumber(p.coins)}</b></span>`).join('');
+    const coins = payouts.find(p => p.currency === this.icons.currentCurrency())?.coins ?? 0;
     this.gain.style.left = `${head.x}px`; this.gain.style.top = `${Math.max(TOP_CLEAR + 20, head.y)}px`;
     this.gain.getAnimations().forEach(a => a.cancel());
     const rise = (y: number, scale: number) => `translate(-50%, calc(-50% - ${y}px)) scale(${scale})`;
@@ -238,7 +241,7 @@ export class MiningOverlay {
     ], { duration: (SALE_FLIGHT.first + SALE_FLIGHT.stream) * s, fill: 'forwards' });
     const counter = document.querySelector<HTMLElement>('.hud-coins .ui-pill-icon'), value = document.querySelector<HTMLElement>('.hud-coins .ui-pill-value');
     const target = counter?.getBoundingClientRect(), box = this.root.getBoundingClientRect();
-    if (still || !counter || !target?.width) return;
+    if (!coins || still || !counter || !target?.width) return;
     const to = { x: target.left - box.left + target.width / 2, y: target.top - box.top + target.height / 2 };
     const at = (p: { x: number; y: number }, scale: number) => `translate(${p.x}px, ${p.y}px) translate(-50%, -50%) scale(${scale})`;
     const count = saleCoinCount(coins), coin = this.icons.currency();

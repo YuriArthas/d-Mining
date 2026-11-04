@@ -95,7 +95,7 @@ test('the double-sale boost doubles the quote and the coins of a sale while it r
     const s=fixture(0,p=>{p.wallet.balances.gold=0;p.rewards.timed.sell=boost;});
     s.collected(Array.from({length:4},()=>({kind:64})));
     const quoted=s.getSnapshot().sale;at(s,sell);
-    return {quoted:quoted.coins,coins:s.getSnapshot().coins};
+    return {quoted:quoted.payouts.find(p=>p.currency==='gold')?.coins,coins:s.getSnapshot().coins};
   };
   const plain=sale(0),doubled=sale(60);
   assert.ok(plain.coins>0);assert.equal(plain.quoted,plain.coins);
@@ -107,9 +107,9 @@ test('stepping into the sell ring and 全部出售 both send one sold event with
   s.onFeedback(e=>{if(e.type==='sold')events.push(e);});
   s.collected(Array.from({length:4},()=>({kind:64})));at(s,sell);
   const first=s.getSnapshot().coins;
-  assert.deepEqual(events,[{type:'sold',coins:first,count:4}]);
+  assert.deepEqual(events,[{type:'sold',payouts:[{currency:'gold',coins:first}],count:4}]);
   s.collected(Array.from({length:3},()=>({kind:64})));
   assert.equal(s.sellAvailable().status,'sold');
-  assert.deepEqual(events.at(-1),{type:'sold',coins:s.getSnapshot().coins-first,count:3});
+  assert.deepEqual(events.at(-1),{type:'sold',payouts:[{currency:'gold',coins:s.getSnapshot().coins-first}],count:3});
   assert.equal(s.sellAvailable().status,'empty');assert.equal(events.length,2);
 });

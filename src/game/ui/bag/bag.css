@@ -76,8 +76,9 @@ html:not([lang^=zh]) .bag-egg-name { font-size: 12px; }
 .bag-egg[data-locked] .bag-egg-go { background: var(--ui-mute); font-size: 11px; -webkit-text-stroke-width: 2.5px; }
 
 /* Ores: what the bag holds and sells for, the material store as a ticket card, the ores with their unit price. */
-.bag-sell { display: flex; align-items: center; gap: 12px; flex: none; }
+.bag-sell { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; flex: none; }
 .bag-capacity { flex: 1; min-width: 140px; }
+.bag-sell-values { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 14px; }
 .bag-sell-value { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; white-space: nowrap; }
 .bag-sell-value .ui-icon { width: 22px; height: 22px; }
 .bag-sell-value b { font-size: 17px; }
@@ -120,8 +121,6 @@ html:not([lang^=zh]) .bag-egg-name { font-size: 12px; }
 .bag-gear[data-kind=backpacks] { --c: var(--ui-purple); }
 .bag-gear-art { width: 92px; display: grid; justify-items: center; align-content: center; gap: 4px; flex: none; }
 .bag-gear-art > .ui-icon { width: 76px; height: 76px; }
-.bag-gear-level { font-size: 16px; }
-.bag-gear-level small { font-size: 11px; color: var(--ui-ink-soft); }
 .bag-gear-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
 .bag-gear-info h4 { font-size: 18px; text-align: left; }
 .bag-gear-next { display: grid; gap: 5px; margin-top: auto; }

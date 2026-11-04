@@ -25,7 +25,7 @@ async function run(name,fixture,lang,width,height,safe,action){
 }
 try {
  await run('legacy-852','legacy','zh',852,393,{left:59,right:59,top:0,bottom:21},async({p,state,tap,shot,layout})=>{
- const s=await state();assert.equal(s.inventory.capacity,input.economy.bags[2].capacity);assert.equal(s.inventory.used,260);assert.deepEqual(s.equipment.backpacks,[25,190]);assert.equal(s.sale.coins,20);
+ const s=await state();assert.equal(s.inventory.capacity,input.economy.bags[2].capacity);assert.equal(s.inventory.used,260);assert.deepEqual(s.equipment.backpacks,[25,190]);assert.equal(s.sale.payouts.find(p=>p.currency==='gold')?.coins,20);
  await layout();await shot('full');await tap('.hud-bag .ui-pill-hit');await p.waitForSelector('.bag-ore-volume');assert.match(await p.locator('.bag-ore-volume').innerText(),/13/);await shot('contents');await tap('.ui-sheet-close');
  await tap('.hud-sell');await p.waitForFunction(()=>window.__miningValidation.snapshot().economy.inventory.used===0,null,{timeout:120000});assert.equal((await state()).coins,s.coins+20);pass('old skipped bag migrates to tier 3; 20 rocks occupy 260, sell for 20 exactly once');
  await p.evaluate(()=>window.__miningSave.flush());await p.reload({waitUntil:'domcontentloaded'});await p.waitForFunction(()=>window.__miningValidation?.snapshot().ready&&!document.querySelector('.loading-screen'),null,{timeout:180000});assert.equal((await state()).inventory.capacity,190);assert.equal((await state()).inventory.used,0);assert.equal((await state()).coins,s.coins+20);pass('tier identity and sale survive public IndexedDB reload');

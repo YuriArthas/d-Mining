@@ -74,7 +74,7 @@ const SLOW = 8;
     await fill(again, namespace);
     const bag = (await snap()).economy.inventory;
     assert.equal(bag.used, 30, 'thirty ore in the bag');
-    const quote = (await snap()).economy.sale.coins, before = await counter();
+    const quote = (await snap()).economy.sale.payouts.find(p=>p.currency==='gold')?.coins, before = await counter();
     await shot('01-full-bag', `a bag of ore, ${before} in the counter, about to sell for ${quote}`);
 
     // Slowed eight times, first only timed: a screenshot takes seconds here and holds the page, so this run takes none
@@ -124,7 +124,7 @@ const SLOW = 8;
     await page.evaluate(() => window.__miningValidation.teleport([0, .1, 46]));
     await page.waitForTimeout(2000);
     await fill(again, namespace);
-    const quote2 = (await snap()).economy.sale.coins, money = (await snap()).economy.coins;
+    const quote2 = (await snap()).economy.sale.payouts.find(p=>p.currency==='gold')?.coins, money = (await snap()).economy.coins;
     await probe();
     await tap(page.getByRole('button', { name: '传送到售卖圈出售' }));
     await page.waitForFunction(() => window.__saleProbe.start !== null, null, { timeout: 60000, polling: 50 });

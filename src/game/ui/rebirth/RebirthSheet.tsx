@@ -31,7 +31,7 @@ export function RebirthSheet({ session, onClose, onReborn }: { session: GameSess
         <small>{tr("msg.finish_all_three_worlds_to_be_reborn_after_that_ore_sells_fo", { x: offer.nextMultiplier })}</small>
         <ul className="rebirth-needs">
           <li data-done={offer.reached || undefined}><i aria-hidden="true">{offer.reached ? '✓' : ''}</i><Icon kind="portal" />{tr("msg.reach_layername", { layerName: offer.layerName })}</li>
-          <li data-done={offer.level || undefined}><i aria-hidden="true">{offer.level ? '✓' : ''}</i><Icon kind="pickaxe" />{tr("msg.pickaxe_at_lv_toollevel", { toolLevel: offer.toolLevel })}</li>
+          <li data-done={offer.level || undefined}><i aria-hidden="true">{offer.level ? '✓' : ''}</i><Icon kind="pickaxe" />{tr("msg.needs_named_pickaxe", { name: state.shopCatalog.tools[offer.toolLevel - 1].name })}</li>
         </ul>
       </section>
       <div className="rebirth-side">

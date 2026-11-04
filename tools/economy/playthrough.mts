@@ -311,7 +311,7 @@ function mineBag(w: 1 | 2 | 3, k: number) { return timed('mine', () => mineBagNo
 function mineBagNow(w: 1 | 2 | 3, k: number) {
   if (!toSite(w, k)) return false;
   const wanted = need(w, k); let mined = 0;
-  while (!s().inventory.isFull && (mined < 5 || (s().sale?.coins ?? 0) < wanted)) { if (!mineStep(w, k) || failures > 30) return false; mined++; if (g.clock.now - lastProgress > 300) return false; }
+  while (!s().inventory.isFull && (mined < 5 || ((s().sale.status === 'quoted' ? s().sale.payouts.find(p => p.currency === s().currency)?.coins : 0) ?? 0) < wanted)) { if (!mineStep(w, k) || failures > 30) return false; mined++; if (g.clock.now - lastProgress > 300) return false; }
   return true;
 }
 function descend(w: 1 | 2 | 3, k: number) { return timed('descend', () => descendNow(w, k)); }

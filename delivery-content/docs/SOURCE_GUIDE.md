@@ -1,6 +1,6 @@
 # 源工程接续与构建
 
-这是 r3 交付候选。完整游戏源码、锁文件、运行素材和 `dist/` 同包提供。素材来源与本次许可资料范围见 `ASSET_PROVENANCE.md`、`ASSET_AUTHORIZATION.md`。
+这是 r6 交付快照。完整游戏源码、锁文件、运行素材和 `dist/` 同包提供。素材来源与本次许可资料范围见 `ASSET_PROVENANCE.md`、`ASSET_AUTHORIZATION.md`。
 
 ## 干净构建
 
@@ -34,11 +34,14 @@ npm run serve
 | 地层与资源 | `content/journeyWorlds.ts`、`layers.ts`、`resources.ts`、`journeyResources.ts`；经济表决定深度、概率、HP、售价和等级门槛 |
 | 布局与碰撞 | `content/pinewind/hubLayout.ts`、`pinewind/authored.json`、`rooms/*.layout.json`、`rooms/*.scene.json`、`underground/*.json` → `world/` 与场景装配 |
 | 文本 | `src/game/i18n/locales/*.json` 自动发现；内容保存稳定文本引用，显示边界解析，详见 I18N_DELIVERY.md |
-| 存档 | `src/game/persistence/`，由 SaveCoordinator 协调 IndexedDB；浏览器站点和测试命名空间相互隔离 |
+| 存档 | `src/game/persistence/`，由 SaveCoordinator 协调 LocalStorageSaveStore，以单键快照保存全部进度和稀疏矿坑；默认 debug 使用不持久化的 MemorySaveStore，显式 saveTest 使用独立 localStorage 验收键；详见 SAVES.md |
+| 调试边界 | `runtime/debugOptions.ts` 统一精确的 `?debug=1` 开关；只在开启后构造诊断计量和碰撞视图、挂载调试接口或启用诊断调参 |
 | 运行素材 | `src/game/assets/`，原始许可在 `licenses/`；来源清单在 `public/provenance/asset-inventory.json` |
 | 音频 | `src/game/audio/` 的合成器、音效和曲谱代码，使用 Web Audio 本地生成 |
 
 相对上述表格，`logic/`、`content/` 等简写均位于 `src/game/`。源文件名中的 validation 不表示它只用于测试。
+
+测试与调试源码保留在完整包，正常启动不执行自动化测试，也不构造帧率计量、渲染剖析和碰撞调试视图；没有要求把所有诊断代码从 dist 剔除。`?debug=1` 使用刷新即清空的内存会话；`?debug=1&kit=1` 打开独立 UI 示例。正式与测试普通存档仍按命名空间隔离，持久化统一采用 localStorage；不读取、迁移或删除旧存储方案的进度。
 
 ## 修改数值
 

@@ -18,6 +18,9 @@
     ]
   ],
   "messages": {
+    "msg.sold_count_items_for_payouts": "已出售 {count} 块矿物，获得 {payouts}",
+    "msg.sale_payout": "{coins} {currency}",
+    "msg.sale_payout_join": "{left} + {right}",
     "boot.dig_down_haul_it_home": "向下探索 · 满载而归",
     "boot.entering_mine_label": "正在进入矿场",
     "boot.entering_the_mine": "正在进入矿场…",
@@ -27,7 +30,7 @@
     "boot.failure_detail": "加载遇到了一点问题，请重新尝试。",
     "boot.getting_ready": "准备出发",
     "boot.graphics": "画面准备",
-    "boot.loading_mining": "正在加载 Mining",
+    "boot.loading_mining": "正在加载掘矿大师",
     "boot.mine": "矿场",
     "boot.mine_assets": "矿场资源",
     "boot.nearby_ground": "附近地形",
@@ -335,7 +338,7 @@
     "msg.how_to_play": "怎么玩",
     "msg.how_to_play_7a328466": "操作帮助",
     "msg.hums_as_it_cuts_ore_like_tofu": "嗡嗡作响，切矿如切豆腐。",
-    "msg.i_dug_down_maxdepth_m_in_mining_come_beat_my_depth_record_ur": "我在 Mining 挖到了 {maxDepth} 米！一起来挑战深度纪录。\n{url}\n邀请码：{inviteCode}\n进入游戏，在“奖励”中粘贴口令领取幸运币。分享至{name}。",
+    "msg.i_dug_down_maxdepth_m_in_mining_come_beat_my_depth_record_ur": "我在掘矿大师挖到了 {maxDepth} 米！一起来挑战深度纪录。\n{url}\n邀请码：{inviteCode}\n进入游戏，在“奖励”中粘贴口令领取幸运币。分享至{name}。",
     "msg.ice_cream_cone": "冰淇淋甜筒",
     "msg.ice_crystal_crane": "冰晶鹤",
     "msg.ice_rock": "冰岩",
@@ -380,7 +383,7 @@
     "msg.lightning_trident": "闪电三叉戟",
     "msg.liquid_nitrogen_egg": "液氮蛋",
     "msg.loaded_with_ore_ready_for_launch": "矿石装满，准备发射。",
-    "msg.loading_mining": "正在加载 Mining",
+    "msg.loading_mining": "正在加载掘矿大师",
     "msg.loading_the_mine": "正在装载矿场",
     "msg.lock_them_in_the_bag_s_material_store_and_they_are_kept_as_y": "（在背包的材料仓里锁定，挖到就存起来）",
     "msg.locked_ore_is_never_sold": "锁定的矿物不会卖掉",
@@ -418,7 +421,7 @@
     "msg.mini_portal": "迷你传送门",
     "msg.mining": "挖矿",
     "msg.mining_bonus": "挖矿 {bonus}",
-    "msg.mining_game": "Mining 游戏",
+    "msg.mining_game": "掘矿大师游戏",
     "msg.mining_speed": "挖矿速度",
     "msg.money": "货币",
     "msg.moonlight_hatchling": "月光幼龙",
@@ -827,6 +830,7 @@
     "msg.depth_route_value": "当前 {depth} 米，路线终点 {end} 米",
     "msg.depth_node_open": "{name}，{depth} 米，已探索",
     "msg.depth_node_locked": "{name}，{depth} 米，未探索",
-    "msg.block_capacity": "每块占 {volume} 容量"
+    "msg.block_capacity": "每块占 {volume} 容量",
+    "boot.game_name": "掘矿大师"
   }
 }

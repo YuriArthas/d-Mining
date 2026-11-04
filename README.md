@@ -1,4 +1,4 @@
-# Mining
+# 掘矿大师 / Mining Master
 
 Roblox 风格的挖矿游戏，移植到 Web（Three.js r186 / WebGL，React，Rapier）。三个世界，每个世界是地表加六层地下休整层；第一世界的地表是松风矿谷。
 
@@ -43,7 +43,7 @@ node tools/publish-pinewind.mjs   # 发布到 games/mining-surface-play/ 并核�
 | `MINING_LOG_DIR` | 日志接收器存储目录，必填 |
 | `TRIPO_API_KEY` / `TRIPO_CONFIG_PATH` | 生成工具凭据；未设置 key 时读取指定配置或用户目录下 `.tripo/config.json` |
 
-Vite 与交付共用加载入口，不注入日志配置；游戏无启动遥测或性能上传按钮。显式 `?debug=1` 才启用本地诊断计量。语言扩展与不修改源码的交付流程见 [docs/i18n-delivery-contract.md](docs/i18n-delivery-contract.md)。
+Vite 与交付共用加载入口，不注入日志配置；游戏无启动遥测或性能上传按钮。仅精确的 `?debug=1` 启用本地诊断计量、碰撞显示与诊断调参，UI 示例页需 `?debug=1&kit=1`。测试和调试源码保留，普通启动不运行测试脚本、不创建帧率计量、渲染剖析或碰撞调试视图。进度与语言持久化仅使用浏览器标准 localStorage。debug 默认使用独立内存存档，刷新即清空，不读取或改写玩家存档；只有显式 `?debug=1&saveTest=your-id` 才使用独立 localStorage 键。旧存储方案的进度不读取、不自动迁移、不删除；存储被禁用或配额不足时明确报错，不切换其他存档路径。存档结构见 [SAVES.md](delivery-content/docs/SAVES.md)。语言扩展与不修改源码的交付流程见 [docs/i18n-delivery-contract.md](docs/i18n-delivery-contract.md)。
 
 `npm run publish:preview` 发布到 `games/mining-test/`；`node tools/publish-pinewind.mjs` 默认发布到 `games/mining-surface-play/`。后者的 `--launcher` 更新宿主列表，`--formal` 发布正式入口，须分别确认对应授权。发布工具缺少宿主路径或公开 URL 时直接报错。浏览器工具使用本地 Playwright 或显式配置的模块，不固定依赖兄弟项目。
 

@@ -22,6 +22,9 @@
     ]
   ],
   "messages": {
+    "msg.sold_count_items_for_payouts": "Sold {count} items for {payouts}",
+    "msg.sale_payout": "{coins} {currency}",
+    "msg.sale_payout_join": "{left} + {right}",
     "boot.dig_down_haul_it_home": "DIG DOWN · HAUL IT HOME",
     "boot.entering_mine_label": "Entering the mine",
     "boot.entering_the_mine": "Entering the mine…",
@@ -31,7 +34,7 @@
     "boot.failure_detail": "Something went wrong while loading. Please try again.",
     "boot.getting_ready": "Getting ready",
     "boot.graphics": "Graphics",
-    "boot.loading_mining": "Loading Mining",
+    "boot.loading_mining": "Loading Mining Master",
     "boot.mine": "MINE",
     "boot.mine_assets": "Mine assets",
     "boot.nearby_ground": "Nearby ground",
@@ -339,7 +342,7 @@
     "msg.how_to_play": "How to Play",
     "msg.how_to_play_7a328466": "How to play",
     "msg.hums_as_it_cuts_ore_like_tofu": "Hums as it cuts ore like tofu.",
-    "msg.i_dug_down_maxdepth_m_in_mining_come_beat_my_depth_record_ur": "I dug down {maxDepth} m in Mining! Come beat my depth record.\n{url}\nInvite code: {inviteCode}\nOpen the game and paste the code in Rewards to get Lucky Coins. Shared to {name}.",
+    "msg.i_dug_down_maxdepth_m_in_mining_come_beat_my_depth_record_ur": "I dug down {maxDepth} m in Mining Master! Come beat my depth record.\n{url}\nInvite code: {inviteCode}\nOpen the game and paste the code in Rewards to get Lucky Coins. Shared to {name}.",
     "msg.ice_cream_cone": "Ice Cream Cone",
     "msg.ice_crystal_crane": "Ice Crystal Crane",
     "msg.ice_rock": "Ice Rock",
@@ -384,7 +387,7 @@
     "msg.lightning_trident": "Lightning Trident",
     "msg.liquid_nitrogen_egg": "Liquid Nitrogen Egg",
     "msg.loaded_with_ore_ready_for_launch": "Loaded with ore, ready for launch.",
-    "msg.loading_mining": "Loading Mining",
+    "msg.loading_mining": "Loading Mining Master",
     "msg.loading_the_mine": "Loading the mine",
     "msg.lock_them_in_the_bag_s_material_store_and_they_are_kept_as_y": "(lock them in the bag's Material Store and they are kept as you dig)",
     "msg.locked_ore_is_never_sold": "Locked ore is never sold",
@@ -422,7 +425,7 @@
     "msg.mini_portal": "Mini Portal",
     "msg.mining": "Mining",
     "msg.mining_bonus": "Mining {bonus}",
-    "msg.mining_game": "Mining game",
+    "msg.mining_game": "Mining Master game",
     "msg.mining_speed": "Mining speed",
     "msg.money": "Money",
     "msg.moonlight_hatchling": "Moonlight Hatchling",
@@ -831,6 +834,7 @@
     "msg.depth_route_value": "{depth}m of {end}m",
     "msg.depth_node_open": "{name}, {depth}m, discovered",
     "msg.depth_node_locked": "{name}, {depth}m, undiscovered",
-    "msg.block_capacity": "{volume} capacity / block"
+    "msg.block_capacity": "{volume} capacity / block",
+    "boot.game_name": "Mining Master"
   }
 }

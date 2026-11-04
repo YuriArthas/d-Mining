@@ -1,10 +1,12 @@
 export async function acquireSaveOwnership(
   name: string,
   signal: AbortSignal,
-  manager: LockManager = navigator.locks,
+  manager: LockManager | undefined = globalThis.navigator?.locks,
+  protocol = globalThis.location?.protocol,
 ): Promise<() => void> {
-  if (!manager) throw Error("当前浏览器不支持安全的多页面存档，请更新浏览器");
   signal.throwIfAborted();
+  // Only HTTPS sessions use cross-page ownership; HTTP must remain playable.
+  if (protocol !== "https:" || !manager) return () => {};
   return new Promise((resolve, reject) => {
     const job = manager.request(name, { ifAvailable: true }, async (lock) => {
       if (!lock) {

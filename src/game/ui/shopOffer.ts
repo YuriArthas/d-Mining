@@ -2,8 +2,6 @@ import { formatNumber } from '../presentation/formatNumber.ts';
 import type { ShopCategory, ShopItem } from '../content/shopCatalog.ts';
 import type { CurrencyId } from '../content/economy.ts';
 import { pickaxeStats } from '../logic/Pickaxe.ts';
-import { ECONOMY } from '../content/economy.ts';
-import { JOURNEY_WORLDS } from '../content/journeyWorlds.ts';
 
 import { tr } from '../i18n/i18n.ts';
 type Snapshot = Readonly<{
@@ -43,15 +41,6 @@ export function offerStats(category: ShopCategory, item: ShopItem, items: readon
   ];
 }
 
-/** The world a shop item belongs to: the world whose currency buys it. */
-export const offerWorld = (item: ShopItem) => ({ gold: 1, tech: 2, star: 3 } as const)[item.currency];
-/** How deep a pickaxe of this level digs in its own world: the deepest layer whose gate it meets. */
-export function toolReach(level: number) {
-  const world = level <= 10 ? 1 : level <= 20 ? 2 : 3, layers = JOURNEY_WORLDS[world - 1].layers;
-  let reach = layers[0].name;
-  layers.forEach((layer, local) => { if (ECONOMY.layers[(world - 1) * 7 + local].gate <= level) reach = layer.name; });
-  return reach;
-}
 /** The gain over what the player carries, as the shop shows it: damage as a multiple (×1.5), speed and capacity
  *  as an increase (+0.5, +5); nothing for an item that is not better. */
 export function offerGain(stat: Readonly<{ key: 'power' | 'speed' | 'capacity'; value: number; current: number }>) {

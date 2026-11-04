@@ -5,8 +5,7 @@ import type { ShopView } from '../presentation/ShopView.ts';
 import { formatNumber as number } from '../presentation/formatNumber.ts';
 import { CloseButton, Pill, PriceButton, Tile, UiButton } from './kit/controls.tsx';
 import { Icon } from './kit/icons.tsx';
-import { offerAction, offerGain, offerState, offerStats, offerTier, offerWorld, toolReach } from './shopOffer.ts';
-import { WORLD_REQUIREMENTS } from '../content/worldJourney.ts';
+import { offerAction, offerGain, offerState, offerStats, offerTier } from './shopOffer.ts';
 import './shop.css';
 import { currencyIcon, currencyName } from './currency.ts';
 
@@ -22,7 +21,7 @@ export function showShopCategory(view: ShopView, state: ReturnType<GameSession['
 }
 
 /** The tool & backpack shop (docs/draft-ui-v2.md, U6): a 3D showroom the camera glides along. Over the cart: the
- *  item's name, its level, its world and (for a pickaxe) how deep it digs; under it: its numbers with the gain over
+ *  item's name and description; under it: its numbers with the gain over
  *  what the player carries (damage ×1.5, speed +0.5), and one button that says what it does and what it costs
  *  (购买 · 价格, 强化 +N · 价格, 装备, 已装备). A price the player cannot pay yet is greyed, never a missing amount.
  *  It opens at a shop counter, with what that counter sells: each world's surface and its halls of layers 2 and 4
@@ -54,7 +53,7 @@ export function ShopPanel({ session, view, onClose }: { session: GameSession; vi
   }, [onClose, view, count]);
   const open = (category: ShopCategory) => showShopCategory(view, state, category);
   if (display.mode !== 'tools' && display.mode !== 'backpacks' || !state.shopStock) return null;
-  // The counter's shelf; levels and the stat bars count against the whole catalogue.
+  // The counter's shelf; stat bars compare against the whole catalogue.
   const category = display.mode, items = state.shopStock[category], all = state.shopCatalog[category], item = items[display.index];
   if (!item) return null;
   const offer = offerState(category, item, state), action = offerAction(category, item, state, offer);
@@ -90,11 +89,6 @@ export function ShopPanel({ session, view, onClose }: { session: GameSession; vi
     </nav>
     <header className="shop-head" key={item.id}>
       <h1 className="shop-name ui-outline" data-tier={offerTier(item)} data-long={resolveText(item.name).length > 13 || undefined}>{resolveText(item.name)}{top && state.equipment.enhance ? ` +${state.equipment.enhance}` : ''}</h1>
-      <div className="shop-tags">
-        <span className="shop-tag ui-num">Lv.{item.level}<small>/{all.length}</small></span>
-        <span className="shop-tag"><Icon kind={currencyIcon(item.currency)} />{resolveText(WORLD_REQUIREMENTS[offerWorld(item) - 1].name)}</span>
-        {category === 'tools' && <span className="shop-tag shop-reach"><Icon kind="pickaxe" />{tr("msg.digs_to_layer", { layer: toolReach(item.level) })}</span>}
-      </div>
       <p className="shop-blurb">{resolveText(item.description)}</p>
     </header>
     <UiButton className="shop-arrow shop-prev" aria-label={tr("msg.previous_item")} disabled={display.index === 0} onPress={() => view.select(display.index - 1)}>◀</UiButton>

@@ -16,12 +16,6 @@
 .shop-name[data-long] { font-size: 28px; max-width: 420px; white-space: normal; text-align: center; line-height: 1.05; }
 .shop-name[data-tier=fine] { color: #7fe6ff; }
 .shop-name[data-tier=star] { color: #ffd84d; }
-.shop-tags { display: flex; gap: 6px; }
-.shop-tag { display: inline-flex; align-items: center; gap: 4px; height: 26px; padding: 0 10px 0 6px; border: 2.5px solid var(--ui-ink); border-radius: 999px; background: var(--ui-paper);
-  color: var(--ui-ink); font: 800 13px/1 var(--ui-font); white-space: nowrap; }
-.shop-tag small { font-size: 10px; color: var(--ui-ink-soft); }
-.shop-tag .ui-icon { width: 18px; height: 18px; }
-.shop-reach { background: var(--ui-gold); }
 .shop-blurb { margin: 0; white-space: nowrap; font: 800 14px/1.2 var(--ui-font); color: #fff; -webkit-text-stroke: 3.5px var(--ui-ink); paint-order: stroke fill; }
 @keyframes shop-name-in { from { opacity: 0; transform: translate(-50%, 8px) scale(.96); } }
 
@@ -65,7 +59,6 @@
 @container game (max-height: 560px) {
   .shop-name { font-size: 28px; --ui-stroke: 5px; }
   .shop-name[data-long] { font-size: 22px; max-width: 380px; }
-  .shop-tag { height: 24px; font-size: 12px; }
   .shop-blurb { font-size: 12px; -webkit-text-stroke-width: 3px; }
   .shop-stat { height: 44px; }
   .shop-stat-icon { width: 32px; height: 32px; padding: 4px; }

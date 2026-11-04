@@ -4,6 +4,7 @@ import {TextGeometry} from 'three/addons/geometries/TextGeometry.js';
 import {FontLoader} from 'three/addons/loaders/FontLoader.js';
 import fontData from '../assets/sign-font.json' with {type:'json'};
 import type {Sign} from '../world/sceneryKit.ts';
+import { debugOptions } from '../runtime/debugOptions.ts';
 const font=new FontLoader().parse(fontData);
 
 // Real extruded glyphs, including their backs and sides. No canvas or UI plane.
@@ -14,7 +15,7 @@ export function createWorldText(sign:Sign,detail:{bevel?:boolean;curveSegments?:
   const geometry=new TextGeometry(text,{font,size:1,depth:.16,curveSegments:detail.curveSegments??5,bevelEnabled:detail.bevel??true,bevelThickness:.012,bevelSize:.01,bevelSegments:1});
   // ExtrudeGeometry emits front/side groups for every glyph contour. Collapse
   // identical material ranges: still real 3D text, exactly the same triangles.
-  if(typeof location==='undefined'||new URLSearchParams(location.search).get('textGroups')!=='0')mergeGroups(geometry);
+  if(debugOptions().mergeTextGroups)mergeGroups(geometry);
   geometry.computeBoundingBox();const b=geometry.boundingBox!;
   const scale=width/Math.max(.01,b.max.x-b.min.x);
   geometry.translate(-(b.min.x+b.max.x)/2,-(b.min.y+b.max.y)/2,-.08);geometry.scale(scale,scale,scale);

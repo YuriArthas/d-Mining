@@ -200,7 +200,7 @@ test('equipped pets raise what ore sells for in their currency and mine faster i
   session.resetPosition(); assert.equal(session.hit([0, -1, 0]).damage, session.getSnapshot().pickaxe.power);
   assert.ok(Math.abs(session.combatDebug().nextAttackAt - 1 / 2.2) < 1e-9);
   session.collected(Array.from({ length: 20 }, () => ({ kind: 64 })));
-  assert.deepEqual(session.getSnapshot().sale, { status: 'quoted', count: 20, coins: 22 });
+  assert.deepEqual(session.getSnapshot().sale, { status: 'quoted', count: 20, payouts: [{currency:'gold',coins:22}] });
   const sale = SESSION_CONTENT.sales[0]; session.updatePosition([sale.x, sale.y, sale.z], true);
   assert.equal(session.getSnapshot().coins, 212);
   session.pets.unequipAll(); assert.equal(session.getSnapshot().saleMultiplier, 1); assert.equal(session.getSnapshot().miningStats.speed, 2);

@@ -163,7 +163,7 @@ const UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, 
     const namespace = await page.evaluate(() => window.__miningSave.namespace);
     await page.reload({ waitUntil: 'domcontentloaded' }); await ready(true);
     assert.equal((await snapshot()).economy.coins, coins + 123); assert.equal(await page.evaluate(() => window.__miningSave.namespace), namespace);
-    await check('Isolated IndexedDB save retains exact coin balance across reload', { namespace, coins: coins + 123 });
+    await check('Isolated localStorage save retains exact coin balance across reload', { namespace, coins: coins + 123 });
     const external = report.requests.filter(r => new URL(r.url).origin !== new URL(base).origin);
     const writes = report.requests.filter(r => !['GET', 'HEAD'].includes(r.method));
     assert.deepEqual(external, []); assert.deepEqual(writes, []); assert.deepEqual(report.errors, []); assert.deepEqual(report.blockedExternalRequests, []);

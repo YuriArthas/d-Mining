@@ -154,11 +154,11 @@ def main():
     print(f"digits  glyphs={len(latin):5} bytes={digits_out['bytes']:7}")
     # Vietnamese: Fredoka has no ă ơ ư đ or stacked tones, so a Vietnamese page sets every letter in Noto (one face,
     # so a word never mixes two fonts). Its text is the Vietnamese table plus ASCII.
-    vi_path = ROOT / 'src/game/i18n/vi.json'
+    vi_path = ROOT / 'src/game/i18n/locales/vi.json'
     if vi_path.exists():
         spec = CJK[0]
         font = load(spec)
-        vi_text = {chr(c) for c in range(0x20, 0x7F)} | {c for v in json.loads(vi_path.read_text(encoding='utf-8')).values() for c in v if not c.isspace()}
+        vi_text = {chr(c) for c in range(0x20, 0x7F)} | {c for v in json.loads(vi_path.read_text(encoding='utf-8'))['messages'].values() for c in v if not c.isspace()}
         vi_text |= set('0123456789+-×/%:,.!?·↑✓…—')
         covered = {ord(c) for c in vi_text if ord(c) in font.getBestCmap()}
         vi_spec = dict(spec, id='vi', file='mining-vi-noto.woff2')

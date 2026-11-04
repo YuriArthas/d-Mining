@@ -47,7 +47,7 @@ export function PortalSheet({ session, onClose }: { session: GameSession; onClos
     if (!next) return;
     const r = session.unlockWorld(next.id); setConfirm(false);
     toast(r.status === 'opened' ? tr("msg.name_is_open_you_can_teleport_there_now", { name: next.name }) : r.status === 'away' ? tr("msg.stand_at_the_portal_to_unlock")
-      : r.status === 'insufficient-level' ? tr("msg.needs_a_lv_toollevel_pickaxe", { toolLevel: ticket!.toolLevel }) : tr("msg.not_ready_yet_nothing_was_spent"));
+      : r.status === 'insufficient-level' ? tr("msg.needs_named_pickaxe", { name: state.shopCatalog.tools[ticket!.toolLevel - 1].name }) : tr("msg.not_ready_yet_nothing_was_spent"));
   };
   return <Sheet title={tr("msg.world_portal")} onClose={onClose} className="portal-sheet">
     <div className="portal-worlds">{state.worlds.map((world, i) => {
@@ -65,7 +65,11 @@ export function PortalSheet({ session, onClose }: { session: GameSession; onClos
             <UiButton size="m" tone="green" icon="portal" className="portal-go" aria-label={tr("msg.teleport_to_name", { name: world.name })} onPress={() => go(world.id)}>{tr("msg.teleport")}</UiButton></>
           : isNext && ticket ? <>
             <ul className="portal-ticket" aria-label={tr("msg.to_unlock_world_you_need", { world: world.name })}>
-              <Need icon={<Icon kind="pickaxe" />} label={tr("msg.pickaxe_level")} have={Math.min(world.toolLevel, ticket.toolLevel)} need={ticket.toolLevel} text={`Lv.${world.toolLevel}/${ticket.toolLevel}`} />
+              <li className="portal-need portal-tool" data-done={world.toolLevel >= ticket.toolLevel || undefined}>
+                <span className="portal-need-icon"><Icon kind="pickaxe" /></span>
+                <span className="portal-need-label">{tr("msg.needs_named_pickaxe", { name: state.shopCatalog.tools[ticket.toolLevel - 1].name })}</span>
+                {world.toolLevel >= ticket.toolLevel && <i className="portal-tick" aria-hidden="true">✓</i>}
+              </li>
               {world.materials.map(m => <Need key={m.itemId} icon={<OreIcon color={itemDefinition(m.itemId).color} />} label={m.name} have={m.owned} need={m.count}
                 text={`${number(Math.min(m.owned, m.count))}/${number(m.count)}`} />)}
               <Need icon={<Icon kind={currencyIcon(ticket.currency)} />} label={currencyName(ticket.currency)} have={world.ticketBalance} need={ticket.price}

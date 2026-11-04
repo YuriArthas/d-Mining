@@ -1,6 +1,7 @@
 import type { SparseWorld } from '../terrain/SparseWorld.ts';
 import { WorldBorders } from '../presentation/WorldBorders.ts';
 import { ColliderView } from '../presentation/ColliderView.ts';
+import { debugOptions } from './debugOptions.ts';
 import { SceneMotion } from '../presentation/SceneMotion.ts';
 import { FeedbackFixtures } from '../presentation/FeedbackFixtures.ts';
 import { surfaceLightStrengthAtFeet } from '../world/SurfaceLightFade.ts';
@@ -311,8 +312,8 @@ export async function startGame(options: StartGameOptions) {
     scope.defer(() => facilities.dispose());
     root.add(facilities.group, terrain.group);
     const borders=new WorldBorders(physics);root.add(borders.group);scope.defer(()=>borders.dispose());
-    const colliderView = new ColliderView(physics.world, c => sceneryCollision.owns(c, false) || borders.owns(c));
-    root.add(colliderView.lines); scope.defer(() => colliderView.dispose());
+    const colliderView = debugOptions().enabled ? new ColliderView(physics.world, c => sceneryCollision.owns(c, false) || borders.owns(c)) : null;
+    if (colliderView) { root.add(colliderView.lines); scope.defer(() => colliderView.dispose()); }
     const feedbackFixtures = new FeedbackFixtures();
     root.add(feedbackFixtures.group);
     scope.defer(() => feedbackFixtures.dispose());

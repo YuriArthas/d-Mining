@@ -119,7 +119,7 @@ export class RegionPipeline<T> {
       if (reply.epoch !== this.epoch || (reply.transaction && reply.transaction !== this.transaction)) { this.staleResults++; continue; }
       if (reply.error || !reply.results) { this.error = reply.error ?? `${this.kind} 缺少结果`; continue; }
       for (const result of reply.results) {
-        this.metrics.add(`${this.kind}BuildMs`, result.data.buildMs);
+        if (this.metrics.enabled) this.metrics.add(`${this.kind}BuildMs`, result.data.buildMs);
         this.results.push({ ...result, transaction: reply.transaction });
       }
     }
@@ -128,8 +128,8 @@ export class RegionPipeline<T> {
     while (this.results.length && performance.now() < deadline) {
       const result = this.results.shift()!, key = chunkKey(result.data.coord);
       if (!this.validResult(result)) { this.staleResults++; continue; }
-      const start = performance.now(), resource = this.adapter.prepare(result.data);
-      this.metrics.add(`${this.kind}PrepareMs`, performance.now() - start);
+      const start = this.metrics.enabled ? performance.now() : 0, resource = this.adapter.prepare(result.data);
+      if (this.metrics.enabled) this.metrics.add(`${this.kind}PrepareMs`, performance.now() - start);
       if (result.transaction) this.staged.get(key)!.resource = resource;
       else this.install(key, result.data.coord, result.version, resource);
     }

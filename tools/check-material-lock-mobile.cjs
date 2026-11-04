@@ -61,7 +61,7 @@ const AMETHYST = 'journey.amethyst';
     await page.goto(again, { waitUntil: 'domcontentloaded' }); await ready();
     await page.evaluate(() => { window.__miningValidation.teleport([0, .1, 46]); window.__miningValidation.look(0, .3); });
     await page.waitForTimeout(2000);
-    const price = await page.evaluate(ore => window.__miningValidation.snapshot().economy.sale.coins, AMETHYST);
+    const price = await page.evaluate(ore => window.__miningValidation.snapshot().economy.sale.payouts.find(p=>p.currency==='gold')?.coins, AMETHYST);
 
     // 1. Nothing locked at first: the three store toggles and every ore cell open.
     await openBag();

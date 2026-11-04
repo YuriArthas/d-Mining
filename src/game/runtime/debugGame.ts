@@ -144,7 +144,7 @@ export function attachGameDebug(
         ...facilities.diagnostics(),
         colliders: sceneryCollision.count,
         /** The collider view (unlock page's 显示碰撞): on, and its line count. */
-        colliderView: { shown: current.colliderView.lines.visible, lines: (current.colliderView.lines.geometry.getAttribute('position')?.count ?? 0) / 2 },
+        colliderView: { shown: current.colliderView?.lines.visible ?? false, lines: (current.colliderView?.lines.geometry.getAttribute('position')?.count ?? 0) / 2 },
       },
       lighting: {
         shadowEnabled: gl.shadowMap.enabled,

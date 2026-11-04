@@ -22,6 +22,9 @@
     ]
   ],
   "messages": {
+    "msg.sold_count_items_for_payouts": "Menjual {count} item seharga {payouts}",
+    "msg.sale_payout": "{coins} {currency}",
+    "msg.sale_payout_join": "{left} + {right}",
     "boot.dig_down_haul_it_home": "GALI KE BAWAH · BAWA PULANG",
     "boot.entering_mine_label": "Masuk ke tambang",
     "boot.entering_the_mine": "Masuk ke tambang…",
@@ -31,7 +34,7 @@
     "boot.failure_detail": "Ada masalah saat memuat. Coba lagi ya.",
     "boot.getting_ready": "Bersiap",
     "boot.graphics": "Grafis",
-    "boot.loading_mining": "Memuat Mining",
+    "boot.loading_mining": "Memuat Master Tambang",
     "boot.mine": "TAMBANG",
     "boot.mine_assets": "Aset tambang",
     "boot.nearby_ground": "Tanah sekitar",
@@ -339,7 +342,7 @@
     "msg.how_to_play": "Cara Main",
     "msg.how_to_play_7a328466": "Cara main",
     "msg.hums_as_it_cuts_ore_like_tofu": "Berdengung, potong bijih kayak potong tahu.",
-    "msg.i_dug_down_maxdepth_m_in_mining_come_beat_my_depth_record_ur": "Aku menggali sampai {maxDepth} m di Mining! Ayo kalahkan rekor kedalamanku.\n{url}\nKode undangan: {inviteCode}\nBuka game dan tempel kode di Hadiah untuk dapat Koin Hoki. Dibagikan ke {name}.",
+    "msg.i_dug_down_maxdepth_m_in_mining_come_beat_my_depth_record_ur": "Aku menggali sampai {maxDepth} m di Master Tambang! Ayo kalahkan rekor kedalamanku.\n{url}\nKode undangan: {inviteCode}\nBuka game dan tempel kode di Hadiah untuk dapat Koin Hoki. Dibagikan ke {name}.",
     "msg.ice_cream_cone": "Es Krim Cone",
     "msg.ice_crystal_crane": "Bangau Kristal Es",
     "msg.ice_rock": "Batu Es",
@@ -384,7 +387,7 @@
     "msg.lightning_trident": "Trisula Petir",
     "msg.liquid_nitrogen_egg": "Telur Nitrogen",
     "msg.loaded_with_ore_ready_for_launch": "Penuh bijih, siap meluncur.",
-    "msg.loading_mining": "Memuat Mining",
+    "msg.loading_mining": "Memuat Master Tambang",
     "msg.loading_the_mine": "Memuat tambang",
     "msg.lock_them_in_the_bag_s_material_store_and_they_are_kept_as_y": "(kunci di Gudang Bahan pada tas, maka tersimpan saat digali)",
     "msg.locked_ore_is_never_sold": "Bijih yang dikunci tidak dijual",
@@ -422,7 +425,7 @@
     "msg.mini_portal": "Portal Mini",
     "msg.mining": "Gali",
     "msg.mining_bonus": "Gali {bonus}",
-    "msg.mining_game": "Game Mining",
+    "msg.mining_game": "Game Master Tambang",
     "msg.mining_speed": "Kecepatan gali",
     "msg.money": "Uang",
     "msg.moonlight_hatchling": "Bayi Naga Bulan",
@@ -831,6 +834,7 @@
     "msg.depth_route_value": "{depth}m dari {end}m",
     "msg.depth_node_open": "{name}, {depth}m, telah ditemukan",
     "msg.depth_node_locked": "{name}, {depth}m, belum ditemukan",
-    "msg.block_capacity": "{volume} kapasitas / blok"
+    "msg.block_capacity": "{volume} kapasitas / blok",
+    "boot.game_name": "Master Tambang"
   }
 }

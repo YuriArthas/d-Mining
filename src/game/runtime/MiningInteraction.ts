@@ -35,7 +35,7 @@ export class MiningInteraction {
     terrain: TerrainStream,
   ) {
     this.strike=null;
-    const start = performance.now(),
+    const start = terrain.measurements.enabled ? performance.now() : 0,
       press = input.consumeMinePress(),
       aim = press ?? input.getAim();
     let selected: Coord | null = null;
@@ -51,7 +51,7 @@ export class MiningInteraction {
       );
     }
     if (selected && !terrain.canMine(selected)) selected = null;
-    terrain.measurements.add("selectionMs", performance.now() - start);
+    if (terrain.measurements.enabled) terrain.measurements.add("selectionMs", performance.now() - start);
     this.selected = selected;
     this.session.selectTarget(selected);
     this.marker.visible = !!selected;

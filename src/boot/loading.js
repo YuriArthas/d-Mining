@@ -9,6 +9,7 @@
   var pack = packs.find(function (p) { return p.id === lang; });
   document.documentElement.lang = pack.locale;
   var say = function (id) { if (!(id in pack.messages)) throw Error('Missing boot message: ' + id); return pack.messages[id]; };
+  document.title = say('boot.game_name');
   var started = Date.now(), failed = false, ready = false, timer;
   function show() {
     var label = document.getElementById('boot-status');

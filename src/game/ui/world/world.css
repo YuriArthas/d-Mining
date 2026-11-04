@@ -77,3 +77,5 @@ html:not([lang^=zh]) .ui-card-tile .ui-btn { font-size: 13px; padding: 0 4px; }
   .portal-world header b { font-size: 26px; }
   .portal-art { width: 88px; height: 88px; }
 }
+
+.portal-tool { grid-template-columns: 20px minmax(0, 1fr); padding-right: 14px; }

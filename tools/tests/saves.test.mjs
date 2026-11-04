@@ -315,7 +315,7 @@ test("idle flush performs no write, and unrelated pet save does not rewrite ackn
     await f.dispose();
   }
 });
-test("database namespaces are stable and separate production, preview and acceptance worlds", () => {
+test("storage namespaces are stable and separate production, preview and acceptance worlds", () => {
   assert.equal(
     saveNamespace({ pathname: "/games/mining/index.html", search: "" }).name,
     "mining:production:economy-v2",

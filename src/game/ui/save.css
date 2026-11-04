@@ -4,6 +4,7 @@
   background: var(--ui-blue);
 }
 .save-boot-mark { font-size: 56px; line-height: 1; letter-spacing: .06em; --ui-stroke: 8px; }
+html:not([lang^=zh]) .save-boot-mark { font-size: clamp(28px, 5vw, 48px); letter-spacing: .025em; }
 .save-boot h2 { margin: 4px; font-size: 20px; }
 .save-boot-error { max-width: 520px; margin: 0; overflow-wrap: anywhere; font: 700 13px/1.5 var(--ui-font-body); color: #fff1b0; }
 .save-boot-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 6px; }

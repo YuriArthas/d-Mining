@@ -28,7 +28,7 @@ try{
  await run(lang+'-'+w,'full',lang,w,h,safe,async({p,state,tap,shot,layout})=>{
  assert.equal((await state()).inventory.used,25);assert.equal((await state()).inventory.totalCount,5);await layout();await shot('full');
  if(lang==='zh'){await p.waitForTimeout(13000);assert.equal(await p.locator('.hud-sell-guide').count(),1);await p.emulateMedia({reducedMotion:'reduce'});assert.deepEqual(await p.evaluate(()=>['.hud-sell','.hud-sell-arrow'].map(s=>getComputedStyle(document.querySelector(s)).animationName)),['none','none']);}
- const before=await state();await tap(lang==='zh'?'.hud-sell-guide':'.hud-sell');await p.waitForFunction(()=>window.__miningValidation.snapshot().economy.inventory.used===0,null,{timeout:120000});assert.equal((await state()).coins,before.coins+before.sale.coins);assert.equal(await p.locator('.hud-sell-guide').count(),0);pass(lang+' full bag weighted + touch sale exactly once');
+ const before=await state();await tap(lang==='zh'?'.hud-sell-guide':'.hud-sell');await p.waitForFunction(()=>window.__miningValidation.snapshot().economy.inventory.used===0,null,{timeout:120000});assert.equal((await state()).coins,before.coins+before.sale.payouts.find(p=>p.currency==='gold')?.coins);assert.equal(await p.locator('.hud-sell-guide').count(),0);pass(lang+' full bag weighted + touch sale exactly once');
  });}
  for(const [key,tip]of [['egg','pets'],['station','station'],['portal','portal'],['world2','world2'],['world3','world3']])await run(key,key,'zh',852,393,{left:59,right:59,top:0,bottom:21},async({p,state,tap,shot,layout})=>{
  await p.waitForSelector('.ui-tip[data-tip="'+tip+'"]');await layout();await shot('hint');const before=await state();await tap('.ui-tip-go');

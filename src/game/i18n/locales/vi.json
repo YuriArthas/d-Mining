@@ -22,6 +22,9 @@
     ]
   ],
   "messages": {
+    "msg.sold_count_items_for_payouts": "Đã bán {count} vật phẩm, nhận {payouts}",
+    "msg.sale_payout": "{coins} {currency}",
+    "msg.sale_payout_join": "{left} + {right}",
     "boot.dig_down_haul_it_home": "ĐÀO XUỐNG · MANG VỀ NHÀ",
     "boot.entering_mine_label": "Đang vào mỏ",
     "boot.entering_the_mine": "Đang vào mỏ…",
@@ -31,7 +34,7 @@
     "boot.failure_detail": "Có lỗi khi tải. Vui lòng thử lại.",
     "boot.getting_ready": "Đang chuẩn bị",
     "boot.graphics": "Đồ họa",
-    "boot.loading_mining": "Đang tải Mining",
+    "boot.loading_mining": "Đang tải Bậc Thầy Đào Mỏ",
     "boot.mine": "MỎ",
     "boot.mine_assets": "Tài nguyên mỏ",
     "boot.nearby_ground": "Địa hình gần",
@@ -339,7 +342,7 @@
     "msg.how_to_play": "Cách chơi",
     "msg.how_to_play_7a328466": "Cách chơi",
     "msg.hums_as_it_cuts_ore_like_tofu": "Vù vù, cắt quặng như cắt đậu hũ.",
-    "msg.i_dug_down_maxdepth_m_in_mining_come_beat_my_depth_record_ur": "Mình đã đào sâu {maxDepth} m trong Mining! Vào phá kỷ lục độ sâu của mình nhé.\n{url}\nMã mời: {inviteCode}\nVào game và dán mã vào Phần thưởng để nhận Xu May Mắn. Chia sẻ lên {name}.",
+    "msg.i_dug_down_maxdepth_m_in_mining_come_beat_my_depth_record_ur": "Mình đã đào sâu {maxDepth} m trong Bậc Thầy Đào Mỏ! Vào phá kỷ lục độ sâu của mình nhé.\n{url}\nMã mời: {inviteCode}\nVào game và dán mã vào Phần thưởng để nhận Xu May Mắn. Chia sẻ lên {name}.",
     "msg.ice_cream_cone": "Kem Ốc Quế",
     "msg.ice_crystal_crane": "Hạc Băng Tinh",
     "msg.ice_rock": "Đá Băng",
@@ -384,7 +387,7 @@
     "msg.lightning_trident": "Đinh Ba Sấm Sét",
     "msg.liquid_nitrogen_egg": "Trứng Nitơ Lỏng",
     "msg.loaded_with_ore_ready_for_launch": "Đầy quặng, sẵn sàng phóng.",
-    "msg.loading_mining": "Đang tải Mining",
+    "msg.loading_mining": "Đang tải Bậc Thầy Đào Mỏ",
     "msg.loading_the_mine": "Đang tải mỏ",
     "msg.lock_them_in_the_bag_s_material_store_and_they_are_kept_as_y": "(khóa trong Kho nguyên liệu ở ba lô, đào được sẽ được cất lại)",
     "msg.locked_ore_is_never_sold": "Quặng đã khóa sẽ không bị bán",
@@ -422,7 +425,7 @@
     "msg.mini_portal": "Cổng Mini",
     "msg.mining": "Đào quặng",
     "msg.mining_bonus": "Đào {bonus}",
-    "msg.mining_game": "Game Mining",
+    "msg.mining_game": "Game Bậc Thầy Đào Mỏ",
     "msg.mining_speed": "Tốc độ đào",
     "msg.money": "Tiền",
     "msg.moonlight_hatchling": "Rồng Con Ánh Trăng",
@@ -831,6 +834,7 @@
     "msg.depth_route_value": "{depth}m trên {end}m",
     "msg.depth_node_open": "{name}, {depth}m, đã khám phá",
     "msg.depth_node_locked": "{name}, {depth}m, chưa khám phá",
-    "msg.block_capacity": "{volume} sức chứa / khối"
+    "msg.block_capacity": "{volume} sức chứa / khối",
+    "boot.game_name": "Bậc Thầy Đào Mỏ"
   }
 }

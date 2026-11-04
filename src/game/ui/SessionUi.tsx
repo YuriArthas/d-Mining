@@ -20,8 +20,9 @@ import { PortalSheet, StationSheet } from './world/WorldSheet.tsx';
 import { RebirthCelebration, RebirthSheet } from './rebirth/RebirthSheet.tsx';
 
 import { tr } from '../i18n/i18n.ts';
+import { debugOptions } from '../runtime/debugOptions.ts';
 // The testing unlock page is a debug tool: its corner button shows only with ?debug=1.
-const DEBUG = new URLSearchParams(window.location.search).get('debug') === '1';
+const DEBUG = debugOptions().enabled;
 
 type Modal =
   | { kind: 'bag'; tab: BagTab } | { kind: 'rewards'; tab: RewardsTab }

@@ -2,10 +2,11 @@ import { type CharacterPhysics } from './physics.ts';
 import { SparseWorld, type WorldGeneration, CELL, COLLISION_SIZE, chunkKey, validRegion, inBounds, type Coord } from '../terrain/SparseWorld.ts';
 import { RenderTerrain, CollisionTerrain } from '../terrain/TerrainLayers.ts';
 import { Measurements, type WorkerFactory } from '../terrain/RegionPipeline.ts';
+import { debugOptions } from '../runtime/debugOptions.ts';
 type ExcavatedCell = Readonly<{ cell: Coord; kind: number }>;
 export class TerrainStream {
   readonly world: SparseWorld;
-  readonly measurements = new Measurements(new URLSearchParams(globalThis.location?.search ?? "").get("debug") === "1");
+  readonly measurements = new Measurements(debugOptions().enabled);
   readonly render: RenderTerrain;
   readonly collision: CollisionTerrain;
   private readonly waiting = new Map<string, Coord>();
@@ -54,12 +55,14 @@ export class TerrainStream {
       const resources = new Map(txn.cells.map(cell => [chunkKey(cell), { cell, kind: this.world.cell(cell) }]));
       const removed = this.world.remove(txn.cells);
       this.collision.pipeline.commit(txn.cells); this.render.pipeline.commit(txn.cells);
-      this.measurements.add('batchBuildCommitMs', performance.now() - txn.started);
-      for (const c of txn.cells) { const key = chunkKey(c); this.measurements.add('editLatencyMs', performance.now() - this.acceptedAt.get(key)!); this.acceptedAt.delete(key); }
+      if (this.measurements.enabled) {
+        this.measurements.add('batchBuildCommitMs', performance.now() - txn.started);
+        for (const c of txn.cells) { const key = chunkKey(c); this.measurements.add('editLatencyMs', performance.now() - this.acceptedAt.get(key)!); this.acceptedAt.delete(key); }
+      }
       this.transaction = null;
       if (removed.length) this.onExcavated(removed.map(cell => resources.get(chunkKey(cell))!));
     }
-    this.measurements.add('terrainMainMs', performance.now() - start);
+    if (this.measurements.enabled) this.measurements.add('terrainMainMs', performance.now() - start);
   }
   cell(c: Coord): number | null {
     if (!c.every(Number.isInteger)) return null;

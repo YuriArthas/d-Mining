@@ -134,7 +134,7 @@ test('any ore locks, rock too: the sale leaves it in the bag and says so, unlock
   const restored=GameSession.fromData(s.exportProgress(),content);
   assert.deepEqual(restored.getSnapshot().inventory.locked,[copper.itemId,rock.itemId]);
   assert.equal(restored.unlockItem(copper.itemId).status,'unlocked');
-  assert.deepEqual(restored.getSnapshot().sale,{status:'quoted',count:3,coins:3*copper.price});
+  assert.deepEqual(restored.getSnapshot().sale,{status:'quoted',count:3,payouts:[{currency:'gold',coins:3*copper.price}]});
   restored.updatePosition([sale.x,sale.y,sale.z],true);
   assert.deepEqual(restored.getSnapshot().inventory.items,{[rock.itemId]:4});assert.equal(restored.getSnapshot().coins,3*copper.price);
   // A lock on a kind the bag does not hold yet holds too.

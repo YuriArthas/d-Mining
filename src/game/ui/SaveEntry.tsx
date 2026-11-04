@@ -39,6 +39,7 @@ export function SaveEntry({
         (text) => {
           if (!abort.signal.aborted) setMessage(text);
         },
+        target.transient,
       );
     });
     void task
@@ -82,7 +83,7 @@ export function SaveEntry({
   return (
     <main className="game-shell" onContextMenu={(e) => e.preventDefault()}>
       <section className="save-boot" role={error ? "alert" : "status"}>
-        <span className="save-boot-mark ui-outline">MINING</span>
+        <span className="save-boot-mark ui-outline">{tr("boot.game_name")}</span>
         <h2 className="ui-outline">{error ? tr("msg.couldn_t_read_your_progress_right_now") : message}</h2>
         {error && <p className="save-boot-error">{error}</p>}
         <div className="save-boot-actions">

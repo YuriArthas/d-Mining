@@ -75,12 +75,12 @@ test('base rock occupies many units; quantities, prices and saves still count wh
  assert.equal(rock.volume,1);assert.equal(deep.volume,12);
  assert.ok(ORE_ITEMS.filter(r=>r.base).every(r=>r.volume>=1));assert.ok(ORE_ITEMS.filter(r=>!r.base).every(r=>r.volume===1));
  s.collected([{kind:64},{kind:65}]);assert.equal(s.getSnapshot().inventory.used,13);assert.equal(s.getSnapshot().inventory.totalCount,2);
- assert.equal(s.getSnapshot().sale.coins,rock.price+deep.price);
+ assert.equal(s.getSnapshot().sale.payouts.find(p=>p.currency==='gold')?.coins,rock.price+deep.price);
  const saved=s.exportProgress(),r=GameSession.fromData(saved,SESSION_CONTENT);assert.equal(r.getSnapshot().inventory.used,13);
  r.collected([{kind:65}]);assert.equal(r.getSnapshot().inventory.isFull,true);
  const quote=r.getSnapshot().sale;r.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);
- assert.equal(r.getSnapshot().coins,SESSION_CONTENT.initialCoins+quote.coins);assert.equal(r.getSnapshot().inventory.used,0);
- r.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);assert.equal(r.getSnapshot().coins,SESSION_CONTENT.initialCoins+quote.coins);
+ assert.equal(r.getSnapshot().coins,SESSION_CONTENT.initialCoins+quote.payouts.find(p=>p.currency==='gold')?.coins);assert.equal(r.getSnapshot().inventory.used,0);
+ r.updatePosition([SELL_ZONE.x,SELL_ZONE.y,SELL_ZONE.z],true);assert.equal(r.getSnapshot().coins,SESSION_CONTENT.initialCoins+quote.payouts.find(p=>p.currency==='gold')?.coins);
  // Old save quantities survive the new volume even if the bag is now over capacity.
  saved.inventory.items[rock.itemId]=30;
  const legacy=GameSession.fromData(saved,SESSION_CONTENT);assert.equal(legacy.getSnapshot().inventory.totalCount,31);assert.equal(legacy.getSnapshot().inventory.used,42);

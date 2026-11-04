@@ -10,7 +10,7 @@ const describe = (entry, base) => {
   const bytes = readFileSync(join(base, entry.file));
   return { ...entry, bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex') };
 };
-inventory.revision = 'r3';
+inventory.revision = 'r4';
 inventory.status = 'Current runtime snapshot; authorization document collection excluded by user request';
 inventory.runtimeAssetFiles = inventory.runtimeAssetFiles.map(entry => describe(entry, root));
 inventory.authoringFiles = inventory.authoringFiles.map(entry => describe(entry, join(root, 'delivery-content')));

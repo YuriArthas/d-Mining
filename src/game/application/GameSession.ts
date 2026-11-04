@@ -24,10 +24,10 @@ import { Inventory } from "../logic/Inventory.ts";
 import { Wallet } from "../logic/Wallet.ts";
 import { ZoneDetector } from "../logic/ZoneDetector.ts";
 import { Mining } from "./Mining.ts";
-import { quoteSale, sellItems } from "./Sale.ts";
+import { quoteCurrencySale, sellCurrencyItems, type SalePayout } from "./Sale.ts";
 import { Pickaxe, pickaxeStats } from "../logic/Pickaxe.ts";
 import { MiningCombat } from "./MiningCombat.ts";
-import { oreDrops, oreDefinition, itemDefinition, itemVolume, itemPrice, ORE_ITEMS } from "./items.ts";
+import { oreDrops, oreDefinition, itemDefinition, itemVolume, itemPrice, itemCurrency, ORE_ITEMS } from "./items.ts";
 import type { Coord } from "../terrain/SparseWorld.ts";
 import { tr, resolveText } from '../i18n/i18n.ts';
 import { message, type TextRef } from '../i18n/messages.ts';
@@ -44,7 +44,7 @@ type WorldCommands = {
 };
 const knownItem = (itemId: string) => ORE_ITEMS.some(item => item.itemId === itemId);
 export type SessionFeedback =
-  | Readonly<{ type: 'sold'; coins: number; count: number }>
+  | Readonly<{ type: 'sold'; payouts: readonly SalePayout[]; count: number }>
   | Readonly<{ type: 'purchased' }>
   | Readonly<{ type: 'reward' }>
   | Readonly<{ type: 'hatched'; tier: number; auto: boolean }>
@@ -119,13 +119,11 @@ export class GameSession {
     const r=this.rewards.getSnapshot();
     this.rewardEffects={mining:r.permanent.mining,autoHatch:r.permanent.autoHatch,speed:r.timed.speed>0,luck:r.timed.luck>0,sell:r.timed.sell>0};
   }
-  /** Everything ore sells for right now is multiplied by: the equipped pets' bonus in this world's currency, the
+  /** Everything ore sells for right now is multiplied by: the equipped pets' bonus in the ore's currency, the
    *  rebirths, and the capsule's double-sale boost while it runs. */
-  private saleMultiplier() {
-    return (1+this.petService.getBonus()[this.currency]/100)*rebirthMultiplier(this.rebirthRecord.count)*(this.rewardEffects.sell?REWARD_CONFIG.sellMultiplier:1);
+  private saleMultiplier(currency: CurrencyId = this.currency) {
+    return (1+this.petService.getBonus()[currency]/100)*rebirthMultiplier(this.rebirthRecord.count)*(this.rewardEffects.sell?REWARD_CONFIG.sellMultiplier:1);
   }
-  /** The current world's slot of the wallet, where sales are paid. */
-  private till() { const c=this.currency; return { canCredit:(n:number)=>this.wallet.canCredit(c,n), credit:(n:number)=>this.wallet.credit(c,n) }; }
   private readonly rebirthRecord: RebirthRecord;
   /** World 3's last layer, which (with the last pickaxe) completes the journey. */
   private readonly finalLayer = (() => { const r=ECONOMY.rebirth; return this.content.destinations.filter(d=>d.worldId===r.world)[r.layer-1]?.id ?? null; });
@@ -420,7 +418,7 @@ export class GameSession {
       balances: this.wallet.getBalances(),
       saleMultiplier: this.saleMultiplier(),
       /** What the bag sells for: every kind but the locked ones. */
-      sale: quoteSale(this.inventory.sellable(), itemPrice, this.saleMultiplier()),
+      sale: quoteCurrencySale(this.inventory.sellable(), itemPrice, itemCurrency, c => this.saleMultiplier(c)),
       inSellZone: this.inSellZone,
       atHome: this.atHome,
       /** Standing on the current world's teleport station pad. */
@@ -1035,9 +1033,9 @@ export class GameSession {
   /** Sells the whole bag (ticket minerals wait in the material store, never in the bag), stepping into the sell ring
    *  or with 全部出售 standing in it: the same save, coins flying into the counter and notice either way. */
   private executeSale() {
-    const result=sellItems(this.inventory,this.till(),itemPrice,this.inventory.sellable(),this.saleMultiplier());
-    if(result.status==='sold'){this.onboarding.record('soldOnce');this.committed(true);this.feedback({ type: 'sold', coins: result.coins, count: result.count });}
-    this.notice=result.status==='sold'?message("msg.sold_count_items_for_coins_currency", { count: result.count, coins: result.coins, currency: currencyText(this.currency) })
+    const result=sellCurrencyItems(this.inventory,this.wallet,itemPrice,itemCurrency,this.inventory.sellable(),c => this.saleMultiplier(c));
+    if(result.status==='sold'){this.onboarding.record('soldOnce');this.committed(true);this.feedback({ type: 'sold', payouts: result.payouts, count: result.count });}
+    this.notice=result.status==='sold'?message("msg.sold_count_items_for_payouts", { count: result.count, payouts: result.payouts.map(p => message("msg.sale_payout", { coins: p.coins, currency: currencyText(p.currency) })).reduce((left, right) => message("msg.sale_payout_join", { left, right })) })
       :result.status==='empty'?(this.inventory.getSnapshot().totalCount?message("msg.locked_ore_is_never_sold"):message("msg.nothing_to_sell")):message("msg.amount_out_of_range");
     return result;
   }

@@ -18,6 +18,7 @@ import {
 import { startGame, type PreparedGame } from "../runtime/startGame.ts";
 import { updateGame } from "../runtime/updateGame.ts";
 import { attachGameDebug } from "../runtime/debugGame.ts";
+import { debugOptions } from '../runtime/debugOptions.ts';
 import { RenderSchedule, type RenderRate } from "../movement.ts";
 import { RenderSubmission } from "../presentation/RenderSubmission.ts";
 import { RenderProfiler } from "../presentation/RenderProfiler.ts";
@@ -61,8 +62,8 @@ export function ValidationScene({
   onPerformance: (value: PerformanceSnapshot) => void;
   session: GameSession;
 }) {
-  const params = new URLSearchParams(location.search);
-  const debug = params.get("debug") === "1";
+  const diagnostics = debugOptions();
+  const debug = diagnostics.enabled;
   const root = useRef<Group>(null),
     avatar = useRef<Group>(null);
   const runtime = useRef<PreparedGame | null>(null);
@@ -105,7 +106,7 @@ export function ValidationScene({
       input,
       session,
       restoredWorld: savedGame.world,
-      previewLayer: params.get("debug") === "1" ? params.get("layer") : null,
+      previewLayer: diagnostics.previewLayer,
       signal: controller.signal,
       settings: () => ({
         bakedShadows: settings.current.sceneShadowsEnabled,
@@ -160,17 +161,13 @@ export function ValidationScene({
     if (!("fenceSync" in context)) throw new Error("需要 WebGL2 绘制同步支持");
     const gate = new RenderSubmission(
       context,
-      new URLSearchParams(location.search).get("framesInFlight") === "1"
-        ? 1
-        : 2,
-      new URLSearchParams(location.search).get("submission") === "fenced"
-        ? "fenced"
-        : "browser",
+      diagnostics.framesInFlight,
+      diagnostics.submission,
     );
     submission.current = gate;
     const profile = debug ? new RenderProfiler(
       gl,
-      params.get("gpuTiming") === "1",
+      diagnostics.gpuTiming,
     ) : null;
     profiler.current = profile;
     return () => {
@@ -233,7 +230,7 @@ export function ValidationScene({
       let cpuMs = 0, drawn = false;
       if (scheduled) {
         const before = submission.current?.submitted ?? 0,
-          start = performance.now();
+          start = debug ? performance.now() : 0;
         advance(now / 1000);
         if (
           !loadingReleased.current &&
@@ -244,7 +241,7 @@ export function ValidationScene({
           input.reset();
           onLoading({ ready: true });
         }
-        const end = performance.now();
+        const end = debug ? performance.now() : 0;
         cpuMs = end - start;
         drawn = (submission.current?.submitted ?? 0) > before;
         if (debug) runtime.current?.terrain.measurements.add("mainFrameMs", cpuMs);

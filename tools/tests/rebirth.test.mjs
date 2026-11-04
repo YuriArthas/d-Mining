@@ -61,6 +61,6 @@ test('重生：三种货币、镐子（含强化）、背包、材料仓、世�
   const saved = s.exportProgress(); saved.inventory.items = { 'journey.coal': 4 };
   const back = GameSession.fromData(saved, content);
   const plain = session(d => { d.inventory.items = { 'journey.coal': 4 }; });
-  assert.equal(back.getSnapshot().sale.coins, Math.round(plain.getSnapshot().sale.coins * 1.5));
+  assert.equal(back.getSnapshot().sale.payouts.find(p=>p.currency==='gold')?.coins, Math.round(plain.getSnapshot().sale.payouts.find(p=>p.currency==='gold')?.coins * 1.5));
   assert.equal(back.getSnapshot().rebirth.count, 1);
 });

@@ -8,11 +8,11 @@ export function LoadingScreen({state,onExit}:{state:LoadingState;onExit:()=>void
  const active=LOADING_STAGES.find(s=>!state.steps[s].complete);
  const percent=Math.floor(state.progress*100);
  return <section className="loading-screen" aria-label={tr("msg.loading_mining")} data-phase={state.error?'error':state.ready?'ready':active??'entering'}>
-  <div className="loading-topline"><span>MINING <b>·</b> {tr("msg.mine")}</span><button type="button" onClick={onExit}>{tr("msg.exit_game")} <span aria-hidden="true">↗</span></button></div>
+  <div className="loading-topline"><span>{tr("boot.game_name")} <b>·</b> {tr("msg.mine")}</span><button type="button" onClick={onExit}>{tr("msg.exit_game")} <span aria-hidden="true">↗</span></button></div>
   <div className="loading-content">
    <img className="loading-emblem" src={loadingEmblem} alt=""/>
    <div className="loading-eyebrow">{tr("msg.dig_down_haul_it_home")}</div>
-   <h1>MINING</h1>
+   <h1>{tr("boot.game_name")}</h1>
    <div className="loading-status" role="status" aria-live="polite">
     <h2>{state.error?tr("msg.could_not_enter_the_mine"):state.ready?tr("msg.ready_let_s_go"):active?descriptions[active]:tr("msg.the_mine_is_ready_here_we_go")}</h2>
     {state.error&&<p className="loading-error">{tr("msg.something_went_wrong_while_loading_please_try_again")}</p>}
