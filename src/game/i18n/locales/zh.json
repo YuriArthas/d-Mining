@@ -2,7 +2,7 @@
   "id": "zh",
   "label": "简体中文",
   "locale": "zh-CN",
-  "order": 1,
+  "order": 0,
   "numberUnits": [
     [
       1000000000000.0,

@@ -23,6 +23,11 @@ function boot(search = '', saved = null) {
   documentListeners.DOMContentLoaded();
   return { document: context.document, window, nodes, listeners, intervals, replacements, console, originalWarn, originalError, tick: ms => { now += ms; for (const fn of intervals.values()) fn(); } };
 }
+test('loading UI defaults to Chinese when no language is requested or saved', () => {
+  const b = boot();
+  assert.equal(b.document.documentElement.lang, 'zh-CN');
+  assert.equal(b.nodes['boot-status'].textContent, '正在进入矿场…');
+});
 test('loading UI uses the selected language, offers retry after delay and stops its timer when ready', () => {
   const b = boot('?lang=id', 'vi');
   assert.equal(b.document.documentElement.lang, 'id');

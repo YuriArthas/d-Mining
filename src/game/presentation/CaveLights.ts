@@ -5,8 +5,10 @@ type Room = Readonly<{ id: string; x: number; z: number; depth: number }>;
 const POOL = 6;
 
 /** Underground light: a fixed pool of point lights moved to the current layer's hall sources (glowing
- *  mushrooms, stall lanterns), and a warm helmet lamp so freshly dug tunnels never go black. The number of
- *  lights never changes (no shader recompiles when changing layers); unused ones sit at zero. No shadows. */
+ *  mushrooms, stall lanterns), and a warm helmet lamp so freshly dug tunnels never go black. Unused pool
+ *  slots stay at zero intensity so the underground program keeps a stable point-light count (no recompile
+ *  when changing halls). The whole group is hidden on the surface so valley materials draw with zero point
+ *  lights. No shadows. */
 export class CaveLights {
   readonly group = new Group();
   private readonly pool: PointLight[] = [];
@@ -17,8 +19,17 @@ export class CaveLights {
   constructor(rooms: readonly Room[]) {
     this.rooms = rooms;
     this.group.name = 'cave-lights';
-    for (let i = 0; i < POOL; i++) { const light = new PointLight('#ffffff', 0, 10, 2); light.castShadow = false; this.pool.push(light); this.group.add(light); }
-    this.helmet.castShadow = false; this.group.add(this.helmet);
+    this.group.visible = false;
+    for (let i = 0; i < POOL; i++) {
+      const light = new PointLight('#ffffff', 0, 10, 2);
+      light.castShadow = false;
+      light.userData.caveLight = true;
+      this.pool.push(light);
+      this.group.add(light);
+    }
+    this.helmet.castShadow = false;
+    this.helmet.userData.caveLight = true;
+    this.group.add(this.helmet);
   }
 
   /** Call every frame with the drawn feet, the layer at them and how much surface daylight reaches them (0-1). */
@@ -26,6 +37,7 @@ export class CaveLights {
     const underground = 1 - Math.max(0, Math.min(1, surfaceLight));
     this.helmet.position.set(feet[0], feet[1] + 2.3, feet[2]);
     this.helmet.intensity = 4.5 * underground;
+    this.group.visible = underground > 0;
     const hallId = HALL_BY_LAYER[layerId] ?? null;
     if (hallId === this.hall) return;
     this.hall = hallId;
@@ -39,7 +51,7 @@ export class CaveLights {
     });
   }
 
-  diagnostics() { return { hall: this.hall, lights: this.pool.filter(l => l.intensity > 0).length, helmet: this.helmet.intensity }; }
+  diagnostics() { return { hall: this.hall, lights: this.pool.filter(l => l.intensity > 0).length, helmet: this.helmet.intensity, active: this.group.visible }; }
 
   dispose() { for (const light of [...this.pool, this.helmet]) light.dispose(); this.group.removeFromParent(); }
 }

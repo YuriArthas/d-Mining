@@ -100,7 +100,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "worlds[1].ticket.price",
-      "currentValue": 6300000,
+      "currentValue": 86000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -232,7 +232,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "worlds[2].ticket.price",
-      "currentValue": 39000000,
+      "currentValue": 610000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -418,7 +418,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[0].oreChance",
-      "currentValue": 0.18,
+      "currentValue": 0.045,
       "unit": "fraction",
       "constraint": "0 < value < 1",
       "consumers": [
@@ -431,7 +431,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[0].capsuleCoins",
-      "currentValue": 100,
+      "currentValue": 70,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -469,6 +469,19 @@
     },
     {
       "file": "src/game/content/economy.json",
+      "parameter": "layers[0].rock.volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
       "parameter": "layers[0].deep.hp",
       "currentValue": 230,
       "unit": "HP (power: HP/hit)",
@@ -495,6 +508,19 @@
     },
     {
       "file": "src/game/content/economy.json",
+      "parameter": "layers[0].deep.volume",
+      "currentValue": 12,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
       "parameter": "layers[0].ores[0].hp",
       "currentValue": 40,
       "unit": "HP (power: HP/hit)",
@@ -512,6 +538,19 @@
       "currentValue": 3,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[0].ores[0].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -551,6 +590,19 @@
       "currentValue": 6,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[0].ores[1].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -639,7 +691,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[1].oreChance",
-      "currentValue": 0.197,
+      "currentValue": 0.049,
       "unit": "fraction",
       "constraint": "0 < value < 1",
       "consumers": [
@@ -652,7 +704,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[1].capsuleCoins",
-      "currentValue": 320,
+      "currentValue": 200,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -678,9 +730,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[1].rock.price",
-      "currentValue": 2,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[1].rock.volume",
+      "currentValue": 4,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -716,6 +781,19 @@
     },
     {
       "file": "src/game/content/economy.json",
+      "parameter": "layers[1].deep.volume",
+      "currentValue": 22,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
       "parameter": "layers[1].ores[0].hp",
       "currentValue": 150,
       "unit": "HP (power: HP/hit)",
@@ -730,9 +808,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[1].ores[0].price",
-      "currentValue": 6,
+      "currentValue": 9,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[1].ores[0].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -769,9 +860,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[1].ores[1].price",
-      "currentValue": 12,
+      "currentValue": 18,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[1].ores[1].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -860,7 +964,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[2].oreChance",
-      "currentValue": 0.213,
+      "currentValue": 0.0535,
       "unit": "fraction",
       "constraint": "0 < value < 1",
       "consumers": [
@@ -873,7 +977,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[2].capsuleCoins",
-      "currentValue": 1000,
+      "currentValue": 790,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -899,9 +1003,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[2].rock.price",
-      "currentValue": 3,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[2].rock.volume",
+      "currentValue": 6,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -937,6 +1054,19 @@
     },
     {
       "file": "src/game/content/economy.json",
+      "parameter": "layers[2].deep.volume",
+      "currentValue": 65,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
       "parameter": "layers[2].ores[0].hp",
       "currentValue": 240,
       "unit": "HP (power: HP/hit)",
@@ -951,9 +1081,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[2].ores[0].price",
-      "currentValue": 9,
+      "currentValue": 27,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[2].ores[0].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -990,9 +1133,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[2].ores[1].price",
-      "currentValue": 18,
+      "currentValue": 54,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[2].ores[1].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -1081,7 +1237,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[3].oreChance",
-      "currentValue": 0.23,
+      "currentValue": 0.0575,
       "unit": "fraction",
       "constraint": "0 < value < 1",
       "consumers": [
@@ -1094,7 +1250,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[3].capsuleCoins",
-      "currentValue": 4800,
+      "currentValue": 6200,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -1120,9 +1276,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[3].rock.price",
-      "currentValue": 5,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[3].rock.volume",
+      "currentValue": 13,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -1158,6 +1327,19 @@
     },
     {
       "file": "src/game/content/economy.json",
+      "parameter": "layers[3].deep.volume",
+      "currentValue": 120,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
       "parameter": "layers[3].ores[0].hp",
       "currentValue": 520,
       "unit": "HP (power: HP/hit)",
@@ -1172,9 +1354,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[3].ores[0].price",
-      "currentValue": 15,
+      "currentValue": 95,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[3].ores[0].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -1211,9 +1406,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[3].ores[1].price",
-      "currentValue": 30,
+      "currentValue": 190,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[3].ores[1].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -1302,7 +1510,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[4].oreChance",
-      "currentValue": 0.247,
+      "currentValue": 0.0615,
       "unit": "fraction",
       "constraint": "0 < value < 1",
       "consumers": [
@@ -1315,7 +1523,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[4].capsuleCoins",
-      "currentValue": 25000,
+      "currentValue": 79000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -1341,9 +1549,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[4].rock.price",
-      "currentValue": 8,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[4].rock.volume",
+      "currentValue": 19,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -1367,9 +1588,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[4].deep.price",
-      "currentValue": 2,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[4].deep.volume",
+      "currentValue": 370,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -1393,9 +1627,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[4].ores[0].price",
-      "currentValue": 24,
+      "currentValue": 380,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[4].ores[0].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -1432,9 +1679,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[4].ores[1].price",
-      "currentValue": 48,
+      "currentValue": 760,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[4].ores[1].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -1523,7 +1783,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[5].oreChance",
-      "currentValue": 0.263,
+      "currentValue": 0.066,
       "unit": "fraction",
       "constraint": "0 < value < 1",
       "consumers": [
@@ -1536,7 +1796,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[5].capsuleCoins",
-      "currentValue": 120000,
+      "currentValue": 1200000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -1562,9 +1822,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[5].rock.price",
-      "currentValue": 12,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[5].rock.volume",
+      "currentValue": 43,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -1588,9 +1861,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[5].deep.price",
-      "currentValue": 3,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[5].deep.volume",
+      "currentValue": 650,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -1614,9 +1900,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[5].ores[0].price",
-      "currentValue": 36,
+      "currentValue": 1700,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[5].ores[0].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -1653,9 +1952,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[5].ores[1].price",
-      "currentValue": 72,
+      "currentValue": 3400,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[5].ores[1].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -1731,7 +2043,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[6].oreChance",
-      "currentValue": 0.28,
+      "currentValue": 0.07,
       "unit": "fraction",
       "constraint": "0 < value < 1",
       "consumers": [
@@ -1744,7 +2056,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[6].capsuleCoins",
-      "currentValue": 570000,
+      "currentValue": 16000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -1770,9 +2082,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[6].rock.price",
-      "currentValue": 20,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[6].rock.volume",
+      "currentValue": 65,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -1796,9 +2121,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[6].deep.price",
-      "currentValue": 5,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[6].deep.volume",
+      "currentValue": 330,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -1822,9 +2160,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[6].ores[0].price",
-      "currentValue": 60,
+      "currentValue": 8500,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[6].ores[0].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -1861,9 +2212,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[6].ores[1].price",
-      "currentValue": 120,
+      "currentValue": 17000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[6].ores[1].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -1952,7 +2316,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[7].oreChance",
-      "currentValue": 0.18,
+      "currentValue": 0.045,
       "unit": "fraction",
       "constraint": "0 < value < 1",
       "consumers": [
@@ -1965,7 +2329,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[7].capsuleCoins",
-      "currentValue": 140,
+      "currentValue": 110,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -2003,6 +2367,19 @@
     },
     {
       "file": "src/game/content/economy.json",
+      "parameter": "layers[7].rock.volume",
+      "currentValue": 95,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
       "parameter": "layers[7].deep.hp",
       "currentValue": 29000,
       "unit": "HP (power: HP/hit)",
@@ -2029,6 +2406,19 @@
     },
     {
       "file": "src/game/content/economy.json",
+      "parameter": "layers[7].deep.volume",
+      "currentValue": 1500,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
       "parameter": "layers[7].ores[0].hp",
       "currentValue": 3800,
       "unit": "HP (power: HP/hit)",
@@ -2046,6 +2436,19 @@
       "currentValue": 3,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[7].ores[0].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -2085,6 +2488,19 @@
       "currentValue": 6,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[7].ores[1].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -2173,7 +2589,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[8].oreChance",
-      "currentValue": 0.197,
+      "currentValue": 0.049,
       "unit": "fraction",
       "constraint": "0 < value < 1",
       "consumers": [
@@ -2186,7 +2602,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[8].capsuleCoins",
-      "currentValue": 820,
+      "currentValue": 440,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -2212,9 +2628,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[8].rock.price",
-      "currentValue": 2,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[8].rock.volume",
+      "currentValue": 150,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -2250,6 +2679,19 @@
     },
     {
       "file": "src/game/content/economy.json",
+      "parameter": "layers[8].deep.volume",
+      "currentValue": 2200,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
       "parameter": "layers[8].ores[0].hp",
       "currentValue": 5800,
       "unit": "HP (power: HP/hit)",
@@ -2264,9 +2706,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[8].ores[0].price",
-      "currentValue": 6,
+      "currentValue": 9,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[8].ores[0].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -2303,9 +2758,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[8].ores[1].price",
-      "currentValue": 12,
+      "currentValue": 18,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[8].ores[1].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -2394,7 +2862,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[9].oreChance",
-      "currentValue": 0.213,
+      "currentValue": 0.0535,
       "unit": "fraction",
       "constraint": "0 < value < 1",
       "consumers": [
@@ -2407,7 +2875,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[9].capsuleCoins",
-      "currentValue": 2500,
+      "currentValue": 1900,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -2433,9 +2901,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[9].rock.price",
-      "currentValue": 3,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[9].rock.volume",
+      "currentValue": 220,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -2471,6 +2952,19 @@
     },
     {
       "file": "src/game/content/economy.json",
+      "parameter": "layers[9].deep.volume",
+      "currentValue": 3300,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
       "parameter": "layers[9].ores[0].hp",
       "currentValue": 8600,
       "unit": "HP (power: HP/hit)",
@@ -2485,9 +2979,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[9].ores[0].price",
-      "currentValue": 9,
+      "currentValue": 32,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[9].ores[0].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -2524,9 +3031,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[9].ores[1].price",
-      "currentValue": 18,
+      "currentValue": 64,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[9].ores[1].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -2615,7 +3135,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[10].oreChance",
-      "currentValue": 0.23,
+      "currentValue": 0.0575,
       "unit": "fraction",
       "constraint": "0 < value < 1",
       "consumers": [
@@ -2628,7 +3148,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[10].capsuleCoins",
-      "currentValue": 9200,
+      "currentValue": 14000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -2654,9 +3174,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[10].rock.price",
-      "currentValue": 5,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[10].rock.volume",
+      "currentValue": 330,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -2692,6 +3225,19 @@
     },
     {
       "file": "src/game/content/economy.json",
+      "parameter": "layers[10].deep.volume",
+      "currentValue": 4800,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
       "parameter": "layers[10].ores[0].hp",
       "currentValue": 13000,
       "unit": "HP (power: HP/hit)",
@@ -2706,9 +3252,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[10].ores[0].price",
-      "currentValue": 15,
+      "currentValue": 130,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[10].ores[0].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -2745,9 +3304,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[10].ores[1].price",
-      "currentValue": 30,
+      "currentValue": 260,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[10].ores[1].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -2836,7 +3408,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[11].oreChance",
-      "currentValue": 0.247,
+      "currentValue": 0.0615,
       "unit": "fraction",
       "constraint": "0 < value < 1",
       "consumers": [
@@ -2849,7 +3421,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[11].capsuleCoins",
-      "currentValue": 36000,
+      "currentValue": 150000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -2875,9 +3447,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[11].rock.price",
-      "currentValue": 8,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[11].rock.volume",
+      "currentValue": 480,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -2901,9 +3486,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[11].deep.price",
-      "currentValue": 2,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[11].deep.volume",
+      "currentValue": 11000,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -2927,9 +3525,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[11].ores[0].price",
-      "currentValue": 24,
+      "currentValue": 590,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[11].ores[0].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -2966,9 +3577,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[11].ores[1].price",
-      "currentValue": 48,
+      "currentValue": 1200,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[11].ores[1].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -3057,7 +3681,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[12].oreChance",
-      "currentValue": 0.263,
+      "currentValue": 0.066,
       "unit": "fraction",
       "constraint": "0 < value < 1",
       "consumers": [
@@ -3070,7 +3694,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[12].capsuleCoins",
-      "currentValue": 140000,
+      "currentValue": 2100000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -3096,9 +3720,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[12].rock.price",
-      "currentValue": 12,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[12].rock.volume",
+      "currentValue": 1100,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -3122,9 +3759,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[12].deep.price",
-      "currentValue": 3,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[12].deep.volume",
+      "currentValue": 25000,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -3148,9 +3798,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[12].ores[0].price",
-      "currentValue": 36,
+      "currentValue": 3000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[12].ores[0].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -3187,9 +3850,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[12].ores[1].price",
-      "currentValue": 72,
+      "currentValue": 6000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[12].ores[1].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -3265,7 +3941,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[13].oreChance",
-      "currentValue": 0.28,
+      "currentValue": 0.07,
       "unit": "fraction",
       "constraint": "0 < value < 1",
       "consumers": [
@@ -3278,7 +3954,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[13].capsuleCoins",
-      "currentValue": 520000,
+      "currentValue": 29000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -3304,9 +3980,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[13].rock.price",
-      "currentValue": 20,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[13].rock.volume",
+      "currentValue": 2500,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -3330,9 +4019,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[13].deep.price",
-      "currentValue": 5,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[13].deep.volume",
+      "currentValue": 13000,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -3356,9 +4058,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[13].ores[0].price",
-      "currentValue": 60,
+      "currentValue": 18000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[13].ores[0].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -3395,9 +4110,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[13].ores[1].price",
-      "currentValue": 120,
+      "currentValue": 36000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[13].ores[1].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -3486,7 +4214,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[14].oreChance",
-      "currentValue": 0.18,
+      "currentValue": 0.045,
       "unit": "fraction",
       "constraint": "0 < value < 1",
       "consumers": [
@@ -3499,7 +4227,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[14].capsuleCoins",
-      "currentValue": 140,
+      "currentValue": 100,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -3537,6 +4265,19 @@
     },
     {
       "file": "src/game/content/economy.json",
+      "parameter": "layers[14].rock.volume",
+      "currentValue": 5500,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
       "parameter": "layers[14].deep.hp",
       "currentValue": 1700000,
       "unit": "HP (power: HP/hit)",
@@ -3563,6 +4304,19 @@
     },
     {
       "file": "src/game/content/economy.json",
+      "parameter": "layers[14].deep.volume",
+      "currentValue": 85000,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
       "parameter": "layers[14].ores[0].hp",
       "currentValue": 220000,
       "unit": "HP (power: HP/hit)",
@@ -3580,6 +4334,19 @@
       "currentValue": 3,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[14].ores[0].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -3619,6 +4386,19 @@
       "currentValue": 6,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[14].ores[1].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -3707,7 +4487,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[15].oreChance",
-      "currentValue": 0.197,
+      "currentValue": 0.049,
       "unit": "fraction",
       "constraint": "0 < value < 1",
       "consumers": [
@@ -3720,7 +4500,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[15].capsuleCoins",
-      "currentValue": 740,
+      "currentValue": 460,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -3746,9 +4526,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[15].rock.price",
-      "currentValue": 2,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[15].rock.volume",
+      "currentValue": 8500,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -3784,6 +4577,19 @@
     },
     {
       "file": "src/game/content/economy.json",
+      "parameter": "layers[15].deep.volume",
+      "currentValue": 130000,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
       "parameter": "layers[15].ores[0].hp",
       "currentValue": 340000,
       "unit": "HP (power: HP/hit)",
@@ -3798,9 +4604,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[15].ores[0].price",
-      "currentValue": 6,
+      "currentValue": 11,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[15].ores[0].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -3837,9 +4656,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[15].ores[1].price",
-      "currentValue": 12,
+      "currentValue": 22,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[15].ores[1].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -3928,7 +4760,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[16].oreChance",
-      "currentValue": 0.213,
+      "currentValue": 0.0535,
       "unit": "fraction",
       "constraint": "0 < value < 1",
       "consumers": [
@@ -3967,9 +4799,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[16].rock.price",
-      "currentValue": 3,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[16].rock.volume",
+      "currentValue": 13000,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -4005,6 +4850,19 @@
     },
     {
       "file": "src/game/content/economy.json",
+      "parameter": "layers[16].deep.volume",
+      "currentValue": 190000,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
       "parameter": "layers[16].ores[0].hp",
       "currentValue": 500000,
       "unit": "HP (power: HP/hit)",
@@ -4019,9 +4877,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[16].ores[0].price",
-      "currentValue": 9,
+      "currentValue": 44,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[16].ores[0].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -4058,9 +4929,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[16].ores[1].price",
-      "currentValue": 18,
+      "currentValue": 88,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[16].ores[1].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -4149,7 +5033,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[17].oreChance",
-      "currentValue": 0.23,
+      "currentValue": 0.0575,
       "unit": "fraction",
       "constraint": "0 < value < 1",
       "consumers": [
@@ -4162,7 +5046,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[17].capsuleCoins",
-      "currentValue": 8500,
+      "currentValue": 20000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -4188,9 +5072,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[17].rock.price",
-      "currentValue": 5,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[17].rock.volume",
+      "currentValue": 19000,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -4226,6 +5123,19 @@
     },
     {
       "file": "src/game/content/economy.json",
+      "parameter": "layers[17].deep.volume",
+      "currentValue": 280000,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
       "parameter": "layers[17].ores[0].hp",
       "currentValue": 760000,
       "unit": "HP (power: HP/hit)",
@@ -4240,9 +5150,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[17].ores[0].price",
-      "currentValue": 15,
+      "currentValue": 200,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[17].ores[0].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -4279,9 +5202,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[17].ores[1].price",
-      "currentValue": 30,
+      "currentValue": 400,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[17].ores[1].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -4370,7 +5306,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[18].oreChance",
-      "currentValue": 0.247,
+      "currentValue": 0.0615,
       "unit": "fraction",
       "constraint": "0 < value < 1",
       "consumers": [
@@ -4383,7 +5319,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[18].capsuleCoins",
-      "currentValue": 36000,
+      "currentValue": 270000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -4409,9 +5345,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[18].rock.price",
-      "currentValue": 8,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[18].rock.volume",
+      "currentValue": 28000,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -4435,9 +5384,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[18].deep.price",
-      "currentValue": 2,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[18].deep.volume",
+      "currentValue": 650000,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -4461,9 +5423,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[18].ores[0].price",
-      "currentValue": 24,
+      "currentValue": 1000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[18].ores[0].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -4500,9 +5475,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[18].ores[1].price",
-      "currentValue": 48,
+      "currentValue": 2000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[18].ores[1].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -4591,7 +5579,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[19].oreChance",
-      "currentValue": 0.263,
+      "currentValue": 0.066,
       "unit": "fraction",
       "constraint": "0 < value < 1",
       "consumers": [
@@ -4604,7 +5592,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[19].capsuleCoins",
-      "currentValue": 130000,
+      "currentValue": 3900000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -4630,9 +5618,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[19].rock.price",
-      "currentValue": 12,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[19].rock.volume",
+      "currentValue": 65000,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -4656,9 +5657,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[19].deep.price",
-      "currentValue": 3,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[19].deep.volume",
+      "currentValue": 1500000,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -4682,9 +5696,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[19].ores[0].price",
-      "currentValue": 36,
+      "currentValue": 6000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[19].ores[0].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -4721,9 +5748,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[19].ores[1].price",
-      "currentValue": 72,
+      "currentValue": 12000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[19].ores[1].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -4799,7 +5839,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[20].oreChance",
-      "currentValue": 0.28,
+      "currentValue": 0.07,
       "unit": "fraction",
       "constraint": "0 < value < 1",
       "consumers": [
@@ -4812,7 +5852,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[20].capsuleCoins",
-      "currentValue": 520000,
+      "currentValue": 71000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -4838,9 +5878,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[20].rock.price",
-      "currentValue": 20,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[20].rock.volume",
+      "currentValue": 150000,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -4864,9 +5917,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[20].deep.price",
-      "currentValue": 5,
+      "currentValue": 1,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[20].deep.volume",
+      "currentValue": 750000,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -4890,9 +5956,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[20].ores[0].price",
-      "currentValue": 60,
+      "currentValue": 42000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[20].ores[0].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -4929,9 +6008,22 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "layers[20].ores[1].price",
-      "currentValue": 120,
+      "currentValue": 84000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
+      "consumers": [
+        "src/game/content/resources.ts",
+        "src/game/content/journeyWorlds.ts",
+        "src/game/terrain/strata.ts",
+        "src/game/application/GameSession.ts"
+      ]
+    },
+    {
+      "file": "src/game/content/economy.json",
+      "parameter": "layers[20].ores[1].volume",
+      "currentValue": 1,
+      "unit": "count / identifier",
+      "constraint": "finite safe integer; keep matching IDs and ordering",
       "consumers": [
         "src/game/content/resources.ts",
         "src/game/content/journeyWorlds.ts",
@@ -5015,7 +6107,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[0].enhance[0].price",
-      "currentValue": 36,
+      "currentValue": 24,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5039,7 +6131,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[0].enhance[1].price",
-      "currentValue": 54,
+      "currentValue": 36,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5063,7 +6155,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[0].enhance[2].price",
-      "currentValue": 72,
+      "currentValue": 48,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5111,7 +6203,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[1].price",
-      "currentValue": 120,
+      "currentValue": 80,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5147,7 +6239,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[1].enhance[0].price",
-      "currentValue": 140,
+      "currentValue": 170,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5171,7 +6263,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[1].enhance[1].price",
-      "currentValue": 200,
+      "currentValue": 260,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5195,7 +6287,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[1].enhance[2].price",
-      "currentValue": 270,
+      "currentValue": 350,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5243,7 +6335,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[2].price",
-      "currentValue": 450,
+      "currentValue": 580,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5279,7 +6371,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[2].enhance[0].price",
-      "currentValue": 390,
+      "currentValue": 570,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5303,7 +6395,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[2].enhance[1].price",
-      "currentValue": 590,
+      "currentValue": 860,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5327,7 +6419,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[2].enhance[2].price",
-      "currentValue": 780,
+      "currentValue": 1100,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5375,7 +6467,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[3].price",
-      "currentValue": 1300,
+      "currentValue": 1900,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5411,7 +6503,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[3].enhance[0].price",
-      "currentValue": 480,
+      "currentValue": 720,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5435,7 +6527,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[3].enhance[1].price",
-      "currentValue": 720,
+      "currentValue": 1100,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5459,7 +6551,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[3].enhance[2].price",
-      "currentValue": 960,
+      "currentValue": 1400,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5507,7 +6599,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[4].price",
-      "currentValue": 1600,
+      "currentValue": 2400,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5543,7 +6635,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[4].enhance[0].price",
-      "currentValue": 9300,
+      "currentValue": 6300,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5567,7 +6659,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[4].enhance[1].price",
-      "currentValue": 14000,
+      "currentValue": 9500,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5591,7 +6683,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[4].enhance[2].price",
-      "currentValue": 19000,
+      "currentValue": 13000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5639,7 +6731,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[5].price",
-      "currentValue": 31000,
+      "currentValue": 21000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5675,7 +6767,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[5].enhance[0].price",
-      "currentValue": 27000,
+      "currentValue": 130000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5699,7 +6791,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[5].enhance[1].price",
-      "currentValue": 41000,
+      "currentValue": 190000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5723,7 +6815,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[5].enhance[2].price",
-      "currentValue": 54000,
+      "currentValue": 260000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5771,7 +6863,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[6].price",
-      "currentValue": 90000,
+      "currentValue": 430000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5807,7 +6899,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[6].enhance[0].price",
-      "currentValue": 33000,
+      "currentValue": 160000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5831,7 +6923,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[6].enhance[1].price",
-      "currentValue": 50000,
+      "currentValue": 240000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5855,7 +6947,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[6].enhance[2].price",
-      "currentValue": 66000,
+      "currentValue": 320000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5903,7 +6995,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[7].price",
-      "currentValue": 110000,
+      "currentValue": 540000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5939,7 +7031,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[7].enhance[0].price",
-      "currentValue": 510000,
+      "currentValue": 1600000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5963,7 +7055,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[7].enhance[1].price",
-      "currentValue": 770000,
+      "currentValue": 2400000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -5987,7 +7079,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[7].enhance[2].price",
-      "currentValue": 1000000,
+      "currentValue": 3200000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6035,7 +7127,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[8].price",
-      "currentValue": 1700000,
+      "currentValue": 5400000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6071,7 +7163,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[8].enhance[0].price",
-      "currentValue": 4200000,
+      "currentValue": 42000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6095,7 +7187,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[8].enhance[1].price",
-      "currentValue": 6300000,
+      "currentValue": 63000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6119,7 +7211,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[8].enhance[2].price",
-      "currentValue": 8400000,
+      "currentValue": 84000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6167,7 +7259,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[9].price",
-      "currentValue": 14000000,
+      "currentValue": 140000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6203,7 +7295,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[9].enhance[0].price",
-      "currentValue": 6300000,
+      "currentValue": 63000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6227,7 +7319,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[9].enhance[1].price",
-      "currentValue": 9500000,
+      "currentValue": 95000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6251,7 +7343,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[9].enhance[2].price",
-      "currentValue": 13000000,
+      "currentValue": 130000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6335,7 +7427,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[10].enhance[0].price",
-      "currentValue": 810,
+      "currentValue": 720,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6359,7 +7451,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[10].enhance[1].price",
-      "currentValue": 1200,
+      "currentValue": 1100,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6383,7 +7475,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[10].enhance[2].price",
-      "currentValue": 1600,
+      "currentValue": 1400,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6431,7 +7523,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[11].price",
-      "currentValue": 2700,
+      "currentValue": 2400,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6467,7 +7559,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[11].enhance[0].price",
-      "currentValue": 19000,
+      "currentValue": 17000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6491,7 +7583,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[11].enhance[1].price",
-      "currentValue": 28000,
+      "currentValue": 26000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6515,7 +7607,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[11].enhance[2].price",
-      "currentValue": 38000,
+      "currentValue": 35000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6563,7 +7655,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[12].price",
-      "currentValue": 63000,
+      "currentValue": 58000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6599,7 +7691,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[12].enhance[0].price",
-      "currentValue": 170000,
+      "currentValue": 240000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6623,7 +7715,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[12].enhance[1].price",
-      "currentValue": 260000,
+      "currentValue": 360000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6647,7 +7739,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[12].enhance[2].price",
-      "currentValue": 350000,
+      "currentValue": 490000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6695,7 +7787,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[13].price",
-      "currentValue": 580000,
+      "currentValue": 810000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6731,7 +7823,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[13].enhance[0].price",
-      "currentValue": 720000,
+      "currentValue": 300000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6755,7 +7847,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[13].enhance[1].price",
-      "currentValue": 1100000,
+      "currentValue": 450000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6779,7 +7871,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[13].enhance[2].price",
-      "currentValue": 1400000,
+      "currentValue": 600000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6827,7 +7919,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[14].price",
-      "currentValue": 2400000,
+      "currentValue": 1000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6863,7 +7955,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[14].enhance[0].price",
-      "currentValue": 900000,
+      "currentValue": 390000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6887,7 +7979,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[14].enhance[1].price",
-      "currentValue": 1400000,
+      "currentValue": 590000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6911,7 +8003,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[14].enhance[2].price",
-      "currentValue": 1800000,
+      "currentValue": 780000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6959,7 +8051,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[15].price",
-      "currentValue": 3000000,
+      "currentValue": 1300000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -6995,7 +8087,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[15].enhance[0].price",
-      "currentValue": 3900000,
+      "currentValue": 33000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7019,7 +8111,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[15].enhance[1].price",
-      "currentValue": 5900000,
+      "currentValue": 50000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7043,7 +8135,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[15].enhance[2].price",
-      "currentValue": 7800000,
+      "currentValue": 66000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7091,7 +8183,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[16].price",
-      "currentValue": 13000000,
+      "currentValue": 110000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7127,7 +8219,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[16].enhance[0].price",
-      "currentValue": 5100000,
+      "currentValue": 42000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7151,7 +8243,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[16].enhance[1].price",
-      "currentValue": 7700000,
+      "currentValue": 63000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7175,7 +8267,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[16].enhance[2].price",
-      "currentValue": 10000000,
+      "currentValue": 84000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7223,7 +8315,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[17].price",
-      "currentValue": 17000000,
+      "currentValue": 140000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7259,7 +8351,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[17].enhance[0].price",
-      "currentValue": 15000000,
+      "currentValue": 170000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7283,7 +8375,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[17].enhance[1].price",
-      "currentValue": 22000000,
+      "currentValue": 260000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7307,7 +8399,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[17].enhance[2].price",
-      "currentValue": 29000000,
+      "currentValue": 350000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7355,7 +8447,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[18].price",
-      "currentValue": 49000000,
+      "currentValue": 580000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7391,7 +8483,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[18].enhance[0].price",
-      "currentValue": 18000000,
+      "currentValue": 220000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7415,7 +8507,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[18].enhance[1].price",
-      "currentValue": 27000000,
+      "currentValue": 330000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7439,7 +8531,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[18].enhance[2].price",
-      "currentValue": 37000000,
+      "currentValue": 440000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7487,7 +8579,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[19].price",
-      "currentValue": 61000000,
+      "currentValue": 730000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7523,7 +8615,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[19].enhance[0].price",
-      "currentValue": 27000000,
+      "currentValue": 330000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7547,7 +8639,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[19].enhance[1].price",
-      "currentValue": 41000000,
+      "currentValue": 490000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7571,7 +8663,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[19].enhance[2].price",
-      "currentValue": 55000000,
+      "currentValue": 660000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7619,7 +8711,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[20].price",
-      "currentValue": 1400,
+      "currentValue": 600,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7655,7 +8747,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[20].enhance[0].price",
-      "currentValue": 14000,
+      "currentValue": 6000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7679,7 +8771,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[20].enhance[1].price",
-      "currentValue": 20000,
+      "currentValue": 9000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7703,7 +8795,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[20].enhance[2].price",
-      "currentValue": 27000,
+      "currentValue": 12000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7751,7 +8843,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[21].price",
-      "currentValue": 45000,
+      "currentValue": 20000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7787,7 +8879,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[21].enhance[0].price",
-      "currentValue": 120000,
+      "currentValue": 99000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7811,7 +8903,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[21].enhance[1].price",
-      "currentValue": 180000,
+      "currentValue": 150000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7835,7 +8927,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[21].enhance[2].price",
-      "currentValue": 250000,
+      "currentValue": 200000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7883,7 +8975,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[22].price",
-      "currentValue": 410000,
+      "currentValue": 330000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7919,7 +9011,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[22].enhance[0].price",
-      "currentValue": 1000000,
+      "currentValue": 1900000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7943,7 +9035,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[22].enhance[1].price",
-      "currentValue": 1500000,
+      "currentValue": 2800000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -7967,7 +9059,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[22].enhance[2].price",
-      "currentValue": 2000000,
+      "currentValue": 3800000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8015,7 +9107,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[23].price",
-      "currentValue": 3400000,
+      "currentValue": 6300000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8051,7 +9143,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[23].enhance[0].price",
-      "currentValue": 2600000,
+      "currentValue": 15000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8075,7 +9167,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[23].enhance[1].price",
-      "currentValue": 3900000,
+      "currentValue": 23000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8099,7 +9191,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[23].enhance[2].price",
-      "currentValue": 5200000,
+      "currentValue": 30000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8147,7 +9239,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[24].price",
-      "currentValue": 8700000,
+      "currentValue": 50000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8183,7 +9275,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[24].enhance[0].price",
-      "currentValue": 3300000,
+      "currentValue": 19000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8207,7 +9299,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[24].enhance[1].price",
-      "currentValue": 5000000,
+      "currentValue": 28000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8231,7 +9323,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[24].enhance[2].price",
-      "currentValue": 6600000,
+      "currentValue": 38000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8279,7 +9371,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[25].price",
-      "currentValue": 11000000,
+      "currentValue": 63000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8315,7 +9407,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[25].enhance[0].price",
-      "currentValue": 11000000,
+      "currentValue": 240000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8339,7 +9431,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[25].enhance[1].price",
-      "currentValue": 17000000,
+      "currentValue": 360000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8363,7 +9455,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[25].enhance[2].price",
-      "currentValue": 23000000,
+      "currentValue": 490000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8411,7 +9503,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[26].price",
-      "currentValue": 38000000,
+      "currentValue": 810000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8447,7 +9539,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[26].enhance[0].price",
-      "currentValue": 14000000,
+      "currentValue": 300000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8471,7 +9563,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[26].enhance[1].price",
-      "currentValue": 22000000,
+      "currentValue": 450000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8495,7 +9587,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[26].enhance[2].price",
-      "currentValue": 29000000,
+      "currentValue": 600000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8543,7 +9635,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[27].price",
-      "currentValue": 48000000,
+      "currentValue": 1000000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8579,7 +9671,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[27].enhance[0].price",
-      "currentValue": 57000000,
+      "currentValue": 6000000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8603,7 +9695,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[27].enhance[1].price",
-      "currentValue": 86000000,
+      "currentValue": 9000000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8627,7 +9719,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[27].enhance[2].price",
-      "currentValue": 110000000,
+      "currentValue": 12000000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8675,7 +9767,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[28].price",
-      "currentValue": 190000000,
+      "currentValue": 20000000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8711,7 +9803,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[28].enhance[0].price",
-      "currentValue": 72000000,
+      "currentValue": 7500000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8735,7 +9827,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[28].enhance[1].price",
-      "currentValue": 110000000,
+      "currentValue": 11000000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8759,7 +9851,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[28].enhance[2].price",
-      "currentValue": 140000000,
+      "currentValue": 15000000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8807,7 +9899,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "tools[29].price",
-      "currentValue": 240000000,
+      "currentValue": 25000000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8915,7 +10007,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[1].price",
-      "currentValue": 18,
+      "currentValue": 17,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8927,7 +10019,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[1].capacity",
-      "currentValue": 30,
+      "currentValue": 130,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -8963,7 +10055,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[2].price",
-      "currentValue": 68,
+      "currentValue": 51,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -8975,7 +10067,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[2].capacity",
-      "currentValue": 35,
+      "currentValue": 190,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -9023,7 +10115,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[3].capacity",
-      "currentValue": 40,
+      "currentValue": 280,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -9059,7 +10151,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[4].price",
-      "currentValue": 240,
+      "currentValue": 250,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -9071,7 +10163,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[4].capacity",
-      "currentValue": 50,
+      "currentValue": 490,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -9107,7 +10199,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[5].price",
-      "currentValue": 4700,
+      "currentValue": 1600,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -9119,7 +10211,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[5].capacity",
-      "currentValue": 60,
+      "currentValue": 930,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -9155,7 +10247,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[6].price",
-      "currentValue": 14000,
+      "currentValue": 20000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -9167,7 +10259,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[6].capacity",
-      "currentValue": 70,
+      "currentValue": 1200,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -9203,7 +10295,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[7].price",
-      "currentValue": 17000,
+      "currentValue": 25000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -9215,7 +10307,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[7].capacity",
-      "currentValue": 80,
+      "currentValue": 2500,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -9251,7 +10343,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[8].price",
-      "currentValue": 260000,
+      "currentValue": 300000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -9263,7 +10355,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[8].capacity",
-      "currentValue": 90,
+      "currentValue": 3700,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -9299,7 +10391,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[9].price",
-      "currentValue": 2100000,
+      "currentValue": 4100000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -9311,7 +10403,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[9].capacity",
-      "currentValue": 100,
+      "currentValue": 4600,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -9347,7 +10439,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[10].price",
-      "currentValue": 5,
+      "currentValue": 27,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -9359,7 +10451,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[10].capacity",
-      "currentValue": 110,
+      "currentValue": 8900,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -9395,7 +10487,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[11].price",
-      "currentValue": 410,
+      "currentValue": 110,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -9407,7 +10499,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[11].capacity",
-      "currentValue": 120,
+      "currentValue": 13000,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -9443,7 +10535,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[12].price",
-      "currentValue": 9500,
+      "currentValue": 480,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -9455,7 +10547,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[12].capacity",
-      "currentValue": 140,
+      "currentValue": 19000,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -9491,7 +10583,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[13].price",
-      "currentValue": 87000,
+      "currentValue": 3500,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -9503,7 +10595,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[13].capacity",
-      "currentValue": 160,
+      "currentValue": 28000,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -9539,7 +10631,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[14].price",
-      "currentValue": 360000,
+      "currentValue": 38000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -9551,7 +10643,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[14].capacity",
-      "currentValue": 180,
+      "currentValue": 35000,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -9587,7 +10679,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[15].price",
-      "currentValue": 450000,
+      "currentValue": 48000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -9599,7 +10691,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[15].capacity",
-      "currentValue": 200,
+      "currentValue": 64000,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -9635,7 +10727,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[16].price",
-      "currentValue": 2000000,
+      "currentValue": 510000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -9647,7 +10739,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[16].capacity",
-      "currentValue": 220,
+      "currentValue": 80000,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -9683,7 +10775,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[17].price",
-      "currentValue": 2600000,
+      "currentValue": 640000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -9695,7 +10787,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[17].capacity",
-      "currentValue": 240,
+      "currentValue": 140000,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -9731,7 +10823,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[18].price",
-      "currentValue": 7400000,
+      "currentValue": 7100000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -9743,7 +10835,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[18].capacity",
-      "currentValue": 260,
+      "currentValue": 180000,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -9779,7 +10871,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[19].price",
-      "currentValue": 9200000,
+      "currentValue": 8900000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -9791,7 +10883,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[19].capacity",
-      "currentValue": 280,
+      "currentValue": 230000,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -9827,7 +10919,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[20].price",
-      "currentValue": 700,
+      "currentValue": 26,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -9839,7 +10931,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[20].capacity",
-      "currentValue": 300,
+      "currentValue": 500000,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -9875,7 +10967,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[21].price",
-      "currentValue": 6800,
+      "currentValue": 110,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -9887,7 +10979,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[21].capacity",
-      "currentValue": 320,
+      "currentValue": 770000,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -9923,7 +11015,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[22].price",
-      "currentValue": 62000,
+      "currentValue": 650,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -9935,7 +11027,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[22].capacity",
-      "currentValue": 340,
+      "currentValue": 1100000,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -9971,7 +11063,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[23].price",
-      "currentValue": 510000,
+      "currentValue": 5000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -9983,7 +11075,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[23].capacity",
-      "currentValue": 360,
+      "currentValue": 1600000,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -10019,7 +11111,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[24].price",
-      "currentValue": 1300000,
+      "currentValue": 68000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -10031,7 +11123,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[24].capacity",
-      "currentValue": 380,
+      "currentValue": 2000000,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -10067,7 +11159,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[25].price",
-      "currentValue": 1700000,
+      "currentValue": 85000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -10079,7 +11171,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[25].capacity",
-      "currentValue": 400,
+      "currentValue": 3700000,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -10115,7 +11207,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[26].price",
-      "currentValue": 5700000,
+      "currentValue": 980000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -10127,7 +11219,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[26].capacity",
-      "currentValue": 420,
+      "currentValue": 4600000,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -10163,7 +11255,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[27].price",
-      "currentValue": 7200000,
+      "currentValue": 1200000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -10175,7 +11267,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[27].capacity",
-      "currentValue": 450,
+      "currentValue": 8600000,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -10211,7 +11303,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[28].price",
-      "currentValue": 29000000,
+      "currentValue": 18000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -10223,7 +11315,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[28].capacity",
-      "currentValue": 480,
+      "currentValue": 11000000,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -10259,7 +11351,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[29].price",
-      "currentValue": 36000000,
+      "currentValue": 23000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -10271,7 +11363,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "bags[29].capacity",
-      "currentValue": 500,
+      "currentValue": 14000000,
       "unit": "ore items",
       "constraint": "positive integer, strictly increasing across bags",
       "consumers": [
@@ -10295,7 +11387,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "petSlots[0].price",
-      "currentValue": 130000,
+      "currentValue": 190000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -10343,7 +11435,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "petSlots[1].price",
-      "currentValue": 730000,
+      "currentValue": 1500000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -10403,7 +11495,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[0].price",
-      "currentValue": 12,
+      "currentValue": 10,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -10439,7 +11531,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[0].pets[0].miningPct",
-      "currentValue": 4,
+      "currentValue": 15,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -10475,7 +11567,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[0].pets[1].miningPct",
-      "currentValue": 5,
+      "currentValue": 18,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -10511,7 +11603,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[0].pets[2].miningPct",
-      "currentValue": 6,
+      "currentValue": 24,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -10547,7 +11639,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[0].pets[3].miningPct",
-      "currentValue": 9,
+      "currentValue": 35,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -10583,7 +11675,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[0].pets[4].miningPct",
-      "currentValue": 14,
+      "currentValue": 53,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -10619,7 +11711,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[1].price",
-      "currentValue": 130,
+      "currentValue": 81,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -10655,7 +11747,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[1].pets[0].miningPct",
-      "currentValue": 4,
+      "currentValue": 15,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -10691,7 +11783,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[1].pets[1].miningPct",
-      "currentValue": 5,
+      "currentValue": 19,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -10727,7 +11819,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[1].pets[2].miningPct",
-      "currentValue": 7,
+      "currentValue": 25,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -10763,7 +11855,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[1].pets[3].miningPct",
-      "currentValue": 10,
+      "currentValue": 36,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -10799,7 +11891,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[1].pets[4].miningPct",
-      "currentValue": 16,
+      "currentValue": 54,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -10835,7 +11927,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[2].price",
-      "currentValue": 620,
+      "currentValue": 470,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -10871,7 +11963,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[2].pets[0].miningPct",
-      "currentValue": 5,
+      "currentValue": 16,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -10907,7 +11999,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[2].pets[1].miningPct",
-      "currentValue": 6,
+      "currentValue": 19,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -10943,7 +12035,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[2].pets[2].miningPct",
-      "currentValue": 8,
+      "currentValue": 25,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -10979,7 +12071,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[2].pets[3].miningPct",
-      "currentValue": 12,
+      "currentValue": 37,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -11015,7 +12107,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[2].pets[4].miningPct",
-      "currentValue": 18,
+      "currentValue": 56,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -11051,7 +12143,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[3].price",
-      "currentValue": 3600,
+      "currentValue": 4700,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -11087,7 +12179,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[3].pets[0].miningPct",
-      "currentValue": 6,
+      "currentValue": 16,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -11123,7 +12215,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[3].pets[1].miningPct",
-      "currentValue": 7,
+      "currentValue": 20,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -11159,7 +12251,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[3].pets[2].miningPct",
-      "currentValue": 9,
+      "currentValue": 26,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -11195,7 +12287,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[3].pets[3].miningPct",
-      "currentValue": 13,
+      "currentValue": 38,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -11231,7 +12323,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[3].pets[4].miningPct",
-      "currentValue": 20,
+      "currentValue": 57,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -11267,7 +12359,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[4].price",
-      "currentValue": 19000,
+      "currentValue": 60000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -11303,7 +12395,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[4].pets[0].miningPct",
-      "currentValue": 6,
+      "currentValue": 17,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -11339,7 +12431,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[4].pets[1].miningPct",
-      "currentValue": 8,
+      "currentValue": 20,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -11375,7 +12467,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[4].pets[2].miningPct",
-      "currentValue": 10,
+      "currentValue": 27,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -11411,7 +12503,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[4].pets[3].miningPct",
-      "currentValue": 14,
+      "currentValue": 39,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -11447,7 +12539,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[4].pets[4].miningPct",
-      "currentValue": 22,
+      "currentValue": 59,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -11483,7 +12575,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[5].price",
-      "currentValue": 93000,
+      "currentValue": 890000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -11519,7 +12611,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[5].pets[0].miningPct",
-      "currentValue": 7,
+      "currentValue": 17,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -11555,7 +12647,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[5].pets[1].miningPct",
-      "currentValue": 8,
+      "currentValue": 21,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -11591,7 +12683,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[5].pets[2].miningPct",
-      "currentValue": 11,
+      "currentValue": 28,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -11627,7 +12719,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[5].pets[3].miningPct",
-      "currentValue": 16,
+      "currentValue": 40,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -11663,7 +12755,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[5].pets[4].miningPct",
-      "currentValue": 25,
+      "currentValue": 61,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -11699,7 +12791,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[6].price",
-      "currentValue": 430000,
+      "currentValue": 12000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -11735,7 +12827,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[6].pets[0].miningPct",
-      "currentValue": 8,
+      "currentValue": 18,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -11771,7 +12863,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[6].pets[1].miningPct",
-      "currentValue": 9,
+      "currentValue": 21,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -11807,7 +12899,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[6].pets[2].miningPct",
-      "currentValue": 13,
+      "currentValue": 29,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -11843,7 +12935,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[6].pets[3].miningPct",
-      "currentValue": 18,
+      "currentValue": 41,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -11879,7 +12971,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[6].pets[4].miningPct",
-      "currentValue": 28,
+      "currentValue": 63,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -11915,7 +13007,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[7].price",
-      "currentValue": 86,
+      "currentValue": 65,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -11951,7 +13043,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[7].pets[0].miningPct",
-      "currentValue": 9,
+      "currentValue": 18,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -11987,7 +13079,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[7].pets[1].miningPct",
-      "currentValue": 11,
+      "currentValue": 22,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -12023,7 +13115,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[7].pets[2].miningPct",
-      "currentValue": 14,
+      "currentValue": 30,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -12059,7 +13151,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[7].pets[3].miningPct",
-      "currentValue": 20,
+      "currentValue": 42,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -12095,7 +13187,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[7].pets[4].miningPct",
-      "currentValue": 31,
+      "currentValue": 65,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -12131,7 +13223,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[8].price",
-      "currentValue": 620,
+      "currentValue": 330,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -12167,7 +13259,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[8].pets[0].miningPct",
-      "currentValue": 10,
+      "currentValue": 19,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -12203,7 +13295,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[8].pets[1].miningPct",
-      "currentValue": 12,
+      "currentValue": 23,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -12239,7 +13331,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[8].pets[2].miningPct",
-      "currentValue": 16,
+      "currentValue": 30,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -12275,7 +13367,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[8].pets[3].miningPct",
-      "currentValue": 23,
+      "currentValue": 44,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -12311,7 +13403,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[8].pets[4].miningPct",
-      "currentValue": 35,
+      "currentValue": 67,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -12347,7 +13439,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[9].price",
-      "currentValue": 1900,
+      "currentValue": 1400,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -12383,7 +13475,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[9].pets[0].miningPct",
-      "currentValue": 11,
+      "currentValue": 20,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -12419,7 +13511,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[9].pets[1].miningPct",
-      "currentValue": 13,
+      "currentValue": 23,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -12455,7 +13547,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[9].pets[2].miningPct",
-      "currentValue": 18,
+      "currentValue": 31,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -12491,7 +13583,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[9].pets[3].miningPct",
-      "currentValue": 26,
+      "currentValue": 45,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -12527,7 +13619,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[9].pets[4].miningPct",
-      "currentValue": 39,
+      "currentValue": 69,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -12563,7 +13655,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[10].price",
-      "currentValue": 6900,
+      "currentValue": 10000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -12599,7 +13691,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[10].pets[0].miningPct",
-      "currentValue": 12,
+      "currentValue": 20,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -12635,7 +13727,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[10].pets[1].miningPct",
-      "currentValue": 15,
+      "currentValue": 24,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -12671,7 +13763,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[10].pets[2].miningPct",
-      "currentValue": 20,
+      "currentValue": 32,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -12707,7 +13799,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[10].pets[3].miningPct",
-      "currentValue": 29,
+      "currentValue": 46,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -12743,7 +13835,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[10].pets[4].miningPct",
-      "currentValue": 43,
+      "currentValue": 71,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -12779,7 +13871,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[11].price",
-      "currentValue": 27000,
+      "currentValue": 120000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -12815,7 +13907,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[11].pets[0].miningPct",
-      "currentValue": 14,
+      "currentValue": 21,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -12851,7 +13943,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[11].pets[1].miningPct",
-      "currentValue": 17,
+      "currentValue": 25,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -12887,7 +13979,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[11].pets[2].miningPct",
-      "currentValue": 22,
+      "currentValue": 33,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -12923,7 +14015,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[11].pets[3].miningPct",
-      "currentValue": 32,
+      "currentValue": 48,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -12959,7 +14051,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[11].pets[4].miningPct",
-      "currentValue": 49,
+      "currentValue": 73,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -12995,7 +14087,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[12].price",
-      "currentValue": 110000,
+      "currentValue": 460000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -13031,7 +14123,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[12].pets[0].miningPct",
-      "currentValue": 21,
+      "currentValue": 31,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -13067,7 +14159,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[12].pets[1].miningPct",
-      "currentValue": 25,
+      "currentValue": 37,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -13103,7 +14195,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[12].pets[2].miningPct",
-      "currentValue": 33,
+      "currentValue": 50,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -13139,7 +14231,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[12].pets[3].miningPct",
-      "currentValue": 48,
+      "currentValue": 72,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -13175,7 +14267,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[12].pets[4].miningPct",
-      "currentValue": 73,
+      "currentValue": 110,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -13211,7 +14303,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[13].price",
-      "currentValue": 100000,
+      "currentValue": 1500000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -13247,7 +14339,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[13].pets[0].miningPct",
-      "currentValue": 16,
+      "currentValue": 21,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -13283,7 +14375,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[13].pets[1].miningPct",
-      "currentValue": 19,
+      "currentValue": 26,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -13319,7 +14411,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[13].pets[2].miningPct",
-      "currentValue": 25,
+      "currentValue": 34,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -13355,7 +14447,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[13].pets[3].miningPct",
-      "currentValue": 36,
+      "currentValue": 49,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -13391,7 +14483,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[13].pets[4].miningPct",
-      "currentValue": 55,
+      "currentValue": 75,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -13427,7 +14519,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[14].price",
-      "currentValue": 420000,
+      "currentValue": 6200000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -13463,7 +14555,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[14].pets[0].miningPct",
-      "currentValue": 23,
+      "currentValue": 32,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -13499,7 +14591,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[14].pets[1].miningPct",
-      "currentValue": 28,
+      "currentValue": 38,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -13535,7 +14627,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[14].pets[2].miningPct",
-      "currentValue": 37,
+      "currentValue": 51,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -13571,7 +14663,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[14].pets[3].miningPct",
-      "currentValue": 54,
+      "currentValue": 74,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -13607,7 +14699,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[14].pets[4].miningPct",
-      "currentValue": 82,
+      "currentValue": 110,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -13643,7 +14735,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[15].price",
-      "currentValue": 390000,
+      "currentValue": 21000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -13679,7 +14771,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[15].pets[0].miningPct",
-      "currentValue": 17,
+      "currentValue": 22,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -13715,7 +14807,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[15].pets[1].miningPct",
-      "currentValue": 21,
+      "currentValue": 26,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -13751,7 +14843,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[15].pets[2].miningPct",
-      "currentValue": 28,
+      "currentValue": 35,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -13787,7 +14879,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[15].pets[3].miningPct",
-      "currentValue": 40,
+      "currentValue": 51,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -13823,7 +14915,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[15].pets[4].miningPct",
-      "currentValue": 61,
+      "currentValue": 77,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -13859,7 +14951,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[16].price",
-      "currentValue": 1600000,
+      "currentValue": 86000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -13895,7 +14987,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[16].pets[0].miningPct",
-      "currentValue": 26,
+      "currentValue": 33,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -13931,7 +15023,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[16].pets[1].miningPct",
-      "currentValue": 31,
+      "currentValue": 40,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -13967,7 +15059,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[16].pets[2].miningPct",
-      "currentValue": 42,
+      "currentValue": 53,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -14003,7 +15095,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[16].pets[3].miningPct",
-      "currentValue": 60,
+      "currentValue": 76,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -14039,7 +15131,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[16].pets[4].miningPct",
-      "currentValue": 92,
+      "currentValue": 120,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -14075,7 +15167,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[17].price",
-      "currentValue": 110,
+      "currentValue": 79,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -14111,7 +15203,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[17].pets[0].miningPct",
-      "currentValue": 20,
+      "currentValue": 23,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -14147,7 +15239,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[17].pets[1].miningPct",
-      "currentValue": 23,
+      "currentValue": 27,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -14183,7 +15275,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[17].pets[2].miningPct",
-      "currentValue": 31,
+      "currentValue": 36,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -14219,7 +15311,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[17].pets[3].miningPct",
-      "currentValue": 45,
+      "currentValue": 52,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -14255,7 +15347,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[17].pets[4].miningPct",
-      "currentValue": 68,
+      "currentValue": 79,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -14291,7 +15383,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[18].price",
-      "currentValue": 560,
+      "currentValue": 340,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -14327,7 +15419,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[18].pets[0].miningPct",
-      "currentValue": 22,
+      "currentValue": 23,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -14363,7 +15455,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[18].pets[1].miningPct",
-      "currentValue": 26,
+      "currentValue": 28,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -14399,7 +15491,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[18].pets[2].miningPct",
-      "currentValue": 35,
+      "currentValue": 37,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -14435,7 +15527,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[18].pets[3].miningPct",
-      "currentValue": 50,
+      "currentValue": 54,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -14471,7 +15563,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[18].pets[4].miningPct",
-      "currentValue": 77,
+      "currentValue": 82,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -14543,7 +15635,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[19].pets[0].miningPct",
-      "currentValue": 25,
+      "currentValue": 24,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -14651,7 +15743,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[19].pets[3].miningPct",
-      "currentValue": 56,
+      "currentValue": 55,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -14687,7 +15779,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[19].pets[4].miningPct",
-      "currentValue": 86,
+      "currentValue": 84,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -14723,7 +15815,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[20].price",
-      "currentValue": 7700,
+      "currentValue": 7800,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -14759,7 +15851,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[20].pets[0].miningPct",
-      "currentValue": 37,
+      "currentValue": 36,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -14795,7 +15887,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[20].pets[1].miningPct",
-      "currentValue": 44,
+      "currentValue": 43,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -14831,7 +15923,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[20].pets[2].miningPct",
-      "currentValue": 59,
+      "currentValue": 58,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -14867,7 +15959,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[20].pets[3].miningPct",
-      "currentValue": 85,
+      "currentValue": 83,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -14939,7 +16031,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[21].price",
-      "currentValue": 6400,
+      "currentValue": 15000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -14975,7 +16067,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[21].pets[0].miningPct",
-      "currentValue": 27,
+      "currentValue": 25,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -15011,7 +16103,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[21].pets[1].miningPct",
-      "currentValue": 33,
+      "currentValue": 30,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -15047,7 +16139,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[21].pets[2].miningPct",
-      "currentValue": 44,
+      "currentValue": 40,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -15083,7 +16175,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[21].pets[3].miningPct",
-      "currentValue": 63,
+      "currentValue": 57,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -15119,7 +16211,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[21].pets[4].miningPct",
-      "currentValue": 96,
+      "currentValue": 87,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -15155,7 +16247,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[22].price",
-      "currentValue": 25000,
+      "currentValue": 61000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -15191,7 +16283,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[22].pets[0].miningPct",
-      "currentValue": 41,
+      "currentValue": 37,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -15227,7 +16319,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[22].pets[1].miningPct",
-      "currentValue": 49,
+      "currentValue": 45,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -15263,7 +16355,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[22].pets[2].miningPct",
-      "currentValue": 66,
+      "currentValue": 60,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -15299,7 +16391,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[22].pets[3].miningPct",
-      "currentValue": 95,
+      "currentValue": 86,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -15335,7 +16427,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[22].pets[4].miningPct",
-      "currentValue": 140,
+      "currentValue": 130,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -15371,7 +16463,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[23].price",
-      "currentValue": 27000,
+      "currentValue": 200000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -15407,7 +16499,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[23].pets[0].miningPct",
-      "currentValue": 31,
+      "currentValue": 26,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -15443,7 +16535,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[23].pets[1].miningPct",
-      "currentValue": 37,
+      "currentValue": 31,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -15479,7 +16571,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[23].pets[2].miningPct",
-      "currentValue": 49,
+      "currentValue": 41,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -15515,7 +16607,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[23].pets[3].miningPct",
-      "currentValue": 71,
+      "currentValue": 59,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -15551,7 +16643,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[23].pets[4].miningPct",
-      "currentValue": 110,
+      "currentValue": 89,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -15587,7 +16679,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[24].price",
-      "currentValue": 110000,
+      "currentValue": 810000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -15623,7 +16715,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[24].pets[0].miningPct",
-      "currentValue": 46,
+      "currentValue": 38,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -15659,7 +16751,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[24].pets[1].miningPct",
-      "currentValue": 55,
+      "currentValue": 46,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -15695,7 +16787,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[24].pets[2].miningPct",
-      "currentValue": 74,
+      "currentValue": 61,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -15731,7 +16823,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[24].pets[3].miningPct",
-      "currentValue": 110,
+      "currentValue": 88,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -15767,7 +16859,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[24].pets[4].miningPct",
-      "currentValue": 160,
+      "currentValue": 130,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -15803,7 +16895,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[25].price",
-      "currentValue": 94000,
+      "currentValue": 2900000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -15839,7 +16931,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[25].pets[0].miningPct",
-      "currentValue": 34,
+      "currentValue": 26,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -15875,7 +16967,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[25].pets[1].miningPct",
-      "currentValue": 41,
+      "currentValue": 32,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -15911,7 +17003,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[25].pets[2].miningPct",
-      "currentValue": 55,
+      "currentValue": 42,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -15947,7 +17039,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[25].pets[3].miningPct",
-      "currentValue": 79,
+      "currentValue": 60,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -15983,7 +17075,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[25].pets[4].miningPct",
-      "currentValue": 120,
+      "currentValue": 92,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -16019,7 +17111,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[26].price",
-      "currentValue": 380000,
+      "currentValue": 12000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -16055,7 +17147,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[26].pets[0].miningPct",
-      "currentValue": 52,
+      "currentValue": 39,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -16091,7 +17183,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[26].pets[1].miningPct",
-      "currentValue": 62,
+      "currentValue": 47,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -16127,7 +17219,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[26].pets[2].miningPct",
-      "currentValue": 83,
+      "currentValue": 63,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -16163,7 +17255,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[26].pets[3].miningPct",
-      "currentValue": 120,
+      "currentValue": 91,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -16199,7 +17291,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[26].pets[4].miningPct",
-      "currentValue": 180,
+      "currentValue": 140,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -16235,7 +17327,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[27].price",
-      "currentValue": 390000,
+      "currentValue": 53000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -16271,7 +17363,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[27].pets[0].miningPct",
-      "currentValue": 39,
+      "currentValue": 27,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -16307,7 +17399,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[27].pets[1].miningPct",
-      "currentValue": 46,
+      "currentValue": 33,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -16343,7 +17435,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[27].pets[2].miningPct",
-      "currentValue": 62,
+      "currentValue": 43,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -16379,7 +17471,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[27].pets[3].miningPct",
-      "currentValue": 89,
+      "currentValue": 62,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -16415,7 +17507,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[27].pets[4].miningPct",
-      "currentValue": 140,
+      "currentValue": 95,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -16451,7 +17543,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[28].price",
-      "currentValue": 1600000,
+      "currentValue": 210000000,
       "unit": "selected currency",
       "constraint": "nonnegative safe integer, two significant figures for prices; follow progression validation",
       "consumers": [
@@ -16487,7 +17579,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[28].pets[0].miningPct",
-      "currentValue": 58,
+      "currentValue": 41,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -16523,7 +17615,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[28].pets[1].miningPct",
-      "currentValue": 69,
+      "currentValue": 49,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -16559,7 +17651,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[28].pets[2].miningPct",
-      "currentValue": 93,
+      "currentValue": 65,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -16595,7 +17687,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[28].pets[3].miningPct",
-      "currentValue": 130,
+      "currentValue": 93,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [
@@ -16631,7 +17723,7 @@
     {
       "file": "src/game/content/economy.json",
       "parameter": "eggs[28].pets[4].miningPct",
-      "currentValue": 200,
+      "currentValue": 140,
       "unit": "percentage points",
       "constraint": "positive; pet percentages use round integer values",
       "consumers": [

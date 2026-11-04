@@ -13,7 +13,7 @@ const buildTime = existsSync(metadata) ? JSON.parse(readFileSync(metadata, 'utf8
 // iPhone 14 Pro shipped with iOS/Safari 16.0. Vite's default starts at 16.4.
 // Vite also inherits these build options for the terrain worker.
 const browserTarget = ['chrome111', 'edge111', 'firefox114', 'safari16.0', 'ios16.0'];
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   base: './',
   plugins: [react(), {
     name: 'mining-local-resources',
@@ -39,5 +39,10 @@ export default defineConfig({
         .replace('<!-- mining-loading-emblem -->', emblem.replace('<svg ', '<svg class="loading-emblem" '));
     },
   }],
-  build: { outDir: 'dist', target: browserTarget, cssTarget: browserTarget },
-});
+  build: {
+    outDir: 'dist',
+    target: browserTarget,
+    cssTarget: browserTarget,
+    ...(mode === 'profile' ? { sourcemap: true, minify: false, cssMinify: false } : {}),
+  },
+}));

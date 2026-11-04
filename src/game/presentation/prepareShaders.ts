@@ -27,16 +27,25 @@ function warmable(object:Object3D){
 // In play (a later world's scene, loaded on the trip there): `only` warms just the meshes under it, under the whole
 // scene's lights, and `inFrame` runs each one-pixel draw inside the game's next drawn frame, before the world: drawn
 // between frames, a frame the game skips would show the canvas cleared but for that pixel.
+function addWarmLights(warm:Scene,source:Scene,withCaveLights:boolean){
+ source.traverse(object=>{
+  if(!('isLight' in object))return;
+  const caveLight=object.userData.caveLight===true;
+  if(caveLight?!withCaveLights:!warmable(object))return;
+  const light=object.clone();
+  light.visible=true;
+  warm.add(light);
+  if(light instanceof DirectionalLight||light instanceof SpotLight){light.target.updateMatrixWorld(true);warm.add(light.target);}
+ });
+}
 export async function prepareShaders(renderer:WebGLRenderer,source:Scene,camera:Camera,signal:AbortSignal,onProgress:(done:number,total:number)=>void,
  {only=source,inFrame}:{only?:Object3D;inFrame?:(draw:()=>void)=>Promise<void>}={}){
  const started=performance.now(),warm=new Scene();
  warm.environment=source.environment;warm.environmentIntensity=source.environmentIntensity;warm.environmentRotation.copy(source.environmentRotation);warm.fog=source.fog;
  source.updateMatrixWorld(true);camera.updateMatrixWorld(true);
  const meshes:Mesh[]=[],seen=new Set<string>();
- source.traverse(object=>{
-  if(!warmable(object)||!('isLight' in object))return;
-  const light=object.clone();warm.add(light);if(light instanceof DirectionalLight||light instanceof SpotLight){light.target.updateMatrixWorld(true);warm.add(light.target);}
- });
+ let hasCaveLights=false;
+ source.traverse(object=>{if(object.userData.caveLight===true)hasCaveLights=true;});
  only.traverse(object=>{
   if(!warmable(object)||!(object instanceof Mesh)||!camera.layers.test(object.layers))return;
   const material=Array.isArray(object.material)?object.material:[object.material];
@@ -49,29 +58,37 @@ export async function prepareShaders(renderer:WebGLRenderer,source:Scene,camera:
  renderer.debug.onShaderError=(gl,program)=>{throw new Error('材质预热失败：'+gl.getProgramInfoLog(program));};
  const clones=meshes.map(object=>{const clone=object.clone(false);clone.matrixAutoUpdate=false;clone.matrix.copy(object.matrixWorld);clone.frustumCulled=false;return clone;});
  try{
-  onProgress(0,clones.length);await yieldLoadingTask(signal);
-  if(parallel){
-   warm.add(...clones);await renderer.compileAsync(warm,camera);signal.throwIfAborted();warm.remove(...clones);
-  }
-  // Linked in parallel, every object's first use (uniforms, textures) goes in batches. Without asynchronous
-  // completion queries, don't queue every program then block on that entire driver queue: compile and use one
-  // object per program between UI tasks.
+  // Surface hides the cave point-light group; still compile that variant so walking into the shaft does not hitch.
+  const passes=hasCaveLights?[false,true]:[false];
   const keys=new Set<string>(),first=parallel?clones:clones.filter(c=>{const k=programKey(c);if(keys.has(k))return false;keys.add(k);return true;});
-  const batch=parallel?32:1;
-  for(let i=0;i<first.length;i+=batch){
-   const part=first.slice(i,i+batch);
-   onProgress(i,first.length);await yieldLoadingTask(signal);warm.add(...part);
-   try{
-    if(!parallel){renderer.compile(warm,camera);await yieldLoadingTask(signal);}
-    const draw=()=>{
-     renderer.setScissor(0,0,1,1);renderer.setScissorTest(true);
-     try{renderer.render(warm,camera);}finally{renderer.setScissor(scissor);renderer.setScissorTest(scissorTest);}
-    };
-    if(inFrame){await inFrame(draw);signal.throwIfAborted();}else draw();
+  const batch=parallel?32:1,total=first.length*passes.length;
+  onProgress(0,total);await yieldLoadingTask(signal);
+  let done=0;
+  for(const withCaveLights of passes){
+   addWarmLights(warm,source,withCaveLights);
+   if(parallel){
+    warm.add(...clones);await renderer.compileAsync(warm,camera);signal.throwIfAborted();warm.remove(...clones);
    }
-   finally{warm.remove(...part);}
+   // Linked in parallel, every object's first use (uniforms, textures) goes in batches. Without asynchronous
+   // completion queries, don't queue every program then block on that entire driver queue: compile and use one
+   // object per program between UI tasks.
+   for(let i=0;i<first.length;i+=batch){
+    const part=first.slice(i,i+batch);
+    onProgress(done,total);await yieldLoadingTask(signal);warm.add(...part);
+    try{
+     if(!parallel){renderer.compile(warm,camera);await yieldLoadingTask(signal);}
+     const draw=()=>{
+      renderer.setScissor(0,0,1,1);renderer.setScissorTest(true);
+      try{renderer.render(warm,camera);}finally{renderer.setScissor(scissor);renderer.setScissorTest(scissorTest);}
+     };
+     if(inFrame){await inFrame(draw);signal.throwIfAborted();}else draw();
+    }
+    finally{warm.remove(...part);}
+    done+=part.length;
+   }
+   warm.clear();
   }
-  onProgress(first.length,first.length);
+  onProgress(total,total);
  }finally{
   renderer.debug.onShaderError=previousError;renderer.setScissor(scissor);renderer.setScissorTest(scissorTest);warm.clear();
   for(const clone of clones)if('isInstancedMesh' in clone && 'dispose' in clone)(clone as Mesh & {dispose():void}).dispose();

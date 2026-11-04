@@ -1,6 +1,6 @@
 # 源工程接续与构建
 
-这是 r9 交付快照。完整游戏源码、锁文件、运行素材和 `dist/` 同包提供。素材来源与本次许可资料范围见 `ASSET_PROVENANCE.md`、`ASSET_AUTHORIZATION.md`。
+这是 r10 交付快照。完整游戏源码、锁文件、运行素材和 `dist/` 同包提供。素材来源与本次许可资料范围见 `ASSET_PROVENANCE.md`、`ASSET_AUTHORIZATION.md`。
 
 ## 干净构建
 
@@ -52,3 +52,7 @@ npm run serve
 `surface-game-art/` 保存当前场景的 Blender 源文件、制作脚本、布局和小图集；`assets-source/` 保存角色、商店、宠物和基础镐的工作文件；根 `tools/` 中的相关 Python/资产脚本用于记录生产流程。它们不参与普通 `npm run build`，不是运行时依赖。
 
 工作文件副本清除了内部路径/服务地址；运行 GLB、场景 bundle 和贴图保持原字节。原文件和交付副本的哈希、生产方法、面数、贴图尺寸见素材清单。Blender 5.1.2、KTX-Software 4.4.2 等离线美术工具未随包提供；没有宣称不同工具版本下重新生成美术能与当前资源逐字节相同。
+
+## 本次导入的已知差异
+
+默认语言改为中文；关闭 MSAA；地表隐藏地下灯光并预热有灯/无灯两套程序。`npm run build:profile` 生成未压缩且带 source map 的诊断产物，普通 `npm run build` 保持生产构建。普通存档会话恢复为必须支持 Web Locks，因此 HTTP 兼容回归测试当前失败；本次按原包覆盖，未改写这项行为。

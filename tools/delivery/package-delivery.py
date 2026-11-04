@@ -7,8 +7,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / '.tools/fonttools')
 from fontTools.ttLib import TTFont
 
 ROOT = Path(__file__).resolve().parents[2]
-SOURCE = ROOT / 'exports/mining-master-delivery-r9-20261104'
-AUDIT = ROOT / 'artifacts/mining-master-r9-20261104'
+SOURCE = ROOT / 'exports/mining-master-delivery-r10-20261104'
+AUDIT = ROOT / 'artifacts/mining-master-r10-20261104'
 AUDIT.mkdir(parents=True, exist_ok=True)
 release_time = datetime.fromisoformat(json.loads((SOURCE / 'DELIVERY.json').read_text())['buildTime'].replace('Z', '+00:00')).timetuple()[:6]
 hash_bytes = lambda b: hashlib.sha256(b).hexdigest()
@@ -19,8 +19,8 @@ source_files = [p for p in files(SOURCE) if p.name != 'CONTENTS.sha256']
 
 archives = []
 for name, items, relative in [
-    ('mining-master-complete-r9-20261104.zip', files(SOURCE), SOURCE),
-    ('mining-master-dist-r9-20261104.zip', files(SOURCE / 'dist'), SOURCE),
+    ('mining-master-complete-r10-20261104.zip', files(SOURCE), SOURCE),
+    ('mining-master-dist-r10-20261104.zip', files(SOURCE / 'dist'), SOURCE),
 ]:
     target = ROOT / 'exports' / name
     with ZipFile(target, 'w', compression=ZIP_DEFLATED, compresslevel=6) as z:
@@ -78,5 +78,5 @@ for name, items, relative in [
     assert not report['externalGlbUris'], report['externalGlbUris']
     archives.append(report)
 (AUDIT / 'archive-review.json').write_text(json.dumps(archives, ensure_ascii=False, indent=2) + '\n')
-(ROOT / 'exports/mining-master-r9-20261104.sha256').write_text(''.join(a['sha256'] + '  ' + a['archive'] + '\n' for a in archives))
+(ROOT / 'exports/mining-master-r10-20261104.sha256').write_text(''.join(a['sha256'] + '  ' + a['archive'] + '\n' for a in archives))
 print(json.dumps(archives, ensure_ascii=False, indent=2))

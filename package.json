@@ -14,7 +14,8 @@
     "preview": "vite preview",
     "test": "node --test tools/tests/*.test.mjs",
     "publish:preview": "npm run build && node tools/publish-preview.mjs",
-    "pretest": "node tools/prepare-locales.mjs"
+    "pretest": "node tools/prepare-locales.mjs",
+    "build:profile": "node tools/prepare-locales.mjs && node tools/check-module-paths.mjs && node tools/i18n-scan.mjs && tsc --noEmit && vite build --mode profile"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "0.19.3",

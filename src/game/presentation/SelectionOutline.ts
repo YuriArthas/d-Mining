@@ -7,7 +7,7 @@ import {CELL} from '../terrain/grid.ts';
 export function createSelectionOutline(){
  const box=new BoxGeometry(CELL+.012,CELL+.012,CELL+.012),edges=new EdgesGeometry(box);
  const geometry=new LineSegmentsGeometry().fromEdgesGeometry(edges);box.dispose();edges.dispose();
- const material=new LineMaterial({color:'#101010',linewidth:3,worldUnits:false,depthTest:true,depthWrite:false,alphaToCoverage:true});
+ const material=new LineMaterial({color:'#101010',linewidth:3,worldUnits:false,depthTest:true,depthWrite:false,alphaToCoverage:false});
  const outline=new LineSegments2(geometry,material);outline.name='selected-voxel-black-outline';outline.visible=false;outline.renderOrder=2;
  return outline;
 }

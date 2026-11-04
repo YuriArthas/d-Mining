@@ -35,6 +35,15 @@ test('objects behind the camera are warmed too; one first use per program withou
   }finally{for(const m of extra)m.material.dispose();f.geometry.dispose();f.material.dispose();}
  }
 });
+test('hidden cave point lights still warm the lit shader variant',async()=>{
+ const f=fixture(false);
+ const {Group,PointLight}=await import('three');
+ const group=new Group();group.visible=false;group.name='cave-lights';
+ const light=new PointLight();light.userData.caveLight=true;group.add(light);f.scene.add(group);
+ try{await prepareShaders(f.renderer,f.scene,f.camera,new AbortController().signal,()=>{});
+  assert.deepEqual(f.calls,['compile','render','compile','render']);
+ }finally{f.geometry.dispose();f.material.dispose();}
+});
 test('hidden parts are skipped unless they ask to be warmed (the onboarding arrow, the first crack)',async()=>{
  const f=fixture(false),later=new Mesh(f.geometry,new MeshBasicMaterial({map:null,transparent:true})),never=new Mesh(f.geometry,new MeshBasicMaterial({color:'red'}));
  const arrow=new Mesh(f.geometry,new MeshBasicMaterial({wireframe:true}));arrow.userData.prewarm=true;later.add(arrow);

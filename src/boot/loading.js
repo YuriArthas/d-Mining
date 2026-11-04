@@ -5,7 +5,7 @@
   var known = function (v) { return packs.some(function (p) { return p.id === v; }) ? v : null; };
   var asked = known(new URLSearchParams(location.search).get('lang')), saved = null;
   try { saved = known(localStorage.getItem('mining.language')); } catch (_) {}
-  var lang = asked || saved || 'en';
+  var lang = asked || saved || 'zh';
   var pack = packs.find(function (p) { return p.id === lang; });
   document.documentElement.lang = pack.locale;
   var say = function (id) { if (!(id in pack.messages)) throw Error('Missing boot message: ' + id); return pack.messages[id]; };

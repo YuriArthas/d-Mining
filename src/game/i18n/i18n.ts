@@ -10,7 +10,7 @@ function detect(): Lang {
   const asked = known(new URLSearchParams(window.location.search).get('lang'));
   let saved: string | null = null;
   try { saved = known(window.localStorage.getItem(STORAGE_KEY)); } catch { /* browser storage unavailable */ }
-  return asked ?? saved ?? 'en';
+  return asked ?? saved ?? 'zh';
 }
 export const LANG = detect();
 export const LOCALE = packs.find(p => p.id === LANG)!;

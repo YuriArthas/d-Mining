@@ -170,7 +170,7 @@ function GameView({ savedGame }: { savedGame: SavedGame }) {
           resize={{ offsetSize: true }}
           dpr={probeMode==='low-resolution'?Math.min(Math.max(window.devicePixelRatio,1),GAME_CONFIG.pixelRatioMax)*.5:[1,GAME_CONFIG.pixelRatioMax]}
           camera={{ fov: GAME_CONFIG.camera.fov, near: GAME_CONFIG.camera.near, far: 10000 }}
-          gl={{ antialias: true }}
+          gl={{ antialias: GAME_CONFIG.antialias }}
           fallback={<p>{tr("msg.this_browser_can_t_start_the_3d_view_please_use_a_browser_th")}</p>}
         >
           <ValidationScene shopView={shopView} guideMarker={guideMarker} miningLayer={miningLayer} savedGame={savedGame} content={GAME_CONTENT} renderRate={renderRate} shadowsEnabled={shadowsEnabled} probeMode={probeMode} input={input} onStatus={setStatus} onLoading={onLoading} onPerformance={setPerformanceStats} session={session} />

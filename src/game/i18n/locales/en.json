@@ -2,7 +2,7 @@
   "id": "en",
   "label": "English",
   "locale": "en",
-  "order": 0,
+  "order": 1,
   "numberUnits": [
     [
       1000000000000.0,

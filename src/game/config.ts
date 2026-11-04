@@ -2,7 +2,8 @@ import { worldSpawn } from './content/worldJourney.ts';
 // World distances are metres. Rendered geometry and cell queries share cellSize.
 export const GAME_CONFIG = {
   background: '#0b1233',
-  pixelRatioMax: 1.5, // Device pixel ratio cap; positive, normally 1–2.
+  pixelRatioMax: 1.5, // Cap below native 2x; MSAA stays off so fill cost is ~2.25x, not ~9x.
+  antialias: false, // MSAA multiplies every shaded pixel; the selection outline does not need it.
   player: { radius: 0.44, height: 1.85, spawn: worldSpawn(1) },
   camera: {
     distance: 8.5, // Metres from the player's observation target.

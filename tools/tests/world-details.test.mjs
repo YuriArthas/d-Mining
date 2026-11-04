@@ -19,6 +19,6 @@ test('all world signs are genuine extruded glyphs with fronts, backs and sides',
 });
 test('selection uses a thick black screen-space outline with depth testing',()=>{
  const outline=createSelectionOutline();
- try{assert.equal(outline.material.color.getHex(),0x101010);assert.equal(outline.material.linewidth,3);assert.equal(outline.material.worldUnits,false);assert.equal(outline.material.depthTest,true);assert.equal(outline.material.depthWrite,false);}
+ try{assert.equal(outline.material.color.getHex(),0x101010);assert.equal(outline.material.linewidth,3);assert.equal(outline.material.worldUnits,false);assert.equal(outline.material.depthTest,true);assert.equal(outline.material.depthWrite,false);assert.equal(outline.material.alphaToCoverage,false);}
  finally{outline.geometry.dispose();outline.material.dispose();}
 });
