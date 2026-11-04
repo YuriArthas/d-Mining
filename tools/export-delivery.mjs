@@ -7,7 +7,7 @@ import { prepareLocales } from './prepare-locales.mjs';
 import { checkModulePaths } from './check-module-paths.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const out = resolve(process.argv[2] || join(root, 'exports/mining-master-delivery-r7-20261103'));
+const out = resolve(process.argv[2] || join(root, 'exports/mining-master-delivery-r9-20261104'));
 if (!out.startsWith(join(root, 'exports/')) || existsSync(out)) throw Error('Choose a new directory under exports/');
 const packs = prepareLocales();
 checkModulePaths(new URL('../src/', import.meta.url));
@@ -27,8 +27,8 @@ const pkg = JSON.parse(readFileSync(join(root, 'package.json')));
 delete pkg.scripts['publish:preview'];
 pkg.scripts['verify:source'] = 'node tools/verify-delivery-source.mjs';
 put('package.json', JSON.stringify(pkg, null, 2) + '\n');
-put('DELIVERY.json', JSON.stringify({ name: packs.find(p => p.id === 'zh').messages['boot.game_name'], names: Object.fromEntries(packs.map(p => [p.id, p.messages['boot.game_name']])), version: pkg.version, revision: 'r7', buildTime: new Date().toISOString(),
-  runtime: 'static HTTPS or trusted localhost, WebGL2; Web Locks required for save ownership', debug: '?debug=1', reporting: false, renderFpsCap: 60, buildTool: `vite@${pkg.devDependencies.vite}`, excludedTests,
+put('DELIVERY.json', JSON.stringify({ name: packs.find(p => p.id === 'zh').messages['boot.game_name'], names: Object.fromEntries(packs.map(p => [p.id, p.messages['boot.game_name']])), version: pkg.version, revision: 'r9', buildTime: new Date().toISOString(),
+  runtime: 'static HTTP(S), WebGL2; optional Web Locks on HTTPS only; HTTP skips locks without multi-tab exclusion', debug: '?debug=1', reporting: false, renderFpsCap: 60, buildTool: `vite@${pkg.devDependencies.vite}`, excludedTests,
   diagnosticsPolicy: { sourceRetained: true, ordinaryStartup: 'No automated tests, diagnostic meters, debug API or collider view', enabledOnlyBy: '?debug=1', debugSave: 'Ephemeral memory store; no player persistent storage access', acceptanceSave: 'Explicit ?debug=1&saveTest=id, separate localStorage key', kit: '?debug=1&kit=1' },
   progressStorage: { api: 'localStorage', atomicSnapshot: true, oldStorageMigration: false, alternateStorage: false },
   sourceContract: 'All src files, index.html, vite.config.ts, tsconfig.json, package-lock.json and shared build/check tools are unchanged copies.',

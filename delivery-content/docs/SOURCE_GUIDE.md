@@ -1,6 +1,6 @@
 # 源工程接续与构建
 
-这是 r6 交付快照。完整游戏源码、锁文件、运行素材和 `dist/` 同包提供。素材来源与本次许可资料范围见 `ASSET_PROVENANCE.md`、`ASSET_AUTHORIZATION.md`。
+这是 r9 交付快照。完整游戏源码、锁文件、运行素材和 `dist/` 同包提供。素材来源与本次许可资料范围见 `ASSET_PROVENANCE.md`、`ASSET_AUTHORIZATION.md`。
 
 ## 干净构建
 
@@ -17,7 +17,7 @@ npm run serve
 
 运行所需的库、Worker、WASM、字体、模型和贴图已打入产物，游戏不通过 CDN 下载运行包。源码构建的依赖由 `package-lock.json` 锁定，安装时由 npm 获取；交付包不包含 `node_modules`、npm 缓存或 npm 包归档。无需执行美术生成工具即可构建游戏。
 
-`DELIVERY.json.buildTime` 固定构建标识，`revision` 标记本轮交付；重复构建可逐文件比较 `dist` 的 SHA-256。旧 ZIP 在新包生成并通过核对后删除，不创建备份。
+`DELIVERY.json.buildTime` 固定构建标识，`revision` 标记本轮交付；重复构建可逐文件比较 `dist` 的 SHA-256。旧 ZIP 在新包生成并通过核对后删除，不创建备份。 每次交付改动必须重新生成完整源码 ZIP 与 dist ZIP，核对修复已入包并提供下载路径；只构建或提交 push 不算交付完成。
 
 ## 实际入口与消费者
 

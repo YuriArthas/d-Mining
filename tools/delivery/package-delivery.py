@@ -2,13 +2,15 @@ from pathlib import Path
 from zipfile import ZipFile, ZipInfo, ZIP_DEFLATED
 import hashlib, json, gzip, re, base64, subprocess, io
 import sys
+from datetime import datetime
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / '.tools/fonttools'))
 from fontTools.ttLib import TTFont
 
 ROOT = Path(__file__).resolve().parents[2]
-SOURCE = ROOT / 'exports/mining-master-delivery-r7-20261103'
-AUDIT = ROOT / 'artifacts/mining-master-r7-20261103'
+SOURCE = ROOT / 'exports/mining-master-delivery-r9-20261104'
+AUDIT = ROOT / 'artifacts/mining-master-r9-20261104'
 AUDIT.mkdir(parents=True, exist_ok=True)
+release_time = datetime.fromisoformat(json.loads((SOURCE / 'DELIVERY.json').read_text())['buildTime'].replace('Z', '+00:00')).timetuple()[:6]
 hash_bytes = lambda b: hashlib.sha256(b).hexdigest()
 def files(root):
     return sorted(p for p in root.rglob('*') if p.is_file() and 'node_modules' not in p.relative_to(root).parts)
@@ -17,8 +19,8 @@ source_files = [p for p in files(SOURCE) if p.name != 'CONTENTS.sha256']
 
 archives = []
 for name, items, relative in [
-    ('mining-master-complete-r7-20261103.zip', files(SOURCE), SOURCE),
-    ('mining-master-dist-r7-20261103.zip', files(SOURCE / 'dist'), SOURCE),
+    ('mining-master-complete-r9-20261104.zip', files(SOURCE), SOURCE),
+    ('mining-master-dist-r9-20261104.zip', files(SOURCE / 'dist'), SOURCE),
 ]:
     target = ROOT / 'exports' / name
     with ZipFile(target, 'w', compression=ZIP_DEFLATED, compresslevel=6) as z:
@@ -26,7 +28,7 @@ for name, items, relative in [
             rel = p.relative_to(relative).as_posix()
             assert not p.is_symlink(), f'Symlink in archive: {rel}'
             assert not any(part in ['node_modules', '.git', '.cache', '__pycache__'] for part in Path(rel).parts)
-            info = ZipInfo(rel, date_time=(2026, 11, 3, 0, 0, 0))
+            info = ZipInfo(rel, date_time=release_time)
             info.compress_type = ZIP_DEFLATED
             info.external_attr = 0o100644 << 16
             z.writestr(info, p.read_bytes(), compresslevel=6)
@@ -76,5 +78,5 @@ for name, items, relative in [
     assert not report['externalGlbUris'], report['externalGlbUris']
     archives.append(report)
 (AUDIT / 'archive-review.json').write_text(json.dumps(archives, ensure_ascii=False, indent=2) + '\n')
-(ROOT / 'exports/mining-master-r7-20261103.sha256').write_text(''.join(a['sha256'] + '  ' + a['archive'] + '\n' for a in archives))
+(ROOT / 'exports/mining-master-r9-20261104.sha256').write_text(''.join(a['sha256'] + '  ' + a['archive'] + '\n' for a in archives))
 print(json.dumps(archives, ensure_ascii=False, indent=2))
