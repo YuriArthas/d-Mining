@@ -1,0 +1,107 @@
+{
+  "lamps": [
+    {
+      "id": 0,
+      "position": [
+        -3.5300000000000002,
+        3.0,
+        4.0
+      ],
+      "radius": 0.22,
+      "distance": 10.0,
+      "intensity": 18
+    },
+    {
+      "id": 1,
+      "position": [
+        3.5300000000000002,
+        3.0,
+        -5.0
+      ],
+      "radius": 0.22,
+      "distance": 10.0,
+      "intensity": 18
+    },
+    {
+      "id": 2,
+      "position": [
+        -3.5300000000000002,
+        3.0,
+        -14.1
+      ],
+      "radius": 0.22,
+      "distance": 10.0,
+      "intensity": 18
+    }
+  ],
+  "shops": [
+    {
+      "name": "Shop_west_0",
+      "position": [
+        -5.1,
+        0,
+        3
+      ],
+      "width": 6.3,
+      "depth": 4.9,
+      "wall": "plaster_blue"
+    },
+    {
+      "name": "Shop_west_1",
+      "position": [
+        -5.1,
+        0,
+        -5.4
+      ],
+      "width": 6.3,
+      "depth": 4.9,
+      "wall": "plaster_ivory"
+    },
+    {
+      "name": "Shop_west_2",
+      "position": [
+        -5.1,
+        0,
+        -13.8
+      ],
+      "width": 6.3,
+      "depth": 4.9,
+      "wall": "plaster_rose"
+    },
+    {
+      "name": "Shop_east_0",
+      "position": [
+        5.1,
+        0,
+        3
+      ],
+      "width": 6.3,
+      "depth": 4.9,
+      "wall": "plaster_ivory"
+    },
+    {
+      "name": "Shop_east_1",
+      "position": [
+        5.1,
+        0,
+        -5.4
+      ],
+      "width": 6.3,
+      "depth": 4.9,
+      "wall": "plaster_rose"
+    },
+    {
+      "name": "Shop_east_2",
+      "position": [
+        5.1,
+        0,
+        -13.8
+      ],
+      "width": 6.3,
+      "depth": 4.9,
+      "wall": "plaster_blue"
+    }
+  ],
+  "streetWidth": 8.3,
+  "streetLength": 33.6
+}

@@ -1,0 +1,37 @@
+{
+  "model": "gpt-image-2.5-sunburst",
+  "execution": "imagegen skill CLI / edit, --quality high --input-fidelity high --size 1536x1024",
+  "input": {
+    "file": "scene-world1.png",
+    "what": "public build, world 1 by the egg terrace, the current miner with two pets (amber fox, crystal owl), UI hidden",
+    "sha256": "a945ad49878e8c9ed84e8a2824ac3fe14c34d192341d8d45d10fb192aae5e982"
+  },
+  "prompt_set": "prompts.jsonl",
+  "purpose": "player character direction, chosen by the user; not a game asset",
+  "candidates": [
+    {
+      "id": "A",
+      "title": "Q版玩具矿工",
+      "file": "a-chibi-toy.png",
+      "sha256": "a044fcea41d6a39dd139110694b085be20756ae7404c2f5cbb48f6e67d7bd7c8"
+    },
+    {
+      "id": "B",
+      "title": "经典 Roblox 方块小人",
+      "file": "b-roblox-blocky.png",
+      "sha256": "33223751ef2d13e6898ffa76157f990a7f31ea7fef6e3abd96d04318d37b43aa"
+    },
+    {
+      "id": "C",
+      "title": "圆润潮玩矿工",
+      "file": "c-vinyl-toy.png",
+      "sha256": "f75b459ff38c616a51108709e6d7779c38213d4d1545741d4d50af79e426ab8b"
+    },
+    {
+      "id": "D",
+      "title": "卡通小探险家",
+      "file": "d-explorer-kid.png",
+      "sha256": "f47bc048a2d19a7af4ae5ea3036ea1b0d7cad1a24c79301ba41eaa6de2d7c3d7"
+    }
+  ]
+}

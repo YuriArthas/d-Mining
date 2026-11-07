@@ -1,0 +1,424 @@
+{
+  "name": "Pinewind four-block district",
+  "size": 56,
+  "roadWidth": 6,
+  "blocks": [
+    {
+      "id": "shops",
+      "center": [
+        -12.5,
+        0,
+        -12.5
+      ],
+      "bounds": [
+        -22.0,
+        -22.0,
+        -3.0,
+        -3.0
+      ]
+    },
+    {
+      "id": "homes",
+      "center": [
+        12.5,
+        0,
+        -12.5
+      ],
+      "bounds": [
+        3.0,
+        -22.0,
+        22.0,
+        -3.0
+      ]
+    },
+    {
+      "id": "workshop",
+      "center": [
+        -12.5,
+        0,
+        12.5
+      ],
+      "bounds": [
+        -22.0,
+        3.0,
+        -3.0,
+        22.0
+      ]
+    },
+    {
+      "id": "inn",
+      "center": [
+        12.5,
+        0,
+        12.5
+      ],
+      "bounds": [
+        3.0,
+        3.0,
+        22.0,
+        22.0
+      ]
+    }
+  ],
+  "houses": [
+    {
+      "name": "House_shops_-1_-1",
+      "block": "shops",
+      "front": [
+        -16.85,
+        0,
+        -20.2
+      ],
+      "angle": 3.141592653589793,
+      "width": 6.3,
+      "depth": 5.8,
+      "height": 5.05,
+      "wall": "plaster_ivory"
+    },
+    {
+      "name": "House_shops_-1_1",
+      "block": "shops",
+      "front": [
+        -16.85,
+        0,
+        -4.8
+      ],
+      "angle": 0,
+      "width": 6.3,
+      "depth": 5.8,
+      "height": 5.33,
+      "wall": "plaster_blue"
+    },
+    {
+      "name": "House_shops_1_-1",
+      "block": "shops",
+      "front": [
+        -8.15,
+        0,
+        -20.2
+      ],
+      "angle": 3.141592653589793,
+      "width": 6.3,
+      "depth": 5.8,
+      "height": 5.33,
+      "wall": "plaster_blue"
+    },
+    {
+      "name": "House_shops_1_1",
+      "block": "shops",
+      "front": [
+        -8.15,
+        0,
+        -4.8
+      ],
+      "angle": 0,
+      "width": 6.3,
+      "depth": 5.8,
+      "height": 5.609999999999999,
+      "wall": "plaster_rose"
+    },
+    {
+      "name": "House_homes_-1_-1",
+      "block": "homes",
+      "front": [
+        8.15,
+        0,
+        -20.2
+      ],
+      "angle": 3.141592653589793,
+      "width": 6.3,
+      "depth": 5.8,
+      "height": 5.33,
+      "wall": "plaster_blue"
+    },
+    {
+      "name": "House_homes_-1_1",
+      "block": "homes",
+      "front": [
+        8.15,
+        0,
+        -4.8
+      ],
+      "angle": 0,
+      "width": 6.3,
+      "depth": 5.8,
+      "height": 5.609999999999999,
+      "wall": "plaster_rose"
+    },
+    {
+      "name": "House_homes_1_-1",
+      "block": "homes",
+      "front": [
+        16.85,
+        0,
+        -20.2
+      ],
+      "angle": 3.141592653589793,
+      "width": 6.3,
+      "depth": 5.8,
+      "height": 5.609999999999999,
+      "wall": "plaster_rose"
+    },
+    {
+      "name": "House_homes_1_1",
+      "block": "homes",
+      "front": [
+        16.85,
+        0,
+        -4.8
+      ],
+      "angle": 0,
+      "width": 6.3,
+      "depth": 5.8,
+      "height": 5.05,
+      "wall": "plaster_ivory"
+    },
+    {
+      "name": "House_workshop_-1_-1",
+      "block": "workshop",
+      "front": [
+        -16.85,
+        0,
+        4.8
+      ],
+      "angle": 3.141592653589793,
+      "width": 6.3,
+      "depth": 5.8,
+      "height": 5.609999999999999,
+      "wall": "plaster_rose"
+    },
+    {
+      "name": "House_workshop_-1_1",
+      "block": "workshop",
+      "front": [
+        -16.85,
+        0,
+        20.2
+      ],
+      "angle": 0,
+      "width": 6.3,
+      "depth": 5.8,
+      "height": 5.05,
+      "wall": "plaster_ivory"
+    },
+    {
+      "name": "House_workshop_1_-1",
+      "block": "workshop",
+      "front": [
+        -8.15,
+        0,
+        4.8
+      ],
+      "angle": 3.141592653589793,
+      "width": 6.3,
+      "depth": 5.8,
+      "height": 5.05,
+      "wall": "plaster_ivory"
+    },
+    {
+      "name": "House_workshop_1_1",
+      "block": "workshop",
+      "front": [
+        -8.15,
+        0,
+        20.2
+      ],
+      "angle": 0,
+      "width": 6.3,
+      "depth": 5.8,
+      "height": 5.33,
+      "wall": "plaster_blue"
+    },
+    {
+      "name": "House_inn_-1_-1",
+      "block": "inn",
+      "front": [
+        8.15,
+        0,
+        4.8
+      ],
+      "angle": 3.141592653589793,
+      "width": 6.3,
+      "depth": 5.8,
+      "height": 5.05,
+      "wall": "plaster_ivory"
+    },
+    {
+      "name": "House_inn_-1_1",
+      "block": "inn",
+      "front": [
+        8.15,
+        0,
+        20.2
+      ],
+      "angle": 0,
+      "width": 6.3,
+      "depth": 5.8,
+      "height": 5.33,
+      "wall": "plaster_blue"
+    },
+    {
+      "name": "House_inn_1_-1",
+      "block": "inn",
+      "front": [
+        16.85,
+        0,
+        4.8
+      ],
+      "angle": 3.141592653589793,
+      "width": 6.3,
+      "depth": 5.8,
+      "height": 5.33,
+      "wall": "plaster_blue"
+    },
+    {
+      "name": "House_inn_1_1",
+      "block": "inn",
+      "front": [
+        16.85,
+        0,
+        20.2
+      ],
+      "angle": 0,
+      "width": 6.3,
+      "depth": 5.8,
+      "height": 6.15,
+      "wall": "plaster_rose"
+    }
+  ],
+  "lamps": [
+    {
+      "id": 0,
+      "position": [
+        -2.8699999999999997,
+        3.05,
+        -8.0
+      ],
+      "radius": 0.22,
+      "distance": 12,
+      "intensity": 22
+    },
+    {
+      "id": 1,
+      "position": [
+        2.8699999999999997,
+        3.05,
+        8.0
+      ],
+      "radius": 0.22,
+      "distance": 12,
+      "intensity": 22
+    },
+    {
+      "id": 2,
+      "position": [
+        -8.0,
+        3.05,
+        2.8699999999999997
+      ],
+      "radius": 0.22,
+      "distance": 12,
+      "intensity": 22
+    },
+    {
+      "id": 3,
+      "position": [
+        8.0,
+        3.05,
+        -2.8699999999999997
+      ],
+      "radius": 0.22,
+      "distance": 12,
+      "intensity": 22
+    },
+    {
+      "id": 4,
+      "position": [
+        -22.13,
+        3.05,
+        -12.0
+      ],
+      "radius": 0.22,
+      "distance": 12,
+      "intensity": 22
+    },
+    {
+      "id": 5,
+      "position": [
+        22.13,
+        3.05,
+        12.0
+      ],
+      "radius": 0.22,
+      "distance": 12,
+      "intensity": 22
+    },
+    {
+      "id": 6,
+      "position": [
+        -12.0,
+        3.05,
+        22.13
+      ],
+      "radius": 0.22,
+      "distance": 12,
+      "intensity": 22
+    },
+    {
+      "id": 7,
+      "position": [
+        12.0,
+        3.05,
+        -22.13
+      ],
+      "radius": 0.22,
+      "distance": 12,
+      "intensity": 22
+    },
+    {
+      "id": 8,
+      "position": [
+        -22.13,
+        3.05,
+        14.0
+      ],
+      "radius": 0.22,
+      "distance": 12,
+      "intensity": 22
+    },
+    {
+      "id": 9,
+      "position": [
+        22.13,
+        3.05,
+        -14.0
+      ],
+      "radius": 0.22,
+      "distance": 12,
+      "intensity": 22
+    },
+    {
+      "id": 10,
+      "position": [
+        14.0,
+        3.05,
+        22.13
+      ],
+      "radius": 0.22,
+      "distance": 12,
+      "intensity": 22
+    },
+    {
+      "id": 11,
+      "position": [
+        -14.0,
+        3.05,
+        -22.13
+      ],
+      "radius": 0.22,
+      "distance": 12,
+      "intensity": 22
+    }
+  ],
+  "atlasSize": 4096
+}

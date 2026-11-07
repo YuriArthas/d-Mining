@@ -1,0 +1,34 @@
+{
+  "model": "gpt-image-2.5-sunburst",
+  "execution": "imagegen skill CLI / edit, --quality high --input-fidelity high --size 1536x1024 --no-augment",
+  "input": {
+    "file": "scene-spawn.png",
+    "what": "public build, world 1 spawn, default camera, fresh save with the tips skipped (no old arrow), UI hidden",
+    "sha256": "bc790be16418cb12f8d8549944d52e1f148d27370095c0268a53c39fd3e10efb"
+  },
+  "prompt_set": "prompts.jsonl",
+  "purpose": "first-dig guide direction, chosen by the user (C); not a game asset",
+  "candidates": [
+    {
+      "id": "A",
+      "file": "a-white-cyan.png",
+      "sha256": "a8591d02b3ce8a9f65a618b9f0da4236e0bfdb209ed819bbbb5bbfd3cd1c9b2e"
+    },
+    {
+      "id": "B",
+      "file": "b-cyan-beam.png",
+      "sha256": "71780bb57282bd7b6b3de53af09c0c7e27ff0f0af47fbca5cc3be4795c2e5a1c"
+    },
+    {
+      "id": "C",
+      "file": "c-white-chevrons.png",
+      "sha256": "ab4839458c43b92af081fa8d8588f81418f0b8b810d2b3b2e6a670487dd611e7"
+    },
+    {
+      "id": "D",
+      "file": "d-pink-violet.png",
+      "sha256": "008a74ec1c7730999405e350d1c301a3514f84ebce9258f06176f4a4d7c31e41"
+    }
+  ],
+  "chosen": "C"
+}

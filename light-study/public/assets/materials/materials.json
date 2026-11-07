@@ -1,0 +1,565 @@
+{
+  "version": 2,
+  "generator": "tools/build-materials.py",
+  "generatorSha256": "0a5585b0b57a19fc314edb944a339741100c3d8416c78e1156d2d1c9d763b07f",
+  "authoring": "Original deterministic procedural PBR textures; no external/generated model service",
+  "uvConvention": "one mesh UV unit equals one metre; repeat=1/tileMetres",
+  "filtering": "linear magnification, trilinear mipmaps, anisotropy 4",
+  "albedoColorSpace": "sRGB",
+  "normalRoughnessColorSpace": "linear data / NoColorSpace",
+  "materials": {
+    "limestone": {
+      "name": "limestone",
+      "finish": "warm honed stone; soft tool and grain relief; occasional shallow pores",
+      "tileMetres": 1.5,
+      "baseColor": "#d8ccae",
+      "roughness": 0.73647,
+      "metalness": 0,
+      "normalConvention": "+Y tangent space (Three.js), RGB linear data",
+      "heightRangeMetres": [
+        -0.0027864,
+        0.0027916
+      ],
+      "heightRmsMetres": 0.000881,
+      "normalSlopeP95": 0.07461,
+      "roughnessRange": [
+        0.6873,
+        0.79946
+      ],
+      "maps": {
+        "albedo": {
+          "file": "limestone-albedo.png",
+          "sha256": "bec2aba8c94f93d94854b1f3c6b32b06e599ed650eed65f8c31fea89348d5d51",
+          "width": 512,
+          "height": 512,
+          "bytes": 64989,
+          "channels": 3
+        },
+        "normal": {
+          "file": "limestone-normal.png",
+          "sha256": "25f222f56b02f7161debfc94284d95ed3a5aaa4efbaf80bdfdc990f35f2d88a9",
+          "width": 512,
+          "height": 512,
+          "bytes": 153071,
+          "channels": 3
+        },
+        "roughness": {
+          "file": "limestone-roughness.png",
+          "sha256": "434e989374f98094d0a751e66270e75f3a1d5bd1aeabfd93be9f2fb1b7b9412e",
+          "width": 512,
+          "height": 512,
+          "bytes": 46029,
+          "channels": 1
+        }
+      }
+    },
+    "sandstone": {
+      "name": "sandstone",
+      "finish": "warm honed stone; soft tool and grain relief; occasional shallow pores",
+      "tileMetres": 1.5,
+      "baseColor": "#c5a274",
+      "roughness": 0.83082,
+      "metalness": 0,
+      "normalConvention": "+Y tangent space (Three.js), RGB linear data",
+      "heightRangeMetres": [
+        -0.0028569,
+        0.0027589
+      ],
+      "heightRmsMetres": 0.0008467,
+      "normalSlopeP95": 0.07531,
+      "roughnessRange": [
+        0.77727,
+        0.88155
+      ],
+      "maps": {
+        "albedo": {
+          "file": "sandstone-albedo.png",
+          "sha256": "9e050ca6e4dd6b8d7cd64c9b8c9b18e44ef867b9f9af612e6bfe62f553a9c05b",
+          "width": 512,
+          "height": 512,
+          "bytes": 55971,
+          "channels": 3
+        },
+        "normal": {
+          "file": "sandstone-normal.png",
+          "sha256": "b21f583815c4bccde185314ced1faca9b5c7a399d3fadc1d24ce4be053a3ca24",
+          "width": 512,
+          "height": 512,
+          "bytes": 153240,
+          "channels": 3
+        },
+        "roughness": {
+          "file": "sandstone-roughness.png",
+          "sha256": "3025d1e3dc50b8a0b8c08413dd4bd88fa0ff530d3abf2a6a931f3ebd1b1dbe9b",
+          "width": 512,
+          "height": 512,
+          "bytes": 46077,
+          "channels": 1
+        }
+      }
+    },
+    "plaster_blue": {
+      "name": "plaster_blue",
+      "finish": "soft trowelled mineral plaster; shallow pores; broad quiet pigment",
+      "tileMetres": 2,
+      "baseColor": "#5c9cb7",
+      "roughness": 0.86942,
+      "metalness": 0,
+      "normalConvention": "+Y tangent space (Three.js), RGB linear data",
+      "heightRangeMetres": [
+        -0.0034334,
+        0.003566
+      ],
+      "heightRmsMetres": 0.0012334,
+      "normalSlopeP95": 0.05437,
+      "roughnessRange": [
+        0.83341,
+        0.91055
+      ],
+      "maps": {
+        "albedo": {
+          "file": "plaster_blue-albedo.png",
+          "sha256": "bc42229a3c7c5a9bf4dd5ef23f38987ea033786d3e0c431e4afe1febb9aab7f0",
+          "width": 512,
+          "height": 512,
+          "bytes": 44555,
+          "channels": 3
+        },
+        "normal": {
+          "file": "plaster_blue-normal.png",
+          "sha256": "11ef2940c78b8af5580573ed0a385429ec69390228900b36a2bd218011b8ca80",
+          "width": 512,
+          "height": 512,
+          "bytes": 130919,
+          "channels": 3
+        },
+        "roughness": {
+          "file": "plaster_blue-roughness.png",
+          "sha256": "b56e0448acd5b57ae8eccecf685afd44edcb7ae67bd8c14975c079285e0a1bff",
+          "width": 512,
+          "height": 512,
+          "bytes": 38948,
+          "channels": 1
+        }
+      }
+    },
+    "plaster_ivory": {
+      "name": "plaster_ivory",
+      "finish": "soft trowelled mineral plaster; shallow pores; broad quiet pigment",
+      "tileMetres": 2,
+      "baseColor": "#e0cda5",
+      "roughness": 0.87848,
+      "metalness": 0,
+      "normalConvention": "+Y tangent space (Three.js), RGB linear data",
+      "heightRangeMetres": [
+        -0.0036612,
+        0.0040696
+      ],
+      "heightRmsMetres": 0.0012094,
+      "normalSlopeP95": 0.05362,
+      "roughnessRange": [
+        0.84158,
+        0.92707
+      ],
+      "maps": {
+        "albedo": {
+          "file": "plaster_ivory-albedo.png",
+          "sha256": "8061cdf27f37f525c1b523fe028ad6fc30c5e4a7527316b56834e1306c4126a3",
+          "width": 512,
+          "height": 512,
+          "bytes": 48926,
+          "channels": 3
+        },
+        "normal": {
+          "file": "plaster_ivory-normal.png",
+          "sha256": "d2a53d1882c0118ad8ca99e83b034bf9617aa72685a6b9f75612107ec765d3b1",
+          "width": 512,
+          "height": 512,
+          "bytes": 129811,
+          "channels": 3
+        },
+        "roughness": {
+          "file": "plaster_ivory-roughness.png",
+          "sha256": "2a1280a6d0af07e415793086cb13cf660a7eb1cc6cf61c36d9180cc9e0621556",
+          "width": 512,
+          "height": 512,
+          "bytes": 38641,
+          "channels": 1
+        }
+      }
+    },
+    "wood": {
+      "name": "wood",
+      "finish": "warm oiled broad wood grain",
+      "tileMetres": 1,
+      "baseColor": "#a47040",
+      "roughness": 0.58972,
+      "metalness": 0,
+      "normalConvention": "+Y tangent space (Three.js), RGB linear data",
+      "heightRangeMetres": [
+        -0.0005724,
+        0.0005739
+      ],
+      "heightRmsMetres": 0.0002121,
+      "normalSlopeP95": 0.06381,
+      "roughnessRange": [
+        0.54322,
+        0.63647
+      ],
+      "maps": {
+        "albedo": {
+          "file": "wood-albedo.png",
+          "sha256": "0e8a78bc52a48a35cda576fd71bfda0627651b05fb219e8acc6f5f1e7df14867",
+          "width": 256,
+          "height": 256,
+          "bytes": 11019,
+          "channels": 3
+        },
+        "normal": {
+          "file": "wood-normal.png",
+          "sha256": "00c308adecea203c73c75a84b36bb20bd2758d782686235d31e392171f512d67",
+          "width": 256,
+          "height": 256,
+          "bytes": 18495,
+          "channels": 3
+        },
+        "roughness": {
+          "file": "wood-roughness.png",
+          "sha256": "0d7a70f1095cb3286391a475614524214be278046be417e5fd4aa11dc681bfb3",
+          "width": 256,
+          "height": 256,
+          "bytes": 8015,
+          "channels": 1
+        }
+      }
+    },
+    "painted_wood": {
+      "name": "painted_wood",
+      "finish": "opaque teal painted broad wood grain",
+      "tileMetres": 1,
+      "baseColor": "#377b7b",
+      "roughness": 0.52972,
+      "metalness": 0,
+      "normalConvention": "+Y tangent space (Three.js), RGB linear data",
+      "heightRangeMetres": [
+        -0.0003868,
+        0.0003864
+      ],
+      "heightRmsMetres": 0.0001645,
+      "normalSlopeP95": 0.03679,
+      "roughnessRange": [
+        0.50046,
+        0.55981
+      ],
+      "maps": {
+        "albedo": {
+          "file": "painted_wood-albedo.png",
+          "sha256": "aeb23193dbfd64c1e3160b9284095eab3575d0845fd2201fec826287ef1eef3b",
+          "width": 256,
+          "height": 256,
+          "bytes": 10740,
+          "channels": 3
+        },
+        "normal": {
+          "file": "painted_wood-normal.png",
+          "sha256": "4e75ed37ac05cbb19a8a31bae25fdcac500ce99e1d03810e2ebd271e32a6909b",
+          "width": 256,
+          "height": 256,
+          "bytes": 22398,
+          "channels": 3
+        },
+        "roughness": {
+          "file": "painted_wood-roughness.png",
+          "sha256": "0a4202bbe8c223992a24c48154c5fcc666c222940d371cf487a929256bffd3ff",
+          "width": 256,
+          "height": 256,
+          "bytes": 10065,
+          "channels": 1
+        }
+      }
+    },
+    "terracotta": {
+      "name": "terracotta",
+      "finish": "unglazed warm terracotta with soft mineral relief",
+      "tileMetres": 1,
+      "baseColor": "#b66e50",
+      "roughness": 0.85977,
+      "metalness": 0,
+      "normalConvention": "+Y tangent space (Three.js), RGB linear data",
+      "heightRangeMetres": [
+        -0.0007923,
+        0.0007023
+      ],
+      "heightRmsMetres": 0.0002485,
+      "normalSlopeP95": 0.02153,
+      "roughnessRange": [
+        0.82793,
+        0.89229
+      ],
+      "maps": {
+        "albedo": {
+          "file": "terracotta-albedo.png",
+          "sha256": "c0d0884ad444651b6cfbb749838f03ef00de96bc11d2a9d94f84f2e49110ee31",
+          "width": 256,
+          "height": 256,
+          "bytes": 8502,
+          "channels": 3
+        },
+        "normal": {
+          "file": "terracotta-normal.png",
+          "sha256": "65275664d74231e6f2bf66824353017a613a3775c379b8f7206afebf6f75cfd3",
+          "width": 256,
+          "height": 256,
+          "bytes": 24310,
+          "channels": 3
+        },
+        "roughness": {
+          "file": "terracotta-roughness.png",
+          "sha256": "32d65c2b5f372f0f0c32a5ac2039270ac16e5dcef6b1643fed58fa40f115cf8d",
+          "width": 256,
+          "height": 256,
+          "bytes": 12881,
+          "channels": 1
+        }
+      }
+    },
+    "iron": {
+      "name": "iron",
+      "baseColor": "#303b43",
+      "roughness": 0.47,
+      "metalness": 0.72
+    },
+    "brass": {
+      "name": "brass",
+      "baseColor": "#bd8f43",
+      "roughness": 0.37,
+      "metalness": 0.85
+    },
+    "lampglass": {
+      "name": "lampglass",
+      "baseColor": "#ffe5ac",
+      "roughness": 0.28,
+      "metalness": 0,
+      "emissive": "#ffbf65",
+      "emissiveIntensity": 0.48
+    },
+    "soil": {
+      "name": "soil",
+      "baseColor": "#514136",
+      "roughness": 1,
+      "metalness": 0
+    },
+    "leaf": {
+      "name": "leaf",
+      "baseColor": "#567a3c",
+      "roughness": 0.93,
+      "metalness": 0
+    }
+  },
+  "variants": {
+    "crafted": {
+      "materials": {
+        "limestone": {
+          "name": "limestone",
+          "finish": "warm neutral stone; broad honed patches; medium tool pits and quiet grain",
+          "tileMetres": 1.5,
+          "baseColor": "#ccc0a5",
+          "roughness": 0.54499,
+          "metalness": 0,
+          "normalConvention": "+Y tangent space (Three.js), RGB linear data",
+          "heightRangeMetres": [
+            -0.0038666,
+            0.0020471
+          ],
+          "heightRmsMetres": 0.0011196,
+          "normalSlopeP95": 0.07417,
+          "roughnessRange": [
+            0.422,
+            0.6825
+          ],
+          "maps": {
+            "albedo": {
+              "file": "crafted-limestone-albedo.png",
+              "sha256": "376fb98b2b0756759a314f762dcfb7352c5d557987a30e63d843e9c8cae114ce",
+              "width": 512,
+              "height": 512,
+              "bytes": 48257,
+              "channels": 3
+            },
+            "normal": {
+              "file": "crafted-limestone-normal.png",
+              "sha256": "c394c82f8ec83aa623f46a84e6a6c5cfcfd6e17438bdf1de35970a6f589f4819",
+              "width": 512,
+              "height": 512,
+              "bytes": 95169,
+              "channels": 3
+            },
+            "roughness": {
+              "file": "crafted-limestone-roughness.png",
+              "sha256": "6fdcdd1696b1120693f9b386870a331a75af6c93cb70d355aee8dd16ccd33819",
+              "width": 512,
+              "height": 512,
+              "bytes": 29997,
+              "channels": 1
+            }
+          }
+        },
+        "sandstone": {
+          "name": "sandstone",
+          "finish": "warm neutral stone; broad honed patches; medium tool pits and quiet grain",
+          "tileMetres": 1.5,
+          "baseColor": "#b89b76",
+          "roughness": 0.60899,
+          "metalness": 0,
+          "normalConvention": "+Y tangent space (Three.js), RGB linear data",
+          "heightRangeMetres": [
+            -0.0042181,
+            0.0021285
+          ],
+          "heightRmsMetres": 0.001172,
+          "normalSlopeP95": 0.08142,
+          "roughnessRange": [
+            0.49734,
+            0.76157
+          ],
+          "maps": {
+            "albedo": {
+              "file": "crafted-sandstone-albedo.png",
+              "sha256": "a0bd90c321db9e7b8f7c839ac0d2f58fd022773e46a1c85bf5b46597f29a72d4",
+              "width": 512,
+              "height": 512,
+              "bytes": 42411,
+              "channels": 3
+            },
+            "normal": {
+              "file": "crafted-sandstone-normal.png",
+              "sha256": "76dd3a7a5e2f507174c83fb86bea5ba5bb8ab0c6ca5d46bdccf3b6977171ef41",
+              "width": 512,
+              "height": 512,
+              "bytes": 99615,
+              "channels": 3
+            },
+            "roughness": {
+              "file": "crafted-sandstone-roughness.png",
+              "sha256": "3939e4cb13581fb3d57ec27e2b02c99866f064c6577ca841b898cc6653fa9775",
+              "width": 512,
+              "height": 512,
+              "bytes": 29594,
+              "channels": 1
+            }
+          }
+        },
+        "plaster_blue": {
+          "name": "plaster_blue",
+          "finish": "quiet mineral plaster; broad softly overlapping coats; shallow trowel relief; no isolated chalk islands",
+          "tileMetres": 2.0,
+          "baseColor": "#658ba2",
+          "roughness": 0.81101,
+          "metalness": 0,
+          "normalConvention": "+Y tangent space (Three.js), RGB linear data",
+          "heightRangeMetres": [
+            -0.004053,
+            0.0141555
+          ],
+          "heightRmsMetres": 0.0059552,
+          "normalSlopeP95": 0.23272,
+          "roughnessRange": [
+            0.76891,
+            0.8534
+          ],
+          "maps": {
+            "albedo": {
+              "file": "crafted-plaster_blue-albedo.png",
+              "sha256": "a400ddd91a69ee97fd7f5742f4f57aa6c5c83771b937ee08957324c7a02e500b",
+              "width": 512,
+              "height": 512,
+              "bytes": 33396,
+              "channels": 3
+            },
+            "normal": {
+              "file": "crafted-plaster_blue-normal.png",
+              "sha256": "ad779f7863944d71793e53747d19d51a44483cc4e28fdafcdce49cc717043725",
+              "width": 512,
+              "height": 512,
+              "bytes": 156802,
+              "channels": 3
+            },
+            "roughness": {
+              "file": "crafted-plaster_blue-roughness.png",
+              "sha256": "95dc3d02ac227afe22d996b0c0bd1e56991f59e883fe3b419ebe33f50ceeb528",
+              "width": 512,
+              "height": 512,
+              "bytes": 38342,
+              "channels": 1
+            }
+          }
+        },
+        "plaster_ivory": {
+          "name": "plaster_ivory",
+          "finish": "quiet mineral plaster; broad softly overlapping coats; shallow trowel relief; no isolated chalk islands",
+          "tileMetres": 2.0,
+          "baseColor": "#d5c6a8",
+          "roughness": 0.81618,
+          "metalness": 0,
+          "normalConvention": "+Y tangent space (Three.js), RGB linear data",
+          "heightRangeMetres": [
+            -0.0033961,
+            0.0137393
+          ],
+          "heightRmsMetres": 0.0063655,
+          "normalSlopeP95": 0.22867,
+          "roughnessRange": [
+            0.76974,
+            0.85357
+          ],
+          "maps": {
+            "albedo": {
+              "file": "crafted-plaster_ivory-albedo.png",
+              "sha256": "a6f6ff3cf2ae4f9d79bd4ce8578106a48108b6276aca2186e46afc8467d520c7",
+              "width": 512,
+              "height": 512,
+              "bytes": 39029,
+              "channels": 3
+            },
+            "normal": {
+              "file": "crafted-plaster_ivory-normal.png",
+              "sha256": "e4b01c9cf817252e640fbd1b41a3e70e7c47200a1a35e6efac0b52abf1ed83e7",
+              "width": 512,
+              "height": 512,
+              "bytes": 154981,
+              "channels": 3
+            },
+            "roughness": {
+              "file": "crafted-plaster_ivory-roughness.png",
+              "sha256": "18fb0c4470251fd58ad20328ac63ec46d803a5ea83134d5fcd0ea856616c5ae1",
+              "width": 512,
+              "height": 512,
+              "bytes": 37531,
+              "channels": 1
+            }
+          }
+        }
+      }
+    }
+  },
+  "variantBudgets": {
+    "baseline": {
+      "textureCount": 21,
+      "downloadBytes": 1077602,
+      "baseLevelDecodedRGBABytes": 14942208,
+      "estimatedRGBAWithMipBytes": 19922937
+    },
+    "crafted": {
+      "textureCount": 21,
+      "downloadBytes": 931549,
+      "baseLevelDecodedRGBABytes": 14942208,
+      "estimatedRGBAWithMipBytes": 19922937
+    }
+  },
+  "budget": {
+    "textureCount": 33,
+    "downloadBytes": 1882726,
+    "baseLevelDecodedRGBABytes": 27525120,
+    "estimatedRGBAWithMipBytes": 36700149
+  }
+}

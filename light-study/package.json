@@ -1,0 +1,23 @@
+{
+  "name": "mining-light-study",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit && node tools/pack-district.mjs && node tools/prepare-transfer.mjs && python3 tools/pack-street.py && vite build && node tools/asset-manifest.mjs && node tools/release-budget.mjs",
+    "publish": "npm run build && node tools/publish.mjs",
+    "publish:first": "npm run build && node tools/publish.mjs --launcher"
+  },
+  "dependencies": {
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "@gltf-transform/core": "4.5.1",
+    "@gltf-transform/extensions": "4.5.1",
+    "@gltf-transform/functions": "4.5.1",
+    "@types/three": "0.186.0",
+    "meshoptimizer": "1.0.1",
+    "typescript": "7.0.2",
+    "vite": "8.3.2"
+  }
+}
